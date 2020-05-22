@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_Z1CmII3kEeq7suCev8DfDQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_x62IgI3kEeq7suCev8DfDQ" featurename="commands" parentElementId="xpath:/">
+    <elements xsi:type="commands:Command" xmi:id="_1Ba34I3kEeq7suCev8DfDQ" elementId="aero.minova.rcp.tasks.ui.contribute.command.open" commandName="Open Map"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_EGJbUI3lEeq7suCev8DfDQ" featurename="handlers" parentElementId="xpath:/">
+    <elements xsi:type="commands:Handler" xmi:id="_LZXKQI3lEeq7suCev8DfDQ" elementId="aero.minova.rcp.tasks.ui.contribute.handler.openmap" contributionURI="bundleclass://aero.minova.rcp.tasks.ui.contribute/aero.minova.rcp.tasks.ui.contribute.handlers.OpenMapHandler" command="_1Ba34I3kEeq7suCev8DfDQ"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Qlw9sI3lEeq7suCev8DfDQ" featurename="menuContributions" parentElementId="xpath:/">
+    <elements xsi:type="menu:MenuContribution" xmi:id="_UvH_wI3lEeq7suCev8DfDQ" elementId="aero.minova.rcp.tasks.ui.contribute.menucontribution." parentId="org.eclipse.ui.main.menu">
+      <children xsi:type="menu:Menu" xmi:id="_jFoLQI3lEeq7suCev8DfDQ" elementId="aero.minova.rcp.tasks.ui.contribute.menu.map" label="Map">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_sSxQQI3lEeq7suCev8DfDQ" elementId="aero.minova.rcp.tasks.ui.contribute.handledmenuitem.openmap" label="Open Map" command="_1Ba34I3kEeq7suCev8DfDQ"/>
+      </children>
+    </elements>
+  </fragments>
+</fragment:ModelFragments>

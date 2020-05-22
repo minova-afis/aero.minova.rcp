@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.e4.ui.css.swt.theme">
+      <theme
+            basestylesheeturi="css/default.css"
+            id="aero.minova.rcp.css.default"
+            label="Default">
+      </theme>
+      <theme
+            basestylesheeturi="css/rainbow.css"
+            id="aero.minova.rcp.css.rainbow"
+            label="Rainbow">
+      </theme>
+   </extension>
+
+</plugin>

@@ -1,0 +1,76 @@
+[
+	{
+		"id": "978-0641723445",
+		"cat": [
+			"book",
+			"hardcover"
+		],
+		"name": "The Lightning Thief",
+		"author": "Rick Riordan",
+		"genre": "fantasy",
+		"inStock": true,
+		"price": 12.50,
+		"seiten": 384,
+		"release": "2012-04-23T18:25:43.511Z"
+	},
+	{
+		"id": "978-1423103349",
+		"cat": [
+			"book",
+			"paperback"
+		],
+		"name": "The Sea of Monsters",
+		"author": "Rick Riordan",
+		"genre": "fantasy",
+		"inStock": true,
+		"price": 6.49,
+		"seiten": 304,
+		"release": "2012-04-23T18:25:43.511Z"
+		
+	},
+	{
+		"id": "978-1857995879",
+		"cat": [
+			"book",
+			"paperback"
+		],
+		"name": "Sophie's World : The Greek Philosophers",
+		"author": "Jostein Gaarder",
+		"genre": "fantasy",
+		"inStock": true,
+		"price": 3.07,
+		"seiten": 64,
+		"release": "2012-04-23T18:25:43.511Z"
+		
+	},
+	{
+		"id": "978-1933988177",
+		"cat": [
+			"book",
+			"paperback"
+		],
+		"name": "Lucene in Action, Second Edition",
+		"author": "Michael McCandless",
+		"genre": "IT",
+		"inStock": true,
+		"price": 30.50,
+		"seiten": 475,
+		"release": "2012-04-23T18:25:43.511Z"
+		
+	},
+	{
+		"id": "978-3-423-34926-0",
+		"cat": [
+			"book",
+			"paperback"
+		],
+		"name": "Das Leben gestalten mit den Big Five for Live",
+		"author": "John Strelecky",
+		"genre": "IT",
+		"inStock": true,
+		"price": 9.9,
+		"seiten": 291,
+		"release": "2012-04-23T18:25:43.511Z"
+		
+	}
+]

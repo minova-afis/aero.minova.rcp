@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="500" height="400">
+    <children xsi:type="basic:PartSashContainer" xmi:id="_6wlLksgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.partsashcontainer.sample" horizontal="true">
+      <children xsi:type="basic:PartStack" xmi:id="_6wlLk8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.partstack.sample">
+        <children xsi:type="basic:Part" xmi:id="_6wlLlMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.part.sample" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.SamplePart" label="Sample Part" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/home.png"/>
+        <children xsi:type="basic:Part" xmi:id="_4gLxID89Eeq2X4uuTUkVkA" elementId="aero.minova.rcp.rcp.part.json-part" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.GsonPart" label="JSON-Part"/>
+        <children xsi:type="basic:Part" xmi:id="_JImO0ISgEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.part.overview" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.tasks.ui.parts.TodoOverviewPart" label="Overview">
+          <menus xsi:type="menu:PopupMenu" xmi:id="_bzdE0IoZEeqTPvlHiGbElQ" elementId="aero.minova.rcp.rcp.popupmenu.table" label="Table menu">
+            <children xsi:type="menu:HandledMenuItem" xmi:id="_lhTqMIoZEeqTPvlHiGbElQ" elementId="aero.minova.rcp.rcp.handledmenuitem.remove" label="Remove" command="_PHP1cI3eEeq7suCev8DfDQ"/>
+          </menus>
+        </children>
+        <children xsi:type="basic:Part" xmi:id="_IQ1KcJXlEeq2EMKXEfw2MA" elementId="aero.minova.rcp.rcp.part.nattablejson" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableGsonPart" label="NatTable Json"/>
+      </children>
+      <children xsi:type="basic:PartSashContainer" xmi:id="_JbyC0ISbEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.partsashcontainer.0">
+        <children xsi:type="basic:PartStack" xmi:id="_KNpkoISbEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.partstack.0">
+          <children xsi:type="basic:Part" xmi:id="_ipkE8I-TEeqgZrLPeD685g" elementId="aero.minova.rcp.rcp.part.nattableDataExample" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableDataExample" label="NatTable Data Example"/>
+          <children xsi:type="basic:Part" xmi:id="_bXGccJEeEeqZOe0eOktDvQ" elementId="aero.minova.rcp.rcp.part.nattablelayerstackexample" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableLayerStackExamplePart" label="NatTable LayerStack Example"/>
+          <children xsi:type="basic:Part" xmi:id="_n9gosJExEeqZOe0eOktDvQ" elementId="aero.minova.rcp.rcp.part.nattablecompositionexample" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableCompositionExamplePart" label="NatTable Composition Example"/>
+          <children xsi:type="basic:Part" xmi:id="_348SoJNKEeq5Ua0rVgEIkA" elementId="aero.minova.rcp.rcp.part.nattablegridexample" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableGridExamplePart" label="NatTable GridExample"/>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_KykPkISbEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.partstack.1">
+          <children xsi:type="basic:Part" xmi:id="_R0MtAISgEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.part.Playground" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.tasks.ui.parts.PlaygroundPart" label="Playground"/>
+          <children xsi:type="basic:Part" xmi:id="_PaTdcISgEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.tasks.ui.parts.TodoDetailsPart" label="Details"/>
+          <children xsi:type="basic:Part" xmi:id="_yfZ-8JW3Eeq9sepnld6Kfg" elementId="aero.minova.rcp.rcp.part.simpleedit" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.SimpleEditor" label="Simple Edit"/>
+          <children xsi:type="basic:Part" xmi:id="_zOlYIJXCEeq-meIwiwg5nA" elementId="aero.minova.rcp.rcp.part.advanceedit" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.AdvanceEditor" label="Advance Edit"/>
+        </children>
+      </children>
+    </children>
+    <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
+      <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="file" label="File">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLi8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.file.open" label="Open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.save" label="Save" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/save_edit.png" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_CB_QQJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handledmenuitem.theme" label="Theme" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/theme.png" command="_G3ZgAJQ9EeqGueGN8sfnvg"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_y1koEJRKEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handledmenuitem.entercredentials" label="EnterCredentials" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/login.png" command="_1a0BcJRJEeqGueGN8sfnvg"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
+      </children>
+      <children xsi:type="menu:Menu" xmi:id="_6wlLjsgZEeSyMNYR5xypkQ" elementId="help" label="Help">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLj8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+      </children>
+    </mainMenu>
+    <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top">
+      <children xsi:type="menu:ToolBar" xmi:id="_6wlLlsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.toolbar">
+        <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLmMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.save" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/save_edit.png" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLl8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="__8AHMJUYEeqmGZPB7cWGQw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_Leg0MI3eEeq7suCev8DfDQ"/>
+      </children>
+    </trimBars>
+  </children>
+  <handlers xmi:id="_6wlLfcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
+  <handlers xmi:id="_6wlLgcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.openCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OpenHandler" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
+  <handlers xmi:id="_6wlLhMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.saveCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveHandler" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
+  <handlers xmi:id="_6wlLh8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.aboutCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AboutHandler" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+  <handlers xmi:id="_RbM1EI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.handler.new" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewTodoHandler" command="_Leg0MI3eEeq7suCev8DfDQ"/>
+  <handlers xmi:id="_TeaqAI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.handler.remove" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RemoveTodoHandler" command="_PHP1cI3eEeq7suCev8DfDQ"/>
+  <handlers xmi:id="_J_J7IJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.theme" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ThemeSwitchHandler" command="_G3ZgAJQ9EeqGueGN8sfnvg"/>
+  <handlers xmi:id="_0R9jAJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.EnterCredentialHandler" command="_1a0BcJRJEeqGueGN8sfnvg"/>
+  <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
+    <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
+    <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
+    <bindings xmi:id="_6wlLhcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1s" keySequence="M1+S" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
+    <bindings xmi:id="_6wlLiMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1a" keySequence="M1+A" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+  </bindingTables>
+  <rootContext xmi:id="_6wlLecgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
+    <children xmi:id="_6wlLesgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
+    <children xmi:id="_6wlLe8gZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
+  </rootContext>
+  <commands xmi:id="_6wlLfMgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.exit" commandName="exitCommand"/>
+  <commands xmi:id="_6wlLgMgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.open" commandName="openCommand"/>
+  <commands xmi:id="_6wlLg8gZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.save" commandName="saveCommand"/>
+  <commands xmi:id="_6wlLhsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
+  <commands xmi:id="_Leg0MI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.command.new" commandName="newCommand"/>
+  <commands xmi:id="_PHP1cI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.command.remove" commandName="removeCommand"/>
+  <commands xmi:id="_G3ZgAJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.command.themecommand" commandName="themeCommand"/>
+  <commands xmi:id="_1a0BcJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.command.entercredentials" commandName="EnterCredentials"/>
+  <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
+  <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
+  <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
+  <addons xmi:id="_6wlLdcgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.commands.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.CommandProcessingAddon"/>
+  <addons xmi:id="_6wlLdsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
+  <addons xmi:id="_6wlLd8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
+  <addons xmi:id="_6wlLeMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
+</application:Application>

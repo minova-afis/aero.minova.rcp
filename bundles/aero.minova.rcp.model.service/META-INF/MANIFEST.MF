@@ -1,0 +1,18 @@
+Service-Component: OSGI-INF/aero.minova.rcp.model.service.TodoServiceImpl.xml,
+ OSGI-INF/aero.minova.rcp.model.service.PersonServiceImpl.xml
+Bundle-ActivationPolicy: lazy
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Service
+Bundle-SymbolicName: aero.minova.rcp.model.service
+Bundle-Version: 1.5.1.qualifier
+Automatic-Module-Name: aero.minova.rcp.test
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: aero.minova.rcp.model;bundle-version="1.3.2",
+ org.eclipse.osgi.services;bundle-version="3.8.0"
+Export-Package: aero.minova.rcp.model.service
+Service-Component: OSGI-INF/aero.minova.rcp.model.service.TodoServiceImpl.xml,
+ OSGI-INF/aero.minova.rcp.model.service.PersonServiceImpl.xml
+Bundle-ActivationPolicy: lazy
+ 
+
