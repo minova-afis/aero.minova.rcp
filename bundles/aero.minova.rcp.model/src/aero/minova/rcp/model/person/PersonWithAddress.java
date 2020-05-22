@@ -2,8 +2,6 @@ package aero.minova.rcp.model.person;
 
 import java.util.Date;
 
-import aero.minova.rcp.model.person.Person.Gender;
-
 public class PersonWithAddress extends Person {
 
 	private Address address;
