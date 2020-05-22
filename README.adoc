@@ -35,17 +35,17 @@ $ cd releng/target-definition <1>
 $ mvn release:prepare <2>
 [INFO] Scanning for projects...
 [INFO] 
-[INFO] ------------------< name.saak.tycho:eclipse-2019-03 >-------------------
+[INFO] ------------------< aero.minova.rcp:eclipse-2019-03 >-------------------
 [INFO] Building eclipse-2019-03 1.0.2-SNAPSHOT
 [INFO] ---------------------[ eclipse-target-definition ]----------------------
 [INFO] 
 ...
-[INFO] Working directory: /Users/saak/git/2020tycho/releng/target-definition
+[INFO] Working directory: /Users/saak/git/aero.minova.rcp/releng/target-definition
 [WARNING] Ignoring unrecognized line: ?? releng/target-definition/release.properties
 [INFO] Checking dependencies and plugins for snapshots ...
-What is the release version for "eclipse-2019-03"? (name.saak.tycho:eclipse-2019-03) 1.0.2: : 1.1.0 <3>
-What is SCM release tag or label for "eclipse-2019-03"? (name.saak.tycho:eclipse-2019-03) eclipse-2019-03-1.1.0: : <4>
-What is the new development version for "eclipse-2019-03"? (name.saak.tycho:eclipse-2019-03) 1.1.1-SNAPSHOT: : <5>
+What is the release version for "eclipse-2019-03"? (aero.minova.rcp:eclipse-2019-03) 1.0.2: : 1.1.0 <3>
+What is SCM release tag or label for "eclipse-2019-03"? (aero.minova.rcp:eclipse-2019-03) eclipse-2019-03-1.1.0: : <4>
+What is the new development version for "eclipse-2019-03"? (aero.minova.rcp:eclipse-2019-03) 1.1.1-SNAPSHOT: : <5>
 [INFO] Transforming 'eclipse-2019-03'...
 ...
 [INFO] BUILD SUCCESS
@@ -57,7 +57,7 @@ What is the new development version for "eclipse-2019-03"? (name.saak.tycho:ecli
 $ mvn release:perform <6>
 [INFO] Scanning for projects...
 [INFO] 
-[INFO] ------------------< name.saak.tycho:eclipse-2019-03 >-------------------
+[INFO] ------------------< aero.minova.rcp:eclipse-2019-03 >-------------------
 [INFO] Building eclipse-2019-03 1.1.1-SNAPSHOT
 [INFO] ---------------------[ eclipse-target-definition ]----------------------
 [INFO] 
@@ -106,11 +106,11 @@ Dazu ist die Verbindung zum Nexus erforderlich.
 ==== Konfiguration
 
 Als nächsten kann man die Konfiguration für alle Eclipse Plugins / Module releasen.
-Sie befindet sich im Ordner `releng/name.saak.tycho.configuration`.
+Sie befindet sich im Ordner `releng/aero.minova.rcp.configuration`.
 
 Sie enthält den Verweis auf die Target Platform.
 
-include::releng/name.saak.tycho.configuration/pom.xml[tags=target-definition]
+include::releng/aero.minova.rcp.configuration/pom.xml[tags=target-definition]
 
 Deshalb muss die Version immer neu gesetzt werden, sobald die Target Plattform verändert wird.
 Danach muss man auch die Konfiguration neu releasen.
@@ -139,22 +139,22 @@ eclipse-2019-03-1.0.0
 eclipse-2019-03-1.0.1
 eclipse-2019-03-1.1.0
 eclipse-2019-03-1.2.0
-name.saak.tycho.configuration-1.0.0
-name.saak.tycho.configuration-1.0.1
-name.saak.tycho.configuration-1.0.2
-name.saak.tycho.configuration-1.0.3
-name.saak.tycho.configuration-1.0.4
-name.saak.tycho.configuration-1.1.0
-name.saak.tycho.configuration-1.2.0
-name.saak.tycho.root-1.0.1
-name.saak.tycho.root-1.0.2
-name.saak.tycho.root-1.0.3
-name.saak.tycho.root-1.1.0
-name.saak.tycho.root-1.2.0
+aero.minova.rcp.configuration-1.0.0
+aero.minova.rcp.configuration-1.0.1
+aero.minova.rcp.configuration-1.0.2
+aero.minova.rcp.configuration-1.0.3
+aero.minova.rcp.configuration-1.0.4
+aero.minova.rcp.configuration-1.1.0
+aero.minova.rcp.configuration-1.2.0
+aero.minova.rcp.root-1.0.1
+aero.minova.rcp.root-1.0.2
+aero.minova.rcp.root-1.0.3
+aero.minova.rcp.root-1.1.0
+aero.minova.rcp.root-1.2.0
 ----
 
 Jedes Release verfügt über ein eigenes Tag.
-Das Root-Projekt hat die Tags, die mit `name.saak.tycho.root-` beginnen.
+Das Root-Projekt hat die Tags, die mit `aero.minova.rcp.root-` beginnen.
 In unserem Fall ist die letzte Version des Products 1.2.0.
 
 Die neue Version enthält eine neue Funktionalität.
@@ -170,7 +170,7 @@ Den Buildprozess in Maven stoßen wir mit mehreren Parametern an, weil wir sonst
 $ mvn release:prepare \
   -DreleaseVersion=1.3.0 \ <1>
   -DdevelopmentVersion=1.3.1-SNAPSHOT \ <2>
-  -Dtag=name.saak.tycho.root-1.3.0 <3>
+  -Dtag=aero.minova.rcp.root-1.3.0 <3>
 ----
 
 <1> Die Version des Releases können wir mit dem Parameter `releaseVersion` festlegen.
@@ -187,12 +187,12 @@ Und dort heißt es dann `.qualifier`.
 
 <3> Für das Release benötigen wir auch einen Tag.
 Beim ersten Mal wurde der Projektname des Root-Projektes genommen, weil wir in dem Verzeichnis den Release-Prozess gestartet haben.
-Wenn man es mal irgendwo konfiguriert, könnte man auch als Tagnamen den Namen des Produktprojektes (`name.saak.tycho.product`) verwenden.
+Wenn man es mal irgendwo konfiguriert, könnte man auch als Tagnamen den Namen des Produktprojektes (`aero.minova.rcp.product`) verwenden.
 
 ===== Build abschließen
 
 Sobald die Vorbereitung erfolgreich war, kann man den Build abschließen.
-Damit wird er dann auch auf unserem link:http://nexus.minova.com:8081/nexus/#view-repositories;releases~browsestorage~name/saak/tycho/name.saak.tycho.product[Nexus] gespeichert.
+Damit wird er dann auch auf unserem link:http://nexus.minova.com:8081/nexus/#view-repositories;releases~browsestorage~name/saak/tycho/aero.minova.rcp.product[Nexus] gespeichert.
 
 .Root-Projekt releasen
 [bash]
