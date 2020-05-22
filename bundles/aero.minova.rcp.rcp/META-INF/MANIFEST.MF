@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
 Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 1.1.0
 Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.core.runtime;bundle-version="0.0.0",
  org.eclipse.swt;bundle-version="0.0.0",
