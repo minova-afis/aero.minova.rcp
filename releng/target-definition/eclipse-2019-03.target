@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?>
+<target name="eclipse-2019-03">
+<locations>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="http://download.eclipse.org/releases/2019-12"/>
+			<unit id="org.eclipse.equinox.sdk.feature.group" version="3.20.0.v20191122-2104"/>
+			<unit id="org.eclipse.sdk.feature.group" version="4.14.0.v20191210-0610"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="http://download.eclipse.org/nattable/releases/1.6.0/repository/"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.core.feature.feature.group" version="1.6.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.core.source.feature.feature.group" version="1.6.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.e4.feature.feature.group" version="1.2.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.e4.source.feature.feature.group" version="1.2.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.feature.feature.group" version="1.6.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.source.feature.feature.group" version="1.6.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.nebula.feature.feature.group" version="1.2.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.nebula.source.feature.feature.group" version="1.2.0.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.poi.feature.feature.group" version="1.5.1.201909181823"/>
+			<unit id="org.eclipse.nebula.widgets.nattable.extension.poi.source.feature.feature.group" version="1.5.1.201909181823"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository"/>
+			<unit id="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" version="2.9.2.v20180207-1730"/>
+			<unit id="com.google.gson" version="2.2.4.v201311231704"/>
+			<unit id="com.google.gson" version="2.8.2.v20180104-1110"/>
+			<unit id="com.google.gson.source" version="2.2.4.v201311231704"/>
+			<unit id="com.google.gson.source" version="2.8.2.v20180104-1110"/>
+			<unit id="com.sun.jersey" version="1.17.0.v201503170330"/>
+			<unit id="com.sun.jersey.source" version="1.17.0.v201503170330"/>
+			<unit id="org.glassfish.jersey.apache.connector" version="2.22.1.v20161103-1916"/>
+			<unit id="org.glassfish.jersey.apache.connector.source" version="2.22.1.v20161103-1916"/>
+			<unit id="org.glassfish.jersey.bundles.repackaged.jersey-guava" version="2.22.1.v20161103-1916"/>
+			<unit id="org.glassfish.jersey.bundles.repackaged.jersey-guava.source" version="2.22.1.v20161103-1916"/>
+			<unit id="org.glassfish.jersey.containers.servlet" version="2.22.1.v20161103-0227"/>
+			<unit id="org.glassfish.jersey.containers.servlet.core" version="2.22.1.v20161103-0227"/>
+			<unit id="org.glassfish.jersey.containers.servlet.core.source" version="2.22.1.v20161103-0227"/>
+			<unit id="org.glassfish.jersey.containers.servlet.source" version="2.22.1.v20161103-0227"/>
+			<unit id="org.glassfish.jersey.core.jersey-client" version="2.22.1.v20161103-1916"/>
+			<unit id="org.glassfish.jersey.core.jersey-client.source" version="2.22.1.v20161103-1916"/>
+			<unit id="org.glassfish.jersey.core.jersey-common" version="2.22.1.v20181004-1955"/>
+			<unit id="org.glassfish.jersey.core.jersey-common.source" version="2.22.1.v20181004-1955"/>
+			<unit id="org.glassfish.jersey.core.jersey-server" version="2.22.1.v20181004-1955"/>
+			<unit id="org.glassfish.jersey.core.jersey-server.source" version="2.22.1.v20181004-1955"/>
+			<unit id="org.glassfish.jersey.ext.entityfiltering" version="2.22.1.v20181004-1955"/>
+			<unit id="org.glassfish.jersey.ext.entityfiltering.source" version="2.22.1.v20181004-1955"/>
+			<unit id="org.glassfish.jersey.media.jersey-media-json-jackson" version="2.22.1.v20161117-2005"/>
+			<unit id="org.glassfish.jersey.media.jersey-media-json-jackson.source" version="2.22.1.v20161117-2005"/>
+		</location>
+</locations></target>
