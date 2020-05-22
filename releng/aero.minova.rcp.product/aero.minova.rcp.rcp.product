@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="RCP Produkt" uid="RCP product" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.5.1.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="RCP Produkt" uid="RCP product" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="0.1.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -27,10 +27,10 @@
    </vm>
 
    <plugins>
+      <plugin id="aero.minova.rcp.rcp"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="javax.annotation"/>
       <plugin id="javax.inject"/>
-      <plugin id="aero.minova.rcp.rcp"/>
       <plugin id="org.apache.batik.constants"/>
       <plugin id="org.apache.batik.css"/>
       <plugin id="org.apache.batik.i18n"/>
@@ -103,11 +103,11 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.e4.rcp" installMode="root"/>
       <feature id="aero.minova.rcp.feature" installMode="root"/>
+      <feature id="aero.minova.json.feature" installMode="root"/>
+      <feature id="org.eclipse.e4.rcp" installMode="root"/>
       <feature id="org.eclipse.emf.ecore" installMode="root"/>
       <feature id="org.eclipse.emf.common" installMode="root"/>
-      <feature id="name.saak.json.feature" installMode="root"/>
    </features>
 
    <configurations>
