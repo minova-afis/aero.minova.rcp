@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova.rcp</groupId>
 	<artifactId>eclipse-2019-03</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>eclipse-target-definition</packaging>
 
 	<properties>
@@ -53,6 +53,6 @@
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.rcp.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.rcp.git</developerConnection>
-		<tag>eclipse-2019-03-1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 </project>
