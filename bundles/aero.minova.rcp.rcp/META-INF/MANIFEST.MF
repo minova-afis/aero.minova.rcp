@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
 Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
-Bundle-Version: 1.5.1.qualifier
+Bundle-Version: 0.1.0.qualifier
 Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.core.runtime;bundle-version="0.0.0",
  org.eclipse.swt;bundle-version="0.0.0",
@@ -20,7 +20,7 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.ui.workbench.swt,
  aero.minova.rcp.model,
  aero.minova.rcp.model.service,
- aero.minova.rcp.tasks.services;bundle-version="1.0.0",
+ aero.minova.rcp.tasks.services,
  org.eclipse.core.databinding;bundle-version="1.7.700",
  org.eclipse.core.databinding.beans;bundle-version="1.6.0",
  org.eclipse.core.databinding.property;bundle-version="1.7.200",
