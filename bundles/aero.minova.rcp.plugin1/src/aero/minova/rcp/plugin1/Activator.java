@@ -1,23 +1,18 @@
 package aero.minova.rcp.plugin1;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import java.time.Instant;
 import java.time.LocalDate;
 
 import javax.inject.Inject;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.IJobFunction;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import com.google.gson.Gson;
 
 import aero.minova.rcp.plugin1.model.Column;
 import aero.minova.rcp.plugin1.model.DataType;
@@ -34,6 +29,7 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		test();
 		// more code
+		@SuppressWarnings("unused")
 		IJobFunction jobFunction = new IJobFunction() {
 
 			@Override
@@ -101,7 +97,7 @@ public class Activator implements BundleActivator {
 		t.addRow(r);
 
 		Gson gson = new Gson();
-		String s =gson.toJson(t);
+		String s = gson.toJson(t);
 		System.out.println(s);
 		t = gson.fromJson(s, Table.class);
 		System.out.println(t.getName());
