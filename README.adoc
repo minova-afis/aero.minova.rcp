@@ -117,6 +117,12 @@ Danach muss man auch die Konfiguration neu releasen.
 
 ==== Root
 
+[WARNING]
+Das Root-Projekt wird auf dem Jenkins gebaut.
+
+link:http://minjenkins.minova.com:8080/job/release-aero.minova.rcp/[http://minjenkins.minova.com:8080/job/release-aero.minova.rcp/]
+
+
 Als letztes kann man dann das Root-Projekt releasen.
 Es hat einen Verweis auf die Konfiguration.
 
