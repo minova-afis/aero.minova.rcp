@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="name.saak.json.feature"
+      id="aero.minova.json.feature"
       label="JSON Integration Feature"
       version="0.1.0.qualifier">
 
