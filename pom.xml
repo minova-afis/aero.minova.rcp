@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova.rcp</groupId>
 	<artifactId>aero.minova.rcp.root</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 	<!-- tag::parent[] -->
 	<parent>
@@ -92,6 +92,6 @@
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.rcp.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.rcp.git</developerConnection>
-		<tag>aero.minova.rcp.root-0.1.0</tag>
+		<tag>aero.minova.rcp-1.1.0</tag>
 	</scm>
 </project>
