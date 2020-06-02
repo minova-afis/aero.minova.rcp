@@ -35,6 +35,5 @@ hs_err_pid*
 
 #Eclipse Settings
 **/.settings/*
-**/.classpath
 **/.log
 **/.metadata/
