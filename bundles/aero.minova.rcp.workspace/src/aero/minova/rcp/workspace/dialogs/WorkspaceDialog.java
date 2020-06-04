@@ -9,22 +9,21 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Combo;
 
 public class WorkspaceDialog extends Dialog {
 
 	private Text txtUsername;
 	private Text txtPassword;
-	private FileDialog fdApplicationArea;
+//	private FileDialog fdApplicationArea;
 	private String username = "";
 	private String password = "";
-	private String applicationArea = "";
+//	private String applicationArea = "";
 	private Text text;
 	private Button btnOK;
 	private Button btnConnect;
@@ -78,14 +77,12 @@ public class WorkspaceDialog extends Dialog {
 		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
 		btnNewButton.setText("List Applications");
 		new Label(container, SWT.NONE);
-		
+
 		Combo combo = new Combo(container, SWT.NONE);
-		combo.setItems(new String[] {"SIS", "AFIS", "TTA"});
+		combo.setItems(new String[] { "SIS", "AFIS", "TTA" });
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		new Label(container, SWT.NONE);
 
-		
-		
 		return container;
 	}
 
@@ -95,16 +92,16 @@ public class WorkspaceDialog extends Dialog {
 		btnConnect = createButton(parent, IDialogConstants.OPEN_ID, "Connect", false);
 		btnOK.setEnabled(false);
 		btnConnect.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				btnOK.setEnabled(true);
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 	}

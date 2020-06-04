@@ -4,14 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import javax.annotation.processing.FilerException;
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
@@ -22,8 +18,6 @@ import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Display;
-import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 
@@ -44,7 +38,7 @@ public class LifeCycle {
 		String userName = "Test1";// get username from login dialog;
 		String workspaceName = "xyz1"; // muss noch ermittelt werden
 
-		Preferences serverPrefs = ConfigurationScope.INSTANCE.getNode("aero.minova.rcp.workspace.server");
+//		Preferences serverPrefs = ConfigurationScope.INSTANCE.getNode("aero.minova.rcp.workspace.server");
 
 		ISecurePreferences sprefs = SecurePreferencesFactory.getDefault();
 		ISecurePreferences sNode = sprefs.node("aero.minova.rcp.workspace").node("server");
