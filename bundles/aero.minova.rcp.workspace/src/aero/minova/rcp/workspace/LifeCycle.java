@@ -48,7 +48,7 @@ public class LifeCycle {
 
 		ISecurePreferences sprefs = SecurePreferencesFactory.getDefault();
 		ISecurePreferences sNode = sprefs.node("aero.minova.rcp.workspace").node("server");
-
+		
 		try {
 //			if (!sNode.nodeExists(workspaceName)) {
 //			}

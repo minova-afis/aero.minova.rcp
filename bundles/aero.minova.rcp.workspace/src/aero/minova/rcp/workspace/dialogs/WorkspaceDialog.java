@@ -98,7 +98,8 @@ public class WorkspaceDialog extends Dialog {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				btnOK.setEnabled(true);
+				DatabaseConnChecker checker = new DatabaseConnChecker();
+				btnOK.setEnabled(checker.checkConnection(null, txtUsername.getText(), txtPassword.getText()));
 			}
 			
 			@Override

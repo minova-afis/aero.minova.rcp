@@ -15,4 +15,5 @@ Require-Bundle: org.eclipse.e4.core.services,
  org.eclipse.swt,
  org.eclipse.equinox.security,
  org.eclipse.jface
-Import-Package: javax.inject
+Import-Package: javax.inject,
+ org.postgresql
