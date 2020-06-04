@@ -21,5 +21,6 @@
 		<module>aero.minova.rcp.css</module>
 		<module>aero.minova.rcp.tasks.model</module>
 		<module>aero.minova.rcp.tasks.services</module>
+		<module>org.postgres.postgres</module>
 	</modules>
 </project>

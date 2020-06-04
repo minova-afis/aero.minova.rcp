@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Postgres
+Bundle-SymbolicName: org.postgres.postgres
+Bundle-Version: 1.0.0
+Automatic-Module-Name: org.postgres.postgres
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.postgresql
