@@ -138,6 +138,8 @@
 
    <plugin
          id="org.eclipse.equinox.security.macosx"
+         os="macosx"
+         ws="cocoa"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -146,6 +148,9 @@
 
    <plugin
          id="org.eclipse.equinox.security.win32.x86_64"
+         os="win32"
+         ws="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
