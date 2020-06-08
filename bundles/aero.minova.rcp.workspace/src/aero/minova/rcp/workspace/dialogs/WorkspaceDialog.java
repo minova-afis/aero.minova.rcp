@@ -18,16 +18,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Combo;
 
 public class WorkspaceDialog extends Dialog {
-
-	private Text txtUsername;
 	private Text txtPassword;
 	private FileDialog fdApplicationArea;
 	private String username = "";
-	private String password = "";
-	private String applicationArea = "";
-	private Text text;
+	private String userpassword = "";
 	private Button btnOK;
 	private Button btnConnect;
+	private Combo comboUser;
 
 	public WorkspaceDialog(Shell parentShell) {
 		super(parentShell);
@@ -44,40 +41,36 @@ public class WorkspaceDialog extends Dialog {
 
 		Label lblUser = new Label(container, SWT.NONE);
 		lblUser.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblUser.setText("Username");
-
-		txtUsername = new Text(container, SWT.BORDER);
-		txtUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		txtUsername.setText(username);
-		txtUsername.addModifyListener(e -> {
-			Text textWidget = (Text) e.getSource();
-			String userText = textWidget.getText();
+		lblUser.setText("Benutzername");
+		
+		comboUser = new Combo(container, SWT.NONE);
+		comboUser.setItems(new String[] {"bauer", "postgres"});
+		comboUser.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		comboUser.setText(username);
+		comboUser.addModifyListener(e -> {
+			Combo comboBox = (Combo) e.getSource();
+			String userText = comboBox.getText();
 			username = userText;
 		});
+		new Label(container, SWT.NONE);
 
 		Label lblPassword = new Label(container, SWT.NONE);
 		lblPassword.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblPassword.setText("Password");
+		lblPassword.setText("Passwort");
 
 		txtPassword = new Text(container, SWT.BORDER | SWT.PASSWORD);
-		txtPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		txtPassword.setText(password);
+		txtPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtPassword.setText(userpassword);
 		txtPassword.addModifyListener(e -> {
 			Text textWidget = (Text) e.getSource();
 			String passwordText = textWidget.getText();
-			password = passwordText;
+			userpassword = passwordText;
 		});
+		new Label(container, SWT.NONE);
 
 		Label lblApplicationArea = new Label(container, SWT.NONE);
 		lblApplicationArea.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblApplicationArea.setText("Application Area");
-
-		text = new Text(container, SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
-		btnNewButton.setText("List Applications");
-		new Label(container, SWT.NONE);
+		lblApplicationArea.setText("Anwendung");
 		
 		Combo combo = new Combo(container, SWT.NONE);
 		combo.setItems(new String[] {"SIS", "AFIS", "TTA"});
@@ -98,8 +91,10 @@ public class WorkspaceDialog extends Dialog {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				
+				
 				DatabaseConnChecker checker = new DatabaseConnChecker();
-				btnOK.setEnabled(checker.checkConnection(null, txtUsername.getText(), txtPassword.getText()));
+				btnOK.setEnabled(checker.checkConnection(null, comboUser.getText(), txtPassword.getText()));
 			}
 			
 			@Override
@@ -118,8 +113,8 @@ public class WorkspaceDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		username = txtUsername.getText();
-		password = txtPassword.getText();
+		username = comboUser.getText();
+		userpassword = txtPassword.getText();
 		super.okPressed();
 	}
 
@@ -132,11 +127,11 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	public String getPassword() {
-		return password;
+		return userpassword;
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		this.userpassword = password;
 	}
 
 }

@@ -13,18 +13,18 @@ public class DatabaseConnChecker {
 	private final static String password = "Svetlana21";
 
 	private static final String QUERY = "select current_user username";
-	private static final String SELECT_ALL_QUERY = "select * from input";
+	private static final String SELECT_ALL_QUERY = "select * from userdata";
 
-	
 	public boolean checkConnection(String url, String username, String password) {
-		if (url == null) url = this.url;
-		
+		if (url == null)
+			url = this.url;
+
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}		
+		}
 		try (Connection connection = DriverManager.getConnection(url, username, password);
 				// Step 2:Create a statement using connection object
 				PreparedStatement preparedStatement = connection.prepareStatement(QUERY);) {
@@ -35,12 +35,10 @@ public class DatabaseConnChecker {
 
 			// Step 4: Process the ResultSet object.
 			while (rs.next()) {
-//				int id = rs.getInt("id");
 				String name = rs.getString("username");
-//				String email = rs.getString("email");
-//				String country = rs.getString("country");
-//				String password = rs.getString("password");
+//				String userpassword = rs.getString("userpassword");
 				System.out.println(name);
+//				System.out.println(userpassword);
 			}
 			rs.close();
 			connection.close();
@@ -50,7 +48,7 @@ public class DatabaseConnChecker {
 		}
 		return false;
 	}
-	
+
 	public void getUserById() {
 		// using try-with-resources to avoid closing resources (boiler plate
 		// code)
@@ -66,12 +64,10 @@ public class DatabaseConnChecker {
 
 			// Step 4: Process the ResultSet object.
 			while (rs.next()) {
-//				int id = rs.getInt("id");
 				String name = rs.getString("username");
-//				String email = rs.getString("email");
-//				String country = rs.getString("country");
-//				String password = rs.getString("password");
+//				String userpassword = rs.getString("userpassword");
 				System.out.println(name);
+//				System.out.println(userpassword);
 			}
 		} catch (SQLException e) {
 			printSQLException(e);
@@ -92,11 +88,8 @@ public class DatabaseConnChecker {
 
 			// Step 4: Process the ResultSet object.
 			while (rs.next()) {
-				int id = rs.getInt("id");
 				String name = rs.getString("name");
-				String email = rs.getString("description");
-				String country = rs.getString("notice");
-				System.out.println(id + "," + name + "," + email + "," + country);
+				System.out.println(name);
 			}
 		} catch (SQLException e) {
 			printSQLException(e);
