@@ -46,6 +46,9 @@
         <children xsi:type="menu:HandledToolItem" xmi:id="__8AHMJUYEeqmGZPB7cWGQw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_Leg0MI3eEeq7suCev8DfDQ"/>
       </children>
     </trimBars>
+    <trimBars xmi:id="_aLxJUKpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
+      <children xsi:type="menu:ToolControl" xmi:id="_bPcM0KpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.toolcontrol.0"/>
+    </trimBars>
   </children>
   <handlers xmi:id="_6wlLfcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
   <handlers xmi:id="_6wlLgcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.openCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OpenHandler" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
