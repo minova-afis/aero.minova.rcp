@@ -73,6 +73,7 @@
 	<modules>
 		<module>bundles</module>
 		<module>features</module>
+		<module>libs</module>
 		<module>releng</module>
 	</modules>
 

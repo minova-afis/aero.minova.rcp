@@ -1,5 +1,9 @@
 package aero.minova.rcp.workspace.dialogs;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -9,26 +13,35 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Combo;
 
+import aero.minova.rcp.workspace.WorkspaceException;
+import aero.minova.rcp.workspace.handler.WorkspaceHandler;
+
+@SuppressWarnings("restriction")
 public class WorkspaceDialog extends Dialog {
-	private Text txtPassword;
-	private FileDialog fdApplicationArea;
-	private String username = "";
-	private String userpassword = "";
+
+	private Text username;
+	private Text password;
+	private Text text;
 	private Button btnOK;
 	private Button btnConnect;
-	private Combo comboUser;
+	private Text message;
+	private Text connectionString;
+	private Text remoteUsername;
+	private Combo profile;
 
-	public WorkspaceDialog(Shell parentShell) {
+	private WorkspaceHandler workspaceHandler;
+	private Logger logger;
+
+	public WorkspaceDialog(Shell parentShell, Logger logger) {
 		super(parentShell);
-
+		this.logger = logger;
 	}
 
 	@Override
@@ -39,68 +52,139 @@ public class WorkspaceDialog extends Dialog {
 		layout.marginLeft = 10;
 		container.setLayout(layout);
 
-		Label lblUser = new Label(container, SWT.NONE);
-		lblUser.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblUser.setText("Benutzername");
-		
-		comboUser = new Combo(container, SWT.NONE);
-		comboUser.setItems(new String[] {"bauer", "postgres"});
-		comboUser.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		comboUser.setText(username);
-		comboUser.addModifyListener(e -> {
-			Combo comboBox = (Combo) e.getSource();
-			String userText = comboBox.getText();
-			username = userText;
+		Label lblProfile = new Label(container, SWT.NONE);
+		lblProfile.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblProfile.setText("Profile");
+
+		profile = new Combo(container, SWT.NONE);
+		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		profile.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int i = profile.getSelectionIndex();
+				logger.info("Item " + i + " selected");
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 		new Label(container, SWT.NONE);
+
+		Label lblUser = new Label(container, SWT.NONE);
+		lblUser.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblUser.setText("Username");
+
+		username = new Text(container, SWT.BORDER);
+		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		// username.setText(workspaceData.getUsername());
+		username.addModifyListener(e -> {
+			Text textWidget = (Text) e.getSource();
+			String userText = textWidget.getText();
+			// workspaceData.setUsername(userText);
+		});
 
 		Label lblPassword = new Label(container, SWT.NONE);
 		lblPassword.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblPassword.setText("Passwort");
+		lblPassword.setText("Password");
 
-		txtPassword = new Text(container, SWT.BORDER | SWT.PASSWORD);
-		txtPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		txtPassword.setText(userpassword);
-		txtPassword.addModifyListener(e -> {
+		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
+		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		// TODO
+		// password.setText(workspaceData.getPassword());
+		password.addModifyListener(e -> {
 			Text textWidget = (Text) e.getSource();
 			String passwordText = textWidget.getText();
-			userpassword = passwordText;
+			// TODO
+			// workspaceData.setPassword(passwordText);
 		});
-		new Label(container, SWT.NONE);
 
 		Label lblApplicationArea = new Label(container, SWT.NONE);
 		lblApplicationArea.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblApplicationArea.setText("Anwendung");
-		
-		Combo combo = new Combo(container, SWT.NONE);
-		combo.setItems(new String[] {"SIS", "AFIS", "TTA"});
-		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		lblApplicationArea.setText("Application Area");
+
+		text = new Text(container, SWT.BORDER);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
+		btnNewButton.setText("List Applications");
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 
-		
-		
+		Label lblMessage = new Label(container, SWT.NONE);
+		lblMessage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblMessage.setText("Message");
+
+		message = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
+//		message.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+		message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 2));
+		new Label(container, SWT.NONE);
+
+		Label lblConnectionString = new Label(container, SWT.NONE);
+		lblConnectionString.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblConnectionString.setText("Connection String");
+
+		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
+		connectionString.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		new Label(container, SWT.NONE);
+
+		Label lblRemoteUsername = new Label(container, SWT.NONE);
+		lblRemoteUsername.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblRemoteUsername.setText("Remote Username");
+
+		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
+		remoteUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		new Label(container, SWT.NONE);
+
+		updateProfiles();
+
 		return container;
+	}
+
+	private void updateProfiles() {
+		// TODO
+		// workspaces = WorkspaceData.getWorkspaceData();
+//		String profileNames[] = new String[workspaces.length];
+//		for (int i = 0; i < workspaces.length; i++) {
+//			profileNames[i] = workspaces[i].getDisplayName();
+//		}
+	}
+
+	private void checkWorkspace() {
+		workspaceHandler = null;
+		try {
+			message.setText("");
+			workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
+			btnOK.setEnabled(workspaceHandler.checkConnection(username.getText(), password.getText()));
+		} catch (MalformedURLException | WorkspaceException e1) {
+			logger.error(e1);
+			message.setText(e1.getMessage());
+			btnOK.setEnabled(false);
+		}
+		if (workspaceHandler != null) {
+			connectionString.setText(workspaceHandler.getConnectionString());
+			remoteUsername.setText(workspaceHandler.getRemoteUsername());
+			profile.setText(workspaceHandler.getDisplayName());
+		}
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		btnOK = createButton(parent, IDialogConstants.OK_ID, "Login", true);
-		btnConnect = createButton(parent, IDialogConstants.OPEN_ID, "Connect", false);
+		text.setText("file:/Users/saak/Documents/Entwicklung/MINOVA");
+		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
+		btnConnect = createButton(parent, IDialogConstants.RETRY_ID, "Check", false);
 		btnOK.setEnabled(false);
 		btnConnect.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
-				
-				DatabaseConnChecker checker = new DatabaseConnChecker();
-				btnOK.setEnabled(checker.checkConnection(null, comboUser.getText(), txtPassword.getText()));
+				checkWorkspace();
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
 	}
@@ -113,25 +197,40 @@ public class WorkspaceDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		username = comboUser.getText();
-		userpassword = txtPassword.getText();
+		// TODO
+		// WorkspaceData wd = new WorkspaceData();
+//		try {
+//			wd.setConnection(new URL(text.getText()));
+//		} catch (MalformedURLException e) {
+//			// kann nicht kommen
+//		}
+//		wd.setProfile(workspaceHandler.getProfile());
+//		wd.setUsername(username.getText());
+//		wd.setPassword(password.getText());
+//		workspaceHandler.open();
 		super.okPressed();
 	}
 
 	public String getUsername() {
-		return username;
+		// TODO
+		// return workspaceData.getUsername();
+		return "";
 	}
 
 	public void setUsername(String username) {
-		this.username = username;
+		// TODO
+		// workspaceData.setUsername(username);
 	}
 
 	public String getPassword() {
-		return userpassword;
+		// TODO
+		// return workspaceData.getPassword();
+		return "";
 	}
 
 	public void setPassword(String password) {
-		this.userpassword = password;
+		// TODO
+		// workspaceData.setPassword(password);
 	}
 
 }
