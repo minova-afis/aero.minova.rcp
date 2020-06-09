@@ -10,13 +10,13 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
@@ -29,6 +29,9 @@ public class LifeCycle {
 
 	@Inject
 	Logger logger;
+	
+	@Inject
+	UISynchronize sync;
 
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
@@ -37,7 +40,7 @@ public class LifeCycle {
 		int returnCode;
 
 		// Show login dialog to the user
-		workspaceDialog = new WorkspaceDialog(Display.getDefault().getActiveShell(), logger);
+		workspaceDialog = new WorkspaceDialog(Display.getDefault().getActiveShell(), logger, sync);
 
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("RecurtnCode: " + returnCode);
