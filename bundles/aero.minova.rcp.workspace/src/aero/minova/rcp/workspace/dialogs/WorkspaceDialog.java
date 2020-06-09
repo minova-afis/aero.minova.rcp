@@ -2,8 +2,20 @@ package aero.minova.rcp.workspace.dialogs;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.core.runtime.jobs.ProgressProvider;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -17,6 +29,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -38,9 +51,14 @@ public class WorkspaceDialog extends Dialog {
 
 	private WorkspaceHandler workspaceHandler;
 	private Logger logger;
+	private ProgressBar progressBar;
+	private GlobalProgressMonitor monitor;
+	private final UISynchronize sync;
+	private SubMonitor subMonitor;
 
-	public WorkspaceDialog(Shell parentShell, Logger logger) {
+	public WorkspaceDialog(Shell parentShell, Logger logger, UISynchronize sync) {
 		super(parentShell);
+		this.sync = Objects.requireNonNull(sync);
 		this.logger = logger;
 	}
 
@@ -137,6 +155,21 @@ public class WorkspaceDialog extends Dialog {
 		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
 		remoteUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+
+		progressBar = new ProgressBar(container, SWT.SMOOTH);
+		progressBar.setBounds(100, 10, 200, 20);
+		progressBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		new Label(container, SWT.NONE);
+
+		monitor = new GlobalProgressMonitor();
+
+		Job.getJobManager().setProgressProvider(new ProgressProvider() {
+			@Override
+			public IProgressMonitor createMonitor(Job job) {
+				return monitor.addJob(job);
+			}
+		});
 
 		updateProfiles();
 
@@ -153,21 +186,39 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	private void checkWorkspace() {
-		workspaceHandler = null;
-		try {
-			message.setText("");
-			workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
-			btnOK.setEnabled(workspaceHandler.checkConnection(username.getText(), password.getText()));
-		} catch (MalformedURLException | WorkspaceException e1) {
-			logger.error(e1);
-			message.setText(e1.getMessage());
-			btnOK.setEnabled(false);
-		}
-		if (workspaceHandler != null) {
-			connectionString.setText(workspaceHandler.getConnectionString());
-			remoteUsername.setText(workspaceHandler.getRemoteUsername());
-			profile.setText(workspaceHandler.getDisplayName());
-		}
+		Job job = new Job("Check Connection") {
+			protected IStatus run(IProgressMonitor monitor) {
+				subMonitor = SubMonitor.convert(monitor, 20);
+				for (int i = 0; i < 21; i++) {
+					try {
+						TimeUnit.SECONDS.sleep(0);
+						subMonitor.split(1);
+						sync.asyncExec(() -> {
+							workspaceHandler = null;
+							try {
+								message.setText("");
+								workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
+								btnOK.setEnabled(
+										workspaceHandler.checkConnection(username.getText(), password.getText()));
+							} catch (MalformedURLException | WorkspaceException e1) {
+								logger.error(e1);
+								message.setText(e1.getMessage());
+								btnOK.setEnabled(false);
+							}
+							if (workspaceHandler != null) {
+								connectionString.setText(workspaceHandler.getConnectionString());
+								remoteUsername.setText(workspaceHandler.getRemoteUsername());
+								profile.setText(workspaceHandler.getDisplayName());
+							}
+						});
+					} catch (InterruptedException e) {
+						return Status.CANCEL_STATUS;
+					}
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 
 	@Override
@@ -193,6 +244,76 @@ public class WorkspaceDialog extends Dialog {
 	protected Point getInitialSize() {
 		return new Point(450, 300);
 
+	}
+
+	private final class GlobalProgressMonitor extends NullProgressMonitor {
+
+		// thread-Safe via thread confinement of the UI-Thread
+		// (means access only via UI-Thread)
+		private long runningTasks = 0L;
+
+		@Override
+		public void beginTask(final String name, final int totalWork) {
+			sync.syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					if (runningTasks <= 0) {
+						// --- no task is running at the moment ---
+						progressBar.setSelection(0);
+						progressBar.setMaximum(totalWork);
+
+					} else {
+						// --- other tasks are running ---
+						progressBar.setMaximum(progressBar.getMaximum() + totalWork);
+					}
+
+					runningTasks++;
+					progressBar.setToolTipText("Currently running: " + runningTasks + "\nLast task: " + name);
+				}
+			});
+		}
+
+		@Override
+		public void worked(final int work) {
+			sync.syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					progressBar.setSelection(progressBar.getSelection() + work);
+				}
+			});
+		}
+
+		public IProgressMonitor addJob(Job job) {
+			if (job != null) {
+				job.addJobChangeListener(new JobChangeAdapter() {
+					@Override
+					public void done(IJobChangeEvent event) {
+						sync.syncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								runningTasks--;
+								if (runningTasks > 0) {
+									// --- some tasks are still running ---
+									progressBar.setToolTipText("Currently running: " + runningTasks);
+
+								} else {
+									// --- all tasks are done (a reset of selection could also be done) ---
+									progressBar.setToolTipText("No background progress running.");
+									progressBar.setSelection(0);
+								}
+							}
+						});
+
+						// clean-up
+						event.getJob().removeJobChangeListener(this);
+					}
+				});
+			}
+			return this;
+		}
 	}
 
 	@Override
