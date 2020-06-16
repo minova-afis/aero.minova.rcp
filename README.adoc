@@ -10,6 +10,18 @@ Aktuell ist es das nackte RCP-Projekt mit einem Bespiel Part und einem weiteren 
 Als nächstes möchte ich die NatTable und JSON integrieren.
 Dazu habe ich eine interessante Seite gefunden (https://www.vogella.com/tutorials/NatTableDataSources/article.html)
 
+=== Workspace
+
+Diese Anwendung soll eine Anwendung sein, die dann mehrfach geöffnet werden kann. 
+Dabei hat jede Instanz seinen eigenen link:bundles/aero.minova.rcp.workspace/README.adoc[Workspace]
+In den Workspaces werden auch zusätzliche Plug-ins gespeichert, die die Anwendung bereichern.
+
+=== Masken
+
+Wir wollen in dieser Anwendung auch Masken verwenden, ähnlich den heutigen Masken in TTA.
+Dazu müssen wir wieder ein Schema definieren, dass es erlaubt entsprechende Masken zu definieren.
+
+
 == Releaseprozess
 
 Der Releaseprozess funktioniert.
