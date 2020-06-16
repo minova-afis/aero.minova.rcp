@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Vector;
 
 public class Row {
-	List<Object> values = new Vector<>();
+	List<Value> values = new Vector<>();
 
-	public void addValue(Object o) {
-		values.add(o);
+	public void addValue(Value v) {
+		values.add(v);
 	}
 }

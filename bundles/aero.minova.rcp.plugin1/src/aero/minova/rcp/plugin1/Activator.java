@@ -1,7 +1,8 @@
 package aero.minova.rcp.plugin1;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import javax.inject.Inject;
 
@@ -13,11 +14,15 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.plugin1.model.Column;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.plugin1.model.ValueDeserializer;
+import aero.minova.rcp.plugin1.model.ValueSerializer;
 
 public class Activator implements BundleActivator {
 
@@ -82,24 +87,31 @@ public class Activator implements BundleActivator {
 
 		Row r;
 		r = new Row();
-		r.addValue(new Integer(1));
-		r.addValue("SAAKW");
-		r.addValue("Wilfried Saak");
-		r.addValue(Instant.now());
-		r.addValue(LocalDate.now());
+		r.addValue(new Value(1));
+		r.addValue(null);
+//		r.addValue(new Value(23.5));
+		r.addValue(new Value("Wilfried Saak"));
+		r.addValue(new Value(Instant.now()));
+		r.addValue(new Value(ZonedDateTime.now()));
 		t.addRow(r);
 		r = new Row();
-		r.addValue(new Integer(2));
-		r.addValue("THEUERERG");
-		r.addValue("Gudrun Theuerer");
-		r.addValue(Instant.now());
-		r.addValue(LocalDate.of(1968, 12, 19));
+		r.addValue(new Value(123.45));
+		r.addValue(new Value("THEUERERG"));
+		r.addValue(new Value("Gudrun Theuerer"));
+		r.addValue(new Value(Instant.now()));
+		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
 		t.addRow(r);
 
 		Gson gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
 		String s = gson.toJson(t);
 		System.out.println(s);
 		t = gson.fromJson(s, Table.class);
+		System.out.println(gson.toJson(t));
 		System.out.println(t.getName());
 	}
 
