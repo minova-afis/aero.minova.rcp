@@ -24,6 +24,7 @@ Er steht uns tageweise zur Verfügung.
 * Lars Vogel
 ** Zugriff auf Github Repository ermöglichen.
 ** Mögliche Themen:
+*** Anwendung kann nicht gebaut werden.
 *** Tests in RCP
 *** Responsive Anwendung via Jobs
 *** Wie würde man einen Update-Prozess implementieren? Über p2 repository?
