@@ -78,6 +78,9 @@
         <children xsi:type="menu:HandledToolItem" xmi:id="_6LLnALT0EeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.handledtoolitem.item" label="Item" command="_hBlUELTuEeqQOOIc1bTPFQ">
           <parameters xmi:id="_AfQ0MLT1EeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.2" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="item"/>
         </children>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_UWQasLUfEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.handledtoolitem.kunde" label="Kunde" command="_hBlUELTuEeqQOOIc1bTPFQ">
+          <parameters xmi:id="_UWQasbUfEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.2" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="kunde"/>
+        </children>
       </children>
     </trimBars>
     <trimBars xmi:id="_aLxJUKpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
