@@ -187,11 +187,21 @@ public class WorkspaceDialog extends Dialog {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
+		btnOK.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				okPressed();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
 	}
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(450, 300);
+		return new Point(900, 600);
 
 	}
 
