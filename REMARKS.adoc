@@ -1,0 +1,62 @@
+Wir wollen die Version 12 unseres Frameworks erstellen.
+Sie soll folgende neuen Features aufweisen.
+
+* Zugriff auf den Server über http (WebService)
+* Lokales Caching von bereits geladenen Daten, damit teilweise offline gearbeitet werden kann
+* Eine Applikation (.exe) für alle Anwendungen (AFIS, DISPO, SIS, TTA, ...)
+* Zugriff auf den Server über Dateisystem (file://)\\
+
+Das Framework wird aber komplett neu entwickelt. 
+Es soll kein Code einfach nur kopiert werden.
+Wir möchten nämlich bestimmte Entwicklungsziele erreichen.
+
+* [https://github.com/minova-afis/aero.minova.rcp  GitHub] als SCM
+** Arbeiten mit Feature Branches
+** ? Lernen von Pull-Requests ?
+** Dokumentation in adoc, so dass wir es in GitHub leicht lesen können
+* Tests für den Code von Anfang an
+* Build und Release über Maven (auf unserem Jenkins)
+
+Lars Vogel wird uns bei der Entwicklung helfen. 
+Er steht uns tageweise zur Verfügung.
+
+
+* Lars Vogel
+** Zugriff auf Github Repository ermöglichen.
+** Mögliche Themen:
+*** Anwendung kann nicht gebaut werden.
+*** Tests in RCP
+*** Responsive Anwendung via Jobs
+*** Wie würde man einen Update-Prozess implementieren? Über p2 repository?
+*** RCP Perspectives
+*** Welche Java Version?
+** Mögliche Termine (sind nicht fest):
+*** 26.06 
+*** 09.07 
+*** 10.07
+*** 23.07
+*** 24.07
+* Generische Schnittstelle um daten abzuholen und zu speichern (AVM, WIS)
+** Ansprechen einer REST-Schnittstellte (ncore Daten-modell über REST-Schnittstelle erweitern).
+** REST-Schnittstelle über CAS (http://mobilestar.afis.aero/) bereitstellen.
+** Authentifizierung
+** #47642 Zugriff auf Dateisystem über REST 
+* Oberfläche (BAD, HOM, ERC)
+** Progress bar über Jobs umsetzen.
+** Workspace auswählen.
+*** Beispielhafter Workspace
+** Tabellen werden über NatTables umgesetzt.
+** Index-Tabelle
+** Detail-Maske
+*** Textfelder
+*** Komboboxen
+** Adjustible tools in toolbar
+** Styling über CSS?
+* Offline Modus (Anforderung von Skytanking)
+** Server fällt aus und man will wenigsten den momentanen letzten Flugplan haben, damit man in einem Notfall-Modus arbeiten kann.
+** Das Nacherfassen der Daten erfolgt manuell.
+
+Notizen:
+* Aussehen der Oberfläche sollte erhalten bleiben.
+
+

@@ -2,6 +2,8 @@
 
 Der Standard RCP Fatclient von MINOVA
 
+link:/REMARKS.adoc[Notizen]
+
 == Funktionsumfang
 
 Ich möchte diese Anwendung entsprechend erweitern.
