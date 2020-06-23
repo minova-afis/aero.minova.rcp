@@ -24,12 +24,12 @@ Er steht uns tageweise zur Verfügung.
 * Lars Vogel
 ** Zugriff auf Github Repository ermöglichen.
 ** Mögliche Themen:
-*** Anwendung kann nicht gebaut werden.
-*** Tests in RCP
+*** Wie kann man mehrere Workspace pro Benutzer unterstüzen und wie merkt man sich diese, damit der Anwender diese beim start auswählen kann.
+*** Tests in RCP: Test-Plugins? Was sollte man in Unit-Tests reintun und was in Test-Plugins.
 *** Responsive Anwendung via Jobs
 *** Wie würde man einen Update-Prozess implementieren? Über p2 repository?
-*** RCP Perspectives
-*** Welche Java Version?
+*** Welche Java Version? Sollten wir die aktuelle Version der Target-Platform verwenden?
+*** Was währe eine empfholene Arbeitsweise auf Github?
 ** Mögliche Termine (sind nicht fest):
 *** 26.06 
 *** 09.07 
