@@ -36,6 +36,21 @@
         </children>
       </children>
     </children>
+    <snippets xsi:type="advanced:Perspective" xmi:id="_BsbHsLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.perspective.main" selectedElement="_Ut2xQLTxEeqQOOIc1bTPFQ" label="Standard">
+      <children xsi:type="basic:PartSashContainer" xmi:id="_Ut2xQLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.partsashcontainer.main" selectedElement="_Y8AzwLTxEeqQOOIc1bTPFQ" horizontal="true">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_Y8AzwLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.partsashcontainer.left" selectedElement="_hO4o4LTxEeqQOOIc1bTPFQ">
+          <children xsi:type="basic:PartStack" xmi:id="_hO4o4LTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_nvl80LTxEeqQOOIc1bTPFQ">
+            <children xsi:type="basic:Part" xmi:id="_nvl80LTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.SearchPart" label="Search"/>
+          </children>
+          <children xsi:type="basic:PartStack" xmi:id="_hlOFQLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_qqH0QLTxEeqQOOIc1bTPFQ">
+            <children xsi:type="basic:Part" xmi:id="_qqH0QLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.IndexPart" label="Index"/>
+          </children>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_aBIBsLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_vNjjMLTxEeqQOOIc1bTPFQ">
+          <children xsi:type="basic:Part" xmi:id="_vNjjMLTxEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.DetailsPart" label="Details"/>
+        </children>
+      </children>
+    </snippets>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="file" label="File">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLi8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.file.open" label="Open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -55,10 +70,13 @@
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLl8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="__8AHMJUYEeqmGZPB7cWGQw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_Leg0MI3eEeq7suCev8DfDQ"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_cai3gLTuEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.handledtoolitem.start" label="Start" command="_hBlUELTuEeqQOOIc1bTPFQ">
-          <parameters xmi:id="_4Cg5ELTuEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.0" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="aero.minova.rcp.perspective.start"/>
+          <parameters xmi:id="_4Cg5ELTuEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.0" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="start"/>
         </children>
         <children xsi:type="menu:HandledToolItem" xmi:id="_euGOgLTuEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.handledtoolitem.other" label="Other" command="_hBlUELTuEeqQOOIc1bTPFQ">
-          <parameters xmi:id="_5LD1gLTuEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.1" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="aero.minova.rcp.perspective.other"/>
+          <parameters xmi:id="_5LD1gLTuEeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.1" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="other"/>
+        </children>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_6LLnALT0EeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.handledtoolitem.item" label="Item" command="_hBlUELTuEeqQOOIc1bTPFQ">
+          <parameters xmi:id="_AfQ0MLT1EeqQOOIc1bTPFQ" elementId="aero.minova.rcp.rcp.parameter.2" name="aero.minova.rcp.rcp.commandparameter.perspectiveId" value="item"/>
         </children>
       </children>
     </trimBars>
