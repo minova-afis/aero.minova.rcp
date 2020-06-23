@@ -31,45 +31,73 @@ public class SwitchPerspectiveHandler {
 
 	@Execute
 	public void execute(MWindow window, @Named(COMMAND_PARAMETER) String perspectiveId) {
+		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService.find("aero.minova.rcp.rcp.perspectivestack", window);
 
+		Logger.getGlobal().log(Level.INFO, "Trying to Switch Perspective " + perspectiveId);
+
 		MUIElement element = modelService.find(PERSPECTIVE_PREFIX + perspectiveId, window);
-		MPerspective perspective;
 		if (element == null) {
-			element = modelService.cloneSnippet(window, SNIPPET_PERSPECTIVE, window);
-
-			if (element == null) {
-				// immer noch?
-				Logger.getGlobal().log(Level.SEVERE, "Can't find nor clone Perspective " + perspectiveId);
-			} else {
-				element.setElementId(PERSPECTIVE_PREFIX + perspectiveId);
-				perspective = (MPerspective) element;
-				perspective.setParent(perspectiveStack);
-
-				switchTo(perspective);
-
-				findAndInitPart(perspective, "search", perspectiveId);
-				findAndInitPart(perspective, "index", perspectiveId);
-				findAndInitPart(perspective, "details", perspectiveId);
-			}
+			/* MPerspective perspective = */ createNewPerspective(window, perspectiveStack, perspectiveId);
 		} else {
 			switchTo(element);
 		}
 	}
 
-	private void findAndInitPart(MPerspective perspective, String partId, String perspectiveId) {
+	/**
+	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt sofort zur neuen Perspektive.
+	 * 
+	 * @param window
+	 * @param perspectiveStack
+	 * @param perspectiveId
+	 * @return die neue Perspektive
+	 */
+	private MPerspective createNewPerspective(MWindow window, MElementContainer<MUIElement> perspectiveStack, String perspectiveId) {
+		MPerspective perspective = null;
+		MUIElement element = modelService.cloneSnippet(window, SNIPPET_PERSPECTIVE, window);
+
+		if (element == null) {
+			Logger.getGlobal().log(Level.SEVERE, "Can't find nor clone Perspective " + perspectiveId);
+		} else {
+			element.setElementId(PERSPECTIVE_PREFIX + perspectiveId);
+			perspective = (MPerspective) element;
+			perspective.setParent(perspectiveStack);
+
+			switchTo(perspective);
+
+			findAndInitPart(perspective, "search", perspectiveId);
+			findAndInitPart(perspective, "index", perspectiveId);
+			findAndInitPart(perspective, "details", perspectiveId);
+		}
+
+		return perspective;
+	}
+
+	/**
+	 * Initialisiert einen {@link SimplePart}. Dazu muss die Perspektive schon ausgewählt sein, weil sonst der Part noch nicht erzeugt wurde.
+	 * 
+	 * @param perspective
+	 * @param partId
+	 * @param text
+	 */
+	private void findAndInitPart(MPerspective perspective, String partId, String text) {
 		MUIElement elem = modelService.find(PARTID_PREFIX + partId, perspective);
 		if (elem instanceof MPart) {
 			MPart part = (MPart) elem;
 			Object object = part.getObject();
 			if (object instanceof SimplePart) {
-				((SimplePart) object).setText(perspectiveId);
+				((SimplePart) object).setText(text);
 			}
 		} else {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find Part " + partId);
 		}
 	}
 
+	/**
+	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist
+	 * 
+	 * @param element
+	 */
 	private void switchTo(MUIElement element) {
 		if (element instanceof MPerspective) {
 			partService.switchPerspective((MPerspective) element);
