@@ -29,7 +29,7 @@ Er steht uns tageweise zur Verfügung.
 *** Responsive Anwendung via Jobs
 *** Wie würde man einen Update-Prozess implementieren? Über p2 repository?
 *** Welche Java Version? Sollten wir die aktuelle Version der Target-Platform verwenden?
-*** Was währe eine empfholene Arbeitsweise auf Github?
+*** Was wäre eine empfohlene Arbeitsweise auf Github?
 ** Mögliche Termine (sind nicht fest):
 *** 26.06 
 *** 09.07 
