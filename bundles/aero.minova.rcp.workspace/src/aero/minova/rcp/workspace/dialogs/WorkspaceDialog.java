@@ -59,9 +59,9 @@ public class WorkspaceDialog extends Dialog {
 		// Layout data für die Labels
 		GridDataFactory labelGridData = GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER);
 		
-		Label lblProfile = new Label(container, SWT.NONE);
-		labelGridData.applyTo(lblProfile);
-		lblProfile.setText("Profile");
+		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE).supplyLayoutData(labelGridData::create);
+		
+		labelFactory.text("Profile").create(container);
 
 		profile = new Combo(container, SWT.NONE);
 		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -78,9 +78,7 @@ public class WorkspaceDialog extends Dialog {
 		});
 		new Label(container, SWT.NONE);
 
-		Label lblUser = new Label(container, SWT.NONE);
-		labelGridData.applyTo(lblUser);
-		lblUser.setText("Username");
+		labelFactory.text("Username").create(container);
 
 		username = new Text(container, SWT.BORDER);
 		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
