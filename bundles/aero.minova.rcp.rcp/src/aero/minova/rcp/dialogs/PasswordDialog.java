@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Text;
 public class PasswordDialog extends Dialog {
 
 	private Text txtUser;
-	private Text txtPassword;
+	private Text txtPassword; 
 	private String user = "";
 	private String password = "";
 
