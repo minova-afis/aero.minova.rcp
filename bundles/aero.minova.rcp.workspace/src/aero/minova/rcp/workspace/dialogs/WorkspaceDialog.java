@@ -6,6 +6,9 @@ import java.net.URL;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -47,13 +50,17 @@ public class WorkspaceDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
+		
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginRight = 5;
 		layout.marginLeft = 10;
 		container.setLayout(layout);
 
+		// Layout data für die Labels
+		GridDataFactory labelGridData = GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER);
+		
 		Label lblProfile = new Label(container, SWT.NONE);
-		lblProfile.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblProfile);
 		lblProfile.setText("Profile");
 
 		profile = new Combo(container, SWT.NONE);
@@ -72,7 +79,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblUser = new Label(container, SWT.NONE);
-		lblUser.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblUser);
 		lblUser.setText("Username");
 
 		username = new Text(container, SWT.BORDER);
@@ -87,7 +94,7 @@ public class WorkspaceDialog extends Dialog {
 		});
 
 		Label lblPassword = new Label(container, SWT.NONE);
-		lblPassword.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblPassword);
 		lblPassword.setText("Password");
 
 		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
@@ -102,7 +109,7 @@ public class WorkspaceDialog extends Dialog {
 		});
 
 		Label lblApplicationArea = new Label(container, SWT.NONE);
-		lblApplicationArea.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblPassword);
 		lblApplicationArea.setText("Application Area");
 
 		text = new Text(container, SWT.BORDER);
@@ -115,7 +122,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblMessage = new Label(container, SWT.NONE);
-		lblMessage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblMessage);
 		lblMessage.setText("Message");
 
 		message = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
@@ -124,7 +131,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblConnectionString = new Label(container, SWT.NONE);
-		lblConnectionString.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblConnectionString);
 		lblConnectionString.setText("Connection String");
 
 		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
@@ -132,7 +139,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblRemoteUsername = new Label(container, SWT.NONE);
-		lblRemoteUsername.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblRemoteUsername);
 		lblRemoteUsername.setText("Remote Username");
 
 		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
