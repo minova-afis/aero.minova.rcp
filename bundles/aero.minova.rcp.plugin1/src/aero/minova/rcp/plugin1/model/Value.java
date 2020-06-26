@@ -4,99 +4,70 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 
 public class Value {
-	public static enum Type {
-		INTEGER, DOUBLE, STRING, INSTANT, ZONED
-	};
 
-	private final Type type;
-	private final Integer integerValue;
-	private final Double doubleValue;
-	private final String stringValue;
-	private final Instant instantValue;
-	private final ZonedDateTime zonedDateTimeValue;
+	private final DataType type;
+	private final Object value;
 
+	//TODO Werte sollten nicht null sein!
+	
 	public Value(Integer integerValue) {
-		this(Type.INTEGER, integerValue, null, null, null, null);
+		type = DataType.INTEGER;
+		value = integerValue;
+	}
+	public Value(Boolean booleanValue) {
+		type = DataType.BOOLEAN;
+		value = booleanValue;
 	}
 
 	public Value(Double doubleValue) {
-		this(Type.DOUBLE, null, doubleValue, null, null, null);
+		type = DataType.DOUBLE;
+		value = doubleValue;
 	}
 
 	public Value(String stringValue) {
-		this(Type.STRING, null, null, stringValue, null, null);
+		type = DataType.STRING;
+		value = stringValue;
 	}
-	
+
 	public Value(Instant instantValue) {
-		this(Type.INSTANT, null, null, null, instantValue, null);
+		type = DataType.INSTANT;
+		value = instantValue;
 	}
-	
+
 	public Value(ZonedDateTime zonedDateTimeValue) {
-		this(Type.ZONED, null, null, null, null, zonedDateTimeValue);
-	}
-	
-	public Value(Type type, Integer integerValue, Double doubleValue, String stringValue, Instant instantValue, ZonedDateTime zonedDateTimeValue) {
-		this.type = type;
-		if (type == Type.INTEGER)
-			this.integerValue = integerValue;
-		else
-			this.integerValue = null;
-		if (type == Type.DOUBLE)
-			this.doubleValue = doubleValue;
-		else
-			this.doubleValue = null;
-		if (type == Type.STRING)
-			this.stringValue = stringValue;
-		else
-			this.stringValue = null;
-		if (type == Type.INSTANT)
-			this.instantValue = instantValue;
-		else
-			this.instantValue = null;
-		if (type == Type.ZONED)
-			this.zonedDateTimeValue = zonedDateTimeValue;
-		else
-			this.zonedDateTimeValue = null;
+		type = DataType.ZONED;
+		value = zonedDateTimeValue;
 	}
 
 	public Object getValue() {
-		switch (type) {
-		case INTEGER:
-			return integerValue;
-		case DOUBLE:
-			return doubleValue;
-		case STRING:
-			return stringValue;
-		case INSTANT:
-			return instantValue;
-		case ZONED:
-			return zonedDateTimeValue;
-		default:
-			return null; // kein Type definiert - eigentlich nicht möglich
-		}
+		return value;
 	}
-	
-	public Type getType() {
+
+	public DataType getType() {
 		return type;
 	}
 
 	public Integer getIntegerValue() {
-		return integerValue;
+		return type == DataType.INTEGER ? (Integer) value : null;
 	}
 
 	public String getStringValue() {
-		return stringValue;
+		return type == DataType.STRING ? (String) value : null;
 	}
 
 	public Double getDoubleValue() {
-		return doubleValue;
+		return type == DataType.DOUBLE ? (Double) value : null;
 	}
 
 	public Instant getInstantValue() {
-		return instantValue;
+		return type == DataType.INSTANT ? (Instant) value : null;
 	}
 
 	public ZonedDateTime getZonedDateTimeValue() {
-		return zonedDateTimeValue;
+		return type == DataType.ZONED ? (ZonedDateTime) value : null;
+	}
+	
+	public Boolean getBooleanValue() {
+		return type == DataType.BOOLEAN ? (Boolean) value : null;
 	}
 }

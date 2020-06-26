@@ -173,7 +173,9 @@ public class WorkspaceDialog extends Dialog {
 	
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		text.setText("file:/Users/saak/Documents/Entwicklung/MINOVA");
+		text.setText("file:/Users/erlanger/Documents/MINOVA");
+		password.setText("Minova+0");
+		username.setText("sa");
 		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnConnect = createButton(parent, IDialogConstants.RETRY_ID, "Check", false);
 		btnOK.setEnabled(false);

@@ -36,6 +36,8 @@ public class LifeCycle {
 		WorkspaceHandler workspaceHandler;
 		int returnCode;
 
+		
+		
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(Display.getDefault().getActiveShell(), logger);
 

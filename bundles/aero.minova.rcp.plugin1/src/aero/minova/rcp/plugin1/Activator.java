@@ -82,8 +82,9 @@ public class Activator implements BundleActivator {
 		t.addColumn(new Column("KeyLong", DataType.INTEGER));
 		t.addColumn(new Column("KeyText", DataType.STRING));
 		t.addColumn(new Column("Description", DataType.STRING));
-		t.addColumn(new Column("LastDate", DataType.TIMESTAMP));
-		t.addColumn(new Column("ValidUntil", DataType.DATE));
+		t.addColumn(new Column("LastDate", DataType.ZONED));
+		t.addColumn(new Column("ValidUntil", DataType.INSTANT));
+		t.addColumn(new Column("Married", DataType.BOOLEAN));
 
 		Row r;
 		r = new Row();
@@ -93,6 +94,7 @@ public class Activator implements BundleActivator {
 		r.addValue(new Value("Wilfried Saak"));
 		r.addValue(new Value(Instant.now()));
 		r.addValue(new Value(ZonedDateTime.now()));
+		r.addValue(new Value(true));
 		t.addRow(r);
 		r = new Row();
 		r.addValue(new Value(123.45));
@@ -100,6 +102,7 @@ public class Activator implements BundleActivator {
 		r.addValue(new Value("Gudrun Theuerer"));
 		r.addValue(new Value(Instant.now()));
 		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
+		r.addValue(new Value(true));
 		t.addRow(r);
 
 		Gson gson = new Gson();

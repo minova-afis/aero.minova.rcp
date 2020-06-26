@@ -26,6 +26,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			return new Value(Instant.parse(value));
 		case "z":
 			return new Value(ZonedDateTime.parse(value));
+		case "b":
+			return new Value(Boolean.valueOf(value));
 		default:
 			break;
 		}
