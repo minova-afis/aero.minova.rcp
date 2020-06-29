@@ -6,7 +6,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho.version>1.4.0</tycho.version>
+		<tycho.version>1.7.0</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-repo.url>http://download.eclipse.org/releases/2018-12</eclipse-repo.url>
 	</properties>
@@ -62,8 +62,8 @@
 					<target>
 						<artifact>
 							<groupId>aero.minova.rcp</groupId>
-							<artifactId>eclipse-2019-03</artifactId>
-							<version>1.0.0</version>
+							<artifactId>eclipse-2020-06</artifactId>
+							<version>1.0.1-SNAPSHOT</version>
 						</artifact>
 					</target>
 					<!-- end::target-definition[] -->

@@ -64,7 +64,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			if (!applicationXbs.exists()) {
 				try {
 					// Wir schreiben mal eine Beispieldatei
-					Preferences sysNode = Preferences.systemRoot();
+					Preferences sysNode = Preferences.userRoot();
 					sysNode = sysNode.node("/aero.minova/application");
 					sysNode.put("prifile", "EXAMPLE");
 					FileOutputStream applicationOS = new FileOutputStream(applicationXbs);
@@ -92,7 +92,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			if (!connectionXbs.exists()) {
 				try {
 					// Wir schreiben mal eine Beispieldatei
-					Preferences sysNode = Preferences.systemRoot();
+					Preferences sysNode = Preferences.userRoot();
 					sysNode = sysNode.node("/aero.minova/connection");
 					sysNode.put("url", "jdbc:jtds:sqlserver://localhost/SIS");
 					sysNode.put("driver", "net.sourceforge.jtds.jdbc.Driver");
@@ -106,7 +106,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			}
 
 			// Datenbankdefinition einlesen
-			prefs = Preferences.systemRoot();
+			prefs = Preferences.userRoot();
 			try {
 				InputStream prefsIS = new FileInputStream(connectionXbs);
 				Preferences.importPreferences(prefsIS);

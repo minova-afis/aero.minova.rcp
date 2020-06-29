@@ -6,8 +6,6 @@ Bundle-Version: 1.2.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.plugin1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.osgi,
- javax.ws.rs,
- org.glassfish.jersey.core.jersey-client,
  org.eclipse.core.jobs,
  org.eclipse.e4.ui.di,
  com.google.gson,

@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.configuration</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>./releng/aero.minova.rcp.configuration</relativePath>
 	</parent>
 	<!-- end::parent[] -->

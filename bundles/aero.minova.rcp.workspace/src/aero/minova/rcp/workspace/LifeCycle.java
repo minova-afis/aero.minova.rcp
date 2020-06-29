@@ -17,7 +17,6 @@ import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.FileWorkspace;
@@ -39,8 +38,10 @@ public class LifeCycle {
 		WorkspaceHandler workspaceHandler;
 		int returnCode;
 
+		
+		
 		// Show login dialog to the user
-		workspaceDialog = new WorkspaceDialog(Display.getDefault().getActiveShell(), logger, sync);
+		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("RecurtnCode: " + returnCode);
