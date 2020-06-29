@@ -2,7 +2,7 @@
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="500" height="400">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack.0">
-      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.stundenerfassung">
+      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.stundenerfassung" label="Home">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.2" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_Blgn4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.1">
             <children xsi:type="basic:PartStack" xmi:id="_DgwT4LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_C4Nl4LYkEeqEVOzPNoSbhw">
@@ -47,7 +47,7 @@
           </children>
         </children>
       </children>
-      <children xsi:type="advanced:Perspective" xmi:id="_9xarMLYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.examples">
+      <children xsi:type="advanced:Perspective" xmi:id="_9xarMLYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.examples" label="Extra">
         <children xsi:type="basic:PartSashContainer" xmi:id="_6wlLksgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.partsashcontainer.sample" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_JbyC0ISbEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.partsashcontainer.0">
             <children xsi:type="basic:PartStack" xmi:id="_KNpkoISbEeqyYqeAAEwq_Q" elementId="aero.minova.rcp.rcp.partstack.0">
@@ -104,8 +104,12 @@
         <children xsi:type="menu:HandledToolItem" xmi:id="_r8lAQLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_ttVMMLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.close" label="Close"/>
       </children>
-      <children xsi:type="menu:ToolControl" xmi:id="_RfmHALYZEeqV7Z1ZgGl1eQ" elementId="aero.minova.rcp.rcp.PerspectiveSpacer" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"/>
-      <children xsi:type="menu:ToolControl" xmi:id="_7IYeULYhEeq16pBJlkSbTw" elementId="aero.minova.rcp.rcp.spacerglue" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"/>
+      <children xsi:type="menu:ToolControl" xmi:id="_RfmHALYZEeqV7Z1ZgGl1eQ" elementId="aero.minova.rcp.rcp.PerspectiveSpacer" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
+        <tags>stretch</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_7IYeULYhEeq16pBJlkSbTw" elementId="aero.minova.rcp.rcp.spacerglue" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
+        <tags>glue</tags>
+      </children>
       <children xsi:type="menu:ToolControl" xmi:id="_ERnTsLYiEeq16pBJlkSbTw" elementId="aero.minova.rcp.rcp.perspectiveswitcher" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.perspectiveswitcher/org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.PerspectiveSwitcherSwtTrim"/>
     </trimBars>
     <trimBars xmi:id="_aLxJUKpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
