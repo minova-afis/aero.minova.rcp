@@ -21,6 +21,6 @@
 		<module>aero.minova.rcp.css</module>
 		<module>aero.minova.rcp.tasks.model</module>
 		<module>aero.minova.rcp.tasks.services</module>
-		<module>org.postgres.postgres</module>
+		<module>org.eclipse.e4.ui.workbench.perspectiveswitcher</module>
 	</modules>
 </project>
