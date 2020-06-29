@@ -188,10 +188,10 @@ public class WorkspaceDialog extends Dialog {
 	private void checkWorkspace() {
 		Job job = new Job("Check Connection") {
 			protected IStatus run(IProgressMonitor monitor) {
-				subMonitor = SubMonitor.convert(monitor, 20);
-				for (int i = 0; i < 21; i++) {
+				subMonitor = SubMonitor.convert(monitor, 5);
+				for (int i = 0; i < 6; i++) {
 					try {
-						TimeUnit.SECONDS.sleep(0);
+						TimeUnit.SECONDS.sleep(1);
 						subMonitor.split(1);
 						sync.asyncExec(() -> {
 							workspaceHandler = null;
