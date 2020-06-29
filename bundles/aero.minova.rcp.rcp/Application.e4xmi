@@ -45,6 +45,9 @@
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLl8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="__8AHMJUYEeqmGZPB7cWGQw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_Leg0MI3eEeq7suCev8DfDQ"/>
       </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_RfmHALYZEeqV7Z1ZgGl1eQ" elementId="aero.minova.rcp.rcp.PerspectiveSpacer" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"/>
+      <children xsi:type="menu:ToolControl" xmi:id="_7IYeULYhEeq16pBJlkSbTw" elementId="aero.minova.rcp.rcp.spacerglue" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"/>
+      <children xsi:type="menu:ToolControl" xmi:id="_ERnTsLYiEeq16pBJlkSbTw" elementId="aero.minova.rcp.rcp.perspectiveswitcher" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.perspectiveswitcher/org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.PerspectiveSwitcherSwtTrim"/>
     </trimBars>
     <trimBars xmi:id="_aLxJUKpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
       <children xsi:type="menu:ToolControl" xmi:id="_bPcM0KpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.toolcontrol.0"/>
