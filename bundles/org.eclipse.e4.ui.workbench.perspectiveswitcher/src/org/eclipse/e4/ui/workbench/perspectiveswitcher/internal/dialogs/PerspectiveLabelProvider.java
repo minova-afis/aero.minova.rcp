@@ -1,12 +1,7 @@
 /*******************************************************************************
- * Copyright (c) 2012 Joseph Carroll and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Joseph Carroll <jdsalingerjr@gmail.com> - initial API and implementation
+ * Copyright (c) 2012 Joseph Carroll and others. All rights reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: Joseph Carroll
+ * <jdsalingerjr@gmail.com> - initial API and implementation
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.perspectiveswitcher.internal.dialogs;
 
@@ -14,7 +9,6 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -30,7 +24,6 @@ import org.eclipse.swt.graphics.Image;
 
 @Creatable
 public class PerspectiveLabelProvider extends LabelProvider implements ITableLabelProvider {
-
 	@Inject
 	private Logger logger;
 
@@ -52,29 +45,29 @@ public class PerspectiveLabelProvider extends LabelProvider implements ITableLab
 
 	@Override
 	public final Image getImage(Object element) {
-		Assert.isTrue(element instanceof MPerspective);
 		Image icon = null;
-		MPerspective perspective = (MPerspective) element;
+		if (element instanceof MPerspective) {
+			MPerspective perspective = (MPerspective) element;
 
-		String _uri = perspective.getIconURI();
-		ImageDescriptor descriptor = null;
+			String _uri = perspective.getIconURI();
+			ImageDescriptor descriptor = null;
 
-		try {
-			URI iconURI = URI.createURI(_uri);
-			descriptor = resourceUtilities.imageDescriptorFromURI(iconURI);
-		} catch (RuntimeException ex) {
-			logger.error("PerspectiveLabelProvider: uri=" + _uri);
-		}
+			try {
+				URI iconURI = URI.createURI(_uri);
+				descriptor = resourceUtilities.imageDescriptorFromURI(iconURI);
+			} catch (RuntimeException ex) {
+				logger.error("PerspectiveLabelProvider: uri=" + _uri);
+			}
 
-		if (descriptor != null) {
-			icon = imageCache.get(descriptor);
+			if (descriptor != null) {
+				icon = imageCache.get(descriptor);
 
-			if (icon == null) {
-				icon = descriptor.createImage();
-				imageCache.put(descriptor, icon);
+				if (icon == null) {
+					icon = descriptor.createImage();
+					imageCache.put(descriptor, icon);
+				}
 			}
 		}
-
 		return icon;
 	}
 
@@ -88,8 +81,7 @@ public class PerspectiveLabelProvider extends LabelProvider implements ITableLab
 
 	@Override
 	public final String getText(Object element) {
-		String label = translationService.translate("unknown",
-				"platform:/plugin/" + E4PerspectiveSwitcherActivator.PLUGIN_ID); //$NON-NLS-1$
+		String label = translationService.translate("unknown", "platform:/plugin/" + E4PerspectiveSwitcherActivator.PLUGIN_ID); //$NON-NLS-2$
 
 		if (element instanceof MPerspective) {
 			MPerspective perspective = (MPerspective) element;
@@ -100,10 +92,12 @@ public class PerspectiveLabelProvider extends LabelProvider implements ITableLab
 			}
 
 			if (markActive && E4Util.isSelectedElement(perspective)) {
-				label = label + "\t(" + translationService.translate("active",
-						"platform:/plugin/" + E4PerspectiveSwitcherActivator.PLUGIN_ID) + ")"; //$NON-NLS-1$
+				label = label + "\t(" + translationService.translate("active", "platform:/plugin/" + E4PerspectiveSwitcherActivator.PLUGIN_ID) + ")"; //$NON-NLS-3$
 			}
+		} else if (element instanceof String) {
+			label = (String) element;
 		}
+
 		return label;
 	}
 
@@ -116,5 +110,4 @@ public class PerspectiveLabelProvider extends LabelProvider implements ITableLab
 	public final String getColumnText(Object element, int columnIndex) {
 		return getText(element);
 	}
-
 }
