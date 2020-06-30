@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="500" height="400">
-    <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack.0">
+    <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack">
       <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.stundenerfassung" label="Home">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.2" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_Blgn4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.1">
@@ -76,6 +76,21 @@
         </children>
       </children>
     </children>
+    <snippets xsi:type="advanced:Perspective" xmi:id="_G_59ALqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.perspective.main" selectedElement="_RRPC4LqjEeqSa5ZfLepYaA" label="Snippet">
+      <children xsi:type="basic:PartSashContainer" xmi:id="_RRPC4LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partsashcontainer.main" selectedElement="_S7uOwLqjEeqSa5ZfLepYaA" horizontal="true">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_S7uOwLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partsashcontainer.left" selectedElement="_ZHU1YLqjEeqSa5ZfLepYaA">
+          <children xsi:type="basic:PartStack" xmi:id="_ZHU1YLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_ijnJoLqjEeqSa5ZfLepYaA">
+            <children xsi:type="basic:Part" xmi:id="_ijnJoLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.search" label="Search"/>
+          </children>
+          <children xsi:type="basic:PartStack" xmi:id="_Zc6q4LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_nezRQLqjEeqSa5ZfLepYaA">
+            <children xsi:type="basic:Part" xmi:id="_nezRQLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.index" label="Index"/>
+          </children>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_T04rYLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_r6jD0LqjEeqSa5ZfLepYaA">
+          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" label="Details"/>
+        </children>
+      </children>
+    </snippets>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.menu" label="File">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLi8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.file.open" label="Open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
