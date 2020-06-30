@@ -201,6 +201,9 @@ public class SelectPerspectiveDialog extends Dialog implements ISelectionChanged
 			Object obj = _sel.getFirstElement();
 			if (obj instanceof MPerspective) {
 				selection = obj;
+			} else if (obj instanceof String) {
+				context.set("NEW_PERSPECTIVE", obj);
+				selection = E4WorkbenchCommandConstants.PERSPECTIVE_PREFIX + obj;
 			}
 		}
 	}
@@ -208,14 +211,22 @@ public class SelectPerspectiveDialog extends Dialog implements ISelectionChanged
 	@Override
 	protected void okPressed() {
 		HashMap<String, Object> parameters = new HashMap<>(2);
-    	parameters.put(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID,
-    			((MPerspective) selection).getElementId());
-    	parameters.put(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW,
-    			"false");
 
-		ParameterizedCommand command = commandService
-				.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, parameters);
-		handlerService.executeHandler(command);
+		String perspectiveId = null;
+		if (selection instanceof MPerspective) {
+			perspectiveId = ((MPerspective) selection).getElementId();
+		} else if (selection instanceof String) {
+			perspectiveId = (String) selection;
+		}
+
+		if (perspectiveId != null) {
+			parameters.put(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID, perspectiveId);
+			parameters.put(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW, "false");
+
+			ParameterizedCommand command = commandService.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, parameters);
+			handlerService.executeHandler(command);
+		}
+
 		super.okPressed();
 	}
 
