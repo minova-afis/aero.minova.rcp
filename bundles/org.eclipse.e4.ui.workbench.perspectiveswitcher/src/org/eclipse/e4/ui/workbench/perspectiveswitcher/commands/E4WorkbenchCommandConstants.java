@@ -97,4 +97,13 @@ public interface E4WorkbenchCommandConstants {
 	 */
 	public static final String PERSPECTIVES_SHOW_TEXT$_DESCRIPTION = "Displays the perspective name next to its icon"; //$NON-NLS-1$
 
+	/**
+	 * Prefix for all Minova Perspectives
+	 */
+	public static final String PERSPECTIVE_PREFIX = "aero.minova.rcp.rcp.perspective.";
+
+	/**
+	 * Id of the Snippet Perspective which can be cloned
+	 */
+	public static final String SNIPPET_PERSPECTIVE = PERSPECTIVE_PREFIX + "main";
 }
