@@ -1,12 +1,7 @@
 /*******************************************************************************
- * Copyright (c) 2012 Joseph Carroll and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Joseph Carroll <jdsalingerjr@gmail.com> - initial API and implementation
+ * Copyright (c) 2012 Joseph Carroll and others. All rights reserved. This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: Joseph Carroll
+ * <jdsalingerjr@gmail.com> - initial API and implementation
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.perspectiveswitcher.internal.dialogs;
 
@@ -26,27 +21,46 @@ import org.eclipse.jface.viewers.Viewer;
 @Creatable
 public class PerspectiveContentProvider implements IStructuredContentProvider {
 	@Override
-    public void dispose() {
-        //no-op
-    }
+	public void dispose() {
+		// no-op
+	}
 
 	@Override
-    public Object[] getElements(Object element) {
+	public Object[] getElements(Object element) {
 		List<MPerspective> perspectives = new ArrayList<>(5);
 
 		if (element instanceof MWindow) {
 			addElementsFrom((MWindow) element, perspectives);
 		}
 
-        return perspectives.toArray();
-    }
+		List<Object> possiblePerspectives = new ArrayList<>();
+		addPossiblePerspectives(possiblePerspectives);
 
-    @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        //no-op
-    }
+		Object[] all = new Object[perspectives.size() + possiblePerspectives.size()];
 
-    private void addElementsFrom(MWindow window, List<MPerspective> perspectives) {
+		int i = 0;
+		for (MPerspective mPerspective : perspectives) {
+			all[i++] = mPerspective;
+		}
+		for (Object object : possiblePerspectives) {
+			all[i++] = object;
+		}
+
+		return all;
+	}
+
+	private void addPossiblePerspectives(List<Object> possiblePerspectives) {
+		possiblePerspectives.add("item");
+		possiblePerspectives.add("tank");
+		possiblePerspectives.add("customer");
+	}
+
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		// no-op
+	}
+
+	private void addElementsFrom(MWindow window, List<MPerspective> perspectives) {
 		List<MWindowElement> windowElements = window.getChildren();
 		for (MWindowElement _elm : windowElements) {
 			if (_elm instanceof MPerspectiveStack) {
@@ -55,9 +69,9 @@ public class PerspectiveContentProvider implements IStructuredContentProvider {
 				addChildPerspectives((MPartSashContainer) _elm, perspectives);
 			}
 		}
-    }
+	}
 
-    private void addChildPerspectives(MPartSashContainer partContainer, List<MPerspective> perspectives) {
+	private void addChildPerspectives(MPartSashContainer partContainer, List<MPerspective> perspectives) {
 		List<MPartSashContainerElement> containerElements = partContainer.getChildren();
 		for (MPartSashContainerElement _elm : containerElements) {
 			if (_elm instanceof MPartSashContainer) {
@@ -67,5 +81,5 @@ public class PerspectiveContentProvider implements IStructuredContentProvider {
 				perspectives.addAll(((MPerspectiveStack) _elm).getChildren());
 			}
 		}
-    }
+	}
 }
