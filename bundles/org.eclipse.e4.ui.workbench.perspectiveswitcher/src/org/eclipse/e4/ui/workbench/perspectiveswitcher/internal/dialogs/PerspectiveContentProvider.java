@@ -36,17 +36,23 @@ public class PerspectiveContentProvider implements IStructuredContentProvider {
 		List<Object> possiblePerspectives = new ArrayList<>();
 		addPossiblePerspectives(possiblePerspectives);
 
-		Object[] all = new Object[perspectives.size() + possiblePerspectives.size()];
+		List<Object> all = new ArrayList<>();
 
-		int i = 0;
-		for (MPerspective mPerspective : perspectives) {
-			all[i++] = mPerspective;
-		}
+		all.addAll(perspectives);
 		for (Object object : possiblePerspectives) {
-			all[i++] = object;
+			
+			all.add(object);
+			
+			for (MPerspective mPerspective : perspectives) {
+				if (mPerspective.getElementId().equals("aero.minova.rcp.rcp.perspective." + object)) {
+					all.remove(object);
+				}
+
+			}
+
 		}
 
-		return all;
+		return all.toArray();
 	}
 
 	private void addPossiblePerspectives(List<Object> possiblePerspectives) {
