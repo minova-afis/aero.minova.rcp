@@ -1,13 +1,20 @@
 package aero.minova.rcp.workspace.dialogs;
 
-import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedWorkspaceHandlers;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.PASSWORD;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.URL;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.USER;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedWorkspaceAccessData;
 import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.storeWorkspaceAccessData;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -181,16 +188,29 @@ public class WorkspaceDialog extends Dialog {
 		}
 		// Zugriffsdaten nur speichern, wenn Zugriff erfolgreich.
 		storeWorkspaceAccessData(//
-				profile.getText(), //
-				text.getText(), username.getText(), password.getText());
-		getSavedWorkspaceHandlers(logger);
+				username.getText(), // TODO Profilnamen als Workspace-Namen verwenden. "profile.getText()" funktioniert nicht.
+				text.getText(), username.getText(), password.getText(), true);
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		text.setText("file:/Users/erlanger/Documents/MINOVA");
-		password.setText("Minova+0");
-		username.setText("sa");
+		try {
+			Optional<ISecurePreferences> primaryWorkspaceHandler = getSavedPrimaryWorkspaceAccessData(logger);
+			if (primaryWorkspaceHandler.isPresent()) {
+				text.setText(//
+						primaryWorkspaceHandler.get().get(URL, null));
+				password.setText(//
+						primaryWorkspaceHandler.get().get(PASSWORD, "Minova+0"));
+				username.setText(//
+						primaryWorkspaceHandler.get().get(USER, "sa"));
+			} else {
+				text.setText("file:/Users/erlanger/Documents/MINOVA");
+				password.setText("Minova+0");
+				username.setText("sa");
+			}
+		} catch (StorageException e) {
+			throw new RuntimeException(e);
+		}
 		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnConnect = createButton(parent, IDialogConstants.RETRY_ID, "Check", false);
 		btnOK.setEnabled(false);
