@@ -52,7 +52,7 @@ public class WorkspaceDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		
+
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginRight = 5;
 		layout.marginLeft = 10;
@@ -60,9 +60,9 @@ public class WorkspaceDialog extends Dialog {
 
 		// Layout data für die Labels
 		GridDataFactory labelGridData = GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER);
-		
+
 		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE).supplyLayoutData(labelGridData::create);
-		
+
 		labelFactory.text("Profile").create(container);
 
 		profile = new Combo(container, SWT.NONE);
@@ -76,7 +76,8 @@ public class WorkspaceDialog extends Dialog {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 		new Label(container, SWT.NONE);
 
@@ -176,9 +177,12 @@ public class WorkspaceDialog extends Dialog {
 			remoteUsername.setText(workspaceHandler.getRemoteUsername());
 			profile.setText(workspaceHandler.getDisplayName());
 		}
-		storeWorkspaceAccessData("TODO", text.getText(), username.getText(), password.getText());
+		// Zugriffsdaten nur speichern, wenn Zugriff erfolgreich.
+		storeWorkspaceAccessData(//
+				profile.getItem(profile.getSelectionIndex()), //
+				text.getText(), username.getText(), password.getText());
 	}
-	
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		text.setText("file:/Users/erlanger/Documents/MINOVA");
@@ -195,17 +199,19 @@ public class WorkspaceDialog extends Dialog {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 		btnOK.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				okPressed();
 			}
-			
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 	}
 
