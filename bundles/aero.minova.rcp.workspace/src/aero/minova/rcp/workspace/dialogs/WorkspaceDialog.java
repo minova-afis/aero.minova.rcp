@@ -183,6 +183,7 @@ public class WorkspaceDialog extends Dialog {
 		storeWorkspaceAccessData(//
 				profile.getText(), //
 				text.getText(), username.getText(), password.getText());
+		getSavedWorkspaceHandlers(logger);
 	}
 
 	@Override
