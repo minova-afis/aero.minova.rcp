@@ -48,7 +48,7 @@ public class LifeCycle {
 
 //		workspaceDialog.getWorkspaceData();
 		
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 
 		String userName = "Test1";// get username from login dialog;
 		String workspaceName = "xyz1"; // muss noch ermittelt werden
@@ -69,7 +69,7 @@ public class LifeCycle {
 
 //		Preferences serverPrefs = ConfigurationScope.INSTANCE.getNode("aero.minova.rcp.workspace.server");
 
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 
 		ISecurePreferences sprefs = SecurePreferencesFactory.getDefault();
 		ISecurePreferences sNode = sprefs.node("aero.minova.rcp.workspace").node("workspaces");
@@ -91,7 +91,7 @@ public class LifeCycle {
 //			logger.error(e, "Error storing access data ");
 //		}
 
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 		// check if the instance location is already set,
 		// otherwise setting another one will throw an IllegalStateException
 		if (!Platform.getInstanceLocation().isSet()) {
