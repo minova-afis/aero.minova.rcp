@@ -16,6 +16,7 @@ import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -66,30 +67,6 @@ public class LifeCycle {
 			workspaceHandler = null;
 			break;
 		}
-
-//		Preferences serverPrefs = ConfigurationScope.INSTANCE.getNode("aero.minova.rcp.workspace.server");
-
-		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
-
-		ISecurePreferences sprefs = SecurePreferencesFactory.getDefault();
-		ISecurePreferences sNode = sprefs.node("aero.minova.rcp.workspace").node("workspaces");
-
-//		logger.info("sss " + Platform.getInstanceLocation().isSet());
-//		try {
-////			if (!sNode.nodeExists(workspaceName)) {
-////			}
-//			ISecurePreferences test = sNode.node(workspaceName);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("user", userName, false);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("url", "http://localhost", false);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("password", "valuee", true); // setzt auch den Workspace
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.flush();
-//		} catch (StorageException e) {
-//			logger.error(e, "Error storing access data ");
-//		}
 
 		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 		// check if the instance location is already set,
