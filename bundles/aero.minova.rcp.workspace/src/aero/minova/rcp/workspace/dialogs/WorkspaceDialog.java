@@ -1,5 +1,7 @@
 package aero.minova.rcp.workspace.dialogs;
 
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.storeWorkspaceAccessData;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -174,6 +176,7 @@ public class WorkspaceDialog extends Dialog {
 			remoteUsername.setText(workspaceHandler.getRemoteUsername());
 			profile.setText(workspaceHandler.getDisplayName());
 		}
+		storeWorkspaceAccessData("TODO", text.getText(), username.getText(), password.getText());
 	}
 	
 	@Override

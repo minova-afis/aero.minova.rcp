@@ -28,7 +28,7 @@ public class WorkspaceAccessPreferences {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void storeWorkspaceAccessData(String workspaceName, String userName, String url, String password) {
+	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
 				.node(WORKSPACES);
