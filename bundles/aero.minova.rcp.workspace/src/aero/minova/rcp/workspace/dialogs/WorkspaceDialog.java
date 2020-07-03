@@ -1,9 +1,11 @@
 package aero.minova.rcp.workspace.dialogs;
 
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedWorkspaceHandlers;
 import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.storeWorkspaceAccessData;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.jface.dialogs.Dialog;
@@ -179,7 +181,7 @@ public class WorkspaceDialog extends Dialog {
 		}
 		// Zugriffsdaten nur speichern, wenn Zugriff erfolgreich.
 		storeWorkspaceAccessData(//
-				profile.getItem(profile.getSelectionIndex()), //
+				profile.getText(), //
 				text.getText(), username.getText(), password.getText());
 	}
 
