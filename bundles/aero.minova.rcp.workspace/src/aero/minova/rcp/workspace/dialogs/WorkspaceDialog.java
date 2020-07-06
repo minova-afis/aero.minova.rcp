@@ -1,11 +1,25 @@
 package aero.minova.rcp.workspace.dialogs;
 
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.PASSWORD;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.URL;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.USER;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedWorkspaceAccessData;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.storeWorkspaceAccessData;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -47,14 +61,18 @@ public class WorkspaceDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
+
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginRight = 5;
 		layout.marginLeft = 10;
 		container.setLayout(layout);
 
-		Label lblProfile = new Label(container, SWT.NONE);
-		lblProfile.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblProfile.setText("Profile");
+		// Layout data für die Labels
+		GridDataFactory labelGridData = GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER);
+
+		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE).supplyLayoutData(labelGridData::create);
+
+		labelFactory.text("Profile").create(container);
 
 		profile = new Combo(container, SWT.NONE);
 		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -67,13 +85,12 @@ public class WorkspaceDialog extends Dialog {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 		new Label(container, SWT.NONE);
 
-		Label lblUser = new Label(container, SWT.NONE);
-		lblUser.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblUser.setText("Username");
+		labelFactory.text("Username").create(container);
 
 		username = new Text(container, SWT.BORDER);
 		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -87,7 +104,7 @@ public class WorkspaceDialog extends Dialog {
 		});
 
 		Label lblPassword = new Label(container, SWT.NONE);
-		lblPassword.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblPassword);
 		lblPassword.setText("Password");
 
 		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
@@ -102,7 +119,7 @@ public class WorkspaceDialog extends Dialog {
 		});
 
 		Label lblApplicationArea = new Label(container, SWT.NONE);
-		lblApplicationArea.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblPassword);
 		lblApplicationArea.setText("Application Area");
 
 		text = new Text(container, SWT.BORDER);
@@ -115,7 +132,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblMessage = new Label(container, SWT.NONE);
-		lblMessage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblMessage);
 		lblMessage.setText("Message");
 
 		message = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
@@ -124,7 +141,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblConnectionString = new Label(container, SWT.NONE);
-		lblConnectionString.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblConnectionString);
 		lblConnectionString.setText("Connection String");
 
 		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
@@ -132,7 +149,7 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblRemoteUsername = new Label(container, SWT.NONE);
-		lblRemoteUsername.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		labelGridData.applyTo(lblRemoteUsername);
 		lblRemoteUsername.setText("Remote Username");
 
 		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
@@ -169,13 +186,31 @@ public class WorkspaceDialog extends Dialog {
 			remoteUsername.setText(workspaceHandler.getRemoteUsername());
 			profile.setText(workspaceHandler.getDisplayName());
 		}
+		// Zugriffsdaten nur speichern, wenn Zugriff erfolgreich.
+		storeWorkspaceAccessData(//
+				username.getText(), // TODO Profilnamen als Workspace-Namen verwenden. "profile.getText()" funktioniert nicht.
+				text.getText(), username.getText(), password.getText(), true);
 	}
-	
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		text.setText("file:/Users/erlanger/Documents/MINOVA");
-		password.setText("Minova+0");
-		username.setText("sa");
+		try {
+			Optional<ISecurePreferences> primaryWorkspaceHandler = getSavedPrimaryWorkspaceAccessData(logger);
+			if (primaryWorkspaceHandler.isPresent()) {
+				text.setText(//
+						primaryWorkspaceHandler.get().get(URL, null));
+				password.setText(//
+						primaryWorkspaceHandler.get().get(PASSWORD, "Minova+0"));
+				username.setText(//
+						primaryWorkspaceHandler.get().get(USER, "sa"));
+			} else {
+				text.setText("file:/Users/erlanger/Documents/MINOVA");
+				password.setText("Minova+0");
+				username.setText("sa");
+			}
+		} catch (StorageException e) {
+			throw new RuntimeException(e);
+		}
 		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnConnect = createButton(parent, IDialogConstants.RETRY_ID, "Check", false);
 		btnOK.setEnabled(false);
@@ -187,17 +222,19 @@ public class WorkspaceDialog extends Dialog {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 		btnOK.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				okPressed();
 			}
-			
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 	}
 

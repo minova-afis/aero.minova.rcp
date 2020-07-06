@@ -18,6 +18,7 @@ import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.FileWorkspace;
@@ -39,7 +40,7 @@ public class LifeCycle {
 		
 		
 		// Show login dialog to the user
-		workspaceDialog = new WorkspaceDialog(Display.getDefault().getActiveShell(), logger);
+		workspaceDialog = new WorkspaceDialog(null, logger);
 
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("RecurtnCode: " + returnCode);
@@ -48,7 +49,7 @@ public class LifeCycle {
 
 //		workspaceDialog.getWorkspaceData();
 		
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 
 		String userName = "Test1";// get username from login dialog;
 		String workspaceName = "xyz1"; // muss noch ermittelt werden
@@ -67,31 +68,7 @@ public class LifeCycle {
 			break;
 		}
 
-//		Preferences serverPrefs = ConfigurationScope.INSTANCE.getNode("aero.minova.rcp.workspace.server");
-
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
-
-		ISecurePreferences sprefs = SecurePreferencesFactory.getDefault();
-		ISecurePreferences sNode = sprefs.node("aero.minova.rcp.workspace").node("workspaces");
-
-//		logger.info("sss " + Platform.getInstanceLocation().isSet());
-//		try {
-////			if (!sNode.nodeExists(workspaceName)) {
-////			}
-//			ISecurePreferences test = sNode.node(workspaceName);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("user", userName, false);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("url", "http://localhost", false);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("password", "valuee", true); // setzt auch den Workspace
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.flush();
-//		} catch (StorageException e) {
-//			logger.error(e, "Error storing access data ");
-//		}
-
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 		// check if the instance location is already set,
 		// otherwise setting another one will throw an IllegalStateException
 		if (!Platform.getInstanceLocation().isSet()) {
