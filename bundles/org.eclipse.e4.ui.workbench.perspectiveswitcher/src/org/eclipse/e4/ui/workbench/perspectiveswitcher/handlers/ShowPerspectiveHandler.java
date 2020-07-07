@@ -11,15 +11,20 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.commands.MCommand;
+import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
@@ -27,41 +32,69 @@ import org.eclipse.e4.ui.workbench.perspectiveswitcher.commands.E4WorkbenchParam
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.internal.dialogs.SelectPerspectiveDialog;
 
 public final class ShowPerspectiveHandler {
+	
+	
 	@Execute
-	public void execute(IEclipseContext context, @Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow)
+	public void execute(IEclipseContext context,
+			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
+			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
+			MApplication application, EModelService model, ECommandService commandService)
 			throws InvocationTargetException, InterruptedException {
+		
+		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
+		MUIElement toolitem = model.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
+		
+		String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
+		String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
+		
+		
+		MCommand command = null;
+		final MHandledToolItem newToolitem = model.createModelElement(MHandledToolItem.class);
+
 		if (perspectiveID == null || perspectiveID.equals("")) {
 			openSelectionDialog(context);
 		} else if (Boolean.parseBoolean(newWindow)) {
 			openNewWindowPerspective(context, perspectiveID);
 		} else {
 			openPerspective(context, perspectiveID);
+			if (toolitem == null) {
+				((MToolBar) toolbar).getChildren().add(newToolitem);
+				command = model.createModelElement(MCommand.class);
+				command.setElementId("aero.minova.rcp.rcp.command.openform");
+				application.getCommands().add(command);
+				MParameter par = model.createModelElement(MParameter.class);
+				par.setName("org.eclipse.e4.ui.perspectives.parameters.perspectiveId");
+				par.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId33");
+				par.setValue(perspectiveID);
+				newToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID);
+				newToolitem.setCommand(command);
+				newToolitem.getParameters().add(par);
+				newToolitem.setLabel(toolLabel);
+				newToolitem.setEnabled(true);
+			}
 		}
 	}
 
 	/**
 	 * Opens the specified perspective in a new window.
 	 * 
-	 * @param perspectiveId
-	 *            The perspective to open; must not be <code>null</code>
-	 * @throws ExecutionException
-	 *             If the perspective could not be opened.
+	 * @param perspectiveId The perspective to open; must not be <code>null</code>
+	 * @throws ExecutionException If the perspective could not be opened.
 	 */
 	private void openNewWindowPerspective(IEclipseContext context, String perspectiveID) {
 		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
 		EPartService partService = context.get(EPartService.class);
 
-		List<MPerspective> perspectives = modelService.findElements(application, perspectiveID, MPerspective.class, null);
+		List<MPerspective> perspectives = modelService.findElements(application, perspectiveID, MPerspective.class,
+				null);
 		partService.switchPerspective(perspectives.get(0));
 	}
 
 	/**
 	 * Opens a view selection dialog, allowing the user to chose a view.
 	 * 
-	 * @throws ExecutionException
-	 *             If the perspective could not be opened.
+	 * @throws ExecutionException If the perspective could not be opened.
 	 */
 	private final void openSelectionDialog(IEclipseContext context) {
 		SelectPerspectiveDialog dialog = ContextInjectionFactory.make(SelectPerspectiveDialog.class, context);
@@ -71,10 +104,8 @@ public final class ShowPerspectiveHandler {
 	/**
 	 * Opens the perspective with the given identifier.
 	 * 
-	 * @param perspectiveId
-	 *            The perspective to open; must not be <code>null</code>
-	 * @throws ExecutionException
-	 *             If the perspective could not be opened.
+	 * @param perspectiveId The perspective to open; must not be <code>null</code>
+	 * @throws ExecutionException If the perspective could not be opened.
 	 */
 	private final void openPerspective(IEclipseContext context, String perspectiveID) {
 		MApplication application = context.get(MApplication.class);
@@ -89,7 +120,8 @@ public final class ShowPerspectiveHandler {
 	}
 
 	/**
-	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt sofort zur neuen Perspektive.
+	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt
+	 * sofort zur neuen Perspektive.
 	 * 
 	 * @param window
 	 * @param perspectiveStack
@@ -102,7 +134,8 @@ public final class ShowPerspectiveHandler {
 		EModelService modelService = context.get(EModelService.class);
 
 		@SuppressWarnings("unchecked")
-		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService.find("aero.minova.rcp.rcp.perspectivestack", application);
+		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService
+				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
 		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
@@ -113,9 +146,10 @@ public final class ShowPerspectiveHandler {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
-			String label = (String) context.get("NEW_PERSPECTIVE");
-			label = label.substring(0, 1).toUpperCase() + label.substring(1);
-			perspective.setLabel(label);
+//			String label = (String) context.get("NEW_PERSPECTIVE");
+//			label = label.substring(0, 1).toUpperCase() + label.substring(1);
+			perspective.setLabel(perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1));
+//			perspective.setLabel(label);
 //			perspective.setTooltip(label);
 			perspective.setParent(perspectiveStack);
 
