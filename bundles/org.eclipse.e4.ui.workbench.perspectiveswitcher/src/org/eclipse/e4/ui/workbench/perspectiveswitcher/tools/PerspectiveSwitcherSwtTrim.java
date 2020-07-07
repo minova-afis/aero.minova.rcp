@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.perspectiveswitcher.tools;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.ToolBarImpl;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -60,6 +63,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -108,7 +112,6 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 	private boolean showShortcutText;
 	static String _null = ""; //$NON-NLS-1$
 
-	//
 	static RGB defaultContainerCurveColor = new RGB(0, 0, 0);
 	Image openPerspectiveImage;
 	Color internalCrvColor;
@@ -136,6 +139,10 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 		rowLayout.marginBottom = 4;
 		composite.setLayout(rowLayout);
 
+		toolBar = new ToolBar(composite, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+		
+		composite = toolBar.getParent();
+
 		composite.addPaintListener(new PaintListener() {
 
 			@Override
@@ -151,8 +158,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 				dispose();
 			}
 		});
-
-		toolBar = new ToolBar(composite, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+		
 
 		toolBar.addMenuDetectListener(new MenuDetectListener() {
 
@@ -206,8 +212,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 
 		ToolItem perspectiveDialog = new ToolItem(toolBar, SWT.PUSH);
 		perspectiveDialog.setImage(getOpenPerspectiveImage());
-		perspectiveDialog
-				.setToolTipText(E4WorkbenchMessages.OpenSelectPerspectiveWindow);
+		perspectiveDialog.setToolTipText(E4WorkbenchMessages.OpenSelectPerspectiveWindow);
 		perspectiveDialog.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -220,8 +225,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		// The perspectives currently open
-		List<MPerspectiveStack> appPerspectiveStacks = E4Util
-				.getMatchingChildren(window, MPerspectiveStack.class);
+		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
 		if (appPerspectiveStacks.size() > 0) {
 			for (MPerspectiveStack stack : appPerspectiveStacks)
 				for (MPerspective perspective : stack.getChildren()) {
@@ -239,8 +243,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 
 		Point size = composite.getSize();
 		int h = size.y;
-		int[] simpleCurve = new int[] { 0, h - 1, 1, h - 1, 2, h - 2, 2, 1, 3,
-				0 };
+		int[] simpleCurve = new int[] { 0, h - 1, 1, h - 1, 2, h - 2, 2, 1, 3, 0 };
 
 		gc.setForeground(getContainerCurveColor(event));
 		gc.drawPolyline(simpleCurve);
@@ -251,8 +254,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 		r.add(bounds);
 
 		int[] simpleCurveClose = new int[simpleCurve.length + 4];
-		System.arraycopy(simpleCurve, 0, simpleCurveClose, 0,
-				simpleCurve.length);
+		System.arraycopy(simpleCurve, 0, simpleCurveClose, 0, simpleCurve.length);
 		int index = simpleCurve.length;
 		simpleCurveClose[index++] = bounds.width;
 		simpleCurveClose[index++] = 0;
@@ -313,9 +315,8 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 	}
 
 	void openPerspectiveDialog() {
-		ParameterizedCommand command = commandService.createCommand(
-				E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE,
-				Collections.EMPTY_MAP);
+		ParameterizedCommand command = commandService
+				.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE, Collections.EMPTY_MAP);
 		handlerService.executeHandler(command);
 	}
 
@@ -346,8 +347,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				MPerspective perspective = (MPerspective) event.widget
-						.getData();
+				MPerspective perspective = (MPerspective) event.widget.getData();
 				E4Util.setWindowSelectedElement(perspective);
 			}
 		});
@@ -390,8 +390,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 	}
 
 	@Override
-	public void updateAttributeFor(MPerspective perspective, String attName,
-			Object newValue) {
+	public void updateAttributeFor(MPerspective perspective, String attName, Object newValue) {
 		ToolItem item = getToolItemFor(perspective);
 
 		if (showShortcutText && UIEvents.UILabel.LABEL.equals(attName)) {
@@ -471,8 +470,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 		ImageDescriptor descriptor = null;
 		try {
 			URI uri = URI.createURI(iconURI);
-			descriptor = (ImageDescriptor) resourceUtilities
-					.imageDescriptorFromURI(uri);
+			descriptor = (ImageDescriptor) resourceUtilities.imageDescriptorFromURI(uri);
 		} catch (RuntimeException ex) {
 			logger.debug(ex, "icon uri=" + iconURI);
 		}
@@ -488,8 +486,7 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 	Image getOpenPerspectiveImage() {
 		if (openPerspectiveImage == null || openPerspectiveImage.isDisposed()) {
 			Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-			URL url = FileLocator.find(bundle, new Path(
-					"icons/full/eview16/new_persp.gif"), null);
+			URL url = FileLocator.find(bundle, new Path("icons/full/eview16/new_persp.gif"), null);
 			ImageDescriptor imageDescr = ImageDescriptor.createFromURL(url);
 			return imageDescr.createImage();
 			// ImageDescriptor desc =
@@ -545,9 +542,8 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				ParameterizedCommand command = commandService.createCommand(
-						E4WorkbenchCommandConstants.PERSPECTIVES_SAVE_AS,
-						Collections.EMPTY_MAP);
+				ParameterizedCommand command = commandService
+						.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_SAVE_AS, Collections.EMPTY_MAP);
 				handlerService.executeHandler(command);
 			}
 		});
@@ -563,9 +559,8 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				ParameterizedCommand command = commandService.createCommand(
-						E4WorkbenchCommandConstants.PERSPECTIVES_RESET,
-						Collections.EMPTY_MAP);
+				ParameterizedCommand command = commandService
+						.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_RESET, Collections.EMPTY_MAP);
 				handlerService.executeHandler(command);
 			}
 		});
@@ -581,9 +576,8 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				ParameterizedCommand command = commandService.createCommand(
-						E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE,
-						Collections.EMPTY_MAP);
+				ParameterizedCommand command = commandService
+						.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE, Collections.EMPTY_MAP);
 				handlerService.executeHandler(command);
 			}
 		});
@@ -601,9 +595,8 @@ public class PerspectiveSwitcherSwtTrim implements IPerspectiveSwitcherControl {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Map<String, Object> parameters = new HashMap<>(3);
-				ParameterizedCommand command = commandService.createCommand(
-						E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_TEXT,
-						parameters);
+				ParameterizedCommand command = commandService
+						.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_TEXT, parameters);
 				handlerService.executeHandler(command);
 			}
 		});
