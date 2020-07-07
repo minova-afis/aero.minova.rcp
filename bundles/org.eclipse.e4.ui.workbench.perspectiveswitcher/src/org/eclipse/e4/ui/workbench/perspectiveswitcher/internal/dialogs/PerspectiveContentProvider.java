@@ -56,9 +56,9 @@ public class PerspectiveContentProvider implements IStructuredContentProvider {
 	}
 
 	private void addPossiblePerspectives(List<Object> possiblePerspectives) {
-		possiblePerspectives.add("item");
-		possiblePerspectives.add("tank");
-		possiblePerspectives.add("customer");
+		possiblePerspectives.add("Item");
+		possiblePerspectives.add("Tank");
+		possiblePerspectives.add("Customer");
 	}
 
 	@Override
