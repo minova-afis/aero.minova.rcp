@@ -34,16 +34,16 @@ import org.eclipse.e4.ui.workbench.perspectiveswitcher.internal.dialogs.SelectPe
 public final class ShowPerspectiveHandler {
 	
 	
-	@Execute
+		@Execute
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
 			MApplication application, EModelService model, ECommandService commandService)
 			throws InvocationTargetException, InterruptedException {
-		
+
 		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
 		MUIElement toolitem = model.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
-		
+
 		if (perspectiveID == null || perspectiveID.equals("")) {
 			openSelectionDialog(context);
 		} else if (Boolean.parseBoolean(newWindow)) {
@@ -53,20 +53,20 @@ public final class ShowPerspectiveHandler {
 			if (toolitem == null) {
 				final MHandledToolItem newToolitem = model.createModelElement(MHandledToolItem.class);
 				MCommand command = null;
-				
+
 				String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
 				String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
-				
+
 				((MToolBar) toolbar).getChildren().add(newToolitem);
 				command = model.createModelElement(MCommand.class);
 				command.setElementId("aero.minova.rcp.rcp.command.openform");
 				application.getCommands().add(command);
-				
+
 				MParameter parameter = model.createModelElement(MParameter.class);
 				parameter.setName("org.eclipse.e4.ui.perspectives.parameters.perspectiveId");
 				parameter.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId33");
 				parameter.setValue(perspectiveID);
-				
+
 				newToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID);
 				newToolitem.setCommand(command);
 				newToolitem.getParameters().add(parameter);
