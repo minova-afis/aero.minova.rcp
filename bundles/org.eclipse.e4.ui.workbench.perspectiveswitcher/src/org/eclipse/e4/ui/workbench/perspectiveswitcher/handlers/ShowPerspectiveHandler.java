@@ -71,6 +71,7 @@ public final class ShowPerspectiveHandler {
 				newToolitem.setCommand(command);
 				newToolitem.getParameters().add(parameter);
 				newToolitem.setLabel(toolLabel);
+//				newToolitem.setIconURI("platform:/plugin/aero.minova.rcp.rcp/icons/" + toolitemLabel + ".png");
 				newToolitem.setEnabled(true);
 			}
 		}
