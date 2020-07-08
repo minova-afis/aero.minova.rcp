@@ -108,6 +108,15 @@ public class Activator implements BundleActivator {
 		r.addValue(new Value(true));
 		r.addValue(new Value(false));
 		t.addRow(r);
+		r = new Row();
+		r.addValue(null);
+		r.addValue(new Value("T"));
+		r.addValue(null);
+		r.addValue(null);
+		r.addValue(null);
+		r.addValue(null);
+		r.addValue(new Value(false));
+		t.addRow(r);
 
 		Gson gson = new Gson();
 		gson = new GsonBuilder() //
