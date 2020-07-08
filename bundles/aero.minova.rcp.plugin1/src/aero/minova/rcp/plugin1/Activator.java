@@ -85,6 +85,8 @@ public class Activator implements BundleActivator {
 		t.addColumn(new Column("LastDate", DataType.ZONED));
 		t.addColumn(new Column("ValidUntil", DataType.INSTANT));
 		t.addColumn(new Column("Married", DataType.BOOLEAN));
+		// Wenn in dieser Row ein & steht, bedeutet es, dass die Row inklusiver der vorherigen zusammengeführt werden. Es bildet ein selektionskriterium mit UND 
+		t.addColumn(new Column("&", DataType.BOOLEAN)); // Verunden
 
 		Row r;
 		r = new Row();
@@ -95,6 +97,7 @@ public class Activator implements BundleActivator {
 		r.addValue(new Value(Instant.now()));
 		r.addValue(new Value(ZonedDateTime.now()));
 		r.addValue(new Value(true));
+		r.addValue(new Value(false));
 		t.addRow(r);
 		r = new Row();
 		r.addValue(new Value(123.45));
@@ -103,6 +106,7 @@ public class Activator implements BundleActivator {
 		r.addValue(new Value(Instant.now()));
 		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
 		r.addValue(new Value(true));
+		r.addValue(new Value(false));
 		t.addRow(r);
 
 		Gson gson = new Gson();
