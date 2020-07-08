@@ -82,7 +82,7 @@ Das Resultat der Anfrage ist ein Table-Objekt mit 0-N Rows. Die Row kann grundsÃ
   ]
 }
 ----
-Daraus ergibt sich folgendes SQL-Statment-_>: 
+Daraus ergibt sich folgendes SQL-Statment: 
 
 [source,sql]
 ----
