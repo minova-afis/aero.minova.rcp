@@ -1,17 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form icon="Item.ico" title="@tItem.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="XMLForm.xsd">
-    <docbook>
-        <table name="tItem" position="after"/>
-        <de>
-            <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Diese Datei lehnt sich an die Produktstammdaten ist. Sie ist aber dafür gedacht, die
-                Möglichkeiten innerhalb von Masken zu beschreiben. </para>
-            <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Indexspalten können nicht näher erläutert / dokumentiert werden. </para>
-        </de>
-        <en>
-            <para xmlns="http://docbook.org/ns/docbook"/>
-        </en>
-    </docbook>
     <index-view id="IndexView" index-report="auto" source="dbo.vItemIndex">
         <column key="true" name="KeyLong" size="0" text="@KeyLong">
             <number decimals="0" />
@@ -30,70 +19,18 @@
         <head>
             <field key-type="primary" name="KeyLong" sql-index="0" visible="false">
                 <number/>
-                <docbook>
-                    <de>
-                        <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Der interne Schlüssel wird immer benötigt. Er wird mit dem
-                                <filename>key-type="primary"</filename> definiert. </para>
-                        <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Eine andere Definition kann man in der Maske tStock finden. </para>
-                    </de>
-                    <en>
-                        <para xmlns="http://docbook.org/ns/docbook"/>
-                    </en>
-                </docbook>
             </field>
             <field key-type="user" name="KeyText" required="true" sql-index="1" text="@tItem.KeyText">
                 <text length="20"/>
-                <docbook>
-                    <de>
-                        <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Der Benutzerschlüssel (Matchcode) wird meistens benötigt. Er wird mit dem
-                                <filename>key-type="user"</filename> definiert. </para>
-                        <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Eine andere Definition kann man in der Maske tStock finden. </para>
-                    </de>
-                    <en>
-                        <para xmlns="http://docbook.org/ns/docbook"/>
-                    </en>
-                </docbook>
             </field>
             <field fill="toright" name="Description" number-columns-spanned="4" sql-index="2" text="@tItem.Description">
                 <text length="50"/>
-                <docbook>
-                    <de>
-                        <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Felder, die über die gesamte Maskenbreite (Abschnittsbreite,
-                            OptionPagebreite) gehen, werden entsprechend definiert (<filename>fill="toright" number-columns-spanned="4"</filename>). </para>
-                    </de>
-                    <en>
-                        <para xmlns="http://docbook.org/ns/docbook"/>
-                    </en>
-                </docbook>
             </field>
             <field name="Blocked" sql-index="34" text="@tItem.Blocked" visible="false">
                 <boolean/>
-                <docbook>
-                    <de>
-                        <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> 
-                            Das Feld <filename>Blocked</filename> ist erforderlich, wenn man den Datensatz mit einem Gesperrt-Kennzeichen verwenden will. Heute sollte man das Feld selbst als unsichtbar () definieren
-                            und dafür im bereich <filename>detail</filename> das Attribut
-                            
-                        </para>
-                    </de>
-                    <en>
-                        <para xmlns="http://docbook.org/ns/docbook"/>
-                    </en>
-                </docbook>
             </field>
         </head>
         <page icon="Administration.ico" id="Administration" text="@tItem.Group.Administration">
-            <docbook>
-                <de>
-                    <para xmlns="http://docbook.org/ns/docbook" userlevel="dev">
-                        Einzelne OptionPages können auch innerhalb der Maske definiert werden.
-                    </para>
-                </de>
-                <en>
-                    <para xmlns="http://docbook.org/ns/docbook"></para>
-                </en>
-            </docbook>
-            
             <table column-count="6">
                 <row name="header-row">
                     <column number-columns-spanned="2">

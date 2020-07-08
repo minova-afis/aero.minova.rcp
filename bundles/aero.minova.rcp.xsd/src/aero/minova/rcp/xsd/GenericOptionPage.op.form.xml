@@ -1,30 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form icon="Item.ico" title="@tItem.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="XMLForm.xsd">
-    <docbook>
-        <table name="tItem" position="after"/>
-        <de>
-            <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Diese Datei lehnt sich an die Produktstammdaten ist. Sie ist aber dafür gedacht, die
-                Möglichkeiten innerhalb von Masken zu beschreiben. </para>
-            <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Indexspalten können nicht näher erläutert / dokumentiert werden. </para>
-        </de>
-        <en>
-            <para xmlns="http://docbook.org/ns/docbook"/>
-        </en>
-    </docbook>
     <detail id="Detail" procedure-suffix="Item">
         <page icon="Administration.ico" id="Administration" text="@tItem.Group.Administration">
-            <docbook>
-                <de>
-                    <para xmlns="http://docbook.org/ns/docbook" userlevel="dev">
-                        Einzelne OptionPages können auch innerhalb der Maske definiert werden.
-                    </para>
-                </de>
-                <en>
-                    <para xmlns="http://docbook.org/ns/docbook"></para>
-                </en>
-            </docbook>
-            
             <table column-count="6">
                 <row name="header-row">
                     <column number-columns-spanned="2">

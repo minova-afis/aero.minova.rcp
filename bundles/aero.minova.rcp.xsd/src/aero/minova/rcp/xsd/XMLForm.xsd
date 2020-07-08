@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema elementFormDefault="qualified"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+           jxb:version="2.1">
 	<xs:complexType name="column">
 		<xs:choice maxOccurs="1" minOccurs="1">
 			<xs:element name="number" type="number" />
@@ -27,10 +28,11 @@
 		</xs:attribute>
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
-				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Spaltenname. Dieser Name sollte immer mit '@' beginnen.
-						Dann wird der Name in den Messages nachgeschlagen.
-					</p>
+			<xs:appinfo>
+					<jxb:property name="text-attribute" />
+				</xs:appinfo>
+				<xs:documentation> Hier wird der zu übersetzende text eingetragten.
+					'@' Muss voran gestellt werden.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -303,16 +305,6 @@
 		<xs:attribute name="max-value" type="xs:float"
 			use="optional" />
 	</xs:complexType>
-	<xs:complexType name="text">
-		<xs:attribute default="50" name="length" use="optional">
-			<xs:simpleType>
-				<xs:restriction base="xs:int">
-					<xs:minInclusive value="1" />
-					<xs:maxInclusive value="1024" />
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-	</xs:complexType>
 	<xs:complexType name="editor">
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" minOccurs="0"
@@ -360,6 +352,16 @@
 		<xs:attribute name="field-name" type="xs:string"
 			use="required" />
 	</xs:complexType>
+		<xs:complexType name="text">
+		<xs:attribute default="50" name="length" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:minInclusive value="1"/>
+					<xs:maxInclusive value="1024"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
 	<xs:complexType name="field">
 		<xs:sequence>
 			<xs:choice maxOccurs="1" minOccurs="1">
@@ -398,11 +400,22 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
+		<xs:attribute name="text" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:appinfo>
+					<jxb:property name="text-attribute" />
+				</xs:appinfo>
+				<xs:documentation>
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Spaltenname. Dieser Name sollte immer mit '@' beginnen.
+						Dann wird der Name in den Messages nachgeschlagen.
+					</p>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="tab-index" type="xs:integer"
 			use="optional" />
 		<!--xs:attribute name="tab-index" type="xs:IDREF"/ -->
 		<xs:attribute name="name" type="xs:ID" use="required" />
-		<xs:attribute name="text" type="xs:string" use="optional" />
 		<xs:attribute name="default" type="xs:string"
 			use="optional" />
 		<xs:attribute default="true" name="required"
