@@ -1,0 +1,79 @@
+== Table Model
+
+Dieses Plug-in sorgt beinhaltet ein Model zum Austausch von Daten zwischen dem CAS und der WFC Anwendung.
+
+=== Table
+
+Das Table-Objekt wird für alle Anfragen von WFC an CAS verwendet. Des Weiteren wird die Struktur verwendet um angefragte Datensätze an das WFC zu übergeben. 
+
+=== Anfrage über den Indexbereich
+
+Wenn in der WFC Anwendung eine Suchanfrage über den Indexbereich erstellt wird wird ein Table-Objekt mit entsprechenden rows erstellt. 
+Der Name des Table-Objekts entspricht dabei dem Namen der View aus der Maske. Die Columns repräsentieren die Datenfelder die eingetargen wurden. 
+eine einzelne Row trägt in diesem Fall die information der *Where Clause*. Bei dieser Form von Anfrage kann wird zusätzlich du den übergebnen Columns aus der View noch eine weitere Column übergeben. 
+Der Name der Column ist: *&*. Wenn in einer Row für diese Spalte ein _True_ übergeben wird, muss die where clause die vorherige (obere) Row mit der Row verunden. 
+
+{
+  "name": "vEmployeIndex",
+  "columns": [
+    {
+      "name": "KeyLong",
+      "type": "INTEGER"
+    },
+    {
+      "name": "KeyText",
+      "type": "STRING"
+    },
+    {
+      "name": "Description",
+      "type": "STRING"
+    },
+    {
+      "name": "LastDate",
+      "type": "ZONED"
+    },
+    {
+      "name": "ValidUntil",
+      "type": "INSTANT"
+    },
+    {
+      "name": "Married",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "\u0026",
+      "type": "BOOLEAN"
+    }
+  ],
+  "rows": [
+   {
+      "values": [
+        null,
+        "s-T",
+        null,
+        null,
+        null,
+        null,
+        "b-false"
+      ]
+    }
+    {
+      "values": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "b-true",
+        "b-false"
+      ]
+    }
+  ]
+}
+
+Daruas würde sich folgendes SQL-Statment erstellen lassen: 
+
+select * from vEmployeIndex where KeyText like 'T%' and Married = true
+
+
+
