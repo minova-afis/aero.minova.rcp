@@ -26,7 +26,9 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.core.databinding.property;bundle-version="1.7.200",
  org.eclipse.jface.databinding;bundle-version="1.9.200",
  org.eclipse.equinox.preferences,
- org.eclipse.e4.core.services
+ org.eclipse.e4.core.services,
+ aero.minova.rcp.form.model,
+ javax.xml.bind;bundle-version="2.2.0"
 Automatic-Module-Name: aero.minova.rcp.rcp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: javax.annotation;version="1.0.0";resolution:=optional,

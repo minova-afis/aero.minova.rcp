@@ -6,7 +6,7 @@
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.2" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_Blgn4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.1">
             <children xsi:type="basic:PartStack" xmi:id="_DgwT4LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_C4Nl4LYkEeqEVOzPNoSbhw">
-              <children xsi:type="basic:Part" xmi:id="_C4Nl4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableDataExample" label="@Form.Search" tooltip="Hier kann man Sachen machen. ">
+              <children xsi:type="basic:Part" xmi:id="_C4Nl4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.XMLSearchPart" label="@Form.Search" tooltip="Hier kann man Sachen machen. ">
                 <toolbar xmi:id="_pvc5ALbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolbar.1">
                   <tags>NoMove</tags>
                   <children xsi:type="menu:HandledToolItem" xmi:id="_rX_kILbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert"/>

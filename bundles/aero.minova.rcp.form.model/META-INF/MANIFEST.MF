@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: XSD Form Model
+Bundle-SymbolicName: aero.minova.rcp.form.model
+Bundle-Version: 1.2.0.qualifier
+Export-Package: aero.minova.rcp.form.model.xsd
+Require-Bundle: javax.xml.bind;bundle-version="2.2.0"
