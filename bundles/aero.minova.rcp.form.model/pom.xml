@@ -65,6 +65,7 @@
 				<executions>
 					<execution>
 						<id>xjc</id>
+						<phase>generate-sources</phase>
 						<goals>
 							<goal>xjc</goal>
 						</goals>
