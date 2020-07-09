@@ -2,7 +2,9 @@ package aero.minova.rcp.rcp.parts;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
@@ -13,12 +15,24 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ReflectiveColumnPropertyAccessor;
+import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
-import org.eclipse.swt.SWT;
+import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.xml.sax.SAXException;
 
+import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 
 public class XMLSearchPart {
@@ -27,41 +41,84 @@ public class XMLSearchPart {
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
+		Form form = null;
 		try {
 			xmlProcessor = new XmlProcessor(Form.class);
-			Form object = (Form) xmlProcessor
-					.load(new File("/home/hofmann/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
-			System.out.println(object);
-
-			parent.setLayout(new GridLayout());
-
-			// property names of the Person class
-			String[] propertyNames = { "firstName", "lastName", "gender", "married", "birthday" };
-
-			// create the data provider
-			IColumnPropertyAccessor<String> columnPropertyAccessor = new ReflectiveColumnPropertyAccessor<String>(propertyNames);
-			IDataProvider bodyDataProvider = new ListDataProvider<String>(new ArrayList<String>(), columnPropertyAccessor);
-
-			final DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-
-//			IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames);
-//			DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-
-			// use different style bits to avoid rendering of inactive scrollbars for small
-			// table
-			// Note: The enabling/disabling and showing of the scrollbars is handled by the
-			// ViewportLayer. Without the ViewportLayer the scrollbars will always be
-			// visible with the default style bits of NatTable.
-			final NatTable natTable = new NatTable(parent, SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.BORDER, bodyDataLayer);
-
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
+			form = (Form) xmlProcessor
+					.load(new File("/Users/erlanger/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
 
 		} catch (JAXBException | SAXException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		parent.setLayout(new GridLayout());
+		
+		// mapping from property to label, needed for column header labels
+        Map<String, String> propertyToLabelMap = new HashMap<String, String>();
+        List<Column> column = form.getIndexView().getColumn();
+        String[] propertyNames = new String[column.size()];
+        int i = 0;
+        for (Column column2 : column) {
+        	propertyToLabelMap.put(column2.getName(), column2.getTextAttribute().toString());
+        	propertyNames[i++] = column2.getName();
+		}
+        
 
-	}
+        IColumnPropertyAccessor<Column> columnPropertyAccessor =
+                new ReflectiveColumnPropertyAccessor<Column>(propertyNames);
+
+        // build the body layer stack
+        IDataProvider bodyDataProvider = new ListDataProvider<Column>(column, columnPropertyAccessor);
+//                new ListDataProvider<Person>(
+//                        personService.getPersons(50),
+//                        columnPropertyAccessor);
+        DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+        SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
+        ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
+
+        // build the column header layer stack
+        IDataProvider columnHeaderDataProvider =
+                new DefaultColumnHeaderDataProvider(propertyNames, propertyToLabelMap);
+        DataLayer columnHeaderDataLayer =
+                new DataLayer(columnHeaderDataProvider);
+        ILayer columnHeaderLayer =
+                new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+
+        // build the row header layer stack
+        IDataProvider rowHeaderDataProvider =
+                new DefaultRowHeaderDataProvider(bodyDataProvider);
+        DataLayer rowHeaderDataLayer =
+                new DataLayer(rowHeaderDataProvider, 40, 20);
+        ILayer rowHeaderLayer =
+                new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
+
+        // build the corner layer stack
+        ILayer cornerLayer = new CornerLayer(
+                new DataLayer(
+                        new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
+                rowHeaderLayer,
+                columnHeaderLayer);
+
+        // create the grid layer composed with the prior created layer stacks
+        GridLayer gridLayer =
+                new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
+
+        NatTable natTable = new NatTable(parent, gridLayer, true);
+        Transfer[] transfer = { new ByteArrayTransfer() {
+			
+			@Override
+			protected String[] getTypeNames() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			protected int[] getTypeIds() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		} };
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
+    }
 
 	
 }
