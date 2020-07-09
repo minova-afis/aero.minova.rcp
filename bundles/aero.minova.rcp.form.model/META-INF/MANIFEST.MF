@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Xbs
-Bundle-SymbolicName: aero.minova.rcp.xbs
+Bundle-Name: XSD Form Model
+Bundle-SymbolicName: aero.minova.rcp.form.model
 Bundle-Version: 1.0.0.qualifier
-Export-Package: aero.minova.rcp.xsd,
- aero.minova.rcp.xsd.model
+Export-Package: aero.minova.rcp.form.model.xsd,
+ aero.minova.rcp.xsd
