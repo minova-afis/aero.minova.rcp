@@ -3,5 +3,4 @@ Bundle-ManifestVersion: 2
 Bundle-Name: XSD Form Model
 Bundle-SymbolicName: aero.minova.rcp.form.model
 Bundle-Version: 1.0.0.qualifier
-Export-Package: aero.minova.rcp.form.model.xsd,
- aero.minova.rcp.xsd
+Export-Package: aero.minova.rcp.form.model.xsd
