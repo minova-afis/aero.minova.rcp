@@ -52,27 +52,44 @@
 					<argLine>--illegal-access=permit</argLine>
 				</configuration>
 			</plugin>
+			<!-- plugin> <groupId>org.apache.cxf</groupId> <artifactId>cxf-xjc-plugin</artifactId> 
+				<version>3.3.0</version> <executions> <execution> <id>xjc</id> <phase>generate-sources</phase> 
+				<goals> <goal>xsdtojava</goal> </goals> <configuration> <xsdOptions> <xsdOption> 
+				<xsd>${basedir}/src/aero/minova/rcp/form/model/XMLForm.xsd</xsd> <packagename>aero.minova.rcp.form.model.xsd</packagename> 
+				</xsdOption> </xsdOptions> <noGeneratedHeaderComments>true</noGeneratedHeaderComments> 
+				</configuration> </execution> </executions> </plugin -->
 			<plugin>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-xjc-plugin</artifactId>
-				<version>3.3.0</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>2.4</version>
 				<executions>
 					<execution>
 						<id>xjc</id>
-						<phase>generate-sources</phase>
 						<goals>
-							<goal>xsdtojava</goal>
+							<goal>xjc</goal>
 						</goals>
-						<configuration>
-							<xsdOptions>
-								<xsdOption>
-									<xsd>${basedir}/src/aero/minova/rcp/form/model/XMLForm.xsd</xsd>
-									<packagename>aero.minova.rcp.form.model.xsd</packagename>
-								</xsdOption>
-							</xsdOptions>
-						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<target>2.1</target>
+					<sources>
+						<source>${basedir}/src/aero/minova/rcp/form/model/XMLForm.xsd</source>
+					</sources>
+					<packageName>aero.minova.rcp.form.model.xsd</packageName>
+					<noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.glassfish.jaxb</groupId>
+						<artifactId>jaxb-xjc</artifactId>
+						<version>2.3.2</version>
+					</dependency>
+					 <dependency>
+                        <groupId>com.sun.activation</groupId>
+                        <artifactId>jakarta.activation</artifactId>
+                        <version>1.2.1</version>
+                    </dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -88,7 +105,7 @@
 							<outputDirectory>${basedir}/src/aero/minova/rcp/form/model/xsd/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/target/generated/src/main/java/aero/minova/rcp/form/model/xsd/</directory>
+									<directory>${basedir}/target/generated-sources/jaxb/aero/minova/rcp/form/model/xsd/</directory>
 								</resource>
 							</resources>
 						</configuration>
