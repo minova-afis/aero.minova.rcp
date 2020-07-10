@@ -8,6 +8,7 @@ package org.eclipse.e4.ui.workbench.perspectiveswitcher.handlers;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -24,6 +25,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -32,17 +34,25 @@ import org.eclipse.e4.ui.workbench.perspectiveswitcher.commands.E4WorkbenchParam
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.internal.dialogs.SelectPerspectiveDialog;
 
 public final class ShowPerspectiveHandler {
-	
-	
-		@Execute
+
+	@Inject
+	MApplication application;
+
+	@Inject
+	EModelService model;
+
+	@Inject
+	ECommandService commandService;
+
+	@Execute
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
-			MApplication application, EModelService model, ECommandService commandService)
+			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow)
 			throws InvocationTargetException, InterruptedException {
 
 		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
-		MUIElement toolitem = model.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
+		MUIElement closeToolbar = model.find("aero.minova.rcp.rcp.toolbar.close", application);
+		MUIElement closeToolitem = model.find("aero.minova.rcp.rcp.handledtoolitem.closeperspective", closeToolbar);
 
 		if (perspectiveID == null || perspectiveID.equals("")) {
 			openSelectionDialog(context);
@@ -50,31 +60,77 @@ public final class ShowPerspectiveHandler {
 			openNewWindowPerspective(context, perspectiveID);
 		} else {
 			openPerspective(context, perspectiveID);
-			if (toolitem == null) {
-				final MHandledToolItem newToolitem = model.createModelElement(MHandledToolItem.class);
-				MCommand command = null;
+			createNewToolItem(perspectiveID);
+			createCloseItem();
 
-				String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
-				String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
+			MPopupMenu popup = model.createModelElement(MPopupMenu.class);
+			toolbar.getParent().getChildren().add(popup);
+			popup.getParent().getChildren().add(closeToolitem);
 
-				((MToolBar) toolbar).getChildren().add(newToolitem);
-				command = model.createModelElement(MCommand.class);
-				command.setElementId("aero.minova.rcp.rcp.command.openform");
-				application.getCommands().add(command);
-
-				MParameter parameter = model.createModelElement(MParameter.class);
-				parameter.setName("org.eclipse.e4.ui.perspectives.parameters.perspectiveId");
-				parameter.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId33");
-				parameter.setValue(perspectiveID);
-
-				newToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID);
-				newToolitem.setCommand(command);
-				newToolitem.getParameters().add(parameter);
-				newToolitem.setLabel(toolLabel);
-//				newToolitem.setIconURI("platform:/plugin/aero.minova.rcp.rcp/icons/" + toolitemLabel + ".png");
-				newToolitem.setEnabled(true);
-			}
 		}
+
+	}
+
+	/*
+	 * Creating new HandledToolItem for each Perspective that is open
+	 * 
+	 */
+	public void createNewToolItem(
+			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID) {
+
+		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
+		MUIElement toolitem = model.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
+
+		if (toolitem == null) {
+			final MHandledToolItem newToolitem = model.createModelElement(MHandledToolItem.class);
+			MCommand command = null;
+
+			String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
+			String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
+
+			((MToolBar) toolbar).getChildren().add(newToolitem);
+			command = model.createModelElement(MCommand.class);
+			command.setElementId("aero.minova.rcp.rcp.command.openform");
+			application.getCommands().add(command);
+
+			MParameter parameter = model.createModelElement(MParameter.class);
+			parameter.setName("org.eclipse.e4.ui.perspectives.parameters.perspectiveId");
+			parameter.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId33");
+			parameter.setValue(perspectiveID);
+
+			newToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID);
+			newToolitem.setCommand(command);
+			newToolitem.getParameters().add(parameter);
+			newToolitem.setLabel(toolLabel);
+//			newToolitem.setIconURI("platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app" + toolitemLabel +  ".png");
+			newToolitem.setEnabled(true);
+		}
+	}
+
+
+	/*
+	 * Create a HandledToolitem to Close Perspectives, if a perspective was opened.
+	 */
+
+	public void createCloseItem() {
+
+		MUIElement closeToolbar = model.find("aero.minova.rcp.rcp.toolbar.close", application);
+		MUIElement closeToolitem = model.find("aero.minova.rcp.rcp.handledtoolitem.closeperspective", closeToolbar);
+
+		if (closeToolitem == null) {
+			final MHandledToolItem closeNewToolitem = model.createModelElement(MHandledToolItem.class);
+			MCommand closeCommand = null;
+			((MToolBar) closeToolbar).getChildren().add(closeNewToolitem);
+			closeCommand = model.createModelElement(MCommand.class);
+			closeCommand.setElementId("aero.minova.rcp.rcp.command.closeperspective");
+			application.getCommands().add(closeCommand);
+
+			closeNewToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem.closeperspective");
+			closeNewToolitem.setCommand(closeCommand);
+			closeNewToolitem.setLabel("Close");
+			closeNewToolitem.setEnabled(true);
+		}
+
 	}
 
 	/**
@@ -148,12 +204,12 @@ public final class ShowPerspectiveHandler {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
+			perspective.setLabel(perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1));
+			perspective.setParent(perspectiveStack);
 //			String label = (String) context.get("NEW_PERSPECTIVE");
 //			label = label.substring(0, 1).toUpperCase() + label.substring(1);
-			perspective.setLabel(perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1));
 //			perspective.setLabel(label);
 //			perspective.setTooltip(label);
-			perspective.setParent(perspectiveStack);
 
 			switchTo(context, perspective);
 
