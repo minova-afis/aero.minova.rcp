@@ -2,7 +2,7 @@
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="500" height="400">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack">
-      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.stundenerfassung" label="Home">
+      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.home" label="Home">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.2" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_Blgn4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.1">
             <children xsi:type="basic:PartStack" xmi:id="_DgwT4LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_C4Nl4LYkEeqEVOzPNoSbhw">
@@ -123,15 +123,13 @@
       </children>
     </mainMenu>
     <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top">
+      <children xsi:type="menu:ToolBar" xmi:id="_Qiu9IL0fEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar"/>
       <children xsi:type="menu:ToolBar" xmi:id="_C_vM8LuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbar.3">
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLmMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.save" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/save_edit.png" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_E6aJ4LuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbarseparator.0"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLl8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_eYo3wLuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbarseparator.2"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="__8AHMJUYEeqmGZPB7cWGQw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_Leg0MI3eEeq7suCev8DfDQ"/>
-      </children>
-      <children xsi:type="menu:ToolControl" xmi:id="_FCjM4LbcEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolcontrol.strech" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
-        <tags>strech</tags>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_Wof8QLuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbar.4">
         <children xsi:type="menu:HandledToolItem" xmi:id="_-RJpQLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.css" label="CSS" command="_G3ZgAJQ9EeqGueGN8sfnvg"/>
@@ -140,7 +138,11 @@
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_kQDXELuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbarseparator.4"/>
         <children xsi:type="menu:HandledToolItem" xmi:id="_ttVMMLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.close" label="Close"/>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_Qiu9IL0fEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar"/>
+      <children xsi:type="menu:ToolControl" xmi:id="_KrLlsMEWEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.toolcontrol.0">
+        <tags>stretch</tags>
+        <tags>glue</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_6r2lwMEWEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.toolbar.close"/>
     </trimBars>
     <trimBars xmi:id="_aLxJUKpaEeqnXO2qXK5wdA" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom"/>
   </children>
@@ -153,6 +155,7 @@
   <handlers xmi:id="_J_J7IJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.theme" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ThemeSwitchHandler" command="_G3ZgAJQ9EeqGueGN8sfnvg"/>
   <handlers xmi:id="_0R9jAJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.EnterCredentialHandler" command="_1a0BcJRJEeqGueGN8sfnvg"/>
   <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.perspectiveswitcher/org.eclipse.e4.ui.workbench.perspectiveswitcher.handlers.ShowPerspectiveHandler" command="_4p5JwLufEeqOjqZ1liG0LA"/>
+  <handlers xmi:id="_R4qb4MEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler" command="_Oe_xYMEdEeqyRP6BKwa0Bg"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -174,6 +177,7 @@
   <commands xmi:id="_4p5JwLufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="FormName" optional="false"/>
   </commands>
+  <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
