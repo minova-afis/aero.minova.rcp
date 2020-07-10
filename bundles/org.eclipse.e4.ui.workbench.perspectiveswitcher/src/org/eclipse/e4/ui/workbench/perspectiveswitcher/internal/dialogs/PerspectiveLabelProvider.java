@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.perspectiveswitcher.internal.dialogs;
 
+
 import java.util.HashMap;
 
 import javax.inject.Inject;
