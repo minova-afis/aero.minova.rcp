@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="WorkingTime" title="@WorkingTime.Administration" xmlns="http://ch.minova.aero" helper-class="ch.minova.sis.workingtime.helper.WorkingTimeHelper" >
+<form icon="WorkingTime" title="@WorkingTime.Administration" targetNamespace="http://ch.minova.aero" helper-class="ch.minova.sis.workingtime.helper.WorkingTimeHelper" >
 	<index-view source="vWorkingTimeIndex2" index-report="auto">
 		<column name="KeyLong" key="true" text="@WorkingTime.KeyLong" aggregate="COUNT">
 			<number/>
