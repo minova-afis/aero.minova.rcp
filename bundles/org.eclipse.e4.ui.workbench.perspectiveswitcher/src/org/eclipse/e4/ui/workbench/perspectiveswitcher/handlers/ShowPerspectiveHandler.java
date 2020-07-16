@@ -101,6 +101,7 @@ public final class ShowPerspectiveHandler {
 			newToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID);
 			newToolitem.setCommand(command);
 			newToolitem.getParameters().add(parameter);
+			newToolitem.setToBeRendered(true);
 			newToolitem.setLabel(toolLabel);
 //			newToolitem.setIconURI("platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app" + toolitemLabel +  ".png");
 			newToolitem.setEnabled(true);
@@ -127,6 +128,7 @@ public final class ShowPerspectiveHandler {
 
 			closeNewToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem.closeperspective");
 			closeNewToolitem.setCommand(closeCommand);
+			closeNewToolitem.setToBeRendered(true);
 			closeNewToolitem.setLabel("Close");
 			closeNewToolitem.setEnabled(true);
 		}
