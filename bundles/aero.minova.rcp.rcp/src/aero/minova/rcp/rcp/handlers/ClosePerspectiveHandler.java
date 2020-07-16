@@ -28,14 +28,21 @@ public class ClosePerspectiveHandler {
 		MPerspective currentPerspective = modelService.getActivePerspective(window);
 		String perspectiveID = currentPerspective.getElementId();
 		MUIElement toolitem = modelService.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
+		MUIElement closeToolbar = modelService.find("aero.minova.rcp.rcp.toolbar.close", application);
+		MUIElement closeToolitem = modelService.find("aero.minova.rcp.rcp.handledtoolitem.closeperspective", closeToolbar);
 
-		currentPerspective.setToBeRendered(false);
 		currentPerspective.getParent().getChildren().remove(currentPerspective);
 
-		toolitem.setToBeRendered(false);
 		toolitem.getParent().getChildren().remove(toolitem);
 
 		partService.switchPerspective("aero.minova.rcp.rcp.perspective.home");
+		
+		if(closeToolitem.isToBeRendered()) {
+			
+			closeToolitem.getParent().getChildren().remove(closeToolitem);
+			
+		}
+		
 
 	}
 
