@@ -143,13 +143,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.e4.ui.workbench.perspectiveswitcher"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.equinox.security.linux.x86_64"
          os="linux"
          ws="gtk"
@@ -176,6 +169,13 @@
 
    <plugin
          id="org.eclipse.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="aero.minova.rcp.perspectiveswitcher"
          download-size="0"
          install-size="0"
          version="0.0.0"

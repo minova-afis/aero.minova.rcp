@@ -154,7 +154,7 @@
   <handlers xmi:id="_TeaqAI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.handler.remove" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RemoveTodoHandler" command="_PHP1cI3eEeq7suCev8DfDQ"/>
   <handlers xmi:id="_J_J7IJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.theme" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ThemeSwitchHandler" command="_G3ZgAJQ9EeqGueGN8sfnvg"/>
   <handlers xmi:id="_0R9jAJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.EnterCredentialHandler" command="_1a0BcJRJEeqGueGN8sfnvg"/>
-  <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.perspectiveswitcher/org.eclipse.e4.ui.workbench.perspectiveswitcher.handlers.ShowPerspectiveHandler" command="_4p5JwLufEeqOjqZ1liG0LA"/>
+  <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler" command="_4p5JwLufEeqOjqZ1liG0LA"/>
   <handlers xmi:id="_R4qb4MEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler" command="_Oe_xYMEdEeqyRP6BKwa0Bg"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
