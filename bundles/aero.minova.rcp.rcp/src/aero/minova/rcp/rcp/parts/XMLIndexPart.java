@@ -34,9 +34,8 @@ import org.xml.sax.SAXException;
 
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.form.model.xsd.IndexView;
 
-public class XMLSearchPart {
+public class XMLIndexPart {
 
 	private XmlProcessor xmlProcessor;
 
@@ -51,15 +50,6 @@ public class XMLSearchPart {
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
 		}
-//		form = new Form();
-//		form.setIndexView(new IndexView());
-//		for (int i = 0; i < 10; i++) {
-//			Column c = new Column();
-//			c.setName(value);
-//			form.getIndexView().getColumn().add(e)
-//		}
-		
-		
 		parent.setLayout(new GridLayout());
 		
 		// mapping from property to label, needed for column header labels
