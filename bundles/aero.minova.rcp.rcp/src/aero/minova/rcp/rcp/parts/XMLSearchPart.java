@@ -14,7 +14,6 @@ import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
-import org.eclipse.nebula.widgets.nattable.data.ReflectiveColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
@@ -26,8 +25,6 @@ import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
-import org.eclipse.swt.dnd.ByteArrayTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.xml.sax.SAXException;
@@ -35,6 +32,11 @@ import org.xml.sax.SAXException;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.IndexView;
+import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.plugin1.model.DataType;
+import aero.minova.rcp.plugin1.model.Row;
+import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.plugin1.model.Value;
 
 public class XMLSearchPart {
 
@@ -42,93 +44,87 @@ public class XMLSearchPart {
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
-		Form form = null;
-		try {
-			xmlProcessor = new XmlProcessor(Form.class);
-			form = (Form) xmlProcessor
-					.load(new File("/Users/erlanger/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
-
-		} catch (JAXBException | SAXException | IOException e) {
-			e.printStackTrace();
-		}
-//		form = new Form();
-//		form.setIndexView(new IndexView());
-//		for (int i = 0; i < 10; i++) {
-//			Column c = new Column();
-//			c.setName(value);
-//			form.getIndexView().getColumn().add(e)
-//		}
-		
-		
 		parent.setLayout(new GridLayout());
-		
+
+		Form form = readFormData();
+
 		// mapping from property to label, needed for column header labels
-        Map<String, String> propertyToLabelMap = new HashMap<String, String>();
-        List<Column> column = form.getIndexView().getColumn();
-        String[] propertyNames = new String[column.size()];
-        int i = 0;
-        for (Column column2 : column) {
-        	propertyToLabelMap.put(column2.getName(), column2.getTextAttribute().toString());
-        	propertyNames[i++] = column2.getName();
+		Map<String, String> tableHeadersMap = new HashMap<>();
+		List<Column> columns = form.getIndexView().getColumn();
+		String[] propertyNames = new String[columns.size()];
+		int i = 0;
+		for (Column column : columns) {
+			tableHeadersMap.put(column.getName(), column.getTextAttribute());
+			propertyNames[i++] = column.getName();
 		}
-        
 
-        IColumnPropertyAccessor<Column> columnPropertyAccessor =
-                new ReflectiveColumnPropertyAccessor<Column>(propertyNames);
+		// Datenmodel für die Eingaben
+		Table t = new Table();
+		t.addColumn(new aero.minova.rcp.plugin1.model.Column("KeyLong", DataType.INTEGER));
+		t.addColumn(new aero.minova.rcp.plugin1.model.Column("EmployeeText", DataType.STRING));
+		Row r;
+		r = new Row();
+		r.addValue(null);
+		r.addValue(null);
+		t.addRow(r);
+		r = new Row();
+		r.addValue(new Value("56"));
+		r.addValue(new Value("Peter"));
+		t.addRow(r);
 
-        // build the body layer stack
-        IDataProvider bodyDataProvider = new ListDataProvider<Column>(column, columnPropertyAccessor);
-//                new ListDataProvider<Person>(
-//                        personService.getPersons(50),
-//                        columnPropertyAccessor);
-        DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-        SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
-        ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
+		IColumnPropertyAccessor<Row> columnPropertyAccessor = new MinovaColumnPropertyAccessor(t);
 
-        // build the column header layer stack
-        IDataProvider columnHeaderDataProvider =
-                new DefaultColumnHeaderDataProvider(propertyNames, propertyToLabelMap);
-        DataLayer columnHeaderDataLayer =
-                new DataLayer(columnHeaderDataProvider);
-        ILayer columnHeaderLayer =
-                new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		// build the body layer stack
+		IDataProvider bodyDataProvider = new ListDataProvider<Row>(t.getRows(), columnPropertyAccessor);
+		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
+		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
-        // build the row header layer stack
-        IDataProvider rowHeaderDataProvider =
-                new DefaultRowHeaderDataProvider(bodyDataProvider);
-        DataLayer rowHeaderDataLayer =
-                new DataLayer(rowHeaderDataProvider, 40, 20);
-        ILayer rowHeaderLayer =
-                new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
+		// build the column header layer stack
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
+		DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
+		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
-        // build the corner layer stack
-        ILayer cornerLayer = new CornerLayer(
-                new DataLayer(
-                        new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
-                rowHeaderLayer,
-                columnHeaderLayer);
+		// build the row header layer stack
+		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
+		DataLayer rowHeaderDataLayer = new DataLayer(rowHeaderDataProvider, 40, 20);
+		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
 
-        // create the grid layer composed with the prior created layer stacks
-        GridLayer gridLayer =
-                new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
+		// build the corner layer stack
+		ILayer cornerLayer = new CornerLayer(
+				new DataLayer(new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
+				rowHeaderLayer, columnHeaderLayer);
 
-        NatTable natTable = new NatTable(parent, gridLayer, true);
-        Transfer[] transfer = { new ByteArrayTransfer() {
-			
-			@Override
-			protected String[] getTypeNames() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			protected int[] getTypeIds() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		} };
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
-    }
+		// create the grid layer composed with the prior created layer stacks
+		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
 
-	
+		NatTable natTable = new NatTable(parent, gridLayer, true);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
+	}
+
+	private Form readFormData() {
+
+		Form form;
+//		try {
+//			xmlProcessor = new XmlProcessor(Form.class);
+//			form = (Form) xmlProcessor.load(new File(
+//					"/Users/erlanger/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+//
+//		} catch (JAXBException | SAXException | IOException e) {
+//			e.printStackTrace();
+//		}
+		// test data for creating a NatTable
+		form = new Form();
+		form.setIndexView(new IndexView());
+		Column c = new Column();
+		c.setName("KeyLong"); // das hier ist Attribute im Datenmodell
+		c.setTextAttribute("ID");
+		form.getIndexView().getColumn().add(c);
+		Column c2 = new Column();
+		c2.setName("EmployeeText"); // das hier ist Attribute im Datenmodell
+		c2.setTextAttribute("Mitarbeiter");
+		form.getIndexView().getColumn().add(c2);
+		return form;
+	}
+
 }
