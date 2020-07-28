@@ -9,11 +9,11 @@
               <children xsi:type="basic:Part" xmi:id="_C4Nl4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.XMLSearchPart" label="@Form.Search" tooltip="Hier kann man Sachen machen. ">
                 <toolbar xmi:id="_pvc5ALbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolbar.1">
                   <tags>NoMove</tags>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_rX_kILbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_vUnxwLbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="Clear"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_yd5P0LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_0xNWQLbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_2CU_4LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_rX_kILbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert" command="_y3TngNDREeqZdekMGDv2pg"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_vUnxwLbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="Clear" command="_rnXZkNDSEeqZdekMGDv2pg"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_0xNWQLbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save" command="_sAqqYNDSEeqZdekMGDv2pg"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_yd5P0LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load" command="_r5Qa0NDSEeqZdekMGDv2pg"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_2CU_4LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize" command="_sJJQ8NDSEeqZdekMGDv2pg"/>
                 </toolbar>
               </children>
             </children>
@@ -114,6 +114,11 @@
   <handlers xmi:id="_TeaqAI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.handler.remove" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RemoveTodoHandler" command="_PHP1cI3eEeq7suCev8DfDQ"/>
   <handlers xmi:id="_J_J7IJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.theme" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ThemeSwitchHandler" command="_G3ZgAJQ9EeqGueGN8sfnvg"/>
   <handlers xmi:id="_0R9jAJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.EnterCredentialHandler" command="_1a0BcJRJEeqGueGN8sfnvg"/>
+  <handlers xmi:id="_6jvuwNDREeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.revertsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertSearchHandler" command="_y3TngNDREeqZdekMGDv2pg"/>
+  <handlers xmi:id="_GOfCINDTEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_rnXZkNDSEeqZdekMGDv2pg"/>
+  <handlers xmi:id="_GTuugNDTEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.loadsearchcriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadSearchCriteriaHandler" command="_r5Qa0NDSEeqZdekMGDv2pg"/>
+  <handlers xmi:id="_GWvmQNDTEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.savesearchcriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveSearchCriteriaHandler" command="_sAqqYNDSEeqZdekMGDv2pg"/>
+  <handlers xmi:id="_GZafwNDTEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.optimizesearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeSearchHandler" command="_sJJQ8NDSEeqZdekMGDv2pg"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -132,6 +137,11 @@
   <commands xmi:id="_PHP1cI3eEeq7suCev8DfDQ" elementId="aero.minova.rcp.rcp.command.remove" commandName="removeCommand"/>
   <commands xmi:id="_G3ZgAJQ9EeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.command.themecommand" commandName="themeCommand"/>
   <commands xmi:id="_1a0BcJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.command.entercredentials" commandName="EnterCredentials"/>
+  <commands xmi:id="_y3TngNDREeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.revertsearch" commandName="RevertSearch"/>
+  <commands xmi:id="_rnXZkNDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.clearsearch" commandName="ClearSearch"/>
+  <commands xmi:id="_r5Qa0NDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.loadsearchcriteria" commandName="LoadSearchCriteria"/>
+  <commands xmi:id="_sAqqYNDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.savesearchcriteria" commandName="SaveSearchCriteria"/>
+  <commands xmi:id="_sJJQ8NDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.optimizesearch" commandName="OptimizeSearch"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
