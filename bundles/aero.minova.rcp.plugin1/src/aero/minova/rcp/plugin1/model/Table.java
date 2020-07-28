@@ -45,7 +45,7 @@ public class Table {
 
 	public void addRow(Row r) {
 		if (columns.size() != r.values.size()) {
-			throw new RuntimeException();
+			throw new RuntimeException("Mehr Columns definiert, als Wert übergeben!");
 		}
 		rows.add(r);
 	}

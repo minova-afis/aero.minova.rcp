@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="aero.minova.rcp.dataservice.internal.DataFormService">
+   <service>
+      <provide interface="aero.minova.rcp.dataservice.IDataFormService"/>
+   </service>
+   <implementation class="aero.minova.rcp.dataservice.internal.DataFormService"/>
+</scr:component>

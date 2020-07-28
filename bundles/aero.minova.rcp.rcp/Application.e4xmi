@@ -18,7 +18,7 @@
               </children>
             </children>
             <children xsi:type="basic:PartStack" xmi:id="_kj92ILblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partstack.2">
-              <children xsi:type="basic:Part" xmi:id="_VXUwELYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.nattable.part.NatTableDataExample" label="@Form.Index">
+              <children xsi:type="basic:Part" xmi:id="_VXUwELYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.XMLIndexPart" label="@Form.Index">
                 <toolbar xmi:id="_xQqyQLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolbar.0">
                   <children xsi:type="menu:HandledToolItem" xmi:id="_0MXuYLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load"/>
                   <children xsi:type="menu:HandledToolItem" xmi:id="_1xOzYLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="Expand"/>
