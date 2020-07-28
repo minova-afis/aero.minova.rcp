@@ -1,13 +1,10 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.xml.bind.JAXBException;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -23,11 +20,11 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.xml.sax.SAXException;
 
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -77,7 +74,9 @@ public class XMLSearchPart {
 		// build the body layer stack
 		IDataProvider bodyDataProvider = new ListDataProvider<Row>(t.getRows(), columnPropertyAccessor);
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-		SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
+		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(bodyDataLayer);
+
+		SelectionLayer selectionLayer = new SelectionLayer(columnReorderLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
 		// build the column header layer stack
