@@ -42,93 +42,73 @@ public class XMLSearchPart {
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
-		Form form = null;
-		try {
-			xmlProcessor = new XmlProcessor(Form.class);
-			form = (Form) xmlProcessor
-					.load(new File("/Users/erlanger/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
-
-		} catch (JAXBException | SAXException | IOException e) {
-			e.printStackTrace();
-		}
-//		form = new Form();
-//		form.setIndexView(new IndexView());
-//		for (int i = 0; i < 10; i++) {
-//			Column c = new Column();
-//			c.setName(value);
-//			form.getIndexView().getColumn().add(e)
-//		}
-		
-		
 		parent.setLayout(new GridLayout());
-		
+
+		Form form = readFormData();
+
 		// mapping from property to label, needed for column header labels
-        Map<String, String> propertyToLabelMap = new HashMap<String, String>();
-        List<Column> column = form.getIndexView().getColumn();
-        String[] propertyNames = new String[column.size()];
-        int i = 0;
-        for (Column column2 : column) {
-        	propertyToLabelMap.put(column2.getName(), column2.getTextAttribute().toString());
-        	propertyNames[i++] = column2.getName();
+		Map<String, String> tableHeadersMap = new HashMap<>();
+		List<Column> columns = form.getIndexView().getColumn();
+		String[] propertyNames = new String[columns.size()];
+		int i = 0;
+		for (Column column : columns) {
+			tableHeadersMap.put(column.getName(), column.getTextAttribute());
+			propertyNames[i++] = column.getName();
 		}
-        
 
-        IColumnPropertyAccessor<Column> columnPropertyAccessor =
-                new ReflectiveColumnPropertyAccessor<Column>(propertyNames);
+		IColumnPropertyAccessor<Column> columnPropertyAccessor = new ReflectiveColumnPropertyAccessor<Column>(
+				propertyNames);
 
-        // build the body layer stack
-        IDataProvider bodyDataProvider = new ListDataProvider<Column>(column, columnPropertyAccessor);
+		// build the body layer stack
+		IDataProvider bodyDataProvider = new ListDataProvider<Column>(columns, columnPropertyAccessor);
 //                new ListDataProvider<Person>(
 //                        personService.getPersons(50),
 //                        columnPropertyAccessor);
-        DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-        SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
-        ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
+		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
+		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
-        // build the column header layer stack
-        IDataProvider columnHeaderDataProvider =
-                new DefaultColumnHeaderDataProvider(propertyNames, propertyToLabelMap);
-        DataLayer columnHeaderDataLayer =
-                new DataLayer(columnHeaderDataProvider);
-        ILayer columnHeaderLayer =
-                new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		// build the column header layer stack
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
+		DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
+		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
-        // build the row header layer stack
-        IDataProvider rowHeaderDataProvider =
-                new DefaultRowHeaderDataProvider(bodyDataProvider);
-        DataLayer rowHeaderDataLayer =
-                new DataLayer(rowHeaderDataProvider, 40, 20);
-        ILayer rowHeaderLayer =
-                new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
+		// build the row header layer stack
+		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
+		DataLayer rowHeaderDataLayer = new DataLayer(rowHeaderDataProvider, 40, 20);
+		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
 
-        // build the corner layer stack
-        ILayer cornerLayer = new CornerLayer(
-                new DataLayer(
-                        new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
-                rowHeaderLayer,
-                columnHeaderLayer);
+		// build the corner layer stack
+		ILayer cornerLayer = new CornerLayer(
+				new DataLayer(new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
+				rowHeaderLayer, columnHeaderLayer);
 
-        // create the grid layer composed with the prior created layer stacks
-        GridLayer gridLayer =
-                new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
+		// create the grid layer composed with the prior created layer stacks
+		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
 
-        NatTable natTable = new NatTable(parent, gridLayer, true);
-        Transfer[] transfer = { new ByteArrayTransfer() {
-			
-			@Override
-			protected String[] getTypeNames() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			protected int[] getTypeIds() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		} };
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
-    }
+		NatTable natTable = new NatTable(parent, gridLayer, true);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
+	}
 
-	
+	private Form readFormData() {
+
+//		try {
+//		xmlProcessor = new XmlProcessor(Form.class);
+//		form = (Form) xmlProcessor
+//				.load(new File("/Users/erlanger/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+//
+//	} catch (JAXBException | SAXException | IOException e) {
+//		e.printStackTrace();
+//	}
+		// test data for creating a NatTable
+		Form form;
+		form = new Form();
+		form.setIndexView(new IndexView());
+		Column c = new Column();
+		c.setName("name"); // das hier ist Attribute im Datenmodell
+		c.setTextAttribute("testing");
+		form.getIndexView().getColumn().add(c);
+		return form;
+	}
+
 }
