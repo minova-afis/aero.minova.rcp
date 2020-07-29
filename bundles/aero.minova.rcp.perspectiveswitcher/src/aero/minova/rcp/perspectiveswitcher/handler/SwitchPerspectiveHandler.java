@@ -22,6 +22,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.swt.widgets.ToolBar;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
@@ -33,9 +34,11 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
-
+	
 	@Inject
 	EModelService model;
+	
+	ToolBar toolbar;
 
 	@Execute
 	public void execute(IEclipseContext context,
@@ -53,6 +56,7 @@ public class SwitchPerspectiveHandler {
 		}
 
 	}
+	 
 
 	/*
 	 * Creating new HandledToolItem for each Perspective that is open
@@ -116,6 +120,7 @@ public class SwitchPerspectiveHandler {
 		}
 
 	}
+	
 
 	/**
 	 * Opens the perspective with the given identifier.
@@ -202,5 +207,6 @@ public class SwitchPerspectiveHandler {
 			// error
 		}
 	}
+
 
 }

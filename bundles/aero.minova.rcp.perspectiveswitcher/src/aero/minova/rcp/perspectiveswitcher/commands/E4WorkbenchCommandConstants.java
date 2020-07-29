@@ -12,4 +12,10 @@ public interface E4WorkbenchCommandConstants {
 	 */
 	public static final String SNIPPET_PERSPECTIVE = PERSPECTIVE_PREFIX + "main";
 
+	 /**
+     * Id for command "Close" in category "Perspectives"
+     * (value is <code>"org.eclipse.e4.ui.perspectives.close"</code>).
+     */
+    public static final String PERSPECTIVES_CLOSE = "org.eclipse.e4.ui.perspectives.close"; //$NON-NLS-1$
+    
 }
