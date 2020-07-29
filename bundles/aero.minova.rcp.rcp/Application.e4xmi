@@ -13,7 +13,11 @@
                   <children xsi:type="menu:HandledToolItem" xmi:id="_vUnxwLbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="Clear"/>
                   <children xsi:type="menu:HandledToolItem" xmi:id="_yd5P0LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load"/>
                   <children xsi:type="menu:HandledToolItem" xmi:id="_0xNWQLbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_2CU_4LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_2CU_4LbkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize">
+                    <menu xmi:id="_yzDnYNDWEeqbHPiXqzapow" elementId="aero.minova.rcp.rcp.menu.0">
+                      <children xsi:type="menu:HandledMenuItem" xmi:id="_1TduoNDWEeqbHPiXqzapow" elementId="aero.minova.rcp.rcp.handledmenuitem.sdsd" label="sdsd"/>
+                    </menu>
+                  </children>
                 </toolbar>
               </children>
             </children>
@@ -91,11 +95,6 @@
         </children>
       </children>
     </snippets>
-    <snippets xsi:type="basic:TrimBar" xmi:id="_FFlt8L0rEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.trimbar.perspectives">
-      <children xsi:type="menu:ToolBar" xmi:id="_GbzS8L0rEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.toolbar.perspective">
-        <children xsi:type="menu:HandledToolItem" xmi:id="_Gzy8ML0rEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.handledtoolitem.0"/>
-      </children>
-    </snippets>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.menu" label="File">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLi8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.file.open" label="Open" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app.png" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -123,7 +122,10 @@
       </children>
     </mainMenu>
     <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top">
-      <children xsi:type="menu:ToolBar" xmi:id="_Qiu9IL0fEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar"/>
+      <children xsi:type="menu:ToolBar" xmi:id="_Qiu9IL0fEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar">
+        <children xsi:type="menu:HandledToolItem" xmi:id="_JD5GkNFjEeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handledtoolitem.keepperspective" label="Keep It" type="Check" command="_gqcNMNF7Eeq2n_R750bOVg"/>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="__dgRwNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.toolbarseparator.1"/>
+      </children>
       <children xsi:type="menu:ToolBar" xmi:id="_C_vM8LuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbar.3">
         <children xsi:type="menu:HandledToolItem" xmi:id="_6wlLmMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.trimbar.top.save" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/save_edit.png" command="_6wlLg8gZEeSyMNYR5xypkQ"/>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_E6aJ4LuEEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.toolbarseparator.0"/>
@@ -156,6 +158,7 @@
   <handlers xmi:id="_0R9jAJRJEeqGueGN8sfnvg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.EnterCredentialHandler" command="_1a0BcJRJEeqGueGN8sfnvg"/>
   <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler" command="_4p5JwLufEeqOjqZ1liG0LA"/>
   <handlers xmi:id="_R4qb4MEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler" command="_Oe_xYMEdEeqyRP6BKwa0Bg"/>
+  <handlers xmi:id="_jeEycNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handler.1" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.KeepPerspectiveHandler" command="_gqcNMNF7Eeq2n_R750bOVg"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O" command="_6wlLgMgZEeSyMNYR5xypkQ"/>
@@ -178,6 +181,7 @@
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="FormName" optional="false"/>
   </commands>
   <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand"/>
+  <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
