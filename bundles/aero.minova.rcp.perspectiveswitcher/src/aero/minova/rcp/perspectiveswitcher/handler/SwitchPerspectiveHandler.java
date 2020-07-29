@@ -22,7 +22,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.swt.widgets.ToolBar;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
@@ -34,11 +33,9 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
-	
+
 	@Inject
 	EModelService model;
-	
-	ToolBar toolbar;
 
 	@Execute
 	public void execute(IEclipseContext context,
@@ -56,7 +53,6 @@ public class SwitchPerspectiveHandler {
 		}
 
 	}
-	 
 
 	/*
 	 * Creating new HandledToolItem for each Perspective that is open
@@ -64,6 +60,7 @@ public class SwitchPerspectiveHandler {
 	 */
 	public void createNewToolItem(
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID) {
+
 
 		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
 		MUIElement toolitem = model.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
@@ -91,7 +88,7 @@ public class SwitchPerspectiveHandler {
 			newToolitem.setToBeRendered(true);
 			newToolitem.setLabel(toolLabel);
 //			newToolitem.setIconURI("platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app" + toolitemLabel +  ".png");
-			newToolitem.setEnabled(true);
+
 		}
 	}
 
@@ -120,7 +117,6 @@ public class SwitchPerspectiveHandler {
 		}
 
 	}
-	
 
 	/**
 	 * Opens the perspective with the given identifier.
@@ -207,6 +203,5 @@ public class SwitchPerspectiveHandler {
 			// error
 		}
 	}
-
 
 }
