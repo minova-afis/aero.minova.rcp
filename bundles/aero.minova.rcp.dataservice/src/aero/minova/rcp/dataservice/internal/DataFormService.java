@@ -61,6 +61,8 @@ public class DataFormService implements IDataFormService {
 		
 		Detail detail = new Detail();
 		Head head = new Head();
+		Page page = new Page();
+		page.setText("Administration");
 		
 		Field field = new Field();
 		field.setName("Keylong");
@@ -99,7 +101,7 @@ public class DataFormService implements IDataFormService {
 		field.setSqlIndex(new BigInteger("3"));
 		Instant instant = Instant.now();
 		field.setDateTime(instant);
-		head.getFieldOrGrid().add(field);
+		page.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("ValidUntil");
@@ -107,8 +109,8 @@ public class DataFormService implements IDataFormService {
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("4"));
 		ZonedDateTime zoned = ZonedDateTime.now();
-		field.setDateTime(text);
-		head.getFieldOrGrid().add(field);
+		field.setDateTime(zoned);
+		page.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("Married");
@@ -118,7 +120,7 @@ public class DataFormService implements IDataFormService {
 		aero.minova.rcp.form.model.xsd.Boolean bool = new Boolean();
 		text.setLength(20);
 		field.setBoolean(bool);
-		head.getFieldOrGrid().add(field);
+		page.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("VehicleKey");
@@ -128,10 +130,9 @@ public class DataFormService implements IDataFormService {
 		Lookup lookup = new Lookup();
 		text.setLength(20);
 		field.setLookup(lookup);
-		head.getFieldOrGrid().add(field);
+		page.getFieldOrGrid().add(field);
 		
-		Page page = new Page();
-		page.setText("Page");
+	
 		detail.getHeadAndPage().add(head);
 		detail.getHeadAndPage().add(page);
 		
