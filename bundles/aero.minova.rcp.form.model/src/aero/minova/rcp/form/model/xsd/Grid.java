@@ -7,8 +7,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
@@ -30,7 +28,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;choice&gt;
  *           &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
  *             &lt;element name="field" type="{}field" maxOccurs="unbounded" minOccurs="0"/&gt;
- *             &lt;element name="toolbar" type="{}toolbar" maxOccurs="unbounded" minOccurs="0"/&gt;
  *           &lt;/choice&gt;
  *         &lt;/choice&gt;
  *         &lt;element name="events" type="{}events" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -77,18 +74,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "button",
-    "fieldOrToolbar",
+    "field",
     "events"
 })
 @XmlRootElement(name = "grid")
 public class Grid {
 
     protected List<Button> button;
-    @XmlElements({
-        @XmlElement(name = "field", type = Field.class),
-        @XmlElement(name = "toolbar", type = Toolbar.class)
-    })
-    protected List<Object> fieldOrToolbar;
+    protected List<Field> field;
     protected List<Events> events;
     @XmlAttribute(name = "procedure-prefix")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -172,33 +165,32 @@ public class Grid {
     }
 
     /**
-     * Gets the value of the fieldOrToolbar property.
+     * Gets the value of the field property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the fieldOrToolbar property.
+     * This is why there is not a <CODE>set</CODE> method for the field property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getFieldOrToolbar().add(newItem);
+     *    getField().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Field }
-     * {@link Toolbar }
      * 
      * 
      */
-    public List<Object> getFieldOrToolbar() {
-        if (fieldOrToolbar == null) {
-            fieldOrToolbar = new ArrayList<Object>();
+    public List<Field> getField() {
+        if (field == null) {
+            field = new ArrayList<Field>();
         }
-        return this.fieldOrToolbar;
+        return this.field;
     }
 
     /**

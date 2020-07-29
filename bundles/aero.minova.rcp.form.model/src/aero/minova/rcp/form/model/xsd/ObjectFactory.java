@@ -102,14 +102,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Toolbar }
-     * 
-     */
-    public Toolbar createToolbar() {
-        return new Toolbar();
-    }
-
-    /**
      * Create an instance of {@link Addon }
      * 
      */
@@ -259,22 +251,6 @@ public class ObjectFactory {
      */
     public Page createPage() {
         return new Page();
-    }
-
-    /**
-     * Create an instance of {@link Section }
-     * 
-     */
-    public Section createSection() {
-        return new Section();
-    }
-
-    /**
-     * Create an instance of {@link Separator }
-     * 
-     */
-    public Separator createSeparator() {
-        return new Separator();
     }
 
     /**
