@@ -74,6 +74,7 @@ public class DataFormService implements IDataFormService {
 		
 		field = new Field();
 		field.setName("KeyText");
+		field.setTextAttribute("MatchCode");
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("1"));
 		Text text = new Text();
@@ -83,6 +84,7 @@ public class DataFormService implements IDataFormService {
 		
 		field = new Field();
 		field.setName("Description");
+		field.setTextAttribute("Beschreibung");
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("2"));
 		text = new Text();
@@ -92,6 +94,7 @@ public class DataFormService implements IDataFormService {
 		
 		field = new Field();
 		field.setName("LastDate");
+		field.setTextAttribute("Letzte Änderung");
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("3"));
 		Instant instant = Instant.now();
@@ -100,6 +103,7 @@ public class DataFormService implements IDataFormService {
 		
 		field = new Field();
 		field.setName("ValidUntil");
+		field.setTextAttribute("Gültig bis");
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("4"));
 		ZonedDateTime zoned = ZonedDateTime.now();
@@ -108,6 +112,7 @@ public class DataFormService implements IDataFormService {
 		
 		field = new Field();
 		field.setName("Married");
+		field.setTextAttribute("Verheiratet");
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("5"));
 		aero.minova.rcp.form.model.xsd.Boolean bool = new Boolean();
@@ -117,6 +122,7 @@ public class DataFormService implements IDataFormService {
 		
 		field = new Field();
 		field.setName("VehicleKey");
+		field.setTextAttribute("Fahrzeug ID");
 		field.setVisible(true);
 		field.setSqlIndex(new BigInteger("6"));
 		Lookup lookup = new Lookup();
