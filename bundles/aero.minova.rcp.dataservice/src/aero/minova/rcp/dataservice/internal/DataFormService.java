@@ -70,7 +70,7 @@ public class DataFormService implements IDataFormService {
 		Number number = new Number();
 		number.setDecimals(0);
 		field.setNumber(number);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("KeyText");
@@ -79,7 +79,7 @@ public class DataFormService implements IDataFormService {
 		Text text = new Text();
 		text.setLength(20);
 		field.setText(text);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("Description");
@@ -88,7 +88,7 @@ public class DataFormService implements IDataFormService {
 		text = new Text();
 		text.setLength(50);
 		field.setText(text);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("LastDate");
@@ -96,7 +96,7 @@ public class DataFormService implements IDataFormService {
 		field.setSqlIndex(new BigInteger("3"));
 		Instant instant = Instant.now();
 		field.setDateTime(instant);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("ValidUntil");
@@ -104,7 +104,7 @@ public class DataFormService implements IDataFormService {
 		field.setSqlIndex(new BigInteger("4"));
 		ZonedDateTime zoned = ZonedDateTime.now();
 		field.setDateTime(text);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("Married");
@@ -113,7 +113,7 @@ public class DataFormService implements IDataFormService {
 		aero.minova.rcp.form.model.xsd.Boolean bool = new Boolean();
 		text.setLength(20);
 		field.setBoolean(bool);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		field = new Field();
 		field.setName("VehicleKey");
@@ -122,7 +122,7 @@ public class DataFormService implements IDataFormService {
 		Lookup lookup = new Lookup();
 		text.setLength(20);
 		field.setLookup(lookup);
-		head.getFieldOrSeparatorOrGrid().add(field);
+		head.getFieldOrGrid().add(field);
 		
 		Page page = new Page();
 		page.setText("Page");
