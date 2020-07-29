@@ -41,9 +41,9 @@ public class XMLIndexPart {
 		String string = prefs.get(tableName, null);
 		data = dataService.getData(tableName);
 
-		if (string != null) {
-			data = mjs.json2Table(string);
-		}
+//		if (string != null) {
+//			data = mjs.json2Table(string);
+//		}
 
 		parent.setLayout(new GridLayout());
 		NatTableUtil.createNatTable(parent, form, data);
