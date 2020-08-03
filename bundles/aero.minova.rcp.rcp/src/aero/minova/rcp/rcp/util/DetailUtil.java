@@ -27,6 +27,8 @@ public class DetailUtil {
 		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE);
 		TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
 		ButtonFactory btnFactory = ButtonFactory.newButton(SWT.CHECK);
+		TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
+
 		Integer numberOfColumns = null;
 		if (field.getNumberColumnsSpanned() == null
 				|| field.getNumberColumnsSpanned().compareTo(new BigInteger("2")) == 0) {
@@ -51,22 +53,29 @@ public class DetailUtil {
 				Button button = btnFactory.create(composite);
 				button.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
 			} else {
-				Text text = textFactory.create(composite);
+				Text text;
 				GridData gd;
 				Integer numberRowSpand = null;
 
-				if (field.getNumberRowsSpanned() != null) {
-					numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
-				}
-
 				if (numberOfColumns == 4) {
-					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field, 4), numberRowSpand);
+					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field, 4));
 				} else {
 					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field));
 				}
 				if (field.getUnitText() == null) {
 					// Wenn es keine Einheit gibt, muss das Feld 2 Spaltenbreiten einnehmen
 					gd.horizontalSpan = gd.horizontalSpan + 1;
+				}
+
+				if (field.getNumberRowsSpanned() != null) {
+					numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
+					text = textMultiFactory.create(composite);
+					if (numberRowSpand != null) {
+						int hight = text.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+						gd.heightHint = hight * numberRowSpand;
+					}
+				} else {
+					text = textFactory.create(composite);
 				}
 				text.setLayoutData(gd);
 			}
@@ -100,24 +109,13 @@ public class DetailUtil {
 	}
 
 	/**
-	 * Erstellt ein neues GridData-Objekt mit Breite und der Anzahl an Spalten.
-	 * 
-	 * @param numberColumns default = 1
-	 * @param widthHint
-	 * @return GridData
-	 */
-	private static GridData getGridDataFactory(Integer numberColumns, Integer widthHint) {
-		return getGridDataFactory(numberColumns, widthHint, null);
-	}
-
-	/**
 	 * 
 	 * @param numberColumns
 	 * @param widthHint
 	 * @param numberRowSpand
 	 * @return
 	 */
-	private static GridData getGridDataFactory(Integer numberColumns, Integer widthHint, Integer numberRowSpand) {
+	private static GridData getGridDataFactory(Integer numberColumns, Integer widthHint) {
 		GridDataFactory gridDataFactory = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP);
 		GridData data = gridDataFactory.create();
 		if (widthHint != null) {
@@ -127,9 +125,6 @@ public class DetailUtil {
 			data.horizontalSpan = 1;
 		} else {
 			data.horizontalSpan = 4;
-		}
-		if (numberRowSpand != null) {
-			data.verticalSpan = numberRowSpand;
 		}
 		return data;
 	}
