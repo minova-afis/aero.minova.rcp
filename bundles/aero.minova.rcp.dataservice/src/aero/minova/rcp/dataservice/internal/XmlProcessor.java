@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.parts;
+package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.xml.sax.SAXException;
+
 
  
 
@@ -48,7 +49,8 @@ public class XmlProcessor {
      * @throws IOException 
      */
     public Object load(File file) throws JAXBException, SAXException, IOException {
-        JAXBContext jc = JAXBContext.newInstance(this.expectedRootClass.getPackage().getName());
+    	JAXBContext jc = JAXBContext.newInstance(this.expectedRootClass.getPackageName(),
+    			this.expectedRootClass.getClassLoader());
         Unmarshaller unmarshaller = jc.createUnmarshaller();
 
         // unmarshaller.setProperty(name, value);
