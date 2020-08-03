@@ -37,3 +37,7 @@ hs_err_pid*
 **/.settings/*
 **/.log
 **/.metadata/
+
+# Pomless build artifacts
+.polyglot.feature.xml
+.polyglot..META-INF_MANIFEST.MF
