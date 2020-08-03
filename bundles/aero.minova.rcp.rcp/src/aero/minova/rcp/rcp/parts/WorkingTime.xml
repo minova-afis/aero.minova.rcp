@@ -92,10 +92,10 @@
 			<field name="BookingDate" sql-index="6" text="@WorkingTime.BookingDate" number-columns-spanned="4" required="true">
 				<short-date/>
 			</field>
-			<field name="StartDate" text="@WorkingTime.StartDate" sql-index="7" required="true">
+			<field name="StartDate" text="@WorkingTime.StartDate" sql-index="7" required="true" unit-text="Uhr">
 				<short-time/>
 			</field>
-			<field name="EndDate" text="@WorkingTime.EndDate" sql-index="8" required="true">
+			<field name="EndDate" text="@WorkingTime.EndDate" sql-index="8" required="true" unit-text="Uhr">
 				<short-time/>
 			</field>
 			<field name="RenderedQuantity" sql-index="9" text="@WorkingTime.RenderedQuantity" read-only="true" required="true">
