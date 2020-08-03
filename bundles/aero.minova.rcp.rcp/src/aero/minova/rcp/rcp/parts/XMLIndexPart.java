@@ -46,7 +46,7 @@ public class XMLIndexPart {
 //		}
 
 		parent.setLayout(new GridLayout());
-		NatTableUtil.createNatTable(parent, form, data);
+		NatTableUtil.createNatTable(parent, form, data, true);
 	}
 
 	@PersistTableSelection

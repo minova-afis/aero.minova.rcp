@@ -49,7 +49,7 @@ public class XMLSearchPart {
 		}
 
 		parent.setLayout(new GridLayout());
-		NatTableUtil.createNatTable(parent, form, data);
+		NatTableUtil.createNatTable(parent, form, data, false);
 	}
 
 	@PersistTableSelection

@@ -35,7 +35,7 @@ import aero.minova.rcp.plugin1.model.Table;
 
 public class NatTableUtil {
 
-	public static void createNatTable(Composite parent, Form form, Table table) {
+	public static void createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer) {
 
 		Map<String, String> tableHeadersMap = new HashMap<>();
 		List<Column> columns = form.getIndexView().getColumn();
@@ -72,7 +72,9 @@ public class NatTableUtil {
 		ILayer cornerLayer = new CornerLayer(
 				new DataLayer(new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
 				rowHeaderLayer, columnHeaderLayer);
-
+		
+		
+		
 		// create the grid layer composed with the prior created layer stacks
 		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
 
