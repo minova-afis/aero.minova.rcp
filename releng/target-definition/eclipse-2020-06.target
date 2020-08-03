@@ -59,5 +59,15 @@
 			<repository location="https://download.eclipse.org/rt/eclipselink/updates/"/>
 			<unit id="org.eclipse.persistence.sdk.feature.group" version="2.7.7.v20200504-69f2c2b80d"/>
 		</location>
+	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+		<repository location="http://download.eclipse.org/e4/snapshots/org.eclipse.e4.tools/latest/"/>
+		<unit id="org.eclipse.e4.tools.bundle.spy.feature.feature.group" version="0.1.0.v20200123-1744"/>
+		<unit id="org.eclipse.e4.tools.context.spy.feature.feature.group" version="0.17.0.v20200123-1744"/>
+		<unit id="org.eclipse.e4.tools.css.spy.feature.feature.group" version="0.14.0.v20200123-1744"/>
+		<unit id="org.eclipse.e4.tools.event.spy.feature.feature.group" version="0.15.0.v20200123-1744"/>
+		<unit id="org.eclipse.e4.tools.model.spy.feature.feature.group" version="0.1.100.v20200123-1744"/>
+		<unit id="org.eclipse.e4.tools.preference.spy.feature.feature.group" version="0.1.0.v20200203-1625"/>
+		<unit id="org.eclipse.e4.tools.spies.feature.feature.group" version="0.18.0.v20200203-1625"/>
+	</location>
 </locations>
 </target>
