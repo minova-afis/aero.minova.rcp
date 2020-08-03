@@ -1,7 +1,14 @@
 package aero.minova.rcp.rcp.util;
 
+import java.math.BigInteger;
+
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.widgets.ButtonFactory;
+import org.eclipse.jface.widgets.LabelFactory;
+import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -16,125 +23,142 @@ import aero.minova.rcp.form.model.xsd.Page;
 
 public class DetailUtil {
 	public static void createField(Field field, Composite composite) {
-		if (field.isVisible()) {
-			// GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 3);
-//			Composite formComposite = new Composite(composite, SWT.FILL  | SWT.RIGHT);
-			Label label = new Label(composite, SWT.RIGHT);
-			label.setText(field.getTextAttribute());
-//			label.setLayoutData(gridData);
-			
-			if (field.getNumber() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			} else if (field.getBignumber() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getLookup() != null) {
-				CCombo combo = new CCombo(composite, SWT.BORDER);
-				combo.setText("");
-			}
-			else if (field.getPercentage() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getText() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getShortDate() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getLongDate() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getShortTime() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getLongTime() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getDateTime() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getWeekDay() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getEditor() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getMoney() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getParamString() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getVoid() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			else if (field.getBoolean() != null) {
-				Button button = new Button(composite, SWT.CHECK);
-				button.setText("");
-			}
-			else if (field.getColor() != null) {
-				Text text = new Text(composite, SWT.BORDER);
-				text.setText("");
-			}
-			
-			Label labelUnit = new Label(composite, SWT.None);
-			if (field.getUnitText() != null) {
-				labelUnit.setText(field.getUnitText());
-			}
-//				labelUnit.setLayoutData(gridData);
+
+		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE);
+		TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
+		ButtonFactory btnFactory = ButtonFactory.newButton(SWT.CHECK);
+		Integer numberOfColumns = null;
+		if (field.getNumberColumnsSpanned() == null
+				|| field.getNumberColumnsSpanned().compareTo(new BigInteger("2")) == 0) {
+			numberOfColumns = 1;
+		} else {
+			numberOfColumns = 4;
 		}
+
+		if (field.isVisible()) {
+			Label label = labelFactory.create(composite);
+			label.setText(field.getTextAttribute());
+			label.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+
+			if (field.getLookup() != null) {
+				CCombo combo = new CCombo(composite, SWT.BORDER);
+				combo.setLayoutData(getGridDataFactory(numberOfColumns, getWidthHintForElement(field)));
+				// Description für die LookUp
+				Label labelDescription = labelFactory.create(composite);
+				labelDescription.setText("Description");
+				labelDescription.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+			} else if (field.getBoolean() != null) {
+				Button button = btnFactory.create(composite);
+				button.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+			} else {
+				Text text = textFactory.create(composite);
+				GridData gd;
+				Integer numberRowSpand = null;
+
+				if (field.getNumberRowsSpanned() != null) {
+					numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
+				}
+
+				if (numberOfColumns == 4) {
+					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field, 4), numberRowSpand);
+				} else {
+					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field));
+				}
+				if (field.getUnitText() == null) {
+					// Wenn es keine Einheit gibt, muss das Feld 2 Spaltenbreiten einnehmen
+					gd.horizontalSpan = gd.horizontalSpan + 1;
+				}
+				text.setLayoutData(gd);
+			}
+		}
+
+		if (field.getUnitText() != null & field.getLookup() == null) {
+			Label labelUnit = new Label(composite, SWT.None);
+			labelUnit.setText(field.getUnitText());
+			labelUnit.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+		}
+	}
+
+	private static Integer getWidthHintForElement(Field field, Integer numberOfColumns) {
+		if (numberOfColumns == null) {
+			numberOfColumns = 1;
+		}
+		if (field.getDateTime() != null || field.getLookup() != null || field.getShortDate() != null
+				|| field.getShortTime() != null) {
+			return 150;
+		} else if (field.getUnitText() != null) {
+			return 20;
+		} else if (field.getBoolean() != null) {
+			return 20;
+		} else {
+			return 150 * numberOfColumns;
+		}
+	}
+
+	private static Integer getWidthHintForElement(Field field) {
+		return getWidthHintForElement(field, 1);
+	}
+
+	/**
+	 * Erstellt ein neues GridData-Objekt mit Breite und der Anzahl an Spalten.
+	 * 
+	 * @param numberColumns default = 1
+	 * @param widthHint
+	 * @return GridData
+	 */
+	private static GridData getGridDataFactory(Integer numberColumns, Integer widthHint) {
+		return getGridDataFactory(numberColumns, widthHint, null);
+	}
+
+	/**
+	 * 
+	 * @param numberColumns
+	 * @param widthHint
+	 * @param numberRowSpand
+	 * @return
+	 */
+	private static GridData getGridDataFactory(Integer numberColumns, Integer widthHint, Integer numberRowSpand) {
+		GridDataFactory gridDataFactory = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP);
+		GridData data = gridDataFactory.create();
+		if (widthHint != null) {
+			data.widthHint = widthHint;
+		}
+		if (numberColumns == null || numberColumns <= 2) {
+			data.horizontalSpan = 1;
+		} else {
+			data.horizontalSpan = 4;
+		}
+		if (numberRowSpand != null) {
+			data.verticalSpan = numberRowSpand;
+		}
+		return data;
 	}
 
 	public static Composite createSection(FormToolkit formToolkit, Composite parent, Head head) {
 		Section section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
 
-//		FormData formData = new FormData();
-//		formData.top = new FormAttachment(0);
-//		formData.bottom = new FormAttachment(100, -450);
-//		formData.right = new FormAttachment(0, 450);
-//		formData.left = new FormAttachment(0);
-//		section.setLayoutData(formData);
 		formToolkit.paintBordersFor(section);
 		section.setText("Kopfdaten");
 		section.setExpanded(true);
 		Composite composite = formToolkit.createComposite(section, SWT.RIGHT);
 		formToolkit.paintBordersFor(composite);
 		section.setClient(composite);
-		composite.setLayout(new GridLayout(6, true));
+		composite.setLayout(new GridLayout(6, false));
 
 		return composite;
 	}
 
 	public static Composite createSection(FormToolkit formToolkit, Composite parent, Page page) {
-		Section section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
+		Section section = formToolkit.createSection(parent,
+				Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
 
-//		FormData formData = new FormData();
-//		formData.top = new FormAttachment(450);
-//		formData.bottom = new FormAttachment(550, -900);
-//		formData.right = new FormAttachment(0, 450);
-//		formData.left = new FormAttachment(0);
-//		section.setLayoutData(formData);
 		formToolkit.paintBordersFor(section);
 		section.setText(page.getText());
 		section.setExpanded(true);
 		Composite composite = formToolkit.createComposite(section, SWT.RIGHT);
 		formToolkit.paintBordersFor(composite);
 		section.setClient(composite);
-		composite.setLayout(new GridLayout(6, true));
+		composite.setLayout(new GridLayout(6, false));
 
 		return composite;
 	}
