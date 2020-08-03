@@ -58,8 +58,10 @@
 	<modules>
 		<module>bundles</module>
 		<module>features</module>
-		<module>libs</module>
 		<module>releng</module>
+		<module>libs</module>
+		<module>tests</module>
+
 	</modules>
 
 	<distributionManagement>
