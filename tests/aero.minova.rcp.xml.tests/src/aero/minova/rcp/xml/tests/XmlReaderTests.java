@@ -1,4 +1,4 @@
-package aero.minova.rcp.xml.test;
+package aero.minova.rcp.xml.tests;
 
 import static org.junit.Assert.*;
 
