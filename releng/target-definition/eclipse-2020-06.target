@@ -47,9 +47,17 @@
 			<unit id="org.glassfish.jersey.ext.entityfiltering.source" version="2.22.1.v20181004-1955"/>
 			<unit id="org.glassfish.jersey.media.jersey-media-json-jackson" version="2.22.1.v20161117-2005"/>
 			<unit id="org.glassfish.jersey.media.jersey-media-json-jackson.source" version="2.22.1.v20161117-2005"/>
-			<unit id="javax.xml.bind" version="2.2.0.v201105210648"/>
-			<unit id="javax.xml.stream" version="0.0.0"/>
-			<unit id="javax.activation" version="0.0.0"/>
-			<unit id="javax.xml" version="0.0.0"/>
 		</location>
-</locations></target>
+		
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository"/>
+			<unit id="javax.xml.bind" version="2.2.0.v201105210648"/>
+			<unit id="javax.xml.stream" version="1.0.1.v201004272200"/>
+			<unit id="javax.activation" version="1.1.0.v201211130549"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="https://download.eclipse.org/rt/eclipselink/updates/"/>
+			<unit id="org.eclipse.persistence.sdk.feature.group" version="2.7.7.v20200504-69f2c2b80d"/>
+		</location>
+</locations>
+</target>
