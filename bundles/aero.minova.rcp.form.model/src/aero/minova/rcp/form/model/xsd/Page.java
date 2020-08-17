@@ -26,15 +26,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;sequence&gt;
  *         &lt;choice minOccurs="0"&gt;
  *           &lt;element name="button" type="{}button" maxOccurs="unbounded" minOccurs="0"/&gt;
- *           &lt;element name="toolbar" type="{}toolbar" minOccurs="0"/&gt;
  *         &lt;/choice&gt;
  *         &lt;choice&gt;
  *           &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
  *             &lt;element name="field" type="{}field" maxOccurs="unbounded" minOccurs="0"/&gt;
- *             &lt;element name="separator" type="{}separator" maxOccurs="unbounded" minOccurs="0"/&gt;
  *             &lt;element ref="{}grid" maxOccurs="unbounded" minOccurs="0"/&gt;
  *           &lt;/choice&gt;
- *           &lt;element name="section" type="{}section" maxOccurs="unbounded" minOccurs="0"/&gt;
  *           &lt;element name="table" type="{}layout-table" minOccurs="0"/&gt;
  *         &lt;/choice&gt;
  *       &lt;/sequence&gt;
@@ -52,22 +49,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "page", propOrder = {
     "button",
-    "toolbar",
-    "fieldOrSeparatorOrGrid",
-    "section",
+    "fieldOrGrid",
     "table"
 })
 public class Page {
 
     protected List<Button> button;
-    protected Toolbar toolbar;
     @XmlElements({
         @XmlElement(name = "field", type = Field.class),
-        @XmlElement(name = "separator", type = Separator.class),
         @XmlElement(name = "grid", type = Grid.class)
     })
-    protected List<Object> fieldOrSeparatorOrGrid;
-    protected List<Section> section;
+    protected List<Object> fieldOrGrid;
     protected LayoutTable table;
     @XmlAttribute(name = "text", required = true)
     protected String text;
@@ -112,87 +104,33 @@ public class Page {
     }
 
     /**
-     * Ruft den Wert der toolbar-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Toolbar }
-     *     
-     */
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
-
-    /**
-     * Legt den Wert der toolbar-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Toolbar }
-     *     
-     */
-    public void setToolbar(Toolbar value) {
-        this.toolbar = value;
-    }
-
-    /**
-     * Gets the value of the fieldOrSeparatorOrGrid property.
+     * Gets the value of the fieldOrGrid property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the fieldOrSeparatorOrGrid property.
+     * This is why there is not a <CODE>set</CODE> method for the fieldOrGrid property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getFieldOrSeparatorOrGrid().add(newItem);
+     *    getFieldOrGrid().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Field }
-     * {@link Separator }
      * {@link Grid }
      * 
      * 
      */
-    public List<Object> getFieldOrSeparatorOrGrid() {
-        if (fieldOrSeparatorOrGrid == null) {
-            fieldOrSeparatorOrGrid = new ArrayList<Object>();
+    public List<Object> getFieldOrGrid() {
+        if (fieldOrGrid == null) {
+            fieldOrGrid = new ArrayList<Object>();
         }
-        return this.fieldOrSeparatorOrGrid;
-    }
-
-    /**
-     * Gets the value of the section property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the section property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSection().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Section }
-     * 
-     * 
-     */
-    public List<Section> getSection() {
-        if (section == null) {
-            section = new ArrayList<Section>();
-        }
-        return this.section;
+        return this.fieldOrGrid;
     }
 
     /**

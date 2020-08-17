@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="aero.minova.rcp.dataservice.internal.MinovaJsonService">
+   <service>
+      <provide interface="aero.minova.rcp.dataservice.IMinovaJsonService"/>
+   </service>
+   <implementation class="aero.minova.rcp.dataservice.internal.MinovaJsonService"/>
+</scr:component>

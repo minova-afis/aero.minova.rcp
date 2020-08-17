@@ -13,21 +13,11 @@
 	</parent>
 	<!-- end::parent[] -->
 	<properties>
-		<tycho.version>1.4.0</tycho.version>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<build>
 		<!-- To define the plugin version in your parent POM -->
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-pomgenerator-plugin</artifactId>
-					<version>${tycho.version}</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -62,19 +52,16 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-pomgenerator-plugin</artifactId>
-				<version>${tycho.version}</version>
-			</plugin>
 		</plugins>
 	</build>
 
 	<modules>
 		<module>bundles</module>
 		<module>features</module>
-		<module>libs</module>
 		<module>releng</module>
+		<module>libs</module>
+		<module>tests</module>
+
 	</modules>
 
 	<distributionManagement>

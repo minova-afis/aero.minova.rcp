@@ -16,12 +16,11 @@
 		<module>aero.minova.rcp.workspace</module>
 		<module>aero.minova.rcp.rcp</module>
 		<module>aero.minova.rcp.contribute.parts</module>
-		<module>aero.minova.rcp.tasks.ui.contribute</module>
 		<module>aero.minova.rcp.model</module>
 		<module>aero.minova.rcp.model.service</module>
 		<module>aero.minova.rcp.css</module>
 		<module>aero.minova.rcp.tasks.model</module>
 		<module>aero.minova.rcp.tasks.services</module>
-		<module>org.eclipse.e4.ui.workbench.perspectiveswitcher</module>
+		<module>aero.minova.rcp.dataservice</module>
 	</modules>
 </project>

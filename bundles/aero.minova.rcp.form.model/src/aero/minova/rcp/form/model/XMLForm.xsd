@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema elementFormDefault="qualified"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-           jxb:version="2.1">
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.1">
 	<xs:complexType name="column">
 		<xs:choice maxOccurs="1" minOccurs="1">
 			<xs:element name="number" type="number" />
@@ -28,7 +28,7 @@
 		</xs:attribute>
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
-			<xs:appinfo>
+				<xs:appinfo>
 					<jxb:property name="text-attribute" />
 				</xs:appinfo>
 				<xs:documentation> Hier wird der zu übersetzende text eingetragten.
@@ -352,12 +352,12 @@
 		<xs:attribute name="field-name" type="xs:string"
 			use="required" />
 	</xs:complexType>
-		<xs:complexType name="text">
+	<xs:complexType name="text">
 		<xs:attribute default="50" name="length" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:int">
-					<xs:minInclusive value="1"/>
-					<xs:maxInclusive value="1024"/>
+					<xs:minInclusive value="1" />
+					<xs:maxInclusive value="1024" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -488,8 +488,7 @@
 		</xs:attribute>
 		<xs:attribute default="true" name="visible"
 			type="xs:boolean" use="optional" />
-		<xs:attribute default="@unit.StandardVolume"
-			name="unit-text" type="xs:string" use="optional" />
+		<xs:attribute name="unit-text" type="xs:string" use="optional" />
 		<xs:attribute default="true" name="read-only"
 			type="xs:boolean" use="optional" />
 		<!--xs:attribute name="length" type="xs:integer"/ -->
@@ -733,20 +732,14 @@
 			<xs:choice maxOccurs="1" minOccurs="0">
 				<xs:element maxOccurs="unbounded" minOccurs="0"
 					name="button" type="button" />
-				<xs:element maxOccurs="1" minOccurs="0" name="toolbar"
-					type="toolbar" />
 			</xs:choice>
 			<xs:choice maxOccurs="1" minOccurs="1">
 				<xs:choice maxOccurs="unbounded" minOccurs="0">
 					<xs:element maxOccurs="unbounded" minOccurs="0"
 						name="field" type="field" />
 					<xs:element maxOccurs="unbounded" minOccurs="0"
-						name="separator" type="separator" />
-					<xs:element maxOccurs="unbounded" minOccurs="0"
 						ref="grid" />
 				</xs:choice>
-				<xs:element maxOccurs="unbounded" minOccurs="0"
-					name="section" type="section" />
 				<xs:element maxOccurs="1" minOccurs="0" name="table"
 					type="layout-table">
 					<xs:annotation>
@@ -767,52 +760,6 @@
 		<xs:attribute name="id" type="xs:NCName" />
 		<xs:attribute default="true" name="visible"
 			type="xs:boolean" />
-	</xs:complexType>
-	<xs:complexType name="section">
-		<xs:sequence>
-			<xs:choice maxOccurs="1" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0"
-					name="button" type="button" />
-				<xs:element maxOccurs="1" minOccurs="0" name="toolbar"
-					type="toolbar" />
-			</xs:choice>
-			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0"
-					name="field" type="field" />
-				<xs:element maxOccurs="unbounded" minOccurs="0"
-					name="separator" type="separator" />
-				<xs:element maxOccurs="unbounded" minOccurs="0"
-					ref="grid" />
-			</xs:choice>
-		</xs:sequence>
-		<xs:attribute name="text" type="xs:string" use="required" />
-		<xs:attribute name="icon" type="xs:NCName" />
-		<xs:attribute name="id" type="xs:NCName" />
-	</xs:complexType>
-	<xs:complexType name="separator">
-		<xs:attribute name="text" type="xs:string" use="required" />
-		<xs:attribute name="icon" type="xs:NCName" />
-		<xs:attribute name="id" type="xs:NCName" />
-		<xs:attribute name="number-columns-spanned"
-			use="required">
-			<xs:simpleType>
-				<xs:restriction base="xs:integer">
-					<xs:enumeration value="4" />
-					<xs:enumeration value="2" />
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-	</xs:complexType>
-	<xs:complexType name="toolbar">
-		<xs:annotation>
-			<xs:documentation>Erstellt eine Toolbar mit Buttons
-			</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="1"
-				name="button" type="button" />
-		</xs:sequence>
-		<!--<xs:attribute name="flat" type="xs:boolean" use="optional" default="false"/> -->
 	</xs:complexType>
 	<xs:complexType name="button">
 		<xs:annotation>
@@ -1456,20 +1403,14 @@
 			<xs:choice maxOccurs="1" minOccurs="0">
 				<xs:element maxOccurs="unbounded" minOccurs="0"
 					name="button" type="button" />
-				<xs:element maxOccurs="1" minOccurs="0" name="toolbar"
-					type="toolbar" />
 			</xs:choice>
 			<xs:choice maxOccurs="1" minOccurs="1">
 				<xs:choice maxOccurs="unbounded" minOccurs="0">
 					<xs:element maxOccurs="unbounded" minOccurs="0"
 						name="field" type="field" />
 					<xs:element maxOccurs="unbounded" minOccurs="0"
-						name="separator" type="separator" />
-					<xs:element maxOccurs="unbounded" minOccurs="0"
 						ref="grid" />
 				</xs:choice>
-				<xs:element maxOccurs="unbounded" minOccurs="0"
-					name="section" type="section" />
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -1485,8 +1426,6 @@
 					<xs:choice maxOccurs="unbounded" minOccurs="0">
 						<xs:element maxOccurs="unbounded" minOccurs="0"
 							name="field" type="field" />
-						<xs:element maxOccurs="unbounded" minOccurs="0"
-							name="toolbar" type="toolbar" />
 					</xs:choice>
 				</xs:choice>
 				<xs:element maxOccurs="unbounded" minOccurs="0"

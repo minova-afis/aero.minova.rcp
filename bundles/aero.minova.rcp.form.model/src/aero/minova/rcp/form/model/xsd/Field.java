@@ -121,7 +121,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
  *       &lt;attribute name="visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
- *       &lt;attribute name="unit-text" type="{http://www.w3.org/2001/XMLSchema}string" default="@unit.StandardVolume" /&gt;
+ *       &lt;attribute name="unit-text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="read-only" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -1024,11 +1024,7 @@ public class Field {
      *     
      */
     public String getUnitText() {
-        if (unitText == null) {
-            return "@unit.StandardVolume";
-        } else {
-            return unitText;
-        }
+        return unitText;
     }
 
     /**
