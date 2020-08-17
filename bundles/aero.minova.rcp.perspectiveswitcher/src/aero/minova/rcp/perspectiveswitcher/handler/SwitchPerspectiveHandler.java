@@ -3,6 +3,8 @@ package aero.minova.rcp.perspectiveswitcher.handler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,11 +20,12 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.swt.widgets.ToolBar;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
@@ -34,29 +37,26 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
-	
+
 	@Inject
 	EModelService model;
 	
-	ToolBar toolbar;
-
 	@Execute
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow)
-			throws InvocationTargetException, InterruptedException {
+			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
+			MWindow window) throws InvocationTargetException, InterruptedException {
 
 		if (Boolean.parseBoolean(newWindow)) {
 			openNewWindowPerspective(context, perspectiveID);
 		} else {
-			openPerspective(context, perspectiveID);
+			openPerspective(context, perspectiveID, window);
 			createNewToolItem(perspectiveID);
 			createCloseItem();
 
 		}
-
+		
 	}
-	 
 
 	/*
 	 * Creating new HandledToolItem for each Perspective that is open
@@ -75,7 +75,6 @@ public class SwitchPerspectiveHandler {
 			String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
 			String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
 
-			((MToolBar) toolbar).getChildren().add(newToolitem);
 			command = model.createModelElement(MCommand.class);
 			command.setElementId("aero.minova.rcp.rcp.command.openform");
 			application.getCommands().add(command);
@@ -86,12 +85,19 @@ public class SwitchPerspectiveHandler {
 			parameter.setValue(perspectiveID);
 
 			newToolitem.setElementId("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID);
+			newToolitem.setType(ItemType.RADIO);
 			newToolitem.setCommand(command);
 			newToolitem.getParameters().add(parameter);
 			newToolitem.setToBeRendered(true);
 			newToolitem.setLabel(toolLabel);
 //			newToolitem.setIconURI("platform:/plugin/aero.minova.rcp.rcp/icons/open_in_app" + toolitemLabel +  ".png");
-			newToolitem.setEnabled(true);
+			((MToolBar) toolbar).getChildren().add(newToolitem);
+			for (MToolBarElement i : ((MToolBar) toolbar).getChildren()) {
+				if (i instanceof MHandledToolItem && ((MHandledToolItem) i).getType() == ItemType.RADIO) {
+					((MHandledToolItem) i).setSelected(false);
+				}
+			}
+			newToolitem.setSelected(true);
 		}
 	}
 
@@ -120,7 +126,6 @@ public class SwitchPerspectiveHandler {
 		}
 
 	}
-	
 
 	/**
 	 * Opens the perspective with the given identifier.
@@ -128,7 +133,7 @@ public class SwitchPerspectiveHandler {
 	 * @param perspectiveId The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException If the perspective could not be opened.
 	 */
-	private final void openPerspective(IEclipseContext context, String perspectiveID) {
+	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window) {
 		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
 
@@ -136,7 +141,7 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID);
 		} else {
-			switchTo(context, element);
+			switchTo(context, element, perspectiveID, window);
 		}
 	}
 
@@ -178,7 +183,7 @@ public class SwitchPerspectiveHandler {
 		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
 
 		if (element == null) {
-//			Logger.getGlobal().log(Level.SEVERE, "Can't find nor clone Perspective " + perspectiveID);
+			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
@@ -186,7 +191,7 @@ public class SwitchPerspectiveHandler {
 			perspective.setLabel(perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1));
 			perspective.setParent(perspectiveStack);
 
-			switchTo(context, perspective);
+			switchTo(context, perspective, perspectiveID, window);
 
 		}
 
@@ -198,15 +203,35 @@ public class SwitchPerspectiveHandler {
 	 * 
 	 * @param element
 	 */
-	private void switchTo(IEclipseContext context, MUIElement element) {
+	private void switchTo(IEclipseContext context, MUIElement element,
+			@Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID, MWindow window) {
 		EPartService partService = context.get(EPartService.class);
+		
+		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
+
+		List<MHandledToolItem> keepPerspectives = model.findElements(toolbar,
+				"aero.minova.rcp.rcp.handledtoolitem.keepperspective", MHandledToolItem.class);
+		MHandledToolItem keepPerspectiveItem = keepPerspectives.get(0);
+
+		List<MHandledToolItem> toolitems = model.findElements(toolbar,
+				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, MHandledToolItem.class);
+		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
 
 		if (element instanceof MPerspective) {
 			partService.switchPerspective((MPerspective) element);
+			if (toolitem != null) {
+				if (toolitem.getTags().contains("keepIt")) {
+					keepPerspectiveItem.setSelected(true);
+				} else {
+					keepPerspectiveItem.setSelected(false);
+				}
+			}
+			
+
 		} else {
 			// error
 		}
-	}
 
+	}
 
 }
