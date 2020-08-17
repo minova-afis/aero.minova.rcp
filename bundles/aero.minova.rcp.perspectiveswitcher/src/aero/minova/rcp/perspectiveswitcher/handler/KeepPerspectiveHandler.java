@@ -24,6 +24,7 @@ public class KeepPerspectiveHandler {
 	@Inject
 	EPartService partService;
 
+
 	@Execute
 	public void execute(MWindow window) {
 		
