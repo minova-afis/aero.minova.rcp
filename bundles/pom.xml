@@ -22,5 +22,6 @@
 		<module>aero.minova.rcp.tasks.model</module>
 		<module>aero.minova.rcp.tasks.services</module>
 		<module>aero.minova.rcp.dataservice</module>
+		<module>aero.minova.rcp.perspectiveswitcher</module>
 	</modules>
 </project>

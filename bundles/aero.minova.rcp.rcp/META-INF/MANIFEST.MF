@@ -29,7 +29,7 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.core.services,
  org.eclipse.e4.ui.workbench.renderers.swt,
  org.eclipse.ui.workbench;bundle-version="3.119.0",
- aero.minova.rcp.perspectiveswitcher
+ aero.minova.rcp.perspectiveswitcher,
  aero.minova.rcp.form.model,
  javax.xml.bind;bundle-version="2.2.0",
  aero.minova.rcp.dataservice;bundle-version="1.2.0",
@@ -39,5 +39,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.plugin1.model, aero.minova.rcp.tasks.model,
  javax.annotation;version="1.0.0";resolution:=optional,
  javax.inject;version="1.0.0",
- org.eclipse.e4.ui.css.swt.theme,
- org.eclipse.ui.internal
+ org.eclipse.e4.ui.css.swt.theme
+
