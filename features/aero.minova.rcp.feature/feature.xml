@@ -154,6 +154,7 @@
          unpack="false"/>
 
    <plugin
+<<<<<<< HEAD
          id="org.eclipse.ui"
          download-size="0"
          install-size="0"
@@ -176,6 +177,9 @@
 
    <plugin
          id="aero.minova.rcp.perspectiveswitcher"
+=======
+         id="aero.minova.rcp.form.model"
+>>>>>>> master
          download-size="0"
          install-size="0"
          version="0.0.0"

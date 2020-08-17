@@ -15,8 +15,6 @@ import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.FileWorkspace;
@@ -28,7 +26,7 @@ public class LifeCycle {
 
 	@Inject
 	Logger logger;
-	
+
 	@Inject
 	UISynchronize sync;
 
@@ -38,19 +36,18 @@ public class LifeCycle {
 		WorkspaceHandler workspaceHandler;
 		int returnCode;
 
-		
-		
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("RecurtnCode: " + returnCode);
-			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace ausgesucht
+			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
+										// ausgesucht
 		}
 
 //		workspaceDialog.getWorkspaceData();
-		
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 
 		String userName = "Test1";// get username from login dialog;
 		String workspaceName = "xyz1"; // muss noch ermittelt werden
@@ -69,31 +66,7 @@ public class LifeCycle {
 			break;
 		}
 
-//		Preferences serverPrefs = ConfigurationScope.INSTANCE.getNode("aero.minova.rcp.workspace.server");
-
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
-
-		ISecurePreferences sprefs = SecurePreferencesFactory.getDefault();
-		ISecurePreferences sNode = sprefs.node("aero.minova.rcp.workspace").node("workspaces");
-
-//		logger.info("sss " + Platform.getInstanceLocation().isSet());
-//		try {
-////			if (!sNode.nodeExists(workspaceName)) {
-////			}
-//			ISecurePreferences test = sNode.node(workspaceName);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("user", userName, false);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("url", "http://localhost", false);
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.put("password", "valuee", true); // setzt auch den Workspace
-//			logger.info("sss " + Platform.getInstanceLocation().isSet());
-//			test.flush();
-//		} catch (StorageException e) {
-//			logger.error(e, "Error storing access data ");
-//		}
-
-		logger.info("sss " + Platform.getInstanceLocation().isSet());
+		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 		// check if the instance location is already set,
 		// otherwise setting another one will throw an IllegalStateException
 		if (!Platform.getInstanceLocation().isSet()) {
@@ -130,11 +103,14 @@ public class LifeCycle {
 	}
 
 	@PreSave
-	void preSave(IEclipseContext workbenchContext) {}
+	void preSave(IEclipseContext workbenchContext) {
+	}
 
 	@ProcessAdditions
-	void processAdditions(IEclipseContext workbenchContext) {}
+	void processAdditions(IEclipseContext workbenchContext) {
+	}
 
 	@ProcessRemovals
-	void processRemovals(IEclipseContext workbenchContext) {}
+	void processRemovals(IEclipseContext workbenchContext) {
+	}
 }

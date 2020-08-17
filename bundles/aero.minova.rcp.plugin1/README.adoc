@@ -1,0 +1,153 @@
+== Table Model
+
+Dieses Plug-in beinhaltet ein Model zum Austausch von Daten zwischen dem CAS und der WFC Anwendung.
+
+=== Table
+
+Das Table-Objekt wird für alle Anfragen von WFC an CAS verwendet. Des Weiteren wird diese Struktur verwendet um angefragte Datensätze an das WFC zu übergeben. 
+
+=== Column
+Die Spalten bilden die Tbellenfelder ab und ensprechen der Felder die ünber eine View an das CAS angefragt werden. 
+
+=== Row
+Dieses Objekt bildet die Werte für die entsprechenden Columns ab. Die Row muss nicht bei jeder abfrage gefüllt werden.
+
+=== Anfrage WFC -> CAS (Indexbereich, aufruf einer View, LookUpFelder)
+
+Wenn in der WFC Anwendung eine Suchanfrage über den Indexbereich erstellt wird wird ein Table-Objekt mit entsprechenden Rows erstellt. 
+Der Name des Table-Objekts entspricht dabei dem Namen der View aus der Maske. Die Columns repräsentieren die Datenfelder aus dem Index-Bereich. Sie werden von der Maske vorbestimmt. 
+Die Row trägt in diesem Fall die Information der *Where Clause*. Bei dieser Form von Anfrage kann zusätzlich zu den übergebenen Columns aus der View noch eine weitere Column übergeben werden. 
+Der Name der Column ist: *&*. Diese Spalte wird nicht in der Datenbank abgebildet sonder fungiert als Verknüpfung zwischen zwei Rows. Wenn in einer Row für diese Spalte ein _True_ übergeben wird, muss die where clause die vorherige (obere) Row mit der Row zuammen führen und verunden. 
+
+Das Resultat der Anfrage ist ein Table-Objekt mit 0-N Rows. Die Row kann grundsätzlich auch da sein und keine Werte enthalten.
+
+[source,java]
+----
+{
+  "name": "vEmployeIndex",
+  "columns": [
+    {
+      "name": "KeyLong",
+      "type": "INTEGER"
+    },
+    {
+      "name": "KeyText",
+      "type": "STRING"
+    },
+    {
+      "name": "Description",
+      "type": "STRING"
+    },
+    {
+      "name": "LastDate",
+      "type": "ZONED"
+    },
+    {
+      "name": "ValidUntil",
+      "type": "INSTANT"
+    },
+    {
+      "name": "Married",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "&",
+      "type": "BOOLEAN"
+    }
+  ],
+  "rows": [
+   {
+      "values": [
+        null,
+        "s-T",
+        null,
+        null,
+        null,
+        null,
+        "b-false", 
+        "b-false"
+      ]
+    }
+    {
+      "values": [
+        null,
+        "s-%Bauer",
+        null,
+        null,
+        null,
+        "b-false",
+        "b-true"
+      ]
+    }
+  ]
+}
+----
+Daraus ergibt sich folgendes SQL-Statment: 
+
+[source,sql]
+----
+
+select * from vEmployeIndex where KeyText like 'T%' and KeyText like '%Bauer'
+----
+
+=== Anfrage WFC -> CAS (Detailbereich, aufruf einer Prozedur: CRUD)
+Bei dieser Anfrage erfolgt die Antwort nur mit einem zugehörigen Datensatz welcher in einer Row dargestellt wird.
+Zum Beipsiel : opUpdateEmploye KeyLong, ....
+
+Das Resultat der Anfrage ist ein Table-Objekt mit 0-1 Rows. Die Row kann grundsätzlich auch da sein und keine Werte enthalten.
+
+[source,java]
+----
+{
+  "name": "opUpdateEmploye",
+  "columns": [
+    {
+      "name": "KeyLong",
+      "type": "INTEGER"
+    },
+    {
+      "name": "KeyText",
+      "type": "STRING"
+    },
+    {
+      "name": "Description",
+      "type": "STRING"
+    },
+    {
+      "name": "LastDate",
+      "type": "ZONED"
+    },
+    {
+      "name": "ValidUntil",
+      "type": "INSTANT"
+    },
+    {
+      "name": "Married",
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "\u0026",
+      "type": "BOOLEAN"
+    }
+  ],
+  "rows": [
+   {
+      "values": [
+        XXX,
+        "s-T",
+        XX,
+        XX,
+        XX,
+        XX,
+        "b-false", 
+        "b-false"
+      ]
+    }
+  ]
+}
+----
+
+=== Anfrage WFC -> CAS (Detailbereich, aufruf einer Prozedur mit einer Table als Resultset)
+Es wird eine Anfrage vom WFC an das CAS gestellt. Hier handelt es sich um eine Anfrage über eine Prozedur. Es wird erwartet, dass eine Tabelle mit 0-N Rows zurückgegeben wird.
+
+

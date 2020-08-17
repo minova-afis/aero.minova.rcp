@@ -6,6 +6,11 @@ import java.util.Vector;
 public class Table {
 
 	String name;
+	//vDriverIndex
+	//opReadDriverRights
+	//spReadDriver
+	//opReadContact
+	//
 	List<Column> columns = new Vector<>();
 	List<Row> rows = new Vector<>();
 

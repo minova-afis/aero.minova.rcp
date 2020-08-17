@@ -1,8 +1,14 @@
 package aero.minova.rcp.workspace.dialogs;
 
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.PASSWORD;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.URL;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.USER;
+import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -16,10 +22,11 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.jobs.ProgressProvider;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -68,7 +75,7 @@ public class WorkspaceDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-		
+
 		GridLayout layout = new GridLayout(3, false);
 		layout.marginRight = 5;
 		layout.marginLeft = 10;
@@ -76,9 +83,9 @@ public class WorkspaceDialog extends Dialog {
 
 		// Layout data für die Labels
 		GridDataFactory labelGridData = GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER);
-		
+
 		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE).supplyLayoutData(labelGridData::create);
-		
+
 		labelFactory.text("Profile").create(container);
 
 		profile = new Combo(container, SWT.NONE);
@@ -224,13 +231,28 @@ public class WorkspaceDialog extends Dialog {
 			}
 		};
 		job.schedule();
+
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		text.setText("file:/Users/erlanger/Documents/MINOVA");
-		password.setText("Minova+0");
-		username.setText("sa");
+		try {
+			Optional<ISecurePreferences> primaryWorkspaceHandler = getSavedPrimaryWorkspaceAccessData(logger);
+			if (primaryWorkspaceHandler.isPresent()) {
+				text.setText(//
+						primaryWorkspaceHandler.get().get(URL, null));
+				password.setText(//
+						primaryWorkspaceHandler.get().get(PASSWORD, "Minova+0"));
+				username.setText(//
+						primaryWorkspaceHandler.get().get(USER, "sa"));
+			} else {
+				text.setText("file:/Users/erlanger/Documents/MINOVA");
+				password.setText("Minova+0");
+				username.setText("sa");
+			}
+		} catch (StorageException e) {
+			throw new RuntimeException(e);
+		}
 		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnConnect = createButton(parent, IDialogConstants.RETRY_ID, "Check", false);
 		btnOK.setEnabled(false);
@@ -246,14 +268,15 @@ public class WorkspaceDialog extends Dialog {
 			}
 		});
 		btnOK.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				okPressed();
 			}
-			
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
 	}
 

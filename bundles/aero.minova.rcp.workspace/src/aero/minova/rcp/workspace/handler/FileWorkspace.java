@@ -66,7 +66,7 @@ public class FileWorkspace extends WorkspaceHandler {
 					// Wir schreiben mal eine Beispieldatei
 					Preferences sysNode = Preferences.userRoot();
 					sysNode = sysNode.node("/aero.minova/application");
-					sysNode.put("prifile", "EXAMPLE");
+					sysNode.put("profile", "EXAMPLE");
 					FileOutputStream applicationOS = new FileOutputStream(applicationXbs);
 					sysNode.exportNode(applicationOS);
 					applicationOS.close();

@@ -53,7 +53,7 @@ public abstract class WorkspaceHandler {
 		}
 	}
 
-	private static WorkspaceHandler newInstance(ISecurePreferences node, Logger logger) throws MalformedURLException, StorageException {
+	public static WorkspaceHandler newInstance(ISecurePreferences node, Logger logger) throws MalformedURLException, StorageException {
 		URL connection = new URL(node.get("url", "N/A"));
 
 		WorkspaceHandler instance = newInstance(connection, logger);
@@ -63,27 +63,6 @@ public abstract class WorkspaceHandler {
 		instance.workspaceData.setInBackingStore(true);
 		
 		return instance;
-	}
-
-	/**
-	 * @return a list of all WorkspaceHandler that are store in the preferences. The password is not available before the the workspace is set (#active())
-	 */
-	public static WorkspaceHandler[] getSavedHandlers(Logger logger) {
-		ISecurePreferences securePreferences = SecurePreferencesFactory.getDefault();
-		ISecurePreferences workspaceNodes = securePreferences.node("aero.minova.rcp.workspace").node("workspaces");
-		String workspaceNames[] = workspaceNodes.childrenNames();
-		WorkspaceHandler workspaces[] = new WorkspaceHandler[workspaceNames.length];
-
-		for (int i = 0; i < workspaceNames.length; i++) {
-			try {
-				workspaces[i] = newInstance(workspaceNodes.node(workspaceNames[i]), logger);
-			} catch (MalformedURLException | StorageException e) {
-				logger.error(e);
-				workspaces[i] = null;
-			}
-		}
-
-		return workspaces;
 	}
 
 	protected WorkspaceHandler(Logger logger) {

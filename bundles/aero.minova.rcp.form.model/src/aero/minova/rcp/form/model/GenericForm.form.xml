@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form icon="Item.ico" title="@tItem.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="XMLForm.xsd">
+    <index-view id="IndexView" index-report="auto" source="dbo.vItemIndex">
+        <column key="true" name="KeyLong" size="0" text="@KeyLong">
+            <number decimals="0" />
+        </column>
+        <column name="KeyText" text="@tItem.KeyText">
+            <text length="20"/>
+        </column>
+        <column name="Description" text="@tItem.Description">
+            <text length="60"/>
+        </column>
+        <column name="Blocked" text="@tItem.Blocked">
+            <boolean/>
+        </column>
+    </index-view>
+    <detail button-block-visible="true" id="Detail" procedure-suffix="Item">
+        <head>
+            <field key-type="primary" name="KeyLong" sql-index="0" visible="false">
+                <number/>
+            </field>
+            <field key-type="user" name="KeyText" required="true" sql-index="1" text="@tItem.KeyText">
+                <text length="20"/>
+            </field>
+            <field fill="toright" name="Description" number-columns-spanned="4" sql-index="2" text="@tItem.Description">
+                <text length="50"/>
+            </field>
+            <field name="Blocked" sql-index="34" text="@tItem.Blocked" visible="false">
+                <boolean/>
+            </field>
+        </head>
+        <page icon="Administration.ico" id="Administration" text="@tItem.Group.Administration">
+            <table column-count="6">
+                <row name="header-row">
+                    <column number-columns-spanned="2">
+                       <label field="measured-level-before"></label> 
+                    </column>
+                    <column>
+                       <label field="measured-date-before" align="left"></label> 
+                    </column>
+                    <column>
+                       <label field="measure-ambient-volume-before"></label> 
+                    </column>
+                    <column>
+                       <label field="measure-standard-volume-before"></label> 
+                    </column>
+                    <column>
+                       <label field="measure-weight-before"></label> 
+                    </column>
+                </row>
+                <row name="measured-before-row" text="@MeasuredBefore">
+                    <column >
+                       <label row="measured-before-row"></label> 
+                    </column>
+                    <column>
+                        <field name="measured-level-before" text="@MeasurementDate">
+                            <number decimals="0"/>
+                        </field> 
+                    </column>
+                    <column>
+                        <field name="measured-date-before" text="@MeasurementDate">
+                            <date-time></date-time>
+                        </field> 
+                    </column>
+                    <column>
+                        <field name="measure-ambient-volume-before" text="@MeasurementDate">
+                            <number decimals="0"/>
+                        </field> 
+                    </column>
+                    <column>
+                        <field name="measure-standard-volume-before" text="@MeasurementDate">
+                            <number decimals="0"/>
+                        </field> 
+                    </column>
+                    <column>
+                        <field name="measure-weight-before" text="@MeasurementDate">
+                            <number decimals="0"/>
+                        </field> 
+                    </column>
+                </row>
+            </table>
+        </page>
+        <page text="Test2">
+            <table column-count="5">
+                <row name="zeile-1">
+                    <column number-columns-spanned="4">
+                        <label field="header-row"></label>
+                    </column>
+                </row>
+            </table>
+        </page>
+     </detail>
+</form>
