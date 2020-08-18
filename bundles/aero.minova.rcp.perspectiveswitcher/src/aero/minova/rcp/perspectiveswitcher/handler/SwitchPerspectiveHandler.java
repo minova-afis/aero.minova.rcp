@@ -219,7 +219,7 @@ public class SwitchPerspectiveHandler {
 		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
 
 		if (element instanceof MPerspective) {
-			partService.switchPerspective((MPerspective) element);
+			partService.switchPerspective(element.getElementId());
 			if (toolitem != null) {
 				if (toolitem.getTags().contains("keepIt")) {
 					keepPerspectiveItem.setSelected(true);
