@@ -31,7 +31,7 @@ public class ClosePerspectiveHandler {
 
 		MPerspective currentPerspective = modelService.getActivePerspective(window);
 		String perspectiveID = currentPerspective.getElementId();
-
+		
 		MUIElement toolitem = modelService.find("aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, toolbar);
 
 		MUIElement closeToolbar = modelService.find("aero.minova.rcp.rcp.toolbar.close", application);
@@ -42,7 +42,6 @@ public class ClosePerspectiveHandler {
 				"aero.minova.rcp.rcp.handledtoolitem.keepperspective", MHandledToolItem.class);
 		MHandledToolItem keepPerspectiveItem = keepPerspectives.get(0);
 
-		currentPerspective.getParent().getChildren().remove(currentPerspective);
 
 		if (keepPerspectiveItem.isSelected()) {
 			System.out.println("Item behalten");
@@ -50,7 +49,8 @@ public class ClosePerspectiveHandler {
 			toolitem.getParent().getChildren().remove(toolitem);
 		}
 
-		partService.switchPerspective("aero.minova.rcp.rcp.perspective.home");
+		currentPerspective.getParent().getChildren().remove(currentPerspective);
+		partService.switchPerspective("aero.minova.rcp.rcp.perspective.stundenerfassung");
 
 		if (closeToolitem.isToBeRendered()) {
 
