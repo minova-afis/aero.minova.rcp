@@ -53,14 +53,26 @@ public class SwitchPerspectiveHandler {
 			openPerspective(context, perspectiveID, window);
 			createNewToolItem(perspectiveID);
 			createCloseItem();
+		}
 
+		MPerspective currentPerspective = model.getActivePerspective(window);
+
+		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
+
+		List<MHandledToolItem> toolitems = model.findElements(toolbar,
+				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, MHandledToolItem.class);
+		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
+
+		if (currentPerspective.getElementId() == perspectiveID) {
+			toolitem.setSelected(true);
+		} else {
+			toolitem.setSelected(false);
 		}
 
 	}
 
 	/*
-	 * Creating new HandledToolItem for each Perspective that is open
-	 * 
+	 * Erstellt ein Toolitem für jede dynamische Perspektive die geöffnet wird.
 	 */
 	public void createNewToolItem(
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID) {
@@ -105,7 +117,6 @@ public class SwitchPerspectiveHandler {
 	/*
 	 * Create a HandledToolitem to Close Perspectives, if a perspective was opened.
 	 */
-
 	public void createCloseItem() {
 
 		MUIElement closeToolbar = model.find("aero.minova.rcp.rcp.toolbar.close", application);
@@ -207,7 +218,7 @@ public class SwitchPerspectiveHandler {
 	public void switchTo(IEclipseContext context, MUIElement element,
 			@Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID, MWindow window) {
 		EPartService partService = context.get(EPartService.class);
-		
+
 		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
 
 		List<MHandledToolItem> keepPerspectives = model.findElements(toolbar,
@@ -226,10 +237,12 @@ public class SwitchPerspectiveHandler {
 				} else {
 					keepPerspectiveItem.setSelected(false);
 				}
+			} else {
+				keepPerspectiveItem.setSelected(false);
 			}
-			
+
 		} else {
-			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective" + perspectiveID);
+			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		}
 
 	}
