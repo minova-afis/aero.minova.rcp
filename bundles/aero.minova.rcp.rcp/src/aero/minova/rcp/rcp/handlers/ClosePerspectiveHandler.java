@@ -31,9 +31,15 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 
 		MUIElement toolbar = modelService.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
 
+		/*
+		 * Holt die in dem Moment aktive Perspektive.
+		 */
 		MPerspective currentPerspective = modelService.getActivePerspective(window);
 		String perspectiveID = currentPerspective.getElementId();
 
+		/*
+		 * Holt die UIElemente.
+		 */
 		List<MHandledToolItem> toolitems = modelService.findElements(toolbar,
 				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, MHandledToolItem.class);
 		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
@@ -42,18 +48,32 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 				"aero.minova.rcp.rcp.handledtoolitem.keepperspective", MHandledToolItem.class);
 		MHandledToolItem keepPerspectiveItem = keepPerspectives.get(0);
 
+		/*
+		 * Entfernt das Toolitem einer Perspektive, falls der KeepIt Button nicht
+		 * gesetzt ist.
+		 */
 		if (keepPerspectiveItem.isSelected()) {
 			toolitem.setSelected(false);
 		} else {
 			toolitem.getParent().getChildren().remove(toolitem);
 		}
 
+		/*
+		 * Resetet und Entfernt die aktuelle Perspektive.
+		 */
 		modelService.resetPerspectiveModel(currentPerspective, window);
 		currentPerspective.getParent().getChildren().remove(currentPerspective);
+
 		List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
 
+		/*
+		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat.
+		 */
 		switchTo(window.getContext(), perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
 
+		/*
+		 * Holt alle UIElemente und setzt die richtigen Selektionsstatus.
+		 */
 		List<MHandledToolItem> htoolitems = modelService.findElements(toolbar,
 				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveList.get(0).getElementId(), MHandledToolItem.class);
 
@@ -66,6 +86,21 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 				htoolitem.setSelected(true);
 			} else {
 				htoolitem.setSelected(false);
+			}
+		}
+
+		/*
+		 * Entfernt den Close Button, falls keine dynamischen Perspektiven aktive sind.,
+		 */
+		MUIElement closeToolbar = modelService.find("aero.minova.rcp.rcp.toolbar.close", application);
+		List<MHandledToolItem> closeToolitems = modelService.findElements(closeToolbar,
+				"aero.minova.rcp.rcp.handledtoolitem.closeperspective", MHandledToolItem.class);
+		MHandledToolItem closeToolitem = (closeToolitems == null || closeToolitems.size() == 0) ? null
+				: closeToolitems.get(0);
+
+		if (closeToolitem != null) {
+			if (perspectiveList.size() <= 2) {
+				closeToolitem.getParent().getChildren().remove(0);
 			}
 		}
 
