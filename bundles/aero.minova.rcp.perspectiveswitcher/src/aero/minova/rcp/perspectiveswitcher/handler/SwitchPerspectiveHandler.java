@@ -190,8 +190,8 @@ public class SwitchPerspectiveHandler {
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
 			perspective.setLabel(perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1));
-			perspective.setParent(perspectiveStack);
-
+//			perspective.setParent(perspectiveStack);
+			perspectiveStack.getChildren().add(0, perspective);
 			switchTo(context, perspective, perspectiveID, window);
 
 		}
@@ -204,10 +204,10 @@ public class SwitchPerspectiveHandler {
 	 * 
 	 * @param element
 	 */
-	private void switchTo(IEclipseContext context, MUIElement element,
+	public void switchTo(IEclipseContext context, MUIElement element,
 			@Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID, MWindow window) {
 		EPartService partService = context.get(EPartService.class);
-
+		
 		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
 
 		List<MHandledToolItem> keepPerspectives = model.findElements(toolbar,
@@ -227,7 +227,7 @@ public class SwitchPerspectiveHandler {
 					keepPerspectiveItem.setSelected(false);
 				}
 			}
-
+			
 		} else {
 			// error
 		}
