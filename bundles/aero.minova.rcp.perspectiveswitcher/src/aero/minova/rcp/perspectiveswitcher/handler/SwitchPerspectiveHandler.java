@@ -229,7 +229,7 @@ public class SwitchPerspectiveHandler {
 			}
 			
 		} else {
-			// error
+			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective" + perspectiveID);
 		}
 
 	}
