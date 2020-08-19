@@ -24,10 +24,14 @@ public class KeepPerspectiveHandler {
 	@Inject
 	EPartService partService;
 
-
 	@Execute
 	public void execute(MWindow window) {
-		
+
+		/*
+		 * Setzt fest, dass das Toolitem der Perspektive, bei der der Knopf gesetzt
+		 * wurde, in der Toolbar behalten wird, auch wenn die eigentliche Perspektive
+		 * geschlossen ist. Vergleich das Dock bei MAC.
+		 */
 		MPerspective currentPerspective = modelService.getActivePerspective(window);
 		String perspectiveID = currentPerspective.getElementId();
 
