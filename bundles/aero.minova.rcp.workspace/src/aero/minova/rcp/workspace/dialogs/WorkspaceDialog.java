@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 @SuppressWarnings("restriction")
 public class WorkspaceDialog extends Dialog {
@@ -76,7 +77,7 @@ public class WorkspaceDialog extends Dialog {
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
 
-		GridLayout layout = new GridLayout(3, false);
+		GridLayout layout = new GridLayout(5, false);
 		layout.marginRight = 5;
 		layout.marginLeft = 10;
 		container.setLayout(layout);
@@ -86,10 +87,13 @@ public class WorkspaceDialog extends Dialog {
 
 		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE).supplyLayoutData(labelGridData::create);
 
-		labelFactory.text("Profile").create(container);
+//		labelFactory.text("Profile").create(container);
+		Label lblProfile = new Label(container, SWT.NONE);
+		labelGridData.applyTo(lblProfile);
+		lblProfile.setText("Profile");
 
 		profile = new Combo(container, SWT.NONE);
-		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		profile.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -104,10 +108,12 @@ public class WorkspaceDialog extends Dialog {
 		});
 		new Label(container, SWT.NONE);
 
-		labelFactory.text("Username").create(container);
+		Label lblUsername = new Label(container, SWT.NONE);
+		labelGridData.applyTo(lblUsername);
+		lblUsername.setText("Username");
 
 		username = new Text(container, SWT.BORDER);
-		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		// username.setText(workspaceData.getUsername());
 		username.addModifyListener(e -> {
 			Text textWidget = (Text) e.getSource();
@@ -116,11 +122,12 @@ public class WorkspaceDialog extends Dialog {
 		});
 
 		Label lblPassword = new Label(container, SWT.NONE);
+		lblPassword.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		labelGridData.applyTo(lblPassword);
 		lblPassword.setText("Password");
 
 		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
-		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		// TODO
 		// password.setText(workspaceData.getPassword());
 		password.addModifyListener(e -> {
@@ -129,16 +136,19 @@ public class WorkspaceDialog extends Dialog {
 			// TODO
 			// workspaceData.setPassword(passwordText);
 		});
+		new Label(container, SWT.NONE);
 
 		Label lblApplicationArea = new Label(container, SWT.NONE);
-		labelGridData.applyTo(lblPassword);
+		lblApplicationArea.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblApplicationArea.setText("Application Area");
 
 		text = new Text(container, SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 
 		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
 		btnNewButton.setText("List Applications");
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
@@ -148,8 +158,12 @@ public class WorkspaceDialog extends Dialog {
 		lblMessage.setText("Message");
 
 		message = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
-//		message.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
-		message.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 2));
+		// message.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+		GridData gd_message = new GridData(SWT.FILL, SWT.FILL, true, false, 3, 2);
+		gd_message.heightHint = 13;
+		message.setLayoutData(gd_message);
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 
 		Label lblConnectionString = new Label(container, SWT.NONE);
@@ -158,20 +172,25 @@ public class WorkspaceDialog extends Dialog {
 
 		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
 		connectionString.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		new Label(container, SWT.NONE);
 
 		Label lblRemoteUsername = new Label(container, SWT.NONE);
+		lblRemoteUsername.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		labelGridData.applyTo(lblRemoteUsername);
 		lblRemoteUsername.setText("Remote Username");
 
 		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-		remoteUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		GridData gd_remoteUsername = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_remoteUsername.widthHint = 55;
+		remoteUsername.setLayoutData(gd_remoteUsername);
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 
-		progressBar = new ProgressBar(container, SWT.SMOOTH);
+		progressBar = new ProgressBar(container, SWT.NONE);
+		progressBar.setFont(SWTResourceManager.getFont("American Typewriter", 20, SWT.NORMAL));
 		progressBar.setBounds(100, 10, 200, 20);
-		progressBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		GridData gd_progressBar = new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1);
+		gd_progressBar.heightHint = 20;
+		progressBar.setLayoutData(gd_progressBar);
 		new Label(container, SWT.NONE);
 
 		monitor = new GlobalProgressMonitor();
@@ -282,7 +301,7 @@ public class WorkspaceDialog extends Dialog {
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(900, 600);
+		return new Point(684, 262);
 
 	}
 
@@ -335,14 +354,16 @@ public class WorkspaceDialog extends Dialog {
 							@Override
 							public void run() {
 								runningTasks--;
-								if (runningTasks > 0) {
-									// --- some tasks are still running ---
-									progressBar.setToolTipText("Currently running: " + runningTasks);
+								if (!progressBar.isDisposed()) {
+									if (runningTasks > 0) {
+										// --- some tasks are still running ---
+										progressBar.setToolTipText("Currently running: " + runningTasks);
 
-								} else {
-									// --- all tasks are done (a reset of selection could also be done) ---
-									progressBar.setToolTipText("No background progress running.");
-									progressBar.setSelection(0);
+									} else {
+										// --- all tasks are done (a reset of selection could also be done) ---
+										progressBar.setToolTipText("No background progress running.");
+										progressBar.setSelection(0);
+									}
 								}
 							}
 						});
