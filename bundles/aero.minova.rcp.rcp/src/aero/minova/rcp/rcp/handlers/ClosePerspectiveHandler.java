@@ -99,7 +99,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 				: closeToolitems.get(0);
 
 		if (closeToolitem != null) {
-			if (perspectiveList.size() <= 2) {
+			if (perspectiveList.size() <= 1) {
 				closeToolitem.getParent().getChildren().remove(0);
 			}
 		}
