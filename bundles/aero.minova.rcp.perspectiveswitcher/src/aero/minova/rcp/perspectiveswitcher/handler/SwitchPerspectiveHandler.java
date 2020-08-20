@@ -55,20 +55,6 @@ public class SwitchPerspectiveHandler {
 			createCloseItem();
 		}
 
-		MPerspective currentPerspective = model.getActivePerspective(window);
-
-		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
-
-		List<MHandledToolItem> toolitems = model.findElements(toolbar,
-				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, MHandledToolItem.class);
-		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
-
-		if (currentPerspective.getElementId() == perspectiveID) {
-			toolitem.setSelected(true);
-		} else {
-			toolitem.setSelected(false);
-		}
-
 	}
 
 	/*
@@ -201,7 +187,6 @@ public class SwitchPerspectiveHandler {
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
 			perspective.setLabel(perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1));
-//			perspective.setParent(perspectiveStack);
 			perspectiveStack.getChildren().add(0, perspective);
 			switchTo(context, perspective, perspectiveID, window);
 
