@@ -90,7 +90,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		}
 
 		/*
-		 * Entfernt den Close Button, falls keine dynamischen Perspektiven aktive sind.,
+		 * Entfernt den Close Button, falls keine dynamischen Perspektiven aktive sind.
 		 */
 		MUIElement closeToolbar = modelService.find("aero.minova.rcp.rcp.toolbar.close", application);
 		List<MHandledToolItem> closeToolitems = modelService.findElements(closeToolbar,
@@ -99,7 +99,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 				: closeToolitems.get(0);
 
 		if (closeToolitem != null) {
-			if (perspectiveList.size() <= 1) {
+			if (newCurrentPerspective.getElementId().equals("aero.minova.rcp.rcp.perspective.sis")) {
 				closeToolitem.getParent().getChildren().remove(0);
 			}
 		}

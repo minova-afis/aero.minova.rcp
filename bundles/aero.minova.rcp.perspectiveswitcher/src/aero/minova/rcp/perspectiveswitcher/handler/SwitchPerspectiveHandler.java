@@ -47,12 +47,47 @@ public class SwitchPerspectiveHandler {
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
 			MWindow window) throws InvocationTargetException, InterruptedException {
 
+		MUIElement toolbar = model.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
+		MPerspective currentPerspective = model.getActivePerspective(window);
+
+		List<MHandledToolItem> toolitemsOld = model.findElements(toolbar,
+				"aero.minova.rcp.rcp.handledtoolitem." + currentPerspective.getElementId(), MHandledToolItem.class);
+		MHandledToolItem toolitemOld = (toolitemsOld == null || toolitemsOld.size() == 0) ? null : toolitemsOld.get(0);
+
 		if (Boolean.parseBoolean(newWindow)) {
 			openNewWindowPerspective(context, perspectiveID);
+			createNewToolItem(perspectiveID);
 		} else {
 			openPerspective(context, perspectiveID, window);
 			createNewToolItem(perspectiveID);
 			createCloseItem();
+		}
+
+		List<MHandledToolItem> toolitems = model.findElements(toolbar,
+				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, MHandledToolItem.class);
+		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
+
+		MPerspective newCurrentPerspective = model.getActivePerspective(window);
+
+		if (toolitemOld != null)
+			toolitemOld.setSelected(false);
+
+		if (("aero.minova.rcp.rcp.handledtoolitem." + newCurrentPerspective.getElementId())
+				.equals(toolitem.getElementId())) {
+			toolitem.setSelected(true);
+		} else {
+			toolitem.setSelected(false);
+		}
+		
+		MUIElement closeToolbar = model.find("aero.minova.rcp.rcp.toolbar.close", application);
+		List<MHandledToolItem> closeItemImpl = model.findElements(closeToolbar,
+				"aero.minova.rcp.rcp.handledtoolitem.closeperspective", MHandledToolItem.class);
+
+		if (closeItemImpl.get(0) != null) {
+			if (newCurrentPerspective.getElementId().equals("aero.minova.rcp.rcp.perspective.sis")) {
+				MHandledToolItem closeItem = closeItemImpl.get(0);
+				closeItem.getParent().getChildren().remove(0);
+			}
 		}
 
 	}
@@ -157,6 +192,7 @@ public class SwitchPerspectiveHandler {
 		List<MPerspective> perspectives = modelService.findElements(application, perspectiveID, MPerspective.class,
 				null);
 		partService.switchPerspective(perspectives.get(0));
+
 	}
 
 	/**
