@@ -2,7 +2,7 @@
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="500" height="400">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack">
-      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.stundenerfassung">
+      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.sis">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.main" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_Blgn4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.1" containerData="1000">
             <children xsi:type="basic:PartStack" xmi:id="_DgwT4LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_C4Nl4LYkEeqEVOzPNoSbhw">
@@ -72,6 +72,7 @@
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLj8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_hZQ74LufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.menu.master" label="Master">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_KPdTcOLKEeqIbaaiaTRUGA" elementId="aero.minova.rcp.rcp.handledmenuitem.sis" label="SIS" command="_4j7QUOOOEeqf6YlJmDESrg"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_oeKiALufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handledmenuitem.item" label="Item" command="_4p5JwLufEeqOjqZ1liG0LA">
           <parameters xmi:id="_CzjhYLugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.0" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.item"/>
         </children>
@@ -109,6 +110,7 @@
   <handlers xmi:id="_GWvmQNDTEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.savesearchcriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveSearchCriteriaHandler" command="_sAqqYNDSEeqZdekMGDv2pg"/>
   <handlers xmi:id="_GZafwNDTEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.handler.optimizesearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeSearchHandler" command="_sJJQ8NDSEeqZdekMGDv2pg"/>
   <handlers xmi:id="_0VNTQNWPEeq9oeSITNqxdw" elementId="aero.minova.rcp.rcp.handler.optimizedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeDetailHandler" command="_wuFbkNWPEeq9oeSITNqxdw"/>
+  <handlers xmi:id="_656QQOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SISHandler" command="_4j7QUOOOEeqf6YlJmDESrg"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
@@ -132,6 +134,7 @@
   <commands xmi:id="_sAqqYNDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.savesearchcriteria" commandName="SaveSearchCriteria"/>
   <commands xmi:id="_sJJQ8NDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.optimizesearch" commandName="OptimizeSearch"/>
   <commands xmi:id="_wuFbkNWPEeq9oeSITNqxdw" elementId="aero.minova.rcp.rcp.command.optimizedetail" commandName="OptimizeDetail"/>
+  <commands xmi:id="_4j7QUOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.command.siscommand" commandName="SISCommand"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
