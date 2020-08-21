@@ -27,11 +27,10 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -45,7 +44,6 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 @SuppressWarnings("restriction")
 public class WorkspaceDialog extends Dialog {
@@ -76,24 +74,17 @@ public class WorkspaceDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite container = (Composite) super.createDialogArea(parent);
-
-		GridLayout layout = new GridLayout(5, false);
-		layout.marginRight = 5;
-		layout.marginLeft = 10;
-		container.setLayout(layout);
+		container.setLayout(new GridLayout(6, false));
 
 		// Layout data für die Labels
 		GridDataFactory labelGridData = GridDataFactory.swtDefaults().align(SWT.RIGHT, SWT.CENTER);
 
-		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE).supplyLayoutData(labelGridData::create);
-
-//		labelFactory.text("Profile").create(container);
 		Label lblProfile = new Label(container, SWT.NONE);
 		labelGridData.applyTo(lblProfile);
 		lblProfile.setText("Profile");
 
 		profile = new Combo(container, SWT.NONE);
-		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1));
 		profile.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -106,14 +97,20 @@ public class WorkspaceDialog extends Dialog {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		new Label(container, SWT.NONE);
 
 		Label lblUsername = new Label(container, SWT.NONE);
+		lblUsername.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
 		labelGridData.applyTo(lblUsername);
 		lblUsername.setText("Username");
 
 		username = new Text(container, SWT.BORDER);
-		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		GridData gd3 = new GridData(GridData.FILL);
+		gd3.verticalSpan = 1;
+		gd3.horizontalSpan = 2;
+		gd3.grabExcessHorizontalSpace = true;
+		gd3.grabExcessVerticalSpace = false;
+		gd3.horizontalAlignment = SWT.FILL;
 		// username.setText(workspaceData.getUsername());
 		username.addModifyListener(e -> {
 			Text textWidget = (Text) e.getSource();
@@ -122,12 +119,12 @@ public class WorkspaceDialog extends Dialog {
 		});
 
 		Label lblPassword = new Label(container, SWT.NONE);
-		lblPassword.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		lblPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		labelGridData.applyTo(lblPassword);
 		lblPassword.setText("Password");
 
 		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
-		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		// TODO
 		// password.setText(workspaceData.getPassword());
 		password.addModifyListener(e -> {
@@ -136,61 +133,88 @@ public class WorkspaceDialog extends Dialog {
 			// TODO
 			// workspaceData.setPassword(passwordText);
 		});
-		new Label(container, SWT.NONE);
+		// new Label(container, SWT.NONE);
 
 		Label lblApplicationArea = new Label(container, SWT.NONE);
-		lblApplicationArea.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		GridData gd_lblApplicationArea = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gd_lblApplicationArea.verticalAlignment = SWT.FILL;
+		gd_lblApplicationArea.horizontalAlignment = SWT.RIGHT;
+		lblApplicationArea.setLayoutData(gd_lblApplicationArea);
+
 		lblApplicationArea.setText("Application Area");
 
 		text = new Text(container, SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		GridData gd = new GridData(GridData.FILL);
+		gd.verticalSpan = 1;
+		gd.horizontalSpan = 4;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = false;
+		gd.horizontalAlignment = SWT.FILL;
+		text.setLayoutData(gd);
 
 		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
+		GridData gd_btnNewButton = new GridData(GridData.VERTICAL_ALIGN_END);
+		gd_btnNewButton.verticalAlignment = SWT.FILL;
+		btnNewButton.setLayoutData(gd_btnNewButton);
 		btnNewButton.setText("List Applications");
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
 
 		Label lblMessage = new Label(container, SWT.NONE);
 		labelGridData.applyTo(lblMessage);
 		lblMessage.setText("Message");
 
 		message = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
-		// message.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
-		GridData gd_message = new GridData(SWT.FILL, SWT.FILL, true, false, 3, 2);
-		gd_message.heightHint = 13;
-		message.setLayoutData(gd_message);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
+		GridData gd2 = new GridData(GridData.FILL);
+		gd2.verticalSpan = 2;
+		gd2.horizontalSpan = 5;
+		gd2.grabExcessHorizontalSpace = true;
+		gd2.grabExcessVerticalSpace = false;
+		gd2.verticalAlignment = SWT.FILL;
+		gd2.horizontalAlignment = SWT.FILL;
+		message.setLayoutData(gd2);
 		new Label(container, SWT.NONE);
 
 		Label lblConnectionString = new Label(container, SWT.NONE);
+		lblConnectionString.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 		labelGridData.applyTo(lblConnectionString);
 		lblConnectionString.setText("Connection String");
 
 		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-		connectionString.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		connectionString.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
 		Label lblRemoteUsername = new Label(container, SWT.NONE);
-		lblRemoteUsername.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		labelGridData.applyTo(lblRemoteUsername);
 		lblRemoteUsername.setText("Remote Username");
 
 		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-		GridData gd_remoteUsername = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_remoteUsername.widthHint = 55;
-		remoteUsername.setLayoutData(gd_remoteUsername);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
+		remoteUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
 		progressBar = new ProgressBar(container, SWT.NONE);
-		progressBar.setFont(SWTResourceManager.getFont("American Typewriter", 20, SWT.NORMAL));
-		progressBar.setBounds(100, 10, 200, 20);
-		GridData gd_progressBar = new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1);
-		gd_progressBar.heightHint = 20;
-		progressBar.setLayoutData(gd_progressBar);
+		progressBar.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+		progressBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 6, 1));
+//		progressBar.setFont(new Font("American Typewriter", 20, SWT.NORMAL));
+		progressBar.setBounds(100, 10, 200, SWT.NONE);
+
+		new Label(container, SWT.NONE);
+		Label lbl = new Label(container, SWT.NONE);
+		lbl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		labelGridData.applyTo(lbl);
+		lbl.setText(" Remote Username");
+		 lbl.setVisible(false);
+
+		Button btnNewButton2 = new Button(container, SWT.ARROW | SWT.DOWN);
+		GridData gd_btnNewButton2 = new GridData(GridData.VERTICAL_ALIGN_CENTER);
+		gd_btnNewButton2.horizontalAlignment = SWT.FILL;
+		gd_btnNewButton2.verticalAlignment = SWT.FILL;
+		btnNewButton2.setLayoutData(gd_btnNewButton2);
+		btnNewButton2.setText("List Applications");
+		btnNewButton2.setVisible(false);
+
+		new Label(container, SWT.NONE);
+		Label lbl2 = new Label(container, SWT.NONE);
+		lbl2.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		labelGridData.applyTo(lbl2);
+		lbl2.setText(" Remote Username");
+		 lbl2.setVisible(false);
 		new Label(container, SWT.NONE);
 
 		monitor = new GlobalProgressMonitor();
@@ -219,10 +243,10 @@ public class WorkspaceDialog extends Dialog {
 	private void checkWorkspace() {
 		Job job = new Job("Check Connection") {
 			protected IStatus run(IProgressMonitor monitor) {
-				subMonitor = SubMonitor.convert(monitor, 20);
-				for (int i = 0; i < 21; i++) {
+				subMonitor = SubMonitor.convert(monitor, 2);
+				for (int i = 0; i < 4; i++) {
 					try {
-						TimeUnit.SECONDS.sleep(0);
+						TimeUnit.SECONDS.sleep(1);
 						subMonitor.split(1);
 						sync.asyncExec(() -> {
 							workspaceHandler = null;
@@ -265,7 +289,7 @@ public class WorkspaceDialog extends Dialog {
 				username.setText(//
 						primaryWorkspaceHandler.get().get(USER, "sa"));
 			} else {
-				text.setText("file:/Users/erlanger/Documents/MINOVA");
+				text.setText("file:/Users/bauer/Documents/Entwicklung/MINOVA");
 				password.setText("Minova+0");
 				username.setText("sa");
 			}
@@ -297,12 +321,6 @@ public class WorkspaceDialog extends Dialog {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-	}
-
-	@Override
-	protected Point getInitialSize() {
-		return new Point(684, 262);
-
 	}
 
 	private final class GlobalProgressMonitor extends NullProgressMonitor {
