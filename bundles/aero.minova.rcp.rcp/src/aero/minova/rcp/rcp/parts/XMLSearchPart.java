@@ -1,12 +1,12 @@
 package aero.minova.rcp.rcp.parts;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.prefs.BackingStoreException;
@@ -62,5 +62,10 @@ public class XMLSearchPart {
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@PreDestroy
+	public void test(Composite parent) {
+		//Form form = dataFormService.getForm();
 	}
 }
