@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.e4.core.services,
  org.eclipse.swt,
  org.eclipse.equinox.security,
  org.eclipse.jface,
- aero.minova.libs.jtds
+ aero.minova.libs.jtds,
+ org.eclipse.e4.ui.di
 Import-Package: javax.inject,
  org.eclipse.e4.core.di.annotations;version="1.6.0"
 Export-Package: aero.minova.rcp.workspace,

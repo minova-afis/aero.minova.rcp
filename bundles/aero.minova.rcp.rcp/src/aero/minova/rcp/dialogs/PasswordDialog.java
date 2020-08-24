@@ -24,9 +24,9 @@ public class PasswordDialog extends Dialog {
 
 	}
 
-    @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite container = (Composite) super.createDialogArea(parent);
+	@Override
+	protected Control createDialogArea(Composite parent) {
+		Composite container = (Composite) super.createDialogArea(parent);
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginRight = 5;
 		layout.marginLeft = 10;
@@ -62,45 +62,45 @@ public class PasswordDialog extends Dialog {
 
 		return container;
 	}
-    
-    @Override
-    protected void createButtonsForButtonBar(Composite parent) {
-    	createButton(parent, IDialogConstants.OK_ID, "Login", true);
-    	createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
-    	
-    }
-    
-    @Override
-    protected Point getInitialSize() {
-    	return new Point(450, 300);
-    	
-    }
-    
-    @Override
-    protected void okPressed() {
-    	user = txtUser.getText();
-    	password = txtPassword.getText();
-    	super.okPressed();
-    	
-    }
-    
-    public String getUser() {
-    	return user;
-    	
-    }
-    
-    public void setUser(String user) {
-    	this.user = user;
-    	
-    }
-    
-    public String getPassword() {
-    	return password;
-    	
-    }
-    
-    public void setPassword(String password) {
-    	this.password = password;
-    }
+
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		createButton(parent, IDialogConstants.OK_ID, "Login", true);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+
+	}
+
+	@Override
+	protected Point getInitialSize() {
+		return new Point(450, 300);
+
+	}
+
+	@Override
+	protected void okPressed() {
+		user = txtUser.getText();
+		password = txtPassword.getText();
+		super.okPressed();
+
+	}
+
+	public String getUser() {
+		return user;
+
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+
+	}
+
+	public String getPassword() {
+		return password;
+
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 }

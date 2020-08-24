@@ -10,15 +10,11 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.equinox.security.storage.StorageException;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.FileWorkspace;
@@ -31,24 +27,26 @@ public class LifeCycle {
 	@Inject
 	Logger logger;
 
+	@Inject
+	UISynchronize sync;
+
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
 		WorkspaceDialog workspaceDialog;
 		WorkspaceHandler workspaceHandler;
 		int returnCode;
 
-		
-		
 		// Show login dialog to the user
-		workspaceDialog = new WorkspaceDialog(null, logger);
+		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("RecurtnCode: " + returnCode);
-			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace ausgesucht
+			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
+										// ausgesucht
 		}
 
 //		workspaceDialog.getWorkspaceData();
-		
+
 		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
 
 		String userName = "Test1";// get username from login dialog;
@@ -105,11 +103,14 @@ public class LifeCycle {
 	}
 
 	@PreSave
-	void preSave(IEclipseContext workbenchContext) {}
+	void preSave(IEclipseContext workbenchContext) {
+	}
 
 	@ProcessAdditions
-	void processAdditions(IEclipseContext workbenchContext) {}
+	void processAdditions(IEclipseContext workbenchContext) {
+	}
 
 	@ProcessRemovals
-	void processRemovals(IEclipseContext workbenchContext) {}
+	void processRemovals(IEclipseContext workbenchContext) {
+	}
 }
