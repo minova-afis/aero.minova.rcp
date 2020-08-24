@@ -13,6 +13,10 @@
                name="appName"
                value="RCP Produkt">
          </property>
+         <property
+               name="cssTheme"
+               value="aero.minova.rcp.minova-light">
+         </property>
       </product>
    </extension>
 </plugin>
