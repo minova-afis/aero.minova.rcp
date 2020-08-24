@@ -1,0 +1,65 @@
+CTabItem, LayoutComposite, ExpandableComposite,
+	ScrolledComposite, Canvas, DetailComposite, ToolBar,
+	LookupControl, NatTable {
+	background-color: COLOR-WIDGET-BACKGROUND;
+}
+Label, MinovaSection {
+	color: #666666;
+	background-color: inherit;
+}
+
+Label.DescriptionLabel {
+	color: black;
+}
+/* 
+Composite, Label {
+	background-color: #e8e8e8;
+}
+*/
+
+MinovaSection, MinovaComposite {
+	background-color: COLOR-WIDGET-BACKGROUND;
+	background-color-titlebar: white;
+	/*background-color-gradient-titlebar: #e9e9e9;*/
+	border-color-titlebar: black;
+}
+CTabItem:selected {
+	background-color: white;
+}
+
+LookupText, Text {
+	color: black;
+	background-color: white;
+}
+
+LookupText.ValueRequired, Text.ValueRequired {
+	/*background-color: #FFC300;*/
+	background-color: #FCD267;
+}
+
+LookupText.InvalidValue, Text.InvalidValue {
+	color: white;
+	background-color: red;
+}
+
+LookupText.ReadOnly, Text.ReadOnly {
+	background-color: inherit;
+}
+
+Text#Console {
+	color: white;
+	background-color: black;
+}
+LookupControl Label {
+	color: black;
+}
+/*
+
+Label.UnitText {
+	color: black;
+}
+*/
+Label#SplashLabel {
+	color: white;
+	background-color: inherit;
+}

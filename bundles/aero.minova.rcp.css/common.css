@@ -1,0 +1,18 @@
+.MPartStack {
+	swt-maximize-visible: false;
+	swt-minimize-visible: false;
+}
+
+Label#SplashLabel {
+	/* beim Laden von CSS Splash nicht verändern! */
+	font-size: 10px;
+}
+
+Text#Console {
+	/* Schriftart für Konsole muss feste Breite haben */
+	font-family: "courier new";
+}
+
+Label, Text, LookupText, LookupTwistie {
+	font-family: tahoma;
+}
