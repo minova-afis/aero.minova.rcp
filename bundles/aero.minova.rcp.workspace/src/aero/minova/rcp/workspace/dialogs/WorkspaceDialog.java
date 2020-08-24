@@ -30,7 +30,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -104,13 +103,16 @@ public class WorkspaceDialog extends Dialog {
 		lblUsername.setText("Username");
 
 		username = new Text(container, SWT.BORDER);
-		username.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		GridData gd_username = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+		gd_username.widthHint = 130;
+		username.setLayoutData(gd_username);
 		GridData gd3 = new GridData(GridData.FILL);
 		gd3.verticalSpan = 1;
 		gd3.horizontalSpan = 2;
 		gd3.grabExcessHorizontalSpace = true;
 		gd3.grabExcessVerticalSpace = false;
 		gd3.horizontalAlignment = SWT.FILL;
+		gd3.widthHint = 60;
 		// username.setText(workspaceData.getUsername());
 		username.addModifyListener(e -> {
 			Text textWidget = (Text) e.getSource();
@@ -124,7 +126,13 @@ public class WorkspaceDialog extends Dialog {
 		lblPassword.setText("Password");
 
 		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
-		password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		GridData gd6 = new GridData(GridData.FILL);
+		gd6.verticalSpan = 1;
+		gd6.horizontalSpan = 2;
+		gd6.grabExcessVerticalSpace = false;
+		gd6.horizontalAlignment = SWT.FILL;
+		gd6.widthHint = 130;
+		password.setLayoutData(gd6);
 		// TODO
 		// password.setText(workspaceData.getPassword());
 		password.addModifyListener(e -> {
@@ -145,9 +153,9 @@ public class WorkspaceDialog extends Dialog {
 
 		text = new Text(container, SWT.BORDER);
 		GridData gd = new GridData(GridData.FILL);
+		gd.widthHint = 365;
 		gd.verticalSpan = 1;
 		gd.horizontalSpan = 4;
-		gd.grabExcessHorizontalSpace = true;
 		gd.grabExcessVerticalSpace = false;
 		gd.horizontalAlignment = SWT.FILL;
 		text.setLayoutData(gd);
@@ -166,7 +174,6 @@ public class WorkspaceDialog extends Dialog {
 		GridData gd2 = new GridData(GridData.FILL);
 		gd2.verticalSpan = 2;
 		gd2.horizontalSpan = 5;
-		gd2.grabExcessHorizontalSpace = true;
 		gd2.grabExcessVerticalSpace = false;
 		gd2.verticalAlignment = SWT.FILL;
 		gd2.horizontalAlignment = SWT.FILL;
@@ -174,12 +181,20 @@ public class WorkspaceDialog extends Dialog {
 		new Label(container, SWT.NONE);
 
 		Label lblConnectionString = new Label(container, SWT.NONE);
-		lblConnectionString.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+		GridData gd5 = new GridData();
+		gd5.horizontalAlignment = SWT.BEGINNING;
+		gd5.widthHint = 120;
+		gd5.horizontalSpan = 1;
+		gd5.verticalSpan = 1;
+		gd5.horizontalAlignment = SWT.FILL;
+		lblConnectionString.setLayoutData(gd5);
 		labelGridData.applyTo(lblConnectionString);
 		lblConnectionString.setText("Connection String");
 
 		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-		connectionString.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		GridData gd_connectionString = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
+		gd_connectionString.widthHint = 80;
+		connectionString.setLayoutData(gd_connectionString);
 
 		Label lblRemoteUsername = new Label(container, SWT.NONE);
 		labelGridData.applyTo(lblRemoteUsername);
@@ -188,34 +203,13 @@ public class WorkspaceDialog extends Dialog {
 		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
 		remoteUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
-		progressBar = new ProgressBar(container, SWT.NONE);
+		progressBar = new ProgressBar(container, SWT.BORDER | SWT.SMOOTH);
 		progressBar.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-		progressBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 6, 1));
+		GridData gd_progressBar = new GridData(SWT.FILL, SWT.FILL, false, false, 6, 1);
+		gd_progressBar.heightHint = 20;
+		progressBar.setLayoutData(gd_progressBar);
 //		progressBar.setFont(new Font("American Typewriter", 20, SWT.NORMAL));
 		progressBar.setBounds(100, 10, 200, SWT.NONE);
-
-		new Label(container, SWT.NONE);
-		Label lbl = new Label(container, SWT.NONE);
-		lbl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		labelGridData.applyTo(lbl);
-		lbl.setText(" Remote Username");
-		 lbl.setVisible(false);
-
-		Button btnNewButton2 = new Button(container, SWT.ARROW | SWT.DOWN);
-		GridData gd_btnNewButton2 = new GridData(GridData.VERTICAL_ALIGN_CENTER);
-		gd_btnNewButton2.horizontalAlignment = SWT.FILL;
-		gd_btnNewButton2.verticalAlignment = SWT.FILL;
-		btnNewButton2.setLayoutData(gd_btnNewButton2);
-		btnNewButton2.setText("List Applications");
-		btnNewButton2.setVisible(false);
-
-		new Label(container, SWT.NONE);
-		Label lbl2 = new Label(container, SWT.NONE);
-		lbl2.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
-		labelGridData.applyTo(lbl2);
-		lbl2.setText(" Remote Username");
-		 lbl2.setVisible(false);
-		new Label(container, SWT.NONE);
 
 		monitor = new GlobalProgressMonitor();
 
