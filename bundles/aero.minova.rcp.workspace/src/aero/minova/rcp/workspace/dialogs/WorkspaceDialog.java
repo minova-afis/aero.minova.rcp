@@ -245,19 +245,24 @@ public class WorkspaceDialog extends Dialog {
 						sync.asyncExec(() -> {
 							workspaceHandler = null;
 							try {
-								message.setText("");
-								workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
-								btnOK.setEnabled(
-										workspaceHandler.checkConnection(username.getText(), password.getText()));
+								if (message != null && !message.isDisposed()) {
+									message.setText("");
+									workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
+									btnOK.setEnabled(
+											workspaceHandler.checkConnection(username.getText(), password.getText()));
+
+								}
 							} catch (MalformedURLException | WorkspaceException e1) {
 								logger.error(e1);
 								message.setText(e1.getMessage());
 								btnOK.setEnabled(false);
 							}
 							if (workspaceHandler != null) {
-								connectionString.setText(workspaceHandler.getConnectionString());
-								remoteUsername.setText(workspaceHandler.getRemoteUsername());
-								profile.setText(workspaceHandler.getDisplayName());
+								if (message != null && !message.isDisposed()) {
+									connectionString.setText(workspaceHandler.getConnectionString());
+									remoteUsername.setText(workspaceHandler.getRemoteUsername());
+									profile.setText(workspaceHandler.getDisplayName());
+								}
 							}
 						});
 					} catch (InterruptedException e) {
@@ -351,7 +356,9 @@ public class WorkspaceDialog extends Dialog {
 
 				@Override
 				public void run() {
-					progressBar.setSelection(progressBar.getSelection() + work);
+					if (progressBar!=null && !progressBar.isDisposed()) {
+						progressBar.setSelection(progressBar.getSelection() + work);
+					}
 				}
 			});
 		}
