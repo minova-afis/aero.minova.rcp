@@ -32,8 +32,6 @@ public class XMLDetailPart {
 		parent.setLayout(new GridLayout(1, true));
 
 		Form form = dataFormService.getForm();
-//		String tableName = form.getIndexView().getSource();
-//		Table data = dataService.getData(tableName);
 
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {

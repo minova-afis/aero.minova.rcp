@@ -22,6 +22,14 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 
 public class DetailUtil {
+
+	public static final int LABEL_WIDTH_HINT = 150;
+	public static final int TEXT_WIDTH_HINT = 170;
+	public static final int LOOKUP_WIDTH_HINT = 170;
+	public static final int UNIT_WIDTH_HINT = 20;
+	public static final int BIG_TEXT_WIDTH_HINT = 490;
+	public static final int LOOKUP_DESCRIPTION_WIDTH_HINT = 320;
+
 	public static void createField(Field field, Composite composite) {
 		if (!field.isVisible()) {
 			return;
@@ -41,8 +49,9 @@ public class DetailUtil {
 
 		Label label = labelFactory.create(composite);
 		label.setText(field.getTextAttribute());
-		GridData data1 = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
+		GridData data1 = GridDataFactory.fillDefaults().grab(true, false).align(SWT.RIGHT, SWT.TOP).create();
 		data1.horizontalSpan = 1;
+		data1.widthHint = LABEL_WIDTH_HINT;
 		label.setLayoutData(data1);
 
 		if (field.getLookup() != null) {
@@ -52,10 +61,9 @@ public class DetailUtil {
 			if (twoColumns) {
 				Label labelDescription = labelFactory.create(composite);
 				labelDescription.setText("Description");
-				GridDataFactory gridDataFactoryLabelDescription = GridDataFactory.fillDefaults().grab(true, false)
-						.align(SWT.LEFT, SWT.TOP);
-				GridData data = gridDataFactoryLabelDescription.create();
+				GridData data = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
 				data.horizontalSpan = 3;
+				data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 				labelDescription.setLayoutData(data);
 			}
 		} else if (field.getBoolean() != null) {
@@ -65,15 +73,7 @@ public class DetailUtil {
 			Text text;
 			GridData gd;
 			Integer numberRowSpand = null;
-			if (!twoColumns && field.getText() != null) {
-				gd = getGridDataFactory(twoColumns, field);
-			} else {
-				gd = getGridDataFactory(twoColumns, field);
-			}
-			if (field.getUnitText() == null) {
-				// Wenn es keine Einheit gibt, muss das Feld 2 Spaltenbreiten einnehmen
-				gd.horizontalSpan = gd.horizontalSpan + 1;
-			}
+			gd = getGridDataFactory(twoColumns, field);
 
 			if (field.getNumberRowsSpanned() != null) {
 				numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
@@ -86,47 +86,52 @@ public class DetailUtil {
 				text = textFactory.create(composite);
 			}
 			text.setLayoutData(gd);
+			if (twoColumns && gd.horizontalSpan != 5) {
+				Label l = new Label(composite, SWT.None);
+				GridData data = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
+				data.horizontalSpan = 3;
+				data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
+				l.setLayoutData(data);
+			}
 		}
 
-		if (field.getUnitText() != null & field.getLookup() == null) {
-			Field fielddummy = new Field();
-			fielddummy.setUnitText("Test");
+		if (field.getUnitText() != null && field.getLookup() == null) {
 			Label labelUnit = new Label(composite, SWT.None);
-
 			labelUnit.setText(field.getUnitText());
-			labelUnit.setLayoutData(getGridDataFactory(twoColumns, fielddummy));
+			GridData data2 = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
+			data2.horizontalSpan = 1;
+			data2.widthHint = UNIT_WIDTH_HINT;
+			labelUnit.setLayoutData(data2);
 		}
 	}
 
-	private static Integer getSpannedHintForElement(Field field, boolean twoColumns) {
-		if (field.getText() != null && field.getUnitText() != null) {
+	public static Integer getSpannedHintForElement(Field field, boolean twoColumns) {
+		if (field.getUnitText() != null) {
 			return 1;
-		} else if (field.getText() != null && field.getUnitText() == null && twoColumns) {
+		} else if (field.getText() != null && twoColumns) {
 			return 5;
 		} else {
 			return 2;
 		}
 	}
 
-	private static Integer getWidthHintForElement(Field field, boolean twoColumns) {
-		if (field.getDateTime() != null || field.getShortDate() != null
-				|| field.getShortTime() != null) {
-			return 150;
+	public static int getWidthHintForElement(Field field, boolean twoColumns) {
+		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
+			return TEXT_WIDTH_HINT;
 		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null)
 				&& field.getUnitText() != null) {
-			return 150;
-		}
-		else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null || field.getLookup() != null)
-				&& field.getUnitText() == null) {
-			return 150 + 20;
+			return LABEL_WIDTH_HINT;
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null
+				|| field.getLookup() != null) && field.getUnitText() == null) {
+			return LOOKUP_WIDTH_HINT;
 		} else if (field.getBoolean() != null) {
-			return 20;
+			return UNIT_WIDTH_HINT;
 		} else {
 			if (twoColumns) {
-				return ((3 * 150) + (20));
+				return BIG_TEXT_WIDTH_HINT;
 			}
-			return 150 * 3;
 		}
+		return -1;
 	}
 
 	private static Integer getWidthHintForElement(Field field) {
@@ -168,7 +173,7 @@ public class DetailUtil {
 	public static Composite createSection(FormToolkit formToolkit, Composite parent, Page page) {
 		Section section = formToolkit.createSection(parent,
 				Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
-
+		section.setLayoutData(GridDataFactory.fillDefaults().create());
 		formToolkit.paintBordersFor(section);
 		section.setText(page.getText());
 		section.setExpanded(true);
