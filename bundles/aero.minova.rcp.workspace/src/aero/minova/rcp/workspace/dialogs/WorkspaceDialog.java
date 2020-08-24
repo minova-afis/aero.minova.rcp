@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.core.ui.Util;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
@@ -245,12 +246,11 @@ public class WorkspaceDialog extends Dialog {
 						sync.asyncExec(() -> {
 							workspaceHandler = null;
 							try {
-								if (message != null && !message.isDisposed()) {
+								if (Util.isAvailable(message)) {
 									message.setText("");
 									workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
 									btnOK.setEnabled(
 											workspaceHandler.checkConnection(username.getText(), password.getText()));
-
 								}
 							} catch (MalformedURLException | WorkspaceException e1) {
 								logger.error(e1);
@@ -258,7 +258,7 @@ public class WorkspaceDialog extends Dialog {
 								btnOK.setEnabled(false);
 							}
 							if (workspaceHandler != null) {
-								if (message != null && !message.isDisposed()) {
+								if (Util.isAvailable(message)) {
 									connectionString.setText(workspaceHandler.getConnectionString());
 									remoteUsername.setText(workspaceHandler.getRemoteUsername());
 									profile.setText(workspaceHandler.getDisplayName());
@@ -395,7 +395,6 @@ public class WorkspaceDialog extends Dialog {
 			return this;
 		}
 	}
-
 	@Override
 	protected void okPressed() {
 		// TODO
