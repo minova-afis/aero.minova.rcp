@@ -44,8 +44,6 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) o2, co);
 					}
 				}
-				co.getParent().getParent().pack();
-				co.requestLayout();
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
 				Composite co = DetailUtil.createSection(formToolkit, parent, page);
@@ -54,8 +52,6 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) o2, co);
 					}
 				}
-				co.getParent().getParent().pack();
-				co.requestLayout();
 			}
 		}
 	}
