@@ -29,7 +29,7 @@ public class XMLDetailPart {
 	@PostConstruct
 	public void createComposite(Composite parent) {
 		//Top-Level_Element
-		parent.setLayout(new GridLayout(1, false));
+		parent.setLayout(new GridLayout(1, true));
 
 		Form form = dataFormService.getForm();
 //		String tableName = form.getIndexView().getSource();
