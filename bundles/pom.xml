@@ -11,6 +11,7 @@
 	</parent>
 
 	<modules>
+		<module>aero.minova.rcp.css</module>
 		<module>aero.minova.rcp.form.model</module>
 		<module>aero.minova.rcp.plugin1</module>
 		<module>aero.minova.rcp.workspace</module>
