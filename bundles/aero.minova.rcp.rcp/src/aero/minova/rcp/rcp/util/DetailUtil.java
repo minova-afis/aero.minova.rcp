@@ -82,9 +82,12 @@ public class DetailUtil {
 		}
 
 		if (field.getUnitText() != null & field.getLookup() == null) {
+			Field fielddummy = new Field();
+			fielddummy.setUnitText("Test");
 			Label labelUnit = new Label(composite, SWT.None);
+
 			labelUnit.setText(field.getUnitText());
-			labelUnit.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+			labelUnit.setLayoutData(getGridDataFactory(null, getWidthHintForElement(fielddummy)));
 		}
 	}
 
@@ -100,6 +103,9 @@ public class DetailUtil {
 		} else if (field.getBoolean() != null) {
 			return 20;
 		} else {
+			if (numberOfColumns == 4) {
+				return ((3 * 150) + (20));
+			}
 			return 150 * numberOfColumns;
 		}
 	}
