@@ -156,26 +156,18 @@ public class DetailUtil {
 		return data;
 	}
 
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Head head) {
-		Section section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
+	public static Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+		Section section;
+		if (ob instanceof Head) {
+			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
+			section.setText("Kopfdaten");
+		} else {
+			section = formToolkit.createSection(parent,
+					Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
+			section.setText(((Page) ob).getText());
+		}
 		section.setLayoutData(GridDataFactory.fillDefaults().create());
 		formToolkit.paintBordersFor(section);
-		section.setText("Kopfdaten");
-		section.setExpanded(true);
-		Composite composite = formToolkit.createComposite(section, SWT.RIGHT);
-		formToolkit.paintBordersFor(composite);
-		section.setClient(composite);
-		composite.setLayout(new GridLayout(6, false));
-
-		return composite;
-	}
-
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Page page) {
-		Section section = formToolkit.createSection(parent,
-				Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
-		section.setLayoutData(GridDataFactory.fillDefaults().create());
-		formToolkit.paintBordersFor(section);
-		section.setText(page.getText());
 		section.setExpanded(true);
 		Composite composite = formToolkit.createComposite(section, SWT.RIGHT);
 		formToolkit.paintBordersFor(composite);

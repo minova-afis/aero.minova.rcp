@@ -10,13 +10,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Lookup;
 import aero.minova.rcp.form.model.xsd.Number;
 import aero.minova.rcp.plugin1.model.Table;
@@ -27,10 +30,12 @@ public class DetailUtilTests {
 	private Table t;
 	private Shell shell;
 	private Composite composite;
+	private FormToolkit formToolkit;
 
 	@Before
 	public void setup() {
 		shell = new Shell();
+		formToolkit = new FormToolkit(Display.getDefault());
 		composite = CompositeFactory.newComposite(SWT.None).create(shell);
 		composite.setLayout(new GridLayout(6, false));
 
@@ -60,6 +65,65 @@ public class DetailUtilTests {
 
 		field.setNumberColumnsSpanned(new BigInteger("2"));
 		assertTrue(DetailUtil.getSpannedHintForElement(field, true) == 2);
+
+	}
+
+	@Test
+	public void testHeader() throws Exception {
+		Field field = new Field();
+		field.setTextAttribute("Test");
+		field.setDateTime(new Object());
+		field.setNumberColumnsSpanned(new BigInteger("4"));
+
+		Field lookup = new Field();
+		lookup.setTextAttribute("Test");
+		lookup.setLookup(new Lookup());
+		lookup.setNumberColumnsSpanned(new BigInteger("4"));
+
+		Head head = new Head();
+		head.getFieldOrGrid().add(field);
+		head.getFieldOrGrid().add(lookup);
+
+		Composite co = DetailUtil.createSection(formToolkit, composite.getParent(), head);
+		for (Object o2 : head.getFieldOrGrid()) {
+			if (o2 instanceof Field) {
+				DetailUtil.createField((Field) o2, co);
+			}
+		}
+		Control[] children = co.getChildren();
+		assertEquals(children.length, 6);
+		Object layoutData = children[0].getLayoutData();
+		assertEquals(layoutData.getClass(), GridData.class);
+		assertEquals(((GridData) layoutData).horizontalAlignment, SWT.RIGHT);
+		assertEquals(1, ((GridData) layoutData).horizontalSpan);
+		assertEquals(150, ((GridData) layoutData).widthHint);
+		Object layoutData1 = children[1].getLayoutData();
+		assertTrue(layoutData1.getClass().equals(GridData.class));
+		assertTrue(((GridData) layoutData1).horizontalAlignment == SWT.LEFT);
+		assertEquals(2, ((GridData) layoutData1).horizontalSpan);
+		assertEquals(170, ((GridData) layoutData1).widthHint);
+		layoutData = children[2].getLayoutData();
+		assertEquals(layoutData.getClass(), GridData.class);
+		assertEquals(((GridData) layoutData).horizontalAlignment, SWT.LEFT);
+		assertEquals(3, ((GridData) layoutData).horizontalSpan);
+		assertEquals(children[2].getClass(), Label.class);
+		assertTrue(((Label) children[2]).getText().isEmpty());
+
+		layoutData = children[3].getLayoutData();
+		assertTrue(layoutData.getClass().equals(GridData.class));
+		assertTrue(((GridData) layoutData).horizontalAlignment == SWT.RIGHT);
+		assertTrue(((GridData) layoutData).horizontalSpan == 1);
+		assertTrue(((GridData) layoutData).widthHint == 150);
+		layoutData = children[4].getLayoutData();
+		assertTrue(layoutData.getClass().equals(GridData.class));
+		assertTrue(((GridData) layoutData).horizontalAlignment == SWT.LEFT);
+		assertTrue(((GridData) layoutData).horizontalSpan == 2);
+		assertTrue(((GridData) layoutData).widthHint == 170);
+		layoutData = children[5].getLayoutData();
+		assertTrue(layoutData.getClass().equals(GridData.class));
+		assertTrue(((GridData) layoutData).horizontalAlignment == SWT.LEFT);
+		assertTrue(((GridData) layoutData).horizontalSpan == 3);
+		assertEquals(320, ((GridData) layoutData).widthHint);
 
 	}
 
@@ -117,7 +181,7 @@ public class DetailUtilTests {
 	}
 
 	@Test
-	public void newtest() throws Exception {
+	public void createLookUpLayoutRow() throws Exception {
 		Field field = new Field();
 		field.setTextAttribute("Test");
 		field.setLookup(new Lookup());
