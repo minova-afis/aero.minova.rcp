@@ -78,7 +78,7 @@ public class SwitchPerspectiveHandler {
 		} else {
 			toolitem.setSelected(false);
 		}
-		
+
 		MUIElement closeToolbar = model.find("aero.minova.rcp.rcp.toolbar.close", application);
 		List<MHandledToolItem> closeItemImpl = model.findElements(closeToolbar,
 				"aero.minova.rcp.rcp.handledtoolitem.closeperspective", MHandledToolItem.class);
@@ -131,7 +131,6 @@ public class SwitchPerspectiveHandler {
 				}
 			}
 			newToolitem.setSelected(true);
-
 		}
 	}
 
