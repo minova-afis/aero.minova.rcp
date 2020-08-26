@@ -15,7 +15,7 @@
          </property>
          <property
                name="cssTheme"
-               value="aero.minova.rcp.minova-light">
+               value="aero.minova.rcp.defaulttheme">
          </property>
       </product>
    </extension>
