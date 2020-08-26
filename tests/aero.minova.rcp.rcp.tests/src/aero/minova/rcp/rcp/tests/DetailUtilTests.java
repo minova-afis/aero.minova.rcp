@@ -46,6 +46,17 @@ public class DetailUtilTests {
 		shell.dispose();
 	}
 
+	
+	
+	@Test (expected = NumberFormatException.class)
+	public void ensureWeCannotHandleNumberParsingExceptionsinNumberRowsSpanned() {
+		Field field = new Field();
+		field.setVisible(true);
+		field.setTextAttribute("Testing");
+		field.setNumberRowsSpanned("THIS RESULTS IN AN EXCEPTION");
+		DetailUtil.createField(field, composite);
+	}
+	
 	@Test
 	public void ensureInvisibleFieldIsHidden() {
 		Composite composite = CompositeFactory.newComposite(SWT.None).create(shell);
