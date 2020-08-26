@@ -57,4 +57,12 @@ public class Table {
 	public List<Row> getRows() {
 		return rows;
 	}
+	
+	public void addRow() {
+		Row row = new Row();
+		for (int i = 0; i < columns.size(); i++) {
+			row.addValue(new Value(""));
+		}
+		rows.add(row);
+	}
 }
