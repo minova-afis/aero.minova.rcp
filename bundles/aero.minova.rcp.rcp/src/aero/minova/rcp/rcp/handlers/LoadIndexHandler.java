@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -32,8 +33,8 @@ public class LoadIndexHandler {
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
 		Table table = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
 		table.getRows().clear();
-		Table table2 = dataService.getData(table.getName(), table);
-		broker.post("PLAPLA", table2);
+		CompletableFuture<Table> tableFuture = dataService.getDataAsync(table.getName(), table);
+		tableFuture.thenAccept(t -> broker.post("PLAPLA", t));
 	}
 
 }

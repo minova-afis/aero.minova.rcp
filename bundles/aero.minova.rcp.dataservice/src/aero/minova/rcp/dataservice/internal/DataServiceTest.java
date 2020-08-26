@@ -3,6 +3,8 @@ package aero.minova.rcp.dataservice.internal;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.CompletableFuture;
+
 import org.osgi.service.component.annotations.Component;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.plugin1.model.Column;
@@ -86,6 +88,12 @@ public class DataServiceTest implements IDataService {
 		r.addValue(new Value(false));
 		t.addRow(r);
 		return t;
+	}
+
+	@Override
+	public CompletableFuture<Table> getDataAsync(String tableName, Table seachTable) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -6,9 +6,11 @@ import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.concurrent.CompletableFuture;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -70,7 +72,24 @@ public class DataService implements IDataService {
 		Table data = gson.fromJson(response.body(), Table.class);
 		return data;
 	}
+	
+	@Override
+	public CompletableFuture<Table> getDataAsync(String tableName, Table seachTable) {
+		init();
+		String body = gson.toJson(seachTable);
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
+				.header("Content-Type", "application/json") //
+				.method("GET", BodyPublishers.ofString(body))//
+				.build();
+		
+		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
+		
+		return future;
+		
+	}
 
+	
 	@Override
 	/**
 	 * mintest.minova.com:8084/data/index
