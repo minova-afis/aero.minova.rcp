@@ -26,6 +26,7 @@ public class XMLDetailPart {
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	
 
+
 	@PostConstruct
 	public void createComposite(Composite parent) {
 		//Top-Level_Element
@@ -36,18 +37,18 @@ public class XMLDetailPart {
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
-				Composite co = DetailUtil.createSection(formToolkit, parent, head);
-				for (Object o2 : head.getFieldOrGrid()) {
-					if (o2 instanceof Field) {
-						DetailUtil.createField((Field) o2, co);
+				Composite detailFieldComposite = DetailUtil.createSection(formToolkit, parent, head);
+				for (Object fieldOrGrid : head.getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite);
 					}
 				}
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
-				Composite co = DetailUtil.createSection(formToolkit, parent, page);
+				Composite detailFieldComposite = DetailUtil.createSection(formToolkit, parent, page);
 				for (Object o2 : page.getFieldOrGrid()) {
 					if (o2 instanceof Field) {
-						DetailUtil.createField((Field) o2, co);
+						DetailUtil.createField((Field) o2, detailFieldComposite);
 					}
 				}
 			}
