@@ -8,6 +8,11 @@
             id="aero.minova.rcp.minova-light"
             label="Light">
       </theme>
+      <theme
+            basestylesheeturi="css/default.css"
+            id="aero.minova.rcp.default"
+            label="Default">
+      </theme>
    </extension>
 
 </plugin>

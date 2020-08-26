@@ -1,7 +1,7 @@
-@import url("platform:/plugin/ch.minova.e4.ui/css/colors.css");
-@import url("platform:/plugin/ch.minova.e4.ui/css/margin.css");
-@import url("platform:/plugin/ch.minova.e4.ui/css/common.css");
-@import url("platform:/plugin/ch.minova.e4.ui/css/nattable.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/colors.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/margin.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/common.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/nattable.css");
 
 Label, LookupTwistie {
 	font-size: 9px;
