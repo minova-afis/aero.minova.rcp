@@ -7,6 +7,8 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.prefs.BackingStoreException;
@@ -36,6 +38,10 @@ public class XMLSearchPart {
 	private IDataFormService dataFormService;
 
 	private Table data;
+	
+	@Inject MPart mPart;
+
+	private NatTable natTable;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -51,7 +57,8 @@ public class XMLSearchPart {
 		}
 
 		parent.setLayout(new GridLayout());
-		NatTableUtil.createNatTable(parent, form, data, false);
+		mPart.getContext().set("NatTableDataSearchArea", data);
+		natTable = NatTableUtil.createNatTable(parent, form, data, false);
 	}
 
 	@PersistTableSelection
@@ -70,4 +77,5 @@ public class XMLSearchPart {
 	public void test(Composite parent) {
 		// Form form = dataFormService.getForm();
 	}
+
 }
