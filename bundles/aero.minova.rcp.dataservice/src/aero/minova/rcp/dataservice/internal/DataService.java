@@ -50,30 +50,6 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	/**
-	 * mintest.minova.com:8084/data/index
-	 */
-	public Table getData(String tableName, Table seachTable) {
-		init();
-		System.out.println(seachTable.toString());
-		String body = gson.toJson(seachTable);
-		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
-				.header("Content-Type", "application/json") //
-				.method("GET", BodyPublishers.ofString(body))//
-				.build();
-		System.out.println(request.bodyPublisher().get());
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		Table data = gson.fromJson(response.body(), Table.class);
-		return data;
-	}
-	
-	@Override
 	public CompletableFuture<Table> getDataAsync(String tableName, Table seachTable) {
 		init();
 		String body = gson.toJson(seachTable);
@@ -88,29 +64,4 @@ public class DataService implements IDataService {
 		return future;
 		
 	}
-
-	
-	@Override
-	/**
-	 * mintest.minova.com:8084/data/index
-	 * Hier wird nur der Index ohne Such-Einträge geschickt. 
-	 */
-	public Table getData(String tableName) {
-		init();
-		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
-				.header("Content-Type", "application/json") //
-				.method("GET", BodyPublishers.ofString(tableName))//
-				.build();
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		Table data = gson.fromJson(response.body(), Table.class);
-		return data;
-		
-	}
-
 }
