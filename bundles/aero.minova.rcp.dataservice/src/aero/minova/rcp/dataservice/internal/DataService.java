@@ -1,91 +1,97 @@
 package aero.minova.rcp.dataservice.internal;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodyHandlers;
+
 import org.osgi.service.component.annotations.Component;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.Column;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.plugin1.model.ValueDeserializer;
+import aero.minova.rcp.plugin1.model.ValueSerializer;
 
 @Component
 public class DataService implements IDataService {
 
-	@Override
-	public Table getData(String tableName, Table seachTable) {
+	private HttpRequest request;
+	private HttpClient httpClient;
+	private Authenticator authentication;
+	private Gson gson;
 
-		Table t = new Table();
-		t.setName("OrderReceiver");
-		t.addColumn(new Column("KeyLong", DataType.INTEGER));
-		t.addColumn(new Column("KeyText", DataType.STRING));
-		t.addColumn(new Column("Description", DataType.STRING));
-		t.addColumn(new Column("LastDate", DataType.ZONED));
-		t.addColumn(new Column("ValidUntil", DataType.INSTANT));
-		t.addColumn(new Column("Married", DataType.BOOLEAN));
-		// Wenn in dieser Row ein & steht, bedeutet es, dass die Row inklusiver der
-		// vorherigen zusammengeführt werden. Es bildet ein selektionskriterium mit UND
-		t.addColumn(new Column("&", DataType.BOOLEAN)); // Verunden
+	private void init() {
+		
+		authentication = new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("admin", "admin".toCharArray());
+			}
+		};
+		httpClient = HttpClient.newBuilder().authenticator(authentication).build();
 
-		Row r;
-		r = new Row();
-		r.addValue(new Value(1));
-		r.addValue(null);
-		r.addValue(new Value(23.5));
-		r.addValue(new Value("Wilfried Saak"));
-		r.addValue(new Value(Instant.now()));
-		r.addValue(new Value(ZonedDateTime.now()));
-		r.addValue(new Value(true));
-		t.addRow(r);
-		return t;
+		gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
 	}
 
 	@Override
+	/**
+	 * mintest.minova.com:8084/data/index
+	 */
+	public Table getData(String tableName, Table seachTable) {
+		init();
+		System.out.println(seachTable.toString());
+		String body = gson.toJson(seachTable);
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
+				.header("Content-Type", "application/json") //
+				.method("GET", BodyPublishers.ofString(body))//
+				.build();
+		System.out.println(request.bodyPublisher().get());
+		HttpResponse<String> response = null;
+		try {
+			response = httpClient.send(request, BodyHandlers.ofString());
+			System.out.println(response.body());
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		Table data = gson.fromJson(response.body(), Table.class);
+		return data;
+	}
+
+	@Override
+	/**
+	 * mintest.minova.com:8084/data/index
+	 * Hier wird nur der Index ohne Such-Einträge geschickt. 
+	 */
 	public Table getData(String tableName) {
-
-		Table t = new Table();
-		t.setName("OrderReceiver");
-		t.addColumn(new Column("KeyLong", DataType.INTEGER));
-		t.addColumn(new Column("KeyText", DataType.STRING));
-		t.addColumn(new Column("Description", DataType.STRING));
-		t.addColumn(new Column("LastDate", DataType.ZONED));
-		t.addColumn(new Column("ValidUntil", DataType.INSTANT));
-		t.addColumn(new Column("Married", DataType.BOOLEAN));
-		// Wenn in dieser Row ein & steht, bedeutet es, dass die Row inklusiver der
-		// vorherigen zusammengeführt werden. Es bildet ein selektionskriterium mit UND
-		t.addColumn(new Column("&", DataType.BOOLEAN)); // Verunden
-
-		Row r;
-		r = new Row();
-		r.addValue(new Value(1));
-		r.addValue(null);
-		r.addValue(new Value("Wilfried Saak"));
-		r.addValue(new Value(Instant.now()));
-		r.addValue(new Value(ZonedDateTime.now()));
-		r.addValue(new Value(true));
-		r.addValue(new Value(false));
-		t.addRow(r);
-		r = new Row();
-		r.addValue(new Value(123.45));
-		r.addValue(new Value("THEUERERG"));
-		r.addValue(new Value("Gudrun Theuerer"));
-		r.addValue(new Value(Instant.now()));
-		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
-		r.addValue(new Value(true));
-		r.addValue(new Value(false));
-		t.addRow(r);
-		r = new Row();
-		r.addValue(null);
-		r.addValue(new Value("T"));
-		r.addValue(null);
-		r.addValue(null);
-		r.addValue(null);
-		r.addValue(null);
-		r.addValue(new Value(false));
-		t.addRow(r);
-		return t;
+		init();
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
+				.header("Content-Type", "application/json") //
+				.method("GET", BodyPublishers.ofString(tableName))//
+				.build();
+		HttpResponse<String> response = null;
+		try {
+			response = httpClient.send(request, BodyHandlers.ofString());
+			System.out.println(response.body());
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		Table data = gson.fromJson(response.body(), Table.class);
+		return data;
+		
 	}
 
 }

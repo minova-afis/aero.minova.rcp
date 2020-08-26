@@ -22,139 +22,152 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 
 public class DetailUtil {
-	public static void createField(Field field, Composite composite) {
 
+	public static final int LABEL_WIDTH_HINT = 150;
+	public static final int TEXT_WIDTH_HINT = 170;
+	public static final int LOOKUP_WIDTH_HINT = 170;
+	public static final int UNIT_WIDTH_HINT = 20;
+	public static final int BIG_TEXT_WIDTH_HINT = 490;
+	public static final int LOOKUP_DESCRIPTION_WIDTH_HINT = 320;
+
+	public static void createField(Field field, Composite composite) {
+		if (!field.isVisible()) {
+			return;
+		}
 		LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE);
 		TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
 		ButtonFactory btnFactory = ButtonFactory.newButton(SWT.CHECK);
 		TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
 
-		Integer numberOfColumns = null;
-		if (field.getNumberColumnsSpanned() == null
-				|| field.getNumberColumnsSpanned().compareTo(new BigInteger("2")) == 0) {
-			numberOfColumns = 1;
-		} else {
-			numberOfColumns = 4;
+		// 2 Felder nebeneinander (Label + Textbox) --> (einspaltig) false
+		// 4 Felder nebeneinander (label + Textbox + label + Textbox) --> (zweispaltig)
+		// true
+		boolean twoColumns = false;
+		if (new BigInteger("4").equals(field.getNumberColumnsSpanned())) {
+			twoColumns = true;
 		}
 
-		if (field.isVisible()) {
-			Label label = labelFactory.create(composite);
-			label.setText(field.getTextAttribute());
-			label.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+		Label label = labelFactory.create(composite);
+		label.setText(field.getTextAttribute());
+		GridData data1 = GridDataFactory.fillDefaults().grab(true, false).align(SWT.RIGHT, SWT.TOP).create();
+		data1.horizontalSpan = 1;
+		data1.widthHint = LABEL_WIDTH_HINT;
+		label.setLayoutData(data1);
 
-			if (field.getLookup() != null) {
-				CCombo combo = new CCombo(composite, SWT.BORDER);
-				combo.setLayoutData(getGridDataFactory(numberOfColumns, getWidthHintForElement(field)));
-				// Description für die LookUp
+		if (field.getLookup() != null) {
+			CCombo combo = new CCombo(composite, SWT.BORDER);
+			combo.setLayoutData(getGridDataFactory(twoColumns, field));
+			// Description für die LookUp
+			if (twoColumns) {
 				Label labelDescription = labelFactory.create(composite);
 				labelDescription.setText("Description");
-				labelDescription.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
-			} else if (field.getBoolean() != null) {
-				Button button = btnFactory.create(composite);
-				button.setLayoutData(getGridDataFactory(null, getWidthHintForElement(field)));
+				GridData data = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
+				data.horizontalSpan = 3;
+				data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
+				labelDescription.setLayoutData(data);
+			}
+		} else if (field.getBoolean() != null) {
+			Button button = btnFactory.create(composite);
+			button.setLayoutData(getGridDataFactory(twoColumns, field));
+		} else {
+			Text text;
+			GridData gd;
+			Integer numberRowSpand = null;
+			gd = getGridDataFactory(twoColumns, field);
+
+			if (field.getNumberRowsSpanned() != null) {
+				numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
+				text = textMultiFactory.create(composite);
+				if (numberRowSpand != null) {
+					int hight = text.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+					gd.heightHint = hight * numberRowSpand;
+				}
 			} else {
-				Text text;
-				GridData gd;
-				Integer numberRowSpand = null;
-
-				if (numberOfColumns == 4) {
-					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field, 4));
-				} else {
-					gd = getGridDataFactory(numberOfColumns, getWidthHintForElement(field));
-				}
-				if (field.getUnitText() == null) {
-					// Wenn es keine Einheit gibt, muss das Feld 2 Spaltenbreiten einnehmen
-					gd.horizontalSpan = gd.horizontalSpan + 1;
-				}
-
-				if (field.getNumberRowsSpanned() != null) {
-					numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
-					text = textMultiFactory.create(composite);
-					if (numberRowSpand != null) {
-						int hight = text.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-						gd.heightHint = hight * numberRowSpand;
-					}
-				} else {
-					text = textFactory.create(composite);
-				}
-				text.setLayoutData(gd);
+				text = textFactory.create(composite);
+			}
+			text.setLayoutData(gd);
+			if (twoColumns && gd.horizontalSpan != 5) {
+				Label l = new Label(composite, SWT.None);
+				GridData data = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
+				data.horizontalSpan = 3;
+				data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
+				l.setLayoutData(data);
 			}
 		}
 
-		if (field.getUnitText() != null & field.getLookup() == null) {
-			Field fielddummy = new Field();
-			fielddummy.setUnitText("Test");
+		if (field.getUnitText() != null && field.getLookup() == null) {
 			Label labelUnit = new Label(composite, SWT.None);
-
 			labelUnit.setText(field.getUnitText());
-			labelUnit.setLayoutData(getGridDataFactory(null, getWidthHintForElement(fielddummy)));
+			GridData data2 = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP).create();
+			data2.horizontalSpan = 1;
+			data2.widthHint = UNIT_WIDTH_HINT;
+			labelUnit.setLayoutData(data2);
 		}
 	}
 
-	private static Integer getWidthHintForElement(Field field, Integer numberOfColumns) {
-		if (numberOfColumns == null) {
-			numberOfColumns = 1;
-		}
-		if (field.getDateTime() != null || field.getLookup() != null || field.getShortDate() != null
-				|| field.getShortTime() != null) {
-			return 150;
-		} else if (field.getUnitText() != null) {
-			return 20;
-		} else if (field.getBoolean() != null) {
-			return 20;
+	public static Integer getSpannedHintForElement(Field field, boolean twoColumns) {
+		if (field.getUnitText() != null) {
+			return 1;
+		} else if (field.getText() != null && twoColumns) {
+			return 5;
 		} else {
-			if (numberOfColumns == 4) {
-				return ((3 * 150) + (20));
-			}
-			return 150 * numberOfColumns;
+			return 2;
 		}
+	}
+
+	public static int getWidthHintForElement(Field field, boolean twoColumns) {
+		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
+			return TEXT_WIDTH_HINT;
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null)
+				&& field.getUnitText() != null) {
+			return LABEL_WIDTH_HINT;
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null
+				|| field.getLookup() != null) && field.getUnitText() == null) {
+			return LOOKUP_WIDTH_HINT;
+		} else if (field.getBoolean() != null) {
+			return UNIT_WIDTH_HINT;
+		} else {
+			if (twoColumns) {
+				return BIG_TEXT_WIDTH_HINT;
+			}
+		}
+		return -1;
 	}
 
 	private static Integer getWidthHintForElement(Field field) {
-		return getWidthHintForElement(field, 1);
+		return getWidthHintForElement(field, false);
 	}
 
 	/**
 	 * 
-	 * @param numberColumns
+	 * @param twoColumns
 	 * @param widthHint
-	 * @param numberRowSpand
 	 * @return
 	 */
-	private static GridData getGridDataFactory(Integer numberColumns, Integer widthHint) {
+	private static GridData getGridDataFactory(boolean twoColumns, Field field) {
 		GridDataFactory gridDataFactory = GridDataFactory.fillDefaults().grab(true, false).align(SWT.LEFT, SWT.TOP);
 		GridData data = gridDataFactory.create();
-		if (widthHint != null) {
-			data.widthHint = widthHint;
+		data.horizontalSpan = getSpannedHintForElement(field, twoColumns);
+		if (twoColumns && data.horizontalSpan > 2) {
+			data.grabExcessHorizontalSpace = true;
+			data.horizontalAlignment = SWT.FILL;
 		}
-		if (numberColumns == null || numberColumns <= 2) {
-			data.horizontalSpan = 1;
-		} else {
-			data.horizontalSpan = 4;
-		}
+		data.widthHint = getWidthHintForElement(field);
 		return data;
 	}
 
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Head head) {
-		Section section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
-
+	public static Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+		Section section;
+		if (ob instanceof Head) {
+			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
+			section.setText("Kopfdaten");
+		} else {
+			section = formToolkit.createSection(parent,
+					Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
+			section.setText(((Page) ob).getText());
+		}
+		section.setLayoutData(GridDataFactory.fillDefaults().create());
 		formToolkit.paintBordersFor(section);
-		section.setText("Kopfdaten");
-		section.setExpanded(true);
-		Composite composite = formToolkit.createComposite(section, SWT.RIGHT);
-		formToolkit.paintBordersFor(composite);
-		section.setClient(composite);
-		composite.setLayout(new GridLayout(6, false));
-
-		return composite;
-	}
-
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Page page) {
-		Section section = formToolkit.createSection(parent,
-				Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
-
-		formToolkit.paintBordersFor(section);
-		section.setText(page.getText());
 		section.setExpanded(true);
 		Composite composite = formToolkit.createComposite(section, SWT.RIGHT);
 		formToolkit.paintBordersFor(composite);

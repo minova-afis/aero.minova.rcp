@@ -15,6 +15,7 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -42,8 +43,9 @@ public class XMLSearchPart {
 		Form form = dataFormService.getForm();
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
-		data = dataService.getData(tableName, new Table());
 
+		data = dataFormService.getTableFromFormIndex(form);
+		data.addRow();
 		if (string != null) {
 			data = mjs.json2Table(string);
 		}
@@ -54,7 +56,7 @@ public class XMLSearchPart {
 
 	@PersistTableSelection
 	public void savePrefs(@Named("SpaltenKonfiguration") Boolean name) {
-		
+
 		String tableName = data.getName();
 		prefs.put(tableName, mjs.table2Json(data));
 		try {
@@ -63,9 +65,9 @@ public class XMLSearchPart {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@PreDestroy
 	public void test(Composite parent) {
-		//Form form = dataFormService.getForm();
+		// Form form = dataFormService.getForm();
 	}
 }

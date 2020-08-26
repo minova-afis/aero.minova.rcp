@@ -38,12 +38,13 @@ public class XMLIndexPart {
 
 		Form form = dataFormService.getForm();
 		String tableName = form.getIndexView().getSource();
+		
 		String string = prefs.get(tableName, null);
-		data = dataService.getData(tableName);
+		data = dataService.getData(tableName, dataFormService.getTableFromFormIndex(form));
 
-//		if (string != null) {
-//			data = mjs.json2Table(string);
-//		}
+		if (string != null) {
+			data = mjs.json2Table(string);
+		}
 
 		parent.setLayout(new GridLayout());
 		NatTableUtil.createNatTable(parent, form, data, true);
