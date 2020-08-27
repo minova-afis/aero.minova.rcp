@@ -14,16 +14,10 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.commands.MCommand;
-import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
@@ -40,7 +34,7 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	EModelService model;
-
+	
 	@Execute
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
