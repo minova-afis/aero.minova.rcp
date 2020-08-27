@@ -21,11 +21,11 @@
               <children xsi:type="basic:Part" xmi:id="_VXUwELYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.XMLIndexPart" label="@Form.Index">
                 <toolbar xmi:id="_xQqyQLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolbar.0">
                   <children xsi:type="menu:HandledToolItem" xmi:id="_0MXuYLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load" command="_xHFacOejEeq-Csq7J9vXlA"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_1xOzYLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="Expand"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_8zFFgLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="Collapse"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_-JVt0LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.exportindex" label="ExportIndex"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_Ah_nQLbmEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="Print"/>
-                  <children xsi:type="menu:HandledToolItem" xmi:id="_D1f_YLbmEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.resize" label="Resize"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_1xOzYLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="Expand" command="_Mt6KEOg0Eeq4vM3bKRf1IQ"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_8zFFgLblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="Collapse" command="_ZtzH8Og0Eeq4vM3bKRf1IQ"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_-JVt0LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.exportindex" label="ExportIndex" command="_c0UM8Og0Eeq4vM3bKRf1IQ"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_Ah_nQLbmEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="Print" command="_ks22gOg0Eeq4vM3bKRf1IQ"/>
+                  <children xsi:type="menu:HandledToolItem" xmi:id="_D1f_YLbmEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.resize" label="Resize" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
                 </toolbar>
               </children>
             </children>
@@ -34,10 +34,10 @@
             <children xsi:type="basic:Part" xmi:id="_bwZyALYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.detail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.XMLDetailPart" label="@Form.Detail">
               <toolbar xmi:id="_ep_8oLbmEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolbar.2">
                 <tags>NoMove</tags>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_oh6ssLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save"/>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_z_Hv0LbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="New"/>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_9wjNoLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.delete" label="Delete"/>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_BqzcsLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_oh6ssLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_z_Hv0LbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="New" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_9wjNoLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.delete" label="Delete" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_BqzcsLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert" command="_9_ZcUOg1Eeq4vM3bKRf1IQ"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_X4AesLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.booking" visible="false" label="Booking"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_fyN8MLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.cancel" visible="false" label="Cancel"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_kDdu8LbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.correct" visible="false" label="Correct"/>
