@@ -4,9 +4,19 @@
    <extension
          point="org.eclipse.e4.ui.css.swt.theme">
       <theme
-            basestylesheeturi="css/minova-light.css"
-            id="aero.minova.rcp.minova-light"
+            basestylesheeturi="css/default.css"
+            id="aero.minova.rcp.defaulttheme"
             label="Light">
+      </theme>
+       <theme
+            basestylesheeturi="css/minova-debugcolors.css"
+            id="aero.minova.rcp.debugtheme"
+            label="Light">
+      </theme>
+      <theme
+            basestylesheeturi="css/default.css"
+            id="aero.minova.rcp.default"
+            label="Default">
       </theme>
    </extension>
 

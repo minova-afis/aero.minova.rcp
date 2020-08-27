@@ -4,14 +4,18 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -23,9 +27,6 @@ public class XMLIndexPart {
 	IEclipsePreferences prefs;
 
 	@Inject
-	private IDataService dataService;
-
-	@Inject
 	private IMinovaJsonService mjs;
 
 	@Inject
@@ -33,25 +34,45 @@ public class XMLIndexPart {
 
 	private Table data;
 
+	@Inject
+	IEventBroker broker;
+
+	private NatTable natTable;
+
 	@PostConstruct
 	public void createComposite(Composite parent) {
 
 		Form form = dataFormService.getForm();
 		String tableName = form.getIndexView().getSource();
-		String string = prefs.get(tableName, null);
-		data = dataService.getData(tableName);
 
-//		if (string != null) {
-//			data = mjs.json2Table(string);
-//		}
+		String string = prefs.get(tableName, null);
+		data = dataFormService.getTableFromFormIndex(form);
+		data.addRow();
+		if (string != null) {
+			data = mjs.json2Table(string);
+		}
 
 		parent.setLayout(new GridLayout());
-		NatTableUtil.createNatTable(parent, form, data, true);
+		natTable = NatTableUtil.createNatTable(parent, form, data, true);
 	}
 
 	@PersistTableSelection
 	public void savePrefs() {
-		//TODO INDEX Part reihenfolge + Gruppierung speichern
+		// TODO INDEX Part reihenfolge + Gruppierung speichern
 	}
-	
+
+	/**
+	 * Diese Methode ließt die Index-Apalten aus und erstellet daraus eine Tabel,
+	 * diese wir dann an den CAS als Anfrage übergeben.
+	 */
+	@Inject
+	@Optional
+	public void load(@UIEventTopic("PLAPLA") Table table) {
+		data.getRows().clear();
+		for (Row r : table.getRows()) {
+			data.addRow(r);
+		}
+		natTable.refresh(false);
+		natTable.requestLayout();
+	}
 }

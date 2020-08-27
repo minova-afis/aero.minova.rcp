@@ -35,7 +35,7 @@ import aero.minova.rcp.plugin1.model.Table;
 
 public class NatTableUtil {
 
-	public static void createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer) {
+	public static NatTable createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer) {
 
 		Map<String, String> tableHeadersMap = new HashMap<>();
 		List<Column> columns = form.getIndexView().getColumn();
@@ -80,5 +80,6 @@ public class NatTableUtil {
 
 		NatTable natTable = new NatTable(parent, gridLayer, true);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
+		return natTable;
 	}
 }

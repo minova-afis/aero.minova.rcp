@@ -1,8 +1,5 @@
 package aero.minova.rcp.dataservice.internal;
 
-import java.math.BigInteger;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.io.File;
 import java.io.IOException;
 
@@ -12,30 +9,62 @@ import org.osgi.service.component.annotations.Component;
 import org.xml.sax.SAXException;
 
 import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.form.model.xsd.Boolean;
 import aero.minova.rcp.form.model.xsd.Column;
-import aero.minova.rcp.form.model.xsd.Detail;
-import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.form.model.xsd.Head;
-import aero.minova.rcp.form.model.xsd.IndexView;
-import aero.minova.rcp.form.model.xsd.Lookup;
-import aero.minova.rcp.form.model.xsd.Number;
-import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.form.model.xsd.Text;
+import aero.minova.rcp.plugin1.model.DataType;
+import aero.minova.rcp.plugin1.model.Table;
 
 @Component
 public class DataFormService implements IDataFormService {
+
+	@Override
+	public Table getTableFromFormIndex(Form form) {
+		Table dataTable = new Table();
+		dataTable.setName(form.getIndexView().getSource());
+		for (Column c : form.getIndexView().getColumn()) {
+
+			aero.minova.rcp.plugin1.model.Column columnTable = new aero.minova.rcp.plugin1.model.Column(c.getName(),
+					getDataType(c));
+			dataTable.addColumn(columnTable);
+		}
+		return dataTable;
+	}
+
+	/**
+	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element
+	 * zurück
+	 * 
+	 * @param c aero.minova.rcp.form.model.xsd.Column;
+	 * @return DataType
+	 */
+	public DataType getDataType(Column c) {
+		if ((c.getNumber() != null && c.getNumber().getDecimals() == 0) || c.getBignumber() != null) {
+			return DataType.INTEGER;
+		} else if (c.getBoolean() != null) {
+			return DataType.STRING;
+		} else if (c.getText() != null) {
+			return DataType.STRING;
+		} else if (c.getShortTime() != null || c.getLongTime() != null) {
+			return DataType.STRING;
+		} else if (c.getShortDate() != null || c.getLongDate() != null || c.getDateTime() != null) {
+			return DataType.STRING;
+			//sollte Zoned sein
+		} else if (c.getMoney() != null || (c.getNumber() != null && c.getNumber().getDecimals() >= 0)) {
+			return DataType.STRING;
+		}
+		return null;
+	}
+
 	@Override
 	public Form getForm() {
 		// Test data
 		String userDir = System.getProperty("user.home");
-		
+
 		Form form = null;
 		try {
 			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
-			form = (Form) xmlProcessor.load(new File(userDir+
-					"/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+			form = (Form) xmlProcessor.load(new File(userDir
+					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
 
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
@@ -144,7 +173,7 @@ public class DataFormService implements IDataFormService {
 //		detail.getHeadAndPage().add(page);
 //		
 //		form.setDetail(detail);
-		
+
 		return form;
 	}
 

@@ -7,6 +7,8 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.prefs.BackingStoreException;
@@ -15,6 +17,7 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -35,6 +38,10 @@ public class XMLSearchPart {
 	private IDataFormService dataFormService;
 
 	private Table data;
+	
+	@Inject MPart mPart;
+
+	private NatTable natTable;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -42,19 +49,21 @@ public class XMLSearchPart {
 		Form form = dataFormService.getForm();
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
-		data = dataService.getData(tableName, new Table());
 
+		data = dataFormService.getTableFromFormIndex(form);
+		data.addRow();
 		if (string != null) {
 			data = mjs.json2Table(string);
 		}
 
 		parent.setLayout(new GridLayout());
-		NatTableUtil.createNatTable(parent, form, data, false);
+		mPart.getContext().set("NatTableDataSearchArea", data);
+		natTable = NatTableUtil.createNatTable(parent, form, data, false);
 	}
 
 	@PersistTableSelection
 	public void savePrefs(@Named("SpaltenKonfiguration") Boolean name) {
-		
+
 		String tableName = data.getName();
 		prefs.put(tableName, mjs.table2Json(data));
 		try {
@@ -63,9 +72,10 @@ public class XMLSearchPart {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@PreDestroy
 	public void test(Composite parent) {
-		//Form form = dataFormService.getForm();
+		// Form form = dataFormService.getForm();
 	}
+
 }

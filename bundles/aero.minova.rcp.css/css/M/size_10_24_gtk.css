@@ -1,5 +1,5 @@
-@import url("platform:/plugin/ch.minova.e4.ui/css/M/size_10_24.css");
-@import url("platform:/plugin/ch.minova.e4.ui/css/M/size_10_gtk.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/M/size_10_24.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/M/size_10_gtk.css");
 
 CTabFolder {
 	swt-tab-height: 34px;
