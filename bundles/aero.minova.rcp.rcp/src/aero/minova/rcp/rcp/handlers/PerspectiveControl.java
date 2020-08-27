@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.handlers;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +16,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4PerspectiveSwitcherPreferences;
@@ -45,7 +44,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class PerspectiveControl implements IPerspectiveSwitcherControl {
+import aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler;
+
+public class PerspectiveControl extends SwitchPerspectiveHandler implements IPerspectiveSwitcherControl {
 
 	@Inject
 	private Logger logger;
@@ -68,6 +69,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	@Inject
 	MWindow window;
 
+	/*
+	 * Set preferences for showShortcutText
+	 */
 	@Inject
 	@Preference(value = E4PerspectiveSwitcherPreferences.SHOW_TEXT, nodePath = E4PerspectiveSwitcherPreferences.ROOT_PREFERENCES_NODE)
 	private boolean showShortcutText;
@@ -78,6 +82,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	ToolBar toolBar;
 	ToolItem shortcut;
 
+	/*
+	 * Clear the Toolbar to prevent NullPointerExceptions
+	 */
 	@PreDestroy
 	void cleanUp() {
 		if (perspectiveSwitcher != null)
@@ -87,6 +94,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		disposeToolBarImages();
 	}
 
+	/*
+	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
+	 */
 	@PostConstruct
 	public void createGui(Composite parent, MWindow window) {
 		perspectiveSwitcher.setControlProvider(this);
@@ -94,7 +104,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		composite.setLayout(rowLayout);
 
-		toolBar = new ToolBar(composite, SWT.FLAT | SWT.BAR );
+		toolBar = new ToolBar(composite, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		toolBar.addMenuDetectListener(new MenuDetectListener() {
 
 			@Override
@@ -122,6 +132,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			}
 		});
 
+		// The perspectives currently open
 		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
 		if (appPerspectiveStacks.size() > 0) {
 			for (MPerspectiveStack stack : appPerspectiveStacks)
@@ -143,48 +154,58 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		return descriptor;
 	}
 
+	/*
+	 * Add the shortcut for the perspective in the toolbar
+	 */
 	@Override
 	public void addPerspectiveShortcut(MPerspective perspective) {
-		shortcut = new ToolItem(toolBar, SWT.RADIO);
-		shortcut.setData(perspective);
+		// TODO
+		if (shortcut == null || !perspective.getLabel().equals(shortcut.getText())) {
+			shortcut = new ToolItem(toolBar, SWT.RADIO);
+			shortcut.setData(perspective);
 
-		ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
+			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
 
-		if (descriptor != null) {
-			Image icon = descriptor.createImage();
-			shortcut.setImage(icon);
-		}
-
-		if (descriptor == null || showShortcutText) {
-			String label = perspective.getLocalizedLabel();
-			shortcut.setText(label != null ? label : _null);
-			shortcut.setToolTipText(perspective.getLocalizedTooltip());
-		} else {
-			shortcut.setText(_null);
-			shortcut.setToolTipText(perspective.getLocalizedLabel());
-		}
-
-		shortcut.setSelection(E4Util.isSelectedElement(perspective));
-
-		shortcut.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				MPerspective perspective = (MPerspective) event.widget.getData();
-				E4Util.setWindowSelectedElement(perspective);
+			if (descriptor != null) {
+				Image icon = descriptor.createImage();
+				shortcut.setImage(icon);
 			}
-		});
 
-		// update the layout ???
+			if (descriptor == null || showShortcutText) {
+				//Kein Icon, oder expliyit gewünscht, Label wird als Text übernommen
+				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : _null);
+			}
+			shortcut.setToolTipText(perspective.getLocalizedTooltip());
+
+			shortcut.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					Map<String, String> parameter = Map.of("org.eclipse.e4.ui.perspectives.parameters.perspectiveId",
+							perspective.getElementId());
+					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform",
+							parameter);
+					handlerService.executeHandler(command);
+				}
+			});
+		}
+		shortcut.setSelection(E4Util.isSelectedElement(perspective));
 
 	}
 
+	/*
+	 * Create a popupmenu for the toolbar
+	 */
 	void openMenuFor(ToolItem item, MPerspective perspective) {
 		final Menu menu = new Menu(toolBar);
 		menu.setData(perspective);
 
+		MPerspective currentperspective = modelService.getActivePerspective(window);
+
 		if (perspective.isVisible()) {
-			addCloseMenuItem(menu);
+			if (!"aero.minova.rcp.rcp.perspective.sis".equals(currentperspective.getElementId())) {
+				addCloseMenuItem(menu);
+			}
 		}
 
 		new MenuItem(menu, SWT.SEPARATOR);
@@ -216,6 +237,22 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		});
 	}
 
+	ToolItem getToolItemFor(MPerspective perspective) {
+		if (toolBar == null || toolBar.isDisposed())
+			return null;
+
+		if (!perspective.getTags().contains("KeepIt")) {
+			ToolItem toolItem = null;
+			for (int i = 0; i < toolBar.getItems().length && toolItem == null; i++) {
+				if (toolBar.getItem(i).getData() == perspective)
+					toolItem = toolBar.getItem(i);
+			}
+
+			return toolItem;
+		}
+		return null;
+	}
+
 	private void disposeToolBarImages() {
 		if (toolBar == null || toolBar.isDisposed())
 			return;
@@ -230,18 +267,20 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		}
 	}
 
+	//////////////////////////////////
+	// Menu Items
+	//////////////////////////////////
+
 	private void addCloseMenuItem(Menu menu) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.Activate);
 		menuItem.setText(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE$_NAME);
-
-		// TODO: Integrate into help system
 
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				ParameterizedCommand command = commandService
-						.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE, Collections.EMPTY_MAP);
+						.createCommand("aero.minova.rcp.rcp.command.closeperspective");
 				handlerService.executeHandler(command);
 			}
 		});
@@ -252,20 +291,17 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		menuItem.setText("KeepIt");
 		menuItem.setSelection(showShortcutText);
 
-		// TODO: Integrate into help system
-
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Map<String, Object> parameters = new HashMap<>(3);
 				ParameterizedCommand command = commandService
-						.createCommand(E4WorkbenchCommandConstants.PERSPECTIVES_SHOW_TEXT, parameters);
+						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand");
 				handlerService.executeHandler(command);
 			}
 		});
 	}
-	
+
 	@Override
 	public void setSelectedElement(MPerspective perspective) {
 		for (ToolItem item : toolBar.getItems())
@@ -274,14 +310,57 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Override
 	public void removePerspectiveShortcut(MPerspective perspective) {
-		// TODO Auto-generated method stub
+		ToolItem item = getToolItemFor(perspective);
+		if (item == null || item.isDisposed())
+			return;
+
+		Image icon = item.getImage();
+		if (icon != null) {
+			item.setImage(null);
+			icon.dispose();
+			icon = null;
+		}
+
+		item.dispose();
+
+		// update the layout
 
 	}
 
 	@Override
-	public void updateAttributeFor(MPerspective perspective, String attributeName, Object newValue) {
-		// TODO Auto-generated method stub
+	public void updateAttributeFor(MPerspective perspective, String attName, Object newValue) {
+		ToolItem item = getToolItemFor(perspective);
 
+		if (showShortcutText && UIEvents.UILabel.LABEL.equals(attName)) {
+			String newName = (String) newValue;
+			item.setText(newName != null ? newName : _null);
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
+			String newTip = (String) newValue;
+			item.setToolTipText(newTip);
+		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+			ImageDescriptor descriptor = getIconFor((String) newValue);
+			Image newIcon = null;
+			Image oldIcon = item.getImage();
+
+			if (descriptor != null)
+				newIcon = descriptor.createImage();
+			item.setImage(newIcon);
+
+			if (oldIcon != null) {
+				oldIcon.dispose();
+				oldIcon = null;
+			}
+
+			if (!showShortcutText) {
+				String label = null;
+				if (item.getData() instanceof MPerspective)
+					label = ((MPerspective) item.getData()).getLocalizedLabel();
+				else
+					label = item.getText();
+
+				item.setText(item.getImage() == null ? label : _null);
+			}
+		}
 	}
 
 }
