@@ -30,7 +30,8 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  aero.minova.rcp.form.model,
  javax.xml.bind;bundle-version="2.2.0",
  aero.minova.rcp.dataservice;bundle-version="1.2.0",
- org.eclipse.ui.forms;bundle-version="3.9.100"
+ org.eclipse.ui.forms;bundle-version="3.9.100",
+ org.eclipse.core.databinding.observable
 Automatic-Module-Name: aero.minova.rcp.rcp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.core.ui,
