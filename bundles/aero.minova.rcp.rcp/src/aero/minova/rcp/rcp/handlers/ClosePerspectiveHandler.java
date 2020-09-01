@@ -11,7 +11,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4Util;
 
 import aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler;
 
