@@ -1,11 +1,33 @@
 package aero.minova.rcp.rcp.parts;
 
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.beans.typed.BeanProperties;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.databinding.swt.typed.WidgetProperties;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -13,7 +35,13 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.plugin1.model.Column;
+import aero.minova.rcp.plugin1.model.DataType;
+import aero.minova.rcp.plugin1.model.Row;
+import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.plugin1.model.Value;
 import aero.minova.rcp.rcp.util.DetailUtil;
+import aero.minova.rcp.plugin1.model.DetailPartBinding;
 
 public class XMLDetailPart {
 
@@ -23,12 +51,22 @@ public class XMLDetailPart {
 //	@Inject
 //	private IDataService dataService;
 	
+	@Inject
+	IEventBroker broker;
+	
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
+	
+	private DataBindingContext dbc;
+	private Map<String, IObservableValue<?>> fields;
+	private DetailPartBinding value = new DetailPartBinding();
+	private WritableValue<DetailPartBinding> observableValue = new WritableValue<>();
 	
 
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
+		fields = new HashMap<>();
+		dbc = new DataBindingContext();
 		//Top-Level_Element
 		parent.setLayout(new GridLayout(1, true));
 
@@ -43,6 +81,12 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite);
 					}
 				}
+				fields.put(DetailPartBinding.EMPLOYEEKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[1]));
+				fields.put(DetailPartBinding.ORDERRECEIVERKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[4]));
+				fields.put(DetailPartBinding.SERVICECONTRACTKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[7]));
+				fields.put(DetailPartBinding.SERVICEKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[10]));
+				fields.put(DetailPartBinding.SERVICEOBJECTKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[13]));
+				
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
 				Composite detailFieldComposite = DetailUtil.createSection(formToolkit, parent, page);
@@ -51,7 +95,82 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) o2, detailFieldComposite);
 					}
 				}
+				
+				fields.put(DetailPartBinding.BOOKINGDATE,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[1]));
+				fields.put(DetailPartBinding.STARTDATE,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[4]));
+				fields.put(DetailPartBinding.ENDDATE,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[7]));
+				fields.put(DetailPartBinding.RENDEREDQUANTITY,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[10]));
+				fields.put(DetailPartBinding.CHARGEDQUANTIY,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[12]));
+				fields.put(DetailPartBinding.DESCRIPTION,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[14]));
 			}
 		}
+		fields.forEach((k, v) -> dbc.bindValue(v, BeanProperties.value(k).observeDetail(observableValue)));
 	}
+	@Inject
+	@Optional
+	public void UpdateSelectedEntry(@UIEventTopic("CAS_request_selected_entry") Table table)
+	{
+		System.out.println("Table recieved");
+		table = getTestTable();
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		for(Row r: table.getRows())
+		{
+			value.setKeylong(r.getValue(0).getIntegerValue());
+			value.setEmployeeKey(r.getValue(1).getStringValue());
+			value.setOrderReceiverKey(r.getValue(2).getStringValue());
+			value.setServiceContractKey(r.getValue(3).getStringValue());
+			value.setServiceObjectKey(r.getValue(4).getStringValue());
+			value.setServiceKey(r.getValue(5).getStringValue());
+			value.setBookingDate(r.getValue(6).getZonedDateTimeValue().format(dtf));
+			value.setStartDate(r.getValue(7).getZonedDateTimeValue().format(dtf));
+			value.setEndDate(r.getValue(8).getZonedDateTimeValue().format(dtf));
+			value.setRenderedQuantity(r.getValue(9).getDoubleValue().toString());
+			value.setChargedQuantity(r.getValue(10).getDoubleValue().toString());
+			value.setDescription(r.getValue(11).getStringValue());
+			value.setSpelling(r.getValue(12).getStringValue());
+			
+			observableValue.setValue(value);
+
+		}
+	}
+	
+	public Table getTestTable() {
+		Table rowIndexTable = new Table();
+		rowIndexTable.setName("spReadWorkingTime");
+		rowIndexTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		rowIndexTable.addColumn(new Column("EmployeeKey", DataType.STRING));
+		rowIndexTable.addColumn(new Column("OrderReceiverKey", DataType.STRING));
+		rowIndexTable.addColumn(new Column("ServiceContractKey", DataType.STRING));
+		rowIndexTable.addColumn(new Column("ServiceObjectKey", DataType.STRING));
+		rowIndexTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		rowIndexTable.addColumn(new Column("BookingDate", DataType.ZONED));
+		rowIndexTable.addColumn(new Column("StartDate", DataType.ZONED));
+		rowIndexTable.addColumn(new Column("EndDate", DataType.ZONED));
+		rowIndexTable.addColumn(new Column("RenderedQuantity", DataType.DOUBLE));
+		rowIndexTable.addColumn(new Column("ChargedQuantity", DataType.DOUBLE));
+		rowIndexTable.addColumn(new Column("Description", DataType.STRING));
+		rowIndexTable.addColumn(new Column("Spelling", DataType.STRING));
+		Row r = new Row();
+		r.addValue(new Value(3));
+		r.addValue(new Value(44));
+		r.addValue(new Value(55));
+		r.addValue(new Value(66));
+		r.addValue(new Value(77));
+		r.addValue(new Value(88));
+		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
+		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
+		r.addValue(new Value(ZonedDateTime.of(1968, 12, 18, 18, 00, 0, 0, ZoneId.of("Europe/Berlin"))));
+		r.addValue(new Value(44.2));
+		r.addValue(new Value(33.2));
+		r.addValue(new Value("test"));
+		r.addValue(new Value("test"));
+		rowIndexTable.addRow(r);
+		return rowIndexTable;
+	}
+	
+	@PreDestroy
+	public void dispose() {
+		dbc.dispose();
+	}
+	
 }
