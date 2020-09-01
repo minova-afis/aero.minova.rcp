@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -26,11 +27,10 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
@@ -48,20 +48,19 @@ public class XMLDetailPart {
 	@Inject
 	private IDataFormService dataFormService;
 
-//	@Inject
-//	private IDataService dataService;
+	@Inject
+	private IDataService dataService;
 	
 	@Inject
 	IEventBroker broker;
 	
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
+	private Composite parent;
 	
 	private DataBindingContext dbc;
 	private Map<String, IObservableValue<?>> fields;
 	private DetailPartBinding value = new DetailPartBinding();
 	private WritableValue<DetailPartBinding> observableValue = new WritableValue<>();
-	
-
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -69,6 +68,7 @@ public class XMLDetailPart {
 		dbc = new DataBindingContext();
 		//Top-Level_Element
 		parent.setLayout(new GridLayout(1, true));
+		this.parent=parent;
 
 		Form form = dataFormService.getForm();
 
@@ -81,10 +81,15 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite);
 					}
 				}
+				//Employee
 				fields.put(DetailPartBinding.EMPLOYEEKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[1]));
+				//Customer
 				fields.put(DetailPartBinding.ORDERRECEIVERKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[4]));
+				//Contract
 				fields.put(DetailPartBinding.SERVICECONTRACTKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[7]));
+				//Project
 				fields.put(DetailPartBinding.SERVICEKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[10]));
+				//Service
 				fields.put(DetailPartBinding.SERVICEOBJECTKEY,WidgetProperties.ccomboSelection().observe( (CCombo) detailFieldComposite.getChildren()[13]));
 				
 			} else if (o instanceof Page) {
@@ -95,12 +100,17 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) o2, detailFieldComposite);
 					}
 				}
-				
+				//BookingDate
 				fields.put(DetailPartBinding.BOOKINGDATE,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[1]));
+				//StartDate
 				fields.put(DetailPartBinding.STARTDATE,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[4]));
+				//EndDate
 				fields.put(DetailPartBinding.ENDDATE,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[7]));
+				//RenderedQuantity
 				fields.put(DetailPartBinding.RENDEREDQUANTITY,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[10]));
+				//ChargedQuantity
 				fields.put(DetailPartBinding.CHARGEDQUANTIY,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[12]));
+				//Description
 				fields.put(DetailPartBinding.DESCRIPTION,WidgetProperties.text(SWT.Modify).observe( detailFieldComposite.getChildren()[14]));
 			}
 		}
@@ -115,6 +125,11 @@ public class XMLDetailPart {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		for(Row r: table.getRows())
 		{
+			Composite head = (Composite)parent.getChildren()[0];
+			head = (Composite)head.getChildren()[1];
+			//TODO: request the options for the ccombo-fields from CAS
+			refillCComboboxes(head);
+			
 			value.setKeylong(r.getValue(0).getIntegerValue());
 			value.setEmployeeKey(r.getValue(1).getStringValue());
 			value.setOrderReceiverKey(r.getValue(2).getStringValue());
@@ -133,6 +148,216 @@ public class XMLDetailPart {
 
 		}
 	}
+	//This function starts async-CAS-requests for all CComboboxes to load all Options for the selected Data
+	public void refillCComboboxes(Composite c)
+	{
+		Table CASRequest = new Table();
+		CompletableFuture<Table> tableFuture;
+		CCombo serviceObjectKey = (CCombo)c.getChildren()[13];
+		CCombo serviceContractKey = (CCombo)c.getChildren()[7];
+		CCombo serviceKey = (CCombo)c.getChildren()[10];
+		CCombo orderReceiverKey = (CCombo)c.getChildren()[4];
+		Row r;
+		
+		//TODO:Employee
+		
+		//OrderReceiver
+		CASRequest.setName("spReadWorkingTimeOrderReceiver");
+		CASRequest.addColumn(new Column("ServiceObjectKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceContractKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceKey", DataType.STRING));
+		CASRequest.addColumn(new Column("BookingDate", DataType.ZONED));
+		r = new Row();
+		if(serviceObjectKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceObjectKey.getItem(serviceObjectKey.getSelectionIndex())));
+		}
+		if(serviceContractKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceContractKey.getItem(serviceContractKey.getSelectionIndex())));
+		}
+		if(serviceKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceKey.getItem(serviceKey.getSelectionIndex()).toString()));
+		}
+		r.addValue(null);
+		CASRequest.addRow(r);
+		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
+		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeOrderReceiver", t));
+		
+		//ServiceContract
+		CASRequest = new Table();
+		CASRequest.setName("spReadWorkingTimeServiceContract");
+		CASRequest.addColumn(new Column("OrderReceiverKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceObjectKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceKey", DataType.STRING));
+		CASRequest.addColumn(new Column("BookingDate", DataType.ZONED));
+		r = new Row();
+		if(orderReceiverKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(orderReceiverKey.getItem(orderReceiverKey.getSelectionIndex())));
+		}
+		if(serviceObjectKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceObjectKey.getItem(serviceObjectKey.getSelectionIndex())));
+		}
+		if(serviceKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceKey.getItem(serviceKey.getSelectionIndex()).toString()));
+		}
+		r.addValue(null);
+		CASRequest.addRow(r);
+		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
+		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeServiceContract", t));
+		
+		//ServiceObject
+		CASRequest = new Table();
+		CASRequest.setName("spReadWorkingTimeServiceObject");
+		CASRequest.addColumn(new Column("OrderReceiverKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceContractKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceKey", DataType.STRING));
+		CASRequest.addColumn(new Column("BookingDate", DataType.ZONED));
+		r = new Row();
+		if(orderReceiverKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(orderReceiverKey.getItem(orderReceiverKey.getSelectionIndex())));
+		}
+		if(serviceContractKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceContractKey.getItem(serviceContractKey.getSelectionIndex())));
+		}
+		if(serviceKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceKey.getItem(serviceKey.getSelectionIndex()).toString()));
+		}
+		r.addValue(null);
+		CASRequest.addRow(r);
+		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
+		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeServiceObject", t));
+		
+		//Service
+		CASRequest = new Table();
+		CASRequest.setName("spReadWorkingTimeService");
+		CASRequest.addColumn(new Column("OrderReceiverKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceObjectKey", DataType.STRING));
+		CASRequest.addColumn(new Column("ServiceContractKey", DataType.STRING));
+		CASRequest.addColumn(new Column("BookingDate", DataType.ZONED));
+		r = new Row();
+		if(orderReceiverKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(orderReceiverKey.getItem(orderReceiverKey.getSelectionIndex())));
+		}
+		if(serviceObjectKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceObjectKey.getItem(serviceObjectKey.getSelectionIndex())));
+		}
+		if(serviceContractKey.getSelectionIndex() == -1){
+			r.addValue(null);
+		}
+		else
+		{
+			r.addValue(new Value(serviceContractKey.getItem(serviceContractKey.getSelectionIndex())));
+		}
+		r.addValue(null);
+		CASRequest.addRow(r);
+		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
+		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeService", t));		
+		
+	}
+	//these Functions get the responce of the CAS for the Async Requests, filling the recieved-data into the ccomboboxes
+	@Inject
+	@Optional
+	public void UpdateCComboOrderReceiver(@UIEventTopic("CAS_request_ReadWorkingTimeOrderReceiver") Table table)
+	{
+		System.out.println("recieved table");
+		for(Row r: table.getRows())
+		{
+			System.out.print("new row:");
+			int i = 0;
+			while(i<table.getColumnCount())
+			{
+				System.out.println(r.getValue(i).toString());
+			}
+		}
+	}
+	@Inject
+	@Optional
+	public void UpdateCComboServiceContract(@UIEventTopic("CAS_request_ReadWorkingTimeServiceContract") Table table)
+	{
+		System.out.println("recieved table");
+		for(Row r: table.getRows())
+		{
+			System.out.print("new row:");
+			int i = 0;
+			while(i<table.getColumnCount())
+			{
+				System.out.println(r.getValue(i).toString());
+			}
+		}
+	}
+	@Inject
+	@Optional
+	public void UpdateCComboServiceObject(@UIEventTopic("CAS_request_ReadWorkingTimeServiceObject") Table table)
+	{
+		System.out.println("recieved table");
+		for(Row r: table.getRows())
+		{
+			System.out.print("new row:");
+			int i = 0;
+			while(i<table.getColumnCount())
+			{
+				System.out.println(r.getValue(i).toString());
+			}
+		}
+	}
+	@Inject
+	@Optional
+	public void UpdateCComboService(@UIEventTopic("CAS_request_ReadWorkingTimeService") Table table)
+	{
+		System.out.println("recieved table");
+		for(Row r: table.getRows())
+		{
+			System.out.print("new row:");
+			int i = 0;
+			while(i<table.getColumnCount())
+			{
+				System.out.println(r.getValue(i).toString());
+			}
+		}
+	}	
 	
 	public Table getTestTable() {
 		Table rowIndexTable = new Table();
