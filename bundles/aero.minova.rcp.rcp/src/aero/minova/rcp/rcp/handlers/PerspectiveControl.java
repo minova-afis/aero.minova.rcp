@@ -12,6 +12,7 @@ import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -44,9 +45,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-import aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler;
-
-public class PerspectiveControl extends SwitchPerspectiveHandler implements IPerspectiveSwitcherControl {
+public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Inject
 	private Logger logger;
@@ -68,6 +67,9 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 
 	@Inject
 	MWindow window;
+
+	@Inject
+	MApplication application;
 
 	/*
 	 * Set preferences for showShortcutText
@@ -114,16 +116,17 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 
 				p = toolBar.getDisplay().map(null, toolBar, p);
 				ToolItem item = tb.getItem(p);
-				if (item != null && item.getData() != null)
-					openMenuFor(item, (MPerspective) item.getData());
-				else if (item == null)
-					logger.debug("No item found");
-				else
+				if (!item.getData().equals(null)) {
+					if (item != null && item.getData() != null) {
+						openMenuFor(item, (String) item.getData());
+					} else if (item == null || item.getData().equals(null))
+						logger.debug("No item found");
+				} else
 					logger.debug("Perspective not associated with item");
 
 			}
 		});
-		
+
 		toolBar.addDisposeListener(new DisposeListener() {
 
 			@Override
@@ -139,6 +142,8 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered())
 						addPerspectiveShortcut(perspective);
+					;
+
 				}
 		}
 	}
@@ -155,14 +160,16 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 	}
 
 	/*
-	 * Add the shortcut for the perspective in the toolbar
+	 * Add shortcut for the perspective in the toolbar
 	 */
 	@Override
 	public void addPerspectiveShortcut(MPerspective perspective) {
-		// TODO
-		if (shortcut == null || !perspective.getLabel().equals(shortcut.getText())) {
+		@SuppressWarnings("unchecked")
+		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
+
+		if (!(keepit != null && keepit.contains(perspective.getElementId()))) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
-			shortcut.setData(perspective);
+			shortcut.setData(perspective.getElementId());
 
 			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
 
@@ -172,7 +179,7 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 			}
 
 			if (descriptor == null || showShortcutText) {
-				//Kein Icon, oder expliyit gewünscht, Label wird als Text übernommen
+				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
 				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : _null);
 			}
 			shortcut.setToolTipText(perspective.getLocalizedTooltip());
@@ -188,69 +195,68 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 					handlerService.executeHandler(command);
 				}
 			});
+		} else {
+			shortcut = getToolItemFor(perspective);
 		}
-		shortcut.setSelection(E4Util.isSelectedElement(perspective));
-
+		shortcut.setSelection(true);
 	}
 
 	/*
 	 * Create a popupmenu for the toolbar
 	 */
-	void openMenuFor(ToolItem item, MPerspective perspective) {
-		final Menu menu = new Menu(toolBar);
-		menu.setData(perspective);
+	void openMenuFor(ToolItem item, String perspectiveId) {
+		MPerspective perspective = (MPerspective) modelService.find(perspectiveId, window);
+		if (perspective != null) {
+			final Menu menu = new Menu(toolBar);
+			menu.setData(perspective.getElementId());
 
-		MPerspective currentperspective = modelService.getActivePerspective(window);
-
-		if (perspective.isVisible()) {
-			if (!"aero.minova.rcp.rcp.perspective.sis".equals(currentperspective.getElementId())) {
-				addCloseMenuItem(menu);
+			if (perspective.isVisible()) {
+				if (!"aero.minova.rcp.rcp.perspective.sis".equals(perspective.getElementId())) {
+					addCloseMenuItem(menu);
+				}
 			}
+
+			new MenuItem(menu, SWT.SEPARATOR);
+
+			addKeepItMenuItem(menu);
+
+			Rectangle bounds = item.getBounds();
+			Point point = toolBar.toDisplay(bounds.x, bounds.y + bounds.height);
+			menu.setLocation(point);
+			menu.setVisible(true);
+			menu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuShown(MenuEvent e) {
+					// do nothing
+				}
+
+				@Override
+				public void menuHidden(MenuEvent e) {
+					toolBar.getDisplay().asyncExec(new Runnable() {
+
+						@Override
+						public void run() {
+							menu.dispose();
+
+						}
+					});
+				}
+			});
 		}
-
-		new MenuItem(menu, SWT.SEPARATOR);
-
-		addKeepItMenuItem(menu);
-
-		Rectangle bounds = item.getBounds();
-		Point point = toolBar.toDisplay(bounds.x, bounds.y + bounds.height);
-		menu.setLocation(point);
-		menu.setVisible(true);
-		menu.addMenuListener(new MenuListener() {
-
-			@Override
-			public void menuShown(MenuEvent e) {
-				// do nothing
-			}
-
-			@Override
-			public void menuHidden(MenuEvent e) {
-				toolBar.getDisplay().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						menu.dispose();
-
-					}
-				});
-			}
-		});
 	}
 
 	ToolItem getToolItemFor(MPerspective perspective) {
 		if (toolBar == null || toolBar.isDisposed())
 			return null;
-
-		if (!perspective.getTags().contains("KeepIt")) {
-			ToolItem toolItem = null;
-			for (int i = 0; i < toolBar.getItems().length && toolItem == null; i++) {
-				if (toolBar.getItem(i).getData() == perspective)
-					toolItem = toolBar.getItem(i);
-			}
-
-			return toolItem;
+		ToolItem toolItem = null;
+		for (int i = 0; i < toolBar.getItems().length && toolItem == null; i++) {
+			if (toolBar.getItem(i).getData().equals(perspective.getElementId()))
+				toolItem = toolBar.getItem(i);
 		}
-		return null;
+
+		return toolItem;
+
 	}
 
 	private void disposeToolBarImages() {
@@ -267,62 +273,34 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 		}
 	}
 
-	//////////////////////////////////
-	// Menu Items
-	//////////////////////////////////
-
-	private void addCloseMenuItem(Menu menu) {
-		final MenuItem menuItem = new MenuItem(menu, SWT.Activate);
-		menuItem.setText(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE$_NAME);
-
-		menuItem.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				ParameterizedCommand command = commandService
-						.createCommand("aero.minova.rcp.rcp.command.closeperspective");
-				handlerService.executeHandler(command);
-			}
-		});
-	}
-
-	private void addKeepItMenuItem(Menu menu) {
-		final MenuItem menuItem = new MenuItem(menu, SWT.Activate | SWT.CHECK);
-		menuItem.setText("KeepIt");
-		menuItem.setSelection(showShortcutText);
-
-		menuItem.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				ParameterizedCommand command = commandService
-						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand");
-				handlerService.executeHandler(command);
-			}
-		});
-	}
-
 	@Override
 	public void setSelectedElement(MPerspective perspective) {
+		if (perspective == null) {
+			return;
+		}
 		for (ToolItem item : toolBar.getItems())
-			item.setSelection(item.getData() == perspective);
+			item.setSelection(item.getData().equals(perspective.getElementId()));
 	}
 
 	@Override
 	public void removePerspectiveShortcut(MPerspective perspective) {
-		ToolItem item = getToolItemFor(perspective);
-		if (item == null || item.isDisposed())
-			return;
+		@SuppressWarnings("unchecked")
+		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
 
-		Image icon = item.getImage();
-		if (icon != null) {
-			item.setImage(null);
-			icon.dispose();
-			icon = null;
+		if (keepit == null || !keepit.contains(perspective.getElementId())) {
+			ToolItem item = getToolItemFor(perspective);
+			if (item == null || item.isDisposed())
+				return;
+
+			Image icon = item.getImage();
+			if (icon != null) {
+				item.setImage(null);
+				icon.dispose();
+				icon = null;
+			}
+
+			item.dispose();
 		}
-
-		item.dispose();
-
 		// update the layout
 
 	}
@@ -363,4 +341,38 @@ public class PerspectiveControl extends SwitchPerspectiveHandler implements IPer
 		}
 	}
 
+	//////////////////////////////////
+	// Menu Items
+	//////////////////////////////////
+
+	private void addCloseMenuItem(Menu menu) {
+		final MenuItem menuItem = new MenuItem(menu, SWT.Activate);
+		menuItem.setText(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE$_NAME);
+
+		menuItem.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				ParameterizedCommand command = commandService
+						.createCommand("aero.minova.rcp.rcp.command.closeperspective");
+				handlerService.executeHandler(command);
+			}
+		});
+	}
+
+	private void addKeepItMenuItem(Menu menu) {
+		final MenuItem menuItem = new MenuItem(menu, SWT.Activate | SWT.CHECK);
+		menuItem.setText("KeepIt");
+		menuItem.setSelection(showShortcutText);
+
+		menuItem.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				ParameterizedCommand command = commandService
+						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand");
+				handlerService.executeHandler(command);
+			}
+		});
+	}
 }
