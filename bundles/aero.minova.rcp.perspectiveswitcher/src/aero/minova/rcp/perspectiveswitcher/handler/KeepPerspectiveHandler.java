@@ -1,5 +1,6 @@
 package aero.minova.rcp.perspectiveswitcher.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,7 +12,17 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
-public class KeepPerspectiveHandler extends SwitchPerspectiveHandler {
+/**
+ * Dieser Handler wird im PopupMenu aufgerufen. Toolitems, die mit diesem
+ * Handler makiert wurden, werden nach dem schließen der Perspektive nicht aus
+ * der Toolbar entfernt. So kann man die Perspektive erneutr aus der Toolbar aus
+ * öffnen.
+ * 
+ * @author bauer
+ *
+ */
+
+public class KeepPerspectiveHandler {
 
 	@Inject
 	MApplication application;
@@ -22,20 +33,27 @@ public class KeepPerspectiveHandler extends SwitchPerspectiveHandler {
 	@Inject
 	EPartService partService;
 
+	@SuppressWarnings("unchecked")
 	@Execute
 	public void execute(MWindow window) {
-		
-		MPerspective currentPerspective = modelService.getActivePerspective(window);
-		
-		currentPerspective.getTags().add("KeepIt");
-		
-		/*
-		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat.
-		 */
-		List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
-		switchTo(window.getContext(), perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
 
-	
+		List<String> keepItToolitems;
+
+		MPerspective currentPerspective = modelService.getActivePerspective(window);
+
+		keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
+
+		if (keepItToolitems == null) {
+			keepItToolitems = new ArrayList<String>();
+			application.getContext().set("perspectivetoolbar", keepItToolitems);
+		}
+
+		if (keepItToolitems.contains(currentPerspective.getElementId())) {
+			keepItToolitems.remove(currentPerspective.getElementId());
+		} else {
+			keepItToolitems.add(currentPerspective.getElementId());
+		}
+
 	}
 
 }
