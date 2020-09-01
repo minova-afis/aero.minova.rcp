@@ -1,10 +1,14 @@
 package aero.minova.rcp.plugin1.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class DetailPartBinding {
 
+	private PropertyChangeSupport changes = new PropertyChangeSupport(this);
+	
 	private Integer keylong;
 	private String employeeKey;
 	private String orderReceiverKey;
@@ -20,7 +24,6 @@ public class DetailPartBinding {
 	private String spelling;
 	
 	
-	public static String KEYLONG = "keylong";
 	public static String EMPLOYEEKEY = "employeeKey";
 	public static String ORDERRECEIVERKEY = "orderReceiverKey";
 	public static String SERVICECONTRACTKEY = "serviceContractKey";
@@ -32,8 +35,6 @@ public class DetailPartBinding {
 	public static String RENDEREDQUANTITY = "renderedQuantity";
 	public static String CHARGEDQUANTIY = "chargedQuantity";
 	public static String DESCRIPTION = "description";
-	public static String SPELLING = "spelling";
-
 
 	public Integer getKeylong() {
 		return keylong;
@@ -163,6 +164,14 @@ public class DetailPartBinding {
 	public void setServiceKey(String serviceKey) {
 		this.serviceKey = serviceKey;
 	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener l) {
+        changes.addPropertyChangeListener(l);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+        changes.removePropertyChangeListener(l);
+    }
 	
 	
 	

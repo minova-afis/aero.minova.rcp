@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
@@ -12,9 +10,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
@@ -45,8 +40,6 @@ public class XMLIndexPart {
 	@Inject
 	private IDataFormService dataFormService;
 
-	@Inject
-	private EModelService model;
 
 	private Table data;
 
@@ -55,12 +48,6 @@ public class XMLIndexPart {
 
 	@Inject
 	private IDataService dataService;
-
-	@Inject
-	private MPart mPart;
-
-	@Inject
-	private MPerspective mPerspective;
 
 	private NatTable natTable;
 
