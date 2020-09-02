@@ -129,6 +129,7 @@ public class XMLDetailPart {
 		fields.forEach((k, v) -> dbc.bindValue(v, BeanProperties.value(k).observeDetail(observableValue)));
 	}
 
+	@Inject
 	public void changeSelectedEntry(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
 
 		int keylong = 0;
