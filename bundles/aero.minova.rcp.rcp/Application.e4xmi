@@ -129,8 +129,12 @@
   <commands xmi:id="_4p5JwLufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="FormName" optional="false"/>
   </commands>
-  <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand"/>
-  <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand"/>
+  <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
+    <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="ClosePerspective"/>
+  </commands>
+  <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand">
+    <parameters xmi:id="_DNFBAOw6Eeq18tKVLNTMYA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="KeepPerspective"/>
+  </commands>
   <commands xmi:id="_y3TngNDREeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.revertsearch" commandName="RevertSearch"/>
   <commands xmi:id="_rnXZkNDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.clearsearch" commandName="ClearSearch"/>
   <commands xmi:id="_r5Qa0NDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.loadsearchcriteria" commandName="LoadSearchCriteria"/>
