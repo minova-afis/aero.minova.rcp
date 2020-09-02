@@ -192,7 +192,7 @@ public class XMLDetailPart {
 		r.addValue(null);
 		CASRequest.addRow(r);
 		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
-		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeOrderReceiver", t));
+		tableFuture.thenAccept(t -> UpdateCComboOrderReceiver(t));
 		
 		//ServiceContract
 		CASRequest = new Table();
@@ -226,7 +226,7 @@ public class XMLDetailPart {
 		r.addValue(null);
 		CASRequest.addRow(r);
 		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
-		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeServiceContract", t));
+		tableFuture.thenAccept(t ->  UpdateCComboServiceContract(t));
 		
 		//ServiceObject
 		CASRequest = new Table();
@@ -260,7 +260,7 @@ public class XMLDetailPart {
 		r.addValue(null);
 		CASRequest.addRow(r);
 		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
-		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeServiceObject", t));
+		tableFuture.thenAccept(t -> UpdateCComboServiceObject(t));
 		
 		//Service
 		CASRequest = new Table();
@@ -294,15 +294,16 @@ public class XMLDetailPart {
 		r.addValue(null);
 		CASRequest.addRow(r);
 		tableFuture = dataService.getDataAsync(CASRequest.getName(), CASRequest);
-		tableFuture.thenAccept(t -> broker.post("CAS_request_ReadWorkingTimeService", t));		
+		tableFuture.thenAccept(t -> UpdateCComboService(t));		
 		
 	}
 	//these Functions get the responce of the CAS for the Async Requests, filling the recieved-data into the ccomboboxes
+	//TODO: implementation!
 	@Inject
 	@Optional
-	public void UpdateCComboOrderReceiver(@UIEventTopic("CAS_request_ReadWorkingTimeOrderReceiver") Table table)
+	public void UpdateCComboEmployee(@UIEventTopic("CAS_request_tEmployee") Table table)
 	{
-		System.out.println("recieved table");
+		System.out.println("recieved employee-table");
 		for(Row r: table.getRows())
 		{
 			System.out.print("new row:");
@@ -313,11 +314,9 @@ public class XMLDetailPart {
 			}
 		}
 	}
-	@Inject
-	@Optional
-	public void UpdateCComboServiceContract(@UIEventTopic("CAS_request_ReadWorkingTimeServiceContract") Table table)
-	{
-		System.out.println("recieved table");
+	
+	public void UpdateCComboOrderReceiver(Table table) {
+		System.out.println("recieved orderreceiver-table");
 		for(Row r: table.getRows())
 		{
 			System.out.print("new row:");
@@ -328,11 +327,9 @@ public class XMLDetailPart {
 			}
 		}
 	}
-	@Inject
-	@Optional
-	public void UpdateCComboServiceObject(@UIEventTopic("CAS_request_ReadWorkingTimeServiceObject") Table table)
+	public void UpdateCComboServiceContract(Table table)
 	{
-		System.out.println("recieved table");
+		System.out.println("recieved servicecontract-table");
 		for(Row r: table.getRows())
 		{
 			System.out.print("new row:");
@@ -343,11 +340,22 @@ public class XMLDetailPart {
 			}
 		}
 	}
-	@Inject
-	@Optional
-	public void UpdateCComboService(@UIEventTopic("CAS_request_ReadWorkingTimeService") Table table)
+	public void UpdateCComboServiceObject(Table table)
 	{
-		System.out.println("recieved table");
+		System.out.println("recieved serviceobject-table");
+		for(Row r: table.getRows())
+		{
+			System.out.print("new row:");
+			int i = 0;
+			while(i<table.getColumnCount())
+			{
+				System.out.println(r.getValue(i).toString());
+			}
+		}
+	}
+	public void UpdateCComboService(Table table)
+	{
+		System.out.println("recieved service-table");
 		for(Row r: table.getRows())
 		{
 			System.out.print("new row:");
