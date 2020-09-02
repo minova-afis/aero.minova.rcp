@@ -41,6 +41,7 @@ import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.builder.RowBuilder;
 import aero.minova.rcp.plugin1.model.builder.TableBuilder;
 import aero.minova.rcp.rcp.util.DetailUtil;
+import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class XMLDetailPart {
 
@@ -80,21 +81,21 @@ public class XMLDetailPart {
 						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite);
 					}
 				}
-				// Employee
-				fields.put(DetailPartBinding.EMPLOYEEKEY,
-						WidgetProperties.ccomboSelection().observe((CCombo) detailFieldComposite.getChildren()[1]));
-				// Customer
-				fields.put(DetailPartBinding.ORDERRECEIVERKEY,
-						WidgetProperties.ccomboSelection().observe((CCombo) detailFieldComposite.getChildren()[4]));
-				// Contract
-				fields.put(DetailPartBinding.SERVICECONTRACTKEY,
-						WidgetProperties.ccomboSelection().observe((CCombo) detailFieldComposite.getChildren()[7]));
-				// Project
-				fields.put(DetailPartBinding.SERVICEKEY,
-						WidgetProperties.ccomboSelection().observe((CCombo) detailFieldComposite.getChildren()[10]));
-				// Service
-				fields.put(DetailPartBinding.SERVICEOBJECTKEY,
-						WidgetProperties.ccomboSelection().observe((CCombo) detailFieldComposite.getChildren()[13]));
+//				// Employee
+//				fields.put(DetailPartBinding.EMPLOYEEKEY,
+//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[1]));
+//				// Customer
+//				fields.put(DetailPartBinding.ORDERRECEIVERKEY,
+//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[4]));
+//				// Contract
+//				fields.put(DetailPartBinding.SERVICECONTRACTKEY,
+//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[7]));
+//				// Project
+//				fields.put(DetailPartBinding.SERVICEKEY,
+//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[10]));
+//				// Service
+//				fields.put(DetailPartBinding.SERVICEOBJECTKEY,
+//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[13]));
 
 			} else if (o instanceof Page) {
 				Page page = (Page) o;

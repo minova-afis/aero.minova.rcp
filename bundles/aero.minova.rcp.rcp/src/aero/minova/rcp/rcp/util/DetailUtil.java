@@ -20,6 +20,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
 
@@ -94,8 +95,11 @@ public class DetailUtil {
 	}
 
 	private static void buildLookupField(Field field, Composite composite, 	boolean twoColumns) {
-		CCombo combo = new CCombo(composite, SWT.BORDER);
-		combo.setLayoutData(getGridDataFactory(twoColumns, field));
+		
+		
+		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
+		//CCombo combo = new CCombo(composite, SWT.BORDER);
+		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
 		// Description für die LookUp
 		if (twoColumns) {
 			Label labelDescription = labelFactory.create(composite);
