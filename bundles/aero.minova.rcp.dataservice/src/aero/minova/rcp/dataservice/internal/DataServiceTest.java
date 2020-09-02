@@ -1,12 +1,9 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
-import org.osgi.service.component.annotations.Component;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.plugin1.model.Column;
 import aero.minova.rcp.plugin1.model.DataType;
@@ -16,9 +13,9 @@ import aero.minova.rcp.plugin1.model.Value;
 
 public class DataServiceTest implements IDataService {
 
-	@Override
-	public CompletableFuture<Table> getDataAsync(String tableName, Table seachTable) {
 
+	@Override
+	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
 		Table t = new Table();
 		t.setName("OrderReceiver");
 		t.addColumn(new Column("KeyLong", DataType.INTEGER));
@@ -43,5 +40,17 @@ public class DataServiceTest implements IDataService {
 		t.addRow(r);
 
 		return CompletableFuture.supplyAsync(() -> t);
+	}
+
+	@Override
+	public CompletableFuture<Table> getDetailDataAsync(String tableName, Table detailTable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
