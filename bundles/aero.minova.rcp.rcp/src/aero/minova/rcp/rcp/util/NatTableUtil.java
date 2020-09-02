@@ -55,7 +55,7 @@ public class NatTableUtil {
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(bodyDataLayer);
 
 		//SelectionLayer selectionLayer = new SelectionLayer(columnReorderLayer);
-		SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
+		SelectionLayer selectionLayer = new SelectionLayer(columnReorderLayer);
 		E4SelectionListener<Row> e4SelectionListener = new E4SelectionListener<Row>(selectionService, selectionLayer, bodyDataProvider);
 		e4SelectionListener.setFullySelectedRowsOnly(false);
 		e4SelectionListener.setHandleSameRowSelection(false);
@@ -76,9 +76,9 @@ public class NatTableUtil {
 		ILayer cornerLayer = new CornerLayer(
 				new DataLayer(new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider)),
 				rowHeaderLayer, columnHeaderLayer);
-		
-		
-		
+
+
+
 		// create the grid layer composed with the prior created layer stacks
 		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
 
