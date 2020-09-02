@@ -130,8 +130,11 @@ public class XMLDetailPart {
 	}
 
 	@Inject
-	public void changeSelectedEntry(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
+	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
 
+		if (rows == null || rows.isEmpty()) {
+			return;
+		}
 		int keylong = 0;
 		Row row = rows.get(0);
 		keylong = row.getValue(0).getIntegerValue();
