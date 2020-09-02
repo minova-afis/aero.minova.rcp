@@ -142,7 +142,7 @@ public class DetailPartBinding {
 
 
 	public void setDescription(String description) {
-		this.description = description;
+		changes.firePropertyChange(DESCRIPTION, this.description, this.description = description);
 	}
 
 
@@ -153,6 +153,7 @@ public class DetailPartBinding {
 
 	public void setSpelling(String spelling) {
 		this.spelling = spelling;
+		
 	}
 
 

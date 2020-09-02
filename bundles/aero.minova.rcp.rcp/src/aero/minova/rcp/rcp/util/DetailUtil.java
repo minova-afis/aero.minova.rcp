@@ -1,6 +1,12 @@
 package aero.minova.rcp.rcp.util;
 
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.print.attribute.HashAttributeSet;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.ButtonFactory;
@@ -12,6 +18,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -20,6 +27,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
@@ -29,13 +37,13 @@ public class DetailUtil {
 	public static final int UNIT_WIDTH_HINT = 20;
 	public static final int BIG_TEXT_WIDTH_HINT = 490;
 	public static final int LOOKUP_DESCRIPTION_WIDTH_HINT = 320;
-	
+
 	public static final GridDataFactory gridDataFactory = GridDataFactory.fillDefaults().grab(true, false);
 	public static final LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE);
-	private static TextFactory textMultiFactory= TextFactory.newText(SWT.BORDER | SWT.MULTI);
+	private static TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
 	private static TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
 
-	public static void createField(Field field, Composite composite) {
+	public static void createField(Field field, Composite composite, Map<String, Control> controls) {
 		if (!field.isVisible()) {
 			return;
 		}
@@ -48,18 +56,20 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(field.getTextAttribute()).supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create).create(composite);
+		labelFactory.text(field.getTextAttribute())
+				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
+				.create(composite);
 
 		if (field.getLookup() != null) {
-			buildLookupField(field, composite, twoColumns);
+			buildLookupField(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() == null) {
-			buildMiddlePart(field, composite, twoColumns);
+			buildMiddlePart(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() != null) {
 			throw new RuntimeException("Not yet supported");
 //			Button button = btnFactory.create(composite);
 //			button.setLayoutData(getGridDataFactory(twoColumns, field));
 		}
-		
+
 		if (field.getUnitText() != null && field.getLookup() == null) {
 			Label labelUnit = labelFactory.text(field.getUnitText()).create(composite);
 			GridData data2 = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
@@ -68,12 +78,12 @@ public class DetailUtil {
 		}
 	}
 
-	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns) {
+	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
 		gd = getGridDataFactory(twoColumns, field);
-
 		if (field.getNumberRowsSpanned() != null) {
 			numberRowSpand = Integer.valueOf(field.getNumberRowsSpanned());
 			text = textMultiFactory.create(composite);
@@ -92,15 +102,20 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			l.setLayoutData(data);
 		}
+		text.setData("field", field);
+		text.setData("consumer", (Consumer<Table>) t -> {
+			String s = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getStringValue();
+			text.setText(s);
+		});
+		controls.put(field.getName(), text);
 	}
 
-	private static void buildLookupField(Field field, Composite composite, 	boolean twoColumns) {
-		
-		
+	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls) {
+
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
-		//CCombo combo = new CCombo(composite, SWT.BORDER);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
-		// Description für die LookUp
+		lookUpControl.setData("field", field);
 		if (twoColumns) {
 			Label labelDescription = labelFactory.create(composite);
 			labelDescription.setText("Description");
@@ -109,6 +124,8 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			labelDescription.setLayoutData(data);
 		}
+		controls.put(field.getName(), lookUpControl);
+
 	}
 
 	public static Integer getSpannedHintForElement(Field field, boolean twoColumns) {
@@ -146,12 +163,13 @@ public class DetailUtil {
 
 	/**
 	 * T
+	 * 
 	 * @param twoColumns
 	 * @param widthHint
 	 * @return
 	 */
 	private static GridData getGridDataFactory(boolean twoColumns, Field field) {
-		GridData data  = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
+		GridData data = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 		data.horizontalSpan = getSpannedHintForElement(field, twoColumns);
 		if (twoColumns && data.horizontalSpan > 2) {
 //			data.grabExcessHorizontalSpace = true;
