@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.extension.e4.selection.E4SelectionListener;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
@@ -25,8 +26,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.widgets.Composite;
 
-import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -35,7 +34,7 @@ import aero.minova.rcp.plugin1.model.Table;
 
 public class NatTableUtil {
 
-	public static NatTable createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer) {
+	public static NatTable createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer, ESelectionService selectionService) {
 
 		Map<String, String> tableHeadersMap = new HashMap<>();
 		List<Column> columns = form.getIndexView().getColumn();
@@ -51,11 +50,16 @@ public class NatTableUtil {
 		IColumnPropertyAccessor<Row> columnPropertyAccessor = new MinovaColumnPropertyAccessor(table);
 
 		// build the body layer stack
-		IDataProvider bodyDataProvider = new ListDataProvider<Row>(table.getRows(), columnPropertyAccessor);
+		IRowDataProvider<Row> bodyDataProvider = new ListDataProvider<Row>(table.getRows(), columnPropertyAccessor);
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(bodyDataLayer);
 
-		SelectionLayer selectionLayer = new SelectionLayer(columnReorderLayer);
+		//SelectionLayer selectionLayer = new SelectionLayer(columnReorderLayer);
+		SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
+		E4SelectionListener<Row> e4SelectionListener = new E4SelectionListener<Row>(selectionService, selectionLayer, bodyDataProvider);
+		e4SelectionListener.setFullySelectedRowsOnly(false);
+		e4SelectionListener.setHandleSameRowSelection(false);
+		selectionLayer.addLayerListener(e4SelectionListener);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
 		// build the column header layer stack
