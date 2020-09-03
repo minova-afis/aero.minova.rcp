@@ -2,7 +2,7 @@
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="1024" height="800">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack">
-      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.sis">
+      <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.sis" label="SIS">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.main" horizontal="true">
           <children xsi:type="basic:PartSashContainer" xmi:id="_Blgn4LYkEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.1" containerData="1000">
             <children xsi:type="basic:PartStack" xmi:id="_DgwT4LblEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_C4Nl4LYkEeqEVOzPNoSbhw">
@@ -74,29 +74,22 @@
       <children xsi:type="menu:Menu" xmi:id="_hZQ74LufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.menu.master" label="Master">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_KPdTcOLKEeqIbaaiaTRUGA" elementId="aero.minova.rcp.rcp.handledmenuitem.sis" label="SIS" command="_4j7QUOOOEeqf6YlJmDESrg"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_oeKiALufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handledmenuitem.item" label="Item" command="_4p5JwLufEeqOjqZ1liG0LA">
-          <parameters xmi:id="_CzjhYLugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.0" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.item"/>
+          <parameters xmi:id="_CzjhYLugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.item" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.item"/>
         </children>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_m8ZJELumEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handledmenuitem.tank" label="Tank" command="_4p5JwLufEeqOjqZ1liG0LA">
           <parameters xmi:id="_pWmhsLumEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.tank" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.tank"/>
         </children>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_5BzFYLz9EeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.handledmenuitem.dispo" label="DISPO" command="_4p5JwLufEeqOjqZ1liG0LA">
-          <parameters xmi:id="_8clxQLz9EeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.parameter.2" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.dispo"/>
+          <parameters xmi:id="_8clxQLz9EeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.parameter.dispo" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.dispo"/>
         </children>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6fT-sL-OEeqZxdHjk084tw" elementId="aero.minova.rcp.rcp.handledmenuitem.kunde" label="Kunde" command="_4p5JwLufEeqOjqZ1liG0LA">
           <parameters xmi:id="_9HjMQL-OEeqZxdHjk084tw" elementId="aero.minova.rcp.rcp.parameter.kunde" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.kunde"/>
         </children>
       </children>
     </mainMenu>
-    <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top">
-      <children xsi:type="menu:ToolBar" xmi:id="_Qiu9IL0fEeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar">
-        <children xsi:type="menu:HandledToolItem" xmi:id="_JD5GkNFjEeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handledtoolitem.keepperspective" label="Keep It" type="Check" command="_gqcNMNF7Eeq2n_R750bOVg"/>
-        <children xsi:type="menu:ToolBarSeparator" xmi:id="__dgRwNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.toolbarseparator.1"/>
-      </children>
-      <children xsi:type="menu:ToolControl" xmi:id="_KrLlsMEWEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.toolcontrol.0">
-        <tags>stretch</tags>
-        <tags>glue</tags>
-      </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_6r2lwMEWEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.toolbar.close"/>
+    <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top"/>
+    <trimBars xmi:id="__yOk0ObVEeq4PLO5TyETwg" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
+      <children xsi:type="menu:ToolControl" xmi:id="_drXssOazEeq4PLO5TyETwg" elementId="aero.minova.rcp.rcp.toolcontrol.perspectivetoolbar" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PerspectiveControl"/>
     </trimBars>
   </children>
   <handlers xmi:id="_6wlLfcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
@@ -127,8 +120,12 @@
   <commands xmi:id="_4p5JwLufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="FormName" optional="false"/>
   </commands>
-  <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand"/>
-  <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand"/>
+  <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
+    <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="ClosePerspective"/>
+  </commands>
+  <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand">
+    <parameters xmi:id="_DNFBAOw6Eeq18tKVLNTMYA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="KeepPerspective"/>
+  </commands>
   <commands xmi:id="_y3TngNDREeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.revertsearch" commandName="RevertSearch"/>
   <commands xmi:id="_rnXZkNDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.clearsearch" commandName="ClearSearch"/>
   <commands xmi:id="_r5Qa0NDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.loadsearchcriteria" commandName="LoadSearchCriteria"/>
