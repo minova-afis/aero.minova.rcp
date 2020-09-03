@@ -295,20 +295,24 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 		if (keepit == null || !keepit.contains(perspective.getElementId())) {
 			ToolItem item = getToolItemFor(perspective.getElementId());
-			if (item == null || item.isDisposed())
-				return;
-
-			Image icon = item.getImage();
-			if (icon != null) {
-				item.setImage(null);
-				icon.dispose();
-				icon = null;
-			}
-
-			item.dispose();
+			removeToolItem(item);
 		}
 		// update the layout
 
+	}
+
+	private void removeToolItem(ToolItem item) {
+		if (item == null || item.isDisposed())
+			return;
+
+		Image icon = item.getImage();
+		if (icon != null) {
+			item.setImage(null);
+			icon.dispose();
+			icon = null;
+		}
+
+		item.dispose();
 	}
 
 	@Override
@@ -374,8 +378,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		final List<String> keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
 
 		menuItem.setText("KeepIt");
-//		menuItem.setSelection(showShortcutText);
-
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -385,9 +387,11 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 				ParameterizedCommand command = commandService
 						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
+				
+				//Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
 				if(!(keepItToolitems != null && keepItToolitems.contains(perspectiveId)) && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
-					toolitem.dispose();
+					removeToolItem(toolitem);
 				}
 			}
 		});
