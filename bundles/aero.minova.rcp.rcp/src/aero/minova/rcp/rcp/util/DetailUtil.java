@@ -1,22 +1,16 @@
 package aero.minova.rcp.rcp.util;
 
 import java.math.BigInteger;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.print.attribute.HashAttributeSet;
 
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -28,6 +22,7 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.plugin1.model.Value;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
@@ -104,7 +99,22 @@ public class DetailUtil {
 		}
 		text.setData("field", field);
 		text.setData("consumer", (Consumer<Table>) t -> {
-			String s = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getStringValue();
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+			String s = null;
+			if (rowindex.getBooleanValue() != null) {
+				s = rowindex.getBooleanValue().toString();
+			} else if (rowindex.getZonedDateTimeValue() != null) {
+				s = dtf.format(rowindex.getZonedDateTimeValue());
+			} else if (rowindex.getInstantValue() != null) {
+				s = rowindex.getInstantValue().toString();
+			} else if (rowindex.getDoubleValue() != null) {
+				s = rowindex.getDoubleValue().toString();
+			} else if (rowindex.getIntegerValue() != null) {
+				s = rowindex.getIntegerValue().toString();
+			} else if (rowindex.getStringValue() != null) {
+				s = rowindex.getStringValue();
+			}
 			text.setText(s);
 		});
 		controls.put(field.getName(), text);
@@ -163,7 +173,7 @@ public class DetailUtil {
 
 	/**
 	 * T
-	 * 
+	 *
 	 * @param twoColumns
 	 * @param widthHint
 	 * @return
