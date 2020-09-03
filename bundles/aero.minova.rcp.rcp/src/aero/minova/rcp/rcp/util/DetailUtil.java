@@ -99,13 +99,19 @@ public class DetailUtil {
 		}
 		text.setData("field", field);
 		text.setData("consumer", (Consumer<Table>) t -> {
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+			DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+			DateTimeFormatter dtfHour = DateTimeFormatter.ofPattern("hh:mm");
+
 			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
 			String s = null;
 			if (rowindex.getBooleanValue() != null) {
 				s = rowindex.getBooleanValue().toString();
 			} else if (rowindex.getZonedDateTimeValue() != null) {
-				s = dtf.format(rowindex.getZonedDateTimeValue());
+				if (rowindex.getZonedDateTimeValue().getHour() != 0) {
+					s = dtfHour.format(rowindex.getZonedDateTimeValue());
+				} else {
+					s = dtfDate.format(rowindex.getZonedDateTimeValue());
+				}
 			} else if (rowindex.getInstantValue() != null) {
 				s = rowindex.getInstantValue().toString();
 			} else if (rowindex.getDoubleValue() != null) {
