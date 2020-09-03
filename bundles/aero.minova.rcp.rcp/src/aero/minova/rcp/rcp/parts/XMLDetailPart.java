@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.parts;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +36,9 @@ import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.DetailPartBinding;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
 import aero.minova.rcp.plugin1.model.builder.RowBuilder;
 import aero.minova.rcp.plugin1.model.builder.TableBuilder;
 import aero.minova.rcp.rcp.util.DetailUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class XMLDetailPart {
 
@@ -168,60 +165,30 @@ public class XMLDetailPart {
 			if (c != null) {
 				Consumer<Table> consumer = (Consumer<Table>) c.getData("consumer");
 				if (consumer != null) {
+						try {
+							consumer.accept(table);
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+				}
+				Map hash = new HashMap<>();
+				hash.put("value", table.getRows().get(0).getValue(i));
+				hash.put("sync", sync);
+				hash.put("dataService", dataService);
+				hash.put("table", table);
+				hash.put("control", c);
+
+				Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData("lookupConsumer");
+				if (lookupConsumer != null) {
 					try {
-						consumer.accept(table);
+						lookupConsumer.accept(hash);
 					} catch (Exception e) {
-						// TODO: handle exception
+						System.out.println("Cast-Exception");
 					}
 				}
-//				Field field = (Field) c.getData("field");
-//				Table t = TableBuilder.newTable(field.getLookup().getTable())//
-//						.withColumn("KeyLong", DataType.INTEGER)//
-//						.withColumn("KeyText", DataType.STRING)//
-//						.withColumn("Description", DataType.STRING)//
-//						.withKey(r.getValue(i).getIntegerValue())//
-//						.create();
-//
-//				CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(t.getName(), t);
-//				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-				if (c instanceof LookupControl) {
-					updateSelectedLookUpEntry(getTestTableLookupFields(), c);
-				}
-//				}));
+
 			}
 		}
-	}
-
-	private void updateSelectedLookUpEntry(Table ta, Control c) {
-		// TODO
-		DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		DateTimeFormatter dtfHour = DateTimeFormatter.ofPattern("hh:mm");
-
-		Row r = ta.getRows().get(0);
-		LookupControl lc = (LookupControl) c;
-		Value v = r.getValue(1);
-		String s = null;
-
-		if (v.getBooleanValue() != null) {
-			s = v.getBooleanValue().toString();
-		} else if (v.getZonedDateTimeValue() != null) {
-			if (v.getZonedDateTimeValue().getHour() != 0) {
-				s = dtfHour.format(v.getZonedDateTimeValue());
-			} else {
-				s = dtfDate.format(v.getZonedDateTimeValue());
-			}
-		} else if (v.getInstantValue() != null) {
-			s = v.getInstantValue().toString();
-		} else if (v.getDoubleValue() != null) {
-			s = v.getDoubleValue().toString();
-		} else if (v.getIntegerValue() != null) {
-			s = v.getIntegerValue().toString();
-		} else if (v.getStringValue() != null) {
-			s = v.getStringValue();
-		}
-		lc.setText(s);
-		System.out.println("Hier werden nun die Daten mit dem UI-Element verknüpft");
-
 	}
 
 	public Table getTestTable() {
@@ -250,21 +217,6 @@ public class XMLDetailPart {
 				.create();
 		rowIndexTable.addRow(r);
 		return rowIndexTable;
-	}
-
-	public Table getTestTableLookupFields() {
-		Table lookupFieldTable = TableBuilder.newTable("spReadWorkingTime")//
-				.withColumn("KeyLong", DataType.INTEGER)//
-				.withColumn("KeyText", DataType.STRING)//
-				.withColumn("Description", DataType.STRING)//
-				.create();
-		Row r = RowBuilder.newRow()//
-				.withValue("2242")//
-				.withValue("lookupfield-value")//
-				.withValue("blabla")//
-				.create();
-		lookupFieldTable.addRow(r);
-		return lookupFieldTable;
 	}
 
 	public Map<String, Control> getControls() {

@@ -1,10 +1,11 @@
 package aero.minova.rcp.rcp.util;
 
 import java.math.BigInteger;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
@@ -18,11 +19,17 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.plugin1.model.DataType;
+import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.plugin1.model.builder.RowBuilder;
+import aero.minova.rcp.plugin1.model.builder.TableBuilder;
+import aero.minova.rcp.plugin1.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
@@ -99,29 +106,9 @@ public class DetailUtil {
 		}
 		text.setData("field", field);
 		text.setData("consumer", (Consumer<Table>) t -> {
-			DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-			DateTimeFormatter dtfHour = DateTimeFormatter.ofPattern("hh:mm");
 
 			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-			String s = null;
-			if (rowindex.getBooleanValue() != null) {
-				s = rowindex.getBooleanValue().toString();
-			} else if (rowindex.getZonedDateTimeValue() != null) {
-				if (rowindex.getZonedDateTimeValue().getHour() != 0) {
-					s = dtfHour.format(rowindex.getZonedDateTimeValue());
-				} else {
-					s = dtfDate.format(rowindex.getZonedDateTimeValue());
-				}
-			} else if (rowindex.getInstantValue() != null) {
-				s = rowindex.getInstantValue().toString();
-			} else if (rowindex.getDoubleValue() != null) {
-				s = rowindex.getDoubleValue().toString();
-			} else if (rowindex.getIntegerValue() != null) {
-				s = rowindex.getIntegerValue().toString();
-			} else if (rowindex.getStringValue() != null) {
-				s = rowindex.getStringValue();
-			}
-			text.setText(s);
+			text.setText((String) ValueBuilder.newValue(rowindex).create());
 		});
 		controls.put(field.getName(), text);
 	}
@@ -132,6 +119,21 @@ public class DetailUtil {
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
 		lookUpControl.setData("field", field);
+		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
+			Table t = TableBuilder.newTable(field.getLookup().getTable())//
+					.withColumn("KeyLong", DataType.INTEGER)//
+					.withColumn("KeyText", DataType.STRING)//
+					.withColumn("Description", DataType.STRING)//
+					.withKey((Integer) ValueBuilder.newValue((Value) m.get("value")).create())//
+					.create();
+
+			CompletableFuture<Table> tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(),
+					t);
+			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
+				updateSelectedLookupEntry(ta, (Control) m.get("control"));
+			}));
+		});
+
 		if (twoColumns) {
 			Label labelDescription = labelFactory.create(composite);
 			labelDescription.setText("Description");
@@ -214,5 +216,29 @@ public class DetailUtil {
 		composite.setLayout(new GridLayout(6, false));
 
 		return composite;
+	}
+
+	public static void updateSelectedLookupEntry(Table ta, Control c) {
+		ta = getTestTableLookupFields();
+		Row r = ta.getRows().get(0);
+		LookupControl lc = (LookupControl) c;
+		Value v = r.getValue(1);
+
+		lc.setText((String) ValueBuilder.newValue(v).create());
+	}
+
+	public static Table getTestTableLookupFields() {
+		Table lookupFieldTable = TableBuilder.newTable("spReadWorkingTime")//
+				.withColumn("KeyLong", DataType.INTEGER)//
+				.withColumn("KeyText", DataType.STRING)//
+				.withColumn("Description", DataType.STRING)//
+				.create();
+		Row r = RowBuilder.newRow()//
+				.withValue("2242")//
+				.withValue("lookupfield-value")//
+				.withValue("blabla")//
+				.create();
+		lookupFieldTable.addRow(r);
+		return lookupFieldTable;
 	}
 }
