@@ -108,7 +108,7 @@ public class DetailUtil {
 		text.setData("consumer", (Consumer<Table>) t -> {
 
 			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-			text.setData("valuetype", ValueBuilder.newValue(rowindex).dataType());
+			text.setData("dataType", ValueBuilder.newValue(rowindex).dataType());
 			text.setText((String) ValueBuilder.newValue(rowindex).create());
 		});
 		controls.put(field.getName(), text);
@@ -130,7 +130,7 @@ public class DetailUtil {
 					.withKey(keyLong)//
 					.create();
 
-			lookUpControl.setData("valuetype", ValueBuilder.newValue((Value) m.get("value")).dataType());
+			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
 			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<Table> tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(),
