@@ -53,4 +53,16 @@ public class DataServiceTest implements IDataService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public CompletableFuture<Table> sendNewEntry(String tableName, Table newEntryTable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Table> updateEntry(String tableName, Table updateTable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

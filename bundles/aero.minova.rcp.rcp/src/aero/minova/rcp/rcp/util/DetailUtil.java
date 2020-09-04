@@ -108,6 +108,7 @@ public class DetailUtil {
 		text.setData("consumer", (Consumer<Table>) t -> {
 
 			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+			text.setData("valuetype", ValueBuilder.newValue(rowindex).dataType());
 			text.setText((String) ValueBuilder.newValue(rowindex).create());
 		});
 		controls.put(field.getName(), text);
@@ -120,12 +121,17 @@ public class DetailUtil {
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
 		lookUpControl.setData("field", field);
 		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
+
+			int keyLong = (Integer) ValueBuilder.newValue((Value) m.get("value")).create();
 			Table t = TableBuilder.newTable(field.getLookup().getTable())//
 					.withColumn("KeyLong", DataType.INTEGER)//
 					.withColumn("KeyText", DataType.STRING)//
 					.withColumn("Description", DataType.STRING)//
-					.withKey((Integer) ValueBuilder.newValue((Value) m.get("value")).create())//
+					.withKey(keyLong)//
 					.create();
+
+			lookUpControl.setData("valuetype", ValueBuilder.newValue((Value) m.get("value")).dataType());
+			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<Table> tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(),
 					t);

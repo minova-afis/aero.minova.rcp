@@ -52,7 +52,7 @@ public class XMLDetailPart {
 	private IDataService dataService;
 
 	@Inject
-	IEventBroker broker;
+	private IEventBroker broker;
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
@@ -62,6 +62,7 @@ public class XMLDetailPart {
 	private DetailPartBinding value = new DetailPartBinding();
 	private WritableValue<DetailPartBinding> observableValue = new WritableValue<>();
 	private Map<String, Control> controls = new HashMap<>();
+	private int entryKey = 0;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -134,6 +135,7 @@ public class XMLDetailPart {
 		int keylong = 0;
 		Row row = rows.get(0);
 		keylong = row.getValue(0).getIntegerValue();
+		entryKey = keylong;
 		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)//
 				.withColumn("EmployeeKey", DataType.STRING)//
 				.withColumn("OrderReceiverKey", DataType.STRING)//
@@ -175,7 +177,6 @@ public class XMLDetailPart {
 				hash.put("value", table.getRows().get(0).getValue(i));
 				hash.put("sync", sync);
 				hash.put("dataService", dataService);
-				hash.put("table", table);
 				hash.put("control", c);
 
 				Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData("lookupConsumer");
@@ -183,7 +184,6 @@ public class XMLDetailPart {
 					try {
 						lookupConsumer.accept(hash);
 					} catch (Exception e) {
-						System.out.println("Cast-Exception");
 					}
 				}
 
@@ -221,6 +221,16 @@ public class XMLDetailPart {
 
 	public Map<String, Control> getControls() {
 		return controls;
+	}
+
+	public void setEntryKey(int entryKey) {
+		this.entryKey = entryKey;
+
+	}
+
+	public int getEntryKey() {
+		return entryKey;
+
 	}
 
 	@PreDestroy

@@ -16,7 +16,11 @@ public class RowBuilder {
 	}
 
 	public RowBuilder withValue(Object value) {
-		row.addValue(new Value(value));
+		if (value != null) {
+			row.addValue(new Value(value));
+		} else {
+			row.addValue(null);
+		}
 		return this;
 	}
 

@@ -29,7 +29,7 @@ public class DataService implements IDataService {
 	private Gson gson;
 
 	private void init() {
-		
+
 		authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -54,10 +54,10 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
-		
+
 		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
 	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
-		
+
 		return future;
 	}
 
@@ -69,10 +69,10 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-		
+
 		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
 	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
-		
+
 		return future;
 	}
 
@@ -84,9 +84,21 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-		
+
 		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
 	      .thenApply(t -> gson.fromJson( t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
-		
+
 		return future;
+	}
+
+	@Override
+	public CompletableFuture<Table> sendNewEntry(String tableName, Table t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Table> updateEntry(String name, Table t) {
+		// TODO Auto-generated method stub
+		return null;
 	}}
