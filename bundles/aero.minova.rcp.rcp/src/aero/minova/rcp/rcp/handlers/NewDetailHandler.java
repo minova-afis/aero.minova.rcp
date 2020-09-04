@@ -37,6 +37,5 @@ public class NewDetailHandler {
 			}
 		}
 		xmlPart.setEntryKey(0);
-		System.out.print("Create a new Detail");
 	}
 }

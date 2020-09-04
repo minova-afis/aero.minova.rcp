@@ -92,13 +92,13 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Table> sendNewEntry(String tableName, Table t) {
+	public CompletableFuture<Table> sendNewEntry(String tableName, Table newEntryTable) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Table> updateEntry(String name, Table t) {
+	public CompletableFuture<Table> updateEntry(String name, Table updateEntryTable) {
 		// TODO Auto-generated method stub
 		return null;
 	}}

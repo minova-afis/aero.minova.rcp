@@ -11,13 +11,13 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dialogs.ErrorDialog;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
@@ -59,7 +59,7 @@ public class SaveDetailHandler {
 			String s = (String) controls.keySet().toArray()[i];
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				tb.withColumn(s, (DataType) t.getData("dataType"));
+				tb.withColumn(s, (DataType) c.getData("dataType"));
 				if (!(t.getText().isBlank())) {
 					rb.withValue(t.getText());
 				} else {
@@ -68,12 +68,11 @@ public class SaveDetailHandler {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupControl l = (LookupControl) c;
-				tb.withColumn(s, (DataType) l.getData("dataType"));
+				tb.withColumn(s, (DataType) c.getData("dataType"));
 				// TODO: Tablecalles to get the correct value, NOT the string (dates,
 				// doubles,...)
-				if (l.getData("keylong") != null) {
-					rb.withValue(l.getData("keyLong"));
+				if (c.getData("keyLong") != null) {
+					rb.withValue(c.getData("keyLong"));
 				}
 				else {
 					rb.withValue(null);
@@ -85,12 +84,12 @@ public class SaveDetailHandler {
 		Row r = rb.create();
 		for (i = 0; i < t.getColumnCount(); i++) {
 			if (r.getValue(i) == null) {
-				ErrorDialog errorDialog = new ErrorDialog(shell, "Not all Fields were filled");
-				errorDialog.open();
+				MessageDialog.openError(shell, "Error", "not all Fields were filled");
 				return;
 			}
 		}
 		t.addRow(r);
+		checkEntryUpdate(new Table());
 
 //		if (t.getColumnName(0) != "Keylong") {
 //			CompletableFuture<Table> tableFuture = dataService.sendNewEntry(t.getName(), t);
@@ -108,23 +107,29 @@ public class SaveDetailHandler {
 
 	public void checkEntryUpdate(Object responce) {
 		if (!(responce instanceof Table)) {
-			System.out.println("Error: Entry could not be updated");
-			ErrorDialog errorDialog = new ErrorDialog(shell, "Error: Entry could not be updated");
-			errorDialog.open();
+			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 		}
 		else {
-			// TODO: implement success popup that will show up for 3 seconds in the corner
+			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully updated the entry",
+					MessageDialog.NONE, new String[] {
+
+					}, 0);
+			sucess.open();
+			sucess.close();
 		}
 	}
 
 	public void checkNewEntryInsert(Object responce) {
 		if (!(responce instanceof Table)) {
-			System.out.println("Error: Entry could not be pushed");
-			ErrorDialog errorDialog = new ErrorDialog(shell, "Error: Entry could not be pushed");
-			errorDialog.open();
+			MessageDialog.openError(shell, "Error", "Entry could not be added");
 		}
 		else {
-			// TODO: implement success popup that will show up for 3 seconds in the corner
+			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully added the entry",
+					MessageDialog.NONE, new String[] {
+
+					}, 0);
+			sucess.open();
+			sucess.close();
 		}
 	}
 }
