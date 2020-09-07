@@ -136,7 +136,6 @@ public class DetailUtil {
 					boolean isAllowed = allowedCharacters.indexOf(character) > -1;
 					if (!isAllowed) {
 						e.doit = false;
-						return;
 					}
 				}
 			}

@@ -50,10 +50,6 @@ public class DeleteDetailHandler {
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb = TableBuilder.newTable("");
 		RowBuilder rb = RowBuilder.newRow();
-		if (xmlPart.getEntryKey() != 0) {
-			tb.withColumn("KeyLong", DataType.INTEGER);
-			rb.withValue(xmlPart.getEntryKey());
-		}
 		int i = 0;
 		for (Control c : controls.values()) {
 			String s = (String) controls.keySet().toArray()[i];
