@@ -44,6 +44,8 @@
 											[2.0.0,)
 										</versionRange>
 										<goals>
+											<goal>build-qualifier</goal>
+											<goal>validate-id</goal>
 											<goal>
 												validate-version
 											</goal>

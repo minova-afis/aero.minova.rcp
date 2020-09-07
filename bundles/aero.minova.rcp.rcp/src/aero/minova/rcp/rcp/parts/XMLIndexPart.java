@@ -8,11 +8,13 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import aero.minova.rcp.dataservice.IDataFormService;
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.plugin1.model.Row;
@@ -32,10 +34,17 @@ public class XMLIndexPart {
 	@Inject
 	private IDataFormService dataFormService;
 
+
 	private Table data;
 
 	@Inject
 	IEventBroker broker;
+
+	@Inject
+	ESelectionService selectionService;
+
+	@Inject
+	private IDataService dataService;
 
 	private NatTable natTable;
 
@@ -53,7 +62,7 @@ public class XMLIndexPart {
 		}
 
 		parent.setLayout(new GridLayout());
-		natTable = NatTableUtil.createNatTable(parent, form, data, true);
+		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService);
 	}
 
 	@PersistTableSelection
@@ -75,4 +84,6 @@ public class XMLIndexPart {
 		natTable.refresh(false);
 		natTable.requestLayout();
 	}
+
+
 }

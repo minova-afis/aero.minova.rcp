@@ -1,14 +1,11 @@
 package aero.minova.rcp.dataservice.internal;
 
-import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,7 +29,7 @@ public class DataService implements IDataService {
 	private Gson gson;
 
 	private void init() {
-		
+
 		authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -50,18 +47,47 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Table> getDataAsync(String tableName, Table seachTable) {
+	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
 		init();
 		String body = gson.toJson(seachTable);
 		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
-		
+
 		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
 	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
-		
+
 		return future;
-		
+	}
+
+	@Override
+	public CompletableFuture<Table> getDetailDataAsync(String tableName, Table detailTable) {
+		init();
+		String body = gson.toJson(detailTable);
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-result-set")) //
+				.header("Content-Type", "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.build();
+
+		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
+
+		return future;
+	}
+
+	@Override
+	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
+		init();
+		String body = gson.toJson(detailTable);
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-return-code")) //
+				.header("Content-Type", "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.build();
+
+		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+	      .thenApply(t -> gson.fromJson( t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
+
+		return future;
 	}
 }
