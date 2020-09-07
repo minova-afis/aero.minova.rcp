@@ -1,17 +1,29 @@
 package aero.minova.rcp.perspectiveswitcher.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+
+import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
+
+/**
+ * Dieser Handler wird im PopupMenu aufgerufen. Toolitems, die mit diesem
+ * Handler makiert wurden, werden nach dem schließen der Perspektive nicht aus
+ * der Toolbar entfernt. So kann man die Perspektive erneutr aus der Toolbar aus
+ * öffnen.
+ * 
+ * @author bauer
+ *
+ */
 
 public class KeepPerspectiveHandler {
 
@@ -24,24 +36,24 @@ public class KeepPerspectiveHandler {
 	@Inject
 	EPartService partService;
 
+	@SuppressWarnings("unchecked")
 	@Execute
-	public void execute(MWindow window) {
+	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveId) {
 
-		/*
-		 * Setzt fest, dass das Toolitem der Perspektive, bei der der Knopf gesetzt
-		 * wurde, in der Toolbar behalten wird, auch wenn die eigentliche Perspektive
-		 * geschlossen ist. Vergleich das Dock bei MAC.
-		 */
-		MPerspective currentPerspective = modelService.getActivePerspective(window);
-		String perspectiveID = currentPerspective.getElementId();
+		List<String> keepItToolitems;
 
-		MUIElement toolbar = modelService.find("aero.minova.rcp.rcp.toolbar.perspectiveswitchertoolbar", application);
-		List<MHandledToolItem> toolitems = modelService.findElements(toolbar,
-				"aero.minova.rcp.rcp.handledtoolitem." + perspectiveID, MHandledToolItem.class);
-		MHandledToolItem toolitem = (toolitems == null || toolitems.size() == 0) ? null : toolitems.get(0);
+		keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
+		
+		if (keepItToolitems == null) {
+			keepItToolitems = new ArrayList<String>();
+			application.getContext().set("perspectivetoolbar", keepItToolitems);
+		}
 
-		if (toolitem != null)
-			toolitem.getTags().add("keepIt");
+		if (keepItToolitems.contains(perspectiveId)) {
+			keepItToolitems.remove(perspectiveId);
+		} else {
+			keepItToolitems.add(perspectiveId);
+		}
 
 	}
 
