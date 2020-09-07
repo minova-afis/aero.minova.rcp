@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -48,7 +49,12 @@ public class SaveDetailHandler {
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
-		TableBuilder tb = TableBuilder.newTable("");
+		TableBuilder tb;
+		if (xmlPart.getEntryKey() != 0) {
+			tb = TableBuilder.newTable("spUpdateWorkingTime");
+		} else {
+			tb = TableBuilder.newTable("spInsertWorkingTime");
+		}
 		RowBuilder rb = RowBuilder.newRow();
 		if (xmlPart.getEntryKey() != 0) {
 			tb.withColumn("KeyLong", DataType.INTEGER);
@@ -86,24 +92,23 @@ public class SaveDetailHandler {
 			}
 		}
 		t.addRow(r);
-		checkEntryUpdate(new Table());
 
-//		if (t.getColumnName(0) != "Keylong" && t.getRows() != null) {
-//			CompletableFuture<Table> tableFuture = dataService.sendNewEntry(t.getName(), t);
-//			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-//				checkNewEntryInsert(tr);
-//			}));
-//		} else if (&& t.getRows() != null) {
-//			CompletableFuture<Table> tableFuture = dataService.updateEntry(t.getName(), t);
-//			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-//				checkEntryUpdate(tr);
-//			}));
-//		}
+		if (t.getColumnName(0) != "Keylong" && t.getRows() != null) {
+			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				checkNewEntryInsert(tr);
+			}));
+		} else if (t.getRows() != null) {
+			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				checkEntryUpdate(tr);
+			}));
+		}
 
 	}
 
-	public void checkEntryUpdate(Object responce) {
-		if (!(responce instanceof Table)) {
+	public void checkEntryUpdate(Table responce) {
+		if (responce.getName() == null) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
 		}
@@ -117,8 +122,8 @@ public class SaveDetailHandler {
 		}
 	}
 
-	public void checkNewEntryInsert(Object responce) {
-		if (!(responce instanceof Table)) {
+	public void checkNewEntryInsert(Table responce) {
+		if (responce.getName() == null) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
 		}
 		else {

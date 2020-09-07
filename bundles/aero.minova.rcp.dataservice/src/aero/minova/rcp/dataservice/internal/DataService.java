@@ -90,21 +90,4 @@ public class DataService implements IDataService {
 
 		return future;
 	}
-
-	@Override
-	public CompletableFuture<Table> sendNewEntry(String tableName, Table newEntryTable) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Table> updateEntry(String name, Table updateEntryTable) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Table> deleteEntry(String tableName, Table deleteTable) {
-		// TODO Auto-generated method stub
-		return null;
-	}}
+}

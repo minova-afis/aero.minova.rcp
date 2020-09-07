@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -48,7 +49,7 @@ public class DeleteDetailHandler {
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
-		TableBuilder tb = TableBuilder.newTable("");
+		TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
 		RowBuilder rb = RowBuilder.newRow();
 		int i = 0;
 		for (Control c : controls.values()) {
@@ -81,27 +82,29 @@ public class DeleteDetailHandler {
 			}
 		}
 		t.addRow(r);
-		Boolean sucess = false;
-//		if (t.getRows() != null) {
-//		CompletableFuture<Table> tableFuture = dataService.deleteEntry(t.getName(), t);
-//		tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-//			 sucess = deleteEntry(tr);
-//		}));
+		if (t.getRows() != null) {
+			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				Boolean sucess = false;
+				sucess = deleteEntry(tr);
 
-		if (sucess == true) {
-			for (Control c : controls.values()) {
-				if (c instanceof Text) {
-					((Text) c).setText("");
+				if (sucess == true) {
+					for (Control c : controls.values()) {
+						if (c instanceof Text) {
+							((Text) c).setText("");
+						}
+						if (c instanceof LookupControl) {
+							((LookupControl) c).setText("");
+						}
+					}
 				}
-				if (c instanceof LookupControl) {
-					((LookupControl) c).setText("");
-				}
-			}
+			}));
 		}
+
 	}
 
-	public boolean deleteEntry(Object responce) {
-		if (!(responce instanceof Table)) {
+	public boolean deleteEntry(Table responce) {
+		if (responce.getName() == null) {
 			MessageDialog.openError(shell, "Error", "Entry could not be deleted");
 			return false;
 		} else {

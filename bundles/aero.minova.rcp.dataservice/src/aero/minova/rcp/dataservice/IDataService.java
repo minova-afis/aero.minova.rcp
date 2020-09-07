@@ -12,10 +12,4 @@ public interface IDataService {
 
 	CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable);
 
-	CompletableFuture<Table> sendNewEntry(String tableName, Table newEntryTable);
-
-	CompletableFuture<Table> updateEntry(String tableName, Table updateTable);
-
-	CompletableFuture<Table> deleteEntry(String tableName, Table deleteTable);
-
 }
