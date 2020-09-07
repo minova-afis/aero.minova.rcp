@@ -104,6 +104,48 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			l.setLayoutData(data);
 		}
+		text.addVerifyListener(e -> {
+			final String oldString = ((Text) e.getSource()).getText();
+			String newS = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+			if(field.getNumber() != null)
+			{
+				if(field.getNumber().getDecimals() == 2)
+				{
+					boolean isFloat = true;
+					try {
+						Float.parseFloat(newS);
+					} catch (NumberFormatException ex) {
+						isFloat = false;
+					}
+					if (!isFloat) {
+						e.doit = false;
+					}
+				}
+
+			}
+			else if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
+					|| field.getShortTime() != null) {
+				String allowedCharacters;
+				if (field.getShortTime() != null) {
+					allowedCharacters = "1234567890:";
+				} else {
+					allowedCharacters = "1234567890.";
+				}
+				for (int index = 0; index < newS.length(); index++) {
+					char character = newS.charAt(index);
+					boolean isAllowed = allowedCharacters.indexOf(character) > -1;
+					if (!isAllowed) {
+						e.doit = false;
+						return;
+					}
+				}
+			}
+			else if (field.getText() != null) {
+				if (newS.length() > field.getText().getLength()) {
+					e.doit = false;
+				}
+			}
+		});
 		text.setData("field", field);
 		text.setData("consumer", (Consumer<Table>) t -> {
 
