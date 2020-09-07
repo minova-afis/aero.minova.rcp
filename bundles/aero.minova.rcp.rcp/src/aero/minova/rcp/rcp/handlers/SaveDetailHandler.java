@@ -58,10 +58,9 @@ public class SaveDetailHandler {
 		for (Control c : controls.values()) {
 			String s = (String) controls.keySet().toArray()[i];
 			if (c instanceof Text) {
-				Text t = (Text) c;
 				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (!(t.getText().isBlank())) {
-					rb.withValue(t.getText());
+				if (!(((Text) c).getText().isBlank())) {
+					rb.withValue(((Text) c).getText());
 				} else {
 					rb.withValue(null);
 
@@ -69,8 +68,6 @@ public class SaveDetailHandler {
 			}
 			if (c instanceof LookupControl) {
 				tb.withColumn(s, (DataType) c.getData("dataType"));
-				// TODO: Tablecalles to get the correct value, NOT the string (dates,
-				// doubles,...)
 				if (c.getData("keyLong") != null) {
 					rb.withValue(c.getData("keyLong"));
 				}
@@ -91,12 +88,12 @@ public class SaveDetailHandler {
 		t.addRow(r);
 		checkEntryUpdate(new Table());
 
-//		if (t.getColumnName(0) != "Keylong") {
+//		if (t.getColumnName(0) != "Keylong" && t.getRows() != null) {
 //			CompletableFuture<Table> tableFuture = dataService.sendNewEntry(t.getName(), t);
 //			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 //				checkNewEntryInsert(tr);
 //			}));
-//		} else {
+//		} else if (&& t.getRows() != null) {
 //			CompletableFuture<Table> tableFuture = dataService.updateEntry(t.getName(), t);
 //			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 //				checkEntryUpdate(tr);
@@ -108,12 +105,13 @@ public class SaveDetailHandler {
 	public void checkEntryUpdate(Object responce) {
 		if (!(responce instanceof Table)) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
+			return;
 		}
 		else {
 			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully updated the entry",
 					MessageDialog.NONE, new String[] {
-
 					}, 0);
+			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			sucess.close();
 		}
@@ -126,8 +124,8 @@ public class SaveDetailHandler {
 		else {
 			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully added the entry",
 					MessageDialog.NONE, new String[] {
-
 					}, 0);
+			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			sucess.close();
 		}

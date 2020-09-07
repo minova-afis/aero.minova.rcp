@@ -65,4 +65,10 @@ public class DataServiceTest implements IDataService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public CompletableFuture<Table> deleteEntry(String tableName, Table deleteTable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

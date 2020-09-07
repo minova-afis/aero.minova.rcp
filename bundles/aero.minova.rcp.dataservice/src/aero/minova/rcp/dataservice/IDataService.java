@@ -16,4 +16,6 @@ public interface IDataService {
 
 	CompletableFuture<Table> updateEntry(String tableName, Table updateTable);
 
+	CompletableFuture<Table> deleteEntry(String tableName, Table deleteTable);
+
 }
