@@ -1,4 +1,3 @@
-
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
@@ -33,7 +32,7 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.ui.forms;bundle-version="3.9.100",
  org.eclipse.core.databinding.observable,
  org.eclipse.nebula.widgets.nattable.extension.e4;bundle-version="1.2.0",
- org.eclipse.e4.ui.css.swt;bundle-version="0.13.1000"
+ org.eclipse.e4.ui.css.swt;bundle-version="0.13.1000",
  org.eclipse.emf.common,
  org.eclipse.e4.core.commands,
  org.eclipse.core.commands,
