@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.preferences;
+package aero.minova.rcp.preferencewindow.pages;
 
 import java.util.HashMap;
 import java.util.Map;
