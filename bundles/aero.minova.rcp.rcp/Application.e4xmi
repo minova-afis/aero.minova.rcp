@@ -66,6 +66,7 @@
     </snippets>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.menu" label="File">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SW9u4PDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handledmenuitem.preferencess" label="Preferences" command="_WsjPEPDoEeqcqsgp84_JDA"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_6wlLjsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.menu" label="Help">
@@ -105,6 +106,7 @@
   <handlers xmi:id="_0VNTQNWPEeq9oeSITNqxdw" elementId="aero.minova.rcp.rcp.handler.optimizedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeDetailHandler" command="_wuFbkNWPEeq9oeSITNqxdw"/>
   <handlers xmi:id="_656QQOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SISHandler" command="_4j7QUOOOEeqf6YlJmDESrg"/>
   <handlers xmi:id="_0qEZAOejEeq-Csq7J9vXlA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_xHFacOejEeq-Csq7J9vXlA"/>
+  <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.preferences.PreferenceWindowExample" command="_WsjPEPDoEeqcqsgp84_JDA"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
@@ -134,6 +136,7 @@
   <commands xmi:id="_wuFbkNWPEeq9oeSITNqxdw" elementId="aero.minova.rcp.rcp.command.optimizedetail" commandName="OptimizeDetail"/>
   <commands xmi:id="_4j7QUOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.command.siscommand" commandName="SISCommand"/>
   <commands xmi:id="_xHFacOejEeq-Csq7J9vXlA" elementId="aero.minova.rcp.rcp.command.loadindex" commandName="LoadIndex"/>
+  <commands xmi:id="_WsjPEPDoEeqcqsgp84_JDA" elementId="org.eclipse.ui.window.preferences" commandName="PreferenceCommand"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
