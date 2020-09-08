@@ -33,7 +33,7 @@ public class LoadIndexHandler {
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
 		Table table = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
 		table.getRows().clear();
-		CompletableFuture<Table> tableFuture = dataService.getDataAsync(table.getName(), table);
+		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(table.getName(), table);
 		tableFuture.thenAccept(t -> broker.post("PLAPLA", t));
 	}
 
