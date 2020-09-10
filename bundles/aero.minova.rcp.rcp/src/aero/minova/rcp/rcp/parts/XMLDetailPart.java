@@ -131,13 +131,16 @@ public class XMLDetailPart {
 	// anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
-
 		if (rows == null || rows.isEmpty()) {
 			return;
 		}
 		int keylong = 0;
 		Row row = rows.get(0);
-		keylong = row.getValue(0).getIntegerValue();
+		if (row.getValue(0).getIntegerValue() == null) {
+			return;
+		} else {
+			keylong = row.getValue(0).getIntegerValue();
+		}
 		entryKey = keylong;
 		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)//
 				.withColumn("EmployeeKey", DataType.STRING)//
