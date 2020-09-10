@@ -63,6 +63,7 @@ public class XMLDetailPart {
 	private WritableValue<DetailPartBinding> observableValue = new WritableValue<>();
 	private Map<String, Control> controls = new HashMap<>();
 	private int entryKey = 0;
+	private Table selectedTable;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -158,14 +159,15 @@ public class XMLDetailPart {
 		rowIndexTable.addRow(r);*/
 		CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-			updateSelectedEntry(t);
+			selectedTable = t;
+			updateSelectedEntry();
 		}));
 	}
 
 	// verarbeitung empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den
 	// daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
-	public void updateSelectedEntry(Table table) {
-		System.out.println("Table recieved");
+	public void updateSelectedEntry() {
+		Table table = selectedTable;
 		table = getTestTable();
 		value = new DetailPartBinding();
 
