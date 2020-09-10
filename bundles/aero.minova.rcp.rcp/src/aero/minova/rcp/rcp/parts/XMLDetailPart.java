@@ -9,13 +9,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -33,7 +29,6 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.DetailPartBinding;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.builder.RowBuilder;
@@ -57,18 +52,12 @@ public class XMLDetailPart {
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
 
-	private DataBindingContext dbc;
-	private Map<String, IObservableValue<?>> fields;
-	private DetailPartBinding value = new DetailPartBinding();
-	private WritableValue<DetailPartBinding> observableValue = new WritableValue<>();
 	private Map<String, Control> controls = new HashMap<>();
 	private int entryKey = 0;
 	private Table selectedTable;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
-		fields = new HashMap<>();
-		dbc = new DataBindingContext();
 		// Top-Level_Element
 		parent.setLayout(new GridLayout(1, true));
 		this.parent = parent;
@@ -82,25 +71,8 @@ public class XMLDetailPart {
 				for (Object fieldOrGrid : head.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
 						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
-
 					}
 				}
-//				// Employee
-//				fields.put(DetailPartBinding.EMPLOYEEKEY,
-//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[1]));
-//				// Customer
-//				fields.put(DetailPartBinding.ORDERRECEIVERKEY,
-//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[4]));
-//				// Contract
-//				fields.put(DetailPartBinding.SERVICECONTRACTKEY,
-//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[7]));
-//				// Project
-//				fields.put(DetailPartBinding.SERVICEKEY,
-//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[10]));
-//				// Service
-//				fields.put(DetailPartBinding.SERVICEOBJECTKEY,
-//						WidgetProperties.ccomboSelection().observe((LookupControl) detailFieldComposite.getChildren()[13]));
-
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
 				Composite detailFieldComposite = DetailUtil.createSection(formToolkit, parent, page);
@@ -110,18 +82,6 @@ public class XMLDetailPart {
 
 					}
 				}
-//				fields.put(DetailPartBinding.BOOKINGDATE,
-//						WidgetProperties.text(SWT.Modify).observe(detailFieldComposite.getChildren()[1]));
-//				fields.put(DetailPartBinding.STARTDATE,
-//						WidgetProperties.text(SWT.Modify).observe(detailFieldComposite.getChildren()[4]));
-//				fields.put(DetailPartBinding.ENDDATE,
-//						WidgetProperties.text(SWT.Modify).observe(detailFieldComposite.getChildren()[7]));
-//				fields.put(DetailPartBinding.RENDEREDQUANTITY,
-//						WidgetProperties.text(SWT.Modify).observe(detailFieldComposite.getChildren()[10]));
-//				fields.put(DetailPartBinding.CHARGEDQUANTIY,
-//						WidgetProperties.text(SWT.Modify).observe(detailFieldComposite.getChildren()[12]));
-//				fields.put(DetailPartBinding.DESCRIPTION,
-//						WidgetProperties.text(SWT.Modify).observe(detailFieldComposite.getChildren()[14]));
 			}
 		}
 
@@ -155,11 +115,6 @@ public class XMLDetailPart {
 				.withColumn("ChargedQuantity", DataType.DOUBLE)//
 				.withColumn("Description", DataType.STRING)//
 				.withColumn("Spelling", DataType.BOOLEAN).withKey(keylong).create();
-		// TODO:RowBuilder so abändern, das die Tabelle einen Wert zurückerhält
-		/*Row r = RowBuilder.newRow().withValue(keylong).withValue(null).withValue(null).withValue(null).withValue(null)
-				.withValue(null).withValue(row.getValue(6)).withValue(row.getValue(7)).withValue(row.getValue(8))
-				.withValue(row.getValue(9)).withValue(row.getValue(10)).withValue(row.getValue(11)).create();
-		rowIndexTable.addRow(r);*/
 		CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			selectedTable = t;
@@ -172,7 +127,6 @@ public class XMLDetailPart {
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
 		table = getTestTable();
-		value = new DetailPartBinding();
 
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = table.getColumnName(i);
@@ -183,7 +137,6 @@ public class XMLDetailPart {
 						try {
 							consumer.accept(table);
 						} catch (Exception e) {
-							// TODO: handle exception
 						}
 				}
 				Map hash = new HashMap<>();
@@ -246,10 +199,4 @@ public class XMLDetailPart {
 		return entryKey;
 
 	}
-
-	@PreDestroy
-	public void dispose() {
-		dbc.dispose();
-	}
-
 }
