@@ -42,10 +42,19 @@ public class DeleteDetailHandler {
 	private UISynchronize sync;
 
 	private Shell shell;
-	@Execute
-	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 
+	private MPerspective mPerspective;
+
+	private MPart mpart;
+	@Execute
+
+	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	// eine Abfrage an den CAS zusammen
+	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 		this.shell = shell;
+		this.mPerspective = mPerspective;
+		this.mpart = mpart;
+
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
@@ -97,14 +106,18 @@ public class DeleteDetailHandler {
 							((LookupControl) c).setText("");
 						}
 					}
+					// LoadIndexHandler li = new LoadIndexHandler();
+					// li.execute(mpart, shell, mPerspective);
 				}
 			}));
 		}
 
 	}
 
+	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
+	// befüllt um die Anfrage anzupassen
 	public boolean deleteEntry(Table responce) {
-		if (responce.getName() == null) {
+		if (responce.getRows().get(0).getValue(0).getIntegerValue() == 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be deleted");
 			return false;
 		} else {

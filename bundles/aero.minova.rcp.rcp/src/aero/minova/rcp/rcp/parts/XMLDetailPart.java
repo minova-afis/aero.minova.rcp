@@ -126,6 +126,8 @@ public class XMLDetailPart {
 
 	}
 
+	// Bei auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
+	// anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
 
@@ -149,13 +151,19 @@ public class XMLDetailPart {
 				.withColumn("ChargedQuantity", DataType.DOUBLE)//
 				.withColumn("Description", DataType.STRING)//
 				.withColumn("Spelling", DataType.BOOLEAN).withKey(keylong).create();
-
+		// TODO:RowBuilder so abändern, das die Tabelle einen Wert zurückerhält
+		/*Row r = RowBuilder.newRow().withValue(keylong).withValue(null).withValue(null).withValue(null).withValue(null)
+				.withValue(null).withValue(row.getValue(6)).withValue(row.getValue(7)).withValue(row.getValue(8))
+				.withValue(row.getValue(9)).withValue(row.getValue(10)).withValue(row.getValue(11)).create();
+		rowIndexTable.addRow(r);*/
 		CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			updateSelectedEntry(t);
 		}));
 	}
 
+	// verarbeitung empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den
+	// daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	public void updateSelectedEntry(Table table) {
 		System.out.println("Table recieved");
 		table = getTestTable();
@@ -191,6 +199,7 @@ public class XMLDetailPart {
 		}
 	}
 
+	// Testdaten, welche nach erfolgreicher CAS-Abfrage gelöscht werden
 	public Table getTestTable() {
 		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)
 				.withColumn("EmployeeKey", DataType.STRING).withColumn("OrderReceiverKey", DataType.STRING)

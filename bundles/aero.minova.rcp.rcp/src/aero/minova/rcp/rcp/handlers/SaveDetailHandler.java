@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dialogs.SucessDialog;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
@@ -43,22 +44,30 @@ public class SaveDetailHandler {
 
 	private Shell shell;
 
+	private MPerspective mPerspective;
+
+	private MPart mpart;
+
+	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	// eine Abfrage an den CAS zusammen. Anhand eines gegebenen oder nicht gegebenen
+	// KeyLongs wird zwischen update und neuem Eintrag unterschieden
 	@Execute
 	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 		this.shell = shell;
+		this.mPerspective = mPerspective;
+		this.mpart = mpart;
+
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb;
-		if (xmlPart.getEntryKey() != 0) {
-			tb = TableBuilder.newTable("spUpdateWorkingTime");
-		} else {
-			tb = TableBuilder.newTable("spInsertWorkingTime");
-		}
 		RowBuilder rb = RowBuilder.newRow();
 		if (xmlPart.getEntryKey() != 0) {
+			tb = TableBuilder.newTable("spUpdateWorkingTime");
 			tb.withColumn("KeyLong", DataType.INTEGER);
 			rb.withValue(xmlPart.getEntryKey());
+		} else {
+			tb = TableBuilder.newTable("spInsertWorkingTime");
 		}
 		int i = 0;
 		for (Control c : controls.values()) {
@@ -93,46 +102,49 @@ public class SaveDetailHandler {
 		}
 		t.addRow(r);
 
-		if (t.getColumnName(0) != "Keylong" && t.getRows() != null) {
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-				checkNewEntryInsert(tr);
-			}));
-		} else if (t.getRows() != null) {
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-				checkEntryUpdate(tr);
-			}));
+		if (t.getRows() != null) {
+			CompletableFuture<Integer> tableFuture = dataService.getReturnCodeAsync(t.getName(), t);
+			if (t.getColumnName(0) != "KeyLong") {
+				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+					checkNewEntryInsert(tr);
+				}));
+			} else {
+				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+					checkEntryUpdate(tr);
+				}));
+			}
 		}
-
 	}
 
-	public void checkEntryUpdate(Table responce) {
-		if (responce.getName() == null) {
+	// Überprüft. ob das Update erfolgreich war
+	public void checkEntryUpdate(Integer responce) {
+
+		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
 		}
 		else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully updated the entry",
-					MessageDialog.NONE, new String[] {
-					}, 0);
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully updated the entry");
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			sucess.close();
+			// LoadIndexHandler li = new LoadIndexHandler();
+			// li.execute(mpart, shell, mPerspective);
 		}
 	}
 
-	public void checkNewEntryInsert(Table responce) {
-		if (responce.getName() == null) {
+	// Überprüft, ob der neue Eintrag erstellt wurde
+	public void checkNewEntryInsert(Integer responce) {
+		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
 		}
 		else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully added the entry",
-					MessageDialog.NONE, new String[] {
-					}, 0);
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully added the entry");
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			sucess.close();
+			// LoadIndexHandler li = new LoadIndexHandler();
+			// li.execute(mpart, shell, mPerspective);
 		}
 	}
 }

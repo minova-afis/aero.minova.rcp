@@ -104,6 +104,8 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			l.setLayoutData(data);
 		}
+		// Fügt einen Listener hinzu, der je nach übermittelten Feldtypes die Eingabe
+		// des Nutzers einschränkt
 		text.addVerifyListener(e -> {
 			final String oldString = ((Text) e.getSource()).getText();
 			String newS = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
@@ -146,6 +148,8 @@ public class DetailUtil {
 			}
 		});
 		text.setData("field", field);
+		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
+		// Indexes in der Detailview aufzulisten
 		text.setData("consumer", (Consumer<Table>) t -> {
 
 			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
@@ -161,21 +165,35 @@ public class DetailUtil {
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
 		lookUpControl.setData("field", field);
+		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
+		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den Cas
+		// gestartet, um die Werte des zugehörigen Keys zu erhalten
 		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
 
 			int keyLong = (Integer) ValueBuilder.newValue((Value) m.get("value")).create();
-			Table t = TableBuilder.newTable(field.getLookup().getTable())//
+			String tableName;
+			if (field.getLookup().getTable() != null) {
+				tableName = field.getLookup().getTable();
+			} else {
+				tableName = field.getLookup().getProcedurePrefix();
+			}
+			Table t = TableBuilder.newTable(tableName)//
 					.withColumn("KeyLong", DataType.INTEGER)//
 					.withColumn("KeyText", DataType.STRING)//
-					.withColumn("Description", DataType.STRING)//
 					.withKey(keyLong)//
 					.create();
 
 			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
 			lookUpControl.setData("keyLong", keyLong);
 
-			CompletableFuture<Table> tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(),
+			CompletableFuture<Table> tableFuture;
+			if (field.getLookup().getTable() != null) {
+
+				tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(),
 					t);
+			} else {
+				tableFuture = ((IDataService) m.get("dataService")).getDetailDataAsync(t.getName(), t);
+			}
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				updateSelectedLookupEntry(ta, (Control) m.get("control"));
 			}));
@@ -265,6 +283,8 @@ public class DetailUtil {
 		return composite;
 	}
 
+	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
+	// Bindung zur Componente
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
 		ta = getTestTableLookupFields();
 		Row r = ta.getRows().get(0);
@@ -274,6 +294,7 @@ public class DetailUtil {
 		lc.setText((String) ValueBuilder.newValue(v).create());
 	}
 
+	// Testdaten, welche nach erfolgreicher CAS-Abfrage gelöscht werden
 	public static Table getTestTableLookupFields() {
 		Table lookupFieldTable = TableBuilder.newTable("spReadWorkingTime")//
 				.withColumn("KeyLong", DataType.INTEGER)//
