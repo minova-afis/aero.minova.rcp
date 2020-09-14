@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
+import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.rcp.parts.XMLDetailPart;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -40,7 +41,12 @@ public class NewDetailHandler {
 					Text endDate = (Text) controls.get("EndDate");
 					t.setText(endDate.getText());
 				} else {
-					t.setText("");
+					Field f = (Field) c.getData("field");
+					if (f.getNumber() != null) {
+						t.setText("0");
+					} else {
+						t.setText("");
+					}
 				}
 			}
 			if (c instanceof LookupControl) {
