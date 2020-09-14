@@ -107,43 +107,45 @@ public class DetailUtil {
 		// Fügt einen Listener hinzu, der je nach übermittelten Feldtypes die Eingabe
 		// des Nutzers einschränkt
 		text.addVerifyListener(e -> {
-			final String oldString = ((Text) e.getSource()).getText();
-			String newS = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
-			if(field.getNumber() != null)
+			// Um sicherzustellen, das Daten auch gelöscht werden können
+			if (e.character != '\b')
 			{
-				if(field.getNumber().getDecimals() == 2)
+				final String oldString = ((Text) e.getSource()).getText();
+				String newS = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+				if (field.getNumber() != null)
 				{
-					boolean isFloat = true;
-					try {
-						Float.parseFloat(newS);
-					} catch (NumberFormatException ex) {
-						isFloat = false;
+					if (field.getNumber().getDecimals() == 2) {
+						boolean isFloat = true;
+						try {
+							Float.parseFloat(newS);
+						} catch (NumberFormatException ex) {
+							isFloat = false;
+						}
+						if (!isFloat) {
+							e.doit = false;
+						}
 					}
-					if (!isFloat) {
-						e.doit = false;
-					}
-				}
 
-			}
-			else if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
-					|| field.getShortTime() != null) {
-				String allowedCharacters;
-				if (field.getShortTime() != null) {
-					allowedCharacters = "1234567890:";
-				} else {
-					allowedCharacters = "1234567890.";
-				}
-				for (int index = 0; index < newS.length(); index++) {
-					char character = newS.charAt(index);
-					boolean isAllowed = allowedCharacters.indexOf(character) > -1;
-					if (!isAllowed) {
-						e.doit = false;
+				} else if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
+						|| field.getShortTime() != null) {
+					String allowedCharacters;
+					if (field.getShortTime() != null) {
+						allowedCharacters = "1234567890:";
+					} else {
+						allowedCharacters = "1234567890.";
+					}
+					for (int index = 0; index < newS.length(); index++) {
+						char character = newS.charAt(index);
+						boolean isAllowed = allowedCharacters.indexOf(character) > -1;
+						if (!isAllowed) {
+							e.doit = false;
+						}
 					}
 				}
-			}
-			else if (field.getText() != null) {
-				if (newS.length() > field.getText().getLength()) {
-					e.doit = false;
+				else if (field.getText() != null) {
+					if (newS.length() > field.getText().getLength()) {
+						e.doit = false;
+					}
 				}
 			}
 		});
@@ -171,27 +173,12 @@ public class DetailUtil {
 		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
 
 			int keyLong = (Integer) ValueBuilder.newValue((Value) m.get("value")).create();
-			String tableName;
-			if (field.getLookup().getTable() != null) {
-				tableName = field.getLookup().getTable();
-			} else {
-				tableName = field.getLookup().getProcedurePrefix();
-			}
-			Table t = TableBuilder.newTable(tableName)//
-					.withColumn("KeyLong", DataType.INTEGER)//
-					.withColumn("KeyText", DataType.STRING)//
-					.withKey(keyLong)//
-					.create();
-
 			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
 			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<Table> tableFuture;
-			if (field.getLookup().getTable() != null) {
-				tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(), t);
-			} else {
-				tableFuture = ((IDataService) m.get("dataService")).getDetailDataAsync(t.getName(), t);
-			}
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"));
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				updateSelectedLookupEntry(ta, (Control) m.get("control"));
 			}));
