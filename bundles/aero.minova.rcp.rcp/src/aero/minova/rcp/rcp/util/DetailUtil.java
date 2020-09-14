@@ -166,7 +166,7 @@ public class DetailUtil {
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
 		lookUpControl.setData("field", field);
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
-		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den Cas
+		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
 		// gestartet, um die Werte des zugehörigen Keys zu erhalten
 		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
 
@@ -188,9 +188,7 @@ public class DetailUtil {
 
 			CompletableFuture<Table> tableFuture;
 			if (field.getLookup().getTable() != null) {
-
-				tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(),
-					t);
+				tableFuture = ((IDataService) m.get("dataService")).getIndexDataAsync(t.getName(), t);
 			} else {
 				tableFuture = ((IDataService) m.get("dataService")).getDetailDataAsync(t.getName(), t);
 			}

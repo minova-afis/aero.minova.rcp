@@ -16,10 +16,12 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -28,12 +30,15 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.builder.RowBuilder;
 import aero.minova.rcp.plugin1.model.builder.TableBuilder;
+import aero.minova.rcp.plugin1.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.util.DetailUtil;
+import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class XMLDetailPart {
 
@@ -84,11 +89,103 @@ public class XMLDetailPart {
 				}
 			}
 		}
+		// Erster Ansatz um selbstgeschriebene Eingaben in Lookupfields zu überprüfen,
+		// garantiert das gültige Eingaben an den CAS versendet werden können
+		for (Control c : controls.values()) {
+			if (c instanceof LookupControl) {
+				requestOptionsFromCAS(c);
+			}
+		}
+		// Einfügen eines Listeners, welche auf Eingaben im LookupField reagiert
+		Display.getCurrent().addFilter(SWT.KeyUp, event -> {
+			Widget w = event.widget;
+			for (Control c : controls.values()) {
+				if (c instanceof LookupControl) {
+					if (w == ((Composite) c).getChildren()[1]) {
+						if (((LookupControl) c).getText().length() == 1 && event.character != '\b') {
+							requestOptionsFromCAS(c);
+						} else {
+							changeShownOptions(c);
+						}
+					}
+				}
 
+			}
+		});
 	}
+	// Eigentliche CAS abfrage anhand des gegebenen KeyTextes
+	public void requestOptionsFromCAS(Control c) {
+		Field field = (Field) c.getData("field");
+		String tableName;
+		if (field.getLookup().getTable() != null) {
+			tableName = field.getLookup().getTable();
+		} else {
+			tableName = field.getLookup().getProcedurePrefix();
+		}
+		TableBuilder tb = TableBuilder.newTable(tableName)//
+				.withColumn("KeyLong", DataType.INTEGER)//
+				.withColumn("KeyText", DataType.STRING);
+		RowBuilder rb = RowBuilder.newRow().withValue(null).withValue(((LookupControl) c).getText());
 
-	// Bei auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
-	// anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
+		// TODO: Einschränken der angegebenen Optionen anhand bereits ausgewählter
+		// Optionen (Kontrakt nur für Kunde x,...)
+		List<TypeParam> parameters = field.getLookup().getParam();
+		for (TypeParam param : parameters) {
+			Control parameterControl = controls.get(param.getFieldName());
+			if (parameterControl.getData("keyLong") != null) {
+				tb.withColumn(param.getFieldName(), DataType.INTEGER);
+				rb.withValue(parameterControl.getData("keyLong"));
+			}
+		}
+		Table t = tb.create();
+		Row row = rb.create();
+		t.addRow(row);
+		CompletableFuture<Table> tableFuture;
+		if (field.getLookup().getTable() != null) {
+			tableFuture = dataService.getIndexDataAsync(t.getName(), t);
+		} else {
+			tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+		}
+		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+			changeOptionsForLookupField(ta, c);
+		}));
+	}
+	// Tauscht die Optionen aus, welche dem LookupField zur Verfügung stehen
+	public void changeOptionsForLookupField(Table ta, Control c) {
+		Map m = new HashMap<Integer, String>();
+		for (Row r : ta.getRows()) {
+			m.put(ValueBuilder.newValue(r.getValue(0)).create(), ValueBuilder.newValue(r.getValue(1)).create());
+		}
+		c.setData("options", m);
+		changeShownOptions(c);
+	}
+	// Schränkt die angezeigten Optionen an, welche in der Map hinterlegt sind,
+	// anhand des eingegebenen Strings
+	// TODO: Die Optionen sind als Hashmap vorhanden, allerdings existiert noch kein
+	// Object welches mit dieser Arbeitet
+	public void changeShownOptions(Control c) {
+		if (c.getData("options") != null) {
+			Map<Integer, String> optionsMap = (Map<Integer, String>) c.getData("options");
+			Map<Integer, String> shownOptionsMap = new HashMap<Integer, String>();
+			int i = 0;
+			for (String s : optionsMap.values()) {
+				Integer keyLong = (Integer) optionsMap.keySet().toArray()[i];
+				if (s.contains(((LookupControl) c).getText())) {
+					shownOptionsMap.put(keyLong, s);
+				}
+				i++;
+			}
+			c.setData("shownOptions", shownOptionsMap);
+
+			if (shownOptionsMap.size() == 1) {
+				c.setData("keyLong", shownOptionsMap.keySet().toArray()[0]);
+			} else {
+				c.setData("keyLong", null);
+			}
+		}
+	}
+	// Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
+	// Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
 		if (rows == null || rows.isEmpty()) {
@@ -121,7 +218,6 @@ public class XMLDetailPart {
 			updateSelectedEntry();
 		}));
 	}
-
 	// verarbeitung empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den
 	// daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	public void updateSelectedEntry() {
@@ -156,7 +252,6 @@ public class XMLDetailPart {
 			}
 		}
 	}
-
 	// Testdaten, welche nach erfolgreicher CAS-Abfrage gelöscht werden
 	public Table getTestTable() {
 		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)

@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +31,17 @@ public class NewDetailHandler {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				t.setText("");
+				if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+					SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy");
+					Date date = new Date(System.currentTimeMillis());
+					t.setText(formatter.format(date));
+				}
+				else if (c.getData("field") == controls.get("StartDate").getData("field")) {
+					Text endDate = (Text) controls.get("EndDate");
+					t.setText(endDate.getText());
+				} else {
+					t.setText("");
+				}
 			}
 			if (c instanceof LookupControl) {
 				LookupControl l = (LookupControl) c;
