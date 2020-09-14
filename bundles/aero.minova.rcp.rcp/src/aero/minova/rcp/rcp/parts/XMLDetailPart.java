@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -17,10 +18,13 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -94,6 +98,38 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof LookupControl) {
 				requestOptionsFromCAS(c);
+			}
+
+			if ((c.getData("field") == controls.get("StartDate").getData("field"))
+					|| (c.getData("field") == controls.get("EndDate").getData("field"))) {
+				c.addKeyListener(new KeyListener() {
+
+					@Override
+					public void keyPressed(KeyEvent e) {
+					}
+
+					@Override
+					public void keyReleased(KeyEvent e) {
+						Text endDate = (Text) controls.get("EndDate");
+						Text startDate = (Text) controls.get("StartDate");
+						if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
+							LocalTime timeEndDate = LocalTime.parse(endDate.getText());
+							LocalTime timeStartDate = LocalTime.parse(startDate.getText());
+							float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+									- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+							timeDifference = timeDifference / 60;
+							Text renderedField = (Text) controls.get("RenderedQuantity");
+							Text chargedField = (Text) controls.get("ChargedQuantity");
+
+							String renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
+							String chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+							chargedField.setText(chargedValue);
+							renderedField.setText(renderedValue);
+						}
+
+					}
+
+				});
 			}
 		}
 		// Einfügen eines Listeners, welche auf Eingaben im LookupField reagiert
@@ -270,8 +306,8 @@ public class XMLDetailPart {
 				.withValue(66)//
 				.withValue(77)//
 				.withValue(ZonedDateTime.of(1968, 12, 18, 00, 00, 0, 0, ZoneId.of("Europe/Berlin")))//
-				.withValue(ZonedDateTime.of(1968, 12, 18, 18, 12, 0, 0, ZoneId.of("Europe/Berlin")))//
-				.withValue(ZonedDateTime.of(1968, 12, 18, 18, 03, 30, 0, ZoneId.of("Europe/Berlin")))//
+				.withValue(ZonedDateTime.of(1968, 12, 18, 18, 15, 0, 0, ZoneId.of("Europe/Berlin")))//
+				.withValue(ZonedDateTime.of(1968, 12, 18, 18, 30, 0, 0, ZoneId.of("Europe/Berlin")))//
 				.withValue(44.2)//
 				.withValue(33.2)//
 				.withValue("test")//
