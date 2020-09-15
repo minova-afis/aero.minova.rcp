@@ -129,8 +129,6 @@ public class DetailUtil {
 					// TODO: beachtung von februar und monatswechsel
 				} else if (field.getShortDate() != null || field.getLongDate() != null) {
 					String allowedCharacters = "1234567890.";
-					String dayCharsFirstPosition = "456789";
-
 					boolean isAllowed = allowedCharacters.indexOf(e.character) > -1;
 					if (!isAllowed) {
 						e.doit = false;
@@ -147,7 +145,7 @@ public class DetailUtil {
 										e.doit = false;
 									}
 								}
-								if (dayCharsFirstPosition.indexOf(newS.charAt(0)) > -1) {
+								if (Integer.valueOf(newS.charAt(0)) < 4) {
 									e.doit = false;
 								} else {
 									String day = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
@@ -188,8 +186,6 @@ public class DetailUtil {
 					}
 				} else if (field.getDateTime() != null || field.getShortTime() != null) {
 					String allowedCharacters = "1234567890:";
-					String hourCharsFirstPositon = "3456789";
-					String hourCharsSecondPosition = "56789";
 					String minuteChars = "6789";
 					boolean isAllowed = allowedCharacters.indexOf(e.character) > -1;
 					if (!isAllowed) {
@@ -207,10 +203,10 @@ public class DetailUtil {
 										e.doit = false;
 									}
 								}
-								if (hourCharsFirstPositon.indexOf(newS.charAt(0)) > -1) {
+								if (Integer.valueOf(newS.charAt(0)) < 3) {
 									e.doit = false;
 								} else {
-									if (newS.charAt(0) == '2' && hourCharsSecondPosition.indexOf(newS.charAt(1)) > -1) {
+									if (newS.charAt(0) == '2' && Integer.valueOf(newS.charAt(1)) < 4) {
 										e.doit = false;
 									}
 									if (minuteChars.indexOf(newS.charAt(3)) > -1) {
