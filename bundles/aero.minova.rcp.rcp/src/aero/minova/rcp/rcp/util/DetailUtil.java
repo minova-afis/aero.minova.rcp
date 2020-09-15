@@ -126,19 +126,98 @@ public class DetailUtil {
 						}
 					}
 
-				} else if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
-						|| field.getShortTime() != null) {
-					String allowedCharacters;
-					if (field.getShortTime() != null) {
-						allowedCharacters = "1234567890:";
+					// TODO: beachtung von februar und monatswechsel
+				} else if (field.getShortDate() != null || field.getLongDate() != null) {
+					String allowedCharacters = "1234567890.";
+					String dayCharsFirstPosition = "456789";
+
+					boolean isAllowed = allowedCharacters.indexOf(e.character) > -1;
+					if (!isAllowed) {
+						e.doit = false;
 					} else {
-						allowedCharacters = "1234567890.";
-					}
-					for (int index = 0; index < newS.length(); index++) {
-						char character = newS.charAt(index);
-						boolean isAllowed = allowedCharacters.indexOf(character) > -1;
-						if (!isAllowed) {
+						if (newS.length() > 10) {
 							e.doit = false;
+						} else {
+							if (newS.length() == 10) {
+								for (int index = 0; index < newS.length(); index++) {
+									if (newS.charAt(index) == '.' && (index != 2 && index != 5)) {
+										e.doit = false;
+									}
+									if ((index == 2 || index == 5) && newS.charAt(index) != '.') {
+										e.doit = false;
+									}
+								}
+								if (dayCharsFirstPosition.indexOf(newS.charAt(0)) > -1) {
+									e.doit = false;
+								} else {
+									String day = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
+									int dayNumber = Integer.valueOf(day);
+									String month = String.valueOf(newS.charAt(3)) + String.valueOf(newS.charAt(4));
+									int monthNumber = Integer.valueOf(month);
+									if (dayNumber > 31) {
+										e.doit = false;
+									}
+									if (newS.charAt(3) != '1' && newS.charAt(3) != '0') {
+										e.doit = false;
+									} else {
+										if (monthNumber > 12) {
+											e.doit = false;
+										}
+										// Beachten der Monatswechsel
+										if (monthNumber == 2 && dayNumber > 28) {
+											String year = String.valueOf(newS.charAt(6))
+													+ String.valueOf(newS.charAt(7)) + String.valueOf(newS.charAt(8))
+													+ String.valueOf(newS.charAt(9));
+											int yearNumber = Integer.valueOf(year);
+											if (yearNumber % 4 != 0) {
+												e.doit = false;
+											} else {
+												if (dayNumber != 29) {
+													e.doit = false;
+												}
+											}
+										} else {
+											if (monthNumber % 2 == 0 && dayNumber == 31) {
+												e.doit = false;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				} else if (field.getDateTime() != null || field.getShortTime() != null) {
+					String allowedCharacters = "1234567890:";
+					String hourCharsFirstPositon = "3456789";
+					String hourCharsSecondPosition = "56789";
+					String minuteChars = "6789";
+					boolean isAllowed = allowedCharacters.indexOf(e.character) > -1;
+					if (!isAllowed) {
+						e.doit = false;
+					} else {
+						if (newS.length() > 5) {
+							e.doit = false;
+						} else {
+							if (newS.length() == 5) {
+								for (int index = 0; index < newS.length(); index++) {
+									if (newS.charAt(index) == ':' && index != 2) {
+										e.doit = false;
+									}
+									if (index == 2 && newS.charAt(index) != ':') {
+										e.doit = false;
+									}
+								}
+								if (hourCharsFirstPositon.indexOf(newS.charAt(0)) > -1) {
+									e.doit = false;
+								} else {
+									if (newS.charAt(0) == '2' && hourCharsSecondPosition.indexOf(newS.charAt(1)) > -1) {
+										e.doit = false;
+									}
+									if (minuteChars.indexOf(newS.charAt(3)) > -1) {
+										e.doit = false;
+									}
+								}
+							}
 						}
 					}
 				}
