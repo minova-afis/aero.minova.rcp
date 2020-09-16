@@ -151,40 +151,31 @@ public class DetailUtil {
 										e.doit = false;
 									}
 								}
-								if (Integer.valueOf(newS.charAt(0)) < 4) {
+								String day = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
+								int dayNumber = Integer.valueOf(day);
+								String month = String.valueOf(newS.charAt(3)) + String.valueOf(newS.charAt(4));
+								int monthNumber = Integer.valueOf(month);
+								if (dayNumber > 31) {
 									e.doit = false;
-								} else {
-									String day = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
-									int dayNumber = Integer.valueOf(day);
-									String month = String.valueOf(newS.charAt(3)) + String.valueOf(newS.charAt(4));
-									int monthNumber = Integer.valueOf(month);
-									if (dayNumber > 31) {
-										e.doit = false;
-									}
-									if (newS.charAt(3) != '1' && newS.charAt(3) != '0') {
+								}
+								if (monthNumber > 12) {
+									e.doit = false;
+								}
+								// Beachten der Monatswechsel
+								if (monthNumber == 2 && dayNumber > 28) {
+									String year = String.valueOf(newS.charAt(6)) + String.valueOf(newS.charAt(7))
+											+ String.valueOf(newS.charAt(8)) + String.valueOf(newS.charAt(9));
+									int yearNumber = Integer.valueOf(year);
+									if (yearNumber % 4 != 0) {
 										e.doit = false;
 									} else {
-										if (monthNumber > 12) {
+										if (dayNumber != 29) {
 											e.doit = false;
 										}
-										// Beachten der Monatswechsel
-										if (monthNumber == 2 && dayNumber > 28) {
-											String year = String.valueOf(newS.charAt(6))
-													+ String.valueOf(newS.charAt(7)) + String.valueOf(newS.charAt(8))
-													+ String.valueOf(newS.charAt(9));
-											int yearNumber = Integer.valueOf(year);
-											if (yearNumber % 4 != 0) {
-												e.doit = false;
-											} else {
-												if (dayNumber != 29) {
-													e.doit = false;
-												}
-											}
-										} else {
-											if (monthNumber % 2 == 0 && dayNumber == 31) {
-												e.doit = false;
-											}
-										}
+									}
+								} else {
+									if (monthNumber % 2 == 0 && dayNumber == 31) {
+										e.doit = false;
 									}
 								}
 							}

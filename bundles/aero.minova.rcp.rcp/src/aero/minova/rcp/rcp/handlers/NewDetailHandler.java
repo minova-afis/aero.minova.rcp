@@ -33,7 +33,7 @@ public class NewDetailHandler {
 			if (c instanceof Text) {
 				Text t = (Text) c;
 				if (c.getData("field") == controls.get("BookingDate").getData("field")) {
-					SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy");
+					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
 				}
