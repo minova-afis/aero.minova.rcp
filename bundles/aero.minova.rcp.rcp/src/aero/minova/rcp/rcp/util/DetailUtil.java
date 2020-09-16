@@ -129,7 +129,13 @@ public class DetailUtil {
 					// TODO: beachtung von februar und monatswechsel
 				} else if (field.getShortDate() != null || field.getLongDate() != null) {
 					String allowedCharacters = "1234567890.";
-					boolean isAllowed = allowedCharacters.indexOf(e.character) > -1;
+					boolean isAllowed = true;
+					for (int i = 0; i < e.text.length(); i++) {
+						char c = e.text.charAt(i);
+						if (allowedCharacters.indexOf(c) == -1) {
+							isAllowed = false;
+						}
+					}
 					if (!isAllowed) {
 						e.doit = false;
 					} else {
@@ -186,8 +192,13 @@ public class DetailUtil {
 					}
 				} else if (field.getDateTime() != null || field.getShortTime() != null) {
 					String allowedCharacters = "1234567890:";
-					String minuteChars = "6789";
-					boolean isAllowed = allowedCharacters.indexOf(e.character) > -1;
+					boolean isAllowed = true;
+					for (int i = 0; i < e.text.length(); i++) {
+						char c = e.text.charAt(i);
+						if (allowedCharacters.indexOf(c) == -1) {
+							isAllowed = false;
+						}
+					}
 					if (!isAllowed) {
 						e.doit = false;
 					} else {
@@ -195,6 +206,11 @@ public class DetailUtil {
 							e.doit = false;
 						} else {
 							if (newS.length() == 5) {
+								String hour = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
+								int hourNumber = Integer.valueOf(hour);
+								String minute = String.valueOf(newS.charAt(3)) + String.valueOf(newS.charAt(4));
+								int minuteNumber = Integer.valueOf(minute);
+
 								for (int index = 0; index < newS.length(); index++) {
 									if (newS.charAt(index) == ':' && index != 2) {
 										e.doit = false;
@@ -203,13 +219,10 @@ public class DetailUtil {
 										e.doit = false;
 									}
 								}
-								if (Integer.valueOf(newS.charAt(0)) < 3) {
+								if (hourNumber > 23) {
 									e.doit = false;
 								} else {
-									if (newS.charAt(0) == '2' && Integer.valueOf(newS.charAt(1)) < 4) {
-										e.doit = false;
-									}
-									if (minuteChars.indexOf(newS.charAt(3)) > -1) {
+									if (minuteNumber > 59) {
 										e.doit = false;
 									}
 								}
