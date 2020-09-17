@@ -85,5 +85,9 @@ public class XMLIndexPart {
 		natTable.requestLayout();
 	}
 
+	public NatTable getNatTable() {
+		return natTable;
+	}
+
 
 }

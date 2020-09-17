@@ -146,9 +146,11 @@ public class DetailUtil {
 								for (int index = 0; index < newS.length(); index++) {
 									if (newS.charAt(index) == '.' && (index != 2 && index != 5)) {
 										e.doit = false;
+										return;
 									}
 									if ((index == 2 || index == 5) && newS.charAt(index) != '.') {
 										e.doit = false;
+										return;
 									}
 								}
 								String day = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
@@ -197,19 +199,22 @@ public class DetailUtil {
 							e.doit = false;
 						} else {
 							if (newS.length() == 5) {
+								for (int index = 0; index < newS.length(); index++) {
+									if (newS.charAt(index) == ':' && index != 2) {
+										e.doit = false;
+										return;
+									}
+									if (index == 2 && newS.charAt(index) != ':') {
+										e.doit = false;
+										return;
+									}
+								}
+
 								String hour = String.valueOf(newS.charAt(0)) + String.valueOf(newS.charAt(1));
 								int hourNumber = Integer.valueOf(hour);
 								String minute = String.valueOf(newS.charAt(3)) + String.valueOf(newS.charAt(4));
 								int minuteNumber = Integer.valueOf(minute);
 
-								for (int index = 0; index < newS.length(); index++) {
-									if (newS.charAt(index) == ':' && index != 2) {
-										e.doit = false;
-									}
-									if (index == 2 && newS.charAt(index) != ':') {
-										e.doit = false;
-									}
-								}
 								if (hourNumber > 23) {
 									e.doit = false;
 								} else {

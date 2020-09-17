@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -7,7 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dialogs.SucessDialog;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
@@ -30,8 +29,6 @@ import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class SaveDetailHandler {
 
-	@Inject
-	private IEventBroker broker;
 
 	@Inject
 	private EModelService model;
@@ -52,6 +49,8 @@ public class SaveDetailHandler {
 	// eine Abfrage an den CAS zusammen. Anhand eines gegebenen oder nicht gegebenen
 	// KeyLongs wird zwischen update und neuem Eintrag unterschieden
 	@Execute
+	// TODO: überprüfen, ob überschneidungen zwischen dem neuen eintrag und bereits
+	// existierenden bestehen (Zeitenüberschneidungen)
 	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 		this.shell = shell;
 		this.mPerspective = mPerspective;
@@ -101,48 +100,105 @@ public class SaveDetailHandler {
 			}
 		}
 		t.addRow(r);
-
-		if (t.getRows() != null) {
-			CompletableFuture<Integer> tableFuture = dataService.getReturnCodeAsync(t.getName(), t);
-			if (t.getColumnName(0) != "KeyLong") {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkNewEntryInsert(tr);
-				}));
-			} else {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkEntryUpdate(tr);
-				}));
+		boolean contradiction = checkWorkingTime((int) controls.get("EmployeeKey").getData("keyLong"),
+				((Text) controls.get("BookingDate")).getText(),
+				((Text) controls.get("StartDate")).getText(), ((Text) controls.get("EndDate")).getText(),
+				((Text) controls.get("RenderedQuantity")).getText(),
+				((Text) controls.get("ChargedQuantity")).getText());
+		if (contradiction == false) {
+			if (t.getRows() != null) {
+				CompletableFuture<Integer> tableFuture = dataService.getReturnCodeAsync(t.getName(), t);
+				if (t.getColumnName(0) != "KeyLong") {
+					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+						checkNewEntryInsert(tr);
+					}));
+				} else {
+					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+						checkEntryUpdate(tr);
+					}));
+				}
 			}
+		}
+		else {
+			MessageDialog.openError(shell, "Error", "Entry not possible, check for wrong inputs in your messured Time");
 		}
 	}
 
+	// Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
+	// eine Überschneidung in den Arbeitszeiten vorliegt
+	private boolean checkWorkingTime(int employee, String bookingDate, String startDate, String endDate,
+			String renderedQuantity,
+			String chargedQuantity) {
+		boolean contradiction = false;
+
+		// Prüfen, ob die bemessene Arbeitszeit der differenz der Stunden entspricht
+		LocalTime timeEndDate = LocalTime.parse(endDate);
+		LocalTime timeStartDate = LocalTime.parse(startDate);
+		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+		timeDifference = timeDifference / 60;
+
+		float renderedQuantityFloat = Float.parseFloat(renderedQuantity);
+		float chargedQuantityFloat = Float.parseFloat(chargedQuantity);
+		if (timeDifference != renderedQuantityFloat) {
+			contradiction = true;
+			return contradiction;
+		}
+		if ((renderedQuantityFloat != chargedQuantityFloat) && (renderedQuantityFloat != chargedQuantityFloat + 0.25)
+				&& (renderedQuantityFloat != chargedQuantityFloat - 0.25)) {
+			contradiction = true;
+			return contradiction;
+		}
+		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
+		// Zeitrahmen bereits einträge existieren
+		Table table = TableBuilder.newTable("spReadWorkingTime").withColumn("EmployeeKey", DataType.INTEGER)
+				.withColumn("BookingDate", DataType.INSTANT).withColumn("StartDate", DataType.INSTANT)
+				.withColumn("EndDate", DataType.INSTANT).create();
+		Row r = RowBuilder.newRow().withValue(employee).withValue(bookingDate).withValue(">=" + startDate)
+				.withValue("=<" + endDate).create();
+		table.addRow(r);
+		Table checkTimes = null;
+		try {
+			checkTimes = dataService.getDetailDataAsync(table.getName(), table).get();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (checkTimes.getRows() != null) {
+			contradiction = true;
+		}
+		return contradiction;
+	}
 	// Überprüft. ob das Update erfolgreich war
-	public void checkEntryUpdate(Integer responce) {
+	private void checkEntryUpdate(Integer responce) {
 
 		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
 		}
 		else {
-			SucessDialog sucess = new SucessDialog(shell, "Sucessfully updated the entry");
+			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully updated the entry",
+					MessageDialog.NONE, new String[] {}, 0);
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
-			sucess.close();
+			// sucess.close();
+			// TODO:reload the index
 			// LoadIndexHandler li = new LoadIndexHandler();
 			// li.execute(mpart, shell, mPerspective);
 		}
 	}
 
 	// Überprüft, ob der neue Eintrag erstellt wurde
-	public void checkNewEntryInsert(Integer responce) {
+	private void checkNewEntryInsert(Integer responce) {
 		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
 		}
 		else {
-			SucessDialog sucess = new SucessDialog(shell, "Sucessfully added the entry");
+			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully added the entry",
+					MessageDialog.NONE, new String[] {}, 0);
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
-			sucess.close();
+			// sucess.close();
+			// TODO:reload the index
 			// LoadIndexHandler li = new LoadIndexHandler();
 			// li.execute(mpart, shell, mPerspective);
 		}

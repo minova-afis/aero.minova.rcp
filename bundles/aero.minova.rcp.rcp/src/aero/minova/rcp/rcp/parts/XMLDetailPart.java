@@ -120,9 +120,15 @@ public class XMLDetailPart {
 							timeDifference = timeDifference / 60;
 							Text renderedField = (Text) controls.get("RenderedQuantity");
 							Text chargedField = (Text) controls.get("ChargedQuantity");
-
-							String renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
-							String chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+							String renderedValue;
+							String chargedValue;
+							if (timeDifference >= 0) {
+								renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
+								chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+							} else {
+								renderedValue = "0";
+								chargedValue = "0";
+							}
 							chargedField.setText(chargedValue);
 							renderedField.setText(renderedValue);
 						}
