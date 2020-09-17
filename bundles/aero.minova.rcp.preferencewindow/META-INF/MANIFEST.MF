@@ -9,4 +9,10 @@ Require-Bundle: org.eclipse.nebula.widgets.opal.preferencewindow;bundle-version=
  org.eclipse.e4.core.di.annotations,
  org.eclipse.e4.ui.di;bundle-version="1.2.800",
  org.eclipse.e4.ui.services;bundle-version="1.3.700",
- org.eclipse.e4.ui.workbench;bundle-version="1.11.300"
+ org.eclipse.e4.ui.workbench;bundle-version="1.11.300",
+ org.eclipse.e4.ui.model.workbench,
+ javax.inject,
+ org.eclipse.equinox.preferences,
+ org.eclipse.e4.core.di.extensions,
+ org.eclipse.osgi.services
+Export-Package: aero.minova.rcp.preferencewindow.builder
