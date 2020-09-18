@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -19,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dialogs.SucessDialog;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
@@ -31,6 +33,9 @@ public class SaveDetailHandler {
 
 
 	@Inject
+	private IEventBroker broker;
+
+	@Inject
 	private EModelService model;
 
 	@Inject
@@ -41,9 +46,8 @@ public class SaveDetailHandler {
 
 	private Shell shell;
 
-	private MPerspective mPerspective;
 
-	private MPart mpart;
+	private Table searchTable;
 
 	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
 	// eine Abfrage an den CAS zusammen. Anhand eines gegebenen oder nicht gegebenen
@@ -52,11 +56,12 @@ public class SaveDetailHandler {
 	// TODO: überprüfen, ob überschneidungen zwischen dem neuen eintrag und bereits
 	// existierenden bestehen (Zeitenüberschneidungen)
 	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
+
 		this.shell = shell;
-		this.mPerspective = mPerspective;
-		this.mpart = mpart;
 
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
+		List<MPart> findSearchTable = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
+		searchTable = (Table) findSearchTable.get(0).getContext().get("NatTableDataSearchArea");
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb;
@@ -105,6 +110,9 @@ public class SaveDetailHandler {
 				((Text) controls.get("StartDate")).getText(), ((Text) controls.get("EndDate")).getText(),
 				((Text) controls.get("RenderedQuantity")).getText(),
 				((Text) controls.get("ChargedQuantity")).getText());
+		// FOR TEST PURPOSE, DELETE
+		contradiction = false;
+
 		if (contradiction == false) {
 			if (t.getRows() != null) {
 				CompletableFuture<Integer> tableFuture = dataService.getReturnCodeAsync(t.getName(), t);
@@ -118,8 +126,7 @@ public class SaveDetailHandler {
 					}));
 				}
 			}
-		}
-		else {
+		} else {
 			MessageDialog.openError(shell, "Error", "Entry not possible, check for wrong inputs in your messured Time");
 		}
 	}
@@ -170,20 +177,20 @@ public class SaveDetailHandler {
 	}
 	// Überprüft. ob das Update erfolgreich war
 	private void checkEntryUpdate(Integer responce) {
-
 		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
-		}
-		else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully updated the entry",
-					MessageDialog.NONE, new String[] {}, 0);
+		} else {
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully updated the entry");
+			// MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully
+			// updated the entry",
+			// MessageDialog.NONE, new String[] {}, 0);
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			// sucess.close();
-			// TODO:reload the index
-			// LoadIndexHandler li = new LoadIndexHandler();
-			// li.execute(mpart, shell, mPerspective);
+			// reload the indexTable
+			CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+			tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
 		}
 	}
 
@@ -191,16 +198,14 @@ public class SaveDetailHandler {
 	private void checkNewEntryInsert(Integer responce) {
 		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
-		}
-		else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully added the entry",
-					MessageDialog.NONE, new String[] {}, 0);
+		} else {
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully added the entry");
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			// sucess.close();
-			// TODO:reload the index
-			// LoadIndexHandler li = new LoadIndexHandler();
-			// li.execute(mpart, shell, mPerspective);
+			// reload the indexTable
+			CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+			tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
 		}
 	}
 }

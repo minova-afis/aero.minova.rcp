@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dialogs.SucessDialog;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
@@ -43,19 +44,18 @@ public class DeleteDetailHandler {
 
 	private Shell shell;
 
-	private MPerspective mPerspective;
+	private Table searchTable = null;
 
-	private MPart mpart;
 	@Execute
 
 	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
 	// eine Abfrage an den CAS zusammen
 	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 		this.shell = shell;
-		this.mPerspective = mPerspective;
-		this.mpart = mpart;
 
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
+		List<MPart> findSearchTable = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
+		searchTable = (Table) findSearchTable.get(0).getContext().get("NatTableDataSearchArea");
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
@@ -92,40 +92,44 @@ public class DeleteDetailHandler {
 		}
 		t.addRow(r);
 		if (t.getRows() != null) {
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-				Boolean sucess = false;
-				sucess = deleteEntry(tr);
+			Integer responce = null;
+			try {
+				responce = dataService.getReturnCodeAsync(t.getName(), t).get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Boolean sucess = false;
+			sucess = deleteEntry(responce);
 
-				if (sucess == true) {
-					for (Control c : controls.values()) {
-						if (c instanceof Text) {
-							((Text) c).setText("");
-						}
-						if (c instanceof LookupControl) {
-							((LookupControl) c).setText("");
-						}
+			if (sucess == true) {
+				for (Control c : controls.values()) {
+					if (c instanceof Text) {
+						((Text) c).setText("");
 					}
-					// LoadIndexHandler li = new LoadIndexHandler();
-					// li.execute(mpart, shell, mPerspective);
+					if (c instanceof LookupControl) {
+						((LookupControl) c).setText("");
+					}
 				}
-			}));
+				// reload the indexTable
+				CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(),
+						searchTable);
+				tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
+			}
 		}
 
 	}
 
 	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
 	// befüllt um die Anfrage anzupassen
-	public boolean deleteEntry(Table responce) {
-		if (responce.getRows().get(0).getValue(0).getIntegerValue() == 0) {
+	public boolean deleteEntry(Integer responce) {
+		if (responce != 0) {
 			MessageDialog.openError(shell, "Error", "Entry could not be deleted");
 			return false;
 		} else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully deleted the entry",
-					MessageDialog.NONE, new String[] {}, 0);
-			sucess.setBlockOnOpen(false);
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully deleted the entry");
+			// sucess.setBlockOnOpen(false);
 			sucess.open();
-			sucess.close();
+			// sucess.close();
 			return true;
 		}
 	}

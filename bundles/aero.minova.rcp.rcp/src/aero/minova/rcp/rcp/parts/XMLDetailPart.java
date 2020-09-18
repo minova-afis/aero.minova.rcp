@@ -99,7 +99,7 @@ public class XMLDetailPart {
 			if (c instanceof LookupControl) {
 				requestOptionsFromCAS(c);
 			}
-
+			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
 			if ((c.getData("field") == controls.get("StartDate").getData("field"))
 					|| (c.getData("field") == controls.get("EndDate").getData("field"))) {
 				c.addKeyListener(new KeyListener() {
