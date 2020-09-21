@@ -175,6 +175,7 @@ public class SaveDetailHandler {
 		}
 		return contradiction;
 	}
+
 	// Überprüft. ob das Update erfolgreich war
 	private void checkEntryUpdate(Integer responce) {
 		if (responce != 0) {

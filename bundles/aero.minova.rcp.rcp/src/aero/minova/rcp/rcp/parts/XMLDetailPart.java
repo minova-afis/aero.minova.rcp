@@ -40,6 +40,7 @@ import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.builder.RowBuilder;
 import aero.minova.rcp.plugin1.model.builder.TableBuilder;
 import aero.minova.rcp.plugin1.model.builder.ValueBuilder;
+import aero.minova.rcp.plugin1.textfieldVerifier.TextfieldVerifier;
 import aero.minova.rcp.rcp.util.DetailUtil;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
@@ -136,6 +137,34 @@ public class XMLDetailPart {
 					}
 
 				});
+			}
+			// Hinzufügen der Listener, um die Verification der Werte zu gewährleisten
+			if (c instanceof Text) {
+				TextfieldVerifier tfv = new TextfieldVerifier();
+				Text text = (Text) c;
+				Field field = (Field) c.getData("field");
+				if (field.getNumber() != null) {
+					text.addVerifyListener(e -> {
+						if (e.character != '\b') {
+							final String oldString = ((Text) e.getSource()).getText();
+							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+							e.doit = tfv.verifyDouble(newString);
+						}
+					});
+				}
+				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
+						|| field.getShortTime() != null) {
+					text.addFocusListener(tfv);
+				}
+				if (field.getText() != null) {
+					text.addVerifyListener(e -> {
+						if (e.character != '\b') {
+							final String oldString = ((Text) e.getSource()).getText();
+							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+							e.doit = tfv.verifyText(newString, field.getText().getLength());
+						}
+					});
+				}
 			}
 		}
 		// Einfügen eines Listeners, welche auf Eingaben im LookupField reagiert

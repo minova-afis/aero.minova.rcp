@@ -9,8 +9,12 @@ Require-Bundle: org.eclipse.osgi,
  org.eclipse.core.jobs,
  org.eclipse.e4.ui.di,
  com.google.gson,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.swt
 Bundle-ActivationPolicy: lazy
-Import-Package: javax.inject
+Import-Package: aero.minova.rcp.form.model.xsd,
+ javax.inject,
+ org.eclipse.swt.events
 Export-Package: aero.minova.rcp.plugin1.model,
- aero.minova.rcp.plugin1.model.builder
+ aero.minova.rcp.plugin1.model.builder,
+ aero.minova.rcp.plugin1.textfieldVerifier
