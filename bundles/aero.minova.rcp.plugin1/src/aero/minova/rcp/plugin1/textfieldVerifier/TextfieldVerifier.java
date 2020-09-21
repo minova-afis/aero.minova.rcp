@@ -105,66 +105,89 @@ public class TextfieldVerifier implements FocusListener{
 		Boolean unallowedFormat = false;
 		if (subString.contains("heute")) {
 			localDate = localDate.now();
+			date = df.format(localDate);
 			subString.replaceFirst("heute", "");
 		}
 		if (subString.contains("h")) {
 			localDate = localDate.now();
+			date = df.format(localDate);
 			subString.replaceFirst("h", "");
 		}
 		if (subString.contains("morgen")) {
 			localDate = localDate.now().plusDays(1);
+			date = df.format(localDate);
 			subString.replaceFirst("morgen", "");
 		}
 		if (subString.contains("m")) {
 			localDate = localDate.now().plusDays(1);
+			date = df.format(localDate);
 			subString.replaceFirst("m", "");
 		}
 		if (subString.contains("gestern")) {
 			localDate = localDate.now().minusDays(1);
+			date = df.format(localDate);
 			subString.replaceFirst("gestern", "");
 		}
 		if (subString.contains("g")) {
 			localDate = localDate.now().minusDays(1);
+			date = df.format(localDate);
 			subString.replaceFirst("g", "");
 		}
 
-		if(!subString.matches(newString))
-		{
-			date = df.format(localDate);
-		} else {
-			if (subString.contains("+") || subString.contains("-")) {
+		if (subString.contains("+") || subString.contains("-")) {
+			if (localDate == null) {
 				localDate = localDate.now();
-				for (int i = 0; i < subString.length(); i++) {
-					if (subString.charAt(i) == '+') {
+			}
+			for (int i = 0; i < subString.length(); i++) {
+				if (subString.charAt(i) == '+') {
+					if (i + 1 < subString.length()) {
+						if (subString.charAt(i + 1) == 'M') {
+							localDate = localDate.plusMonths(1);
+						} else if (subString.charAt(i + 1) == 'Y') {
+							localDate = localDate.plusYears(1);
+						} else {
+							localDate = localDate.plusDays(1);
+						}
+					} else {
 						localDate = localDate.plusDays(1);
 					}
-					if (subString.charAt(i) == '-') {
+				}
+				if (subString.charAt(i) == '-') {
+					if (i + 1 < subString.length()) {
+						if (subString.charAt(i + 1) == 'M') {
+							localDate = localDate.minusMonths(1);
+						} else if (subString.charAt(i + 1) == 'Y') {
+							localDate = localDate.minusYears(1);
+						} else {
+							localDate = localDate.minusDays(1);
+						}
+					} else {
 						localDate = localDate.minusDays(1);
 					}
-				}
-				date = df.format(localDate);
-			} else {
-				int points = 0;
-				for (int i = 0; i < subString.length(); i++) {
-					if (subString.charAt(i) == '.') {
-						points++;
-					}
-					if (allowedCharacters.indexOf(subString.charAt(i)) == -1) {
-						unallowedFormat = true;
-					}
-				}
-				if (points > 2) {
-					unallowedFormat = true;
-				}
-				if (unallowedFormat == true) {
-					date = "";
-					return date;
-				} else {
-					date = getDateFromNumbers(subString, df);
+
 				}
 			}
+			date = df.format(localDate);
+		} else if (localDate == null) {
+			int points = 0;
+			for (int i = 0; i < subString.length(); i++) {
+				if (subString.charAt(i) == '.') {
+					points++;
+				}
+				if (allowedCharacters.indexOf(subString.charAt(i)) == -1) {
+					unallowedFormat = true;
+				}
+			}
+			if (points > 2) {
+				unallowedFormat = true;
+			}
+			if (unallowedFormat == true) {
+				date = "";
+				return date;
+			} else {
+				date = getDateFromNumbers(subString, df);
+			}
 		}
-
 
 		return date;
 	}
@@ -259,8 +282,14 @@ public class TextfieldVerifier implements FocusListener{
 				return date;
 			}
 		}
-
-		localDate = localDate.withDayOfMonth(days).withMonth(months).withYear(years);
+		if (days == 0 || months == 0 || years == 0) {
+			date = "";
+			return date;
+		}
+		localDate = localDate.now();
+		localDate = localDate.withDayOfMonth(days);
+		localDate = localDate.withMonth(months);
+		localDate = localDate.withYear(years);
 		date = df.format(localDate);
 		return date;
 	}
