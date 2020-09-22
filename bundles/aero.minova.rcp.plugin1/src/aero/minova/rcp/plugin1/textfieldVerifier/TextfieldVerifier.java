@@ -239,7 +239,7 @@ public class TextfieldVerifier implements FocusListener{
 			months = Integer.valueOf(subStrings[1]);
 		}
 		if (subStrings.length < 2) {
-			Integer[] dateValues = translateNumbersIntoDate(newString);
+			int[] dateValues = translateNumbersIntoDate(newString);
 			if (dateValues == null) {
 				return date;
 			}
@@ -247,11 +247,14 @@ public class TextfieldVerifier implements FocusListener{
 			months = dateValues[1];
 			years = dateValues[2];
 		}
-		if (years >= 10 && years < 100) {
+		if ((years >= 10 && years < 100)) {
 			String year = String.valueOf(localDate.now().getYear());
 			year = String.valueOf(year.charAt(0)) + String.valueOf(year.charAt(1));
 			year = year + String.valueOf(years);
 			years = Integer.valueOf(year);
+		}
+		if (years == 0) {
+			years = localDate.now().getYear();
 		}
 		date = checkForCorrectForm(date, days, months, years);
 
@@ -301,16 +304,18 @@ public class TextfieldVerifier implements FocusListener{
 		return date;
 	}
 
-	private static Integer[] translateNumbersIntoDate(String newString) {
-		Integer[] dateValues = null;
+	private static int[] translateNumbersIntoDate(String newString) {
+		int[] dateValues = null;
 
 		if (newString.length() == 3) {
+			dateValues = new int[3];
 			dateValues[0] = Integer.valueOf(newString.charAt(0));
 			String monthsString = String.valueOf(newString.charAt(1)) + String.valueOf(newString.charAt(2));
 			dateValues[1] = Integer.valueOf(monthsString);
 			dateValues[2] = 0;
 		}
 		if (newString.length() == 4) {
+			dateValues = new int[3];
 			String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
 			dateValues[0] = Integer.valueOf(daysString);
 			String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
@@ -318,6 +323,7 @@ public class TextfieldVerifier implements FocusListener{
 			dateValues[2] = 0;
 		}
 		if (newString.length() == 5) {
+			dateValues = new int[3];
 			dateValues[0] = Integer.valueOf(newString.charAt(0));
 			String monthsString = String.valueOf(newString.charAt(1)) + String.valueOf(newString.charAt(2));
 			dateValues[1] = Integer.valueOf(monthsString);
@@ -325,6 +331,7 @@ public class TextfieldVerifier implements FocusListener{
 			dateValues[2] = Integer.valueOf(yearsString);
 		}
 		if (newString.length() == 6 || newString.length() == 7) {
+			dateValues = new int[3];
 			String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
 			dateValues[0] = Integer.valueOf(daysString);
 			String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
@@ -333,6 +340,7 @@ public class TextfieldVerifier implements FocusListener{
 			dateValues[2] = Integer.valueOf(yearsString);
 		}
 		if (newString.length() == 8) {
+			dateValues = new int[3];
 			String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
 			dateValues[0] = Integer.valueOf(daysString);
 			String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
@@ -430,7 +438,7 @@ public class TextfieldVerifier implements FocusListener{
 		}
 
 		if (subStrings.length < 2) {
-			Integer[] timeList = checkNumbersForTime(subString);
+			int[] timeList = checkNumbersForTime(subString);
 			if (timeList != null) {
 				hours = timeList[0];
 				minutes = timeList[1];
@@ -451,21 +459,24 @@ public class TextfieldVerifier implements FocusListener{
 		return time;
 	}
 
-	private static Integer[] checkNumbersForTime(String subString) {
-		Integer[] time = null;
+	private static int[] checkNumbersForTime(String subString) {
+		int[] time = null;
 
 		if (subString.length() == 2) {
+			time = new int[2];
 			String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
 			time[0] = Integer.valueOf(hoursString);
 			time[1] = 0;
 		}
 		if (subString.length() == 3) {
+			time = new int[2];
 			String hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
 			time[0] = Integer.valueOf(hour);
 			String minutesString = String.valueOf(subString.charAt(2)) + "0";
 			time[1] = Integer.valueOf(minutesString);
 		}
 		if (subString.length() == 4) {
+			time = new int[2];
 			String hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
 			time[0] = Integer.valueOf(hour);
 			String minutesString = String.valueOf(subString.charAt(2)) + String.valueOf(subString.charAt(3));
