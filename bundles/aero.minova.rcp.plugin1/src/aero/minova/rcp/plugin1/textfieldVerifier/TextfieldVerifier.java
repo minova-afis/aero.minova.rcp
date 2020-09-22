@@ -103,36 +103,84 @@ public class TextfieldVerifier implements FocusListener{
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		LocalDate localDate = null;
 		Boolean unallowedFormat = false;
+
+		localDate = checkDateForCommands(subString, df);
+		localDate = checkForReductionAndAddition(localDate, subString);
+		if (localDate == null) {
+			int points = 0;
+			for (int i = 0; i < subString.length(); i++) {
+				if (subString.charAt(i) == '.') {
+					points++;
+				}
+				if (allowedCharacters.indexOf(subString.charAt(i)) == -1) {
+					unallowedFormat = true;
+				}
+			}
+			if (points > 2) {
+				unallowedFormat = true;
+			}
+			if (unallowedFormat == true) {
+				date = "";
+				return date;
+			} else {
+				date = getDateFromNumbers(subString, df);
+			}
+		}
+		else {
+			date = df.format(localDate);
+		}
+
+		return date;
+	}
+
+	private static LocalDate checkDateForCommands(String subString, DateTimeFormatter df) {
+		LocalDate localDate = null;
+
 		if (subString.contains("heute")) {
 			localDate = localDate.now();
-			date = df.format(localDate);
 			subString.replaceFirst("heute", "");
 		}
 		if (subString.contains("h")) {
 			localDate = localDate.now();
-			date = df.format(localDate);
 			subString.replaceFirst("h", "");
 		}
 		if (subString.contains("morgen")) {
 			localDate = localDate.now().plusDays(1);
-			date = df.format(localDate);
 			subString.replaceFirst("morgen", "");
 		}
 		if (subString.contains("m")) {
 			localDate = localDate.now().plusDays(1);
-			date = df.format(localDate);
 			subString.replaceFirst("m", "");
+		}
+		if (subString.contains("uebermorgen")) {
+			localDate = localDate.now().plusDays(2);
+			subString.replaceFirst("uebermorgen", "");
+		}
+		if (subString.contains("u")) {
+			localDate = localDate.now().plusDays(2);
+			subString.replaceFirst("u", "");
 		}
 		if (subString.contains("gestern")) {
 			localDate = localDate.now().minusDays(1);
-			date = df.format(localDate);
 			subString.replaceFirst("gestern", "");
 		}
 		if (subString.contains("g")) {
 			localDate = localDate.now().minusDays(1);
-			date = df.format(localDate);
 			subString.replaceFirst("g", "");
 		}
+		if (subString.contains("vorgestern")) {
+			localDate = localDate.now().minusDays(2);
+			subString.replaceFirst("vorgestern", "");
+		}
+		if (subString.contains("v")) {
+			localDate = localDate.now().minusDays(2);
+			subString.replaceFirst("v", "");
+		}
+
+		return localDate;
+	}
+
+	private static LocalDate checkForReductionAndAddition(LocalDate localDate, String subString) {
 
 		if (subString.contains("+") || subString.contains("-")) {
 			if (localDate == null) {
@@ -167,29 +215,9 @@ public class TextfieldVerifier implements FocusListener{
 
 				}
 			}
-			date = df.format(localDate);
-		} else if (localDate == null) {
-			int points = 0;
-			for (int i = 0; i < subString.length(); i++) {
-				if (subString.charAt(i) == '.') {
-					points++;
-				}
-				if (allowedCharacters.indexOf(subString.charAt(i)) == -1) {
-					unallowedFormat = true;
-				}
-			}
-			if (points > 2) {
-				unallowedFormat = true;
-			}
-			if (unallowedFormat == true) {
-				date = "";
-				return date;
-			} else {
-				date = getDateFromNumbers(subString, df);
-			}
 		}
 
-		return date;
+		return localDate;
 	}
 
 	private static String getDateFromNumbers(String newString, DateTimeFormatter df) {
@@ -210,43 +238,14 @@ public class TextfieldVerifier implements FocusListener{
 			days = Integer.valueOf(subStrings[0]);
 			months = Integer.valueOf(subStrings[1]);
 		}
-
 		if (subStrings.length < 2) {
-			if (newString.length() == 3) {
-				days = Integer.valueOf(newString.charAt(0));
-				String monthsString = String.valueOf(newString.charAt(1)) + String.valueOf(newString.charAt(2));
-				months = Integer.valueOf(monthsString);
+			Integer[] dateValues = translateNumbersIntoDate(newString);
+			if (dateValues == null) {
+				return date;
 			}
-			if (newString.length() == 4) {
-				String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
-				days = Integer.valueOf(daysString);
-				String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
-				months = Integer.valueOf(monthsString);
-			}
-			if (newString.length() == 5) {
-				days = Integer.valueOf(newString.charAt(0));
-				String monthsString = String.valueOf(newString.charAt(1)) + String.valueOf(newString.charAt(2));
-				months = Integer.valueOf(monthsString);
-				String yearsString = String.valueOf(newString.charAt(3)) + String.valueOf(newString.charAt(4));
-				years = Integer.valueOf(yearsString);
-			}
-			if (newString.length() == 6 || newString.length() == 7) {
-				String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
-				days = Integer.valueOf(daysString);
-				String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
-				months = Integer.valueOf(monthsString);
-				String yearsString = String.valueOf(newString.charAt(4)) + String.valueOf(newString.charAt(5));
-				years = Integer.valueOf(yearsString);
-			}
-			if (newString.length() == 8) {
-				String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
-				days = Integer.valueOf(daysString);
-				String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
-				months = Integer.valueOf(monthsString);
-				String yearsString = String.valueOf(newString.charAt(4)) + String.valueOf(newString.charAt(5))
-						+ String.valueOf(newString.charAt(6)) + String.valueOf(newString.charAt(7));
-				years = Integer.valueOf(yearsString);
-			}
+			days = dateValues[0];
+			months = dateValues[1];
+			years = dateValues[2];
 		}
 		if (years >= 10 && years < 100) {
 			String year = String.valueOf(localDate.now().getYear());
@@ -254,7 +253,20 @@ public class TextfieldVerifier implements FocusListener{
 			year = year + String.valueOf(years);
 			years = Integer.valueOf(year);
 		}
+		date = checkForCorrectForm(date, days, months, years);
+
+		localDate = localDate.now();
+		localDate = localDate.withDayOfMonth(days);
+		localDate = localDate.withMonth(months);
+		localDate = localDate.withYear(years);
+		date = df.format(localDate);
+		return date;
+	}
+
+	private static String checkForCorrectForm(String date, int days, int months, int years) {
+
 		if (years == 0) {
+			LocalDate localDate = null;
 			years = localDate.now().getYear();
 		}
 		if (days > 31) {
@@ -286,12 +298,51 @@ public class TextfieldVerifier implements FocusListener{
 			date = "";
 			return date;
 		}
-		localDate = localDate.now();
-		localDate = localDate.withDayOfMonth(days);
-		localDate = localDate.withMonth(months);
-		localDate = localDate.withYear(years);
-		date = df.format(localDate);
 		return date;
+	}
+
+	private static Integer[] translateNumbersIntoDate(String newString) {
+		Integer[] dateValues = null;
+
+		if (newString.length() == 3) {
+			dateValues[0] = Integer.valueOf(newString.charAt(0));
+			String monthsString = String.valueOf(newString.charAt(1)) + String.valueOf(newString.charAt(2));
+			dateValues[1] = Integer.valueOf(monthsString);
+			dateValues[2] = 0;
+		}
+		if (newString.length() == 4) {
+			String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
+			dateValues[0] = Integer.valueOf(daysString);
+			String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
+			dateValues[1] = Integer.valueOf(monthsString);
+			dateValues[2] = 0;
+		}
+		if (newString.length() == 5) {
+			dateValues[0] = Integer.valueOf(newString.charAt(0));
+			String monthsString = String.valueOf(newString.charAt(1)) + String.valueOf(newString.charAt(2));
+			dateValues[1] = Integer.valueOf(monthsString);
+			String yearsString = String.valueOf(newString.charAt(3)) + String.valueOf(newString.charAt(4));
+			dateValues[2] = Integer.valueOf(yearsString);
+		}
+		if (newString.length() == 6 || newString.length() == 7) {
+			String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
+			dateValues[0] = Integer.valueOf(daysString);
+			String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
+			dateValues[1] = Integer.valueOf(monthsString);
+			String yearsString = String.valueOf(newString.charAt(4)) + String.valueOf(newString.charAt(5));
+			dateValues[2] = Integer.valueOf(yearsString);
+		}
+		if (newString.length() == 8) {
+			String daysString = String.valueOf(newString.charAt(0)) + String.valueOf(newString.charAt(1));
+			dateValues[0] = Integer.valueOf(daysString);
+			String monthsString = String.valueOf(newString.charAt(2)) + String.valueOf(newString.charAt(3));
+			dateValues[1] = Integer.valueOf(monthsString);
+			String yearsString = String.valueOf(newString.charAt(4)) + String.valueOf(newString.charAt(5))
+					+ String.valueOf(newString.charAt(6)) + String.valueOf(newString.charAt(7));
+			dateValues[2] = Integer.valueOf(yearsString);
+		}
+
+		return dateValues;
 	}
 
 	public static String verifyTime(String newString) {
@@ -379,21 +430,10 @@ public class TextfieldVerifier implements FocusListener{
 		}
 
 		if (subStrings.length < 2) {
-			if (subString.length() == 2) {
-				String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
-				hours = Integer.valueOf(hoursString);
-			}
-			if (subString.length() == 3) {
-				String hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
-				hours = Integer.valueOf(hour);
-				String minutesString = String.valueOf(subString.charAt(2)) + "0";
-				minutes = Integer.valueOf(minutesString);
-			}
-			if (subString.length() == 4) {
-				String hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
-				hours = Integer.valueOf(hour);
-				String minutesString = String.valueOf(subString.charAt(2)) + String.valueOf(subString.charAt(3));
-				minutes = Integer.valueOf(minutesString);
+			Integer[] timeList = checkNumbersForTime(subString);
+			if (timeList != null) {
+				hours = timeList[0];
+				minutes = timeList[1];
 			}
 		}
 		if (hours > 23) {
@@ -407,6 +447,30 @@ public class TextfieldVerifier implements FocusListener{
 
 		localTime = LocalTime.of(hours, minutes);
 		time = df.format(localTime);
+
+		return time;
+	}
+
+	private static Integer[] checkNumbersForTime(String subString) {
+		Integer[] time = null;
+
+		if (subString.length() == 2) {
+			String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+			time[0] = Integer.valueOf(hoursString);
+			time[1] = 0;
+		}
+		if (subString.length() == 3) {
+			String hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+			time[0] = Integer.valueOf(hour);
+			String minutesString = String.valueOf(subString.charAt(2)) + "0";
+			time[1] = Integer.valueOf(minutesString);
+		}
+		if (subString.length() == 4) {
+			String hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+			time[0] = Integer.valueOf(hour);
+			String minutesString = String.valueOf(subString.charAt(2)) + String.valueOf(subString.charAt(3));
+			time[1] = Integer.valueOf(minutesString);
+		}
 
 		return time;
 	}
