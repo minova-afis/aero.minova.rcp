@@ -1,8 +1,10 @@
 package aero.minova.rcp.plugin1.textfieldVerifier;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -135,51 +137,141 @@ public class TextfieldVerifier implements FocusListener{
 
 	private static LocalDate checkDateForCommands(String subString, DateTimeFormatter df) {
 		LocalDate localDate = null;
-
-		if (subString.contains("heute")) {
-			localDate = localDate.now();
-			subString.replaceFirst("heute", "");
+		// Überprüfen, ob das Datum als Worz/in der Kurzform übergeben wurde
+		localDate = getWeekdayFromCommand(subString);
+		if (localDate == null) {
+			if (subString.contains("[Jj]anuar")) {
+				localDate = localDate.now().withMonth(1);
+				subString.replaceFirst("[Jj]anuar", "");
+			} else if (subString.contains("[Jj]an")) {
+				localDate = localDate.now().withMonth(1);
+				subString.replaceFirst("[Jj]an", "");
+			} else if (subString.contains("[Ff]ebruar")) {
+				localDate = localDate.now().withMonth(2);
+				subString.replaceFirst("[Ff]ebruar", "");
+			} else if (subString.contains("[Ff]eb")) {
+				localDate = localDate.now().withMonth(2);
+				subString.replaceFirst("[Ff]eb", "");
+			} else if (subString.contains("[Mm][äa]rz")) {
+				localDate = localDate.now().withMonth(3);
+				subString.replaceFirst("Mm][äa]rz", "");
+			} else if (subString.contains("[Mm][äa]r")) {
+				localDate = localDate.now().withMonth(3);
+				subString.replaceFirst("Mm][äa]r", "");
+			} else if (subString.contains("[Aa]pril")) {
+				localDate = localDate.now().withMonth(4);
+				subString.replaceFirst("[Aa]pril", "");
+			} else if (subString.contains("[Aa]pr")) {
+				localDate = localDate.now().withMonth(4);
+				subString.replaceFirst("[Aa]pr", "");
+			} else if (subString.contains("[Mm]ai")) {
+				localDate = localDate.now().withMonth(5);
+				subString.replaceFirst("[Mm]ai", "");
+			} else if (subString.contains("[Jj]uni")) {
+				localDate = localDate.now().withMonth(6);
+				subString.replaceFirst("[Jj]uni", "");
+			} else if (subString.contains("[Jj]un")) {
+				localDate = localDate.now().withMonth(6);
+				subString.replaceFirst("[Jj]un", "");
+			} else if (subString.contains("[Jj]uli")) {
+				localDate = localDate.now().withMonth(7);
+				subString.replaceFirst("[Jj]uli", "");
+			} else if (subString.contains("[Jj]ul")) {
+				localDate = localDate.now().withMonth(7);
+				subString.replaceFirst("[Jj]ul", "");
+			} else if (subString.contains("[Aa]ugust")) {
+				localDate = localDate.now().withMonth(8);
+				subString.replaceFirst("[Aa]ugust", "");
+			} else if (subString.contains("[Aa]ug")) {
+				localDate = localDate.now().withMonth(8);
+				subString.replaceFirst("[Aa]ug", "");
+			} else if (subString.contains("[Ss]eptember")) {
+				localDate = localDate.now().withMonth(9);
+				subString.replaceFirst("[Ss]eptember", "");
+			} else if (subString.contains("[Ss]ep")) {
+				localDate = localDate.now().withMonth(9);
+				subString.replaceFirst("[Ss]ep", "");
+			} else if (subString.contains("[Oo]ktober")) {
+				localDate = localDate.now().withMonth(10);
+				subString.replaceFirst("[Oo]ktober", "");
+			} else if (subString.contains("[Oo]kt")) {
+				localDate = localDate.now().withMonth(10);
+				subString.replaceFirst("[Oo]kt", "");
+			} else if (subString.contains("[Nn]ovember")) {
+				localDate = localDate.now().withMonth(11);
+				subString.replaceFirst("[Nn]ovember", "");
+			} else if (subString.contains("[Nn]ov")) {
+				localDate = localDate.now().withMonth(11);
+				subString.replaceFirst("[Nn]ov", "");
+			} else if (subString.contains("[Dd]ezember")) {
+				localDate = localDate.now().withMonth(12);
+				subString.replaceFirst("[Dd]ezember", "");
+			} else if (subString.contains("[Dd]ez")) {
+				localDate = localDate.now().withMonth(12);
+				subString.replaceFirst("[Dd]ez", "");
+			}
+			// Überprüfen, ob ein relativer Tag ausgewählt wurde
+			else if (subString.contains("heute")) {
+				localDate = localDate.now();
+				subString.replaceFirst("heute", "");
+			} else if (subString.contains("h")) {
+				localDate = localDate.now();
+				subString.replaceFirst("h", "");
+			} else if (subString.contains("morgen")) {
+				localDate = localDate.now().plusDays(1);
+				subString.replaceFirst("morgen", "");
+			} else if (subString.contains("m")) {
+				localDate = localDate.now().plusDays(1);
+				subString.replaceFirst("m", "");
+			} else if (subString.contains("uebermorgen")) {
+				localDate = localDate.now().plusDays(2);
+				subString.replaceFirst("uebermorgen", "");
+			} else if (subString.contains("u")) {
+				localDate = localDate.now().plusDays(2);
+				subString.replaceFirst("u", "");
+			} else if (subString.contains("gestern")) {
+				localDate = localDate.now().minusDays(1);
+				subString.replaceFirst("gestern", "");
+			} else if (subString.contains("g")) {
+				localDate = localDate.now().minusDays(1);
+				subString.replaceFirst("g", "");
+			} else if (subString.contains("vorgestern")) {
+				localDate = localDate.now().minusDays(2);
+				subString.replaceFirst("vorgestern", "");
+			} else if (subString.contains("v")) {
+				localDate = localDate.now().minusDays(2);
+				subString.replaceFirst("v", "");
+			}
 		}
-		if (subString.contains("h")) {
-			localDate = localDate.now();
-			subString.replaceFirst("h", "");
-		}
-		if (subString.contains("morgen")) {
-			localDate = localDate.now().plusDays(1);
-			subString.replaceFirst("morgen", "");
-		}
-		if (subString.contains("m")) {
-			localDate = localDate.now().plusDays(1);
-			subString.replaceFirst("m", "");
-		}
-		if (subString.contains("uebermorgen")) {
-			localDate = localDate.now().plusDays(2);
-			subString.replaceFirst("uebermorgen", "");
-		}
-		if (subString.contains("u")) {
-			localDate = localDate.now().plusDays(2);
-			subString.replaceFirst("u", "");
-		}
-		if (subString.contains("gestern")) {
-			localDate = localDate.now().minusDays(1);
-			subString.replaceFirst("gestern", "");
-		}
-		if (subString.contains("g")) {
-			localDate = localDate.now().minusDays(1);
-			subString.replaceFirst("g", "");
-		}
-		if (subString.contains("vorgestern")) {
-			localDate = localDate.now().minusDays(2);
-			subString.replaceFirst("vorgestern", "");
-		}
-		if (subString.contains("v")) {
-			localDate = localDate.now().minusDays(2);
-			subString.replaceFirst("v", "");
-		}
-
 		return localDate;
 	}
 
+	private static LocalDate getWeekdayFromCommand(String subString) {
+		LocalDate calculationDate = LocalDate.now();
+		LocalDate date = null;
+		DayOfWeek weekday = calculationDate.getDayOfWeek();
+		ArrayList<String[]> weekdays = new ArrayList();
+		weekdays.add(new String[] { "MONDAY", "Montag" });
+		weekdays.add(new String[] { "TUESDAY", "Dienstag" });
+		weekdays.add(new String[] { "WEDNESDAY", "Mittwoch" });
+		weekdays.add(new String[] { "THURSDAY", "Donnerstag" });
+		weekdays.add(new String[] { "FRIDAY", "Freitag" });
+		weekdays.add(new String[] { "SATURDAY", "Samstag" });
+		weekdays.add(new String[] { "SUNDAY", "Sonntag" });
+
+		for (int i = 0; i < 7; i++) {
+			if (subString.contains(weekdays.get(i)[1])) {
+				String requested = weekdays.get(i)[0];
+				for (int j = 1; j <= 7; j++) {
+					if (weekday.plus(j).toString() == requested) {
+						date = calculationDate.plusDays(j);
+					}
+				}
+			}
+		}
+
+		return date;
+	}
 	private static LocalDate checkForReductionAndAddition(LocalDate localDate, String subString) {
 
 		if (subString.contains("+") || subString.contains("-")) {
@@ -189,7 +281,9 @@ public class TextfieldVerifier implements FocusListener{
 			for (int i = 0; i < subString.length(); i++) {
 				if (subString.charAt(i) == '+') {
 					if (i + 1 < subString.length()) {
-						if (subString.charAt(i + 1) == 'M') {
+						if (subString.charAt(i + 1) == 'W') {
+							localDate = localDate.plusDays(7);
+						} else if (subString.charAt(i + 1) == 'M') {
 							localDate = localDate.plusMonths(1);
 						} else if (subString.charAt(i + 1) == 'Y') {
 							localDate = localDate.plusYears(1);
@@ -202,7 +296,9 @@ public class TextfieldVerifier implements FocusListener{
 				}
 				if (subString.charAt(i) == '-') {
 					if (i + 1 < subString.length()) {
-						if (subString.charAt(i + 1) == 'M') {
+						if (subString.charAt(i + 1) == 'W') {
+							localDate = localDate.minusDays(7);
+						} else if (subString.charAt(i + 1) == 'M') {
 							localDate = localDate.minusMonths(1);
 						} else if (subString.charAt(i + 1) == 'Y') {
 							localDate = localDate.minusYears(1);
@@ -256,8 +352,10 @@ public class TextfieldVerifier implements FocusListener{
 		if (years == 0) {
 			years = localDate.now().getYear();
 		}
-		date = checkForCorrectForm(date, days, months, years);
-
+		int[] dateValues = checkForCorrectForm(date, days, months, years);
+		days = dateValues[0];
+		months = dateValues[1];
+		years = dateValues[2];
 		localDate = localDate.now();
 		localDate = localDate.withDayOfMonth(days);
 		localDate = localDate.withMonth(months);
@@ -266,42 +364,43 @@ public class TextfieldVerifier implements FocusListener{
 		return date;
 	}
 
-	private static String checkForCorrectForm(String date, int days, int months, int years) {
+	private static int[] checkForCorrectForm(String date, int days, int months, int years) {
 
+		int[] dateValues = new int[3];
+		dateValues[0] = days;
+		dateValues[1] = months;
+		dateValues[2] = years;
 		if (years == 0) {
 			LocalDate localDate = null;
-			years = localDate.now().getYear();
+			dateValues[2] = localDate.now().getYear();
 		}
 		if (days > 31) {
-			date = "";
-			return date;
+			dateValues[0] = 31;
 		}
 		if (months > 12) {
-			date = "";
-			return date;
+			dateValues[1] = 12;
 		}
 		// Beachten der Monatswechsel
 		if (months == 2 && days > 28) {
 			if (years % 4 != 0) {
-				date = "";
-				return date;
+				dateValues[0] = 28;
 			} else {
 				if (days != 29) {
-					date = "";
-					return date;
+					dateValues[0] = 29;
 				}
 			}
 		} else {
 			if (months % 2 == 0 && days == 31) {
-				date = "";
-				return date;
+				dateValues[0] = 30;
 			}
 		}
-		if (days == 0 || months == 0 || years == 0) {
-			date = "";
-			return date;
+		if (days == 0) {
+			dateValues[0] = 1;
 		}
-		return date;
+		if (months == 0) {
+			dateValues[1] = 1;
+		}
+		return dateValues;
 	}
 
 	private static int[] translateNumbersIntoDate(String newString) {
