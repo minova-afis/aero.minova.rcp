@@ -116,7 +116,7 @@
   <handlers xmi:id="_ul67cOg2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
   <handlers xmi:id="_yOGjEOg2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_9_ZcUOg1Eeq4vM3bKRf1IQ"/>
   <handlers xmi:id="_5pKmcOg2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_Awo04Og2Eeq4vM3bKRf1IQ"/>
-  <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.PreferenceWindowExample" command="_WsjPEPDoEeqcqsgp84_JDA"/>
+  <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindow" command="_WsjPEPDoEeqcqsgp84_JDA"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
