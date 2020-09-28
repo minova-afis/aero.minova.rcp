@@ -18,21 +18,20 @@ public class PreferenceWindowModel {
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
-		buildAnwendungsTab(cprf);
+		cprf.add(buildAnwendungsTab());
 		
-		buildDarstellungsTab(cprf);
+		cprf.add(buildDarstellungsTab());
 
-		buildErweiterungTab(cprf);
+		cprf.add(buildErweiterungTab());
 		
-		buildDruckenTab(cprf);
+		cprf.add(buildDruckenTab());
 
 		return cprf;
 	}
 
-	private void buildAnwendungsTab(List<PreferenceTabDescriptor> cprf) {
+	private PreferenceTabDescriptor buildAnwendungsTab() {
 		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow",
 				"icons/application.png", "applicationTab", "Anwendung", 0.1);
-		cprf.add(ptd);
 		PreferenceSectionDescriptor psd = new PreferenceSectionDescriptor("executionplace", "Ausführungsort", 0.1);
 		ptd.add(psd);
 		PreferenceDescriptor pd = new PreferenceDescriptor(psd, "programmDirectory", "Programmverzeichnis", 0.1,
@@ -45,15 +44,15 @@ public class PreferenceWindowModel {
 		pd = new PreferenceDescriptor(psd, "licenceWarning", "LizenzWarnung [wochen]", 0.1, DisplayType.INTEGER);
 		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "licenswarning", logger));
 		psd.add(pd);
+		return ptd;
 	}
 
-	private void buildDarstellungsTab(List<PreferenceTabDescriptor> cprf) {
+	private PreferenceTabDescriptor buildDarstellungsTab() {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
 		PreferenceDescriptor pd;
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/design.png", "designTab",
 				"Darstellung", 0.2);
-		cprf.add(ptd);
 		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor(psd, "language", "Landessprache", 0.1, DisplayType.COMBO);
@@ -74,15 +73,15 @@ public class PreferenceWindowModel {
 		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "symbolToolbar", logger, "16x16", "24x24",
 				"32x32", "48x48", "64x64"));
 		psd.add(pd);
+		return ptd;
 	}
 
-	private void buildErweiterungTab(List<PreferenceTabDescriptor> cprf) {
+	private PreferenceTabDescriptor buildErweiterungTab() {
 			PreferenceTabDescriptor ptd;
 			PreferenceSectionDescriptor psd;
 			PreferenceDescriptor pd;
 			ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/erweitert.png", "expandedTab",
 					"Erweitert", 0.3);
-			cprf.add(ptd);
 			psd = new PreferenceSectionDescriptor("generalexpanded", "Allgemeines", 0.1);
 			ptd.add(psd);
 			pd = new PreferenceDescriptor(psd, "masks", "Masken mehrfach öffnen", 0.1, DisplayType.CHECK);
@@ -148,14 +147,15 @@ public class PreferenceWindowModel {
 			pd = new PreferenceDescriptor(psd, "showchangedrow", "Zeige geänderte Zeilen", 0.5, DisplayType.CHECK);
 			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "showchangedrow", logger));
 			psd.add(pd);
+			
+			return ptd;
 		}
 
-	private void buildDruckenTab(List<PreferenceTabDescriptor> cprf) {
+	private PreferenceTabDescriptor buildDruckenTab() {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
 		PreferenceDescriptor pd;
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "printTab", "Drucken", 0.4);
-		cprf.add(ptd);
 		psd = new PreferenceSectionDescriptor("print", "Drucken", 0.1);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor(psd, "xmlxsdcreate", "XML + XDS erstellen", 0.1, DisplayType.CHECK);
@@ -179,6 +179,8 @@ public class PreferenceWindowModel {
 		pd = new PreferenceDescriptor(psd, "deactivateinternpreview", "Gruppenspalten verbergen", 0.7, DisplayType.CHECK);
 		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "deactivateinternpreview", logger));
 		psd.add(pd);
+		
+		return ptd;
 	}
 
 }
