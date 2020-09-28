@@ -1,20 +1,16 @@
 package aero.minova.rcp.preferencewindow.pages;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.nebula.widgets.opal.preferencewindow.PWGroup;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.service.prefs.Preferences;
 
-import aero.minova.rcp.preferencewindow.builder.CustomPreferences;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
@@ -29,27 +25,21 @@ public class ApplicationPreferenceWindow {
 
 	// Widget Builder Impelentierung
 	private PreferenceWindowBuilder pwb = PreferenceWindowBuilder.newPWB();
-
-	@Inject
-	Logger logger;
-
 	private PreferenceWindowModel pwm = new PreferenceWindowModel();
-	private CustomPreferences prefs = pwm.createModel();
 
 	@Execute
 	public void execute() {
 
-		final PreferenceWindow window = PreferenceWindow.create(fillData());
+		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
+		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
 
-		for (PreferenceTabDescriptor tab : prefs.getTabs()) {
+		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
-			Image image = tab.getImage().createImage();
-			PWTab newTab = window.addTab(image, tab.getLabel());
+			PWTab newTab = window.addTab(tabDescriptor.getImage(), tabDescriptor.getLabel());
 
-			for (PreferenceSectionDescriptor section : tab.getSections()) {
+			for (PreferenceSectionDescriptor section : tabDescriptor.getSections()) {
 				// Section hinzufügen
 				pwb.addTitledSeparator(newTab, section.getLabel());
-//				PWGroup group = new PWGroup(section.getLabel(), false);
 				
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					// Preference hinzufügen
@@ -63,7 +53,9 @@ public class ApplicationPreferenceWindow {
 
 		window.setSelectedTab(0);
 		if (window.open()) {
-			for (PreferenceTabDescriptor tab : prefs.getTabs()) {
+			
+			// TODO Reicht nicht ein einziger flush?
+			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
@@ -76,10 +68,10 @@ public class ApplicationPreferenceWindow {
 		}
 	}
 
-	public Map<String, Object> fillData() {
-		Map<String, Object> data = new HashMap<String, Object>();
+	public Map<String, Object> fillData(List<PreferenceTabDescriptor> preferenceTabs) {
+		Map<String, Object> data = new HashMap<>();
 
-		for (PreferenceTabDescriptor tab : prefs.getTabs()) {
+		for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 			for (PreferenceSectionDescriptor section : tab.getSections()) {
 

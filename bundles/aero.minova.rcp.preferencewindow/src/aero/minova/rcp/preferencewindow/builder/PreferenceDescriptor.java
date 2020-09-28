@@ -14,7 +14,6 @@ public class PreferenceDescriptor {
 	}
 
 	public PreferenceDescriptor(PreferenceSectionDescriptor section, String id, String label, double order, DisplayType displayType) {
-		super();
 		this.section = section;
 		this.id = id;
 		this.label = label;

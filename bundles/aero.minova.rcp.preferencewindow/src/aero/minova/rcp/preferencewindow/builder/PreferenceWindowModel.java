@@ -1,19 +1,22 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.log.Logger;
 
 public class PreferenceWindowModel {
 
-	public final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
+	public static final  String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
 
 	@Inject
 	Logger logger;
 
-	public CustomPreferences createModel() {
+	public List<PreferenceTabDescriptor> createModel() {
 
-		CustomPreferences cprf = new CustomPreferences();
+		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
 		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow",
 				"icons/application.png", "applicationTab", "Anwendung", 0.1);

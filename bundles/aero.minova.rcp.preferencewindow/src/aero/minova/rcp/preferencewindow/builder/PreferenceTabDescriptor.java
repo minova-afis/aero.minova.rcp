@@ -1,12 +1,13 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 public class PreferenceTabDescriptor {
@@ -15,19 +16,19 @@ public class PreferenceTabDescriptor {
 	String id;
 	String label;
 	double order;
-	List<PreferenceSectionDescriptor> sections = new Vector<PreferenceSectionDescriptor>();
+	List<PreferenceSectionDescriptor> sections = new ArrayList<>();
 
 	public PreferenceTabDescriptor(String imageBundle, String imagePath, String id, String label, double order) {
 		Bundle bundle = Platform.getBundle(imageBundle);
-		image = ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path(imagePath), null));
+		image = ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path(imagePath)));
 		this.id = id;
 		this.label = label;
 		this.order = order;
 		
 	}
 
-	public ImageDescriptor getImage() {
-		return image;
+	public Image getImage() {
+		return image.createImage();
 	}
 
 	/**
