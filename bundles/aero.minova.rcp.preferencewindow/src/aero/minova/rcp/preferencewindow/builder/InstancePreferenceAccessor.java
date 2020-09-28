@@ -1,8 +1,5 @@
 package aero.minova.rcp.preferencewindow.builder;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 public class InstancePreferenceAccessor  {
@@ -24,7 +21,7 @@ public class InstancePreferenceAccessor  {
 		case CHECK:
 			return preferences.getBoolean(preferenceKey, false);
 		case FONT:
-			return preferences.get(preferenceKey, "font");
+			return preferences.get(preferenceKey, null);
 		default:
 			break;
 		}
@@ -58,14 +55,5 @@ public class InstancePreferenceAccessor  {
 				break;
 			}
 	}
-//	@Override
-//	public void flush(PreferenceSectionDescriptor section, Object value) {
-//		Preferences preferences = InstanceScope.INSTANCE.getNode(preferenceNode);
-//		putValue(section, value);
-//		try {
-//			preferences.flush();
-//		} catch (BackingStoreException e) {
-//			Platform.getLog(this.getClass()).error(e.getMessage());
-//		}
-//	}
+
 }
