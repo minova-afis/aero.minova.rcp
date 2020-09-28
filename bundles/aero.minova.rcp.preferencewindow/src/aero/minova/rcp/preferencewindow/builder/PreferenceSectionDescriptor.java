@@ -5,14 +5,13 @@ import java.util.List;
 
 public class PreferenceSectionDescriptor {
 
-	public PreferenceSectionDescriptor(String id, String label, double order) {
-		super();
-		this.id = id;
+	public PreferenceSectionDescriptor(String key, String label, double order) {
+		this.key = key;
 		this.label = label;
 		this.order = order;
 	}
 
-	String id;
+	String key;
 	String label;
 	double order;
 	List<PreferenceDescriptor> preferences = new ArrayList<>();
@@ -23,8 +22,8 @@ public class PreferenceSectionDescriptor {
 	 * 
 	 * @return
 	 */
-	public String getId() {
-		return id;
+	public String getKey() {
+		return key;
 	}
 	
 	/**

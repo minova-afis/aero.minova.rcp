@@ -9,8 +9,11 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.graphics.Image;
+import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
+import aero.minova.rcp.preferencewindow.builder.PreferenceAccessor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
@@ -40,12 +43,12 @@ public class ApplicationPreferenceWindow {
 			for (PreferenceSectionDescriptor section : tabDescriptor.getSections()) {
 				// Section hinzufügen
 				pwb.addTitledSeparator(newTab, section.getLabel());
-				
+
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					// Preference hinzufügen
-					Object[] keys = pref.getValueAccessor().getPossibleValues();
-					String key = pref.getValueAccessor().getKey();
-					createWidgets(newTab, pref, key, keys);
+					Object[] values = pref.getPossibleValues();
+					String key = pref.getKey();
+					createWidgets(newTab, pref, key, values);
 
 				}
 			}
@@ -53,17 +56,20 @@ public class ApplicationPreferenceWindow {
 
 		window.setSelectedTab(0);
 		if (window.open()) {
-			
-			// TODO Reicht nicht ein einziger flush?
 			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						Object value = window.getValueFor(pref.getValueAccessor().getKey());
-						pref.getValueAccessor().flush(section, value);
+						System.out.println(window.getValueFor(pref.getKey()));
+						InstancePreferenceAccessor.putValue(preferences, PREFERENCES_NODE, pref.getDisplayType(), window.getValueFor(pref.getKey()));
 					}
 				}
+			}
+			try {
+				preferences.flush();
+			} catch (BackingStoreException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -76,8 +82,10 @@ public class ApplicationPreferenceWindow {
 			for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 				for (PreferenceDescriptor pref : section.getPreferences()) {
-					String key = pref.getValueAccessor().getKey();
-					data.put(key, pref.getValueAccessor().getValue(section));
+					String key = pref.getKey();
+					System.out.println(InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType()));
+					data.put(key,
+							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType()));
 
 				}
 			}
@@ -86,7 +94,7 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public void createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... keys) {
+	public void createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... values) {
 
 		switch (pref.getDisplayType()) {
 		case STRING:
@@ -105,7 +113,7 @@ public class ApplicationPreferenceWindow {
 			pwb.addDirectoryChooser(tab, pref.getLabel(), key);
 			break;
 		case COMBO:
-			pwb.addComboBoxRO(tab, pref.getLabel(), key, keys);
+			pwb.addComboBoxRO(tab, pref.getLabel(), key, values);
 			break;
 		case CHECK:
 			pwb.addCheckbox(tab, pref.getLabel(), key);

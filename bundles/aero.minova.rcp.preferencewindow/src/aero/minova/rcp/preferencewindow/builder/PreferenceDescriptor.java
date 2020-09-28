@@ -2,25 +2,31 @@ package aero.minova.rcp.preferencewindow.builder;
 
 public class PreferenceDescriptor {
 
-	String id;
+	final String key;
 	String label;
 	double order;
-	PreferenceSectionDescriptor section;
 	PreferenceAccessor valueAccessor;
 	DisplayType displayType;
+	private Object[] possibleValues;
+	
+
+	public PreferenceDescriptor(String key, String label, double order, DisplayType displayType, Object... possibleValues) {
+		this.key = key;
+		this.label = label;
+		this.order = order;
+		this.displayType = displayType;
+		this.possibleValues = possibleValues;
+	}
+
+	public String getKey() {
+		return key;
+	}
 	
 	public DisplayType getDisplayType() {
 		return displayType;
 	}
 
-	public PreferenceDescriptor(PreferenceSectionDescriptor section, String id, String label, double order, DisplayType displayType) {
-		this.section = section;
-		this.id = id;
-		this.label = label;
-		this.order = order;
-		this.displayType = displayType;
-	}
-
+	
 	public String getLabel() {
 		return label;
 	}
@@ -29,21 +35,14 @@ public class PreferenceDescriptor {
 		return order;
 	}
 
-	public PreferenceSectionDescriptor getSection() {
-		return section;
-	}
-
-	public PreferenceAccessor getValueAccessor() {
+	public PreferenceAccessor getValue() {
 		return valueAccessor;
 	}
 	
-	public void setValueAccessor(PreferenceAccessor valueAccessor) {
-		this.valueAccessor = valueAccessor;
+	public Object[] getPossibleValues() {
+		return possibleValues;
 	}
 
-	public String getId() {
-		return id;
-	}
-	
+
 
 }
