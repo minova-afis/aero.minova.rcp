@@ -21,7 +21,6 @@ public class TextfieldVerifier implements FocusListener{
 		} catch (NumberFormatException ex) {
 			correctDouble = false;
 		}
-
 		return correctDouble;
 	}
 
