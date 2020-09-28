@@ -1,7 +1,7 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class PreferenceSectionDescriptor {
 
@@ -15,7 +15,7 @@ public class PreferenceSectionDescriptor {
 	String id;
 	String label;
 	double order;
-	List<PreferenceDescriptor> preferences = new Vector<PreferenceDescriptor>();
+	List<PreferenceDescriptor> preferences = new ArrayList<>();
 	
 	/**
 	 * Liefert die interne ID für diese Section. Sie kann von anderen Plugins verwendet
