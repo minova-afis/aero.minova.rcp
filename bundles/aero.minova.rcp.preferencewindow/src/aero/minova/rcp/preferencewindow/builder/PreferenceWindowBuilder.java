@@ -1,6 +1,5 @@
 package aero.minova.rcp.preferencewindow.builder;
 
-import org.eclipse.nebula.widgets.opal.preferencewindow.PWRow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWButton;
@@ -8,18 +7,18 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWIntegerText;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFontChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWLabel;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWStringText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 
-import aero.minova.rcp.preferencewindow.control.CostumPWFloatText;
-import aero.minova.rcp.preferencewindow.control.CostumPWIntegerText;
+import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
+import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
+import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 
 /**
  * Liefert Methoden zum Erstellen von Preference Window bezogenen Widgets
@@ -56,7 +55,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addStringBox(PWTab tab, String label, String value) {
-		tab.add(new PWStringText(label, value).setAlignment(GridData.FILL));
+		tab.add(new CustomPWStringText(label, value).setAlignment(GridData.FILL).setIndent(25));
 		return this;
 	}
 
@@ -69,7 +68,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addIntegerBox(PWTab tab, String label, String value) {
-		tab.add(new CostumPWIntegerText(label, value).setAlignment(GridData.FILL));
+		tab.add(new CustomPWIntegerText(label, value).setIndent(25));
 		return this;
 	}
 
@@ -82,7 +81,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addFloatBox(PWTab tab, String label, String value) {
-		tab.add(new CostumPWFloatText(label, value).setAlignment(GridData.FILL));
+		tab.add(new CustomPWFloatText(label, value));
 		return this;
 	}
 
@@ -95,7 +94,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addURLBox(PWTab tab, String label, String value) {
-		tab.add(new PWURLText(label, value).setAlignment(GridData.FILL));
+		tab.add(new PWURLText(label, value));
 		return this;
 	}
 
@@ -108,7 +107,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addPasswordBox(PWTab tab, String label, String value) {
-		tab.add(new PWPasswordText(label, value).setAlignment(GridData.FILL));
+		tab.add(new PWPasswordText(label, value));
 		return this;
 	}
 
@@ -121,7 +120,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addDirectoryChooser(PWTab tab, String label, String value) {
-		tab.add(new PWDirectoryChooser(label, value).setAlignment(GridData.FILL));
+		tab.add(new PWDirectoryChooser(label, value).setIndent(25));
 		return this;
 	}
 
@@ -134,7 +133,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addFileChooser(PWTab tab, String label, String value) {
-		tab.add(new PWFileChooser(label, value).setAlignment(GridData.FILL));
+		tab.add(new PWFileChooser(label, value).setIndent(25));
 		return this;
 	}
 
@@ -147,7 +146,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addTextarea(PWTab tab, String label, String value) {
-		tab.add(new PWTextarea(label, value).setAlignment(GridData.FILL));
+		tab.add(new PWTextarea(label, value));
 		return this;
 	}
 
@@ -182,7 +181,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addComboBoxRO(PWTab tab, String label, String value, Object... values) {
-		tab.add(new PWCombo(label, value, values).setAlignment(GridData.FILL));
+		tab.add(new PWCombo(label, value, values));
 		return this;
 	}
 
@@ -195,7 +194,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addComboBoxEA(PWTab tab, String label, String value, Object... values) {
-		tab.add(new PWCombo(label, value, true, values).setAlignment(GridData.FILL));
+		tab.add(new PWCombo(label, value, true, values));
 		return this;
 	}
 
@@ -208,7 +207,7 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addButton(PWTab tab, String label, SelectionListener selectionListener) {
-		tab.add(new PWButton(label, selectionListener).setAlignment(GridData.END).setGrabExcessSpace(true));
+		tab.add(new PWButton(label, selectionListener));
 		return this;
 	}
 
@@ -221,12 +220,20 @@ public class PreferenceWindowBuilder {
 	 * @return
 	 */
 	public PreferenceWindowBuilder addCheckbox(PWTab tab, String label, String value) {
-		tab.add(new PWCheckbox(label, value).setAlignment(GridData.FILL).setIndent(40));
+		tab.add(new PWCheckbox(label, value).setAlignment(GridData.FILL).setIndent(25));
 		return this;
 	}
 	
-	public PreferenceWindowBuilder addTwoIntegerRow(PWTab tab, String label1, String value1, String label2, String value2) {
-		tab.add(new PWRow().add(new CostumPWIntegerText(label1, value1)).add(new CostumPWIntegerText(label2, value2)));
+	/**
+	 * Adds a fontchooser widget
+	 * 
+	 * @param tab
+	 * @param label
+	 * @param value
+	 * @return
+	 */
+	public PreferenceWindowBuilder addFontChooser(PWTab tab, String label, String value) {
+		tab.add(new PWFontChooser(label, value));
 		return this;
 	}
 
