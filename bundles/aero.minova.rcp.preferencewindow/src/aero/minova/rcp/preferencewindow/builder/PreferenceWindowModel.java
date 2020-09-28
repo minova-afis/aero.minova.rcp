@@ -6,18 +6,18 @@ import java.util.List;
 
 public class PreferenceWindowModel {
 
-	public static final  String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
+	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
 
 	public List<PreferenceTabDescriptor> createModel() {
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
 		cprf.add(buildAnwendungsTab());
-		
+
 		cprf.add(buildDarstellungsTab());
 
 		cprf.add(buildErweiterungTab());
-		
+
 		cprf.add(buildDruckenTab());
 
 		return cprf;
@@ -30,7 +30,7 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		PreferenceDescriptor pd = new PreferenceDescriptor("programmDirectory", "Programmverzeichnis", 0.1, DisplayType.FILE);
 		psd.add(pd);
-	
+
 		psd = new PreferenceSectionDescriptor("generalexecution", "Allgemeines", 0.2);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor("licenceWarning", "LizenzWarnung [wochen]", 0.1, DisplayType.INTEGER);
@@ -48,7 +48,7 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		pd = new PreferenceDescriptor("language", "Landessprache", 0.1, DisplayType.COMBO, "Deutsch", "Englisch");
 		psd.add(pd);
-	
+
 		psd = new PreferenceSectionDescriptor("designpreferences", "Design-Einstellungen", 0.2);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor("font", "Schriftgröße", 0.1, DisplayType.COMBO, "S", "M", "L", "XL");
@@ -79,7 +79,7 @@ public class PreferenceWindowModel {
 			psd.add(preferenceDescriptor);
 			
 			return ptd;
-		}
+	}
 
 	private PreferenceTabDescriptor buildDruckenTab() {
 		PreferenceTabDescriptor ptd;
@@ -90,10 +90,13 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		pd = new PreferenceDescriptor("xmlxsdcreate", "XML + XDS erstellen", 0.1, DisplayType.CHECK);
 		psd.add(pd);
-//		pd = new PreferenceDescriptor(psd, "font", "Schriftart Inhaltsverzeichnis", 0.2, DisplayType.FONT);
-//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "font"));
-//		psd.add(pd);
+		pd = new PreferenceDescriptor("font", "Schriftart Inhaltsverzeichnis", 0.2, DisplayType.FONT);
+		psd.add(pd);
+		pd = new PreferenceDescriptor("xmlxsdcreate", "XML + XDS erstellen", 0.1, DisplayType.CHECK);
+		psd.add(pd);
 		pd = new PreferenceDescriptor("optimizewidth", "Breiten optimieren", 0.3, DisplayType.CHECK);
+		psd.add(pd);
+		pd = new PreferenceDescriptor("style", "Schriftart Inhaltsverzeichnis", 0.2, DisplayType.FONT);
 		psd.add(pd);
 		pd = new PreferenceDescriptor("hideemptycolumn", "Leere Spalten verbergen", 0.4, DisplayType.CHECK);
 		psd.add(pd);

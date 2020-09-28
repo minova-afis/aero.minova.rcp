@@ -28,9 +28,8 @@ public class InstancePreferenceAccessor  {
 		default:
 			break;
 		}
-		throw new RuntimeException("getValue called but no fitting case");
+		throw new RuntimeException("Keinen passenden Wert gefunden");
 	}
-
 
 	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value) {
 			switch (type) {
