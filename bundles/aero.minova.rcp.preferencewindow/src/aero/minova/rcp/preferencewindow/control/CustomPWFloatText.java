@@ -2,9 +2,9 @@ package aero.minova.rcp.preferencewindow.control;
 
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFloatText;
 
-public class CostumPWFloatText extends PWFloatText {
+public class CustomPWFloatText extends PWFloatText {
 
-	public CostumPWFloatText(String label, String propertyKey) {
+	public CustomPWFloatText(String label, String propertyKey) {
 		super(label, propertyKey);
 		// TODO Auto-generated constructor stub
 	}
