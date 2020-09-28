@@ -2,7 +2,6 @@ package aero.minova.rcp.plugin1.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Table {
 
@@ -12,8 +11,8 @@ public class Table {
 	// spReadDriver
 	// opReadContact
 	//
-	List<Column> columns = new ArrayList();
-	List<Row> rows = new ArrayList();
+	List<Column> columns = new ArrayList<>();
+	List<Row> rows = new ArrayList<>();
 
 	public void setName(String name) {
 		this.name = name;
