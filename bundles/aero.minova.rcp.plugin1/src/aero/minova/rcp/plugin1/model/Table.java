@@ -2,7 +2,6 @@ package aero.minova.rcp.plugin1.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class Table {
 
@@ -57,10 +56,10 @@ public class Table {
 	public List<Row> getRows() {
 		return rows;
 	}
-	
+
 	public void addRow() {
 		Row row = new Row();
-		for (int i = 0; i < columns.size(); i++) {
+		for (Column column : columns) {
 			row.addValue(new Value(""));
 		}
 		rows.add(row);

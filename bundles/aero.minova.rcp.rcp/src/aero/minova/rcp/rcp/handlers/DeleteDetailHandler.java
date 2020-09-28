@@ -92,9 +92,9 @@ public class DeleteDetailHandler {
 		}
 		t.addRow(r);
 		if (t.getRows() != null) {
-			Integer responce = null;
+			Table responce = null;
 			try {
-				responce = dataService.getReturnCodeAsync(t.getName(), t).get();
+				responce = dataService.getDetailDataAsync(t.getName(), t).get();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -121,8 +121,8 @@ public class DeleteDetailHandler {
 
 	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
 	// befüllt um die Anfrage anzupassen
-	public boolean deleteEntry(Integer responce) {
-		if (responce != 0) {
+	public boolean deleteEntry(Table responce) {
+		if (responce.getRows() != null) {
 			MessageDialog.openError(shell, "Error", "Entry could not be deleted");
 			return false;
 		} else {

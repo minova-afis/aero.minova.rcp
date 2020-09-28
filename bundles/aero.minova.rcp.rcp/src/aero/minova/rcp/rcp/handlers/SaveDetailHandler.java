@@ -115,7 +115,7 @@ public class SaveDetailHandler {
 
 		if (contradiction == false) {
 			if (t.getRows() != null) {
-				CompletableFuture<Integer> tableFuture = dataService.getReturnCodeAsync(t.getName(), t);
+				CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 				if (t.getColumnName(0) != "KeyLong") {
 					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 						checkNewEntryInsert(tr);
@@ -177,8 +177,8 @@ public class SaveDetailHandler {
 	}
 
 	// Überprüft. ob das Update erfolgreich war
-	private void checkEntryUpdate(Integer responce) {
-		if (responce != 0) {
+	private void checkEntryUpdate(Table responce) {
+		if (responce.getRows() != null) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
 		} else {
@@ -196,8 +196,8 @@ public class SaveDetailHandler {
 	}
 
 	// Überprüft, ob der neue Eintrag erstellt wurde
-	private void checkNewEntryInsert(Integer responce) {
-		if (responce != 0) {
+	private void checkNewEntryInsert(Table responce) {
+		if (responce.getRows() != null) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
 		} else {
 			SucessDialog sucess = new SucessDialog(shell, "Sucessfully added the entry");

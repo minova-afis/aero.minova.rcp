@@ -244,14 +244,14 @@ public class XMLDetailPart {
 		}
 		entryKey = keylong;
 		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)//
-				.withColumn("EmployeeKey", DataType.STRING)//
-				.withColumn("OrderReceiverKey", DataType.STRING)//
-				.withColumn("ServiceContractKey", DataType.STRING)//
-				.withColumn("ServiceObjectKey", DataType.STRING)//
-				.withColumn("ServiceKey", DataType.STRING)//
-				.withColumn("BookingDate", DataType.ZONED)//
-				.withColumn("StartDate", DataType.ZONED)//
-				.withColumn("EndDate", DataType.ZONED)//
+				.withColumn("EmployeeKey", DataType.INTEGER)//
+				.withColumn("ServiceContractKey", DataType.INTEGER)//
+				.withColumn("OrderReceiverKey", DataType.INTEGER)//
+				.withColumn("ServiceObjectKey", DataType.INTEGER)//
+				.withColumn("ServiceKey", DataType.INTEGER)//
+				.withColumn("BookingDate", DataType.INSTANT)//
+				.withColumn("StartDate", DataType.INSTANT)//
+				.withColumn("EndDate", DataType.INSTANT)//
 				.withColumn("RenderedQuantity", DataType.DOUBLE)//
 				.withColumn("ChargedQuantity", DataType.DOUBLE)//
 				.withColumn("Description", DataType.STRING)//
@@ -262,11 +262,12 @@ public class XMLDetailPart {
 			updateSelectedEntry();
 		}));
 	}
-	// verarbeitung empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den
-	// daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
+
+	// Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
+	// den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
-		table = getTestTable();
+		// table = getTestTable();
 
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = table.getColumnName(i);

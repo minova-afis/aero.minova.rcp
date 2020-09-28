@@ -12,6 +12,7 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.plugin1.model.DataType;
+import aero.minova.rcp.plugin1.model.OutputType;
 import aero.minova.rcp.plugin1.model.Table;
 
 @Component
@@ -24,7 +25,7 @@ public class DataFormService implements IDataFormService {
 		for (Column c : form.getIndexView().getColumn()) {
 
 			aero.minova.rcp.plugin1.model.Column columnTable = new aero.minova.rcp.plugin1.model.Column(c.getName(),
-					getDataType(c));
+					getDataType(c), OutputType.OUTPUT);
 			dataTable.addColumn(columnTable);
 		}
 		return dataTable;
@@ -33,7 +34,7 @@ public class DataFormService implements IDataFormService {
 	/**
 	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element
 	 * zurück
-	 * 
+	 *
 	 * @param c aero.minova.rcp.form.model.xsd.Column;
 	 * @return DataType
 	 */
@@ -94,12 +95,12 @@ public class DataFormService implements IDataFormService {
 //		c.setName("Married"); // das hier ist Attribute im Datenmodell
 //		c.setTextAttribute("Verheiratet");
 //		form.getIndexView().getColumn().add(c);
-//		
+//
 //		Detail detail = new Detail();
 //		Head head = new Head();
 //		Page page = new Page();
 //		page.setText("Administration");
-//		
+//
 //		Field field = new Field();
 //		field.setName("Keylong");
 //		field.setVisible(false);
@@ -109,7 +110,7 @@ public class DataFormService implements IDataFormService {
 //		number.setDecimals(0);
 //		field.setNumber(number);
 //		head.getFieldOrGrid().add(field);
-//		
+//
 //		field = new Field();
 //		field.setName("KeyText");
 //		field.setTextAttribute("MatchCode");
@@ -119,7 +120,7 @@ public class DataFormService implements IDataFormService {
 //		text.setLength(20);
 //		field.setText(text);
 //		head.getFieldOrGrid().add(field);
-//		
+//
 //		field = new Field();
 //		field.setName("Description");
 //		field.setTextAttribute("Beschreibung");
@@ -129,7 +130,7 @@ public class DataFormService implements IDataFormService {
 //		text.setLength(50);
 //		field.setText(text);
 //		head.getFieldOrGrid().add(field);
-//		
+//
 //		field = new Field();
 //		field.setName("LastDate");
 //		field.setTextAttribute("Letzte Änderung");
@@ -138,7 +139,7 @@ public class DataFormService implements IDataFormService {
 //		Instant instant = Instant.now();
 //		field.setDateTime(instant);
 //		page.getFieldOrGrid().add(field);
-//		
+//
 //		field = new Field();
 //		field.setName("ValidUntil");
 //		field.setTextAttribute("Gültig bis");
@@ -147,7 +148,7 @@ public class DataFormService implements IDataFormService {
 //		ZonedDateTime zoned = ZonedDateTime.now();
 //		field.setDateTime(zoned);
 //		page.getFieldOrGrid().add(field);
-//		
+//
 //		field = new Field();
 //		field.setName("Married");
 //		field.setTextAttribute("Verheiratet");
@@ -157,7 +158,7 @@ public class DataFormService implements IDataFormService {
 //		text.setLength(20);
 //		field.setBoolean(bool);
 //		page.getFieldOrGrid().add(field);
-//		
+//
 //		field = new Field();
 //		field.setName("VehicleKey");
 //		field.setTextAttribute("Fahrzeug ID");
@@ -167,11 +168,11 @@ public class DataFormService implements IDataFormService {
 //		text.setLength(20);
 //		field.setLookup(lookup);
 //		page.getFieldOrGrid().add(field);
-//		
-//	
+//
+//
 //		detail.getHeadAndPage().add(head);
 //		detail.getHeadAndPage().add(page);
-//		
+//
 //		form.setDetail(detail);
 
 		return form;
