@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.swt.graphics.Image;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;

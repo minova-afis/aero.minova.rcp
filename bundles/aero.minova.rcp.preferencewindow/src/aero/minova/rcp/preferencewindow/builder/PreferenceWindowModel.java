@@ -9,7 +9,7 @@ import org.eclipse.e4.core.services.log.Logger;
 
 public class PreferenceWindowModel {
 
-	public static final  String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
+	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
 
 	@Inject
 	Logger logger;
@@ -18,12 +18,12 @@ public class PreferenceWindowModel {
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
-		cprf.add(buildAnwendungsTab());
-		
-		cprf.add(buildDarstellungsTab());
+//		cprf.add(buildAnwendungsTab());
+//
+//		cprf.add(buildDarstellungsTab());
+//
+//		cprf.add(buildErweiterungTab());
 
-		cprf.add(buildErweiterungTab());
-		
 		cprf.add(buildDruckenTab());
 
 		return cprf;
@@ -38,7 +38,7 @@ public class PreferenceWindowModel {
 				DisplayType.FILE);
 		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "file", logger));
 		psd.add(pd);
-	
+
 		psd = new PreferenceSectionDescriptor("generalexecution", "Allgemeines", 0.2);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor(psd, "licenceWarning", "LizenzWarnung [wochen]", 0.1, DisplayType.INTEGER);
@@ -59,7 +59,7 @@ public class PreferenceWindowModel {
 		pd.setValueAccessor(
 				new InstancePreferenceAccessor(PREFERENCES_NODE, "language", logger, "Deutsch", "Englisch"));
 		psd.add(pd);
-	
+
 		psd = new PreferenceSectionDescriptor("designpreferences", "Design-Einstellungen", 0.2);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor(psd, "font", "Schriftgröße", 0.1, DisplayType.COMBO);
@@ -77,79 +77,81 @@ public class PreferenceWindowModel {
 	}
 
 	private PreferenceTabDescriptor buildErweiterungTab() {
-			PreferenceTabDescriptor ptd;
-			PreferenceSectionDescriptor psd;
-			PreferenceDescriptor pd;
-			ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/erweitert.png", "expandedTab",
-					"Erweitert", 0.3);
-			psd = new PreferenceSectionDescriptor("generalexpanded", "Allgemeines", 0.1);
-			ptd.add(psd);
-			pd = new PreferenceDescriptor(psd, "masks", "Masken mehrfach öffnen", 0.1, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "masks", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "dragdrop", "DragDrop deaktivieren", 0.2, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "dragdrop", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "icons", "Alle Icons in Symbolleiste einblenden ", 0.3, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "icons", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "indexautoload", "Index beim Öffnen der Maske automatisch laden", 0.4,
-					DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "indexautoload", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "indexautoupdate", "Index automatisch nach dem Speichern aktualisieren", 0.5,
-					DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "indexautoupdate", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "reportwindow", "Meldungsfenster an Menüleiste", 0.6, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "reportwindow", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "descriptionButton", "Beschreibung für Schaltflächen einblenden", 0.7,
-					DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "descriptionButton", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "maskbuffer", "Masken Puffer benutzen", 0.8, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "maskbuffer", logger));
-			psd.add(pd);
-	
-			psd = new PreferenceSectionDescriptor("buffer", "Puffer", 0.2);
-			ptd.add(psd);
-			pd = new PreferenceDescriptor(psd, "displaybuffer", "Anzeige Puffer [ms]", 0.1, DisplayType.INTEGER);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "displaybuffer", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "maxbuffer", "Max. Puffer [ms]", 0.2, DisplayType.INTEGER);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "maxbuffer", logger));
-			psd.add(pd);
-			
-			psd = new PreferenceSectionDescriptor("table", "Tabelle", 0.3);
-			ptd.add(psd);
-	//		pd = new PreferenceDescriptor(psd, "selectiondelay", "Auswahltverzögerung [ms]", 0.1, DisplayType.INTEGER);
-	//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "selectiondelay", logger));
-	//		psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "sizeautoadjust", "Größe automatisch anpassen", 0.2, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "sizeautoadjust", logger));
-			psd.add(pd);
-			
-			psd = new PreferenceSectionDescriptor("parttable", "Teiltabelle", 0.5);
-			ptd.add(psd);
-			pd = new PreferenceDescriptor(psd, "fadeinbuttontext", "Schaltflächentext einblenden", 0.1, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "fadeinbuttontext", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "buttondetailarea", "Schaltfläche im Detailbereich", 0.2, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "buttondetailarea", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "showlookups", "Zeige Nachschläge", 0.3, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "showlookups", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "fadeingroups", "Gruppen einblenden", 0.4, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "fadeingroups", logger));
-			psd.add(pd);
-			pd = new PreferenceDescriptor(psd, "showchangedrow", "Zeige geänderte Zeilen", 0.5, DisplayType.CHECK);
-			pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "showchangedrow", logger));
-			psd.add(pd);
-			
-			return ptd;
-		}
+		PreferenceTabDescriptor ptd;
+		PreferenceSectionDescriptor psd;
+		PreferenceDescriptor pd;
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/erweitert.png", "expandedTab",
+				"Erweitert", 0.3);
+		psd = new PreferenceSectionDescriptor("generalexpanded", "Allgemeines", 0.1);
+		ptd.add(psd);
+		pd = new PreferenceDescriptor(psd, "masks", "Masken mehrfach öffnen", 0.1, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "masks", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "dragdrop", "DragDrop deaktivieren", 0.2, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "dragdrop", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "icons", "Alle Icons in Symbolleiste einblenden ", 0.3, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "icons", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "indexautoload", "Index beim Öffnen der Maske automatisch laden", 0.4,
+				DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "indexautoload", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "indexautoupdate", "Index automatisch nach dem Speichern aktualisieren", 0.5,
+				DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "indexautoupdate", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "reportwindow", "Meldungsfenster an Menüleiste", 0.6, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "reportwindow", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "descriptionButton", "Beschreibung für Schaltflächen einblenden", 0.7,
+				DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "descriptionButton", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "maskbuffer", "Masken Puffer benutzen", 0.8, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "maskbuffer", logger));
+		psd.add(pd);
+
+		psd = new PreferenceSectionDescriptor("buffer", "Puffer", 0.2);
+		ptd.add(psd);
+		pd = new PreferenceDescriptor(psd, "displaybuffer", "Anzeige Puffer [ms]", 0.1, DisplayType.INTEGER);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "displaybuffer", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "maxbuffer", "Max. Puffer [ms]", 0.2, DisplayType.INTEGER);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "maxbuffer", logger));
+		psd.add(pd);
+
+		psd = new PreferenceSectionDescriptor("table", "Tabelle", 0.3);
+		ptd.add(psd);
+		// pd = new PreferenceDescriptor(psd, "selectiondelay", "Auswahltverzögerung
+		// [ms]", 0.1, DisplayType.INTEGER);
+		// pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE,
+		// "selectiondelay", logger));
+		// psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "sizeautoadjust", "Größe automatisch anpassen", 0.2, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "sizeautoadjust", logger));
+		psd.add(pd);
+
+		psd = new PreferenceSectionDescriptor("parttable", "Teiltabelle", 0.5);
+		ptd.add(psd);
+		pd = new PreferenceDescriptor(psd, "fadeinbuttontext", "Schaltflächentext einblenden", 0.1, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "fadeinbuttontext", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "buttondetailarea", "Schaltfläche im Detailbereich", 0.2, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "buttondetailarea", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "showlookups", "Zeige Nachschläge", 0.3, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "showlookups", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "fadeingroups", "Gruppen einblenden", 0.4, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "fadeingroups", logger));
+		psd.add(pd);
+		pd = new PreferenceDescriptor(psd, "showchangedrow", "Zeige geänderte Zeilen", 0.5, DisplayType.CHECK);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "showchangedrow", logger));
+		psd.add(pd);
+
+		return ptd;
+	}
 
 	private PreferenceTabDescriptor buildDruckenTab() {
 		PreferenceTabDescriptor ptd;
@@ -158,28 +160,29 @@ public class PreferenceWindowModel {
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "printTab", "Drucken", 0.4);
 		psd = new PreferenceSectionDescriptor("print", "Drucken", 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor(psd, "xmlxsdcreate", "XML + XDS erstellen", 0.1, DisplayType.CHECK);
-		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "createxmlxsd", logger));
-		psd.add(pd);
-//		pd = new PreferenceDescriptor(psd, "font", "Schriftart Inhaltsverzeichnis", 0.2, DisplayType.FONT);
-//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "font", logger));
+//		pd = new PreferenceDescriptor(psd, "xmlxsdcreate", "XML + XDS erstellen", 0.1, DisplayType.CHECK);
+//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "createxmlxsd", logger));
 //		psd.add(pd);
-		pd = new PreferenceDescriptor(psd, "optimizewidth", "Breiten optimieren", 0.3, DisplayType.CHECK);
-		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "optimizewidth", logger));
+		pd = new PreferenceDescriptor(psd, "style", "Schriftart Inhaltsverzeichnis", 0.2, DisplayType.FONT);
+		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "style", logger));
 		psd.add(pd);
-		pd = new PreferenceDescriptor(psd, "hideemptycolumn", "Leere Spalten verbergen", 0.4, DisplayType.CHECK);
-		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "hideemptycolumn", logger));
-		psd.add(pd);
-		pd = new PreferenceDescriptor(psd, "hidegoupcolumns", "Gruppenspalten verbergen", 0.5, DisplayType.CHECK);
-		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "hidegoupcolumns", logger));
-		psd.add(pd);
-		pd = new PreferenceDescriptor(psd, "hidesearchdetails", "Suchkriterien verbergen", 0.6, DisplayType.CHECK);
-		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "hidesearchdetails", logger));
-		psd.add(pd);
-		pd = new PreferenceDescriptor(psd, "deactivateinternpreview", "Gruppenspalten verbergen", 0.7, DisplayType.CHECK);
-		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "deactivateinternpreview", logger));
-		psd.add(pd);
-		
+//		pd = new PreferenceDescriptor(psd, "optimizewidth", "Breiten optimieren", 0.3, DisplayType.CHECK);
+//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "optimizewidth", logger));
+//		psd.add(pd);
+//		pd = new PreferenceDescriptor(psd, "hideemptycolumn", "Leere Spalten verbergen", 0.4, DisplayType.CHECK);
+//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "hideemptycolumn", logger));
+//		psd.add(pd);
+//		pd = new PreferenceDescriptor(psd, "hidegoupcolumns", "Gruppenspalten verbergen", 0.5, DisplayType.CHECK);
+//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "hidegoupcolumns", logger));
+//		psd.add(pd);
+//		pd = new PreferenceDescriptor(psd, "hidesearchdetails", "Suchkriterien verbergen", 0.6, DisplayType.CHECK);
+//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "hidesearchdetails", logger));
+//		psd.add(pd);
+//		pd = new PreferenceDescriptor(psd, "deactivateinternpreview", "Gruppenspalten verbergen", 0.7,
+//				DisplayType.CHECK);
+//		pd.setValueAccessor(new InstancePreferenceAccessor(PREFERENCES_NODE, "deactivateinternpreview", logger));
+//		psd.add(pd);
+
 		return ptd;
 	}
 

@@ -63,7 +63,7 @@ public class InstancePreferenceAccessor implements PreferenceAccessor {
 				preferenceValue = preferences.get(preferenceKey, "");
 				break;
 			case FONT:
-				preferenceValue = preferences.get(preferenceKey, "font");
+				preferenceValue = preferences.get(preferenceKey, null);
 				break;
 			default:
 				break;

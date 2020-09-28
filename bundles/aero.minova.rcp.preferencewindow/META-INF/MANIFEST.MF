@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.nebula.widgets.opal.preferencewindow;bundle-version=
  org.eclipse.persistence.core,
  org.eclipse.e4.core.services;bundle-version="2.2.300",
  org.eclipse.osgi,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.swt
 Export-Package: aero.minova.rcp.preferencewindow.builder
 Import-Package: org.eclipse.jface.resource
