@@ -10,7 +10,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
 import aero.minova.rcp.core.ui.PartsID;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 
 public class ClearSearchHandler {
 

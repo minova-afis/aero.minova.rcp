@@ -10,11 +10,11 @@ import org.eclipse.swt.widgets.Control;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.TypeParam;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.builder.RowBuilder;
-import aero.minova.rcp.plugin1.model.builder.TableBuilder;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
 
 public class LookupCASRequestUtil {
 	public static CompletableFuture<Table> getRequestedTable(int keyLong, String keyText, Field field,

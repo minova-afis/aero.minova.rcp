@@ -1,4 +1,4 @@
-package aero.minova.rcp.plugin1.model;
+package aero.minova.rcp.model;
 
 public class Column {
 	public Column(String name, DataType type, OutputType outputType) {

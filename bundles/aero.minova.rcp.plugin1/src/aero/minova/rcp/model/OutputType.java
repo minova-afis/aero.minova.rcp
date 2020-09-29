@@ -1,4 +1,4 @@
-package aero.minova.rcp.plugin1.model;
+package aero.minova.rcp.model;
 
 public enum OutputType {
 	INPUT, OUTPUT;

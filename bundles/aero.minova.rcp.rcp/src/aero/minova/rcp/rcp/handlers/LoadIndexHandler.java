@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 
 public class LoadIndexHandler {
 

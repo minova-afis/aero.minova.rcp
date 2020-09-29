@@ -1,4 +1,4 @@
-package aero.minova.rcp.plugin1.model;
+package aero.minova.rcp.model;
 
 import java.lang.reflect.Type;
 import java.time.Instant;

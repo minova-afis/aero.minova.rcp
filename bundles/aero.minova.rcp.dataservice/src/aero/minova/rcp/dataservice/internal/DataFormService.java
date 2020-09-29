@@ -16,9 +16,9 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.OutputType;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.OutputType;
+import aero.minova.rcp.model.Table;
 
 @Component
 public class DataFormService implements IDataFormService {
@@ -29,7 +29,7 @@ public class DataFormService implements IDataFormService {
 		dataTable.setName(form.getIndexView().getSource());
 		for (Column c : form.getIndexView().getColumn()) {
 
-			aero.minova.rcp.plugin1.model.Column columnTable = new aero.minova.rcp.plugin1.model.Column(c.getName(),
+			aero.minova.rcp.model.Column columnTable = new aero.minova.rcp.model.Column(c.getName(),
 					getDataType(c), OutputType.OUTPUT);
 			dataTable.addColumn(columnTable);
 		}
@@ -84,7 +84,7 @@ public class DataFormService implements IDataFormService {
 		return fields;
 	}
 
-	public aero.minova.rcp.plugin1.model.Column createColumnFromField(Field f) {
+	public aero.minova.rcp.model.Column createColumnFromField(Field f) {
 		DataType type = null;
 		if (f.getPercentage() != null || f.getMoney() != null
 				|| (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
@@ -102,7 +102,7 @@ public class DataFormService implements IDataFormService {
 			type = DataType.INSTANT;
 		}
 
-		return new aero.minova.rcp.plugin1.model.Column(f.getName(), type, OutputType.OUTPUT);
+		return new aero.minova.rcp.model.Column(f.getName(), type, OutputType.OUTPUT);
 
 	}
 	/**

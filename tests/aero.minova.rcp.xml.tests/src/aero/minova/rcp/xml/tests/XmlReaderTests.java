@@ -13,7 +13,7 @@ import aero.minova.rcp.dataservice.internal.DataFormService;
 import aero.minova.rcp.dataservice.internal.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.plugin1.model.DataType;
+import aero.minova.rcp.model.DataType;
 
 import org.junit.Before;
 import org.junit.Test;

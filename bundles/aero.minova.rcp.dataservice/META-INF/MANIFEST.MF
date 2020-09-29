@@ -5,7 +5,7 @@ Bundle-SymbolicName: aero.minova.rcp.dataservice
 Bundle-Version: 1.2.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.dataservice
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Require-Bundle: aero.minova.rcp.plugin1;bundle-version="1.2.0",
+Require-Bundle: aero.minova.rcp.model;bundle-version="1.2.0",
  javax.xml.bind;bundle-version="2.2.0"
 Export-Package: aero.minova.rcp.dataservice,
  aero.minova.rcp.dataservice.internal

@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
 import aero.minova.rcp.dataservice.internal.DataFormService;
 import aero.minova.rcp.dataservice.internal.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 
 public class ReadDetailFromMaskTest {
 

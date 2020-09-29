@@ -16,14 +16,14 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import aero.minova.rcp.plugin1.model.Column;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.SqlProcedureResult;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
-import aero.minova.rcp.plugin1.model.ValueDeserializer;
-import aero.minova.rcp.plugin1.model.ValueSerializer;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 
 public class GsonTest {
 

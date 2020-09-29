@@ -1,10 +1,10 @@
-package aero.minova.rcp.plugin1.model.builder;
+package aero.minova.rcp.model.builder;
 
-import aero.minova.rcp.plugin1.model.Column;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.OutputType;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.OutputType;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 
 public class TableBuilder {
 

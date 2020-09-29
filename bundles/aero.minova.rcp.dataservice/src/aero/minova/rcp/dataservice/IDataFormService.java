@@ -4,7 +4,7 @@ import java.util.List;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 
 public interface IDataFormService {
 

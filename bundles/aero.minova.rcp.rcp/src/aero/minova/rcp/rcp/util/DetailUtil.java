@@ -23,13 +23,13 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
-import aero.minova.rcp.plugin1.model.builder.RowBuilder;
-import aero.minova.rcp.plugin1.model.builder.TableBuilder;
-import aero.minova.rcp.plugin1.model.builder.ValueBuilder;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {

@@ -1,11 +1,11 @@
-package aero.minova.rcp.plugin1.model.builder;
+package aero.minova.rcp.model.builder;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Value;
 
 public class ValueBuilder {
 	private Object translatedValue;

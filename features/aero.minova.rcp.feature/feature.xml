@@ -18,7 +18,7 @@
    </license>
 
    <plugin
-         id="aero.minova.rcp.plugin1"
+         id="aero.minova.rcp.model"
          download-size="0"
          install-size="0"
          version="0.0.0"

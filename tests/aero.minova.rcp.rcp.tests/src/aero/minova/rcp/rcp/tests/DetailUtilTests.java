@@ -22,7 +22,7 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Lookup;
 import aero.minova.rcp.form.model.xsd.Number;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.util.DetailUtil;
 
 public class DetailUtilTests {
@@ -54,7 +54,7 @@ public class DetailUtilTests {
 		field.setVisible(true);
 		field.setTextAttribute("Testing");
 		field.setNumberRowsSpanned("THIS RESULTS IN AN EXCEPTION");
-		DetailUtil.createField(field, composite);
+		DetailUtil.createField(field, composite, null);
 	}
 	
 	@Test
@@ -62,7 +62,7 @@ public class DetailUtilTests {
 		Composite composite = CompositeFactory.newComposite(SWT.None).create(shell);
 		Field field = new Field();
 		field.setVisible(false);
-		DetailUtil.createField(field, composite);
+		DetailUtil.createField(field, composite, null);
 		assertTrue(composite.getChildren().length == 0);
 	}
 
@@ -98,7 +98,7 @@ public class DetailUtilTests {
 		Composite co = DetailUtil.createSection(formToolkit, composite.getParent(), head);
 		for (Object o2 : head.getFieldOrGrid()) {
 			if (o2 instanceof Field) {
-				DetailUtil.createField((Field) o2, co);
+				DetailUtil.createField((Field) o2, co, null);
 			}
 		}
 		Control[] children = co.getChildren();
@@ -144,7 +144,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Test");
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
-		DetailUtil.createField(field, composite);
+		DetailUtil.createField(field, composite, null);
 		Control[] children = composite.getChildren();
 		assertEquals(children.length, 3);
 		Object layoutData = children[0].getLayoutData();
@@ -171,7 +171,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Test");
 		field.setNumber(new Number());
 		field.setUnitText("L");
-		DetailUtil.createField(field, composite);
+		DetailUtil.createField(field, composite, null);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
 		Object layoutData = children[0].getLayoutData();
@@ -197,7 +197,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Test");
 		field.setLookup(new Lookup());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
-		DetailUtil.createField(field, composite);
+		DetailUtil.createField(field, composite, null);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
 		Object layoutData = children[0].getLayoutData();

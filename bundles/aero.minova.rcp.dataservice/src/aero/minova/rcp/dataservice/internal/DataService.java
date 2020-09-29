@@ -15,11 +15,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.SqlProcedureResult;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
-import aero.minova.rcp.plugin1.model.ValueDeserializer;
-import aero.minova.rcp.plugin1.model.ValueSerializer;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 
 @Component
 public class DataService implements IDataService {
