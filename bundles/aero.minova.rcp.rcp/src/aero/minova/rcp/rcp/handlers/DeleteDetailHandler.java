@@ -98,6 +98,7 @@ public class DeleteDetailHandler {
 			}
 			t.addRow(r);
 			if (t.getRows() != null) {
+				// TODO: umbau auf SqlProcedureResult
 				CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 					int responce = 1;
