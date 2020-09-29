@@ -6,6 +6,11 @@ public class Column {
 		this.type = type;
 		this.outputType = outputType;
 	}
+
+	public Column(String name, DataType type) {
+		this.name = name;
+		this.type = type;
+	}
 	String name;
 	DataType type;
 	OutputType outputType;

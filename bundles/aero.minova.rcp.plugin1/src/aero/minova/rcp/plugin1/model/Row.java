@@ -17,4 +17,8 @@ public class Row {
 	public void setValue(Value value, int index) {
 		values.set(index, value);
 	}
+
+	public int size() {
+		return values.size();
+	}
 }

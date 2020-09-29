@@ -3,11 +3,14 @@ package aero.minova.rcp.xml.tests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -16,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import aero.minova.rcp.plugin1.model.Column;
 import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
+import aero.minova.rcp.plugin1.model.SqlProcedureResult;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.Value;
 import aero.minova.rcp.plugin1.model.ValueDeserializer;
@@ -25,7 +29,7 @@ public class GsonTest {
 
 	private Table t;
 
-	@Before
+	// @Before
 	public void setup() {
 		t = new Table();
 		t.setName("OrderReceiver");
@@ -35,7 +39,7 @@ public class GsonTest {
 		t.addColumn(new Column("LastDate", DataType.ZONED));
 		t.addColumn(new Column("ValidUntil", DataType.INSTANT));
 		t.addColumn(new Column("Married", DataType.BOOLEAN));
-		// Wenn in dieser Row ein & steht, bedeutet es, dass die Row inklusiver der vorherigen zusammengeführt werden. Es bildet ein selektionskriterium mit UND 
+		// Wenn in dieser Row ein & steht, bedeutet es, dass die Row inklusiver der vorherigen zusammengeführt werden. Es bildet ein selektionskriterium mit UND
 		t.addColumn(new Column("&", DataType.BOOLEAN)); // Verunden
 
 		Row r;
@@ -73,7 +77,38 @@ public class GsonTest {
 	public void ensureTableIsInitialized() {
 		assertTrue(t!=null);
 	}
-	
+
+	@Test
+	public void blabla() {
+		Instant now = Instant.parse("2020-08-04T22:00:00Z");
+		System.out.println(now);
+
+		String s = null;
+		String userDir = System.getProperty("user.home");
+		String p = userDir
+				+ "/git/aero.minova.rcp/tests/aero.minova.rcp.xml.tests/src/aero/minova/rcp/xml/tests/examplejson.json";
+		try {
+			// FileReader fr = new FileReader(f);
+			s = new String(Files.readAllBytes(Paths.get(p)));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Gson gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
+
+		SqlProcedureResult sql = gson.fromJson(s, SqlProcedureResult.class);
+		assertTrue(sql.getOutputParameters().getRows() != null);
+	}
+
 	@Test
 	public void tableCanBeConvertedToGsonAndBack() {
 		Gson gson = new Gson();
@@ -87,5 +122,5 @@ public class GsonTest {
 		Table newTable = gson.fromJson(s, Table.class);
 		assertNotNull(newTable);
 	}
-	
+
 }

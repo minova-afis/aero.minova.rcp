@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.plugin1.model.SqlProcedureResult;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.Value;
 import aero.minova.rcp.plugin1.model.ValueDeserializer;
@@ -71,7 +72,7 @@ public class DataService implements IDataService {
 				.build();
 
 		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
+				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class).getOutputParameters());
 
 		return future;
 	}

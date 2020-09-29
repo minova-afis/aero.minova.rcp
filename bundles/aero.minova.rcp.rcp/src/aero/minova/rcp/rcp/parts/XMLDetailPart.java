@@ -1,8 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +28,14 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.plugin1.model.DataType;
 import aero.minova.rcp.plugin1.model.Row;
 import aero.minova.rcp.plugin1.model.Table;
 import aero.minova.rcp.plugin1.model.builder.RowBuilder;
-import aero.minova.rcp.plugin1.model.builder.TableBuilder;
 import aero.minova.rcp.plugin1.model.builder.ValueBuilder;
 import aero.minova.rcp.plugin1.textfieldVerifier.TextfieldVerifier;
 import aero.minova.rcp.rcp.util.DetailUtil;
@@ -65,6 +62,7 @@ public class XMLDetailPart {
 	private Map<String, Control> controls = new HashMap<>();
 	private int entryKey = 0;
 	private Table selectedTable;
+	private Form form;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -72,7 +70,7 @@ public class XMLDetailPart {
 		parent.setLayout(new GridLayout(1, true));
 		this.parent = parent;
 
-		Form form = dataFormService.getForm();
+		form = dataFormService.getForm();
 
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
@@ -98,7 +96,7 @@ public class XMLDetailPart {
 		// garantiert das gültige Eingaben an den CAS versendet werden können
 		for (Control c : controls.values()) {
 			if (c instanceof LookupControl) {
-				requestOptionsFromCAS(c);
+				// requestOptionsFromCAS(c);
 			}
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
 			if ((c.getData("field") == controls.get("StartDate").getData("field"))
@@ -184,6 +182,7 @@ public class XMLDetailPart {
 			}
 		});
 	}
+
 	// Eigentliche CAS abfrage anhand des gegebenen KeyTextes
 	public void requestOptionsFromCAS(Control c) {
 		Field field = (Field) c.getData("field");
@@ -194,6 +193,7 @@ public class XMLDetailPart {
 			changeOptionsForLookupField(ta, c);
 		}));
 	}
+
 	// Tauscht die Optionen aus, welche dem LookupField zur Verfügung stehen
 	public void changeOptionsForLookupField(Table ta, Control c) {
 		Map m = new HashMap<Integer, String>();
@@ -203,6 +203,7 @@ public class XMLDetailPart {
 		c.setData("options", m);
 		changeShownOptions(c);
 	}
+
 	// Schränkt die angezeigten Optionen an, welche in der Map hinterlegt sind,
 	// anhand des eingegebenen Strings
 	// TODO: Die Optionen sind als Hashmap vorhanden, allerdings existiert noch kein
@@ -228,39 +229,54 @@ public class XMLDetailPart {
 			}
 		}
 	}
+
 	// Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
 	// Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
-		if (rows == null || rows.isEmpty()) {
-			return;
+		if (rows != null) {
+
+			Row row = rows.get(0);
+			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
+
+			RowBuilder builder = RowBuilder.newRow();
+			List<Field> allFields = dataFormService.getFieldsFromForm(form);
+
+			// Hauptmaske
+
+			List<Column> indexColumns = form.getIndexView().getColumn();
+			for (Field f : allFields) {
+				boolean found = false;
+				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+
+					if (indexColumns.get(i).getName().equals(f.getName())) {
+						found = true;
+						if ("primary".equals(f.getKeyType())) {
+							builder.withValue(row.getValue(i).getValue());
+						} else {
+							builder.withValue(null);
+						}
+					}
+				}
+				if (!found) {
+					builder.withValue(null);
+				}
+
+			}
+			Row r = builder.create();
+			// TODO: dieser wert wurde gesetzt, um einen revert zu ermöglichen und den
+			// save/delete-button zu verwenden, dies muss nun abgeändert werden auf mehrere
+			// Keys
+			// entryKey = keylong;
+			rowIndexTable.addRow(r);
+
+			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
+					rowIndexTable);
+			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+				selectedTable = t;
+				updateSelectedEntry();
+			}));
 		}
-		int keylong = 0;
-		Row row = rows.get(0);
-		if (row.getValue(0).getIntegerValue() == null) {
-			return;
-		} else {
-			keylong = row.getValue(0).getIntegerValue();
-		}
-		entryKey = keylong;
-		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)//
-				.withColumn("EmployeeKey", DataType.INTEGER)//
-				.withColumn("ServiceContractKey", DataType.INTEGER)//
-				.withColumn("OrderReceiverKey", DataType.INTEGER)//
-				.withColumn("ServiceObjectKey", DataType.INTEGER)//
-				.withColumn("ServiceKey", DataType.INTEGER)//
-				.withColumn("BookingDate", DataType.INSTANT)//
-				.withColumn("StartDate", DataType.INSTANT)//
-				.withColumn("EndDate", DataType.INSTANT)//
-				.withColumn("RenderedQuantity", DataType.DOUBLE)//
-				.withColumn("ChargedQuantity", DataType.DOUBLE)//
-				.withColumn("Description", DataType.STRING)//
-				.withColumn("Spelling", DataType.BOOLEAN).withKey(keylong).create();
-		CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
-		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-			selectedTable = t;
-			updateSelectedEntry();
-		}));
 	}
 
 	// Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
@@ -275,10 +291,10 @@ public class XMLDetailPart {
 			if (c != null) {
 				Consumer<Table> consumer = (Consumer<Table>) c.getData("consumer");
 				if (consumer != null) {
-						try {
-							consumer.accept(table);
-						} catch (Exception e) {
-						}
+					try {
+						consumer.accept(table);
+					} catch (Exception e) {
+					}
 				}
 				Map hash = new HashMap<>();
 				hash.put("value", table.getRows().get(0).getValue(i));
@@ -296,34 +312,6 @@ public class XMLDetailPart {
 
 			}
 		}
-	}
-	// Testdaten, welche nach erfolgreicher CAS-Abfrage gelöscht werden
-	public Table getTestTable() {
-		Table rowIndexTable = TableBuilder.newTable("spReadWorkingTime").withColumn("KeyLong", DataType.INTEGER)
-				.withColumn("EmployeeKey", DataType.STRING).withColumn("OrderReceiverKey", DataType.STRING)
-				.withColumn("ServiceContractKey", DataType.STRING).withColumn("ServiceObjectKey", DataType.STRING)
-				.withColumn("ServiceKey", DataType.STRING).withColumn("BookingDate", DataType.ZONED)
-				.withColumn("StartDate", DataType.ZONED).withColumn("EndDate", DataType.ZONED)
-				.withColumn("RenderedQuantity", DataType.DOUBLE).withColumn("ChargedQuantity", DataType.DOUBLE)
-				.withColumn("Description", DataType.STRING).withColumn("Spelling", DataType.BOOLEAN).create();
-
-		Row r = RowBuilder.newRow()//
-				.withValue(3)//
-				.withValue(3)//
-				.withValue(44)//
-				.withValue(55)//
-				.withValue(66)//
-				.withValue(77)//
-				.withValue(ZonedDateTime.of(1968, 12, 18, 00, 00, 0, 0, ZoneId.of("Europe/Berlin")))//
-				.withValue(ZonedDateTime.of(1968, 12, 18, 18, 15, 0, 0, ZoneId.of("Europe/Berlin")))//
-				.withValue(ZonedDateTime.of(1968, 12, 18, 18, 30, 0, 0, ZoneId.of("Europe/Berlin")))//
-				.withValue(44.2)//
-				.withValue(33.2)//
-				.withValue("test")//
-				.withValue(true)//
-				.create();
-		rowIndexTable.addRow(r);
-		return rowIndexTable;
 	}
 
 	public Map<String, Control> getControls() {

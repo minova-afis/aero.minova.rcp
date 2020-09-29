@@ -20,7 +20,6 @@ public class LookupCASRequestUtil {
 	public static CompletableFuture<Table> getRequestedTable(int keyLong, String keyText, Field field,
 			Map<String, Control> controls, IDataService dataService, UISynchronize sync) {
 		String tableName;
-
 		if (field.getLookup().getTable() != null) {
 			tableName = field.getLookup().getTable();
 		} else {
@@ -34,6 +33,10 @@ public class LookupCASRequestUtil {
 			rb = RowBuilder.newRow().withValue(null).withValue(keyText);
 		} else {
 			rb = RowBuilder.newRow().withValue(keyLong).withValue(null);
+		}
+		if (field.getLookup().getTable() == null) {
+			tb = tb.withColumn("FilterLastAction", DataType.BOOLEAN);
+			rb = rb.withValue(0);
 		}
 
 		// TODO: Einschränken der angegebenen Optionen anhand bereits ausgewählter

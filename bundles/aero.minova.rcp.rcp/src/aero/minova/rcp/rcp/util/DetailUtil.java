@@ -226,7 +226,7 @@ public class DetailUtil {
 	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
 	// Bindung zur Componente
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
-		ta = getTestTableLookupFields();
+		// ta = getTestTableLookupFields();
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
 		Value v = r.getValue(1);
