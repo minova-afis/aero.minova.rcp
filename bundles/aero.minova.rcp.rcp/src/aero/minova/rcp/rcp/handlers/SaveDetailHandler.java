@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +32,6 @@ import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class SaveDetailHandler {
 
-
 	@Inject
 	private IEventBroker broker;
 
@@ -45,7 +45,6 @@ public class SaveDetailHandler {
 	private UISynchronize sync;
 
 	private Shell shell;
-
 
 	private Table searchTable;
 
@@ -66,10 +65,12 @@ public class SaveDetailHandler {
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb;
 		RowBuilder rb = RowBuilder.newRow();
-		if (xmlPart.getEntryKey() != 0) {
+		if (xmlPart.getKeys() != null) {
 			tb = TableBuilder.newTable("spUpdateWorkingTime");
-			tb.withColumn("KeyLong", DataType.INTEGER);
-			rb.withValue(xmlPart.getEntryKey());
+			for (ArrayList key : xmlPart.getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
 		} else {
 			tb = TableBuilder.newTable("spInsertWorkingTime");
 		}
@@ -89,8 +90,7 @@ public class SaveDetailHandler {
 				tb.withColumn(s, (DataType) c.getData("dataType"));
 				if (c.getData("keyLong") != null) {
 					rb.withValue(c.getData("keyLong"));
-				}
-				else {
+				} else {
 					rb.withValue(null);
 				}
 			}
@@ -105,37 +105,16 @@ public class SaveDetailHandler {
 			}
 		}
 		t.addRow(r);
-		boolean contradiction = checkWorkingTime((int) controls.get("EmployeeKey").getData("keyLong"),
-				((Text) controls.get("BookingDate")).getText(),
-				((Text) controls.get("StartDate")).getText(), ((Text) controls.get("EndDate")).getText(),
-				((Text) controls.get("RenderedQuantity")).getText(),
-				((Text) controls.get("ChargedQuantity")).getText());
-		// FOR TEST PURPOSE, DELETE
-		contradiction = false;
-
-		if (contradiction == false) {
-			if (t.getRows() != null) {
-				CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-				if (t.getColumnName(0) != "KeyLong") {
-					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-						checkNewEntryInsert(tr);
-					}));
-				} else {
-					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-						checkEntryUpdate(tr);
-					}));
-				}
-			}
-		} else {
-			MessageDialog.openError(shell, "Error", "Entry not possible, check for wrong inputs in your messured Time");
-		}
+		checkWorkingTime((int) controls.get("EmployeeKey").getData("keyLong"),
+				((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
+				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
+				((Text) controls.get("ChargedQuantity")).getText(), t);
 	}
 
 	// Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
 	// eine Überschneidung in den Arbeitszeiten vorliegt
-	private boolean checkWorkingTime(int employee, String bookingDate, String startDate, String endDate,
-			String renderedQuantity,
-			String chargedQuantity) {
+	private void checkWorkingTime(int employee, String bookingDate, String startDate, String endDate,
+			String renderedQuantity, String chargedQuantity, Table t) {
 		boolean contradiction = false;
 
 		// Prüfen, ob die bemessene Arbeitszeit der differenz der Stunden entspricht
@@ -149,36 +128,54 @@ public class SaveDetailHandler {
 		float chargedQuantityFloat = Float.parseFloat(chargedQuantity);
 		if (timeDifference != renderedQuantityFloat) {
 			contradiction = true;
-			return contradiction;
 		}
 		if ((renderedQuantityFloat != chargedQuantityFloat) && (renderedQuantityFloat != chargedQuantityFloat + 0.25)
 				&& (renderedQuantityFloat != chargedQuantityFloat - 0.25)) {
 			contradiction = true;
-			return contradiction;
 		}
 		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
 		// Zeitrahmen bereits einträge existieren
-		Table table = TableBuilder.newTable("spReadWorkingTime").withColumn("EmployeeKey", DataType.INTEGER)
-				.withColumn("BookingDate", DataType.INSTANT).withColumn("StartDate", DataType.INSTANT)
-				.withColumn("EndDate", DataType.INSTANT).create();
-		Row r = RowBuilder.newRow().withValue(employee).withValue(bookingDate).withValue(">=" + startDate)
-				.withValue("=<" + endDate).create();
-		table.addRow(r);
-		Table checkTimes = null;
-		try {
-			checkTimes = dataService.getDetailDataAsync(table.getName(), table).get();
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (contradiction != true) {
+
+			Table table = TableBuilder.newTable("spReadWorkingTime").withColumn("EmployeeKey", DataType.INTEGER)
+					.withColumn("BookingDate", DataType.INSTANT).withColumn("StartDate", DataType.INSTANT)
+					.withColumn("EndDate", DataType.INSTANT).create();
+			Row r = RowBuilder.newRow().withValue(employee).withValue(bookingDate).withValue(">=" + startDate)
+					.withValue("=<" + endDate).create();
+			table.addRow(r);
+
+			CompletableFuture<Table> checkTimes = dataService.getDetailDataAsync(table.getName(), table);
+			checkTimes.thenAccept(ta -> sync.asyncExec(() -> {
+
+				continueCheck(t, ta);
+			}));
 		}
-		if (checkTimes.getRows() != null) {
-			contradiction = true;
+	}
+
+	private void continueCheck(Table t, Table ta) {
+		if (ta.getRows() != null) {
+			if (t.getRows() != null) {
+				// TODO: umbau auf SqlProcedureResult
+				CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				int responce = 1;
+				if (t.getColumnName(0) != "KeyLong") {
+					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+						checkNewEntryInsert(responce);
+					}));
+				} else {
+					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+						checkEntryUpdate(responce);
+					}));
+				}
+			}
+		} else {
+			MessageDialog.openError(shell, "Error", "Entry not possible, check for wrong inputs in your messured Time");
 		}
-		return contradiction;
 	}
 
 	// Überprüft. ob das Update erfolgreich war
-	private void checkEntryUpdate(Table responce) {
-		if (responce.getRows() != null) {
+	private void checkEntryUpdate(int responce) {
+		if (responce != 1) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
 		} else {
@@ -196,8 +193,8 @@ public class SaveDetailHandler {
 	}
 
 	// Überprüft, ob der neue Eintrag erstellt wurde
-	private void checkNewEntryInsert(Table responce) {
-		if (responce.getRows() != null) {
+	private void checkNewEntryInsert(int responce) {
+		if (responce != 1) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
 		} else {
 			SucessDialog sucess = new SucessDialog(shell, "Sucessfully added the entry");

@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public class XMLDetailPart {
 
 	private Map<String, Control> controls = new HashMap<>();
 	private int entryKey = 0;
+	private List<ArrayList> keys = null;
 	private Table selectedTable;
 	private Form form;
 
@@ -245,14 +247,19 @@ public class XMLDetailPart {
 			// Hauptmaske
 
 			List<Column> indexColumns = form.getIndexView().getColumn();
+			setKeys(new ArrayList<ArrayList>());
 			for (Field f : allFields) {
 				boolean found = false;
 				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-
 					if (indexColumns.get(i).getName().equals(f.getName())) {
 						found = true;
 						if ("primary".equals(f.getKeyType())) {
 							builder.withValue(row.getValue(i).getValue());
+							ArrayList al = new ArrayList();
+							al.add(indexColumns.get(i).getName());
+							al.add(row.getValue(i).getValue());
+							al.add(ValueBuilder.newValue(row.getValue(i)).dataType());
+							keys.add(al);
 						} else {
 							builder.withValue(null);
 						}
@@ -264,10 +271,6 @@ public class XMLDetailPart {
 
 			}
 			Row r = builder.create();
-			// TODO: dieser wert wurde gesetzt, um einen revert zu ermöglichen und den
-			// save/delete-button zu verwenden, dies muss nun abgeändert werden auf mehrere
-			// Keys
-			// entryKey = keylong;
 			rowIndexTable.addRow(r);
 
 			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
@@ -283,7 +286,6 @@ public class XMLDetailPart {
 	// den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
-		// table = getTestTable();
 
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = table.getColumnName(i);
@@ -318,13 +320,13 @@ public class XMLDetailPart {
 		return controls;
 	}
 
-	public void setEntryKey(int entryKey) {
-		this.entryKey = entryKey;
-
+	public List<ArrayList> getKeys() {
+		return keys;
 	}
 
-	public int getEntryKey() {
-		return entryKey;
-
+	public void setKeys(List<ArrayList> keys) {
+		this.keys = keys;
 	}
+
+
 }

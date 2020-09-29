@@ -36,7 +36,8 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.emf.common,
  org.eclipse.e4.core.commands,
  org.eclipse.core.commands,
- org.eclipse.e4.ui.workbench.perspectiveswitcher
+ org.eclipse.e4.ui.workbench.perspectiveswitcher,
+ aero.minova.rcp.model;bundle-version="1.2.0"
 Automatic-Module-Name: aero.minova.rcp.rcp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.core.ui,

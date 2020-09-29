@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -60,77 +61,74 @@ public class DeleteDetailHandler {
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
 		RowBuilder rb = RowBuilder.newRow();
-		int i = 0;
-		for (Control c : controls.values()) {
-			String s = (String) controls.keySet().toArray()[i];
-			if (c instanceof Text) {
-				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (!(((Text) c).getText().isBlank())) {
-					rb.withValue(((Text) c).getText());
-				} else {
-					rb.withValue(null);
+		if (xmlPart.getKeys() != null) {
+			for (ArrayList key : xmlPart.getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
+			int i = 0;
+			for (Control c : controls.values()) {
+				String s = (String) controls.keySet().toArray()[i];
+				if (c instanceof Text) {
+					tb.withColumn(s, (DataType) c.getData("dataType"));
+					if (!(((Text) c).getText().isBlank())) {
+						rb.withValue(((Text) c).getText());
+					} else {
+						rb.withValue(null);
 
-				}
-			}
-			if (c instanceof LookupControl) {
-				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (c.getData("keyLong") != null) {
-					rb.withValue(c.getData("keyLong"));
-				} else {
-					rb.withValue(null);
-				}
-			}
-			i++;
-		}
-		Table t = tb.create();
-		Row r = rb.create();
-		for (i = 0; i < t.getColumnCount(); i++) {
-			if (r.getValue(i) == null) {
-				MessageDialog.openError(shell, "Error", "not all Fields were filled");
-				return;
-			}
-		}
-		t.addRow(r);
-		if (t.getRows() != null) {
-			Table responce = null;
-			try {
-				responce = dataService.getDetailDataAsync(t.getName(), t).get();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			Boolean sucess = false;
-			sucess = deleteEntry(responce);
-
-			if (sucess == true) {
-				for (Control c : controls.values()) {
-					if (c instanceof Text) {
-						((Text) c).setText("");
-					}
-					if (c instanceof LookupControl) {
-						((LookupControl) c).setText("");
 					}
 				}
-				// reload the indexTable
-				CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(),
-						searchTable);
-				tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
+				if (c instanceof LookupControl) {
+					tb.withColumn(s, (DataType) c.getData("dataType"));
+					if (c.getData("keyLong") != null) {
+						rb.withValue(c.getData("keyLong"));
+					} else {
+						rb.withValue(null);
+					}
+				}
+				i++;
+			}
+			Table t = tb.create();
+			Row r = rb.create();
+			for (i = 0; i < t.getColumnCount(); i++) {
+				if (r.getValue(i) == null) {
+					MessageDialog.openError(shell, "Error", "not all Fields were filled");
+					return;
+				}
+			}
+			t.addRow(r);
+			if (t.getRows() != null) {
+				CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					int responce = 1;
+					deleteEntry(responce, controls);
+				}));
 			}
 		}
-
 	}
 
 	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
 	// befüllt um die Anfrage anzupassen
-	public boolean deleteEntry(Table responce) {
-		if (responce.getRows() != null) {
+	public void deleteEntry(int responce, Map<String, Control> controls) {
+		if (responce != 1) {
 			MessageDialog.openError(shell, "Error", "Entry could not be deleted");
-			return false;
 		} else {
 			SucessDialog sucess = new SucessDialog(shell, "Sucessfully deleted the entry");
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
 			// sucess.close();
-			return true;
+
+			for (Control c : controls.values()) {
+				if (c instanceof Text) {
+					((Text) c).setText("");
+				}
+				if (c instanceof LookupControl) {
+					((LookupControl) c).setText("");
+				}
+			}
+			// reload the indexTable
+			CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+			tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
 		}
 	}
 }

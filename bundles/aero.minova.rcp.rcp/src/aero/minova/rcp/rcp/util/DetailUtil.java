@@ -23,12 +23,9 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.builder.RowBuilder;
-import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -226,27 +223,10 @@ public class DetailUtil {
 	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
 	// Bindung zur Componente
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
-		// ta = getTestTableLookupFields();
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
 		Value v = r.getValue(1);
 
 		lc.setText((String) ValueBuilder.newValue(v).create());
-	}
-
-	// Testdaten, welche nach erfolgreicher CAS-Abfrage gelöscht werden
-	public static Table getTestTableLookupFields() {
-		Table lookupFieldTable = TableBuilder.newTable("spReadWorkingTime")//
-				.withColumn("KeyLong", DataType.INTEGER)//
-				.withColumn("KeyText", DataType.STRING)//
-				.withColumn("Description", DataType.STRING)//
-				.create();
-		Row r = RowBuilder.newRow()//
-				.withValue("2242")//
-				.withValue("lookupfield-value")//
-				.withValue("blabla")//
-				.create();
-		lookupFieldTable.addRow(r);
-		return lookupFieldTable;
 	}
 }

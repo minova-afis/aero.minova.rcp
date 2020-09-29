@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,6 @@ public class NewDetailHandler {
 				l.setText("");
 			}
 		}
-		xmlPart.setEntryKey(0);
+		xmlPart.setKeys(new ArrayList<ArrayList>());
 	}
 }
