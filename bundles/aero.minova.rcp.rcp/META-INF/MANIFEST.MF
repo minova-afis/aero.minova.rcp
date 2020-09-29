@@ -26,7 +26,6 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.core.services,
  org.eclipse.e4.ui.workbench.renderers.swt,
  org.eclipse.ui.workbench;bundle-version="3.119.0",
- aero.minova.rcp.perspectiveswitcher,
  aero.minova.rcp.form.model,
  javax.xml.bind;bundle-version="2.2.0",
  aero.minova.rcp.dataservice;bundle-version="1.2.0",
@@ -34,9 +33,15 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.core.databinding.observable,
  org.eclipse.nebula.widgets.nattable.extension.e4;bundle-version="1.2.0",
  org.eclipse.e4.ui.css.swt;bundle-version="0.13.1000"
+ org.eclipse.emf.common,
+ org.eclipse.e4.core.commands,
+ org.eclipse.core.commands,
+ org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0"
 Automatic-Module-Name: aero.minova.rcp.rcp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.core.ui,
+ aero.minova.rcp.perspectiveswitcher.commands,
+ aero.minova.rcp.perspectiveswitcher.handler,
  aero.minova.rcp.plugin1.model,
  aero.minova.rcp.plugin1.model.builder,
  aero.minova.rcp.plugin1.textfieldVerifier,

@@ -14,5 +14,7 @@ Require-Bundle: org.eclipse.e4.core.contexts,
  org.eclipse.swt,
  org.eclipse.e4.ui.services,
  org.eclipse.e4.core.services,
- org.eclipse.core.commands
-Export-Package: aero.minova.rcp.perspectiveswitcher.handler
+ org.eclipse.core.commands,
+ org.eclipse.e4.ui.workbench.perspectiveswitcher
+Export-Package: aero.minova.rcp.perspectiveswitcher.commands,
+ aero.minova.rcp.perspectiveswitcher.handler

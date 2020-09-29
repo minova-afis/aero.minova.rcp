@@ -19,6 +19,7 @@
 		<module>aero.minova.rcp.rcp</module>
 		<module>aero.minova.rcp.dataservice</module>
 		<module>aero.minova.rcp.perspectiveswitcher</module>
+		<module>org.eclipse.e4.ui.workbench.perspectiveswitcher</module>
 	</modules>
 	<build>
 		<pluginManagement>
@@ -45,6 +46,9 @@
 										<goals>
 											<goal>build-qualifier</goal>
 											<goal>validate-id</goal>
+											<goal>
+												validate-version
+											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
