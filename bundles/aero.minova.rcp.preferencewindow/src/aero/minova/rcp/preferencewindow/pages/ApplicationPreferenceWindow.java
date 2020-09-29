@@ -8,6 +8,16 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFontChooser;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
+import org.eclipse.swt.layout.GridData;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -17,6 +27,9 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowBuilder;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
+import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
+import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
+import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 
 public class ApplicationPreferenceWindow {
 
@@ -59,10 +72,11 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						System.out.println(window.getValueFor(pref.getKey()));
-						InstancePreferenceAccessor.putValue(preferences, PREFERENCES_NODE, pref.getDisplayType(), window.getValueFor(pref.getKey()));
+						InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
+								window.getValueFor(pref.getKey()));
 					}
 				}
+
 			}
 			try {
 				preferences.flush();
@@ -81,7 +95,6 @@ public class ApplicationPreferenceWindow {
 
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
-					System.out.println(InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType()));
 					data.put(key,
 							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType()));
 
@@ -92,45 +105,47 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public void createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... values) {
-
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... values) {
+		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
-			pwb.addStringBox(tab, pref.getLabel(), key);
+			widget = new CustomPWStringText(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
 			break;
 		case INTEGER:
-			pwb.addIntegerBox(tab, pref.getLabel(), key);
+			widget = new CustomPWIntegerText(pref.getLabel(), key).setIndent(25);
 			break;
 		case FLOAT:
-			pwb.addFloatBox(tab, pref.getLabel(), key);
+			widget =new CustomPWFloatText(pref.getLabel(), key);
 			break;
 		case FILE:
-			pwb.addFileChooser(tab, pref.getLabel(), key);
+			widget = new PWFileChooser(pref.getLabel(), key).setIndent(25);
 			break;
 		case DIRECTORY:
-			pwb.addDirectoryChooser(tab, pref.getLabel(), key);
+			widget = new PWDirectoryChooser(pref.getLabel(), key).setIndent(25);
 			break;
 		case COMBO:
-			pwb.addComboBoxRO(tab, pref.getLabel(), key, values);
+			widget = new PWCombo(pref.getLabel(), key, values);
 			break;
 		case CHECK:
-			pwb.addCheckbox(tab, pref.getLabel(), key);
+			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
 			break;
 		case URL:
-			pwb.addURLBox(tab, pref.getLabel(), key);
+			widget = new PWURLText(pref.getLabel(), key);
 			break;
 		case PASSWORD:
-			pwb.addPasswordBox(tab, pref.getLabel(), key);
+			widget = new PWPasswordText(pref.getLabel(), key);
 			break;
 		case TEXT:
-			pwb.addTextarea(tab, pref.getLabel(), key);
+			widget = new PWTextarea(pref.getLabel(), key);
 			break;
 		case FONT:
-			pwb.addFontChooser(tab, pref.getLabel(), key);
+			widget = new PWFontChooser(pref.getLabel(), key);
 			break;
 		default:
 			break;
 		}
+		tab.add(widget);
+		return widget;
 
 	}
 
