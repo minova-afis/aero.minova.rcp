@@ -24,6 +24,7 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.SucessDialog;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
@@ -144,10 +145,10 @@ public class SaveDetailHandler {
 					.withValue("=<" + endDate).create();
 			table.addRow(r);
 
-			CompletableFuture<Table> checkTimes = dataService.getDetailDataAsync(table.getName(), table);
+			CompletableFuture<SqlProcedureResult> checkTimes = dataService.getDetailDataAsync(table.getName(), table);
 			checkTimes.thenAccept(ta -> sync.asyncExec(() -> {
 
-				continueCheck(t, ta);
+				continueCheck(t, ta.getOutputParameters());
 			}));
 		}
 	}
@@ -156,15 +157,14 @@ public class SaveDetailHandler {
 		if (ta.getRows() != null) {
 			if (t.getRows() != null) {
 				// TODO: umbau auf SqlProcedureResult
-				CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-				int responce = 1;
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 				if (t.getColumnName(0) != "KeyLong") {
 					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-						checkNewEntryInsert(responce);
+						checkNewEntryInsert(tr.getReturnCode());
 					}));
 				} else {
 					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-						checkEntryUpdate(responce);
+						checkEntryUpdate(tr.getReturnCode());
 					}));
 				}
 			}

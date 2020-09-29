@@ -17,7 +17,7 @@ import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 
 public class LookupCASRequestUtil {
-	public static CompletableFuture<Table> getRequestedTable(int keyLong, String keyText, Field field,
+	public static CompletableFuture<?> getRequestedTable(int keyLong, String keyText, Field field,
 			Map<String, Control> controls, IDataService dataService, UISynchronize sync) {
 		String tableName;
 		if (field.getLookup().getTable() != null) {
@@ -53,7 +53,7 @@ public class LookupCASRequestUtil {
 		Row row = rb.create();
 		t.addRow(row);
 		;
-		CompletableFuture<Table> tableFuture;
+		CompletableFuture<?> tableFuture;
 		if (field.getLookup().getTable() != null) {
 			tableFuture = dataService.getIndexDataAsync(t.getName(), t);
 		} else {

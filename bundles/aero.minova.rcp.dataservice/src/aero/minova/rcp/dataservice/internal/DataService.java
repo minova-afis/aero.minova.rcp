@@ -63,7 +63,7 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Table> getDetailDataAsync(String tableName, Table detailTable) {
+	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
 		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
@@ -71,9 +71,8 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 
-		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class).getOutputParameters());
-		System.out.println("test");
+		CompletableFuture<SqlProcedureResult> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class));
 
 		return future;
 	}

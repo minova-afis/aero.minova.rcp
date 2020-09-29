@@ -9,6 +9,7 @@ import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 
@@ -44,7 +45,7 @@ public class DataServiceTest implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Table> getDetailDataAsync(String tableName, Table detailTable) {
+	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -35,6 +35,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
@@ -188,11 +189,18 @@ public class XMLDetailPart {
 	// Eigentliche CAS abfrage anhand des gegebenen KeyTextes
 	public void requestOptionsFromCAS(Control c) {
 		Field field = (Field) c.getData("field");
-		CompletableFuture<Table> tableFuture;
+		CompletableFuture<?> tableFuture;
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(), field, controls,
 				dataService, sync);
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-			changeOptionsForLookupField(ta, c);
+			if (ta instanceof SqlProcedureResult) {
+				SqlProcedureResult sql = (SqlProcedureResult) ta;
+				changeOptionsForLookupField(sql.getOutputParameters(), c);
+			} else if (ta instanceof Table) {
+				Table t = (Table) ta;
+				changeOptionsForLookupField(t, c);
+			}
+
 		}));
 	}
 
@@ -273,10 +281,10 @@ public class XMLDetailPart {
 			Row r = builder.create();
 			rowIndexTable.addRow(r);
 
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
 					rowIndexTable);
 			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-				selectedTable = t;
+				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
 			}));
 		}

@@ -24,6 +24,7 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
@@ -128,11 +129,17 @@ public class DetailUtil {
 			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
 			lookUpControl.setData("keyLong", keyLong);
 
-			CompletableFuture<Table> tableFuture;
+			CompletableFuture<?> tableFuture;
 			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
 					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"));
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
-				updateSelectedLookupEntry(ta, (Control) m.get("control"));
+				if (ta instanceof SqlProcedureResult) {
+					SqlProcedureResult sql = (SqlProcedureResult) ta;
+					updateSelectedLookupEntry(sql.getOutputParameters(), (Control) m.get("control"));
+				} else if (ta instanceof Table) {
+					Table t = (Table) ta;
+					updateSelectedLookupEntry(t, (Control) m.get("control"));
+				}
 			}));
 		});
 
