@@ -1,5 +1,6 @@
 package aero.minova.rcp.xml.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -67,7 +68,7 @@ public class GsonTest {
 		r.addValue(null);
 		r.addValue(new Value("T"));
 		r.addValue(null);
-		r.addValue(null);
+		r.addValue(new Value("=01.01.2020"));
 		r.addValue(null);
 		r.addValue(null);
 		r.addValue(new Value(false));
@@ -108,6 +109,22 @@ public class GsonTest {
 
 		SqlProcedureResult sql = gson.fromJson(s, SqlProcedureResult.class);
 		assertTrue(sql.getOutputParameters().getRows() != null);
+	}
+
+	@Test
+	public void tableCanBeConvertedToGsonAndBackDate() {
+		Gson gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
+		assertEquals("=01.01.2020", t.getRows().get(2).getValue(3).getStringValue());
+		String s = gson.toJson(t);
+		assertTrue(s.length() > 0);
+		Table newTable = gson.fromJson(s, Table.class);
+		assertNotNull(newTable);
+		assertEquals("=01.01.2020", newTable.getRows().get(2).getValue(3).getStringValue());
 	}
 
 	@Test
