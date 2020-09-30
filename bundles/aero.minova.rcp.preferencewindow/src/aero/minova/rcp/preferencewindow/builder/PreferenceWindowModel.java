@@ -18,6 +18,10 @@ public class PreferenceWindowModel {
 		cprf.add(buildErweiterungTab());
 
 		cprf.add(buildDruckenTab());
+		
+		cprf.add(buildConsoleTab());
+		
+		cprf.add(buildSISTab());
 
 		return cprf;
 	}
@@ -68,6 +72,7 @@ public class PreferenceWindowModel {
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/erweitert.png", "expandedTab",
 				"Erweitert", 0.3);
 		psd = new PreferenceSectionDescriptor("generalexpanded", "Allgemeines", 0.1);
+		ptd.add(psd);
 		pd = new PreferenceDescriptor( "masks", "Masken mehrfach öffnen", 0.1, DisplayType.CHECK);
 		psd.add(pd);
 		pd = new PreferenceDescriptor( "dragdrop", "DragDrop deaktivieren", 0.2, DisplayType.CHECK);
@@ -94,7 +99,7 @@ public class PreferenceWindowModel {
 		psd.add(pd);
 		pd = new PreferenceDescriptor( "maxbuffer", "Max. Puffer [ms]", 0.2, DisplayType.INTEGER);
 		psd.add(pd);
-
+		
 		psd = new PreferenceSectionDescriptor("table", "Tabelle", 0.3);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor( "selectiondelay", "Auswahltverzögerung [ms]", 0.1, DisplayType.INTEGER);
@@ -140,6 +145,32 @@ public class PreferenceWindowModel {
 		pd = new PreferenceDescriptor("deactivateinternpreview", "Gruppenspalten verbergen", 0.7, DisplayType.CHECK);
 		psd.add(pd);
 
+		return ptd;
+	}
+	
+	private PreferenceTabDescriptor buildConsoleTab() {
+		PreferenceTabDescriptor ptd;
+		PreferenceSectionDescriptor psd;
+		PreferenceDescriptor pd;
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "consoleTab", "Konsole", 0.5);
+		psd = new PreferenceSectionDescriptor("console", "Konsole", 0.1);
+		ptd.add(psd);
+		pd = new PreferenceDescriptor("maxCharacter", "Max. Zeichen", 0.1, DisplayType.INTEGER);
+		psd.add(pd);
+		
+		return ptd;
+	}
+	
+	private PreferenceTabDescriptor buildSISTab() {
+		PreferenceTabDescriptor ptd;
+		PreferenceSectionDescriptor psd;
+		PreferenceDescriptor pd;
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "sisTab", "Stundenerfassung", 0.6);
+		psd = new PreferenceSectionDescriptor("user", "Benutzer vorbelegen", 0.1);
+		ptd.add(psd);
+		pd = new PreferenceDescriptor("user", "Hier können Sie Ihren Benutzer vorbelegen", 0.1, DisplayType.STRING);
+		psd.add(pd);
+		
 		return ptd;
 	}
 
