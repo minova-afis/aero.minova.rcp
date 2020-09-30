@@ -14,6 +14,7 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChoos
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFontChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
@@ -25,7 +26,6 @@ import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
-import aero.minova.rcp.preferencewindow.builder.PreferenceWindowBuilder;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -38,14 +38,14 @@ public class ApplicationPreferenceWindow {
 	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
 
 	// Widget Builder Impelentierung
-	private PreferenceWindowBuilder pwb = PreferenceWindowBuilder.newPWB();
 	private PreferenceWindowModel pwm = new PreferenceWindowModel();
 
 	@Execute
 	public void execute() {
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
-		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
+		Map<String, Object> fillData = fillData(preferenceTabs);
+		PreferenceWindow window = PreferenceWindow.create(fillData);
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -53,7 +53,7 @@ public class ApplicationPreferenceWindow {
 
 			for (PreferenceSectionDescriptor section : tabDescriptor.getSections()) {
 				// Section hinzufügen
-				pwb.addTitledSeparator(newTab, section.getLabel());
+				newTab.add(new PWSeparator(section.getLabel()));
 
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					// Preference hinzufügen
@@ -109,13 +109,13 @@ public class ApplicationPreferenceWindow {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
-			widget = new CustomPWStringText(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
+			widget = new CustomPWStringText(pref.getLabel(), key).setIndent(25);
 			break;
 		case INTEGER:
 			widget = new CustomPWIntegerText(pref.getLabel(), key).setIndent(25);
 			break;
 		case FLOAT:
-			widget =new CustomPWFloatText(pref.getLabel(), key);
+			widget = new CustomPWFloatText(pref.getLabel(), key);
 			break;
 		case FILE:
 			widget = new PWFileChooser(pref.getLabel(), key).setIndent(25);
