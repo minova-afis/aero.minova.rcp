@@ -76,4 +76,18 @@ public class DataService implements IDataService {
 
 		return future;
 	}
-}
+
+	@Override
+	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
+		init();
+		String body = gson.toJson(detailTable);
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-return-code")) //
+				.header("Content-Type", "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.build();
+		
+		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+	      .thenApply(t -> gson.fromJson( t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
+		
+		return future;
+	}}
