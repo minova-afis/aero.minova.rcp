@@ -14,7 +14,7 @@
 		<module>aero.minova.rcp.css</module>
 		<module>aero.minova.rcp.core</module>
 		<module>aero.minova.rcp.form.model</module>
-		<module>aero.minova.rcp.plugin1</module>
+		<module>aero.minova.rcp.model</module>
 		<module>aero.minova.rcp.workspace</module>
 		<module>aero.minova.rcp.rcp</module>
 		<module>aero.minova.rcp.dataservice</module>
