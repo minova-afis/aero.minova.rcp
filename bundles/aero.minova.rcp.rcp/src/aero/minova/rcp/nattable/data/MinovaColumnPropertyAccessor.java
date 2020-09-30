@@ -2,9 +2,9 @@ package aero.minova.rcp.nattable.data;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 
 public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row> {
 

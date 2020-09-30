@@ -1,6 +1,6 @@
 package aero.minova.rcp.dataservice;
 
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 
 public interface IMinovaJsonService {
 

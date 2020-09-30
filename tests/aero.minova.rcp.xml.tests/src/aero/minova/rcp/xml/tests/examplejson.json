@@ -1,0 +1,92 @@
+{
+    "outputParameters": {
+        "name": "outputParameters",
+        "columns": [
+            {
+                "name": "KeyLong",
+                "type": "INTEGER",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "EmployeeKey",
+                "type": "INTEGER",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "ServiceContractKey",
+                "type": "INTEGER",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "OrderReceiverKey",
+                "type": "INTEGER",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "ServiceObjectKey",
+                "type": "INTEGER",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "ServiceKey",
+                "type": "INTEGER",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "BookingDate",
+                "type": "INSTANT",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "StartDate",
+                "type": "INSTANT",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "EndDate",
+                "type": "INSTANT",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "RenderedQuantity",
+                "type": "DOUBLE",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "ChargedQuantity",
+                "type": "DOUBLE",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "Description",
+                "type": "STRING",
+                "outputType": "OUTPUT"
+            },
+            {
+                "name": "Spelling",
+                "type": "BOOLEAN",
+                "outputType": "OUTPUT"
+            }
+        ],
+        "rows": [
+            {
+                "values": [
+                    "n-261736",
+                    "n-1",
+                    "n-81",
+                    "n-1",
+                    "n-8",
+                    "n-31",
+                    "i-2020-08-04T22:00:00Z",
+                    "i-1900-01-01T14:00:00Z",
+                    "i-1900-01-01T15:00:00Z",
+                    "d-1.0",
+                    "d-0.5",
+                    "s-Test via CAS",
+                    "b-false"
+                ]
+            }
+        ]
+    },
+    "returnCode": 1
+}

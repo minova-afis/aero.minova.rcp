@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -19,11 +20,13 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.builder.RowBuilder;
-import aero.minova.rcp.plugin1.model.builder.TableBuilder;
+import aero.minova.rcp.dialogs.SucessDialog;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.rcp.parts.XMLDetailPart;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -42,78 +45,63 @@ public class DeleteDetailHandler {
 	private UISynchronize sync;
 
 	private Shell shell;
-	@Execute
-	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 
+	private Table searchTable = null;
+
+	@Execute
+
+	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	// eine Abfrage an den CAS zusammen
+	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 		this.shell = shell;
+
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
+		List<MPart> findSearchTable = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
+		searchTable = (Table) findSearchTable.get(0).getContext().get("NatTableDataSearchArea");
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
-		TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
-		RowBuilder rb = RowBuilder.newRow();
-		int i = 0;
-		for (Control c : controls.values()) {
-			String s = (String) controls.keySet().toArray()[i];
-			if (c instanceof Text) {
-				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (!(((Text) c).getText().isBlank())) {
-					rb.withValue(((Text) c).getText());
-				} else {
-					rb.withValue(null);
-
-				}
+		if (xmlPart.getKeys() != null) {
+			TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
+			RowBuilder rb = RowBuilder.newRow();
+			for (ArrayList key : xmlPart.getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
 			}
-			if (c instanceof LookupControl) {
-				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (c.getData("keyLong") != null) {
-					rb.withValue(c.getData("keyLong"));
-				} else {
-					rb.withValue(null);
-				}
-			}
-			i++;
-		}
-		Table t = tb.create();
-		Row r = rb.create();
-		for (i = 0; i < t.getColumnCount(); i++) {
-			if (r.getValue(i) == null) {
-				MessageDialog.openError(shell, "Error", "not all Fields were filled");
-				return;
+			Table t = tb.create();
+			Row r = rb.create();
+			t.addRow(r);
+			if (t.getRows() != null) {
+				// TODO: umbau auf SqlProcedureResult
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					deleteEntry(ta.getReturnCode(), controls);
+				}));
 			}
 		}
-		t.addRow(r);
-		if (t.getRows() != null) {
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-				Boolean sucess = false;
-				sucess = deleteEntry(tr);
-
-				if (sucess == true) {
-					for (Control c : controls.values()) {
-						if (c instanceof Text) {
-							((Text) c).setText("");
-						}
-						if (c instanceof LookupControl) {
-							((LookupControl) c).setText("");
-						}
-					}
-				}
-			}));
-		}
-
 	}
 
-	public boolean deleteEntry(Table responce) {
-		if (responce.getName() == null) {
+	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
+	// befüllt um die Anfrage anzupassen
+	public void deleteEntry(int responce, Map<String, Control> controls) {
+		if (responce != 1) {
 			MessageDialog.openError(shell, "Error", "Entry could not be deleted");
-			return false;
 		} else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully deleted the entry",
-					MessageDialog.NONE, new String[] {}, 0);
-			sucess.setBlockOnOpen(false);
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully deleted the entry");
+			// sucess.setBlockOnOpen(false);
 			sucess.open();
-			sucess.close();
-			return true;
+			// sucess.close();
+
+			for (Control c : controls.values()) {
+				if (c instanceof Text) {
+					((Text) c).setText("");
+				}
+				if (c instanceof LookupControl) {
+					((LookupControl) c).setText("");
+				}
+			}
+			// reload the indexTable
+			CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+			tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
 		}
 	}
 }

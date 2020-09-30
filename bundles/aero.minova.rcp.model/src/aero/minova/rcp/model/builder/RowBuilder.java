@@ -1,7 +1,7 @@
-package aero.minova.rcp.plugin1.model.builder;
+package aero.minova.rcp.model.builder;
 
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Value;
 
 public class RowBuilder {
 

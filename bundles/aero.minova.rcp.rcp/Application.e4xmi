@@ -34,8 +34,8 @@
             <children xsi:type="basic:Part" xmi:id="_bwZyALYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.part.detail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.XMLDetailPart" label="@Form.Detail">
               <toolbar xmi:id="_ep_8oLbmEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.toolbar.2">
                 <tags>NoMove</tags>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_oh6ssLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_z_Hv0LbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="New" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_oh6ssLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/save_edit.png" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_z_Hv0LbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="New" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_9wjNoLbVEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.delete" label="Delete" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_BqzcsLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert" command="_9_ZcUOg1Eeq4vM3bKRf1IQ"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_X4AesLbWEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.handledtoolitem.booking" visible="false" label="Booking"/>

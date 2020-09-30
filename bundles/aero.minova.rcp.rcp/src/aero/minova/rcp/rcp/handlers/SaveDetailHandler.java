@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -19,11 +21,13 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.builder.RowBuilder;
-import aero.minova.rcp.plugin1.model.builder.TableBuilder;
+import aero.minova.rcp.dialogs.SucessDialog;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.rcp.parts.XMLDetailPart;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -43,22 +47,33 @@ public class SaveDetailHandler {
 
 	private Shell shell;
 
+	private Table searchTable;
+
+	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	// eine Abfrage an den CAS zusammen. Anhand eines gegebenen oder nicht gegebenen
+	// KeyLongs wird zwischen update und neuem Eintrag unterschieden
 	@Execute
+	// TODO: überprüfen, ob überschneidungen zwischen dem neuen eintrag und bereits
+	// existierenden bestehen (Zeitenüberschneidungen)
 	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
+
 		this.shell = shell;
+
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
+		List<MPart> findSearchTable = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
+		searchTable = (Table) findSearchTable.get(0).getContext().get("NatTableDataSearchArea");
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb;
-		if (xmlPart.getEntryKey() != 0) {
+		RowBuilder rb = RowBuilder.newRow();
+		if (xmlPart.getKeys() != null) {
 			tb = TableBuilder.newTable("spUpdateWorkingTime");
+			for (ArrayList key : xmlPart.getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
 		} else {
 			tb = TableBuilder.newTable("spInsertWorkingTime");
-		}
-		RowBuilder rb = RowBuilder.newRow();
-		if (xmlPart.getEntryKey() != 0) {
-			tb.withColumn("KeyLong", DataType.INTEGER);
-			rb.withValue(xmlPart.getEntryKey());
 		}
 		int i = 0;
 		for (Control c : controls.values()) {
@@ -76,8 +91,7 @@ public class SaveDetailHandler {
 				tb.withColumn(s, (DataType) c.getData("dataType"));
 				if (c.getData("keyLong") != null) {
 					rb.withValue(c.getData("keyLong"));
-				}
-				else {
+				} else {
 					rb.withValue(null);
 				}
 			}
@@ -92,47 +106,104 @@ public class SaveDetailHandler {
 			}
 		}
 		t.addRow(r);
-
-		if (t.getColumnName(0) != "Keylong" && t.getRows() != null) {
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-				checkNewEntryInsert(tr);
-			}));
-		} else if (t.getRows() != null) {
-			CompletableFuture<Table> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-				checkEntryUpdate(tr);
-			}));
-		}
-
+		checkWorkingTime((int) controls.get("EmployeeKey").getData("keyLong"),
+				((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
+				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
+				((Text) controls.get("ChargedQuantity")).getText(), t);
 	}
 
-	public void checkEntryUpdate(Table responce) {
-		if (responce.getName() == null) {
+	// Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
+	// eine Überschneidung in den Arbeitszeiten vorliegt
+	private void checkWorkingTime(int employee, String bookingDate, String startDate, String endDate,
+			String renderedQuantity, String chargedQuantity, Table t) {
+		boolean contradiction = false;
+
+		// Prüfen, ob die bemessene Arbeitszeit der differenz der Stunden entspricht
+		LocalTime timeEndDate = LocalTime.parse(endDate);
+		LocalTime timeStartDate = LocalTime.parse(startDate);
+		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+		timeDifference = timeDifference / 60;
+
+		float renderedQuantityFloat = Float.parseFloat(renderedQuantity);
+		float chargedQuantityFloat = Float.parseFloat(chargedQuantity);
+		if (timeDifference != renderedQuantityFloat) {
+			contradiction = true;
+		}
+		if ((renderedQuantityFloat != chargedQuantityFloat) && (renderedQuantityFloat != chargedQuantityFloat + 0.25)
+				&& (renderedQuantityFloat != chargedQuantityFloat - 0.25)) {
+			contradiction = true;
+		}
+		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
+		// Zeitrahmen bereits einträge existieren
+		if (contradiction != true) {
+
+			Table table = TableBuilder.newTable("spReadWorkingTime").withColumn("EmployeeKey", DataType.INTEGER)
+					.withColumn("BookingDate", DataType.INSTANT).withColumn("StartDate", DataType.INSTANT)
+					.withColumn("EndDate", DataType.INSTANT).create();
+			Row r = RowBuilder.newRow().withValue(employee).withValue(bookingDate).withValue(">=" + startDate)
+					.withValue("=<" + endDate).create();
+			table.addRow(r);
+
+			CompletableFuture<SqlProcedureResult> checkTimes = dataService.getDetailDataAsync(table.getName(), table);
+			checkTimes.thenAccept(ta -> sync.asyncExec(() -> {
+
+				continueCheck(t, ta.getOutputParameters());
+			}));
+		}
+	}
+
+	private void continueCheck(Table t, Table ta) {
+		if (ta.getRows() != null) {
+			if (t.getRows() != null) {
+				// TODO: umbau auf SqlProcedureResult
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				if (t.getColumnName(0) != "KeyLong") {
+					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+						checkNewEntryInsert(tr.getReturnCode());
+					}));
+				} else {
+					tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+						checkEntryUpdate(tr.getReturnCode());
+					}));
+				}
+			}
+		} else {
+			MessageDialog.openError(shell, "Error", "Entry not possible, check for wrong inputs in your messured Time");
+		}
+	}
+
+	// Überprüft. ob das Update erfolgreich war
+	private void checkEntryUpdate(int responce) {
+		if (responce != 1) {
 			MessageDialog.openError(shell, "Error", "Entry could not be updated");
 			return;
-		}
-		else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully updated the entry",
-					MessageDialog.NONE, new String[] {
-					}, 0);
+		} else {
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully updated the entry");
+			// MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully
+			// updated the entry",
+			// MessageDialog.NONE, new String[] {}, 0);
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
-			sucess.close();
+			// sucess.close();
+			// reload the indexTable
+			CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+			tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
 		}
 	}
 
-	public void checkNewEntryInsert(Table responce) {
-		if (responce.getName() == null) {
+	// Überprüft, ob der neue Eintrag erstellt wurde
+	private void checkNewEntryInsert(int responce) {
+		if (responce != 1) {
 			MessageDialog.openError(shell, "Error", "Entry could not be added");
-		}
-		else {
-			MessageDialog sucess = new MessageDialog(shell, "Sucess", null, "Sucessfully added the entry",
-					MessageDialog.NONE, new String[] {
-					}, 0);
+		} else {
+			SucessDialog sucess = new SucessDialog(shell, "Sucessfully added the entry");
 			// sucess.setBlockOnOpen(false);
 			sucess.open();
-			sucess.close();
+			// sucess.close();
+			// reload the indexTable
+			CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+			tableFuture.thenAccept(ta -> broker.post("PLAPLA", ta));
 		}
 	}
 }

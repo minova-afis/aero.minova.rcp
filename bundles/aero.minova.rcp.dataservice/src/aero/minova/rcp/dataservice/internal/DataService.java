@@ -15,10 +15,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
-import aero.minova.rcp.plugin1.model.ValueDeserializer;
-import aero.minova.rcp.plugin1.model.ValueSerializer;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 
 @Component
 public class DataService implements IDataService {
@@ -62,16 +63,16 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Table> getDetailDataAsync(String tableName, Table detailTable) {
+	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
-		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-result-set")) //
+		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 
-		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-	      .thenApply(t -> gson.fromJson( t.body(), Table.class));
+		CompletableFuture<SqlProcedureResult> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class));
 
 		return future;
 	}
@@ -84,10 +85,9 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-
+		
 		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
 	      .thenApply(t -> gson.fromJson( t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
-
+		
 		return future;
-	}
-}
+	}}

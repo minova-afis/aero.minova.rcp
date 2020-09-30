@@ -1,4 +1,4 @@
-package aero.minova.rcp.plugin1.model;
+package aero.minova.rcp.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ public class Table {
 	// spReadDriver
 	// opReadContact
 	//
-	List<Column> columns = new ArrayList<>();
-	List<Row> rows = new ArrayList<>();
+	List<Column> columns = new ArrayList();
+	List<Row> rows = new ArrayList();
 
 	public void setName(String name) {
 		this.name = name;
@@ -56,10 +56,10 @@ public class Table {
 	public List<Row> getRows() {
 		return rows;
 	}
-	
+
 	public void addRow() {
 		Row row = new Row();
-		for (int i = 0; i < columns.size(); i++) {
+		for (Column column : columns) {
 			row.addValue(new Value(""));
 		}
 		rows.add(row);

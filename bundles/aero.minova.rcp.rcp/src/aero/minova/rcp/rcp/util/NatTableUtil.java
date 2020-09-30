@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Composite;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
 
 public class NatTableUtil {
 
