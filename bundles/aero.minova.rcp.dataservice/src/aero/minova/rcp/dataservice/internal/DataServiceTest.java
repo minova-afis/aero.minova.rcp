@@ -46,6 +46,12 @@ public class DataServiceTest implements IDataService {
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
+  return null;
+}
+
+
+	@Override
+	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
 		// TODO Auto-generated method stub
 		return null;
 	}
