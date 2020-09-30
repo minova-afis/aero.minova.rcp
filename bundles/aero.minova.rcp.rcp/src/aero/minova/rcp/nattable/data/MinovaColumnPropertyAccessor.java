@@ -9,18 +9,6 @@ import aero.minova.rcp.model.Value;
 public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row> {
 
 	private Table table;
-	// Keylong, Keytext, CustomerKeyText, ...
-
-//		Row r;
-//		r = new Row();
-//		r.addValue(new Value(1));
-//		r.addValue(null);
-//		r.addValue(new Value(23.5));
-//		r.addValue(new Value("Wilfried Saak"));
-//		r.addValue(new Value(Instant.now()));
-//		r.addValue(new Value(ZonedDateTime.now()));
-//		r.addValue(new Value(true));
-//		r.addValue(new Value(false));
 
 	/**
 	 * @param propertyNames of the members of the row bean
@@ -32,11 +20,14 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	@Override
 	public Object getDataValue(Row rowObject, int columnIndex) {
 		Value value = rowObject.getValue(columnIndex);
-		return value == null ? null : value.getValue();
+		return value == null ? "" : value.getValue();
 	}
 
 	@Override
 	public void setDataValue(Row rowObject, int columnIndex, Object newValue) {
+		if (newValue == null) {
+			newValue = "";
+		}
 		rowObject.setValue(new Value(newValue), columnIndex);
 
 	}

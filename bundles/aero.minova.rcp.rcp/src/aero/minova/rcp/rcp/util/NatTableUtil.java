@@ -27,7 +27,6 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
-import org.eclipse.nebula.widgets.nattable.selection.ISelectionModel;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -62,6 +61,7 @@ public class NatTableUtil {
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(bodyDataLayer);
 
+		ViewportLayer viewportLayer;
 		SelectionLayer selectionLayer = new SelectionLayer(columnReorderLayer);
 		if (selectionService != null) {
 			selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
@@ -70,8 +70,10 @@ public class NatTableUtil {
 			e4SelectionListener.setFullySelectedRowsOnly(false);
 			e4SelectionListener.setHandleSameRowSelection(false);
 			selectionLayer.addLayerListener(e4SelectionListener);
+			viewportLayer = new ViewportLayer(selectionLayer);
+		} else {
+			viewportLayer = new ViewportLayer(columnReorderLayer);
 		}
-		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
 		// build the column header layer stack
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
@@ -93,9 +95,9 @@ public class NatTableUtil {
 
 		NatTable natTable = new NatTable(parent, gridLayer, false);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(natTable);
+		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
-		if (selectionService != null) {
-			natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
+		if (selectionService == null) {
 			natTable.addConfiguration(new AbstractRegistryConfiguration() {
 				@Override
 				public void configureRegistry(IConfigRegistry configRegistry) {
