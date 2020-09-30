@@ -13,6 +13,6 @@ Text#Console {
 	font-family: "courier new";
 }
 
-Label, Text, LookupText, LookupTwistie {
+Label, Text, Button, LookupText, LookupTwistie {
 	font-family: tahoma;
 }
