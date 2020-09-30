@@ -55,6 +55,7 @@ public class XMLSearchPart {
 
 		data = dataFormService.getTableFromFormIndex(form);
 		if (string != null) {
+			// Auslesen der zuletzt gespeicherten Daten
 			data = mjs.json2Table(string);
 		}
 		data.addRow();
