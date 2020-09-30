@@ -14,4 +14,10 @@ public class Column {
 	String name;
 	DataType type;
 	OutputType outputType;
+
+	@Override
+	public String toString() {
+		return "Column [name=" + name + ", type=" + type + ", outputType=" + outputType + "]";
+	}
+
 }

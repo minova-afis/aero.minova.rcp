@@ -8,26 +8,23 @@ public class Value {
 	private final DataType type;
 	private final Object value;
 
-	// TODO Werte sollten nicht null sein!
-
-	public Value(Object value) {
-		if (value instanceof Integer) {
+	public Value(Object valueNew) {
+		if (valueNew instanceof Integer) {
 			type = DataType.INTEGER;
-		} else if (value instanceof Boolean) {
+		} else if (valueNew instanceof Boolean) {
 			type = DataType.BOOLEAN;
-		} else if (value instanceof Double || value instanceof Float) {
+		} else if (valueNew instanceof Double || valueNew instanceof Float) {
 			type = DataType.DOUBLE;
-		} else if (value instanceof String) {
+		} else if (valueNew instanceof String) {
 			type = DataType.STRING;
-		} else if (value instanceof Instant) {
+		} else if (valueNew instanceof Instant) {
 			type = DataType.INSTANT;
-		} else if (value instanceof ZonedDateTime) {
+		} else if (valueNew instanceof ZonedDateTime) {
 			type = DataType.ZONED;
 		} else {
-			//TODO
 			throw new RuntimeException();
 		}
-		this.value = value;
+		this.value = valueNew;
 	}
 
 	public Value(Integer integerValue) {
@@ -91,4 +88,10 @@ public class Value {
 	public Boolean getBooleanValue() {
 		return type == DataType.BOOLEAN ? (Boolean) value : null;
 	}
+
+	@Override
+	public String toString() {
+		return "Value [type=" + type + ", value=" + value + "]";
+	}
+
 }

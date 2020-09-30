@@ -21,4 +21,10 @@ public class Row {
 	public int size() {
 		return values.size();
 	}
+
+	@Override
+	public String toString() {
+		return "Row [values=" + values + "]";
+	}
+
 }

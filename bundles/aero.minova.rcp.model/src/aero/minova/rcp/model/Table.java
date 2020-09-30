@@ -1,5 +1,7 @@
 package aero.minova.rcp.model;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +61,20 @@ public class Table {
 
 	public void addRow() {
 		Row row = new Row();
-		for (Column column : columns) {
-			row.addValue(new Value(""));
+		for (Column c : columns) {
+			if (c.type.equals(DataType.STRING)) {
+				row.addValue(new Value((String) null));
+			} else if (c.type.equals(DataType.INTEGER)) {
+				row.addValue(new Value((Integer) null));
+			} else if (c.type.equals(DataType.INSTANT)) {
+				row.addValue(new Value((Instant) null));
+			} else if (c.type.equals(DataType.ZONED)) {
+				row.addValue(new Value((ZonedDateTime) null));
+			} else if (c.type.equals(DataType.DOUBLE)) {
+				row.addValue(new Value((Double) null));
+			} else if (c.type.equals(DataType.BOOLEAN)) {
+				row.addValue(new Value((Boolean) null));
+			}
 		}
 		rows.add(row);
 	}
