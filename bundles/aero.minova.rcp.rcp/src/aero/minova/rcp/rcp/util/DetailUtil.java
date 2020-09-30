@@ -56,8 +56,7 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(field.getTextAttribute())
-				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
+		labelFactory.text(field.getTextAttribute()).supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
 				.create(composite);
 
 		if (field.getLookup() != null) {
@@ -78,8 +77,7 @@ public class DetailUtil {
 		}
 	}
 
-	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls) {
+	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -114,8 +112,7 @@ public class DetailUtil {
 		controls.put(field.getName(), text);
 	}
 
-	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls) {
+	private static void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
@@ -130,17 +127,17 @@ public class DetailUtil {
 			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
-					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"));
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls, (IDataService) m.get("dataService"),
+					(UISynchronize) m.get("sync"));
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				Table t = null;
 				if (ta instanceof SqlProcedureResult) {
 					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					t = sql.getOutputParameters();
+					t = sql.getResultSet();
 				} else if (ta instanceof Table) {
 					t = (Table) ta;
 				}
-					updateSelectedLookupEntry(t, (Control) m.get("control"));
+				updateSelectedLookupEntry(t, (Control) m.get("control"));
 
 			}));
 		});
@@ -152,6 +149,7 @@ public class DetailUtil {
 			data.horizontalSpan = 3;
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			labelDescription.setLayoutData(data);
+			lookUpControl.setDescription(labelDescription);
 		}
 		controls.put(field.getName(), lookUpControl);
 
@@ -170,11 +168,10 @@ public class DetailUtil {
 	public static int getWidthHintForElement(Field field, boolean twoColumns) {
 		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
 			return TEXT_WIDTH_HINT;
-		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null)
-				&& field.getUnitText() != null) {
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null) && field.getUnitText() != null) {
 			return LABEL_WIDTH_HINT;
-		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null
-				|| field.getLookup() != null) && field.getUnitText() == null) {
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null || field.getLookup() != null)
+				&& field.getUnitText() == null) {
 			return TEXT_WIDTH_HINT;
 		} else if (field.getBoolean() != null) {
 			return UNIT_WIDTH_HINT;
@@ -214,8 +211,7 @@ public class DetailUtil {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
 			section.setText("Kopfdaten");
 		} else {
-			section = formToolkit.createSection(parent,
-					Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
+			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
 			section.setText(((Page) ob).getText());
 		}
 		section.setLayoutData(GridDataFactory.fillDefaults().create());
@@ -234,8 +230,12 @@ public class DetailUtil {
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
-		Value v = r.getValue(1);
+		int index = ta.getColumnIndex("KeyText");
+		Value v = r.getValue(index);
 
 		lc.setText((String) ValueBuilder.newValue(v).create());
+		if (lc.getDescription() != null && ta.getColumnIndex("Description") > -1) {
+			lc.getDescription().setText((String) ValueBuilder.newValue(r.getValue(ta.getColumnIndex("Description"))).create());
+		}
 	}
 }
