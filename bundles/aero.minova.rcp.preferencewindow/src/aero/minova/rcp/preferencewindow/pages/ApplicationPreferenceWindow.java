@@ -12,7 +12,6 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFontChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
@@ -28,6 +27,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
+import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 
@@ -139,7 +139,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWTextarea(pref.getLabel(), key);
 			break;
 		case FONT:
-			widget = new PWFontChooser(pref.getLabel(), key);
+			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		default:
 			break;
