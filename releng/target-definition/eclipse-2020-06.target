@@ -131,6 +131,7 @@
 		<unit id="org.eclipse.nebula.widgets.tablecombo" version="1.2.0.202007241204"/>
 		<unit id="org.eclipse.nebula.widgets.tablecombo.css.feature.feature.group" version="1.2.0.202007241204"/>
 		<unit id="org.eclipse.nebula.widgets.xviewer.feature.feature.group" version="1.1.0.202007241204"/>
+
 	</location>
 </locations>
 </target>
