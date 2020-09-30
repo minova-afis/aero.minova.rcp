@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
 public class InstancePreferenceAccessor  {
@@ -21,7 +22,8 @@ public class InstancePreferenceAccessor  {
 		case CHECK:
 			return preferences.getBoolean(preferenceKey, false);
 		case FONT:
-			return preferences.get(preferenceKey, null);
+			String fd = preferences.get(preferenceKey, null);
+			return (fd== null? null:new FontData(fd));
 		default:
 			break;
 		}
@@ -49,7 +51,7 @@ public class InstancePreferenceAccessor  {
 				preferences.putBoolean(preferenceKey, Boolean.valueOf((boolean) value));
 				break;
 			case FONT:
-				preferences.put(preferenceKey, (String) value);
+				preferences.put(preferenceKey, ((FontData) value).toString());
 				break;
 			default:
 				break;
