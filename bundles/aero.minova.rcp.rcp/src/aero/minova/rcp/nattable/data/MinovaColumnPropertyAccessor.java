@@ -26,10 +26,10 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	@Override
 	public void setDataValue(Row rowObject, int columnIndex, Object newValue) {
 		if (newValue == null) {
-			newValue = "";
+			rowObject.setValue(null, columnIndex);
+		} else {
+			rowObject.setValue(new Value(newValue), columnIndex);
 		}
-		rowObject.setValue(new Value(newValue), columnIndex);
-
 	}
 
 	@Override
