@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -29,7 +30,7 @@ public class GsonTest {
 
 	private Table t;
 
-	// @Before
+	@Before
 	public void setup() {
 		t = new Table();
 		t.setName("OrderReceiver");

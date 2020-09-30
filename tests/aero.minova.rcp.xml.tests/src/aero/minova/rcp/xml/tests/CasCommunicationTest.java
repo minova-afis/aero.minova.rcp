@@ -1,6 +1,8 @@
 package aero.minova.rcp.xml.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.Authenticator;
@@ -18,6 +20,7 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
@@ -103,11 +106,11 @@ public class CasCommunicationTest {
 				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n"
 				+ "            \"name\": \"FilterLastAction\",\n" + "            \"type\": \"BOOLEAN\"\n"
 				+ "        }\n" + "    ],\n" + "    \"rows\": [\n" + "        {\n" + "            \"values\" : [\n"
-				+ "                \"n-31\"\n" + "                , \"s-ZPROGRAM\"\n" + "                , \"b-0\"\n"
+				+ "                \"n-31\"\n" + "                , null\n" + "                , \"b-0\"\n"
 				+ "            ]\n" + "        }\n" + "    ]\n" + "}";
 
 		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-result-set")) //
+				.uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;
@@ -119,10 +122,11 @@ public class CasCommunicationTest {
 		}
 		assertNotNull(response);
 		assertTrue(response.body().length() > 0);
-		Table newTable = gson.fromJson(response.body(), Table.class);
+		SqlProcedureResult sql = gson.fromJson(response.body(), SqlProcedureResult.class);
+		Table newTable = sql.getResultSet();
 		assertNotNull(newTable);
 		assertEquals(3, newTable.getColumnCount());
-		assertEquals("31", newTable.getRows().get(0).getValue(0).getStringValue());
+		assertEquals(Integer.valueOf(31), newTable.getRows().get(0).getValue(0).getIntegerValue());
 		assertEquals("ZPROGRAM", newTable.getRows().get(0).getValue(1).getStringValue());
 		assertEquals("Programmierung", newTable.getRows().get(0).getValue(2).getStringValue());
 		assertEquals(200, response.statusCode());
@@ -139,13 +143,13 @@ public class CasCommunicationTest {
 				+ "        }\n" + "        , {\n" + "            \"name\": \"ServiceObjectKey\",\n"
 				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n"
 				+ "            \"name\": \"ServiceKey\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n"
-				+ "        , {\n" + "            \"name\": \"BookingDate\",\n" + "            \"type\": \"DATE\"\n"
+				+ "        , {\n" + "            \"name\": \"BookingDate\",\n" + "            \"type\": \"INSTANT\"\n"
 				+ "        }\n" + "        , {\n" + "            \"name\": \"StartDate\",\n"
 				+ "            \"type\": \"INSTANT\"\n" + "        }\n" + "        , {\n"
 				+ "            \"name\": \"EndDate\",\n" + "            \"type\": \"INSTANT\"\n" + "        }\n"
 				+ "        , {\n" + "            \"name\": \"RenderedQuantity\",\n"
 				+ "            \"type\": \"DOUBLE\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"ChargedQuantity\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n"
+				+ "            \"name\": \"ChargedQuantity\",\n" + "            \"type\": \"DOUBLE\"\n" + "        }\n"
 				+ "        , {\n" + "            \"name\": \"Description\",\n" + "            \"type\": \"STRING\"\n"
 				+ "        }\n" + "        , {\n" + "            \"name\": \"Spelling\",\n"
 				+ "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n" + "    \"rows\": [\n"
@@ -159,7 +163,7 @@ public class CasCommunicationTest {
 				+ "                , \"b-0\"\n" + "            ]\n" + "        }\n" + "    ]\n" + "}";
 
 		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-return-code")) //
+				.uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;

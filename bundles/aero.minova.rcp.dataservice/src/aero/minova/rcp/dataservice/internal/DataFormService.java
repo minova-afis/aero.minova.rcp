@@ -56,6 +56,7 @@ public class DataFormService implements IDataFormService {
 		return dataTable;
 	}
 
+	@Override
 	public List<Field> getFieldsFromForm(Form form) {
 		List<Field> allFields = new ArrayList<Field>();
 		for (Object o : form.getDetail().getHeadAndPage()) {
@@ -116,16 +117,16 @@ public class DataFormService implements IDataFormService {
 		if ((c.getNumber() != null && c.getNumber().getDecimals() == 0) || c.getBignumber() != null) {
 			return DataType.INTEGER;
 		} else if (c.getBoolean() != null) {
-			return DataType.STRING;
+			return DataType.BOOLEAN;
 		} else if (c.getText() != null) {
 			return DataType.STRING;
 		} else if (c.getShortTime() != null || c.getLongTime() != null) {
-			return DataType.STRING;
+			return DataType.INSTANT;
 		} else if (c.getShortDate() != null || c.getLongDate() != null || c.getDateTime() != null) {
-			return DataType.STRING;
+			return DataType.INSTANT;
 			//sollte Zoned sein
 		} else if (c.getMoney() != null || (c.getNumber() != null && c.getNumber().getDecimals() >= 0)) {
-			return DataType.STRING;
+			return DataType.DOUBLE;
 		}
 		return null;
 	}
