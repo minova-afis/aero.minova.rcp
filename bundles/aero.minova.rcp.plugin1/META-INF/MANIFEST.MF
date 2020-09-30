@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.osgi,
  org.eclipse.e4.ui.di,
  com.google.gson,
  org.eclipse.core.runtime
-Bundle-Activator: aero.minova.rcp.plugin1.Activator
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.inject
-Export-Package: aero.minova.rcp.plugin1.model
+Export-Package: aero.minova.rcp.plugin1.model,
+ aero.minova.rcp.plugin1.model.builder

@@ -4,7 +4,7 @@
 @import url("platform:/plugin/aero.minova.rcp.css/css/nattable.css");
 
 Label, LookupTwistie {
-	font-size: 9px;
+	font-size: 10px;
 }
 
 Widget, CTabItem, LookupControl, Text, ToolBar, ToolTip, Button, MinovaSection, LookupText {
