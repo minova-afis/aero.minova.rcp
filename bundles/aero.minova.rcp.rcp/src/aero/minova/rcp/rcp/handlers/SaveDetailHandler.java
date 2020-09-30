@@ -2,12 +2,12 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.SucessDialog;
 import aero.minova.rcp.model.DataType;
@@ -49,6 +48,13 @@ public class SaveDetailHandler {
 
 	private Table searchTable;
 
+	@CanExecute
+	public boolean canExecute(MPart mpart) {
+		// TODO
+		System.out.println("TODO canExecute");
+		return true;
+	}
+
 	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
 	// eine Abfrage an den CAS zusammen. Anhand eines gegebenen oder nicht gegebenen
 	// KeyLongs wird zwischen update und neuem Eintrag unterschieden
@@ -58,11 +64,7 @@ public class SaveDetailHandler {
 	public void execute(MPart mpart, MPerspective mPerspective, Shell shell) {
 
 		this.shell = shell;
-
-		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
-		List<MPart> findSearchTable = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
-		searchTable = (Table) findSearchTable.get(0).getContext().get("NatTableDataSearchArea");
-		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
+		XMLDetailPart xmlPart = (XMLDetailPart) mpart;
 		Map<String, Control> controls = xmlPart.getControls();
 		TableBuilder tb;
 		RowBuilder rb = RowBuilder.newRow();
