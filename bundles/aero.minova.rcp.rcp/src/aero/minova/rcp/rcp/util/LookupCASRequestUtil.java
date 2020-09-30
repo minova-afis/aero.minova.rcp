@@ -1,6 +1,5 @@
 package aero.minova.rcp.rcp.util;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -9,7 +8,6 @@ import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -23,7 +21,7 @@ public class LookupCASRequestUtil {
 		if (field.getLookup().getTable() != null) {
 			tableName = field.getLookup().getTable();
 		} else {
-			tableName = field.getLookup().getProcedurePrefix();
+			tableName = field.getLookup().getProcedurePrefix() + "Resolve";
 		}
 		TableBuilder tb = TableBuilder.newTable(tableName)//
 				.withColumn("KeyLong", DataType.INTEGER)//
@@ -36,23 +34,21 @@ public class LookupCASRequestUtil {
 		}
 		if (field.getLookup().getTable() == null) {
 			tb = tb.withColumn("FilterLastAction", DataType.BOOLEAN);
-			rb = rb.withValue(0);
+			rb = rb.withValue(false);
 		}
 
 		// TODO: Einschränken der angegebenen Optionen anhand bereits ausgewählter
 		// Optionen (Kontrakt nur für Kunde x,...)
-		List<TypeParam> parameters = field.getLookup().getParam();
-		for (TypeParam param : parameters) {
-			Control parameterControl = controls.get(param.getFieldName());
-			if (parameterControl.getData("keyLong") != null) {
-				tb.withColumn(param.getFieldName(), DataType.INTEGER);
-				rb.withValue(parameterControl.getData("keyLong"));
-			}
-		}
+		/*
+		 * List<TypeParam> parameters = field.getLookup().getParam(); for (TypeParam
+		 * param : parameters) { Control parameterControl =
+		 * controls.get(param.getFieldName()); if (parameterControl.getData("keyLong")
+		 * != null) { tb.withColumn(param.getFieldName(), DataType.INTEGER);
+		 * rb.withValue(parameterControl.getData("keyLong")); } }
+		 */
 		Table t = tb.create();
 		Row row = rb.create();
 		t.addRow(row);
-		;
 		CompletableFuture<?> tableFuture;
 		if (field.getLookup().getTable() != null) {
 			tableFuture = dataService.getIndexDataAsync(t.getName(), t);

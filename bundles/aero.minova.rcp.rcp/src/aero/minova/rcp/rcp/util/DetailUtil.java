@@ -133,13 +133,15 @@ public class DetailUtil {
 			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
 					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"));
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
+				Table t = null;
 				if (ta instanceof SqlProcedureResult) {
 					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					updateSelectedLookupEntry(sql.getOutputParameters(), (Control) m.get("control"));
+					t = sql.getOutputParameters();
 				} else if (ta instanceof Table) {
-					Table t = (Table) ta;
-					updateSelectedLookupEntry(t, (Control) m.get("control"));
+					t = (Table) ta;
 				}
+					updateSelectedLookupEntry(t, (Control) m.get("control"));
+
 			}));
 		});
 

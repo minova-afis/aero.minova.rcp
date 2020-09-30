@@ -60,43 +60,15 @@ public class DeleteDetailHandler {
 		searchTable = (Table) findSearchTable.get(0).getContext().get("NatTableDataSearchArea");
 		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
 		Map<String, Control> controls = xmlPart.getControls();
-		TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
-		RowBuilder rb = RowBuilder.newRow();
 		if (xmlPart.getKeys() != null) {
+			TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
+			RowBuilder rb = RowBuilder.newRow();
 			for (ArrayList key : xmlPart.getKeys()) {
 				tb.withColumn((String) key.get(0), (DataType) key.get(2));
 				rb.withValue(key.get(1));
 			}
-			int i = 0;
-			for (Control c : controls.values()) {
-				String s = (String) controls.keySet().toArray()[i];
-				if (c instanceof Text) {
-					tb.withColumn(s, (DataType) c.getData("dataType"));
-					if (!(((Text) c).getText().isBlank())) {
-						rb.withValue(((Text) c).getText());
-					} else {
-						rb.withValue(null);
-
-					}
-				}
-				if (c instanceof LookupControl) {
-					tb.withColumn(s, (DataType) c.getData("dataType"));
-					if (c.getData("keyLong") != null) {
-						rb.withValue(c.getData("keyLong"));
-					} else {
-						rb.withValue(null);
-					}
-				}
-				i++;
-			}
 			Table t = tb.create();
 			Row r = rb.create();
-			for (i = 0; i < t.getColumnCount(); i++) {
-				if (r.getValue(i) == null) {
-					MessageDialog.openError(shell, "Error", "not all Fields were filled");
-					return;
-				}
-			}
 			t.addRow(r);
 			if (t.getRows() != null) {
 				// TODO: umbau auf SqlProcedureResult
