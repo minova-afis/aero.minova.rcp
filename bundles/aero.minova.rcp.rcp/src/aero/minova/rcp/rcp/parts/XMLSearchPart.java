@@ -54,14 +54,14 @@ public class XMLSearchPart {
 		String string = prefs.get(tableName, null);
 
 		data = dataFormService.getTableFromFormIndex(form);
-		data.addRow();
 		if (string != null) {
 			data = mjs.json2Table(string);
 		}
+		data.addRow();
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		natTable = NatTableUtil.createNatTable(parent, form, data, false, selectionService);
+		natTable = NatTableUtil.createNatTable(parent, form, data, false, null);
 	}
 
 	@PersistTableSelection
