@@ -105,7 +105,11 @@ public class NatTableUtil {
 							IEditableRule.ALWAYS_EDITABLE);
 				}
 			});
+//			natTable.addConfiguration(new DefaultEditConfiguration());
+//			gridLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(selectionLayer,
+//					ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY));
 		}
+
 		natTable.configure();
 		return natTable;
 	}
