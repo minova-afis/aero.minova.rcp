@@ -3,7 +3,7 @@ CTabItem, LayoutComposite, ExpandableComposite,
 	LookupControl, NatTable {
 	background-color: COLOR-WIDGET-BACKGROUND;
 }
-Label, MinovaSection {
+Label, MinovaSection, Button {
 	color: #666666;
 	background-color: inherit;
 }

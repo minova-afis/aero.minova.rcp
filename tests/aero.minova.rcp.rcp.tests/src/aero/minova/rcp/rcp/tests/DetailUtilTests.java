@@ -34,13 +34,15 @@ public class DetailUtilTests {
 	private Shell shell;
 	private Composite composite;
 	private FormToolkit formToolkit;
-
+	private Map<String, Control> controls;
+	
 	@Before
 	public void setup() {
 		shell = new Shell();
 		formToolkit = new FormToolkit(Display.getDefault());
 		composite = CompositeFactory.newComposite(SWT.None).create(shell);
 		composite.setLayout(new GridLayout(6, false));
+		controls = new HashMap<String, Control>();
 
 	}
 

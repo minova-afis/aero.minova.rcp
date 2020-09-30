@@ -66,6 +66,7 @@
     </snippets>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
       <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.menu" label="File">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SW9u4PDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handledmenuitem.preferencess" label="Preferences" command="_WsjPEPDoEeqcqsgp84_JDA"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_6wlLjsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.menu" label="Help">
@@ -115,6 +116,7 @@
   <handlers xmi:id="_ul67cOg2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
   <handlers xmi:id="_yOGjEOg2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_9_ZcUOg1Eeq4vM3bKRf1IQ"/>
   <handlers xmi:id="_5pKmcOg2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_Awo04Og2Eeq4vM3bKRf1IQ"/>
+  <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindow" command="_WsjPEPDoEeqcqsgp84_JDA"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
@@ -144,6 +146,7 @@
   <commands xmi:id="_wuFbkNWPEeq9oeSITNqxdw" elementId="aero.minova.rcp.rcp.command.optimizedetail" commandName="OptimizeDetail"/>
   <commands xmi:id="_4j7QUOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.command.siscommand" commandName="SISCommand"/>
   <commands xmi:id="_xHFacOejEeq-Csq7J9vXlA" elementId="aero.minova.rcp.rcp.command.loadindex" commandName="LoadIndex"/>
+  <commands xmi:id="_WsjPEPDoEeqcqsgp84_JDA" elementId="org.eclipse.ui.window.preferences" commandName="PreferenceCommand"/>
   <commands xmi:id="_Mt6KEOg0Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.expandindex" commandName="ExpandIndex"/>
   <commands xmi:id="_ZtzH8Og0Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.collapseindex" commandName="Collapse Index"/>
   <commands xmi:id="_c0UM8Og0Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.exportindex" commandName="Export Index"/>

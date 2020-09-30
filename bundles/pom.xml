@@ -20,6 +20,7 @@
 		<module>aero.minova.rcp.dataservice</module>
 		<module>aero.minova.rcp.perspectiveswitcher</module>
 		<module>org.eclipse.e4.ui.workbench.perspectiveswitcher</module>
+		<module>aero.minova.rcp.preferencewindow</module>
 	</modules>
 	<build>
 		<pluginManagement>
