@@ -200,7 +200,7 @@ public class XMLDetailPart {
 		Field field = (Field) c.getData("field");
 		CompletableFuture<?> tableFuture;
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(), field, controls,
-				dataService, sync);
+				dataService, sync, "list");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
