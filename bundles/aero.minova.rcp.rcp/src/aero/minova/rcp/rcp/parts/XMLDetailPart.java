@@ -472,7 +472,14 @@ public class XMLDetailPart {
 	// eine Abfrage an den CAS zusammen
 	public void buildDeleteTable() {
 		if (getKeys() != null) {
-			TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
+			String tablename = form.getIndexView() != null ? "sp" : "op";
+			if (!("sp".equals(form.getDetail().getProcedurePrefix())
+					|| "op".equals(form.getDetail().getProcedurePrefix()))) {
+				tablename = form.getDetail().getProcedurePrefix();
+			}
+			tablename += "Delete";
+			tablename += form.getDetail().getProcedureSuffix();
+			TableBuilder tb = TableBuilder.newTable(tablename);
 			RowBuilder rb = RowBuilder.newRow();
 			for (ArrayList key : getKeys()) {
 				tb.withColumn((String) key.get(0), (DataType) key.get(2));
