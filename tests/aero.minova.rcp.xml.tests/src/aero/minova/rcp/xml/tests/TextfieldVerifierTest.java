@@ -33,6 +33,12 @@ public class TextfieldVerifierTest {
 	}
 
 	@Test
+	public void testHeute() {
+		String verifyTime = TextfieldVerifier.verifyDate("heute");
+		assertEquals(LocalDate.now().format(formatter), verifyTime);
+	}
+
+	@Test
 	public void testm() {
 		String verifyTime = TextfieldVerifier.verifyDate("m");
 		assertEquals(LocalDate.now().plusDays(1).format(formatter), verifyTime);
@@ -55,4 +61,17 @@ public class TextfieldVerifierTest {
 		String verifyTime = TextfieldVerifier.verifyDate("----");
 		assertEquals(LocalDate.now().minusDays(4).format(formatter), verifyTime);
 	}
+
+	@Test
+	public void testDezember() {
+		String verifyTime = TextfieldVerifier.verifyDate("Dezember");
+		assertEquals(LocalDate.now().withMonth(12).format(formatter), verifyTime);
+	}
+
+	@Test
+	public void testDez() {
+		String verifyTime = TextfieldVerifier.verifyDate("Dez");
+		assertEquals(LocalDate.now().withMonth(12).format(formatter), verifyTime);
+	}
+
 }

@@ -16,6 +16,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -23,21 +24,25 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.util.DetailUtil;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
@@ -57,6 +62,10 @@ public class XMLDetailPart {
 
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	@Named(IServiceConstants.ACTIVE_SHELL)
+	Shell shell;
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
@@ -324,6 +333,186 @@ public class XMLDetailPart {
 		}
 	}
 
+	// Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
+	// der gegebenen Keys
+	public void buildSaveTable() {
+		TableBuilder tb;
+		RowBuilder rb = RowBuilder.newRow();
+		String tablename = form.getIndexView() != null ? "sp" : "op";
+		if (!("sp".equals(form.getDetail().getProcedurePrefix())
+				|| "op".equals(form.getDetail().getProcedurePrefix()))) {
+			tablename = form.getDetail().getProcedurePrefix();
+		}
+		if (getKeys() != null) {
+			tablename += "Update";
+		} else {
+			tablename += "Insert";
+		}
+		tablename += form.getDetail().getProcedureSuffix();
+
+		if (getKeys() != null) {
+			tb = TableBuilder.newTable(tablename);
+			for (ArrayList key : getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
+		} else {
+			tb = TableBuilder.newTable(tablename);
+		}
+		int i = 0;
+		for (Control c : controls.values()) {
+			String s = (String) controls.keySet().toArray()[i];
+			if (c instanceof Text) {
+				tb.withColumn(s, (DataType) c.getData("dataType"));
+				if (!(((Text) c).getText().isBlank())) {
+					rb.withValue(((Text) c).getText());
+				} else {
+					rb.withValue(null);
+
+				}
+			}
+			if (c instanceof LookupControl) {
+				tb.withColumn(s, (DataType) c.getData("dataType"));
+				if (c.getData("keyLong") != null) {
+					rb.withValue(c.getData("keyLong"));
+				} else {
+					rb.withValue(null);
+				}
+			}
+			i++;
+		}
+		Table t = tb.create();
+		Row r = rb.create();
+		for (i = 0; i < t.getColumnCount(); i++) {
+			if (r.getValue(i) == null) {
+				MessageDialog.openError(shell, "Error", "not all Fields were filled");
+				return;
+			}
+		}
+		t.addRow(r);
+		checkWorkingTime(((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
+				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
+				((Text) controls.get("ChargedQuantity")).getText(), t);
+	}
+
+	// Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
+	// eine Überschneidung in den Arbeitszeiten vorliegt
+	private void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity,
+			String chargedQuantity, Table t) {
+		boolean contradiction = false;
+
+		// Prüfen, ob die bemessene Arbeitszeit der differenz der Stunden entspricht
+		LocalTime timeEndDate = LocalTime.parse(endDate);
+		LocalTime timeStartDate = LocalTime.parse(startDate);
+		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+		timeDifference = timeDifference / 60;
+
+		float renderedQuantityFloat = Float.parseFloat(renderedQuantity);
+		float chargedQuantityFloat = Float.parseFloat(chargedQuantity);
+		if (timeDifference != renderedQuantityFloat) {
+			contradiction = true;
+		}
+		if ((renderedQuantityFloat != chargedQuantityFloat) && (renderedQuantityFloat != chargedQuantityFloat + 0.25)
+				&& (renderedQuantityFloat != chargedQuantityFloat - 0.25)) {
+			contradiction = true;
+		}
+		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
+		// Zeitrahmen bereits einträge existieren
+		continueCheck(t, contradiction);
+	}
+
+	private void continueCheck(Table t, boolean contradiction) {
+		if (t.getRows() != null && contradiction != true) {
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			if (t.getColumnName(0) != "KeyLong") {
+				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+					checkNewEntryInsert(tr.getReturnCode());
+				}));
+			} else {
+				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+					checkEntryUpdate(tr.getReturnCode());
+				}));
+			}
+		} else {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(),
+					"Entry not possible, check for wronginputs in your messured Time", shell);
+			notificationPopUp.open();
+		}
+	}
+
+	// Überprüft. ob das Update erfolgreich war
+	private void checkEntryUpdate(int responce) {
+		if (responce != 1) {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(), "Entry could not be updated",
+					shell);
+			notificationPopUp.open();
+			return;
+		} else {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(), "Sucessfully updated the entry",
+					shell);
+			notificationPopUp.open();
+		}
+	}
+
+	// Überprüft, ob der neue Eintrag erstellt wurde
+	private void checkNewEntryInsert(int responce) {
+		if (responce != 1) {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(), "Entry could not be added",
+					shell);
+			notificationPopUp.open();
+		} else {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(), "Sucessfully added the entry",
+					shell);
+			notificationPopUp.open();
+		}
+	}
+
+	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	// eine Abfrage an den CAS zusammen
+	public void buildDeleteTable() {
+		if (getKeys() != null) {
+			TableBuilder tb = TableBuilder.newTable("spDeleteWorkingTime");
+			RowBuilder rb = RowBuilder.newRow();
+			for (ArrayList key : getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
+			Table t = tb.create();
+			Row r = rb.create();
+			t.addRow(r);
+			if (t.getRows() != null) {
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					deleteEntry(ta.getReturnCode());
+				}));
+			}
+		}
+	}
+
+	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
+	// befüllt um die Anfrage anzupassen
+	public void deleteEntry(int responce) {
+		if (responce != 1) {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(), "Entry could not be deleted",
+					shell);
+			notificationPopUp.open();
+		} else {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(new Display(), "Sucessfully deleted the entry",
+					shell);
+			notificationPopUp.open();
+
+			for (Control c : controls.values()) {
+				if (c instanceof Text) {
+					((Text) c).setText("");
+				}
+				if (c instanceof LookupControl) {
+					((LookupControl) c).setText("");
+				}
+			}
+		}
+	}
+
 	public Map<String, Control> getControls() {
 		return controls;
 	}
@@ -335,6 +524,5 @@ public class XMLDetailPart {
 	public void setKeys(List<ArrayList> keys) {
 		this.keys = keys;
 	}
-
 
 }

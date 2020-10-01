@@ -210,36 +210,55 @@ public class TextfieldVerifier implements FocusListener{
 				subString.replaceFirst("[Dd]ez", "");
 			}
 			// Überprüfen, ob ein relativer Tag ausgewählt wurde
+			else if (subString.contentEquals("0")) {
+				localDate = localDate.now();
+				subString.replaceFirst("0", "");
+			}
 			else if (subString.contains("heute")) {
 				localDate = localDate.now();
 				subString.replaceFirst("heute", "");
 			} else if (subString.contains("h")) {
 				localDate = localDate.now();
 				subString.replaceFirst("h", "");
+			} else if (subString.contains("H")) {
+				localDate = localDate.now();
+				subString.replaceFirst("H", "");
 			} else if (subString.contains("morgen")) {
 				localDate = localDate.now().plusDays(1);
 				subString.replaceFirst("morgen", "");
 			} else if (subString.contains("m")) {
 				localDate = localDate.now().plusDays(1);
 				subString.replaceFirst("m", "");
+			} else if (subString.contains("M")) {
+				localDate = localDate.now().plusDays(1);
+				subString.replaceFirst("M", "");
 			} else if (subString.contains("uebermorgen")) {
 				localDate = localDate.now().plusDays(2);
 				subString.replaceFirst("uebermorgen", "");
 			} else if (subString.contains("u")) {
 				localDate = localDate.now().plusDays(2);
 				subString.replaceFirst("u", "");
+			} else if (subString.contains("U")) {
+				localDate = localDate.now().plusDays(2);
+				subString.replaceFirst("U", "");
 			} else if (subString.contains("gestern")) {
 				localDate = localDate.now().minusDays(1);
 				subString.replaceFirst("gestern", "");
 			} else if (subString.contains("g")) {
 				localDate = localDate.now().minusDays(1);
 				subString.replaceFirst("g", "");
+			} else if (subString.contains("G")) {
+				localDate = localDate.now().minusDays(1);
+				subString.replaceFirst("G", "");
 			} else if (subString.contains("vorgestern")) {
 				localDate = localDate.now().minusDays(2);
 				subString.replaceFirst("vorgestern", "");
 			} else if (subString.contains("v")) {
 				localDate = localDate.now().minusDays(2);
 				subString.replaceFirst("v", "");
+			} else if (subString.contains("V")) {
+				localDate = localDate.now().minusDays(2);
+				subString.replaceFirst("V", "");
 			}
 		}
 		return localDate;
