@@ -34,7 +34,7 @@ public class DataService implements IDataService {
 		authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("admin", "admin".toCharArray());
+				return new PasswordAuthentication("admin", "rqgzxTf71EAx8chvchMi".toCharArray());
 			}
 		};
 		httpClient = HttpClient.newBuilder().authenticator(authentication).build();
@@ -51,7 +51,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
 		init();
 		String body = gson.toJson(seachTable);
-		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
+		request = HttpRequest.newBuilder().uri(URI.create("https://publictest.minova.com:17280/data/index")) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
@@ -66,7 +66,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
-		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
+		request = HttpRequest.newBuilder().uri(URI.create("https://publictest.minova.com:17280/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
@@ -81,13 +81,14 @@ public class DataService implements IDataService {
 	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
-		request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure-with-return-code")) //
+		request = HttpRequest.newBuilder()
+				.uri(URI.create("https://publictest.minova.com:17280/data/procedure-with-return-code")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-		
+
 		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
 	      .thenApply(t -> gson.fromJson( t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
-		
+
 		return future;
 	}}
