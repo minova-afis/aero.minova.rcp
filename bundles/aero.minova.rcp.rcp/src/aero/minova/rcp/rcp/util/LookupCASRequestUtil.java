@@ -23,11 +23,7 @@ public class LookupCASRequestUtil {
 		if (field.getLookup().getTable() != null) {
 			tableName = field.getLookup().getTable();
 		} else {
-			if (purpose == "resolve") {
-				tableName = field.getLookup().getProcedurePrefix() + "Resolve";
-			} else {
-				tableName = field.getLookup().getProcedurePrefix() + "List";
-			}
+			tableName = field.getLookup().getProcedurePrefix() + purpose;
 
 		}
 		TableBuilder tb = TableBuilder.newTable(tableName)//
@@ -39,7 +35,7 @@ public class LookupCASRequestUtil {
 		} else {
 			rb = RowBuilder.newRow().withValue(keyLong).withValue(null);
 		}
-		if (purpose == "list") {
+		if (purpose == "List") {
 			tb = tb.withColumn("count", DataType.INTEGER);
 			rb = rb.withValue(null);
 		}

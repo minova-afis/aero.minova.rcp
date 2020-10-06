@@ -200,7 +200,7 @@ public class XMLDetailPart {
 		Field field = (Field) c.getData("field");
 		CompletableFuture<?> tableFuture;
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(), field, controls,
-				dataService, sync, "list");
+				dataService, sync, "List");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
@@ -259,7 +259,7 @@ public class XMLDetailPart {
 			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
 
 			RowBuilder builder = RowBuilder.newRow();
-			List<Field> allFields = dataFormService.getFieldsFromForm(form);
+			List<Field> allFields = dataFormService.getFieldsFromForm(form, false);
 
 			// Hauptmaske
 
@@ -336,63 +336,73 @@ public class XMLDetailPart {
 	// Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
 	// der gegebenen Keys
 	public void buildSaveTable() {
-		TableBuilder tb;
+		Table formTable = null;
+		// TableBuilder tb;
 		RowBuilder rb = RowBuilder.newRow();
-		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if (!("sp".equals(form.getDetail().getProcedurePrefix())
-				|| "op".equals(form.getDetail().getProcedurePrefix()))) {
-			tablename = form.getDetail().getProcedurePrefix();
-		}
+		// String tablename = form.getIndexView() != null ? "sp" : "op";
+		// if (!("sp".equals(form.getDetail().getProcedurePrefix())
+		// || "op".equals(form.getDetail().getProcedurePrefix()))) {
+		// tablename = form.getDetail().getProcedurePrefix();
+		// }
 		if (getKeys() != null) {
-			tablename += "Update";
+			formTable = dataFormService.getTableFromFormDetail(form, "Update");
+			// tablename += "Update";
 		} else {
-			tablename += "Insert";
+			formTable = dataFormService.getTableFromFormDetail(form, "Insert");
+			// tablename += "Insert";
 		}
-		tablename += form.getDetail().getProcedureSuffix();
-
+		// tablename += form.getDetail().getProcedureSuffix();
+		int valuePosition = 0;
 		if (getKeys() != null) {
-			tb = TableBuilder.newTable(tablename);
+			// tb = TableBuilder.newTable(tablename);
 			for (ArrayList key : getKeys()) {
-				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				// tb.withColumn((String) key.get(0), (DataType) key.get(2));
 				rb.withValue(key.get(1));
+				valuePosition++;
 			}
-		} else {
-			tb = TableBuilder.newTable(tablename);
-		}
-		int i = 0;
-		for (Control c : controls.values()) {
-			String s = (String) controls.keySet().toArray()[i];
-			if (c instanceof Text) {
-				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (!(((Text) c).getText().isBlank())) {
-					rb.withValue(((Text) c).getText());
-				} else {
-					rb.withValue(null);
+		} // else {
+			// tb = TableBuilder.newTable(tablename);
+			// }
+		while (valuePosition < formTable.getColumnCount()) {
+			int i = 0;
+			for (Control c : controls.values()) {
+				String s = (String) controls.keySet().toArray()[i];
+				if (s.equals(formTable.getColumnName(valuePosition))) {
+					if (c instanceof Text) {
+						// tb.withColumn(s, (DataType) c.getData("dataType"));
+						if (!(((Text) c).getText().isBlank())) {
+							rb.withValue(((Text) c).getText());
+						} else {
+							rb.withValue(null);
 
+						}
+					}
+					if (c instanceof LookupControl) {
+						// tb.withColumn(s, (DataType) c.getData("dataType"));
+						if (c.getData("keyLong") != null) {
+							rb.withValue(c.getData("keyLong"));
+						} else {
+							rb.withValue(null);
+						}
+					}
 				}
+				i++;
 			}
-			if (c instanceof LookupControl) {
-				tb.withColumn(s, (DataType) c.getData("dataType"));
-				if (c.getData("keyLong") != null) {
-					rb.withValue(c.getData("keyLong"));
-				} else {
-					rb.withValue(null);
-				}
-			}
-			i++;
+			valuePosition++;
 		}
-		Table t = tb.create();
+
+		// Table t = tb.create();
 		Row r = rb.create();
-		for (i = 0; i < t.getColumnCount(); i++) {
+		for (int i = 0; i < formTable.getColumnCount(); i++) {
 			if (r.getValue(i) == null) {
 				MessageDialog.openError(shell, "Error", "not all Fields were filled");
 				return;
 			}
 		}
-		t.addRow(r);
+		formTable.addRow(r);
 		checkWorkingTime(((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
 				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
-				((Text) controls.get("ChargedQuantity")).getText(), t);
+				((Text) controls.get("ChargedQuantity")).getText(), formTable);
 	}
 
 	// Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
@@ -419,10 +429,10 @@ public class XMLDetailPart {
 		}
 		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
 		// Zeitrahmen bereits einträge existieren
-		continueCheck(t, contradiction);
+		sendSaveRequest(t, contradiction);
 	}
 
-	private void continueCheck(Table t, boolean contradiction) {
+	private void sendSaveRequest(Table t, boolean contradiction) {
 		if (t.getRows() != null && contradiction != true) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 			if (t.getColumnName(0) != "KeyLong") {

@@ -128,7 +128,7 @@ public class DetailUtil {
 
 			CompletableFuture<?> tableFuture;
 			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls, (IDataService) m.get("dataService"),
-					(UISynchronize) m.get("sync"), "resolve");
+					(UISynchronize) m.get("sync"), "Resolve");
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				Table t = null;
 				if (ta instanceof SqlProcedureResult) {

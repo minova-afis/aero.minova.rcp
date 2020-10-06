@@ -49,7 +49,13 @@ public class DataFormService implements IDataFormService {
 		}
 		tablename += form.getDetail().getProcedureSuffix();
 		dataTable.setName(tablename);
-		List<Field> allFields = getFieldsFromForm(form);
+		List<Field> allFields = null;
+		if (prefix != "Insert") {
+			allFields = getFieldsFromForm(form, false);
+		} else {
+			allFields = getFieldsFromForm(form, true);
+		}
+
 		for (Field f : allFields) {
 			dataTable.addColumn(createColumnFromField(f));
 		}
@@ -57,27 +63,34 @@ public class DataFormService implements IDataFormService {
 	}
 
 	@Override
-	public List<Field> getFieldsFromForm(Form form) {
+	public List<Field> getFieldsFromForm(Form form, Boolean insert) {
 		List<Field> allFields = new ArrayList<Field>();
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
 				List<Object> fields = head.getFieldOrGrid();
-				allFields = filterFields(fields);
+				allFields = filterFields(fields, insert);
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
 				List<Object> fields = page.getFieldOrGrid();
-				allFields.addAll(filterFields(fields));
+				allFields.addAll(filterFields(fields, insert));
 			}
 		}
 		return allFields;
 	}
 
-	public List<Field> filterFields(List<Object> objects) {
+	public List<Field> filterFields(List<Object> objects, Boolean insert) {
 		List<Field> fields = new ArrayList<Field>();
 		for (Object o : objects) {
 			if (o instanceof Field) {
-				fields.add((Field) o);
+				Field f = (Field) o;
+				if (insert == false) {
+					fields.add(f);
+				} else {
+					if (!"primary".equals(f.getKeyType())) {
+						fields.add(f);
+					}
+				}
 			}
 			// TODO:Grid verarbeiten
 		}
