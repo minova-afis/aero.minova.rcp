@@ -34,7 +34,7 @@ public class CustomPWFontChooser extends CustomPWChooser {
 				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey()
 						+ "' has to be a FontData because it is associated to a font chooser");
 			}
-			
+
 		}
 	}
 
@@ -45,7 +45,7 @@ public class CustomPWFontChooser extends CustomPWChooser {
 	@Override
 	protected void setButtonAction(final Text text, final Button button) {
 		fontData = (FontData) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		
+
 		button.addListener(SWT.Selection, event -> {
 			final FontDialog dialog = new FontDialog(text.getShell());
 			final FontData result = dialog.open();
@@ -55,6 +55,7 @@ public class CustomPWFontChooser extends CustomPWChooser {
 				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), result);
 			}
 		});
+		text.setText(buildFontInformation());
 	}
 
 	/**
