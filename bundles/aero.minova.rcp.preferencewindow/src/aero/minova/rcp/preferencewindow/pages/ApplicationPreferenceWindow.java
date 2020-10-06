@@ -124,7 +124,7 @@ public class ApplicationPreferenceWindow {
 			break;
 		case ZONEID:
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values).setWidth(300);
+			widget = new PWCombo(pref.getLabel(), key, values).setWidth(325);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
