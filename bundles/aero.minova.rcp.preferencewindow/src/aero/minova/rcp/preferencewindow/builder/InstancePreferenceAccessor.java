@@ -1,7 +1,14 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.Locale.Category;
+import java.util.Map;
+
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
+
+import aero.minova.rcp.preferencewindow.control.TimeZoneValues;
 
 public class InstancePreferenceAccessor  {
 
@@ -24,6 +31,10 @@ public class InstancePreferenceAccessor  {
 		case FONT:
 			String fd = preferences.get(preferenceKey, null);
 			return (fd== null? null:new FontData(fd));
+		case ZONEID:
+			String id = preferences.get(preferenceKey, "");
+			String result = TimeZoneValues.displayTimeZone(Locale.GERMAN, id);
+			return result;
 		default:
 			break;
 		}
@@ -52,6 +63,13 @@ public class InstancePreferenceAccessor  {
 				break;
 			case FONT:
 				preferences.put(preferenceKey, ((FontData) value).toString());
+				break;
+			case ZONEID:
+				Locale l = Locale.getDefault(Category.DISPLAY);
+				Map<String, ZoneId> zones = TimeZoneValues.getZones(l);
+				String id = value.toString().substring(value.toString().lastIndexOf(")") + 2);
+				String zoneId = TimeZoneValues.getId(zones, id, l).toString();
+				preferences.put(preferenceKey, zoneId);
 				break;
 			default:
 				break;
