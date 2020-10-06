@@ -44,8 +44,7 @@ public class ApplicationPreferenceWindow {
 	public void execute() {
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
-		Map<String, Object> fillData = fillData(preferenceTabs);
-		PreferenceWindow window = PreferenceWindow.create(fillData);
+		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -123,8 +122,9 @@ public class ApplicationPreferenceWindow {
 		case DIRECTORY:
 			widget = new PWDirectoryChooser(pref.getLabel(), key).setIndent(25);
 			break;
+		case ZONEID:
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values);
+			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
