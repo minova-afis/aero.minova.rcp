@@ -9,7 +9,7 @@ public abstract class CustomPWWidget extends PWWidget {
 
 	protected CustomPWWidget(String label, String propertyKey, int numberOfColumns, boolean singleWidget) {
 		super(label, propertyKey, numberOfColumns, singleWidget);
-		this.propertyKey = "";
+		this.propertyKey = propertyKey;
 	}
 
 	@Override
