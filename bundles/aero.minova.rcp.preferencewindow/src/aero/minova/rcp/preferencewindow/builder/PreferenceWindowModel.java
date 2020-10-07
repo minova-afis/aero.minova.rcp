@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
 public class PreferenceWindowModel {
@@ -53,12 +54,7 @@ public class PreferenceWindowModel {
 				"Darstellung", 0.2);
 		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
 		ptd.add(psd);
-		Locale list[] = DateFormat.getAvailableLocales();
-		List<String> lands = new ArrayList<String>();
-		for (Locale land : list) {
-			lands.add(land.getCountry());
-		}
-		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.COMBO, lands.toArray());
+		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.COMBO, CustomLocale.getCountrys().toArray());
 		psd.add(pd);
 		pd = new PreferenceDescriptor("language", "Landessprache", 0.2, DisplayType.COMBO, "Deutsch", "Englisch");
 		psd.add(pd);
