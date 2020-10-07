@@ -2,6 +2,7 @@ package aero.minova.rcp.preferencewindow.control;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -15,9 +16,11 @@ public class CustomLocale {
 		Locale locales[] = getLocales();
 		List<String> countrys = new ArrayList<String>();
 		for (Locale country : locales) {
-			countrys.add(country.getCountry());
+			if (!country.getDisplayCountry().equals("") && !countrys.contains(country.getDisplayCountry()))
+				countrys.add(country.getDisplayCountry());
 		}
+		Collections.sort(countrys);
 		return countrys;
 	}
-
+	
 }
