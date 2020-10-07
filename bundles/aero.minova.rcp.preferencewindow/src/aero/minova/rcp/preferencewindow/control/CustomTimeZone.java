@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class TimeZoneValues {
+public class CustomTimeZone {
 
 	public static Map<String, ZoneId> getZones(Locale locale) {
 		Map<String, ZoneId> map = new HashMap<String, ZoneId>();
