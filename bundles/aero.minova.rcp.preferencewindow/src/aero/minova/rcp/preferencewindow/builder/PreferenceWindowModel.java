@@ -1,7 +1,9 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import aero.minova.rcp.preferencewindow.control.TimeZoneValues;
 
@@ -51,9 +53,16 @@ public class PreferenceWindowModel {
 				"Darstellung", 0.2);
 		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("language", "Landessprache", 0.1, DisplayType.COMBO, "Deutsch", "Englisch");
+		Locale list[] = DateFormat.getAvailableLocales();
+		List<String> lands = new ArrayList<String>();
+		for (Locale land : list) {
+			lands.add(land.getCountry());
+		}
+		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.COMBO, lands.toArray());
 		psd.add(pd);
-		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.2, DisplayType.ZONEID, TimeZoneValues.getTimeZones().toArray());
+		pd = new PreferenceDescriptor("language", "Landessprache", 0.2, DisplayType.COMBO, "Deutsch", "Englisch");
+		psd.add(pd);
+		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID, TimeZoneValues.getTimeZones().toArray());
 		psd.add(pd);
 
 		psd = new PreferenceSectionDescriptor("designpreferences", "Design-Einstellungen", 0.2);
@@ -96,7 +105,6 @@ public class PreferenceWindowModel {
 		psd.add(pd);
 		pd = new PreferenceDescriptor("maskbuffer", "Masken Puffer benutzen", 0.8, DisplayType.CHECK);
 		psd.add(pd);
-
 		psd = new PreferenceSectionDescriptor("buffer", "Puffer", 0.2);
 		ptd.add(psd);
 		pd = new PreferenceDescriptor("displaybuffer", "Anzeige Puffer [ms]", 0.1, DisplayType.INTEGER);
