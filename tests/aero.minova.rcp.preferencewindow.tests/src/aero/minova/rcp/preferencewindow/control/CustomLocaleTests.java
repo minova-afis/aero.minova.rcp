@@ -24,4 +24,11 @@ public class CustomLocaleTests {
 		assertNotNull(countrys);
 		assertTrue(countrys.size() > 0);
 	}
+	
+	@Test
+	public void testGetLanguageForCountry() {
+		List<String> languages = CustomLocale.getLanguageForCountry("land");
+		assertNotNull(languages);
+		System.out.println(languages);
+	}
 }
