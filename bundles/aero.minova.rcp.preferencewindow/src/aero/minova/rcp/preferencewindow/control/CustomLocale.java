@@ -11,4 +11,13 @@ public class CustomLocale {
 		return SimpleDateFormat.getAvailableLocales();
 	}
 
+	public static List<String> getCountrys() {
+		Locale locales[] = getLocales();
+		List<String> countrys = new ArrayList<String>();
+		for (Locale country : locales) {
+			countrys.add(country.getCountry());
+		}
+		return countrys;
+	}
+
 }
