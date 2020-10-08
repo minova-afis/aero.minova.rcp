@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.osgi.service.prefs.Preferences;
 
 public class TestZoneIdTests {
-	
+
 	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
 	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
 
@@ -24,19 +24,19 @@ public class TestZoneIdTests {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
 		assertNotNull(zones);
 	}
-	
+
 	@Test
 	public void testGermanZones() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
 		assertEquals(198, zones.size());
 	}
-	
+
 	@Test
 	public void testGermanyZones() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMANY);
 		assertEquals(198, zones.size());
 	}
-	
+
 	@Test
 	public void testGetId() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMANY);
@@ -50,7 +50,7 @@ public class TestZoneIdTests {
 		assertNotNull(CustomTimeZone.getId(zones, "Central European Time", Locale.US));
 		assertEquals("Europe/Monaco", CustomTimeZone.getId(zones, "Central European Time", Locale.US).toString());
 	}
-	
+
 	@Test
 	public void testGetTimeZone() {
 		String id = "Europe/Monaco";
@@ -58,13 +58,13 @@ public class TestZoneIdTests {
 		String result = CustomTimeZone.displayTimeZone(Locale.GERMAN, tz);
 		assertEquals("(GMT+1:00) Mitteleuropäische Zeit", result);
 	}
-	
+
 	@Test
 	public void testListSize() {
-		List<String> zones = CustomTimeZone.getTimeZones();
+		List<String> zones = CustomTimeZone.getTimeZones("land", "language");
 		assertEquals(198, zones.size());
 	}
-	
+
 	@Test
 	public void testGetTimeZoneId() {
 		Object value = "Ulyanovsk Time";
