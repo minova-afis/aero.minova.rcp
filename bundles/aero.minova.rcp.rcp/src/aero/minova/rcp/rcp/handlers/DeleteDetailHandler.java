@@ -1,16 +1,20 @@
 package aero.minova.rcp.rcp.handlers;
 
-import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import javax.inject.Inject;
 
-import aero.minova.rcp.rcp.parts.XMLDetailPart;
+import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.events.IEventBroker;
 
 public class DeleteDetailHandler {
 
+	@Inject
+	IEventBroker broker;
+
 	@Execute
-	public void execute(MPart mpart) {
-		XMLDetailPart xmlPart = (XMLDetailPart) mpart;
-		xmlPart.buildDeleteTable();
+	public void execute() {
+		// XMLDetailPart xmlPart = (XMLDetailPart) mpart;
+		broker.post("DeleteEntry", null);
+		// xmlPart.buildDeleteTable();
 
 	}
 }

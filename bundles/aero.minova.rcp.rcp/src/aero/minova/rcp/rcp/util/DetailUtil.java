@@ -235,7 +235,10 @@ public class DetailUtil {
 
 		lc.setText((String) ValueBuilder.newValue(v).create());
 		if (lc.getDescription() != null && ta.getColumnIndex("Description") > -1) {
-			lc.getDescription().setText((String) ValueBuilder.newValue(r.getValue(ta.getColumnIndex("Description"))).create());
+			if (r.getValue(ta.getColumnIndex("Description")) != null) {
+				lc.getDescription()
+						.setText((String) ValueBuilder.newValue(r.getValue(ta.getColumnIndex("Description"))).create());
+			}
 		}
 	}
 }

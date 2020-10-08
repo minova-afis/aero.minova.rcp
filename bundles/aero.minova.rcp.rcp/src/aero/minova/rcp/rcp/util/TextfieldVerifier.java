@@ -578,7 +578,11 @@ public class TextfieldVerifier implements FocusListener{
 
 	private static int[] checkNumbersForTime(String subString) {
 		int[] time = null;
-
+		if (subString.length() == 1) {
+			time = new int[2];
+			time[0] = Integer.valueOf(subString);
+			time[1] = 0;
+		}
 		if (subString.length() == 2) {
 			time = new int[2];
 			String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));

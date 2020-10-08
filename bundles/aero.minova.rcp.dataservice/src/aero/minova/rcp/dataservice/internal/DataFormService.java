@@ -28,10 +28,9 @@ public class DataFormService implements IDataFormService {
 		Table dataTable = new Table();
 		dataTable.setName(form.getIndexView().getSource());
 		for (Column c : form.getIndexView().getColumn()) {
-
-			aero.minova.rcp.model.Column columnTable = new aero.minova.rcp.model.Column(c.getName(),
-					getDataType(c), OutputType.OUTPUT);
-			dataTable.addColumn(columnTable);
+			aero.minova.rcp.model.Column tableColumn = new aero.minova.rcp.model.Column(c.getName(), getDataType(c),
+					OutputType.OUTPUT);
+			dataTable.addColumn(tableColumn);
 		}
 		return dataTable;
 	}
@@ -57,7 +56,7 @@ public class DataFormService implements IDataFormService {
 		}
 
 		for (Field f : allFields) {
-			dataTable.addColumn(createColumnFromField(f));
+			dataTable.addColumn(createColumnFromField(f, prefix));
 		}
 		return dataTable;
 	}
@@ -98,27 +97,28 @@ public class DataFormService implements IDataFormService {
 		return fields;
 	}
 
-	public aero.minova.rcp.model.Column createColumnFromField(Field f) {
+	public aero.minova.rcp.model.Column createColumnFromField(Field f, String prefix) {
 		DataType type = null;
 		if (f.getPercentage() != null || f.getMoney() != null
 				|| (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
 		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
-		}
-		else if (f.getBoolean() != null) {
+		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
-		}
-		else if (f.getText() != null) {
+		} else if (f.getText() != null) {
 			type = DataType.STRING;
-		}
-		else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
+		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
 			type = DataType.INSTANT;
 		}
-
-		return new aero.minova.rcp.model.Column(f.getName(), type, OutputType.OUTPUT);
+		if (prefix.equals("Read")) {
+			return new aero.minova.rcp.model.Column(f.getName(), type, OutputType.OUTPUT);
+		} else {
+			return new aero.minova.rcp.model.Column(f.getName(), type);
+		}
 
 	}
+
 	/**
 	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element
 	 * zurück
@@ -137,7 +137,7 @@ public class DataFormService implements IDataFormService {
 			return DataType.INSTANT;
 		} else if (c.getShortDate() != null || c.getLongDate() != null || c.getDateTime() != null) {
 			return DataType.INSTANT;
-			//sollte Zoned sein
+			// sollte Zoned sein
 		} else if (c.getMoney() != null || (c.getNumber() != null && c.getNumber().getDecimals() >= 0)) {
 			return DataType.DOUBLE;
 		}
