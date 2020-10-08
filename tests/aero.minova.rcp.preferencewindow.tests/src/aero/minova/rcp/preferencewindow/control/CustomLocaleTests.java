@@ -31,4 +31,11 @@ public class CustomLocaleTests {
 		assertNotNull(languages);
 		System.out.println(languages);
 	}
+	
+	@Test
+	public void testGetLocale() {
+		Locale locale = CustomLocale.getLocale("land");
+		assertNotNull(locale);
+		assertEquals(Locale.getDefault(), locale);
+	}
 }
