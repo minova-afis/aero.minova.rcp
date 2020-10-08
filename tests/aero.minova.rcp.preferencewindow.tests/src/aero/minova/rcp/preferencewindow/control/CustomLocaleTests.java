@@ -17,24 +17,23 @@ public class CustomLocaleTests {
 		assertNotNull(list);
 		assertEquals(748, list.length);
 	}
-	
+
 	@Test
 	public void testGetCountrys() {
 		List<String> countrys = CustomLocale.getCountrys();
 		assertNotNull(countrys);
 		assertTrue(countrys.size() > 0);
 	}
-	
+
 	@Test
 	public void testGetLanguageForCountry() {
 		List<String> languages = CustomLocale.getLanguageForCountry("land");
 		assertNotNull(languages);
-		System.out.println(languages);
 	}
-	
+
 	@Test
 	public void testGetLocale() {
-		Locale locale = CustomLocale.getLocale("land");
+		Locale locale = CustomLocale.getLocale("land", "language");
 		assertNotNull(locale);
 		assertEquals(Locale.getDefault(), locale);
 	}
