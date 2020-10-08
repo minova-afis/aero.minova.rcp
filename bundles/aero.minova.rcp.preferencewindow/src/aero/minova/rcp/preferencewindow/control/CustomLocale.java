@@ -30,16 +30,16 @@ public class CustomLocale {
 		return countrys;
 	}
 
-	public static Locale getLocale(String key) {
+	public static Locale getLocale(String keyCountry, String keyLanguage) {
 		Locale locale = Locale.getDefault();
 		Locale locales[] = getLocales();
-		Object valueCountry = InstancePreferenceAccessor.getValue(preferences, key, DisplayType.COMBO);
-		for (Locale lo : locales) {
-			if (valueCountry.toString().equals(lo.getDisplayCountry())) {
-				String language = lo.getLanguage();
-				String country = lo.getCountry();
-				locale = new Locale(language, country);
-				
+		Object valueCountry = InstancePreferenceAccessor.getValue(preferences, keyCountry, DisplayType.COMBO);
+		Object valueLanguage = InstancePreferenceAccessor.getValue(preferences, keyLanguage, DisplayType.COMBO);
+		for (Locale l : locales) {
+			if(valueCountry.toString().equals(l.getDisplayCountry())) {
+				if(valueLanguage.toString().equals(l.getDisplayLanguage())) {
+					locale = l;
+				}
 			}
 		}
 		return locale;
