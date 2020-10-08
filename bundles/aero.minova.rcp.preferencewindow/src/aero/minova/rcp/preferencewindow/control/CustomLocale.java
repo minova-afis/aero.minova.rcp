@@ -13,6 +13,7 @@ import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 public class CustomLocale {
+	private static Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
 	public static Locale[] getLocales() {
 		return SimpleDateFormat.getAvailableLocales();
@@ -29,8 +30,22 @@ public class CustomLocale {
 		return countrys;
 	}
 
+	public static Locale getLocale(String key) {
+		Locale locale = Locale.getDefault();
+		Locale locales[] = getLocales();
+		Object valueCountry = InstancePreferenceAccessor.getValue(preferences, key, DisplayType.COMBO);
+		for (Locale lo : locales) {
+			if (valueCountry.toString().equals(lo.getDisplayCountry())) {
+				String language = lo.getLanguage();
+				String country = lo.getCountry();
+				locale = new Locale(language, country);
+				
+			}
+		}
+		return locale;
+	}
+
 	public static List<String> getLanguageForCountry(String key) {
-		Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
 		String language;
 		Locale locales[] = getLocales();
