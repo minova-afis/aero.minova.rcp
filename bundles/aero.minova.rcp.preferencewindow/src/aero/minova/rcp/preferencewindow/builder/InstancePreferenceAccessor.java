@@ -20,6 +20,7 @@ public class InstancePreferenceAccessor {
 		case COMBO:
 		case URL:
 		case PASSWORD:
+		case LOCALE:
 		case TEXT:
 			return preferences.get(preferenceKey, "");
 		case INTEGER:
@@ -48,6 +49,7 @@ public class InstancePreferenceAccessor {
 		case DIRECTORY:
 		case COMBO:
 		case URL:
+		case LOCALE:
 		case PASSWORD:
 		case TEXT:
 			preferences.put(preferenceKey, (String) value);
