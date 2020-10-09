@@ -52,9 +52,9 @@ public class PreferenceWindowModel {
 				"Darstellung", 0.2);
 		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.COMBO, CustomLocale.getCountrys().toArray());
+		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.LOCALE, CustomLocale.getCountrys().toArray());
 		psd.add(pd);
-		pd = new PreferenceDescriptor("language", "Landessprache", 0.2, DisplayType.COMBO,
+		pd = new PreferenceDescriptor("language", "Landessprache", 0.2, DisplayType.LOCALE,
 				CustomLocale.getLanguageForCountry("land").toArray());
 		psd.add(pd);
 		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
