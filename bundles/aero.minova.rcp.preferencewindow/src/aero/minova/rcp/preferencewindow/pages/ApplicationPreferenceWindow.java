@@ -30,6 +30,7 @@ import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
+import aero.minova.rcp.preferencewindow.control.PWLocale;
 
 public class ApplicationPreferenceWindow {
 
@@ -123,8 +124,10 @@ public class ApplicationPreferenceWindow {
 			widget = new PWDirectoryChooser(pref.getLabel(), key).setIndent(25);
 			break;
 		case ZONEID:
-		case COMBO:
 			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			break;
+		case COMBO:
+			widget = new PWCombo(pref.getLabel(), key, values).setWidth(100);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
