@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 
 public class LoadIndexHandler {
 
@@ -32,9 +32,11 @@ public class LoadIndexHandler {
 
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
 		Table table = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
-		table.getRows().clear();
 		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(table.getName(), table);
-		tableFuture.thenAccept(t -> broker.post("PLAPLA", t));
+		tableFuture.join();
+		tableFuture.thenAccept(t -> {
+			broker.post("PLAPLA", t);
+		});
 	}
 
 }

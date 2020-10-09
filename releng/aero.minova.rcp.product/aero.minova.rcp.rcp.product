@@ -112,7 +112,7 @@
    </features>
 
    <configurations>
-      <plugin id="aero.minova.rcp.plugin1" autoStart="true" startLevel="4" />
+      <plugin id="aero.minova.rcp.model" autoStart="true" startLevel="4" />
       <plugin id="org.apache.felix.scr" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />

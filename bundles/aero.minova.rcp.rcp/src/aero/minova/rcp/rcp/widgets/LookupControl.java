@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -21,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
 public class LookupControl extends Composite {
 	protected LookupText textControl;
 	protected LookupTwistie twistie;
+	private Label description;
 
 	public LookupControl(Composite parent, int style) {
 		super(parent, style);
@@ -117,5 +119,13 @@ public class LookupControl extends Composite {
 	@Override
 	public void removeTraverseListener(TraverseListener listener) {
 		textControl.removeTraverseListener(listener);
+	}
+
+	public Label getDescription() {
+		return description;
+	}
+
+	public void setDescription(Label description) {
+		this.description = description;
 	}
 }

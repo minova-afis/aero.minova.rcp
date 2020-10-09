@@ -25,7 +25,7 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Lookup;
 import aero.minova.rcp.form.model.xsd.Number;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.util.DetailUtil;
 
 public class DetailUtilTests {
@@ -51,22 +51,24 @@ public class DetailUtilTests {
 		shell.dispose();
 	}
 
-	
-	
+
+
 	@Test (expected = NumberFormatException.class)
 	public void ensureWeCannotHandleNumberParsingExceptionsinNumberRowsSpanned() {
 		Field field = new Field();
 		field.setVisible(true);
 		field.setTextAttribute("Testing");
 		field.setNumberRowsSpanned("THIS RESULTS IN AN EXCEPTION");
+		Map<String, Control> controls = new HashMap<>();
 		DetailUtil.createField(field, composite, controls);
 	}
-	
+
 	@Test
 	public void ensureInvisibleFieldIsHidden() {
 		Composite composite = CompositeFactory.newComposite(SWT.None).create(shell);
 		Field field = new Field();
 		field.setVisible(false);
+		Map<String, Control> controls = new HashMap<>();
 		DetailUtil.createField(field, composite, controls);
 		assertTrue(composite.getChildren().length == 0);
 	}
@@ -103,6 +105,7 @@ public class DetailUtilTests {
 		Composite co = DetailUtil.createSection(formToolkit, composite.getParent(), head);
 		for (Object o2 : head.getFieldOrGrid()) {
 			if (o2 instanceof Field) {
+				Map<String, Control> controls = new HashMap<>();
 				DetailUtil.createField((Field) o2, co, controls);
 			}
 		}
@@ -149,6 +152,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Test");
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
+		Map<String, Control> controls = new HashMap<>();
 		DetailUtil.createField(field, composite, controls);
 		Control[] children = composite.getChildren();
 		assertEquals(children.length, 3);
@@ -176,6 +180,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Test");
 		field.setNumber(new Number());
 		field.setUnitText("L");
+		Map<String, Control> controls = new HashMap<>();
 		DetailUtil.createField(field, composite, controls);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
@@ -202,6 +207,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Test");
 		field.setLookup(new Lookup());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
+		Map<String, Control> controls = new HashMap<>();
 		DetailUtil.createField(field, composite, controls);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);

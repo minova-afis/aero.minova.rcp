@@ -18,7 +18,7 @@
    </license>
 
    <plugin
-         id="aero.minova.rcp.plugin1"
+         id="aero.minova.rcp.model"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -173,8 +173,8 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-  
- <plugin
+
+   <plugin
          id="org.eclipse.e4.ui.workbench.perspectiveswitcher"
          download-size="0"
          install-size="0"
@@ -211,6 +211,13 @@
 
    <plugin
          id="aero.minova.rcp.preferencewindow"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.jface.notifications"
          download-size="0"
          install-size="0"
          version="0.0.0"

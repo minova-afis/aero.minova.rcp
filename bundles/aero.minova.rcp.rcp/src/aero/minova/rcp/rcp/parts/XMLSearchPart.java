@@ -18,7 +18,7 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
@@ -54,14 +54,15 @@ public class XMLSearchPart {
 		String string = prefs.get(tableName, null);
 
 		data = dataFormService.getTableFromFormIndex(form);
-		data.addRow();
 		if (string != null) {
+			// Auslesen der zuletzt gespeicherten Daten
 			data = mjs.json2Table(string);
 		}
+		data.addRow();
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		natTable = NatTableUtil.createNatTable(parent, form, data, false, selectionService);
+		natTable = NatTableUtil.createNatTable(parent, form, data, false, null);
 	}
 
 	@PersistTableSelection

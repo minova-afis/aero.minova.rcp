@@ -1,9 +1,11 @@
-package aero.minova.rcp.plugin1.model.builder;
+package aero.minova.rcp.model.builder;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import aero.minova.rcp.plugin1.model.DataType;
-import aero.minova.rcp.plugin1.model.Value;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Value;
 
 public class ValueBuilder {
 	private Object translatedValue;
@@ -25,7 +27,12 @@ public class ValueBuilder {
 			}
 			dataType = DataType.ZONED;
 		} else if (v.getInstantValue() != null) {
-			translatedValue = v.getInstantValue().toString();
+			ZonedDateTime zoned = v.getInstantValue().atZone(ZoneId.systemDefault());
+			if (zoned.getHour() != 0) {
+				translatedValue = dtfHour.format(zoned);
+			} else {
+				translatedValue = dtfDate.format(zoned);
+			}
 			dataType = DataType.INSTANT;
 		} else if (v.getDoubleValue() != null) {
 			translatedValue = v.getDoubleValue().toString();

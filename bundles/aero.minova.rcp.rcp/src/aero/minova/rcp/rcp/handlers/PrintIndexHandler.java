@@ -7,7 +7,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.services.IServiceConstants;
 
-import aero.minova.rcp.plugin1.model.Row;
+import aero.minova.rcp.model.Row;
 
 public class PrintIndexHandler {
 

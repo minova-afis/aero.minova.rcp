@@ -1,4 +1,4 @@
-package aero.minova.rcp.plugin1.model;
+package aero.minova.rcp.model;
 
 import java.lang.reflect.Type;
 
@@ -11,6 +11,9 @@ public class ValueSerializer implements JsonSerializer<Value> {
 
 	@Override
 	public JsonElement serialize(Value value, Type type, JsonSerializationContext context) {
+		if (value.getValue() == null) {
+			return null;
+		}
 		switch (value.getType()) {
 		case INTEGER:
 			return new JsonPrimitive("n-" + value.getIntegerValue());

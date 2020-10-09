@@ -6,10 +6,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IMinovaJsonService;
-import aero.minova.rcp.plugin1.model.Table;
-import aero.minova.rcp.plugin1.model.Value;
-import aero.minova.rcp.plugin1.model.ValueDeserializer;
-import aero.minova.rcp.plugin1.model.ValueSerializer;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 
 @Component
 public class MinovaJsonService implements IMinovaJsonService {

@@ -17,8 +17,8 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.plugin1.model.Row;
-import aero.minova.rcp.plugin1.model.Table;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
@@ -83,6 +83,10 @@ public class XMLIndexPart {
 		}
 		natTable.refresh(false);
 		natTable.requestLayout();
+	}
+
+	public NatTable getNatTable() {
+		return natTable;
 	}
 
 

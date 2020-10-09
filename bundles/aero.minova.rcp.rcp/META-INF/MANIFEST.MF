@@ -36,17 +36,21 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.emf.common,
  org.eclipse.e4.core.commands,
  org.eclipse.core.commands,
+ org.eclipse.e4.ui.workbench.perspectiveswitcher,
+ aero.minova.rcp.model;bundle-version="1.2.0",
  org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0",
  aero.minova.rcp.preferencewindow;bundle-version="1.0.0",
- org.eclipse.nebula.widgets.opal.preferencewindow
+ org.eclipse.nebula.widgets.opal.preferencewindow,
+ org.eclipse.jface.notifications;
 Automatic-Module-Name: aero.minova.rcp.rcp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.core.ui,
+ aero.minova.rcp.model,
+ aero.minova.rcp.model.builder,
  aero.minova.rcp.perspectiveswitcher.commands,
  aero.minova.rcp.perspectiveswitcher.handler,
- aero.minova.rcp.plugin1.model,
- aero.minova.rcp.plugin1.model.builder,
  javax.annotation;version="1.0.0";resolution:=optional,
  javax.inject;version="1.0.0",
  org.eclipse.e4.ui.css.swt.theme
-Export-Package: aero.minova.rcp.rcp.widgets
+Export-Package: aero.minova.rcp.rcp.util,
+ aero.minova.rcp.rcp.widgets

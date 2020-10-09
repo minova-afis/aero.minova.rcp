@@ -11,7 +11,7 @@
     
 	
 	<groupId>aero.minova.rcp</groupId>
-	<artifactId>eclipse-2020-06</artifactId>
+	<artifactId>eclipse-2020-09</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>eclipse-target-definition</packaging>
 	

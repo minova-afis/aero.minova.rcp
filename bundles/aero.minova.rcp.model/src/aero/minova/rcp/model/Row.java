@@ -1,4 +1,4 @@
-package aero.minova.rcp.plugin1.model;
+package aero.minova.rcp.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,4 +17,14 @@ public class Row {
 	public void setValue(Value value, int index) {
 		values.set(index, value);
 	}
+
+	public int size() {
+		return values.size();
+	}
+
+	@Override
+	public String toString() {
+		return "Row [values=" + values + "]";
+	}
+
 }
