@@ -1,7 +1,5 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -12,7 +10,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 public class PWLocale extends CustomPWWidget {
-	private final List<Object> data;
+
+	private final List<String> data = CustomLocale.getLanguageForCountry("land");
 	private final boolean editable;
 
 	/**
@@ -21,7 +20,7 @@ public class PWLocale extends CustomPWWidget {
 	 * @param label associated label
 	 * @param propertyKey associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, final Object... values) {
+	public PWLocale(final String label, final String propertyKey,final Object... values) {
 		this(label, propertyKey, false, values);
 	}
 
@@ -33,7 +32,6 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	public PWLocale(final String label, final String propertyKey, final boolean editable, final Object... values) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
-		data = new ArrayList<Object>(Arrays.asList(values));
 		this.editable = editable;
 	}
 
@@ -72,14 +70,12 @@ public class PWLocale extends CustomPWWidget {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), null);
 		} else {
 			if (editable && !(value instanceof String)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey()
-						+ "' has to be a String because it is associated to an editable combo");
+				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to an editable combo");
 			}
 
 			if (!data.isEmpty()) {
 				if (!value.getClass().equals(data.get(0).getClass())) {
-					throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a "
-							+ data.get(0).getClass() + " because it is associated to a combo");
+					throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a " + data.get(0).getClass() + " because it is associated to a combo");
 				}
 			}
 

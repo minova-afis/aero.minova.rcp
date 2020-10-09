@@ -20,7 +20,7 @@ public class CustomLocaleTests {
 
 	@Test
 	public void testGetCountrys() {
-		List<String> countrys = CustomLocale.getCountrys();
+		List<String> countrys = CustomLocale.getCountries();
 		assertNotNull(countrys);
 		assertTrue(countrys.size() > 0);
 	}
