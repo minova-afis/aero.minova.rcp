@@ -41,7 +41,7 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0",
  aero.minova.rcp.preferencewindow;bundle-version="1.0.0",
  org.eclipse.nebula.widgets.opal.preferencewindow,
- org.eclipse.jface.notifications;
+ org.eclipse.jface.notifications
 Automatic-Module-Name: aero.minova.rcp.rcp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.core.ui,
