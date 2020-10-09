@@ -17,7 +17,7 @@ public abstract class CustomPWWidget extends PWWidget {
 
 	@Override
 	protected abstract void check();
-	
+
 	public String getCustomPropertyKey() {
 		return this.propertyKey;
 	}
