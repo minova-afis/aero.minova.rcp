@@ -144,6 +144,9 @@ public class ApplicationPreferenceWindow {
 		case FONT:
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
+		case LOCALE:
+			widget = new PWLocale(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			break;
 		default:
 			break;
 		}
