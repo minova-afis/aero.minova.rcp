@@ -12,7 +12,6 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFontChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
@@ -28,8 +27,10 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
+import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
+import aero.minova.rcp.preferencewindow.control.PWLocale;
 
 public class ApplicationPreferenceWindow {
 
@@ -44,8 +45,7 @@ public class ApplicationPreferenceWindow {
 	public void execute() {
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
-		Map<String, Object> fillData = fillData(preferenceTabs);
-		PreferenceWindow window = PreferenceWindow.create(fillData);
+		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -123,8 +123,11 @@ public class ApplicationPreferenceWindow {
 		case DIRECTORY:
 			widget = new PWDirectoryChooser(pref.getLabel(), key).setIndent(25);
 			break;
+		case ZONEID:
+			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			break;
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values);
+			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
@@ -139,7 +142,10 @@ public class ApplicationPreferenceWindow {
 			widget = new PWTextarea(pref.getLabel(), key);
 			break;
 		case FONT:
-			widget = new PWFontChooser(pref.getLabel(), key);
+			widget = new CustomPWFontChooser(pref.getLabel(), key);
+			break;
+		case LOCALE:
+			widget = new PWLocale(pref.getLabel(), key).setAlignment(GridData.FILL);
 			break;
 		default:
 			break;
