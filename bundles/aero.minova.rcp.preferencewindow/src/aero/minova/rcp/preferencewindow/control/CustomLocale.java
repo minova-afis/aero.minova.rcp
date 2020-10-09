@@ -19,15 +19,15 @@ public class CustomLocale {
 		return SimpleDateFormat.getAvailableLocales();
 	}
 
-	public static List<String> getCountrys() {
+	public static List<String> getCountries() {
 		Locale locales[] = getLocales();
-		List<String> countrys = new ArrayList<String>();
+		List<String> countries = new ArrayList<String>();
 		for (Locale locale : locales) {
-			if (!locale.getDisplayCountry().equals("") && !countrys.contains(locale.getDisplayCountry()))
-				countrys.add(locale.getDisplayCountry());
+			if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry()))
+				countries.add(locale.getDisplayCountry());
 		}
-		Collections.sort(countrys);
-		return countrys;
+		Collections.sort(countries);
+		return countries;
 	}
 
 	public static Locale getLocale(String keyCountry, String keyLanguage) {
