@@ -127,7 +127,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
 			break;
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values).setWidth(100);
+			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
@@ -145,7 +145,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), key).setAlignment(GridData.FILL);
 			break;
 		default:
 			break;
