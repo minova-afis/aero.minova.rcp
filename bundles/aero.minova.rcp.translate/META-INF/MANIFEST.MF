@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: WFC Translation Service
+Bundle-SymbolicName: aero.minova.rcp.translate
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: aero.minova.rcp.translate.Activator
+Bundle-Vendor: MINOVA
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.e4.core.services;bundle-version="2.2.400",
+ javax.inject,
+ org.eclipse.e4.core.di.annotations
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: aero.minova.rcp.translate
+Bundle-ActivationPolicy: lazy
