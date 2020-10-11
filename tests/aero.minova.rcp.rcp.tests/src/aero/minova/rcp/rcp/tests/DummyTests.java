@@ -2,7 +2,7 @@ package aero.minova.rcp.rcp.tests;
 
 import org.junit.Test;
 
-public class DummyTest {
+public class DummyTests {
 
 	@Test
 	public void dummytest() {
