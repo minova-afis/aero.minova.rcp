@@ -17,6 +17,10 @@
                name="cssTheme"
                value="aero.minova.rcp.defaulttheme">
          </property>
+         <property
+               name="lifeCycleURI"
+               value="bundleclass://aero.minova.rcp.translate/aero.minova.rcp.translate.lifecycle.Manager">
+         </property>
       </product>
    </extension>
 </plugin>

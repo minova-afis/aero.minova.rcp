@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
@@ -42,8 +43,13 @@ public class DetailUtil {
 	public static final LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE);
 	private static TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
 	private static TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
+	private final TranslationService translationService;
 
-	public static void createField(Field field, Composite composite, Map<String, Control> controls) {
+	public DetailUtil(TranslationService translationService) {
+		this.translationService = translationService;
+	}
+
+	public void createField(Field field, Composite composite, Map<String, Control> controls) {
 		if (!field.isVisible()) {
 			return;
 		}
@@ -56,7 +62,8 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(field.getTextAttribute()).supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
+		labelFactory.text(translationService.translate(field.getTextAttribute(), null))
+				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
 				.create(composite);
 
 		if (field.getLookup() != null) {
@@ -70,14 +77,15 @@ public class DetailUtil {
 		}
 
 		if (field.getUnitText() != null && field.getLookup() == null) {
-			Label labelUnit = labelFactory.text(field.getUnitText()).create(composite);
+			Label labelUnit = labelFactory.text(translationService.translate(field.getUnitText(), null))
+					.create(composite);
 			GridData data2 = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 			data2.widthHint = UNIT_WIDTH_HINT;
 			labelUnit.setLayoutData(data2);
 		}
 	}
 
-	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -112,7 +120,7 @@ public class DetailUtil {
 		controls.put(field.getName(), text);
 	}
 
-	private static void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	private void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
@@ -127,8 +135,8 @@ public class DetailUtil {
 			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls, (IDataService) m.get("dataService"),
-					(UISynchronize) m.get("sync"), "Resolve");
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				Table t = null;
 				if (ta instanceof SqlProcedureResult) {
@@ -155,7 +163,7 @@ public class DetailUtil {
 
 	}
 
-	public static Integer getSpannedHintForElement(Field field, boolean twoColumns) {
+	public Integer getSpannedHintForElement(Field field, boolean twoColumns) {
 		if (field.getUnitText() != null) {
 			return 1;
 		} else if (field.getText() != null && twoColumns) {
@@ -165,13 +173,14 @@ public class DetailUtil {
 		}
 	}
 
-	public static int getWidthHintForElement(Field field, boolean twoColumns) {
+	public int getWidthHintForElement(Field field, boolean twoColumns) {
 		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
 			return TEXT_WIDTH_HINT;
-		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null) && field.getUnitText() != null) {
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null)
+				&& field.getUnitText() != null) {
 			return LABEL_WIDTH_HINT;
-		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null || field.getLookup() != null)
-				&& field.getUnitText() == null) {
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null
+				|| field.getLookup() != null) && field.getUnitText() == null) {
 			return TEXT_WIDTH_HINT;
 		} else if (field.getBoolean() != null) {
 			return UNIT_WIDTH_HINT;
@@ -183,7 +192,7 @@ public class DetailUtil {
 		return -1;
 	}
 
-	private static Integer getWidthHintForElement(Field field) {
+	private Integer getWidthHintForElement(Field field) {
 		return getWidthHintForElement(field, false);
 	}
 
@@ -194,7 +203,7 @@ public class DetailUtil {
 	 * @param widthHint
 	 * @return
 	 */
-	private static GridData getGridDataFactory(boolean twoColumns, Field field) {
+	private GridData getGridDataFactory(boolean twoColumns, Field field) {
 		GridData data = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 		data.horizontalSpan = getSpannedHintForElement(field, twoColumns);
 		if (twoColumns && data.horizontalSpan > 2) {
@@ -205,13 +214,14 @@ public class DetailUtil {
 		return data;
 	}
 
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
 			section.setText("Kopfdaten");
 		} else {
-			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
+			section = formToolkit.createSection(parent,
+					Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
 			section.setText(((Page) ob).getText());
 		}
 		section.setLayoutData(GridDataFactory.fillDefaults().create());
@@ -227,7 +237,7 @@ public class DetailUtil {
 
 	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
 	// Bindung zur Componente
-	public static void updateSelectedLookupEntry(Table ta, Control c) {
+	public void updateSelectedLookupEntry(Table ta, Control c) {
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
 		int index = ta.getColumnIndex("KeyText");

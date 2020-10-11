@@ -19,6 +19,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -70,6 +71,9 @@ public class XMLDetailPart {
 	private IEventBroker broker;
 
 	@Inject
+	private TranslationService translationService;
+	
+	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
 
@@ -89,22 +93,23 @@ public class XMLDetailPart {
 		this.parent = parent;
 
 		form = dataFormService.getForm();
+		DetailUtil detailUtil = new DetailUtil(translationService);
 
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
-				Composite detailFieldComposite = DetailUtil.createSection(formToolkit, parent, head);
+				Composite detailFieldComposite = detailUtil.createSection(formToolkit, parent, head);
 				for (Object fieldOrGrid : head.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
-						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
+						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
 					}
 				}
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
-				Composite detailFieldComposite = DetailUtil.createSection(formToolkit, parent, page);
+				Composite detailFieldComposite = detailUtil.createSection(formToolkit, parent, page);
 				for (Object fieldOrGrid : page.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
-						DetailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
+						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
 
 					}
 				}
