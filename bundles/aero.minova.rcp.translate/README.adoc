@@ -1,0 +1,23 @@
+== aero.minova.rcp.translate
+
+Der Übersetzungsdienst von WFC übernimmt den Übersetzungsdienst von Eclipse und erweitert Ihn für Werte, die mit `@` beginnen.
+
+Die Sprachen werden wir beim ResourceBundleLoader aufgelöst.
+
+. baseName + _ + language + _ + script + _ + country + _ + variant
+. baseName + _ + language + _ + script + _ + country
+. baseName + _ + language + _ + script
+. baseName + _ + language + _ + country + _ + variant
+. baseName + _ + language + _ + country
+. baseName + _ + language
+. baseName
+
+Wir speichern die Übersetzungen im Workspace im Ordner `i18n`.
+Als baseName wird immer `messages` verwendet.
+Daraus folgt für das Locale `DE_de` folgende 3 Dateien.
+
+. messages.properties
+. messages_de.properties
+. messages_de_DE.properties
+
+Diese Dateien müssen dann vom link:https://github.com/minova-afis/aero.minova.core.application.system[CAS] geladen werden können.
