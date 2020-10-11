@@ -145,26 +145,26 @@ public class WFCTranslationService extends TranslationService {
 			baseFilename = Platform.getInstanceLocation().getURL().toURI().toString();
 			baseFilename += "/i18n/messages";
 			resources = new Properties();
-			load(baseFilename + ".properties");
+			loadProperties(baseFilename + ".properties");
 			if (locale == null) {
 				return;
 			}
 			if (locale.getLanguage() != null) {
-				load(baseFilename + "_" + locale.getLanguage() + ".properties");
+				loadProperties(baseFilename + "_" + locale.getLanguage() + ".properties");
 				if (locale.getCountry() != null) {
-					load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
+					loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
 					if (locale.getVariant() != null) {
-						load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_"
+						loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_"
 								+ locale.getVariant() + ".properties");
 					}
 				}
 				if (locale.getScript() != null) {
-					load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + ".properties");
+					loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + ".properties");
 					if (locale.getCountry() != null) {
-						load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
+						loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
 								+ locale.getCountry() + ".properties");
 						if (locale.getVariant() != null) {
-							load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
+							loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
 									+ locale.getCountry() + "_" + locale.getVariant() + ".properties");
 						}
 					}
@@ -175,11 +175,11 @@ public class WFCTranslationService extends TranslationService {
 		}
 	}
 
-	private void load(String string) {
+	private void loadProperties(String propertiesFilename) {
 		FileInputStream is = null;
 		File f;
 		try {
-			f = new File(new URI(string));
+			f = new File(new URI(propertiesFilename));
 			is = new FileInputStream(f);
 			resources.load(is);
 			logger.error("test");
