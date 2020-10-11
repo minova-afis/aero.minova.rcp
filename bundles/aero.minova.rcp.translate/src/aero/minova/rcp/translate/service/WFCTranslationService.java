@@ -146,8 +146,29 @@ public class WFCTranslationService extends TranslationService {
 			baseFilename += "/i18n/messages";
 			resources = new Properties();
 			load(baseFilename + ".properties");
-			if (locale.getCountry().equals(new Locale("DE").getCountry())) {
-				// Deutschland
+			if (locale == null) {
+				return;
+			}
+			if (locale.getLanguage() != null) {
+				load(baseFilename + "_" + locale.getLanguage() + ".properties");
+				if (locale.getCountry() != null) {
+					load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
+					if (locale.getVariant() != null) {
+						load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_"
+								+ locale.getVariant() + ".properties");
+					}
+				}
+				if (locale.getScript() != null) {
+					load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + ".properties");
+					if (locale.getCountry() != null) {
+						load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
+								+ locale.getCountry() + ".properties");
+						if (locale.getVariant() != null) {
+							load(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
+									+ locale.getCountry() + "_" + locale.getVariant() + ".properties");
+						}
+					}
+				}
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
