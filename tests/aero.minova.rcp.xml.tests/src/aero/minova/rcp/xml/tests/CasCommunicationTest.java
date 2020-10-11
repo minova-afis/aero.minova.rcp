@@ -32,7 +32,7 @@ public class CasCommunicationTest {
 	private Authenticator authentication;
 	private Gson gson;
 
-	@Before
+//	@Before
 	public void setup() {
 		authentication = new Authenticator() {
 			@Override
