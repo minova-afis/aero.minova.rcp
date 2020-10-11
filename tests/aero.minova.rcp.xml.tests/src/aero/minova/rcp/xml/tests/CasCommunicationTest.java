@@ -49,7 +49,7 @@ public class CasCommunicationTest {
 				.create();
 	}
 
-	@Test
+//	@Test
 	public void getAuthentificationIndexHTML() throws Exception {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/index.html"))
 				.build();
@@ -64,7 +64,7 @@ public class CasCommunicationTest {
 		assertEquals(200, response.statusCode());
 	}
 
-	@Test
+//	@Test
 	public void getRestAPI() throws Exception {
 		String body = "{\n" + "    \"name\": \"vWorkingTimeIndex2\",\n" + "    \"columns\": [\n" + "        {\n"
 				+ "            \"name\": \"EmployeeText\",\n" + "            \"type\": \"STRING\"\n" + "        }\n"
@@ -98,7 +98,7 @@ public class CasCommunicationTest {
 
 	}
 
-	@Test
+//	@Test
 	public void postProcedureWithResultSet() throws Exception {
 		String body = "{\n" + "    \"name\": \"spWorkingTimeServiceResolve\",\n" + "    \"columns\": [\n"
 				+ "        {\n" + "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n"
@@ -132,7 +132,7 @@ public class CasCommunicationTest {
 		assertEquals(200, response.statusCode());
 	}
 
-	@Test
+//	@Test
 	public void postProcedureWithReturnCode() throws Exception {
 		String body = "{\n" + "    \"name\": \"spInsertWorkingTime\",\n" + "    \"columns\": [\n" + "        {\n"
 				+ "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n"
@@ -176,7 +176,7 @@ public class CasCommunicationTest {
 		assertEquals(500, response.statusCode());
 	}
 
-	@Test
+//	@Test
 	public void getIndexDataWorkingTimeIndex() {
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/login")).build();
