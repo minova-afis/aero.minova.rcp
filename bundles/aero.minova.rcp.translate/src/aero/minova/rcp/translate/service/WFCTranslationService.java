@@ -186,7 +186,7 @@ public class WFCTranslationService extends TranslationService {
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			// es gibt nicht alle Dateien
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
