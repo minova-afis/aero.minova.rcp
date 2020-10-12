@@ -394,7 +394,15 @@ public class XMLDetailPart {
 			for (int i = r.size(); i < formTable.getColumnCount(); i++) {
 				for (Field f : formFields) {
 					if (f.getName().equals(formTable.getColumnName(i))) {
-						r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
+						if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
+							r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
+						} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
+							r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
+						} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
+							r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
+						} else {
+							r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
+						}
 					}
 				}
 			}
@@ -456,7 +464,6 @@ public class XMLDetailPart {
 				}));
 			} else {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					System.out.println("test");
 					checkEntryUpdate(tr.getReturnCode());
 				}));
 			}
