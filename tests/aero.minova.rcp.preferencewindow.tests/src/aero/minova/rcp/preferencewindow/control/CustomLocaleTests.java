@@ -27,7 +27,7 @@ public class CustomLocaleTests {
 
 	@Test
 	public void testGetLanguageForCountry() {
-		List<String> languages = CustomLocale.getLanguageForCountry("land");
+		List<String> languages = CustomLocale.getLanguages("land");
 		assertNotNull(languages);
 	}
 

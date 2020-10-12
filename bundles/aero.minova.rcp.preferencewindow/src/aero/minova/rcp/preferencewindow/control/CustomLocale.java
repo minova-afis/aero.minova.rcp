@@ -49,7 +49,7 @@ public class CustomLocale {
 		return locale;
 	}
 
-	public static List<String> getLanguageForCountry(String key) {
+	public static List<String> getLanguages(String key) {
 
 		String language;
 		Locale locales[] = getLocales();
