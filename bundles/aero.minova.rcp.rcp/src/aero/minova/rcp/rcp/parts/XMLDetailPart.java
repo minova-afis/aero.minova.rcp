@@ -223,7 +223,7 @@ public class XMLDetailPart {
 	public void changeOptionsForLookupField(Table ta, Control c) {
 		Map m = new HashMap<Integer, String>();
 		for (Row r : ta.getRows()) {
-			m.put(ValueBuilder.newValue(r.getValue(0)).create(), ValueBuilder.newValue(r.getValue(1)).create());
+			m.put(ValueBuilder.value(r.getValue(0)).create(), ValueBuilder.value(r.getValue(1)).create());
 		}
 		c.setData("options", m);
 		changeShownOptions(c);
@@ -281,7 +281,7 @@ public class XMLDetailPart {
 							ArrayList al = new ArrayList();
 							al.add(indexColumns.get(i).getName());
 							al.add(row.getValue(i).getValue());
-							al.add(ValueBuilder.newValue(row.getValue(i)).dataType());
+							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
 							keys.add(al);
 						} else {
 							builder.withValue(null);
@@ -385,12 +385,18 @@ public class XMLDetailPart {
 			valuePosition++;
 		}
 
-		// TODO: spelling/felder collumns ohne zugehöriges feld mit wert null versorgen
-
+		// TODO: spelling/collumns ohne zugehöriges feld mit default-wert versorgen
+		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
+		// Row-Wertes ermittelt und der Row angefügt
 		Row r = rb.create();
+		List<Field> formFields = dataFormService.getFieldsFromForm(form, false);
 		if (controls.size() < formTable.getColumnCount()) {
-			while (r.size() < formTable.getColumnCount()) {
-				r.addValue(null);
+			for (int i = r.size(); i < formTable.getColumnCount(); i++) {
+				for (Field f : formFields) {
+					if (f.getName().equals(formTable.getColumnName(i))) {
+						r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
+					}
+				}
 			}
 		}
 
@@ -433,7 +439,7 @@ public class XMLDetailPart {
 		if (timeDifference != renderedQuantityFloat) {
 			contradiction = true;
 		}
-		if ((renderedQuantityFloat < chargedQuantityFloat)) {
+		if ((renderedQuantityFloat + 0.25 < chargedQuantityFloat)) {
 			contradiction = true;
 		}
 		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
