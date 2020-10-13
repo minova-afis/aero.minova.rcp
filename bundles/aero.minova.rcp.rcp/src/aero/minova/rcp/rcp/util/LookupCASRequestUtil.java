@@ -36,10 +36,12 @@ public class LookupCASRequestUtil {
 		if (isTable) {
 			tb = tb.withColumn("KeyLong", DataType.INTEGER)//
 					.withColumn("KeyText", DataType.STRING)//
-					.withColumn("Description", DataType.STRING);//
+					.withColumn("Description", DataType.STRING)//
+					.withColumn("LastAction", DataType.INTEGER);//
 			rb = rb.withValue(null);
 			rb = rb.withValue(null);
 			rb = rb.withValue(null);
+			rb = rb.withValue(">0");
 		}
 		if (!purpose.equals("List") && !isTable) {
 			tb = tb//
