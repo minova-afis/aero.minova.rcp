@@ -37,9 +37,11 @@ import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
 
-	public DetailUtil(TranslationService translationService) {
-		super();
+	private IEventBroker broker;
+
+	public DetailUtil(TranslationService translationService, IEventBroker broker) {
 		this.translationService = translationService;
+		this.broker = broker;
 	}
 
 	public static final int LABEL_WIDTH_HINT = 150;
@@ -55,8 +57,7 @@ public class DetailUtil {
 
 	TranslationService translationService;
 
-	public static void createField(Field field, Composite composite, Map<String, Control> controls,
-			IEventBroker broker) {
+	public void createField(Field field, Composite composite, Map<String, Control> controls) {
 		if (!field.isVisible()) {
 			return;
 		}
@@ -74,7 +75,7 @@ public class DetailUtil {
 				.create(composite);
 
 		if (field.getLookup() != null) {
-			buildLookupField(field, composite, twoColumns, controls, broker);
+			buildLookupField(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() == null) {
 			buildMiddlePart(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() != null) {
@@ -91,7 +92,7 @@ public class DetailUtil {
 		}
 	}
 
-	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
+	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
 			Map<String, Control> controls) {
 		Text text;
 		GridData gd;
@@ -132,8 +133,7 @@ public class DetailUtil {
 		controls.put(field.getName(), text);
 	}
 
-	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls, IEventBroker broker) {
+	private void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
@@ -265,7 +265,7 @@ public class DetailUtil {
 		return data;
 	}
 
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public  Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);

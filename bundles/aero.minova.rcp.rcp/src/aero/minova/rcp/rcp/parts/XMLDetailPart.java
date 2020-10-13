@@ -91,7 +91,7 @@ public class XMLDetailPart {
 		this.parent = parent;
 
 		form = dataFormService.getForm();
-		DetailUtil detailUtil = new DetailUtil(translationService);
+		DetailUtil detailUtil = new DetailUtil(translationService, broker);
 
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
@@ -99,7 +99,7 @@ public class XMLDetailPart {
 				Composite detailFieldComposite = detailUtil.createSection(formToolkit, parent, head);
 				for (Object fieldOrGrid : head.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
-						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls, broker);
+						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
 					}
 				}
 			} else if (o instanceof Page) {
@@ -107,7 +107,7 @@ public class XMLDetailPart {
 				Composite detailFieldComposite = detailUtil.createSection(formToolkit, parent, page);
 				for (Object fieldOrGrid : page.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
-						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls, broker);
+						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
 
 					}
 				}
