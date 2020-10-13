@@ -24,10 +24,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
 
 /**
  * Ein selbst definiertes UI-Element zur Anzeige von Lookups
- * 
+ *
  * @author saak, wild
  * @since 11.0.0
  */
@@ -42,6 +43,7 @@ public class LookupControl extends Composite {
 		public void openProposalPopup() {
 			super.openProposalPopup();
 		}
+
 	}
 
 	protected Text textControl;
@@ -86,13 +88,22 @@ public class LookupControl extends Composite {
 	protected void addTextControl(int style) {
 		textControl = new Text(this, style);
 		simpleContentProposalProvider = new SimpleContentProposalProvider();
-		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, new TextContentAdapter(), simpleContentProposalProvider, null, null);
+		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, new TextContentAdapter(),
+				simpleContentProposalProvider, null, null);
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
 	}
-	public void setProposals(List<Row> proposals) {
-		List<String> helper = new ArrayList<>();		
-		for (Row row : proposals) {
-			helper.add(row.toString());
+
+	public void setProposals(Table table) {
+		List<String> helper = new ArrayList<>();
+		for (Row row : table.getRows()) {
+			if (row.getValue(table.getColumnIndex("Description")) != null) {
+				String r = //
+						row.getValue(table.getColumnIndex("KeyText")).getStringValue() + " ("
+								+ row.getValue(table.getColumnIndex("Description")).getStringValue() + ")";
+				helper.add(r);
+			} else {
+				helper.add(row.getValue(table.getColumnIndex("KeyText")).getStringValue());
+			}
 		}
 		simpleContentProposalProvider.setProposals(helper.toArray(new String[0]));
 		contentProposalAdapter.openProposalPopup();

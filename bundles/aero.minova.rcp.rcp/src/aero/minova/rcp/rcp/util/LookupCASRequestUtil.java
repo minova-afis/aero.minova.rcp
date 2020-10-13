@@ -22,16 +22,26 @@ public class LookupCASRequestUtil {
 	public static CompletableFuture<?> getRequestedTable(int keyLong, String keyText, Field field,
 			Map<String, Control> controls, IDataService dataService, UISynchronize sync, String purpose) {
 		String tableName;
+		Boolean isTable = false;
 		if (field.getLookup().getTable() != null) {
 			tableName = field.getLookup().getTable();
+			isTable = true;
+			// Hier müssen wir explizit unsere Felder abfragen:
+			// Keylong, KeyText, Descript, LastAction
 		} else {
 			tableName = field.getLookup().getProcedurePrefix() + purpose;
-
 		}
 		TableBuilder tb = TableBuilder.newTable(tableName);
 		RowBuilder rb = RowBuilder.newRow();
-
-		if (!purpose.equals("List")) {
+		if (isTable) {
+			tb = tb.withColumn("KeyLong", DataType.INTEGER)//
+					.withColumn("KeyText", DataType.STRING)//
+					.withColumn("Description", DataType.STRING);//
+			rb = rb.withValue(null);
+			rb = rb.withValue(null);
+			rb = rb.withValue(null);
+		}
+		if (!purpose.equals("List") && !isTable) {
 			tb = tb//
 					.withColumn("KeyLong", DataType.INTEGER)//
 					.withColumn("KeyText", DataType.STRING);
@@ -40,11 +50,11 @@ public class LookupCASRequestUtil {
 			} else {
 				rb = rb.withValue(keyLong).withValue(null);
 			}
-		} else if (purpose.equals("List")) {
+		} else if (purpose.equals("List") && !isTable) {
 			tb = tb.withColumn("count", DataType.INTEGER);
 			rb = rb.withValue(null);
 		}
-		if (field.getLookup().getTable() == null) {
+		if (field.getLookup().getTable() == null && !isTable) {
 			tb = tb.withColumn("FilterLastAction", DataType.BOOLEAN);
 			rb = rb.withValue(false);
 		}
@@ -54,7 +64,7 @@ public class LookupCASRequestUtil {
 		// Für nicht-lookups(bookingdate)->Text übernehmen wenn nicht null
 		// bei leeren feldern ein nullfeld anhängen, alle parameter müssen für die
 		// anfrage gesetzt sein
-		if (purpose.equals("List")) {
+		if (purpose.equals("List") && !isTable) {
 			List<TypeParam> parameters = field.getLookup().getParam();
 			for (TypeParam param : parameters) {
 				Control parameterControl = controls.get(param.getFieldName());

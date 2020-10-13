@@ -23,7 +23,6 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -32,7 +31,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -166,22 +164,6 @@ public class XMLDetailPart {
 				}
 			}
 		}
-		// Einfügen eines Listeners, welche auf Eingaben im LookupField reagiert
-		Display.getCurrent().addFilter(SWT.KeyUp, event -> {
-			Widget w = event.widget;
-			for (Control c : controls.values()) {
-				if (c instanceof LookupControl) {
-					if (w == ((Composite) c).getChildren()[1]) {
-						if (((LookupControl) c).getText().length() == 1 && event.character != '\b') {
-							requestOptionsFromCAS(c);
-						} else {
-							changeSelectionBoxList(c);
-						}
-					}
-				}
-
-			}
-		});
 	}
 
 	public void updateQuantitys() {
@@ -266,9 +248,9 @@ public class XMLDetailPart {
 				// Auswahl der Liste von Treffern anzeigen (Aufpoppen)
 				if (c instanceof LookupControl) {
 					LookupControl lookupControl = (LookupControl) c;
-					lookupControl.setProposals(t.getRows());
+					lookupControl.setProposals(t);
 				}
-				c.setData("keyLong", null);
+				// c.setData("keyLong", null);
 			}
 		}
 	}
