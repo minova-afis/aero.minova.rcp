@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
+import static org.eclipse.swt.events.MouseListener.mouseUpAdapter;
+
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -12,8 +14,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -75,7 +75,7 @@ public class DetailUtil {
 				.create(composite);
 
 		if (field.getLookup() != null) {
-			buildLookupField(field, composite, twoColumns, controls);
+			buildLookupField(field, composite, twoColumns, controls, broker);
 		} else if (field.getBoolean() == null) {
 			buildMiddlePart(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() != null) {
@@ -116,36 +116,38 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			l.setLayoutData(data);
 		}
-		text.setData("field", field);
-		text.setData("dataType", getDataType(field));
+		text.setData(Constants.CONTROL_FIELD, field);
+		text.setData(Constants.CONTROL_DATATYPE, getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
-		text.setData("consumer", new Consumer<Table>() {
+		text.setData(Constants.CONTROL_CONSUMER, new Consumer<Table>() {
 			@Override
 			public void accept(Table t) {
 
 				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-				Field f = (Field) text.getData("field");
+				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
 				text.setText(ValueBuilder.value(value, f).getText());
-				text.setData("dataType", ValueBuilder.value(value).getDataType());
+				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
 			}
 		});
 		controls.put(field.getName(), text);
 	}
 
-	private void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	@SuppressWarnings("rawtypes")
+	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls, IEventBroker broker) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
-		lookUpControl.setData("field", field);
+		lookUpControl.setData(Constants.CONTROL_FIELD, field);
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
 		// gestartet, um die Werte des zugehörigen Keys zu erhalten
-		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
+		lookUpControl.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
 
 			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
-			lookUpControl.setData("dataType", ValueBuilder.value((Value) m.get("value")).getDataType());
-			lookUpControl.setData("keyLong", keyLong);
+			lookUpControl.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
+			lookUpControl.setData(Constants.CONTROL_KEYLONG, keyLong);
 
 			CompletableFuture<?> tableFuture;
 			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
@@ -165,36 +167,14 @@ public class DetailUtil {
 
 		if (twoColumns) {
 			Label labelDescription = labelFactory.create(composite);
-			labelDescription.setText("Description");
+			labelDescription.setText(Constants.TABLE_DESCRIPTION);
 			GridData data = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 			data.horizontalSpan = 3;
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			labelDescription.setLayoutData(data);
 			lookUpControl.setDescription(labelDescription);
-			lookUpControl.addTwistieMouseListener(new MouseListener() {
-
-				@Override
-				public void mouseDoubleClick(MouseEvent e) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				/*
-				 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
-				 * LookUpFelder eingetragen wurden
-				 */
-				public void mouseDown(MouseEvent e) {
-					broker.post("LoadAllLookUpValues", field.getName());
-				}
-
-				@Override
-				public void mouseUp(MouseEvent e) {
-					// TODO Auto-generated method stub
-
-				}
-
-			});
+			lookUpControl
+					.addTwistieMouseListener(mouseUpAdapter(e -> broker.post("LoadAllLookUpValues", field.getName())));
 		}
 		controls.put(field.getName(), lookUpControl);
 
@@ -291,14 +271,14 @@ public class DetailUtil {
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
-		int index = ta.getColumnIndex("KeyText");
+		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
 
 		lc.setText((String) ValueBuilder.value(v).create());
-		if (lc.getDescription() != null && ta.getColumnIndex("Description") > -1) {
-			if (r.getValue(ta.getColumnIndex("Description")) != null) {
-				lc.getDescription()
-						.setText((String) ValueBuilder.value(r.getValue(ta.getColumnIndex("Description"))).create());
+		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
+			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
 			}
 		}
 	}
