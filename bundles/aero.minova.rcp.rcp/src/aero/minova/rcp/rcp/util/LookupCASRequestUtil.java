@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -15,6 +16,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class LookupCASRequestUtil {
 	public static CompletableFuture<?> getRequestedTable(int keyLong, String keyText, Field field,
@@ -26,16 +28,19 @@ public class LookupCASRequestUtil {
 			tableName = field.getLookup().getProcedurePrefix() + purpose;
 
 		}
-		TableBuilder tb = TableBuilder.newTable(tableName)//
-				.withColumn("KeyLong", DataType.INTEGER)//
-				.withColumn("KeyText", DataType.STRING);
-		RowBuilder rb;
-		if (keyLong == 0) {
-			rb = RowBuilder.newRow().withValue(null).withValue(keyText);
-		} else {
-			rb = RowBuilder.newRow().withValue(keyLong).withValue(null);
-		}
-		if (purpose == "List") {
+		TableBuilder tb = TableBuilder.newTable(tableName);
+		RowBuilder rb = RowBuilder.newRow();
+
+		if (purpose != "List") {
+			tb = tb//
+					.withColumn("KeyLong", DataType.INTEGER)//
+					.withColumn("KeyText", DataType.STRING);
+			if (keyLong == 0) {
+				rb = rb.withValue(null).withValue(keyText);
+			} else {
+				rb = rb.withValue(keyLong).withValue(null);
+			}
+		} else if (purpose == "List") {
 			tb = tb.withColumn("count", DataType.INTEGER);
 			rb = rb.withValue(null);
 		}
@@ -46,13 +51,29 @@ public class LookupCASRequestUtil {
 
 		// TODO: Einschränken der angegebenen Optionen anhand bereits ausgewählter
 		// Optionen (Kontrakt nur für Kunde x,...)
-		if (purpose == "list") {
+		// Für nicht-lookups(bookingdate)->Text übernehmen wenn nicht null
+		// bei leeren feldern ein nullfeld anhängen, alle parameter müssen für die
+		// anfrage gesetzt sein
+		if (purpose == "List") {
 			List<TypeParam> parameters = field.getLookup().getParam();
 			for (TypeParam param : parameters) {
 				Control parameterControl = controls.get(param.getFieldName());
-				if (parameterControl.getData("keyLong") != null) {
+				if (parameterControl instanceof LookupControl) {
 					tb.withColumn(param.getFieldName(), DataType.INTEGER);
-					rb.withValue(parameterControl.getData("keyLong"));
+					if (parameterControl.getData("keyLong") != null) {
+						rb.withValue(parameterControl.getData("keyLong"));
+					} else {
+						rb.withValue(null);
+					}
+				} else if (parameterControl instanceof Text) {
+					tb.withColumn(param.getFieldName(), (DataType) parameterControl.getData("dataType"));
+					rb.withValue(null);
+					// if (!(((Text) parameterControl).getText().isBlank())) {
+					// rb.withValue(((Text) parameterControl).getText());
+					// } else {
+					// rb.withValue(null);
+
+					// }
 				}
 			}
 		}

@@ -127,29 +127,7 @@ public class XMLDetailPart {
 
 					@Override
 					public void keyReleased(KeyEvent e) {
-						Text endDate = (Text) controls.get("EndDate");
-						Text startDate = (Text) controls.get("StartDate");
-						if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
-							LocalTime timeEndDate = LocalTime.parse(endDate.getText());
-							LocalTime timeStartDate = LocalTime.parse(startDate.getText());
-							float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
-									- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
-							timeDifference = timeDifference / 60;
-							Text renderedField = (Text) controls.get("RenderedQuantity");
-							Text chargedField = (Text) controls.get("ChargedQuantity");
-							String renderedValue;
-							String chargedValue;
-							if (timeDifference >= 0) {
-								renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
-								chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
-							} else {
-								renderedValue = "0";
-								chargedValue = "0";
-							}
-							chargedField.setText(chargedValue);
-							renderedField.setText(renderedValue);
-						}
-
+						updateQuantitys();
 					}
 
 				});
@@ -201,6 +179,31 @@ public class XMLDetailPart {
 		});
 	}
 
+	public void updateQuantitys() {
+		Text endDate = (Text) controls.get("EndDate");
+		Text startDate = (Text) controls.get("StartDate");
+		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
+			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
+			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
+			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+			timeDifference = timeDifference / 60;
+			Text renderedField = (Text) controls.get("RenderedQuantity");
+			Text chargedField = (Text) controls.get("ChargedQuantity");
+			String renderedValue;
+			String chargedValue;
+			if (timeDifference >= 0) {
+				renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
+				chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+			} else {
+				renderedValue = "0";
+				chargedValue = "0";
+			}
+			chargedField.setText(chargedValue);
+			renderedField.setText(renderedValue);
+		}
+	}
+
 	// Eigentliche CAS abfrage anhand des gegebenen KeyTextes
 	public void requestOptionsFromCAS(Control c) {
 		Field field = (Field) c.getData("field");
@@ -210,7 +213,7 @@ public class XMLDetailPart {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				changeOptionsForLookupField(sql.getOutputParameters(), c);
+				changeOptionsForLookupField(sql.getResultSet(), c);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
 				changeOptionsForLookupField(t, c);
