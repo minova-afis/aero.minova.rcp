@@ -49,6 +49,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
+import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DetailUtil;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.util.TextfieldVerifier;
@@ -120,8 +121,8 @@ public class XMLDetailPart {
 				// requestOptionsFromCAS(c);
 			}
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
-			if ((c.getData("field") == controls.get("StartDate").getData("field"))
-					|| (c.getData("field") == controls.get("EndDate").getData("field"))) {
+			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
+					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
 				c.addKeyListener(new KeyListener() {
 
 					@Override
@@ -139,7 +140,7 @@ public class XMLDetailPart {
 			if (c instanceof Text) {
 				TextfieldVerifier tfv = new TextfieldVerifier();
 				Text text = (Text) c;
-				Field field = (Field) c.getData("field");
+				Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 				if (field.getNumber() != null) {
 					text.addVerifyListener(e -> {
 						if (e.character != '\b') {
@@ -192,7 +193,7 @@ public class XMLDetailPart {
 	}
 
 	public void requestOptionsFromCAS(Control c) {
-		Field field = (Field) c.getData("field");
+		Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 		CompletableFuture<?> tableFuture;
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(), field, controls,
 				dataService, sync, "List");
@@ -215,7 +216,7 @@ public class XMLDetailPart {
 	 * @param c
 	 */
 	public void changeOptionsForLookupField(Table ta, Control c) {
-		c.setData("options", ta);
+		c.setData(Constants.CONTROL_OPTIONS, ta);
 		changeSelectionBoxList(c);
 	}
 
@@ -226,13 +227,13 @@ public class XMLDetailPart {
 	 * @param c
 	 */
 	public void changeSelectionBoxList(Control c) {
-		if (c.getData("options") != null) {
-			Table t = (Table) c.getData("options");
+		if (c.getData(Constants.CONTROL_OPTIONS) != null) {
+			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
 			// TODO prüfen ob der Wert in der Row auch em angefragten Wert entspricht
-			Field field = (Field) c.getData("field");
+			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 			if (t.getRows().size() == 1) {
 				if (field != null && field.getText() != null) {
-					Value value = t.getRows().get(0).getValue(t.getColumnIndex("KeyText"));
+					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 					if (value.getStringValue().equalsIgnoreCase(field.getText().toString())) {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 					} else {
@@ -268,7 +269,7 @@ public class XMLDetailPart {
 		Control control = controls.get(name);
 
 		if (control instanceof LookupControl) {
-			Field field = (Field) control.getData("field");
+			Field field = (Field) control.getData(Constants.CONTROL_FIELD);
 			CompletableFuture<?> tableFuture;
 			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync, "List");
 
@@ -345,7 +346,7 @@ public class XMLDetailPart {
 			String name = table.getColumnName(i);
 			Control c = controls.get(name);
 			if (c != null) {
-				Consumer<Table> consumer = (Consumer<Table>) c.getData("consumer");
+				Consumer<Table> consumer = (Consumer<Table>) c.getData(Constants.CONTROL_CONSUMER);
 				if (consumer != null) {
 					try {
 						consumer.accept(table);
@@ -358,7 +359,7 @@ public class XMLDetailPart {
 				hash.put("dataService", dataService);
 				hash.put("control", c);
 
-				Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData("lookupConsumer");
+				Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
 				if (lookupConsumer != null) {
 					try {
 						lookupConsumer.accept(hash);
@@ -404,8 +405,8 @@ public class XMLDetailPart {
 						}
 					}
 					if (c instanceof LookupControl) {
-						if (c.getData("keyLong") != null) {
-							rb.withValue(c.getData("keyLong"));
+						if (c.getData(Constants.CONTROL_KEYLONG) != null) {
+							rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
 						} else {
 							rb.withValue(null);
 						}

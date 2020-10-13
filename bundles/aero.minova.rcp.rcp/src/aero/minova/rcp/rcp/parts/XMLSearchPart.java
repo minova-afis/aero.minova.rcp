@@ -9,13 +9,11 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
-import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
@@ -29,9 +27,6 @@ public class XMLSearchPart {
 	IEclipsePreferences prefs;
 
 	@Inject
-	private IDataService dataService;
-
-	@Inject
 	private IMinovaJsonService mjs;
 
 	@Inject
@@ -43,8 +38,6 @@ public class XMLSearchPart {
 	private Table data;
 
 	@Inject MPart mPart;
-
-	private NatTable natTable;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -62,7 +55,7 @@ public class XMLSearchPart {
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		natTable = NatTableUtil.createNatTable(parent, form, data, false, null);
+		NatTableUtil.createNatTable(parent, form, data, false, null);
 	}
 
 	@PersistTableSelection
