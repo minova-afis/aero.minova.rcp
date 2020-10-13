@@ -139,75 +139,75 @@ public class TextfieldVerifier implements FocusListener{
 		// Überprüfen, ob das Datum als Worz/in der Kurzform übergeben wurde
 		localDate = getWeekdayFromCommand(subString);
 		if (localDate == null) {
-			if (subString.contains("[Jj]anuar")) {
+			if (subString.contains("Januar")) {
 				localDate = localDate.now().withMonth(1);
-				subString.replaceFirst("[Jj]anuar", "");
-			} else if (subString.contains("[Jj]an")) {
+				subString.replaceFirst("Januar", "");
+			} else if (subString.contains("Jan")) {
 				localDate = localDate.now().withMonth(1);
-				subString.replaceFirst("[Jj]an", "");
-			} else if (subString.contains("[Ff]ebruar")) {
+				subString.replaceFirst("Jan", "");
+			} else if (subString.contains("Februar")) {
 				localDate = localDate.now().withMonth(2);
-				subString.replaceFirst("[Ff]ebruar", "");
-			} else if (subString.contains("[Ff]eb")) {
+				subString.replaceFirst("Februar", "");
+			} else if (subString.contains("Feb")) {
 				localDate = localDate.now().withMonth(2);
-				subString.replaceFirst("[Ff]eb", "");
-			} else if (subString.contains("[Mm][äa]rz")) {
+				subString.replaceFirst("Feb", "");
+			} else if (subString.contains("Maerz")) {
 				localDate = localDate.now().withMonth(3);
-				subString.replaceFirst("Mm][äa]rz", "");
-			} else if (subString.contains("[Mm][äa]r")) {
+				subString.replaceFirst("Maerz", "");
+			} else if (subString.contains("Maer")) {
 				localDate = localDate.now().withMonth(3);
-				subString.replaceFirst("Mm][äa]r", "");
-			} else if (subString.contains("[Aa]pril")) {
+				subString.replaceFirst("Mar", "");
+			} else if (subString.contains("April")) {
 				localDate = localDate.now().withMonth(4);
-				subString.replaceFirst("[Aa]pril", "");
-			} else if (subString.contains("[Aa]pr")) {
+				subString.replaceFirst("April", "");
+			} else if (subString.contains("Apr")) {
 				localDate = localDate.now().withMonth(4);
-				subString.replaceFirst("[Aa]pr", "");
-			} else if (subString.contains("[Mm]ai")) {
+				subString.replaceFirst("Apr", "");
+			} else if (subString.contains("Mai")) {
 				localDate = localDate.now().withMonth(5);
-				subString.replaceFirst("[Mm]ai", "");
-			} else if (subString.contains("[Jj]uni")) {
+				subString.replaceFirst("Mai", "");
+			} else if (subString.contains("Juni")) {
 				localDate = localDate.now().withMonth(6);
-				subString.replaceFirst("[Jj]uni", "");
-			} else if (subString.contains("[Jj]un")) {
+				subString.replaceFirst("Juni", "");
+			} else if (subString.contains("Jun")) {
 				localDate = localDate.now().withMonth(6);
-				subString.replaceFirst("[Jj]un", "");
-			} else if (subString.contains("[Jj]uli")) {
+				subString.replaceFirst("Jun", "");
+			} else if (subString.contains("Juli")) {
 				localDate = localDate.now().withMonth(7);
-				subString.replaceFirst("[Jj]uli", "");
-			} else if (subString.contains("[Jj]ul")) {
+				subString.replaceFirst("Juli", "");
+			} else if (subString.contains("Jul")) {
 				localDate = localDate.now().withMonth(7);
-				subString.replaceFirst("[Jj]ul", "");
-			} else if (subString.contains("[Aa]ugust")) {
+				subString.replaceFirst("Jul", "");
+			} else if (subString.contains("August")) {
 				localDate = localDate.now().withMonth(8);
-				subString.replaceFirst("[Aa]ugust", "");
-			} else if (subString.contains("[Aa]ug")) {
+				subString.replaceFirst("August", "");
+			} else if (subString.contains("Aug")) {
 				localDate = localDate.now().withMonth(8);
-				subString.replaceFirst("[Aa]ug", "");
-			} else if (subString.contains("[Ss]eptember")) {
+				subString.replaceFirst("Aug", "");
+			} else if (subString.contains("September")) {
 				localDate = localDate.now().withMonth(9);
-				subString.replaceFirst("[Ss]eptember", "");
-			} else if (subString.contains("[Ss]ep")) {
+				subString.replaceFirst("September", "");
+			} else if (subString.contains("Sep")) {
 				localDate = localDate.now().withMonth(9);
-				subString.replaceFirst("[Ss]ep", "");
-			} else if (subString.contains("[Oo]ktober")) {
+				subString.replaceFirst("Sep", "");
+			} else if (subString.contains("Oktober")) {
 				localDate = localDate.now().withMonth(10);
-				subString.replaceFirst("[Oo]ktober", "");
-			} else if (subString.contains("[Oo]kt")) {
+				subString.replaceFirst("Oktober", "");
+			} else if (subString.contains("Okt")) {
 				localDate = localDate.now().withMonth(10);
-				subString.replaceFirst("[Oo]kt", "");
-			} else if (subString.contains("[Nn]ovember")) {
+				subString.replaceFirst("Okt", "");
+			} else if (subString.contains("November")) {
 				localDate = localDate.now().withMonth(11);
-				subString.replaceFirst("[Nn]ovember", "");
-			} else if (subString.contains("[Nn]ov")) {
+				subString.replaceFirst("November", "");
+			} else if (subString.contains("Nov")) {
 				localDate = localDate.now().withMonth(11);
-				subString.replaceFirst("[Nn]ov", "");
-			} else if (subString.contains("[Dd]ezember")) {
+				subString.replaceFirst("Nov", "");
+			} else if (subString.contains("Dezember")) {
 				localDate = localDate.now().withMonth(12);
-				subString.replaceFirst("[Dd]ezember", "");
-			} else if (subString.contains("[Dd]ez")) {
+				subString.replaceFirst("Dezember", "");
+			} else if (subString.contains("Dez")) {
 				localDate = localDate.now().withMonth(12);
-				subString.replaceFirst("[Dd]ez", "");
+				subString.replaceFirst("Dez", "");
 			}
 			// Überprüfen, ob ein relativer Tag ausgewählt wurde
 			else if (subString.contentEquals("0")) {
