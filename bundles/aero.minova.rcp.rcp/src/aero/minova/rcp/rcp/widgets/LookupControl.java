@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class LookupControl extends Composite {
 	protected LookupText textControl;
-	protected LookupTwistie twistie;
+	protected Label twistie;
 	private Label description;
 
 	public LookupControl(Composite parent, int style) {
@@ -52,7 +52,7 @@ public class LookupControl extends Composite {
 
 	protected void addLookupTwistie(int style) {
 		// org.eclipse.swt.widgets.Widget.PARENT_BACKGROUND is not visible
-		twistie = new LookupTwistie(this, style | SWT.NO_FOCUS | 1024);
+		twistie = new Label(this, style | SWT.NO_FOCUS | 1024);
 		twistie.setText("▼");
 		twistie.setToolTipText("Lookup.Twistie.ToolTip");
 		twistie.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupTwistie");

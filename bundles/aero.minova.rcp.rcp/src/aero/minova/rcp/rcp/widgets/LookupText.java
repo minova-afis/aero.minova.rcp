@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.widgets;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -10,9 +11,9 @@ import org.eclipse.swt.widgets.Text;
  * @since 11.4.0
  */
 public class LookupText extends Text {
-	private LookupTwistie twistie;
+	private Label twistie;
 
-	public LookupTwistie getTwistie() {
+	public Label getTwistie() {
 		return twistie;
 	}
 
@@ -24,7 +25,7 @@ public class LookupText extends Text {
 		}
 	}
 
-	public void setTwistie(LookupTwistie twistie) {
+	public void setTwistie(Label twistie) {
 		this.twistie = twistie;
 		if (twistie != null && !twistie.isDisposed()) {
 			twistie.setBackground(getBackground());
