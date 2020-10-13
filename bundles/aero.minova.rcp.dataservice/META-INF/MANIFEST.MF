@@ -13,6 +13,5 @@ Import-Package: aero.minova.rcp.form.model.xsd,
  com.google.gson;version="2.8.2",
  org.osgi.service.component.annotations;resolution:=optional
 Service-Component: OSGI-INF/aero.minova.rcp.dataservice.internal.DataFormService.xml,
- OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
- OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml
+ OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml
 Bundle-ActivationPolicy: lazy
