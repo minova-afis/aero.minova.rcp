@@ -67,7 +67,6 @@ public class LookupCASRequestUtil {
 						rb.withValue(null);
 					}
 				} else if (parameterControl instanceof Text) {
-
 					tb.withColumn(param.getFieldName(), (DataType) parameterControl.getData("dataType"));
 					rb.withValue(null);
 				}
