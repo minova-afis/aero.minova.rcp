@@ -20,14 +20,14 @@ public class CustomLocaleTests {
 
 	@Test
 	public void testGetCountrys() {
-		List<String> countrys = CustomLocale.getCountries();
+		List<String> countrys = CustomLocale.getCountries("language");
 		assertNotNull(countrys);
 		assertTrue(countrys.size() > 0);
 	}
 
 	@Test
 	public void testGetLanguageForCountry() {
-		List<String> languages = CustomLocale.getLanguages("land");
+		List<String> languages = CustomLocale.getLanguages();
 		assertNotNull(languages);
 	}
 
