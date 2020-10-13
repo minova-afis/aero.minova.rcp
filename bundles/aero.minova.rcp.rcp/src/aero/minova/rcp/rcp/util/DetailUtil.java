@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.util;
 
-import static org.eclipse.swt.events.MouseListener.mouseUpAdapter;
-
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +12,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -173,8 +173,29 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			labelDescription.setLayoutData(data);
 			lookUpControl.setDescription(labelDescription);
-			lookUpControl
-					.addTwistieMouseListener(mouseUpAdapter(e -> broker.post("LoadAllLookUpValues", field.getName())));
+			lookUpControl.addTwistieMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				/*
+				 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
+				 * LookUpFelder eingetragen wurden
+				 */
+				public void mouseDown(MouseEvent e) {
+					broker.post("LoadAllLookUpValues", field.getName());
+				}
+
+				@Override
+				public void mouseUp(MouseEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+			});
 		}
 		controls.put(field.getName(), lookUpControl);
 

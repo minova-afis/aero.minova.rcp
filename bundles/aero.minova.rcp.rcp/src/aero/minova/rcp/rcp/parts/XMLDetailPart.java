@@ -87,7 +87,7 @@ public class XMLDetailPart {
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
-		// Top-Level_Element
+		// Top-Level_Elemen
 		parent.setLayout(new GridLayout(1, true));
 		this.parent = parent;
 
