@@ -49,19 +49,14 @@ public class CustomLocale {
 		return locale;
 	}
 
-	public static List<String> getLanguages(String key) {
-
-		String language;
+	public static List<String> getLanguages() {
 		Locale locales[] = getLocales();
-		Object valuePreferences = InstancePreferenceAccessor.getValue(preferences, key, DisplayType.COMBO);
 		List<String> languages = new ArrayList<>();
 		for (Locale locale : locales) {
-			if (valuePreferences.toString().equals(locale.getDisplayCountry())) {
-				language = locale.getDisplayLanguage();
-				languages.add(language);
-			}
-
+			if (!locale.getDisplayLanguage().equals("") && !languages.contains(locale.getDisplayLanguage()))
+				languages.add(locale.getDisplayLanguage());
 		}
+		Collections.sort(languages);
 		return languages;
 	}
 }
