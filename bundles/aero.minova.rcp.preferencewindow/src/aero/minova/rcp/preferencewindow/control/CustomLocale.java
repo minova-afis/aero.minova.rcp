@@ -19,11 +19,13 @@ public class CustomLocale {
 		return SimpleDateFormat.getAvailableLocales();
 	}
 
-	public static List<String> getCountries() {
+	public static List<String> getCountries(String key) {
 		Locale locales[] = getLocales();
-		List<String> countries = new ArrayList<String>();
+		Object	valuePreferences = InstancePreferenceAccessor.getValue(preferences, key, DisplayType.COMBO);
+		List<String> countries = new ArrayList<>();
 		for (Locale locale : locales) {
-			if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry()))
+			if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry())
+					&& valuePreferences.toString().equals(locale.getDisplayLanguage()))
 				countries.add(locale.getDisplayCountry());
 		}
 		Collections.sort(countries);
@@ -36,14 +38,9 @@ public class CustomLocale {
 		Object valueCountry = InstancePreferenceAccessor.getValue(preferences, keyCountry, DisplayType.COMBO);
 		Object valueLanguage = InstancePreferenceAccessor.getValue(preferences, keyLanguage, DisplayType.COMBO);
 		for (Locale l : locales) {
-			if(valueCountry.toString().equals(l.getDisplayCountry())) {
-				if(valueLanguage.toString().equals(l.getDisplayLanguage())) {
-					locale = l;
-				} else {
-					locale = Locale.getDefault();
-				}
-			} else {
-				locale = Locale.getDefault();
+			if (valueCountry.toString().equals(l.getDisplayCountry())
+					&& valueLanguage.toString().equals(l.getDisplayLanguage())) {
+				locale = l;
 			}
 		}
 		return locale;
