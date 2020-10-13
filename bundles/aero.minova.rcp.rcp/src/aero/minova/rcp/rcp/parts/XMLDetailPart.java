@@ -72,7 +72,7 @@ public class XMLDetailPart {
 
 	@Inject
 	private TranslationService translationService;
-	
+
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
@@ -93,7 +93,7 @@ public class XMLDetailPart {
 		this.parent = parent;
 
 		form = dataFormService.getForm();
-		DetailUtil detailUtil = new DetailUtil(translationService);
+		DetailUtil detailUtil = new DetailUtil();
 
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
@@ -101,7 +101,7 @@ public class XMLDetailPart {
 				Composite detailFieldComposite = detailUtil.createSection(formToolkit, parent, head);
 				for (Object fieldOrGrid : head.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
-						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
+						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls, broker);
 					}
 				}
 			} else if (o instanceof Page) {
@@ -109,7 +109,7 @@ public class XMLDetailPart {
 				Composite detailFieldComposite = detailUtil.createSection(formToolkit, parent, page);
 				for (Object fieldOrGrid : page.getFieldOrGrid()) {
 					if (fieldOrGrid instanceof Field) {
-						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls);
+						detailUtil.createField((Field) fieldOrGrid, detailFieldComposite, controls, broker);
 
 					}
 				}
@@ -209,7 +209,6 @@ public class XMLDetailPart {
 		}
 	}
 
-	// Eigentliche CAS abfrage anhand des gegebenen KeyTextes
 	public void requestOptionsFromCAS(Control c) {
 		Field field = (Field) c.getData("field");
 		CompletableFuture<?> tableFuture;
@@ -244,7 +243,7 @@ public class XMLDetailPart {
 	public void changeShownOptions(Control c) {
 		if (c.getData("options") != null) {
 			Map<Integer, String> optionsMap = (Map<Integer, String>) c.getData("options");
-			Map<Integer, String> shownOptionsMap = new HashMap<Integer, String>();
+			Map<Integer, String> shownOptionsMap = new HashMap<>();
 			int i = 0;
 			for (String s : optionsMap.values()) {
 				Integer keyLong = (Integer) optionsMap.keySet().toArray()[i];
@@ -261,6 +260,39 @@ public class XMLDetailPart {
 				c.setData("keyLong", null);
 			}
 		}
+	}
+
+	/**
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen
+	 * Es wird eine Liste von Ergebnissen Erstellt, diese wird dem benutzer zur verfügung gestellt.
+	 * @param luc
+	 */
+	@Inject
+	@Optional
+	public void requestLookUpEntriesAll(@UIEventTopic("LoadAllLookUpValues") String name) {
+		Control control = controls.get(name);
+
+		if(control instanceof LookupControl) {
+			Field field = (Field) control.getData("field");
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls,
+					dataService, sync, "List");
+
+			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+				if (ta instanceof SqlProcedureResult) {
+					SqlProcedureResult sql = (SqlProcedureResult) ta;
+					changeOptionsForLookupField(sql.getResultSet(), control);
+				} else if (ta instanceof Table) {
+					Table t1 = (Table) ta;
+					changeOptionsForLookupField(t1, control);
+				}
+
+			}));
+		}
+
+
+
+
 	}
 
 	// Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
@@ -346,6 +378,7 @@ public class XMLDetailPart {
 			}
 		}
 	}
+
 
 	// Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
 	// der gegebenen Keys
@@ -519,8 +552,7 @@ public class XMLDetailPart {
 	public void buildDeleteTable(@UIEventTopic("DeleteEntry") Object obj) {
 		if (getKeys() != null) {
 			String tablename = form.getIndexView() != null ? "sp" : "op";
-			if (!("sp".equals(form.getDetail().getProcedurePrefix())
-					|| "op".equals(form.getDetail().getProcedurePrefix()))) {
+			if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
 				tablename = form.getDetail().getProcedurePrefix();
 			}
 			tablename += "Delete";

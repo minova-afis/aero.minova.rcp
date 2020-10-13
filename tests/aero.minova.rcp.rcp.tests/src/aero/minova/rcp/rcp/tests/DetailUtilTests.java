@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.widgets.CompositeFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -35,14 +36,14 @@ public class DetailUtilTests {
 	private Composite composite;
 	private FormToolkit formToolkit;
 	private Map<String, Control> controls;
-	
+	private IEventBroker broker;
 	@Before
 	public void setup() {
 		shell = new Shell();
 		formToolkit = new FormToolkit(Display.getDefault());
 		composite = CompositeFactory.newComposite(SWT.None).create(shell);
 		composite.setLayout(new GridLayout(6, false));
-		controls = new HashMap<String, Control>();
+		controls = new HashMap<>();
 
 	}
 
@@ -60,7 +61,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Testing");
 		field.setNumberRowsSpanned("THIS RESULTS IN AN EXCEPTION");
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls);
+		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
 	}
 
 	@Test
@@ -69,7 +70,7 @@ public class DetailUtilTests {
 		Field field = new Field();
 		field.setVisible(false);
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls);
+		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
 		assertTrue(composite.getChildren().length == 0);
 	}
 
@@ -88,7 +89,9 @@ public class DetailUtilTests {
 
 	@Test
 	public void testHeader() throws Exception {
+
 		Field field = new Field();
+		field.setName("BookingDate");
 		field.setTextAttribute("Test");
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
@@ -106,7 +109,7 @@ public class DetailUtilTests {
 		for (Object o2 : head.getFieldOrGrid()) {
 			if (o2 instanceof Field) {
 				Map<String, Control> controls = new HashMap<>();
-				new DetailUtil(new DummyTranslationService()).createField((Field) o2, co, controls);
+				new DetailUtil(new DummyTranslationService()).createField((Field) o2, co, controls, broker);
 			}
 		}
 		Control[] children = co.getChildren();
@@ -143,6 +146,11 @@ public class DetailUtilTests {
 		assertTrue(((GridData) layoutData).horizontalAlignment == SWT.LEFT);
 		assertTrue(((GridData) layoutData).horizontalSpan == 3);
 		assertEquals(320, ((GridData) layoutData).widthHint);
+		Control control = controls.get("BookingDate");
+		Object data = control.getData("dataType");
+
+
+
 
 	}
 
@@ -153,7 +161,7 @@ public class DetailUtilTests {
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls);
+		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
 		Control[] children = composite.getChildren();
 		assertEquals(children.length, 3);
 		Object layoutData = children[0].getLayoutData();
@@ -181,7 +189,7 @@ public class DetailUtilTests {
 		field.setNumber(new Number());
 		field.setUnitText("L");
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls);
+		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
 		Object layoutData = children[0].getLayoutData();
@@ -208,7 +216,7 @@ public class DetailUtilTests {
 		field.setLookup(new Lookup());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls);
+		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
 		Object layoutData = children[0].getLayoutData();

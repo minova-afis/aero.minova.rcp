@@ -31,7 +31,7 @@ public class LookupCASRequestUtil {
 		TableBuilder tb = TableBuilder.newTable(tableName);
 		RowBuilder rb = RowBuilder.newRow();
 
-		if (purpose != "List") {
+		if (!purpose.equals("List")) {
 			tb = tb//
 					.withColumn("KeyLong", DataType.INTEGER)//
 					.withColumn("KeyText", DataType.STRING);
@@ -40,7 +40,7 @@ public class LookupCASRequestUtil {
 			} else {
 				rb = rb.withValue(keyLong).withValue(null);
 			}
-		} else if (purpose == "List") {
+		} else if (purpose.equals("List")) {
 			tb = tb.withColumn("count", DataType.INTEGER);
 			rb = rb.withValue(null);
 		}
@@ -54,26 +54,22 @@ public class LookupCASRequestUtil {
 		// Für nicht-lookups(bookingdate)->Text übernehmen wenn nicht null
 		// bei leeren feldern ein nullfeld anhängen, alle parameter müssen für die
 		// anfrage gesetzt sein
-		if (purpose == "List") {
+		if (purpose.equals("List")) {
 			List<TypeParam> parameters = field.getLookup().getParam();
 			for (TypeParam param : parameters) {
 				Control parameterControl = controls.get(param.getFieldName());
 				if (parameterControl instanceof LookupControl) {
 					tb.withColumn(param.getFieldName(), DataType.INTEGER);
-					if (parameterControl.getData("keyLong") != null) {
-						rb.withValue(parameterControl.getData("keyLong"));
+					// Auslesen des KeyLong-Wertes und setzen in der Table!
+					if (parameterControl.getData("KeyLong") != null) {
+						rb.withValue(parameterControl.getData("KeyLong"));
 					} else {
 						rb.withValue(null);
 					}
 				} else if (parameterControl instanceof Text) {
+
 					tb.withColumn(param.getFieldName(), (DataType) parameterControl.getData("dataType"));
 					rb.withValue(null);
-					// if (!(((Text) parameterControl).getText().isBlank())) {
-					// rb.withValue(((Text) parameterControl).getText());
-					// } else {
-					// rb.withValue(null);
-
-					// }
 				}
 			}
 		}

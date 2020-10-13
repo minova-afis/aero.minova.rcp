@@ -20,9 +20,7 @@ public class SaveDetailHandler {
 	// KeyLongs wird zwischen update und neuem Eintrag unterschieden
 	@Execute
 	public void execute() {
-		// XMLDetailPart xmlPart = (XMLDetailPart) mpart;
 		broker.post("SaveEntry", null);
-		// xmlPart.buildSaveTable();
 
 	}
 }

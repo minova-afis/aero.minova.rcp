@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
@@ -34,6 +36,11 @@ import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
 
+	public DetailUtil(TranslationService translationService) {
+		super();
+		this.translationService = translationService;
+	}
+
 	public static final int LABEL_WIDTH_HINT = 150;
 	public static final int TEXT_WIDTH_HINT = 170;
 	public static final int UNIT_WIDTH_HINT = 20;
@@ -45,7 +52,10 @@ public class DetailUtil {
 	private static TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
 	private static TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
 
-	public static void createField(Field field, Composite composite, Map<String, Control> controls) {
+	TranslationService translationService;
+
+	public static void createField(Field field, Composite composite, Map<String, Control> controls,
+			IEventBroker broker) {
 		if (!field.isVisible()) {
 			return;
 		}
@@ -63,7 +73,7 @@ public class DetailUtil {
 				.create(composite);
 
 		if (field.getLookup() != null) {
-			buildLookupField(field, composite, twoColumns, controls);
+			buildLookupField(field, composite, twoColumns, controls, broker);
 		} else if (field.getBoolean() == null) {
 			buildMiddlePart(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() != null) {
@@ -107,18 +117,21 @@ public class DetailUtil {
 		text.setData("field", field);
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
-		text.setData("consumer", (Consumer<Table>) t -> {
+		text.setData("consumer", new Consumer<Table>() {
+			@Override
+			public void accept(Table t) {
 
-			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-			Field f = (Field) text.getData("field");
-			text.setText(ValueBuilder.value(value, f).getText());
-			text.setData("dataType", ValueBuilder.value(value).getDataType());
+				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+				Field f = (Field) text.getData("field");
+				text.setText(ValueBuilder.value(value, f).getText());
+				text.setData("dataType", ValueBuilder.value(value).getDataType());
+			}
 		});
 		controls.put(field.getName(), text);
 	}
 
 	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls) {
+			Map<String, Control> controls, IEventBroker broker) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
@@ -165,13 +178,18 @@ public class DetailUtil {
 				}
 
 				@Override
+				/*
+				 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
+				 * LookUpFelder eingetragen wurden
+				 */
 				public void mouseDown(MouseEvent e) {
-
+					broker.post("LoadAllLookUpValues", field.getName());
 				}
 
 				@Override
 				public void mouseUp(MouseEvent e) {
 					// TODO Auto-generated method stub
+
 
 				}
 
