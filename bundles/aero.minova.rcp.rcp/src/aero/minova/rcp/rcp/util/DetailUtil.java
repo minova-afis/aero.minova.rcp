@@ -113,9 +113,10 @@ public class DetailUtil {
 		// Indexes in der Detailview aufzulisten
 		text.setData("consumer", (Consumer<Table>) t -> {
 
-			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-			text.setData("dataType", ValueBuilder.newValue(rowindex).dataType());
-			text.setText((String) ValueBuilder.newValue(rowindex).create());
+			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+			Field f = (Field) text.getData("field");
+			text.setText(ValueBuilder.value(value, f).getText());
+			text.setData("dataType", ValueBuilder.value(value).getDataType());
 		});
 		controls.put(field.getName(), text);
 	}
@@ -130,8 +131,8 @@ public class DetailUtil {
 		// gestartet, um die Werte des zugehörigen Keys zu erhalten
 		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
 
-			int keyLong = (Integer) ValueBuilder.newValue((Value) m.get("value")).create();
-			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
+			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
+			lookUpControl.setData("dataType", ValueBuilder.value((Value) m.get("value")).getDataType());
 			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<?> tableFuture;
@@ -243,11 +244,11 @@ public class DetailUtil {
 		int index = ta.getColumnIndex("KeyText");
 		Value v = r.getValue(index);
 
-		lc.setText((String) ValueBuilder.newValue(v).create());
+		lc.setText((String) ValueBuilder.value(v).create());
 		if (lc.getDescription() != null && ta.getColumnIndex("Description") > -1) {
 			if (r.getValue(ta.getColumnIndex("Description")) != null) {
 				lc.getDescription()
-						.setText((String) ValueBuilder.newValue(r.getValue(ta.getColumnIndex("Description"))).create());
+						.setText((String) ValueBuilder.value(r.getValue(ta.getColumnIndex("Description"))).create());
 			}
 		}
 	}

@@ -132,29 +132,7 @@ public class XMLDetailPart {
 
 					@Override
 					public void keyReleased(KeyEvent e) {
-						Text endDate = (Text) controls.get("EndDate");
-						Text startDate = (Text) controls.get("StartDate");
-						if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
-							LocalTime timeEndDate = LocalTime.parse(endDate.getText());
-							LocalTime timeStartDate = LocalTime.parse(startDate.getText());
-							float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
-									- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
-							timeDifference = timeDifference / 60;
-							Text renderedField = (Text) controls.get("RenderedQuantity");
-							Text chargedField = (Text) controls.get("ChargedQuantity");
-							String renderedValue;
-							String chargedValue;
-							if (timeDifference >= 0) {
-								renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
-								chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
-							} else {
-								renderedValue = "0";
-								chargedValue = "0";
-							}
-							chargedField.setText(chargedValue);
-							renderedField.setText(renderedValue);
-						}
-
+						updateQuantitys();
 					}
 
 				});
@@ -206,6 +184,31 @@ public class XMLDetailPart {
 		});
 	}
 
+	public void updateQuantitys() {
+		Text endDate = (Text) controls.get("EndDate");
+		Text startDate = (Text) controls.get("StartDate");
+		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
+			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
+			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
+			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+			timeDifference = timeDifference / 60;
+			Text renderedField = (Text) controls.get("RenderedQuantity");
+			Text chargedField = (Text) controls.get("ChargedQuantity");
+			String renderedValue;
+			String chargedValue;
+			if (timeDifference >= 0) {
+				renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
+				chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+			} else {
+				renderedValue = "0";
+				chargedValue = "0";
+			}
+			chargedField.setText(chargedValue);
+			renderedField.setText(renderedValue);
+		}
+	}
+
 	// Eigentliche CAS abfrage anhand des gegebenen KeyTextes
 	public void requestOptionsFromCAS(Control c) {
 		Field field = (Field) c.getData("field");
@@ -215,7 +218,7 @@ public class XMLDetailPart {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				changeOptionsForLookupField(sql.getOutputParameters(), c);
+				changeOptionsForLookupField(sql.getResultSet(), c);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
 				changeOptionsForLookupField(t, c);
@@ -228,7 +231,7 @@ public class XMLDetailPart {
 	public void changeOptionsForLookupField(Table ta, Control c) {
 		Map m = new HashMap<Integer, String>();
 		for (Row r : ta.getRows()) {
-			m.put(ValueBuilder.newValue(r.getValue(0)).create(), ValueBuilder.newValue(r.getValue(1)).create());
+			m.put(ValueBuilder.value(r.getValue(0)).create(), ValueBuilder.value(r.getValue(1)).create());
 		}
 		c.setData("options", m);
 		changeShownOptions(c);
@@ -286,7 +289,7 @@ public class XMLDetailPart {
 							ArrayList al = new ArrayList();
 							al.add(indexColumns.get(i).getName());
 							al.add(row.getValue(i).getValue());
-							al.add(ValueBuilder.newValue(row.getValue(i)).dataType());
+							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
 							keys.add(al);
 						} else {
 							builder.withValue(null);
@@ -390,12 +393,26 @@ public class XMLDetailPart {
 			valuePosition++;
 		}
 
-		// TODO: spelling/felder collumns ohne zugehöriges feld mit wert null versorgen
-
+		// TODO: spelling/collumns ohne zugehöriges feld mit default-wert versorgen
+		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
+		// Row-Wertes ermittelt und der Row angefügt
 		Row r = rb.create();
+		List<Field> formFields = dataFormService.getFieldsFromForm(form, false);
 		if (controls.size() < formTable.getColumnCount()) {
-			while (r.size() < formTable.getColumnCount()) {
-				r.addValue(null);
+			for (int i = r.size(); i < formTable.getColumnCount(); i++) {
+				for (Field f : formFields) {
+					if (f.getName().equals(formTable.getColumnName(i))) {
+						if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
+							r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
+						} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
+							r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
+						} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
+							r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
+						} else {
+							r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
+						}
+					}
+				}
 			}
 		}
 
@@ -438,7 +455,7 @@ public class XMLDetailPart {
 		if (timeDifference != renderedQuantityFloat) {
 			contradiction = true;
 		}
-		if ((renderedQuantityFloat < chargedQuantityFloat)) {
+		if ((renderedQuantityFloat + 0.25 < chargedQuantityFloat)) {
 			contradiction = true;
 		}
 		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
@@ -455,7 +472,6 @@ public class XMLDetailPart {
 				}));
 			} else {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					System.out.println("test");
 					checkEntryUpdate(tr.getReturnCode());
 				}));
 			}
