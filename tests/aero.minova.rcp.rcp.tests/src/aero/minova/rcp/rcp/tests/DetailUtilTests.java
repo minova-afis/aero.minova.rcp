@@ -36,6 +36,7 @@ public class DetailUtilTests {
 	private Composite composite;
 	private FormToolkit formToolkit;
 	private Map<String, Control> controls;
+
 	private IEventBroker broker;
 	@Before
 	public void setup() {
@@ -44,6 +45,7 @@ public class DetailUtilTests {
 		composite = CompositeFactory.newComposite(SWT.None).create(shell);
 		composite.setLayout(new GridLayout(6, false));
 		controls = new HashMap<>();
+
 
 	}
 
