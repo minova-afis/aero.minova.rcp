@@ -51,8 +51,12 @@ public class PreferenceWindowModel {
 				"Darstellung", 0.2);
 		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.LOCALE);
+		pd = new PreferenceDescriptor("language", "Sprache", 0.1, DisplayType.LOCALE);
 		psd.add(pd);
+//		pd = new PreferenceDescriptor("language", "Sprache", 0.1, DisplayType.LOCALE, CustomLocale.getLanguages().toArray());
+//		psd.add(pd);
+//		pd = new PreferenceDescriptor("land", "Land", 0.2, DisplayType.LOCALE, CustomLocale.getCountries("language").toArray());
+//		psd.add(pd);
 		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
 				CustomTimeZone.getTimeZones("land", "language").toArray());
 		psd.add(pd);
