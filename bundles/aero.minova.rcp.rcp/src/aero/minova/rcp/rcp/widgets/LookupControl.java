@@ -1,6 +1,15 @@
 package aero.minova.rcp.rcp.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.IContentProposalProvider;
+import org.eclipse.jface.fieldassist.IControlContentAdapter;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
+import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseListener;
@@ -10,8 +19,11 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import aero.minova.rcp.model.Row;
 
 /**
  * Ein selbst definiertes UI-Element zur Anzeige von Lookups
@@ -20,16 +32,29 @@ import org.eclipse.swt.widgets.Text;
  * @since 11.0.0
  */
 public class LookupControl extends Composite {
-	protected LookupText textControl;
+	private final class ContentProposalAdapterExtension extends ContentProposalAdapter {
+		private ContentProposalAdapterExtension(Control control, IControlContentAdapter controlContentAdapter,
+				IContentProposalProvider proposalProvider, KeyStroke keyStroke, char[] autoActivationCharacters) {
+			super(control, controlContentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
+		}
+
+		@Override
+		public void openProposalPopup() {
+			super.openProposalPopup();
+		}
+	}
+
+	protected Text textControl;
 	protected Label twistie;
 	private Label description;
+	private SimpleContentProposalProvider simpleContentProposalProvider;
+	private ContentProposalAdapterExtension contentProposalAdapter;
 
 	public LookupControl(Composite parent, int style) {
 		super(parent, style);
 
 		addLookupTwistie(style);
 		addTextControl(style | SWT.BORDER);
-		textControl.setTwistie(twistie);
 		addLayout();
 	}
 
@@ -59,8 +84,18 @@ public class LookupControl extends Composite {
 	}
 
 	protected void addTextControl(int style) {
-		textControl = new LookupText(this, style);
+		textControl = new Text(this, style);
+		simpleContentProposalProvider = new SimpleContentProposalProvider();
+		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, new TextContentAdapter(), simpleContentProposalProvider, null, null);
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
+	}
+	public void setProposals(List<Row> proposals) {
+		List<String> helper = new ArrayList<>();		
+		for (Row row : proposals) {
+			helper.add(row.toString());
+		}
+		simpleContentProposalProvider.setProposals(helper.toArray(new String[0]));
+		contentProposalAdapter.openProposalPopup();
 	}
 
 	public void addTwistieMouseListener(MouseListener ml) {

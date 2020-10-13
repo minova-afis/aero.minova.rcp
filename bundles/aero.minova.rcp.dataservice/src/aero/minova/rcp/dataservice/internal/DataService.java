@@ -92,7 +92,11 @@ public class DataService implements IDataService {
 				.build();
 
 		CompletableFuture<SqlProcedureResult> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class));
+				.thenApply(t -> {
+					SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+					logBody(t.body());
+					return fromJson;
+				});
 
 		return future;
 	}

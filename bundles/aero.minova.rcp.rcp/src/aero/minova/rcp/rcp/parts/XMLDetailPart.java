@@ -264,6 +264,10 @@ public class XMLDetailPart {
 			} else {
 				// TODO
 				// Auswahl der Liste von Treffern anzeigen (Aufpoppen)
+				if (c instanceof LookupControl) {
+					LookupControl lookupControl = (LookupControl) c;
+					lookupControl.setProposals(t.getRows());
+				}
 				c.setData("keyLong", null);
 			}
 		}
