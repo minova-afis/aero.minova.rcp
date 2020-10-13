@@ -12,5 +12,6 @@ public interface IDataService {
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
 
 	CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable);
+	CompletableFuture<String> getFile(String path);
 
 }

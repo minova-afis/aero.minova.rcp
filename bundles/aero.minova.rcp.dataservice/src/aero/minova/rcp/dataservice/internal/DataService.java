@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -28,7 +29,6 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 
-@Component
 public class DataService implements IDataService {
 
 	private static final boolean LOG = true;
@@ -80,6 +80,8 @@ public class DataService implements IDataService {
 
 		return future;
 	}
+	
+	
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
@@ -150,6 +152,16 @@ public class DataService implements IDataService {
 		if (LOG) {
 			System.out.println(body);
 		}
+
+	}
+
+	public CompletableFuture<String> getFile(String uri) {
+		  HttpRequest fileRequest = HttpRequest.newBuilder()
+		          .uri(URI.create(uri))
+		          .build();
+
+		  return httpClient.sendAsync(request, BodyHandlers.ofString())
+		          .thenApply(HttpResponse::body);
 
 	}
 
