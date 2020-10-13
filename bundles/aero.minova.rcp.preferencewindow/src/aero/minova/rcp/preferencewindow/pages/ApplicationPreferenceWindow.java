@@ -45,7 +45,8 @@ public class ApplicationPreferenceWindow {
 	public void execute() {
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
-		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
+		Map<String, Object> data = fillData(preferenceTabs);
+		PreferenceWindow window = PreferenceWindow.create(data);
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -59,7 +60,7 @@ public class ApplicationPreferenceWindow {
 					// Preference hinzufügen
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
-					createWidgets(newTab, pref, key, values);
+					createWidgets(newTab, pref, key, data, values);
 
 				}
 			}
@@ -105,7 +106,7 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... values) {
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Map<String,Object> data, Object... values) {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
@@ -145,7 +146,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), "Land", key, data, values).setAlignment(GridData.FILL);
 			break;
 		default:
 			break;
