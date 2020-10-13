@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import static aero.minova.rcp.preferencewindow.control.CustomLocale.getLocales;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -13,7 +14,7 @@ public class CustomLocaleTests {
 
 	@Test
 	public void testGetLocales() {
-		Locale list[] = CustomLocale.getLocales();
+		Locale list[] = getLocales();
 		assertNotNull(list);
 		assertEquals(748, list.length);
 	}
