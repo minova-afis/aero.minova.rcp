@@ -5,12 +5,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -43,13 +44,8 @@ public class DetailUtil {
 	public static final LabelFactory labelFactory = LabelFactory.newLabel(SWT.NONE);
 	private static TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
 	private static TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
-	private final TranslationService translationService;
 
-	public DetailUtil(TranslationService translationService) {
-		this.translationService = translationService;
-	}
-
-	public void createField(Field field, Composite composite, Map<String, Control> controls) {
+	public static void createField(Field field, Composite composite, Map<String, Control> controls) {
 		if (!field.isVisible()) {
 			return;
 		}
@@ -62,7 +58,7 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(translationService.translate(field.getTextAttribute(), null))
+		labelFactory.text(field.getTextAttribute())
 				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
 				.create(composite);
 
@@ -77,15 +73,15 @@ public class DetailUtil {
 		}
 
 		if (field.getUnitText() != null && field.getLookup() == null) {
-			Label labelUnit = labelFactory.text(translationService.translate(field.getUnitText(), null))
-					.create(composite);
+			Label labelUnit = labelFactory.text(field.getUnitText()).create(composite);
 			GridData data2 = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 			data2.widthHint = UNIT_WIDTH_HINT;
 			labelUnit.setLayoutData(data2);
 		}
 	}
 
-	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -113,14 +109,16 @@ public class DetailUtil {
 		// Indexes in der Detailview aufzulisten
 		text.setData("consumer", (Consumer<Table>) t -> {
 
-			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-			text.setData("dataType", ValueBuilder.newValue(rowindex).dataType());
-			text.setText((String) ValueBuilder.newValue(rowindex).create());
+			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+			Field f = (Field) text.getData("field");
+			text.setText(ValueBuilder.value(value, f).getText());
+			text.setData("dataType", ValueBuilder.value(value).getDataType());
 		});
 		controls.put(field.getName(), text);
 	}
 
-	private void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
@@ -130,8 +128,8 @@ public class DetailUtil {
 		// gestartet, um die Werte des zugehörigen Keys zu erhalten
 		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
 
-			int keyLong = (Integer) ValueBuilder.newValue((Value) m.get("value")).create();
-			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
+			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
+			lookUpControl.setData("dataType", ValueBuilder.value((Value) m.get("value")).getDataType());
 			lookUpControl.setData("keyLong", keyLong);
 
 			CompletableFuture<?> tableFuture;
@@ -158,12 +156,32 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			labelDescription.setLayoutData(data);
 			lookUpControl.setDescription(labelDescription);
+			lookUpControl.addTwistieMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void mouseDown(MouseEvent e) {
+
+				}
+
+				@Override
+				public void mouseUp(MouseEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+			});
 		}
 		controls.put(field.getName(), lookUpControl);
 
 	}
 
-	public Integer getSpannedHintForElement(Field field, boolean twoColumns) {
+	public static Integer getSpannedHintForElement(Field field, boolean twoColumns) {
 		if (field.getUnitText() != null) {
 			return 1;
 		} else if (field.getText() != null && twoColumns) {
@@ -173,7 +191,7 @@ public class DetailUtil {
 		}
 	}
 
-	public int getWidthHintForElement(Field field, boolean twoColumns) {
+	public static int getWidthHintForElement(Field field, boolean twoColumns) {
 		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
 			return TEXT_WIDTH_HINT;
 		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null)
@@ -192,7 +210,7 @@ public class DetailUtil {
 		return -1;
 	}
 
-	private Integer getWidthHintForElement(Field field) {
+	private static Integer getWidthHintForElement(Field field) {
 		return getWidthHintForElement(field, false);
 	}
 
@@ -203,7 +221,7 @@ public class DetailUtil {
 	 * @param widthHint
 	 * @return
 	 */
-	private GridData getGridDataFactory(boolean twoColumns, Field field) {
+	private static GridData getGridDataFactory(boolean twoColumns, Field field) {
 		GridData data = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 		data.horizontalSpan = getSpannedHintForElement(field, twoColumns);
 		if (twoColumns && data.horizontalSpan > 2) {
@@ -214,7 +232,7 @@ public class DetailUtil {
 		return data;
 	}
 
-	public Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public static Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
@@ -237,17 +255,17 @@ public class DetailUtil {
 
 	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
 	// Bindung zur Componente
-	public void updateSelectedLookupEntry(Table ta, Control c) {
+	public static void updateSelectedLookupEntry(Table ta, Control c) {
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
 		int index = ta.getColumnIndex("KeyText");
 		Value v = r.getValue(index);
 
-		lc.setText((String) ValueBuilder.newValue(v).create());
+		lc.setText((String) ValueBuilder.value(v).create());
 		if (lc.getDescription() != null && ta.getColumnIndex("Description") > -1) {
 			if (r.getValue(ta.getColumnIndex("Description")) != null) {
 				lc.getDescription()
-						.setText((String) ValueBuilder.newValue(r.getValue(ta.getColumnIndex("Description"))).create());
+						.setText((String) ValueBuilder.value(r.getValue(ta.getColumnIndex("Description"))).create());
 			}
 		}
 	}
