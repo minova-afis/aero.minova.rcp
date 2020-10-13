@@ -15,9 +15,11 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
 
+@Component
 public class WFCTranslationService extends TranslationService {
 
 	private TranslationService parent;
