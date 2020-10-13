@@ -27,6 +27,7 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -115,6 +116,7 @@ public class DetailUtil {
 			l.setLayoutData(data);
 		}
 		text.setData("field", field);
+		text.setData("dataType", getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
 		text.setData("consumer", new Consumer<Table>() {
@@ -190,7 +192,6 @@ public class DetailUtil {
 				public void mouseUp(MouseEvent e) {
 					// TODO Auto-generated method stub
 
-
 				}
 
 			});
@@ -206,6 +207,20 @@ public class DetailUtil {
 			return 5;
 		} else {
 			return 2;
+		}
+	}
+
+	public static DataType getDataType(Field field) {
+		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
+			return DataType.INSTANT;
+		} else if (field.getNumber() != null && field.getNumber().getDecimals() > 0) {
+			return DataType.INTEGER;
+		} else if ((field.getNumber() != null && field.getNumber().getDecimals() > 0) || field.getMoney() != null) {
+			return DataType.DOUBLE;
+		} else if (field.getBoolean() != null) {
+			return DataType.BOOLEAN;
+		} else {
+			return DataType.STRING;
 		}
 	}
 

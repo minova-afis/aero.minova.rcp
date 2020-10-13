@@ -93,7 +93,7 @@ public class XMLDetailPart {
 		this.parent = parent;
 
 		form = dataFormService.getForm();
-		DetailUtil detailUtil = new DetailUtil();
+		DetailUtil detailUtil = new DetailUtil(translationService);
 
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
@@ -175,7 +175,7 @@ public class XMLDetailPart {
 						if (((LookupControl) c).getText().length() == 1 && event.character != '\b') {
 							requestOptionsFromCAS(c);
 						} else {
-							changeShownOptions(c);
+							changeSelectionBoxList(c);
 						}
 					}
 				}
@@ -226,45 +226,54 @@ public class XMLDetailPart {
 		}));
 	}
 
-	// Tauscht die Optionen aus, welche dem LookupField zur Verfügung stehen
+	/**
+	 * Tauscht die Optionen aus, welche dem LookupField zur Verfügung stehen
+	 *
+	 * @param ta
+	 * @param c
+	 */
 	public void changeOptionsForLookupField(Table ta, Control c) {
-		Map m = new HashMap<Integer, String>();
-		for (Row r : ta.getRows()) {
-			m.put(ValueBuilder.value(r.getValue(0)).create(), ValueBuilder.value(r.getValue(1)).create());
-		}
-		c.setData("options", m);
-		changeShownOptions(c);
+		c.setData("options", ta);
+		changeSelectionBoxList(c);
 	}
 
-	// Schränkt die angezeigten Optionen an, welche in der Map hinterlegt sind,
-	// anhand des eingegebenen Strings
-	// TODO: Die Optionen sind als Hashmap vorhanden, allerdings existiert noch kein
-	// Object welches mit dieser Arbeitet
-	public void changeShownOptions(Control c) {
+	/**
+	 * Diese Mtethode setzt die den Ausgewählten Wert direkt in das Control oder
+	 * lässt eine Liste aus möglichen Werten zur Auswahl erscheinen.
+	 *
+	 * @param c
+	 */
+	public void changeSelectionBoxList(Control c) {
 		if (c.getData("options") != null) {
-			Map<Integer, String> optionsMap = (Map<Integer, String>) c.getData("options");
-			Map<Integer, String> shownOptionsMap = new HashMap<>();
-			int i = 0;
-			for (String s : optionsMap.values()) {
-				Integer keyLong = (Integer) optionsMap.keySet().toArray()[i];
-				if (s.contains(((LookupControl) c).getText())) {
-					shownOptionsMap.put(keyLong, s);
-				}
-				i++;
-			}
-			c.setData("shownOptions", shownOptionsMap);
+			Table t = (Table) c.getData("options");
+			// TODO prüfen ob der Wert in der Row auch em angefragten Wert entspricht
+			Field field = (Field) c.getData("field");
+			if (t.getRows().size() == 1) {
+				if (field != null && field.getText() != null) {
+					Value value = t.getRows().get(0).getValue(t.getColumnIndex("KeyText"));
+					if (value.getStringValue().equalsIgnoreCase(field.getText().toString())) {
+						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
+					} else {
+						// TODO "gu" != "MIN" es folgt:
+						// TODO Hier muss aktiv eine neue Liste mit Werten angefragt werden
+					}
+				} else {
+					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 
-			if (shownOptionsMap.size() == 1) {
-				c.setData("keyLong", shownOptionsMap.keySet().toArray()[0]);
+				}
 			} else {
+				// TODO
+				// Auswahl der Liste von Treffern anzeigen (Aufpoppen)
 				c.setData("keyLong", null);
 			}
 		}
 	}
 
 	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen
-	 * Es wird eine Liste von Ergebnissen Erstellt, diese wird dem benutzer zur verfügung gestellt.
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
+	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
+	 * dem benutzer zur verfügung gestellt.
+	 *
 	 * @param luc
 	 */
 	@Inject
@@ -272,11 +281,10 @@ public class XMLDetailPart {
 	public void requestLookUpEntriesAll(@UIEventTopic("LoadAllLookUpValues") String name) {
 		Control control = controls.get(name);
 
-		if(control instanceof LookupControl) {
+		if (control instanceof LookupControl) {
 			Field field = (Field) control.getData("field");
 			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls,
-					dataService, sync, "List");
+			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync, "List");
 
 			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 				if (ta instanceof SqlProcedureResult) {
@@ -289,9 +297,6 @@ public class XMLDetailPart {
 
 			}));
 		}
-
-
-
 
 	}
 
@@ -378,7 +383,6 @@ public class XMLDetailPart {
 			}
 		}
 	}
-
 
 	// Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
 	// der gegebenen Keys
@@ -519,14 +523,12 @@ public class XMLDetailPart {
 	private void checkEntryUpdate(int responce) {
 		if (responce != 1) {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Entry could not be updated",
-					shell);
+					"Entry could not be updated", shell);
 			notificationPopUp.open();
 			return;
 		} else {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Sucessfully updated the entry",
-					shell);
+					"Sucessfully updated the entry", shell);
 			notificationPopUp.open();
 		}
 	}
@@ -539,8 +541,7 @@ public class XMLDetailPart {
 			notificationPopUp.open();
 		} else {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Sucessfully added the entry",
-					shell);
+					"Sucessfully added the entry", shell);
 			notificationPopUp.open();
 		}
 	}
@@ -552,7 +553,8 @@ public class XMLDetailPart {
 	public void buildDeleteTable(@UIEventTopic("DeleteEntry") Object obj) {
 		if (getKeys() != null) {
 			String tablename = form.getIndexView() != null ? "sp" : "op";
-			if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+			if ((!"sp".equals(form.getDetail().getProcedurePrefix())
+					&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
 				tablename = form.getDetail().getProcedurePrefix();
 			}
 			tablename += "Delete";
@@ -580,13 +582,11 @@ public class XMLDetailPart {
 	public void deleteEntry(int responce) {
 		if (responce != 1) {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Entry could not be deleted",
-					shell);
+					"Entry could not be deleted", shell);
 			notificationPopUp.open();
 		} else {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Sucessfully deleted the entry",
-					shell);
+					"Sucessfully deleted the entry", shell);
 			notificationPopUp.open();
 
 			for (Control c : controls.values()) {
