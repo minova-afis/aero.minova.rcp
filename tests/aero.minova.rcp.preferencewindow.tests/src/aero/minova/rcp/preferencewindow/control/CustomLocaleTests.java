@@ -33,7 +33,7 @@ public class CustomLocaleTests {
 
 	@Test
 	public void testGetLocale() {
-		Locale locale = CustomLocale.getLocale("land", "language");
+		Locale locale = CustomLocale.getLocale();
 		assertNotNull(locale);
 		assertEquals(Locale.getDefault(), locale);
 	}

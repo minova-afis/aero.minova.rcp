@@ -58,7 +58,7 @@ public class PreferenceWindowModel {
 //		pd = new PreferenceDescriptor("land", "Land", 0.2, DisplayType.LOCALE, CustomLocale.getCountries("language").toArray());
 //		psd.add(pd);
 		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
-				CustomTimeZone.getTimeZones("land", "language").toArray());
+				CustomTimeZone.getTimeZones().toArray());
 		psd.add(pd);
 
 		psd = new PreferenceSectionDescriptor("designpreferences", "Design-Einstellungen", 0.2);

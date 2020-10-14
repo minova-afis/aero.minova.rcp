@@ -61,7 +61,7 @@ public class TestZoneIdTests {
 
 	@Test
 	public void testListSize() {
-		List<String> zones = CustomTimeZone.getTimeZones("land", "language");
+		List<String> zones = CustomTimeZone.getTimeZones();
 		assertEquals(198, zones.size());
 	}
 
