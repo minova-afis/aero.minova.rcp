@@ -16,13 +16,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.osgi.service.prefs.Preferences;
 
-import aero.minova.rcp.preferencewindow.builder.DisplayType;
-import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
-
 public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
-	private Map<String, Object> data;
 	private final List<String> dataL = CustomLocale.getLanguages();
 	private final boolean editable;
 
@@ -34,9 +30,8 @@ public class PWLocale extends CustomPWWidget {
 	 * @param languageLabel associated label
 	 * @param propertyKey   associated key
 	 */
-	public PWLocale(final String languageLabel, final String propertyKey, Map<String, Object> data,
-			final Object... values) {
-		this(languageLabel, propertyKey, false, data, values);
+	public PWLocale(final String languageLabel, final String propertyKey) {
+		this(languageLabel, propertyKey, false);
 	}
 
 	/**
@@ -45,8 +40,7 @@ public class PWLocale extends CustomPWWidget {
 	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, final boolean editable, Map<String, Object> data,
-			final Object... values) {
+	public PWLocale(final String label, final String propertyKey, final boolean editable) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
 		this.editable = editable;
 	}
@@ -58,8 +52,8 @@ public class PWLocale extends CustomPWWidget {
 	 * @return
 	 */
 	public List<String> getCountriesByData() {
-		Locale locales[] = CustomLocale.getLocales();
-		data = PreferenceWindow.getInstance().getValues();
+		Locale[] locales = CustomLocale.getLocales();
+		Map<String, Object> data = PreferenceWindow.getInstance().getValues();
 		List<String> countries = new ArrayList<>();
 		for (Locale locale : locales) {
 			if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry())
@@ -137,10 +131,10 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		// Erneuert den gespeicherten Wert in der Data des Preference Windows
-		comboCountries.addListener(SWT.Modify, event -> {
+		comboCountries.addListener(SWT.Modify, event -> 
 			PreferenceWindow.getInstance().setValue("land",
-					PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex()));
-		});
+					PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex()))
+		);
 
 		return comboLanguage;
 	}

@@ -60,7 +60,7 @@ public class ApplicationPreferenceWindow {
 					// Preference hinzufügen
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
-					createWidgets(newTab, pref, key, data, values);
+					createWidgets(newTab, pref, key, values);
 
 				}
 			}
@@ -106,7 +106,7 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Map<String,Object> data, Object... values) {
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... values) {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
@@ -146,7 +146,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), "Land", key, data, values).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), "Land").setAlignment(GridData.FILL);
 			break;
 		default:
 			break;
