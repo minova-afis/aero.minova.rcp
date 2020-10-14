@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +26,7 @@ public class PWLocale extends CustomPWWidget {
 	@Inject
 	ILocaleChangeService lcs;
 
-	private final List<String> dataL = CustomLocale.getLanguages();
+	private final List<String> dataL = getLanguages();
 	private Combo comboCountries;
 
 	/**
@@ -39,22 +40,50 @@ public class PWLocale extends CustomPWWidget {
 	}
 
 	/**
+	 * Gibt alle Locales zurück
+	 * 
+	 * @return
+	 */
+	public static Locale[] getLocales() {
+		return SimpleDateFormat.getAvailableLocales();
+	}
+
+	/**
 	 * Erstellt eine Liste mit allen Ländern, die die ausgewählte Sprache, die in
 	 * der Data des PreferenceWindows gespeichert ist, sprechen
 	 * 
 	 * @return
 	 */
 	public List<String> getCountriesByData() {
-		Locale[] locales = CustomLocale.getLocales();
+		Locale[] locales = getLocales();
 		Map<String, Object> data = PreferenceWindow.getInstance().getValues();
 		List<String> countries = new ArrayList<>();
 		for (Locale locale : locales) {
-			if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry())
-					&& data.get(getCustomPropertyKey()).toString().equals(locale.getDisplayLanguage()))
-				countries.add(locale.getDisplayCountry());
+			// gleicht alle Locales ab und sucht sich die mit der passenden Sprache heraus
+			if (data.get("language").toString().equals(locale.getDisplayLanguage()))
+				// sortiert alle leeren und doppelten String aus
+				if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry()))
+					countries.add(locale.getDisplayCountry());
 		}
 		Collections.sort(countries);
 		return countries;
+	}
+
+	/**
+	 * Erstellt eine sortierte Liste alle Sprachen
+	 * 
+	 * @return
+	 */
+	public static List<String> getLanguages() {
+		Locale locales[] = getLocales();
+		List<String> languages = new ArrayList<>();
+		for (Locale locale : locales) {
+			// sortiert alle leeren und doppelten String aus
+			if (!locale.getDisplayLanguage().equals("") && !languages.contains(locale.getDisplayLanguage()))
+				languages.add(locale.getDisplayLanguage());
+		}
+		Collections.sort(languages);
+		return languages;
 	}
 
 	/**
@@ -85,6 +114,7 @@ public class PWLocale extends CustomPWWidget {
 			if (datum.equals(PreferenceWindow.getInstance().getValueFor("language"))) {
 				comboLanguage.select(i);
 			}
+
 		}
 
 		// ModifyListener zur Sprachauswahl hinzufügen, der die Liste mit allen Ländern
