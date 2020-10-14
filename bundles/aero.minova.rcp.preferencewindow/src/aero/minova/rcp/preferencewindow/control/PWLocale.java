@@ -20,19 +20,7 @@ public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
 	private final List<String> dataL = CustomLocale.getLanguages();
-	private final boolean editable;
-
 	private Combo comboCountries;
-
-	/**
-	 * Constructor
-	 *
-	 * @param languageLabel associated label
-	 * @param propertyKey   associated key
-	 */
-	public PWLocale(final String languageLabel, final String propertyKey) {
-		this(languageLabel, propertyKey, false);
-	}
 
 	/**
 	 * Constructor
@@ -40,9 +28,8 @@ public class PWLocale extends CustomPWWidget {
 	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, final boolean editable) {
+	public PWLocale(final String label, final String propertyKey) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
-		this.editable = editable;
 	}
 
 	/**
@@ -82,7 +69,7 @@ public class PWLocale extends CustomPWWidget {
 		addControl(languageLabel);
 
 		// Combo Box für Sprachauswahl erstellen
-		final Combo comboLanguage = new Combo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
+		final Combo comboLanguage = new Combo(parent, SWT.BORDER);
 		addControl(comboLanguage);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
@@ -118,7 +105,7 @@ public class PWLocale extends CustomPWWidget {
 		addControl(countryLabel);
 
 		// Combo Box für Landauswahl erstellen
-		comboCountries = new Combo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
+		comboCountries = new Combo(parent, SWT.BORDER);
 		addControl(comboCountries);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
@@ -151,11 +138,6 @@ public class PWLocale extends CustomPWWidget {
 		if (value == null) {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), null);
 		} else {
-			if (editable && !(value instanceof String)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey()
-						+ "' has to be a String because it is associated to an editable combo");
-			}
-
 			if (!getCountriesByData().isEmpty() && !value.getClass().equals(getCountriesByData().get(0).getClass())) {
 				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a "
 						+ dataL.get(0).getClass() + " because it is associated to a combo");
