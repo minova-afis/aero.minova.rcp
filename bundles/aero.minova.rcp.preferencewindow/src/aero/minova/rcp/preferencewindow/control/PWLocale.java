@@ -34,7 +34,7 @@ public class PWLocale extends CustomPWWidget {
 	 * @param languageLabel associated label
 	 * @param propertyKey   associated key
 	 */
-	public PWLocale(final String languageLabel, String countryLabel, final String propertyKey, Map<String, Object> data,
+	public PWLocale(final String languageLabel, final String propertyKey, Map<String, Object> data,
 			final Object... values) {
 		this(languageLabel, propertyKey, false, data, values);
 	}
@@ -144,11 +144,9 @@ public class PWLocale extends CustomPWWidget {
 						+ "' has to be a String because it is associated to an editable combo");
 			}
 
-			if (!getCountriesByData().isEmpty()) {
-				if (!value.getClass().equals(getCountriesByData().get(0).getClass())) {
-					throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a "
-							+ getCountriesByData().get(0).getClass() + " because it is associated to a combo");
-				}
+			if (!getCountriesByData().isEmpty() && !value.getClass().equals(getCountriesByData().get(0).getClass())) {
+				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a "
+						+ getCountriesByData().get(0).getClass() + " because it is associated to a combo");
 			}
 
 		}
