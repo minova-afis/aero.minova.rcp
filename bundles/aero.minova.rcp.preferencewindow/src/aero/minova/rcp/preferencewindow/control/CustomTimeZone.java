@@ -27,7 +27,7 @@ public class CustomTimeZone {
 	}
 
 	public static List<String> getTimeZones() {
-		Locale locale = CustomLocale.getLocale();
+		Locale locale = Locale.getDefault();
 		Map<String, ZoneId> map = getZones(locale);
 		List<String> zones = new ArrayList<>();
 		ZoneId[]  zoneIds = map.values().toArray(new ZoneId[0]);
