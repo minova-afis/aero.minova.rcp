@@ -19,6 +19,9 @@ import org.osgi.service.prefs.Preferences;
 public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
+	@Inject
+	ILocaleChangeService lcs;
+
 	private final List<String> dataL = CustomLocale.getLanguages();
 	private Combo comboCountries;
 
