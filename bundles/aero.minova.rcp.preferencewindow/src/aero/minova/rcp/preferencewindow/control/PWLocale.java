@@ -51,6 +51,12 @@ public class PWLocale extends CustomPWWidget {
 		this.editable = editable;
 	}
 
+	/**
+	 * Erstellt eine Liste mit allen Ländern, die die ausgewählte Sprache, die in
+	 * der Data des PreferenceWindows gespeichert ist, sprechen
+	 * 
+	 * @return
+	 */
 	public List<String> getCountriesByData() {
 		Locale locales[] = CustomLocale.getLocales();
 		data = PreferenceWindow.getInstance().getValues();
@@ -65,6 +71,10 @@ public class PWLocale extends CustomPWWidget {
 	}
 
 	/**
+	 * Erstellt zwei Combo Boxen. Die erste liefert alle mögliche Sprachen wieder.
+	 * Die zweite liefert eine Liste von Ländern wieder, die die vorher ausgewählte
+	 * Sprache sprechen.
+	 * 
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#build(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
@@ -119,9 +129,9 @@ public class PWLocale extends CustomPWWidget {
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
 		for (int i = 0; i < getCountriesByData().size(); i++) {
-			final Object datum = getCountriesByData().get(i);
-			comboCountries.add(datum.toString());
-			if (datum.equals(PreferenceWindow.getInstance().getValueFor("land"))) {
+			final Object country = getCountriesByData().get(i);
+			comboCountries.add(country.toString());
+			if (country.equals(PreferenceWindow.getInstance().getValueFor("land"))) {
 				comboCountries.select(i);
 			}
 		}
@@ -136,11 +146,14 @@ public class PWLocale extends CustomPWWidget {
 	}
 
 	/**
+	 * Prüft ob der Wert für den Key kein leerer String ist und oder den richtigen
+	 * Datentyp hat
+	 * 
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#check()
 	 */
 	@Override
 	public void check() {
-		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
+		final Object value = PreferenceWindow.getInstance().getValueFor("language");
 		if (value == null) {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), null);
 		} else {
@@ -151,7 +164,7 @@ public class PWLocale extends CustomPWWidget {
 
 			if (!getCountriesByData().isEmpty() && !value.getClass().equals(getCountriesByData().get(0).getClass())) {
 				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a "
-						+ getCountriesByData().get(0).getClass() + " because it is associated to a combo");
+						+ dataL.get(0).getClass() + " because it is associated to a combo");
 			}
 
 		}
