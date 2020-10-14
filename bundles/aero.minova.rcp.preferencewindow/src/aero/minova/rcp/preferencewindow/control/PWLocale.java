@@ -69,6 +69,7 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
+		// Label für Sprachauswahl erstellen
 		final Label languageLabel = new Label(parent, SWT.NONE);
 		languageLabel.setText("Sprache");
 		final GridData labelLGridData = new GridData(GridData.END, getAlignment(), false, false);
@@ -76,9 +77,11 @@ public class PWLocale extends CustomPWWidget {
 		languageLabel.setLayoutData(labelLGridData);
 		addControl(languageLabel);
 
+		// Combo Box für Sprachauswahl erstellen
 		final Combo comboLanguage = new Combo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
 		addControl(comboLanguage);
 
+		// Setzt die Text auf den in den Preferences gespeicherten Wert
 		for (int i = 0; i < dataL.size(); i++) {
 			final Object datum = dataL.get(i);
 			comboLanguage.add(datum.toString());
@@ -87,6 +90,8 @@ public class PWLocale extends CustomPWWidget {
 			}
 		}
 
+		// ModifyListener zur Sprachauswahl hinzufügen, der die Liste mit allen Ländern
+		// für die ausgewählte Sprache neu erstellt, sobald die Sprache gewechselt wird
 		comboLanguage.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(),
 					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
@@ -97,11 +102,10 @@ public class PWLocale extends CustomPWWidget {
 					comboCountries.select(0);
 				}
 			}
-			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE,
-					PWLocale.this.getCountriesByData().get(comboLanguage.getSelectionIndex()));
 
 		});
 
+		// Label für Landauswahl erstellen
 		final Label countryLabel = new Label(parent, SWT.NONE);
 		countryLabel.setText("Land");
 		final GridData labelCGridData = new GridData(GridData.END, getAlignment(), false, false);
@@ -109,9 +113,11 @@ public class PWLocale extends CustomPWWidget {
 		countryLabel.setLayoutData(labelCGridData);
 		addControl(countryLabel);
 
+		// Combo Box für Landauswahl erstellen
 		comboCountries = new Combo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
 		addControl(comboCountries);
 
+		// Setzt die Text auf den in den Preferences gespeicherten Wert
 		for (int i = 0; i < getCountriesByData().size(); i++) {
 			final Object datum = getCountriesByData().get(i);
 			comboCountries.add(datum.toString());
@@ -120,10 +126,9 @@ public class PWLocale extends CustomPWWidget {
 			}
 		}
 
+		// Erneuert den gespeicherten Wert in der Data des Preference Windows
 		comboCountries.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue("land",
-					PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex()));
-			InstancePreferenceAccessor.putValue(preferences, "land", DisplayType.LOCALE,
 					PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex()));
 		});
 
