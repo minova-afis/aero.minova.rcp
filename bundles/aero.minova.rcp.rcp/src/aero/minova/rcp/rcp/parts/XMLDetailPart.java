@@ -114,12 +114,8 @@ public class XMLDetailPart {
 				}
 			}
 		}
-		// Erster Ansatz um selbstgeschriebene Eingaben in Lookupfields zu überprüfen,
-		// garantiert das gültige Eingaben an den CAS versendet werden können
+
 		for (Control c : controls.values()) {
-			if (c instanceof LookupControl) {
-				// requestOptionsFromCAS(c);
-			}
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
 			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
 					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
@@ -229,19 +225,34 @@ public class XMLDetailPart {
 	public void changeSelectionBoxList(Control c) {
 		if (c.getData(Constants.CONTROL_OPTIONS) != null) {
 			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
-			// TODO prüfen ob der Wert in der Row auch em angefragten Wert entspricht
+			LookupControl lc = (LookupControl) c;
+			// Nur Rows, welche den Zeileninhalt beinhalten enthalten sollen aufgelistet
+			// werden
+			for(Row r: t.getRows())
+			{
+				if (!r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).toString().contains(lc.getText())) {
+					t.deleteRow(r);
+				}
+			}
+
 			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 			if (t.getRows().size() == 1) {
 				if (field != null && field.getText() != null) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 					if (value.getStringValue().equalsIgnoreCase(field.getText().toString())) {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
+						c.setData(Constants.CONTROL_KEYLONG,
+								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					} else {
+						c.setData(Constants.CONTROL_KEYLONG, null);
 						// TODO "gu" != "MIN" es folgt:
 						// TODO Hier muss aktiv eine neue Liste mit Werten angefragt werden
 					}
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
+					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
+					c.setData(Constants.CONTROL_KEYLONG,
+							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
 
 				}
 			} else {
@@ -251,7 +262,7 @@ public class XMLDetailPart {
 					LookupControl lookupControl = (LookupControl) c;
 					lookupControl.setProposals(t);
 				}
-				// c.setData("keyLong", null);
+				c.setData(Constants.CONTROL_KEYLONG, null);
 			}
 		}
 	}
@@ -287,8 +298,13 @@ public class XMLDetailPart {
 
 	}
 
-	// Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
-	// Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
+	/**
+	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
+	 * Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
+	 *
+	 * @param rows
+	 */
+
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
 		if (rows != null) {
@@ -336,9 +352,10 @@ public class XMLDetailPart {
 			}));
 		}
 	}
-
-	// Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
-	// den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
+	/**
+	 * 	Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
+	 *	den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
+	 */
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
 
@@ -371,8 +388,12 @@ public class XMLDetailPart {
 		}
 	}
 
-	// Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
-	// der gegebenen Keys
+	/**
+	 * Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
+	 * der gegebenen Keys
+	 *
+	 * @param obj
+	 */
 	@Inject
 	@Optional
 	public void buildSaveTable(@UIEventTopic("SaveEntry") Object obj) {
@@ -417,7 +438,6 @@ public class XMLDetailPart {
 			valuePosition++;
 		}
 
-		// TODO: spelling/collumns ohne zugehöriges feld mit default-wert versorgen
 		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
 		// Row-Wertes ermittelt und der Row angefügt
 		Row r = rb.create();
@@ -446,8 +466,18 @@ public class XMLDetailPart {
 				((Text) controls.get("ChargedQuantity")).getText(), formTable, r);
 	}
 
-	// Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
-	// eine Überschneidung in den Arbeitszeiten vorliegt
+	/**
+	 * Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob
+	 * eine Überschneidung in den Arbeitszeiten vorliegt
+	 *
+	 * @param bookingDate
+	 * @param startDate
+	 * @param endDate
+	 * @param renderedQuantity
+	 * @param chargedQuantity
+	 * @param t
+	 * @param r
+	 */
 	private void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity,
 			String chargedQuantity, Table t, Row r) {
 		boolean contradiction = false;
@@ -506,7 +536,11 @@ public class XMLDetailPart {
 		}
 	}
 
-	// Überprüft. ob das Update erfolgreich war
+	/**
+	 * Überprüft. ob das Update erfolgreich war
+	 *
+	 * @param responce
+	 */
 	private void checkEntryUpdate(int responce) {
 		if (responce != 1) {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
@@ -520,7 +554,11 @@ public class XMLDetailPart {
 		}
 	}
 
-	// Überprüft, ob der neue Eintrag erstellt wurde
+	/**
+	 * Überprüft, ob der neue Eintrag erstellt wurde
+	 *
+	 * @param responce
+	 */
 	private void checkNewEntryInsert(int responce) {
 		if (responce != 1) {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry could not be added",
@@ -533,8 +571,12 @@ public class XMLDetailPart {
 		}
 	}
 
-	// Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
-	// eine Abfrage an den CAS zusammen
+	/**
+	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	 * eine Abfrage an den CAS zusammen
+	 *
+	 * @param obj
+	 */
 	@Inject
 	@Optional
 	public void buildDeleteTable(@UIEventTopic("DeleteEntry") Object obj) {
@@ -564,8 +606,12 @@ public class XMLDetailPart {
 		}
 	}
 
-	// Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
-	// befüllt um die Anfrage anzupassen
+	/**
+	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
+	 * befüllt um die Anfrage anzupassen
+	 *
+	 * @param responce
+	 */
 	public void deleteEntry(int responce) {
 		if (responce != 1) {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),

@@ -120,15 +120,12 @@ public class DetailUtil {
 		text.setData(Constants.CONTROL_DATATYPE, getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
-		text.setData(Constants.CONTROL_CONSUMER, new Consumer<Table>() {
-			@Override
-			public void accept(Table t) {
+		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 
-				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
-				text.setText(ValueBuilder.value(value, f).getText());
-				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
-			}
+			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+			Field f = (Field) text.getData(Constants.CONTROL_FIELD);
+			text.setText(ValueBuilder.value(value, f).getText());
+			text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
 		});
 		controls.put(field.getName(), text);
 	}
@@ -287,8 +284,13 @@ public class DetailUtil {
 		return composite;
 	}
 
-	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
-	// Bindung zur Componente
+	/**
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
+	 * Bindung zur Componente
+	 *
+	 * @param ta
+	 * @param c
+	 */
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
