@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -121,10 +124,8 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		// Erneuert den gespeicherten Wert in der Data des Preference Windows
-		comboCountries.addListener(SWT.Modify, event -> 
-			PreferenceWindow.getInstance().setValue("land",
-					PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex()))
-		);
+		comboCountries.addListener(SWT.Modify, event -> PreferenceWindow.getInstance().setValue("land",
+				PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex())));
 
 		return comboLanguage;
 	}
