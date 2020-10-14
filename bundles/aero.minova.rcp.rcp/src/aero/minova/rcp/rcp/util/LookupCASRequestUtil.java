@@ -26,59 +26,60 @@ public class LookupCASRequestUtil {
 		if (field.getLookup().getTable() != null) {
 			tableName = field.getLookup().getTable();
 			isTable = true;
-			// Hier müssen wir explizit unsere Felder abfragen:
-			// Keylong, KeyText, Descript, LastAction
 		} else {
 			tableName = field.getLookup().getProcedurePrefix() + purpose;
 		}
 		TableBuilder tb = TableBuilder.newTable(tableName);
 		RowBuilder rb = RowBuilder.newRow();
 		if (isTable) {
-			tb = tb.withColumn("KeyLong", DataType.INTEGER)//
-					.withColumn("KeyText", DataType.STRING)//
-					.withColumn("Description", DataType.STRING);//
+			tb = tb.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
+					.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
+					.withColumn(Constants.TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER);//
 			rb = rb.withValue(null);
 			rb = rb.withValue(null);
 			rb = rb.withValue(null);
-		}
-		if (!purpose.equals("List") && !isTable) {
-			tb = tb//
-					.withColumn("KeyLong", DataType.INTEGER)//
-					.withColumn("KeyText", DataType.STRING);
-			if (keyLong == 0) {
-				rb = rb.withValue(null).withValue(keyText);
-			} else {
-				rb = rb.withValue(keyLong).withValue(null);
+			rb = rb.withValue(">0");
+		} else {
+			// Reihenfolge der Werte einhalten!
+			if (!purpose.equals("List")) {
+				tb = tb//
+						.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
+						.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING);
+				if (keyLong == 0) {
+					rb = rb.withValue(null).withValue(keyText);
+				} else {
+					rb = rb.withValue(keyLong).withValue(null);
+				}
+			} else if (purpose.equals("List")) {
+				tb = tb.withColumn("count", DataType.INTEGER);
+				rb = rb.withValue(null);
 			}
-		} else if (purpose.equals("List") && !isTable) {
-			tb = tb.withColumn("count", DataType.INTEGER);
-			rb = rb.withValue(null);
-		}
-		if (field.getLookup().getTable() == null && !isTable) {
 			tb = tb.withColumn("FilterLastAction", DataType.BOOLEAN);
 			rb = rb.withValue(false);
-		}
 
-		// TODO: Einschränken der angegebenen Optionen anhand bereits ausgewählter
-		// Optionen (Kontrakt nur für Kunde x,...)
-		// Für nicht-lookups(bookingdate)->Text übernehmen wenn nicht null
-		// bei leeren feldern ein nullfeld anhängen, alle parameter müssen für die
-		// anfrage gesetzt sein
-		if (purpose.equals("List") && !isTable) {
-			List<TypeParam> parameters = field.getLookup().getParam();
-			for (TypeParam param : parameters) {
-				Control parameterControl = controls.get(param.getFieldName());
-				if (parameterControl instanceof LookupControl) {
-					tb.withColumn(param.getFieldName(), DataType.INTEGER);
-					// Auslesen des KeyLong-Wertes und setzen in der Table!
-					if (parameterControl.getData("KeyLong") != null) {
-						rb.withValue(parameterControl.getData("KeyLong"));
-					} else {
+			// Einschränken der angegebenen Optionen anhand bereits ausgewählter
+			// Optionen (Kontrakt nur für Kunde x,...)
+			// Für nicht-lookups(bookingdate)->Text übernehmen wenn nicht null
+			// bei leeren feldern ein nullfeld anhängen, alle parameter müssen für die
+			// anfrage gesetzt sein
+			if (purpose.equals("List")) {
+				List<TypeParam> parameters = field.getLookup().getParam();
+				for (TypeParam param : parameters) {
+					Control parameterControl = controls.get(param.getFieldName());
+					if (parameterControl instanceof LookupControl) {
+						tb.withColumn(param.getFieldName(), DataType.INTEGER);
+						// Auslesen des KeyLong-Wertes und setzen in der Table!
+						if (parameterControl.getData(Constants.TABLE_KEYLONG) != null) {
+							rb.withValue(parameterControl.getData(Constants.TABLE_KEYLONG));
+						} else {
+							rb.withValue(null);
+						}
+					} else if (parameterControl instanceof Text) {
+						tb.withColumn(param.getFieldName(),
+								(DataType) parameterControl.getData(Constants.CONTROL_DATATYPE));
 						rb.withValue(null);
 					}
-				} else if (parameterControl instanceof Text) {
-					tb.withColumn(param.getFieldName(), (DataType) parameterControl.getData("dataType"));
-					rb.withValue(null);
 				}
 			}
 		}

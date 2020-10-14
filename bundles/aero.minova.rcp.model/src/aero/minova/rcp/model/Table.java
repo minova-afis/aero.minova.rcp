@@ -78,4 +78,8 @@ public class Table {
 		}
 		rows.add(row);
 	}
+
+	public void deleteRow(Row row) {
+		rows.remove(row);
+	}
 }
