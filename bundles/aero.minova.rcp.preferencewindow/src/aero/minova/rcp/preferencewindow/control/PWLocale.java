@@ -1,11 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -19,6 +14,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.osgi.service.prefs.Preferences;
+
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
