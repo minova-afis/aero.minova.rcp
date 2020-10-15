@@ -113,9 +113,7 @@ public class PWLocale extends CustomPWWidget {
 			comboCountries.add(country.toString());
 			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE))) {
 				comboCountries.select(i);
-			} else {
-				comboCountries.select(0);
-			}
+			} 
 		}
 
 		comboCountries.addListener(SWT.Modify, event -> {
