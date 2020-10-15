@@ -29,6 +29,8 @@ public class PWLocale extends CustomPWWidget {
 	private final List<String> dataL = getLanguages();
 	private Combo comboCountries;
 
+	private Combo comboLanguage;
+
 	/**
 	 * Constructor
 	 *
@@ -103,22 +105,19 @@ public class PWLocale extends CustomPWWidget {
 		languageLabel.setLayoutData(labelLGridData);
 		addControl(languageLabel);
 
-		// Combo Box für Sprachauswahl erstellen
-		final Combo comboLanguage = new Combo(parent, SWT.BORDER);
+		comboLanguage = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
 		addControl(comboLanguage);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
 		for (int i = 0; i < dataL.size(); i++) {
-			final Object datum = dataL.get(i);
-			comboLanguage.add(datum.toString());
-			if (datum.equals(PreferenceWindow.getInstance().getValueFor("language"))) {
+			final Object language = dataL.get(i);
+			comboLanguage.add(language.toString());
+			if (language.equals(PreferenceWindow.getInstance().getValueFor("language"))) {
 				comboLanguage.select(i);
 			}
 
 		}
 
-		// ModifyListener zur Sprachauswahl hinzufügen, der die Liste mit allen Ländern
-		// für die ausgewählte Sprache neu erstellt, sobald die Sprache gewechselt wird
 		comboLanguage.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(),
 					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
