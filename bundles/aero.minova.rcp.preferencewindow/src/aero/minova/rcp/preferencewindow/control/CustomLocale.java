@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.osgi.service.prefs.Preferences;
-
-import aero.minova.rcp.preferencewindow.builder.DisplayType;
-import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 public class CustomLocale {
 	static Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
@@ -31,36 +27,6 @@ public class CustomLocale {
 		}
 		Collections.sort(languages);
 		return languages;
-	}
-
-	public static List<String> getCountries() {
-		Locale locale = Locale.getDefault();
-		List<String> countries = new ArrayList<>();
-		Object data = PreferenceWindow.getInstance().getValueFor("language");
-		Locale[] locales = getLocales();
-		for (Locale l : locales) {
-			if (data.toString().equals(l.getDisplayLanguage(locale))) {
-				if (!l.getDisplayCountry(locale).equals("") && !countries.contains(l.getDisplayCountry(locale))) {
-					countries.add(l.getDisplayCountry(locale));
-				}
-			}
-		}
-		Collections.sort(countries);
-		return countries;
-	}
-
-	public static Locale getLocale() {
-		Locale[] locales = getLocales();
-		Locale locale = Locale.getDefault();
-		for (Locale l : locales) {
-			if (InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE)
-					.equals(l.getDisplayLanguage())
-					&& InstancePreferenceAccessor.getValue(preferences, "land", DisplayType.LOCALE)
-							.equals(l.getDisplayCountry())) {
-				locale = l;
-			}
-		}
-		return locale;
 	}
 
 }
