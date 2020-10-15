@@ -72,14 +72,13 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboLanguage.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(),
-					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
-			comboCountries.removeAll();
-			for (String string : getCountriesByData()) {
-				comboCountries.add(string);
-				if (string.equals(PreferenceWindow.getInstance().getValueFor("land"))) {
-					comboCountries.select(0);
-				}
+			// erneuert Liste mit Ländern
+			updateLocale();
+			if (!PreferenceWindow.getInstance().getValueFor("language")
+					.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.COMBO)))
+				comboCountries.removeAll();
+			for (String country : CustomLocale.getCountries()) {
+				comboCountries.add(country);
 			}
 			comboCountries.select(0);
 		});
@@ -116,10 +115,13 @@ public class PWLocale extends CustomPWWidget {
 		return comboLanguage;
 	}
 
+	private void updateLocale() {
+		PreferenceWindow.getInstance().setValue("language", PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
+		PreferenceWindow.getInstance().setValue("land", PWLocale.this.dataC.get(comboCountries.getSelectionIndex()));
+
+	}
+
 	/**
-	 * Prüft ob der Wert für den Key kein leerer String ist und oder den richtigen
-	 * Datentyp hat
-	 * 
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#check()
 	 */
 	@Override
