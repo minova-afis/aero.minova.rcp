@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
@@ -79,6 +80,8 @@ public class ApplicationPreferenceWindow {
 				}
 
 			}
+			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE, window.getValueFor("language"));
+			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE, window.getValueFor("country"));
 			try {
 				preferences.flush();
 			} catch (BackingStoreException e) {
