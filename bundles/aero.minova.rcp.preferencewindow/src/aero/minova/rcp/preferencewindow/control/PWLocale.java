@@ -96,8 +96,8 @@ public class PWLocale extends CustomPWWidget {
 		addControl(comboCountries);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
-		for (int i = 0; i < getCountriesByData().size(); i++) {
-			final Object country = getCountriesByData().get(i);
+		for (int i = 0; i < dataC.size(); i++) {
+			final Object country = dataC.get(i);
 			comboCountries.add(country.toString());
 			if (country.equals(PreferenceWindow.getInstance().getValueFor("land"))) {
 				comboCountries.select(i);
@@ -126,15 +126,7 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	@Override
 	public void check() {
-		final Object value = PreferenceWindow.getInstance().getValueFor("language");
-		if (value == null) {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), null);
-		} else {
-			if (!getCountriesByData().isEmpty() && !value.getClass().equals(getCountriesByData().get(0).getClass())) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a "
-						+ dataL.get(0).getClass() + " because it is associated to a combo");
-			}
-
-		}
+		// Alle Prüfungen auf Null oder einen leeren String werden in anderen Methode
+		// direkt beim erstellen der Listen gemacht
 	}
 }
