@@ -102,6 +102,7 @@ public class ApplicationPreferenceWindow {
 				}
 			}
 		}
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE));
 
 		return data;
 	}
