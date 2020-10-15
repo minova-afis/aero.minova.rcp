@@ -81,7 +81,7 @@ public class PWLocale extends CustomPWWidget {
 					comboCountries.select(0);
 				}
 			}
-
+			comboCountries.select(0);
 		});
 
 		// Label für Landauswahl erstellen
@@ -102,12 +102,16 @@ public class PWLocale extends CustomPWWidget {
 			comboCountries.add(country.toString());
 			if (country.equals(PreferenceWindow.getInstance().getValueFor("land"))) {
 				comboCountries.select(i);
+			} else {
+				comboCountries.select(0);
 			}
 		}
 
-		// Erneuert den gespeicherten Wert in der Data des Preference Windows
-		comboCountries.addListener(SWT.Modify, event -> PreferenceWindow.getInstance().setValue("land",
-				PWLocale.this.getCountriesByData().get(comboCountries.getSelectionIndex())));
+		// Erneuert den gespeicherten Wert in der Data des Preference Windows und fügt
+		// den geänderten Wert den Preferences hinzu
+//		comboCountries.addListener(SWT.Modify, event -> {
+//			updateLocale();
+//		});
 
 		return comboLanguage;
 	}
