@@ -1,11 +1,11 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import javax.inject.Inject;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -60,7 +60,6 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-
 		// Label für Sprachauswahl erstellen
 		final Label languageLabel = new Label(parent, SWT.NONE);
 		languageLabel.setText("Sprache");
@@ -92,6 +91,7 @@ public class PWLocale extends CustomPWWidget {
 				comboCountries.add(country);
 			}
 			comboCountries.select(0);
+
 		});
 
 		// Label für Landauswahl erstellen
