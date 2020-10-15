@@ -21,13 +21,8 @@ import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
-	@Inject
-	ILocaleChangeService lcs;
-
 	private final List<String> dataL = CustomLocale.getLanguages();
-	private List<String> dataC = CustomLocale.getCountries();
 	private Combo comboCountries;
-
 	private Combo comboLanguage;
 
 	/**
