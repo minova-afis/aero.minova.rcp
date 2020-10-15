@@ -103,6 +103,8 @@ public class PWLocale extends CustomPWWidget {
 
 		// Combo Box für Landauswahl erstellen
 		comboCountries = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
+		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		comboCountries.setLayoutData(countryData);
 		addControl(comboCountries);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
