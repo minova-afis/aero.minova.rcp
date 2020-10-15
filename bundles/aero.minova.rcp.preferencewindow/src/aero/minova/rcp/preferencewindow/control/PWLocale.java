@@ -82,12 +82,11 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboLanguage.addListener(SWT.Modify, event -> {
+			PreferenceWindow.getInstance().setValue("language",
+					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
 			// erneuert Liste mit Ländern
-			updateLocale();
-			if (!PreferenceWindow.getInstance().getValueFor("language")
-					.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.COMBO)))
-				comboCountries.removeAll();
-			for (String country : CustomLocale.getCountries()) {
+			comboCountries.removeAll();
+			for (String country : getCountries()) {
 				comboCountries.add(country);
 			}
 			comboCountries.select(0);
@@ -117,19 +116,12 @@ public class PWLocale extends CustomPWWidget {
 			}
 		}
 
-		// Erneuert den gespeicherten Wert in der Data des Preference Windows und fügt
-		// den geänderten Wert den Preferences hinzu
-//		comboCountries.addListener(SWT.Modify, event -> {
-//			updateLocale();
-//		});
+		comboCountries.addListener(SWT.Modify, event -> {
+			PreferenceWindow.getInstance().setValue("country",
+					comboCountries.getItem(comboCountries.getSelectionIndex()));
+		});
 
 		return comboLanguage;
-	}
-
-	private void updateLocale() {
-		PreferenceWindow.getInstance().setValue("language", PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
-		PreferenceWindow.getInstance().setValue("land", PWLocale.this.dataC.get(comboCountries.getSelectionIndex()));
-
 	}
 
 	/**
