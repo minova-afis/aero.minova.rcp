@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -28,9 +29,9 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 
-@Component
 public class DataService implements IDataService {
 
+	private static final boolean LOG = true;
 	private HttpRequest request;
 	private HttpClient httpClient;
 	private Authenticator authentication;
@@ -51,8 +52,7 @@ public class DataService implements IDataService {
 		// TODO: fix certificate-problems
 		httpClient = HttpClient.newBuilder()//
 				.sslContext(disabledSslVerificationContext())//
-				.authenticator(authentication)
-				.build();
+				.authenticator(authentication).build();
 
 		gson = new Gson();
 		gson = new GsonBuilder() //
@@ -66,16 +66,17 @@ public class DataService implements IDataService {
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
 		init();
 		String body = gson.toJson(seachTable);
+		logBody(body);
+
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
 
-		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> {
-					System.out.println(t);
-					return gson.fromJson(t.body(), Table.class);
-				});
+		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+			System.out.println(t);
+			return gson.fromJson(t.body(), Table.class);
+		});
 
 		return future;
 	}
@@ -84,13 +85,18 @@ public class DataService implements IDataService {
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
+		logBody(body);
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 
 		CompletableFuture<SqlProcedureResult> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class));
+				.thenApply(t -> {
+					SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+					logBody(t.body());
+					return fromJson;
+				});
 
 		return future;
 	}
@@ -99,6 +105,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
+		logBody(body);
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
@@ -137,6 +144,23 @@ public class DataService implements IDataService {
 			throw new RuntimeException(e);
 		}
 		return sslContext;
+	}
+
+	void logBody(String body) {
+		if (LOG) {
+			System.out.println(body);
+		}
+
+	}
+
+	public CompletableFuture<String> getFile(String filename) {
+		init();
+		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+				.header("Content-Type", "application/raw") //
+				.build();
+
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
+
 	}
 
 }

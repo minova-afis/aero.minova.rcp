@@ -4,17 +4,17 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 
 public class ValueBuilder {
 	private Object translatedValue;
-	private DateTimeFormatter dtfDate;
+	static private DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 	private DateTimeFormatter dtfHour;
 	private DataType dataType;
 
-	private ValueBuilder(Value v) {
-		dtfDate = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+	private ValueBuilder(Value v, Field f) {
 		dtfHour = DateTimeFormatter.ofPattern("hh:mm");
 		if (v.getBooleanValue() != null) {
 			translatedValue = v.getBooleanValue();
@@ -27,11 +27,12 @@ public class ValueBuilder {
 			}
 			dataType = DataType.ZONED;
 		} else if (v.getInstantValue() != null) {
-			ZonedDateTime zoned = v.getInstantValue().atZone(ZoneId.systemDefault());
-			if (zoned.getHour() != 0) {
-				translatedValue = dtfHour.format(zoned);
+			ZonedDateTime zonedDate = v.getInstantValue().atZone(ZoneId.systemDefault());
+			if (f != null && (f.getShortDate() != null || f.getLongDate() != null)) {
+				translatedValue = dtfDate.format(zonedDate);
+
 			} else {
-				translatedValue = dtfDate.format(zoned);
+				translatedValue = dtfHour.format(zonedDate);
 			}
 			dataType = DataType.INSTANT;
 		} else if (v.getDoubleValue() != null) {
@@ -46,15 +47,45 @@ public class ValueBuilder {
 		}
 	}
 
-	public static ValueBuilder newValue(Value v) {
-		return new ValueBuilder(v);
+	// Aufruf alleine anhand des Fields dient nur dem Auslesen des DataTypes
+	private ValueBuilder(Field f) {
+		dtfHour = DateTimeFormatter.ofPattern("hh:mm");
+		if (f.getBoolean() != null) {
+			dataType = DataType.BOOLEAN;
+		} else if (f.getBignumber() != null || f.getNumber() != null) {
+			dataType = DataType.INTEGER;
+		} else if (f.getDateTime() != null || f.getLongDate() != null || f.getShortDate() != null) {
+			dataType = DataType.ZONED;
+		} else if (f.getShortTime() != null || f.getLongTime() != null) {
+			dataType = DataType.INSTANT;
+		} else if (f.getMoney() != null) {
+			dataType = DataType.DOUBLE;
+		} else if (f.getText() != null) {
+			dataType = DataType.STRING;
+		}
 	}
 
-	public DataType dataType() {
+	public static ValueBuilder value(Value v) {
+		return new ValueBuilder(v, null);
+	}
+
+	public static ValueBuilder value(Value v, Field f) {
+		return new ValueBuilder(v, f);
+	}
+
+	public static ValueBuilder value(Field f) {
+		return new ValueBuilder(f);
+	}
+
+	public DataType getDataType() {
 		return dataType;
 	}
 
 	public Object create() {
 		return translatedValue;
+	}
+
+	public String getText() {
+		return translatedValue.toString();
 	}
 }

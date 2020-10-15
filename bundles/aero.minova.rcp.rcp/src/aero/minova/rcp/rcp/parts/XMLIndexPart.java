@@ -14,7 +14,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
@@ -42,9 +41,6 @@ public class XMLIndexPart {
 
 	@Inject
 	ESelectionService selectionService;
-
-	@Inject
-	private IDataService dataService;
 
 	private NatTable natTable;
 

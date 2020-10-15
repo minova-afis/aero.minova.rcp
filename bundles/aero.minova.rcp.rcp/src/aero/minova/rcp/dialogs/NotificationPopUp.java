@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 			super(display);
 			this.fText = text;
 			setParentShell(shell);
+			// TODO: Einstellung in die Preferences übernehmen?
 			setDelayClose(200);
 		}
 

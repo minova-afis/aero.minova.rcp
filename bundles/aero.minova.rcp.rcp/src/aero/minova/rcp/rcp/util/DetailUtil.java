@@ -5,11 +5,15 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +27,7 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -31,6 +36,13 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class DetailUtil {
+
+	private IEventBroker broker;
+
+	public DetailUtil(TranslationService translationService, IEventBroker broker) {
+		this.translationService = translationService;
+		this.broker = broker;
+	}
 
 	public static final int LABEL_WIDTH_HINT = 150;
 	public static final int TEXT_WIDTH_HINT = 170;
@@ -43,7 +55,9 @@ public class DetailUtil {
 	private static TextFactory textMultiFactory = TextFactory.newText(SWT.BORDER | SWT.MULTI);
 	private static TextFactory textFactory = TextFactory.newText(SWT.BORDER).text("");
 
-	public static void createField(Field field, Composite composite, Map<String, Control> controls) {
+	TranslationService translationService;
+
+	public void createField(Field field, Composite composite, Map<String, Control> controls) {
 		if (!field.isVisible()) {
 			return;
 		}
@@ -56,11 +70,12 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(field.getTextAttribute()).supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
+		labelFactory.text(field.getTextAttribute())
+				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
 				.create(composite);
 
 		if (field.getLookup() != null) {
-			buildLookupField(field, composite, twoColumns, controls);
+			buildLookupField(field, composite, twoColumns, controls, broker);
 		} else if (field.getBoolean() == null) {
 			buildMiddlePart(field, composite, twoColumns, controls);
 		} else if (field.getBoolean() != null) {
@@ -77,7 +92,8 @@ public class DetailUtil {
 		}
 	}
 
-	private static void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -100,35 +116,39 @@ public class DetailUtil {
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			l.setLayoutData(data);
 		}
-		text.setData("field", field);
+		text.setData(Constants.CONTROL_FIELD, field);
+		text.setData(Constants.CONTROL_DATATYPE, getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
-		text.setData("consumer", (Consumer<Table>) t -> {
+		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 
-			Value rowindex = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-			text.setData("dataType", ValueBuilder.newValue(rowindex).dataType());
-			text.setText((String) ValueBuilder.newValue(rowindex).create());
+			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+			Field f = (Field) text.getData(Constants.CONTROL_FIELD);
+			text.setText(ValueBuilder.value(value, f).getText());
+			text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
 		});
 		controls.put(field.getName(), text);
 	}
 
-	private static void buildLookupField(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
+	@SuppressWarnings("rawtypes")
+	private static void buildLookupField(Field field, Composite composite, boolean twoColumns,
+			Map<String, Control> controls, IEventBroker broker) {
 
 		LookupControl lookUpControl = new LookupControl(composite, SWT.LEFT);
 		lookUpControl.setLayoutData(getGridDataFactory(twoColumns, field));
-		lookUpControl.setData("field", field);
+		lookUpControl.setData(Constants.CONTROL_FIELD, field);
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
 		// gestartet, um die Werte des zugehörigen Keys zu erhalten
-		lookUpControl.setData("lookupConsumer", (Consumer<Map>) m -> {
+		lookUpControl.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
 
-			int keyLong = (Integer) ValueBuilder.newValue((Value) m.get("value")).create();
-			lookUpControl.setData("dataType", ValueBuilder.newValue((Value) m.get("value")).dataType());
-			lookUpControl.setData("keyLong", keyLong);
+			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
+			lookUpControl.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
+			lookUpControl.setData(Constants.CONTROL_KEYLONG, keyLong);
 
 			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls, (IDataService) m.get("dataService"),
-					(UISynchronize) m.get("sync"), "Resolve");
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				Table t = null;
 				if (ta instanceof SqlProcedureResult) {
@@ -144,12 +164,35 @@ public class DetailUtil {
 
 		if (twoColumns) {
 			Label labelDescription = labelFactory.create(composite);
-			labelDescription.setText("Description");
+			labelDescription.setText(Constants.TABLE_DESCRIPTION);
 			GridData data = gridDataFactory.align(SWT.LEFT, SWT.TOP).create();
 			data.horizontalSpan = 3;
 			data.widthHint = LOOKUP_DESCRIPTION_WIDTH_HINT;
 			labelDescription.setLayoutData(data);
 			lookUpControl.setDescription(labelDescription);
+			lookUpControl.addTwistieMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				/*
+				 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
+				 * LookUpFelder eingetragen wurden
+				 */
+				public void mouseDown(MouseEvent e) {
+					broker.post("LoadAllLookUpValues", field.getName());
+				}
+
+				@Override
+				public void mouseUp(MouseEvent e) {
+					// TODO Auto-generated method stub
+
+				}
+
+			});
 		}
 		controls.put(field.getName(), lookUpControl);
 
@@ -165,13 +208,28 @@ public class DetailUtil {
 		}
 	}
 
+	public static DataType getDataType(Field field) {
+		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
+			return DataType.INSTANT;
+		} else if (field.getNumber() != null && field.getNumber().getDecimals() > 0) {
+			return DataType.INTEGER;
+		} else if ((field.getNumber() != null && field.getNumber().getDecimals() > 0) || field.getMoney() != null) {
+			return DataType.DOUBLE;
+		} else if (field.getBoolean() != null) {
+			return DataType.BOOLEAN;
+		} else {
+			return DataType.STRING;
+		}
+	}
+
 	public static int getWidthHintForElement(Field field, boolean twoColumns) {
 		if (field.getDateTime() != null || field.getShortDate() != null || field.getShortTime() != null) {
 			return TEXT_WIDTH_HINT;
-		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null) && field.getUnitText() != null) {
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null)
+				&& field.getUnitText() != null) {
 			return LABEL_WIDTH_HINT;
-		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null || field.getLookup() != null)
-				&& field.getUnitText() == null) {
+		} else if ((field.getText() != null || field.getNumber() != null || field.getMoney() != null
+				|| field.getLookup() != null) && field.getUnitText() == null) {
 			return TEXT_WIDTH_HINT;
 		} else if (field.getBoolean() != null) {
 			return UNIT_WIDTH_HINT;
@@ -205,13 +263,14 @@ public class DetailUtil {
 		return data;
 	}
 
-	public static Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public  Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
 			section.setText("Kopfdaten");
 		} else {
-			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
+			section = formToolkit.createSection(parent,
+					Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX | Section.TWISTIE);
 			section.setText(((Page) ob).getText());
 		}
 		section.setLayoutData(GridDataFactory.fillDefaults().create());
@@ -225,19 +284,24 @@ public class DetailUtil {
 		return composite;
 	}
 
-	// Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
-	// Bindung zur Componente
+	/**
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
+	 * Bindung zur Componente
+	 *
+	 * @param ta
+	 * @param c
+	 */
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
-		int index = ta.getColumnIndex("KeyText");
+		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
 
-		lc.setText((String) ValueBuilder.newValue(v).create());
-		if (lc.getDescription() != null && ta.getColumnIndex("Description") > -1) {
-			if (r.getValue(ta.getColumnIndex("Description")) != null) {
-				lc.getDescription()
-						.setText((String) ValueBuilder.newValue(r.getValue(ta.getColumnIndex("Description"))).create());
+		lc.setText((String) ValueBuilder.value(v).create());
+		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
+			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
 			}
 		}
 	}
