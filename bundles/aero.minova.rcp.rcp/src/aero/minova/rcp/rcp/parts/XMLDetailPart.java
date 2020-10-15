@@ -196,10 +196,10 @@ public class XMLDetailPart {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				changeOptionsForLookupField(sql.getResultSet(), c);
+				changeOptionsForLookupField(sql.getResultSet(), c, "textinput");
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				changeOptionsForLookupField(t, c);
+				changeOptionsForLookupField(t, c, "textinput");
 			}
 
 		}));
@@ -211,9 +211,9 @@ public class XMLDetailPart {
 	 * @param ta
 	 * @param c
 	 */
-	public void changeOptionsForLookupField(Table ta, Control c) {
+	public void changeOptionsForLookupField(Table ta, Control c, String sender) {
 		c.setData(Constants.CONTROL_OPTIONS, ta);
-		changeSelectionBoxList(c);
+		changeSelectionBoxList(c, sender);
 	}
 
 	/**
@@ -222,31 +222,52 @@ public class XMLDetailPart {
 	 *
 	 * @param c
 	 */
-	public void changeSelectionBoxList(Control c) {
+	public void changeSelectionBoxList(Control c, String sender) {
 		if (c.getData(Constants.CONTROL_OPTIONS) != null) {
 			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
 			LookupControl lc = (LookupControl) c;
 			// Nur Rows, welche den Zeileninhalt beinhalten enthalten sollen aufgelistet
 			// werden
-			for(Row r: t.getRows())
-			{
-				if (!r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).toString().contains(lc.getText())) {
-					t.deleteRow(r);
-				}
-			}
 
 			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 			if (t.getRows().size() == 1) {
-				if (field != null && field.getText() != null) {
+				if (lc != null && lc.getText() != null) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-					if (value.getStringValue().equalsIgnoreCase(field.getText().toString())) {
+					if (value.getStringValue().equalsIgnoreCase(lc.getText().toString())) {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 						c.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					} else {
+						// Wir speichern den alten Keylongwert für den Fall ab, das der neue String
+						// nicht im CAS existiert. Mit ihm stellen wir den vorherigen Zustand wieder her
+						Value oldKeylongValue = (Value) c.getData(Constants.CONTROL_KEYLONG);
+						final int oldKeylong = oldKeylongValue.getIntegerValue();
 						c.setData(Constants.CONTROL_KEYLONG, null);
 						// TODO "gu" != "MIN" es folgt:
 						// TODO Hier muss aktiv eine neue Liste mit Werten angefragt werden
+						// Überprüfe, ob der der gegebene String in unserer Tabelle bereits existiert
+						searchForStringInGivenTable(lc, t, lc.getText().toString());
+
+						// Wenn der Wert nicht in den gegebenen Rows vorhanden ist, so wird der CAS
+						// abgefragt, ob ein solcher Wert im System existiert
+						if (c.getData(Constants.CONTROL_KEYLONG) == null) {
+
+							CompletableFuture<?> tableFuture;
+							tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(),
+									field, controls, dataService, sync, "List");
+							tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+								if (ta instanceof SqlProcedureResult) {
+									SqlProcedureResult sql = (SqlProcedureResult) ta;
+									checkForCASEntryWithGivenString(c, sql.getResultSet(),
+											lc.getText().toString(), getFieldValueByKeylong(oldKeylong, t), oldKeylong);
+								} else if (ta instanceof Table) {
+									Table employeeTable = (Table) ta;
+									checkForCASEntryWithGivenString(c, employeeTable,
+											lc.getText().toString(), getFieldValueByKeylong(oldKeylong, t), oldKeylong);
+								}
+
+							}));
+						}
 					}
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
@@ -258,13 +279,119 @@ public class XMLDetailPart {
 			} else {
 				// TODO
 				// Auswahl der Liste von Treffern anzeigen (Aufpoppen)
-				if (c instanceof LookupControl) {
-					LookupControl lookupControl = (LookupControl) c;
-					lookupControl.setProposals(t);
+				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
+					Table filteredTable = new Table();
+					for (aero.minova.rcp.model.Column column : t.getColumns()) {
+						filteredTable.addColumn(column);
+					}
+					for (Row r : t.getRows()) {
+						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.startsWith(lc.getText().toLowerCase()))) {
+							filteredTable.addRow(r);
+						}
+
+					}
+					if (c instanceof LookupControl) {
+						changeProposals((LookupControl) c, filteredTable);
+					}
+				} else {
+					if (c instanceof LookupControl) {
+						changeProposals((LookupControl) c, t);
+					}
 				}
-				c.setData(Constants.CONTROL_KEYLONG, null);
+
+
 			}
 		}
+	}
+
+	/**
+	 * Wir erhalten den keyText aus der Tabelle, welcher auf unseren keylong passt
+	 *
+	 * @param keylong
+	 * @param t
+	 * @return
+	 */
+	public String getFieldValueByKeylong(int keylong, Table t) {
+		String keyText = null;
+		for (Row r : t.getRows()) {
+			if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == keylong) {
+				keyText = r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue();
+			}
+		}
+		return keyText;
+	}
+	/**
+	 * Überprüft, on der gegebene String in der bereits ausgelesenen Tabelle vorhanden ist
+	 *
+	 * @param c
+	 * @param t
+	 * @param string
+	 */
+	public void searchForStringInGivenTable(LookupControl lc, Table t,String string) {
+
+		for (Row r : t.getRows()) {
+			if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+					.equalsIgnoreCase(string)) {
+				lc.setData(Constants.CONTROL_KEYLONG,
+						r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
+				lc.setText((String) ValueBuilder
+						.value(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))).create());
+				if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+				}
+			}
+		}
+	}
+	/**
+	 * Überprüft, ob der gegebene String im CAS eingetragen ist. Falls er es ist, so
+	 * werden die erhaltenen Treffer entsprechend ihrer anzahl zur verarbeitung
+	 * weiterverwendet
+	 *
+	 * @param c
+	 * @param t
+	 * @param string
+	 */
+	public void checkForCASEntryWithGivenString(Control c, Table t, String string, String oldText, int oldKeylong) {
+		LookupControl lc = (LookupControl)c;
+		Table filteredTable = new Table();
+		for (Row r : t.getRows()) {
+			if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().startsWith(string))) {
+				filteredTable.addRow(r);
+			}
+		}
+		if (filteredTable.getRows().size() == 0) {
+			// TODO: KEIN TREFFER FÜR DEN GEGEBENEN STRING! Wie gehen wir damit um?
+			// Dies geschieht in der alten anwendung erst beim auswählen eines anderen
+			// Elements in der Anwendung -> puffer?
+			c.setData(Constants.CONTROL_KEYLONG, new Value(oldKeylong));
+			lc.setText(oldText);
+		} else if (filteredTable.getRows().size() == 1) {
+			c.setData(Constants.CONTROL_KEYLONG,
+					filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
+			lc.setText((String) ValueBuilder
+					.value(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))).create());
+			if (filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)))
+						.create());
+			}
+		} else if (filteredTable.getRows().size() > 1) {
+			changeOptionsForLookupField(t, c, "");
+
+		}
+	}
+
+	/**
+	 * Austauschen der gegebenen Optionen für das LookupField
+	 *
+	 * @param c
+	 * @param t
+	 */
+	public void changeProposals(LookupControl lc, Table t) {
+		lc.setProposals(t);
+		lc.setData(Constants.CONTROL_KEYLONG, null);
 	}
 
 	/**
@@ -287,10 +414,10 @@ public class XMLDetailPart {
 			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 				if (ta instanceof SqlProcedureResult) {
 					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					changeOptionsForLookupField(sql.getResultSet(), control);
+					changeOptionsForLookupField(sql.getResultSet(), control, "twisty");
 				} else if (ta instanceof Table) {
 					Table t1 = (Table) ta;
-					changeOptionsForLookupField(t1, control);
+					changeOptionsForLookupField(t1, control, "twisty");
 				}
 
 			}));
