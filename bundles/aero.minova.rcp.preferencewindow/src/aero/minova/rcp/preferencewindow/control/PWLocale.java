@@ -26,7 +26,8 @@ public class PWLocale extends CustomPWWidget {
 	@Inject
 	ILocaleChangeService lcs;
 
-	private final List<String> dataL = getLanguages();
+	private final List<String> dataL = CustomLocale.getLanguages();
+	private List<String> dataC = CustomLocale.getCountries();
 	private Combo comboCountries;
 
 	private Combo comboLanguage;
@@ -42,53 +43,6 @@ public class PWLocale extends CustomPWWidget {
 	}
 
 	/**
-	 * Gibt alle Locales zurück
-	 * 
-	 * @return
-	 */
-	public static Locale[] getLocales() {
-		return SimpleDateFormat.getAvailableLocales();
-	}
-
-	/**
-	 * Erstellt eine Liste mit allen Ländern, die die ausgewählte Sprache, die in
-	 * der Data des PreferenceWindows gespeichert ist, sprechen
-	 * 
-	 * @return
-	 */
-	public List<String> getCountriesByData() {
-		Locale[] locales = getLocales();
-		Map<String, Object> data = PreferenceWindow.getInstance().getValues();
-		List<String> countries = new ArrayList<>();
-		for (Locale locale : locales) {
-			// gleicht alle Locales ab und sucht sich die mit der passenden Sprache heraus
-			if (data.get("language").toString().equals(locale.getDisplayLanguage()))
-				// sortiert alle leeren und doppelten String aus
-				if (!locale.getDisplayCountry().equals("") && !countries.contains(locale.getDisplayCountry()))
-					countries.add(locale.getDisplayCountry());
-		}
-		Collections.sort(countries);
-		return countries;
-	}
-
-	/**
-	 * Erstellt eine sortierte Liste alle Sprachen
-	 * 
-	 * @return
-	 */
-	public static List<String> getLanguages() {
-		Locale locales[] = getLocales();
-		List<String> languages = new ArrayList<>();
-		for (Locale locale : locales) {
-			// sortiert alle leeren und doppelten String aus
-			if (!locale.getDisplayLanguage().equals("") && !languages.contains(locale.getDisplayLanguage()))
-				languages.add(locale.getDisplayLanguage());
-		}
-		Collections.sort(languages);
-		return languages;
-	}
-
-	/**
 	 * Erstellt zwei Combo Boxen. Die erste liefert alle mögliche Sprachen wieder.
 	 * Die zweite liefert eine Liste von Ländern wieder, die die vorher ausgewählte
 	 * Sprache sprechen.
@@ -97,6 +51,7 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
+
 		// Label für Sprachauswahl erstellen
 		final Label languageLabel = new Label(parent, SWT.NONE);
 		languageLabel.setText("Sprache");
