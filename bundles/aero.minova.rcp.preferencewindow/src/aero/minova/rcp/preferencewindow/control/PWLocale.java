@@ -76,7 +76,7 @@ public class PWLocale extends CustomPWWidget {
 		for (int i = 0; i < dataL.size(); i++) {
 			final Object language = dataL.get(i);
 			comboLanguage.add(language.toString());
-			if (language.equals(PreferenceWindow.getInstance().getValueFor("language"))) {
+			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE))) {
 				comboLanguage.select(i);
 			}
 
@@ -107,10 +107,10 @@ public class PWLocale extends CustomPWWidget {
 		addControl(comboCountries);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
-		for (int i = 0; i < dataC.size(); i++) {
-			final Object country = dataC.get(i);
+		for (int i = 0; i < getCountries().size(); i++) {
+			final Object country = getCountries().get(i);
 			comboCountries.add(country.toString());
-			if (country.equals(PreferenceWindow.getInstance().getValueFor("land"))) {
+			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE))) {
 				comboCountries.select(i);
 			} else {
 				comboCountries.select(0);
