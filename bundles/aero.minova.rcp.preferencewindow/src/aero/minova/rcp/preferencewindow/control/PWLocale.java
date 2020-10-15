@@ -35,6 +35,22 @@ public class PWLocale extends CustomPWWidget {
 		super(label, propertyKey, label == null ? 1 : 2, false);
 	}
 
+	public List<String> getCountries() {
+		Locale locale = Locale.getDefault();
+		List<String> countries = new ArrayList<>();
+		String language = PreferenceWindow.getInstance().getValueFor("language").toString();
+		Locale[] locales = CustomLocale.getLocales();
+		for (Locale l : locales) {
+			if (language.equals(l.getDisplayLanguage(locale))) {
+				if (!l.getDisplayCountry(locale).equals("") && !countries.contains(l.getDisplayCountry(locale))) {
+					countries.add(l.getDisplayCountry(locale));
+				}
+			}
+		}
+		Collections.sort(countries);
+		return countries;
+	}
+
 	/**
 	 * Erstellt zwei Combo Boxen. Die erste liefert alle mögliche Sprachen wieder.
 	 * Die zweite liefert eine Liste von Ländern wieder, die die vorher ausgewählte
