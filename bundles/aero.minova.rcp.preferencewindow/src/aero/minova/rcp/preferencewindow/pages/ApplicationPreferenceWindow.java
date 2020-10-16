@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
@@ -45,7 +46,8 @@ public class ApplicationPreferenceWindow {
 	public void execute() {
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
-		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
+		Map<String, Object> data = fillData(preferenceTabs);
+		PreferenceWindow window = PreferenceWindow.create(data);
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -67,6 +69,8 @@ public class ApplicationPreferenceWindow {
 
 		window.setSelectedTab(0);
 		if (window.open()) {
+			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE, window.getValueFor("language"));
+			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE, window.getValueFor("country"));
 			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
@@ -101,6 +105,7 @@ public class ApplicationPreferenceWindow {
 				}
 			}
 		}
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE));
 
 		return data;
 	}
@@ -127,7 +132,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
 			break;
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
@@ -145,7 +150,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), key).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), "language").setAlignment(GridData.FILL);
 			break;
 		default:
 			break;

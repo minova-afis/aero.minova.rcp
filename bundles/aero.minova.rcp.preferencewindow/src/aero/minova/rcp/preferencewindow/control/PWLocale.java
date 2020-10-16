@@ -1,63 +1,129 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
+import javax.inject.Inject;
+
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.osgi.service.prefs.Preferences;
+
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 public class PWLocale extends CustomPWWidget {
+	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
-	private final List<String> data = CustomLocale.getLanguageForCountry("land");
-	private final boolean editable;
-
-	/**
-	 * Constructor
-	 *
-	 * @param label associated label
-	 * @param propertyKey associated key
-	 */
-	public PWLocale(final String label, final String propertyKey,final Object... values) {
-		this(label, propertyKey, false, values);
-	}
+	private final List<String> dataL = CustomLocale.getLanguages();
+	private Combo comboCountries;
+	private Combo comboLanguage;
 
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
+	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, final boolean editable, final Object... values) {
+	public PWLocale(final String label, final String propertyKey) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
-		this.editable = editable;
+	}
+
+	public List<String> getCountries() {
+		List<String> countries = new ArrayList<>();
+		String language = PreferenceWindow.getInstance().getValueFor("language").toString();
+		Locale[] locales = CustomLocale.getLocales();
+		for (Locale l : locales) {
+			if (language.equals(l.getDisplayLanguage(l))) {
+				if (!l.getDisplayCountry(l).equals("") && !countries.contains(l.getDisplayCountry(l))) {
+					countries.add(l.getDisplayCountry(l));
+				}
+			}
+		}
+		Collections.sort(countries);
+		return countries;
 	}
 
 	/**
+	 * Erstellt zwei Combo Boxen. Die erste liefert alle mögliche Sprachen wieder.
+	 * Die zweite liefert eine Liste von Ländern wieder, die die vorher ausgewählte
+	 * Sprache sprechen.
+	 * 
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#build(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		buildLabel(parent, GridData.CENTER);
+		// Label für Sprachauswahl erstellen
+		final Label languageLabel = new Label(parent, SWT.NONE);
+		languageLabel.setText("Sprache");
+		final GridData labelLGridData = new GridData(GridData.END, getAlignment(), false, false);
+		labelLGridData.horizontalIndent = getIndent();
+		languageLabel.setLayoutData(labelLGridData);
+		addControl(languageLabel);
 
-		final Combo combo = new Combo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
-		addControl(combo);
+		comboLanguage = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
+		addControl(comboLanguage);
 
-		for (int i = 0; i < data.size(); i++) {
-			final Object datum = data.get(i);
-			combo.add(datum.toString());
-			if (datum.equals(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()))) {
-				combo.select(i);
+		// Setzt die Text auf den in den Preferences gespeicherten Wert
+		for (int i = 0; i < dataL.size(); i++) {
+			final Object language = dataL.get(i);
+			comboLanguage.add(language.toString());
+			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE))) {
+				comboLanguage.select(i);
+			}
+
+		}
+
+		comboLanguage.addListener(SWT.Modify, event -> {
+			PreferenceWindow.getInstance().setValue("language",
+					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
+			// erneuert Liste mit Ländern
+			comboCountries.removeAll();
+			for (String country : getCountries()) {
+				comboCountries.add(country);
+			}
+			comboCountries.select(0);
+
+		});
+
+		// Label für Landauswahl erstellen
+		final Label countryLabel = new Label(parent, SWT.NONE);
+		countryLabel.setText("Land");
+		final GridData labelCGridData = new GridData(GridData.END, getAlignment(), false, false);
+		labelCGridData.horizontalIndent = getIndent();
+		countryLabel.setLayoutData(labelCGridData);
+		addControl(countryLabel);
+
+		// Combo Box für Landauswahl erstellen
+		comboCountries = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
+		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		comboCountries.setLayoutData(countryData);
+		addControl(comboCountries);
+
+		// Setzt die Text auf den in den Preferences gespeicherten Wert
+		for (int i = 0; i < getCountries().size(); i++) {
+			final Object country = getCountries().get(i);
+			comboCountries.add(country.toString());
+			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE))) {
+				comboCountries.select(i);
 			}
 		}
 
-		combo.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), PWLocale.this.data.get(combo.getSelectionIndex()));
+		comboCountries.addListener(SWT.Modify, event -> {
+			PreferenceWindow.getInstance().setValue("country",
+					comboCountries.getItem(comboCountries.getSelectionIndex()));
 		});
 
-		return combo;
+		return comboLanguage;
 	}
 
 	/**
@@ -65,20 +131,7 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	@Override
 	public void check() {
-		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		if (value == null) {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), null);
-		} else {
-			if (editable && !(value instanceof String)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to an editable combo");
-			}
-
-			if (!data.isEmpty()) {
-				if (!value.getClass().equals(data.get(0).getClass())) {
-					throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a " + data.get(0).getClass() + " because it is associated to a combo");
-				}
-			}
-
-		}
+		// Alle Prüfungen auf Null oder einen leeren String werden in anderen Methode
+		// direkt beim erstellen der Listen gemacht
 	}
 }
