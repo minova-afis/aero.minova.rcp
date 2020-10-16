@@ -34,7 +34,7 @@ public class InstancePreferenceAccessor {
 			return (fd == null ? null : new FontData(fd));
 		case ZONEID:
 			String id = preferences.get(preferenceKey, "");
-			String result = CustomTimeZone.displayTimeZone(CustomLocale.getLocale("land", "language"), id);
+			String result = CustomTimeZone.displayTimeZone(id);
 			return result;
 		default:
 			break;
@@ -67,12 +67,13 @@ public class InstancePreferenceAccessor {
 			preferences.put(preferenceKey, ((FontData) value).toString());
 			break;
 		case ZONEID:
-			Locale l = CustomLocale.getLocale("land", "language");
-			Map<String, ZoneId> zones = CustomTimeZone.getZones(l);
+			Locale l = CustomLocale.getLocale();
+			Map<String, ZoneId> zones = CustomTimeZone.getZones();
 			String id = value.toString().substring(value.toString().lastIndexOf(")") + 2);
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();
 			preferences.put(preferenceKey, zoneId);
 			break;
+
 		default:
 			break;
 		}

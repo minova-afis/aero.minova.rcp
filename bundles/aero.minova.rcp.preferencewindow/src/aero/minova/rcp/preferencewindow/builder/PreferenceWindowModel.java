@@ -3,7 +3,6 @@ package aero.minova.rcp.preferencewindow.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
 public class PreferenceWindowModel {
@@ -52,12 +51,14 @@ public class PreferenceWindowModel {
 				"Darstellung", 0.2);
 		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("land", "Land", 0.1, DisplayType.COMBO, CustomLocale.getCountries().toArray());
+		pd = new PreferenceDescriptor("language", "Sprache", 0.1, DisplayType.LOCALE);
 		psd.add(pd);
-		pd = new PreferenceDescriptor("language", "Landessprache", 0.2, DisplayType.COMBO, CustomLocale.getLanguageForCountry("land").toArray());
-		psd.add(pd);
+//		pd = new PreferenceDescriptor("language", "Sprache", 0.1, DisplayType.LOCALE, CustomLocale.getLanguages().toArray());
+//		psd.add(pd);
+//		pd = new PreferenceDescriptor("land", "Land", 0.2, DisplayType.LOCALE, CustomLocale.getCountries("language").toArray());
+//		psd.add(pd);
 		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
-				CustomTimeZone.getTimeZones("land", "language").toArray());
+				CustomTimeZone.getTimeZones().toArray());
 		psd.add(pd);
 
 		psd = new PreferenceSectionDescriptor("designpreferences", "Design-Einstellungen", 0.2);

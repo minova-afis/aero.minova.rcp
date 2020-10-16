@@ -6,23 +6,32 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
+
+import aero.minova.rcp.dataservice.IDataService;
 
 @Component
 public class WFCTranslationService extends TranslationService {
 
 	private TranslationService parent;
+	private IDataService dataService;
 
 	Logger logger;
 
@@ -30,7 +39,24 @@ public class WFCTranslationService extends TranslationService {
 	private String applicationId = "WFC";
 	private Properties resources = new Properties();
 
+	@Inject
+	protected UISynchronize sync;
+
+	private int propertyFilesToLoadCount = 0;
+
 	public WFCTranslationService() {
+	}
+
+	@Inject
+	@Optional
+	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
+		System.out.println("Injected via context: " + s);
+	}
+
+	@Inject
+	@Optional
+	private void getNotified2(@UIEventTopic(ILocaleChangeService.LOCALE_CHANGE) Locale s) {
+		System.out.println("Injected via event broker: " + s);
 	}
 
 	@Override
@@ -102,6 +128,16 @@ public class WFCTranslationService extends TranslationService {
 		}
 	}
 
+	@Inject
+	@Optional
+	void setDataService(IDataService dataService) {
+		if (logger != null) {
+			logger.info("DataService changed to: " + dataService);
+			logger.info(Platform.getInstallLocation().toString());
+		}
+		this.dataService = dataService;
+	}
+
 	public void setTranslationService(TranslationService o) {
 		this.parent = o;
 
@@ -142,32 +178,40 @@ public class WFCTranslationService extends TranslationService {
 	 *
 	 */
 	private void loadResources() {
-		String baseFilename;
+		String basePath, i18nPath;
+		String filename;
 		try {
-			baseFilename = Platform.getInstanceLocation().getURL().toURI().toString();
-			baseFilename += "/i18n/messages";
+			basePath = Platform.getInstanceLocation().getURL().toURI().toString();
+			i18nPath = basePath + "i18n";
+			File i18nDir = new File(new URI(i18nPath));
+			if (!i18nDir.exists()) {
+				i18nDir.mkdirs();
+			}
+			filename = "i18n/messages";
 			resources = new Properties();
-			loadProperties(baseFilename + ".properties");
+			loadProperties(basePath, filename + ".properties");
 			if (locale == null) {
 				return;
 			}
-			if (locale.getLanguage() != null) {
-				loadProperties(baseFilename + "_" + locale.getLanguage() + ".properties");
-				if (locale.getCountry() != null) {
-					loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
-					if (locale.getVariant() != null) {
-						loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_"
+			if (!isEmpty(locale.getLanguage())) {
+				loadProperties(basePath, filename + "_" + locale.getLanguage() + ".properties");
+				if (!isEmpty(locale.getCountry())) {
+					loadProperties(basePath,
+							filename + "_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
+					if (!isEmpty(locale.getVariant())) {
+						loadProperties(basePath, filename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_"
 								+ locale.getVariant() + ".properties");
 					}
 				}
-				if (locale.getScript() != null) {
-					loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + ".properties");
-					if (locale.getCountry() != null) {
-						loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
+				if (!isEmpty(locale.getScript())) {
+					loadProperties(basePath,
+							filename + "_" + locale.getLanguage() + "_" + locale.getScript() + ".properties");
+					if (!isEmpty(locale.getCountry())) {
+						loadProperties(basePath, filename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
 								+ locale.getCountry() + ".properties");
-						if (locale.getVariant() != null) {
-							loadProperties(baseFilename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
-									+ locale.getCountry() + "_" + locale.getVariant() + ".properties");
+						if (!isEmpty(locale.getVariant())) {
+							loadProperties(basePath, filename + "_" + locale.getLanguage() + "_" + locale.getScript()
+									+ "_" + locale.getCountry() + "_" + locale.getVariant() + ".properties");
 						}
 					}
 				}
@@ -177,31 +221,71 @@ public class WFCTranslationService extends TranslationService {
 		}
 	}
 
-	private void loadProperties(String propertiesFilename) {
+	private boolean isEmpty(String value) {
+		return value == null || value.isEmpty();
+	}
+
+	private void loadProperties(String path, String propertiesFilename) {
 		FileInputStream is = null;
 		File f;
+		URI uri;
 		try {
-			f = new File(new URI(propertiesFilename));
-			is = new FileInputStream(f);
-			resources.load(is);
-			logger.error("test");
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// es gibt nicht alle Dateien
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (is != null)
+			uri = new URI(path + propertiesFilename);
+			try {
+				f = new File(uri);
+				is = new FileInputStream(f);
+				resources.load(is);
+				logger.error("test");
+			} catch (FileNotFoundException e) {
+				// es gibt nicht alle Dateien
+
 				try {
-					is.close();
-				} catch (IOException e) {
-					if (logger != null) {
-						logger.error(e.toString());
-					} else {
-						e.printStackTrace();
-					}
+					CompletableFuture<String> fileFuture = dataService.getFile(propertiesFilename);
+					propertyFilesToLoadCount++;
+					fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
+						try {
+							byte[] file;
+							try {
+								String result = bytes.substring(1, bytes.length() - 2);
+								String byteValues[] = result.split(",");
+								file = new byte[byteValues.length];
+								int i = 0;
+								for (String string : byteValues) {
+									file[i++] = Byte.parseByte(string);
+								}
+							} catch (NumberFormatException nfe) {
+								// Es ist wohl keine Datei angekommen
+								file = new byte[0];
+							}
+							Files.write(Path.of(uri), file);
+							propertyFilesToLoadCount--;
+							if (propertyFilesToLoadCount == 0) {
+								loadResources();
+							}
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}));
+				} catch (NullPointerException npe) {
+					logger.error("NPE " + propertiesFilename);
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (is != null)
+					try {
+						is.close();
+					} catch (IOException e) {
+						if (logger != null) {
+							logger.error(e.toString());
+						} else {
+							e.printStackTrace();
+						}
+					}
+			}
+		} catch (URISyntaxException e2) {
+			e2.printStackTrace();
 		}
 	}
 }

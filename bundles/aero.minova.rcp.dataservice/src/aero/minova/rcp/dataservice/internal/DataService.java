@@ -80,8 +80,6 @@ public class DataService implements IDataService {
 
 		return future;
 	}
-	
-	
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
@@ -155,13 +153,13 @@ public class DataService implements IDataService {
 
 	}
 
-	public CompletableFuture<String> getFile(String uri) {
-		  HttpRequest fileRequest = HttpRequest.newBuilder()
-		          .uri(URI.create(uri))
-		          .build();
+	public CompletableFuture<String> getFile(String filename) {
+		init();
+		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+				.header("Content-Type", "application/raw") //
+				.build();
 
-		  return httpClient.sendAsync(request, BodyHandlers.ofString())
-		          .thenApply(HttpResponse::body);
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
 
 	}
 
