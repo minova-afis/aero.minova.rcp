@@ -5,7 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,14 +39,13 @@ public class PWLocale extends CustomPWWidget {
 	}
 
 	public List<String> getCountries() {
-		Locale locale = Locale.getDefault();
 		List<String> countries = new ArrayList<>();
 		String language = PreferenceWindow.getInstance().getValueFor("language").toString();
 		Locale[] locales = CustomLocale.getLocales();
 		for (Locale l : locales) {
-			if (language.equals(l.getDisplayLanguage(locale))) {
-				if (!l.getDisplayCountry(locale).equals("") && !countries.contains(l.getDisplayCountry(locale))) {
-					countries.add(l.getDisplayCountry(locale));
+			if (language.equals(l.getDisplayLanguage(l))) {
+				if (!l.getDisplayCountry(l).equals("") && !countries.contains(l.getDisplayCountry(l))) {
+					countries.add(l.getDisplayCountry(l));
 				}
 			}
 		}
