@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -16,6 +17,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -26,6 +28,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.util.Constants;
 
 /**
  * Ein selbst definiertes UI-Element zur Anzeige von Lookups
@@ -89,7 +92,55 @@ public class LookupControl extends Composite {
 	protected void addTextControl(int style) {
 		textControl = new Text(this, style);
 		simpleContentProposalProvider = new SimpleContentProposalProvider();
-		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, new TextContentAdapter(),
+		TextContentAdapter tca = new TextContentAdapter() {
+			@Override
+			public void setControlContents(Control control, String text, int cursorPosition) {
+				LookupControl lc = (LookupControl) control.getParent();
+				String proposalString = text;
+				Table options = (Table) lc.getData(Constants.CONTROL_OPTIONS);
+				Pattern p = Pattern.compile(" \\(.*\\)");
+				proposalString = p.matcher(proposalString).replaceAll("");
+				lc.setText(proposalString);
+				for (Row r : options.getRows()) {
+					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+							.equalsIgnoreCase(proposalString)) {
+						lc.setData(Constants.CONTROL_KEYLONG,
+								r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+						if(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							lc.getDescription().setText(
+									r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						}
+					}
+				}
+				((Text) control).setSelection(cursorPosition, cursorPosition);
+			}
+
+			@Override
+			public void insertControlContents(Control control, String text, int cursorPosition) {
+				Point selection = ((Text) control).getSelection();
+				LookupControl lc = (LookupControl) control.getParent();
+				String proposalString = text;
+				Table options = (Table) lc.getData(Constants.CONTROL_OPTIONS);
+				Pattern p = Pattern.compile(" \\(.*\\)");
+				proposalString = p.matcher(proposalString).replaceAll("");
+				lc.setText(proposalString);
+				for (Row r : options.getRows()) {
+					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+							.equalsIgnoreCase(proposalString)) {
+						lc.setData(Constants.CONTROL_KEYLONG,
+								r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							lc.getDescription().setText(
+									r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						}
+					}
+				}
+				if (cursorPosition < text.length()) {
+					((Text) control).setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
+				}
+			}
+		};
+		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, tca,
 				simpleContentProposalProvider, null, null);
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
 	}
