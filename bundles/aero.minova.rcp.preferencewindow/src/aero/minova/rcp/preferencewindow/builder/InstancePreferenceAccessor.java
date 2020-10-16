@@ -7,6 +7,7 @@ import java.util.Map;
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
 public class InstancePreferenceAccessor {
@@ -66,7 +67,7 @@ public class InstancePreferenceAccessor {
 			preferences.put(preferenceKey, ((FontData) value).toString());
 			break;
 		case ZONEID:
-			Locale l = Locale.getDefault();
+			Locale l = CustomLocale.getLocale();
 			Map<String, ZoneId> zones = CustomTimeZone.getZones();
 			String id = value.toString().substring(value.toString().lastIndexOf(")") + 2);
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();

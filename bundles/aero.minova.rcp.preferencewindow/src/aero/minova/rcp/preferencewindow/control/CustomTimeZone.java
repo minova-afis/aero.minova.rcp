@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class CustomTimeZone {
 
 	public static Map<String, ZoneId> getZones() {
-		Locale locale = Locale.getDefault();
+		Locale locale = CustomLocale.getLocale();
 		Map<String, ZoneId> map = new HashMap<String, ZoneId>();
 		for (String zone : ZoneId.getAvailableZoneIds()) {
 			ZoneId zoneId = ZoneId.of(zone);
@@ -23,12 +23,12 @@ public class CustomTimeZone {
 		return map;
 	}
 
-	public static ZoneId getId(Map<String, ZoneId> map, String id, Locale locale) {
+	public static ZoneId getId(Map<String, ZoneId> map, String id, Locale l) {
 		return map.get(id);
 	}
 
 	public static List<String> getTimeZones() {
-		Locale locale = Locale.getDefault();
+		Locale locale = CustomLocale.getLocale();
 		Map<String, ZoneId> map = getZones();
 		List<String> zones = new ArrayList<>();
 		ZoneId[]  zoneIds = map.values().toArray(new ZoneId[0]);
@@ -46,7 +46,7 @@ public class CustomTimeZone {
 	}
 
 	public static String displayTimeZone(String timeZone) {
-		Locale locale = Locale.getDefault();
+		Locale locale = CustomLocale.getLocale();
 		TimeZone tz = TimeZone.getTimeZone(timeZone);
 		long hours = TimeUnit.MILLISECONDS.toHours(tz.getRawOffset());
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(tz.getRawOffset()) - TimeUnit.HOURS.toMinutes(hours);

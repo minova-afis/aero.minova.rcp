@@ -9,6 +9,9 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
+
 public class CustomLocale {
 	static Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
@@ -17,16 +20,29 @@ public class CustomLocale {
 	}
 
 	public static List<String> getLanguages() {
-		Locale locale = Locale.getDefault();
 		Locale[] locales = getLocales();
 		List<String> languages = new ArrayList<>();
 		for (Locale l : locales) {
-			if (!l.getDisplayLanguage(locale).equals("") && !languages.contains(l.getDisplayLanguage(locale))) {
-				languages.add(l.getDisplayLanguage(locale));
+			if (!l.getDisplayLanguage(l).equals("") && !languages.contains(l.getDisplayLanguage(l))) {
+				languages.add(l.getDisplayLanguage(l));
 			}
 		}
 		Collections.sort(languages);
 		return languages;
+	}
+	
+	public static Locale getLocale() {
+		Locale[] locales = CustomLocale.getLocales();
+		String language = InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE).toString();
+		String country = InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE).toString();
+		Locale locale = Locale.getDefault();
+		
+		for (Locale l : locales) {
+			if(l.getDisplayLanguage(l).equals(language) && l.getDisplayCountry(l).equals(country))
+				locale = l;
+		}
+		
+		return locale;
 	}
 
 }
