@@ -69,6 +69,8 @@ public class ApplicationPreferenceWindow {
 
 		window.setSelectedTab(0);
 		if (window.open()) {
+			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE, window.getValueFor("language"));
+			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE, window.getValueFor("country"));
 			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
@@ -80,8 +82,6 @@ public class ApplicationPreferenceWindow {
 				}
 
 			}
-			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE, window.getValueFor("language"));
-			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE, window.getValueFor("country"));
 			try {
 				preferences.flush();
 			} catch (BackingStoreException e) {
