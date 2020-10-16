@@ -52,6 +52,7 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DetailUtil;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
+import aero.minova.rcp.rcp.util.LookupFieldFocusListener;
 import aero.minova.rcp.rcp.util.TextfieldVerifier;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -160,9 +161,62 @@ public class XMLDetailPart {
 					});
 				}
 			}
+			if (c instanceof LookupControl) {
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener();
+				LookupControl lc = (LookupControl) c;
+				lc.addFocusListener(lfl);
+				// Timer timer = new Timer();
+				lc.addKeyListener(new KeyListener() {
+
+					@Override
+					public void keyPressed(KeyEvent e) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void keyReleased(KeyEvent e) {
+						if (e.character != '\b' && e.keyCode != 25 && e.keyCode != 26 && e.keyCode != 27
+								&& e.keyCode != 28) {
+							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
+								requestOptionsFromCAS(lc);
+							} else {
+								changeSelectionBoxList(lc, "");
+							}
+							// rescheduleTimer(timer, lc);
+						}
+					}
+
+				});
+			}
 		}
 	}
 
+	/**
+	 * Diese Methode dient dem Zweck, eine Verzögerung für unsere Eingaben im Field
+	 * zu gewähren
+	 *
+	 * TODO: Wir benötigen einen Weg, aus dem durch den TimerTask erstellten Thread
+	 * heraus auf unsere Methoden des MainThreads zuzugreifen
+	 *
+	 * @param timer
+	 * @param lc
+	 */
+	/*
+	 * public void rescheduleTimer(Timer timer, LookupControl lc) { timer.cancel();
+	 * timer.purge(); timer = new Timer(); timer.schedule(new TimerTask() {
+	 *
+	 * @Override public void run() { if (lc.getData(Constants.CONTROL_OPTIONS) !=
+	 * null || lc.getText().equals("")) { requestOptionsFromCAS(lc); } else {
+	 * changeSelectionBoxList(lc, ""); }
+	 *
+	 * this.cancel(); } }, 500); }
+	 */
+
+	/**
+	 * Aktuellisiert die Quantityvalues, sobald sich einer der beiden Zeiteinträge
+	 * verändert
+	 */
 	public void updateQuantitys() {
 		Text endDate = (Text) controls.get("EndDate");
 		Text startDate = (Text) controls.get("StartDate");
@@ -196,10 +250,10 @@ public class XMLDetailPart {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				changeOptionsForLookupField(sql.getResultSet(), c, "textinput");
+				changeOptionsForLookupField(sql.getResultSet(), c, "");
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				changeOptionsForLookupField(t, c, "textinput");
+				changeOptionsForLookupField(t, c, "");
 			}
 
 		}));
@@ -226,48 +280,43 @@ public class XMLDetailPart {
 		if (c.getData(Constants.CONTROL_OPTIONS) != null) {
 			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
 			LookupControl lc = (LookupControl) c;
-			// Nur Rows, welche den Zeileninhalt beinhalten enthalten sollen aufgelistet
-			// werden
-
 			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 			if (t.getRows().size() == 1) {
-				if (lc != null && lc.getText() != null) {
+				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 					if (value.getStringValue().equalsIgnoreCase(lc.getText().toString())) {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
-						c.setData(Constants.CONTROL_KEYLONG,
+						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					} else {
-						// Wir speichern den alten Keylongwert für den Fall ab, das der neue String
-						// nicht im CAS existiert. Mit ihm stellen wir den vorherigen Zustand wieder her
-						Value oldKeylongValue = (Value) c.getData(Constants.CONTROL_KEYLONG);
-						final int oldKeylong = oldKeylongValue.getIntegerValue();
-						c.setData(Constants.CONTROL_KEYLONG, null);
-						// TODO "gu" != "MIN" es folgt:
-						// TODO Hier muss aktiv eine neue Liste mit Werten angefragt werden
-						// Überprüfe, ob der der gegebene String in unserer Tabelle bereits existiert
-						searchForStringInGivenTable(lc, t, lc.getText().toString());
 
-						// Wenn der Wert nicht in den gegebenen Rows vorhanden ist, so wird der CAS
-						// abgefragt, ob ein solcher Wert im System existiert
-						if (c.getData(Constants.CONTROL_KEYLONG) == null) {
-
-							CompletableFuture<?> tableFuture;
-							tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(),
-									field, controls, dataService, sync, "List");
-							tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-								if (ta instanceof SqlProcedureResult) {
-									SqlProcedureResult sql = (SqlProcedureResult) ta;
-									checkForCASEntryWithGivenString(c, sql.getResultSet(),
-											lc.getText().toString(), getFieldValueByKeylong(oldKeylong, t), oldKeylong);
-								} else if (ta instanceof Table) {
-									Table employeeTable = (Table) ta;
-									checkForCASEntryWithGivenString(c, employeeTable,
-											lc.getText().toString(), getFieldValueByKeylong(oldKeylong, t), oldKeylong);
-								}
-
-							}));
-						}
+						changeProposals((LookupControl) c, t);
+						// Eine Erneute CAS-Anfrage verliert dadurch, das sämtliche Optionen in einem
+						// Puffer gespeichert werden, ihren Sinn. Wenn der gegebene String nicht mit dem
+						// einzigen gefundenen Wert übereinstimmt, so ist der Wert nicht im CAS
+						// vorhanden. Alternative: Liste den tatsächlichen Wert als Option auf
+						/*
+						 * // TODO "gu" != "MIN" es folgt: // TODO Hier muss aktiv eine neue Liste mit
+						 * Werten angefragt werden // Überprüfe, ob der der gegebene String in unserer
+						 * Tabelle bereits existiert searchForStringInGivenTable(lc, t,
+						 * lc.getText().toString());
+						 *
+						 * // Wenn der Wert nicht in den gegebenen Rows vorhanden ist, so wird der CAS
+						 * // abgefragt, ob ein solcher Wert im System existiert if
+						 * (lc.getData(Constants.CONTROL_KEYLONG) == null) {
+						 *
+						 * CompletableFuture<?> tableFuture; tableFuture =
+						 * LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(),
+						 * field, controls, dataService, sync, "List"); tableFuture.thenAccept(ta ->
+						 * sync.asyncExec(() -> { if (ta instanceof SqlProcedureResult) {
+						 * SqlProcedureResult sql = (SqlProcedureResult) ta;
+						 * checkForCASEntryWithGivenString(c, sql.getResultSet(),
+						 * lc.getText().toString()); } else if (ta instanceof Table) { Table
+						 * employeeTable = (Table) ta; checkForCASEntryWithGivenString(c, employeeTable,
+						 * lc.getText().toString()); }
+						 *
+						 * })); }
+						 */
 					}
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
@@ -288,6 +337,12 @@ public class XMLDetailPart {
 						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
 								.startsWith(lc.getText().toLowerCase()))) {
 							filteredTable.addRow(r);
+						} else if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+									.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))
+											.getStringValue().toLowerCase()))) {
+								filteredTable.addRow(r);
+							}
 						}
 
 					}
@@ -312,15 +367,14 @@ public class XMLDetailPart {
 	 * @param t
 	 * @return
 	 */
-	public String getFieldValueByKeylong(int keylong, Table t) {
-		String keyText = null;
-		for (Row r : t.getRows()) {
-			if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == keylong) {
-				keyText = r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue();
-			}
-		}
-		return keyText;
-	}
+	/*
+	 * public String getFieldValueByKeylong(int keylong, Table t) { String keyText =
+	 * null; for (Row r : t.getRows()) { if
+	 * (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() ==
+	 * keylong) { keyText =
+	 * r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue(); } }
+	 * return keyText; }
+	 */
 	/**
 	 * Überprüft, on der gegebene String in der bereits ausgelesenen Tabelle vorhanden ist
 	 *
@@ -328,22 +382,21 @@ public class XMLDetailPart {
 	 * @param t
 	 * @param string
 	 */
-	public void searchForStringInGivenTable(LookupControl lc, Table t,String string) {
-
-		for (Row r : t.getRows()) {
-			if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-					.equalsIgnoreCase(string)) {
-				lc.setData(Constants.CONTROL_KEYLONG,
-						r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-				lc.setText((String) ValueBuilder
-						.value(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))).create());
-				if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder
-						.value(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-				}
-			}
-		}
-	}
+	/*
+	 * public void searchForStringInGivenTable(LookupControl lc, Table t,String
+	 * string) {
+	 *
+	 * for (Row r : t.getRows()) { if
+	 * (r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+	 * .equalsIgnoreCase(string)) { lc.setData(Constants.CONTROL_KEYLONG,
+	 * r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG))); lc.setText((String)
+	 * ValueBuilder
+	 * .value(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))).create()); if
+	 * (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+	 * lc.getDescription().setText((String) ValueBuilder
+	 * .value(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+	 * } } } }
+	 */
 	/**
 	 * Überprüft, ob der gegebene String im CAS eingetragen ist. Falls er es ist, so
 	 * werden die erhaltenen Treffer entsprechend ihrer anzahl zur verarbeitung
@@ -353,35 +406,33 @@ public class XMLDetailPart {
 	 * @param t
 	 * @param string
 	 */
-	public void checkForCASEntryWithGivenString(Control c, Table t, String string, String oldText, int oldKeylong) {
-		LookupControl lc = (LookupControl)c;
-		Table filteredTable = new Table();
-		for (Row r : t.getRows()) {
-			if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().startsWith(string))) {
-				filteredTable.addRow(r);
-			}
-		}
-		if (filteredTable.getRows().size() == 0) {
-			// TODO: KEIN TREFFER FÜR DEN GEGEBENEN STRING! Wie gehen wir damit um?
-			// Dies geschieht in der alten anwendung erst beim auswählen eines anderen
-			// Elements in der Anwendung -> puffer?
-			c.setData(Constants.CONTROL_KEYLONG, new Value(oldKeylong));
-			lc.setText(oldText);
-		} else if (filteredTable.getRows().size() == 1) {
-			c.setData(Constants.CONTROL_KEYLONG,
-					filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-			lc.setText((String) ValueBuilder
-					.value(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))).create());
-			if (filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder
-						.value(filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)))
-						.create());
-			}
-		} else if (filteredTable.getRows().size() > 1) {
-			changeOptionsForLookupField(t, c, "");
-
-		}
-	}
+	/*
+	 * public void checkForCASEntryWithGivenString(Control c, Table t, String
+	 * string) { LookupControl lc = (LookupControl)c; Table filteredTable = new
+	 * Table(); for (aero.minova.rcp.model.Column column : t.getColumns()) {
+	 * filteredTable.addColumn(column); } for (Row r : t.getRows()) { if
+	 * ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().
+	 * startsWith(string))) { filteredTable.addRow(r); } } if
+	 * (filteredTable.getRows().size() == 0) { // TODO: KEIN TREFFER FÜR DEN
+	 * GEGEBENEN STRING! Wie gehen wir damit um? // Stand SIS: Stimmt der Wert mit
+	 * keinem gegebenen Feld überein, so wird der // Wert im Feld geleert, sobald es
+	 * den Fokus verliert // -> puffer?
+	 *
+	 * // c.setData(null); // lc.setText(""); } else if
+	 * (filteredTable.getRows().size() == 1) { c.setData(Constants.CONTROL_KEYLONG,
+	 * filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.
+	 * TABLE_KEYLONG))); lc.setText((String) ValueBuilder
+	 * .value(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))
+	 * ).create()); if
+	 * (filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.
+	 * TABLE_DESCRIPTION)) != null) { lc.getDescription().setText((String)
+	 * ValueBuilder
+	 * .value(filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.
+	 * TABLE_DESCRIPTION))) .create()); } } else if (filteredTable.getRows().size()
+	 * > 1) { changeOptionsForLookupField(t, c, "");
+	 *
+	 * } }
+	 */
 
 	/**
 	 * Austauschen der gegebenen Optionen für das LookupField
@@ -405,7 +456,6 @@ public class XMLDetailPart {
 	@Optional
 	public void requestLookUpEntriesAll(@UIEventTopic("LoadAllLookUpValues") String name) {
 		Control control = controls.get(name);
-
 		if (control instanceof LookupControl) {
 			Field field = (Field) control.getData(Constants.CONTROL_FIELD);
 			CompletableFuture<?> tableFuture;

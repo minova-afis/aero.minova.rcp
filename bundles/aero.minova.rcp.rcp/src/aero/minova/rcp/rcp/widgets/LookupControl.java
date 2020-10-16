@@ -12,6 +12,7 @@ import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Font;
@@ -155,6 +156,16 @@ public class LookupControl extends Composite {
 	@Override
 	public void removeFocusListener(FocusListener listener) {
 		textControl.removeFocusListener(listener);
+	}
+
+	@Override
+	public void addKeyListener(KeyListener listener) {
+		textControl.addKeyListener(listener);
+	}
+
+	@Override
+	public void removeKeyListener(KeyListener listener) {
+		textControl.removeKeyListener(listener);
 	}
 
 	@Override

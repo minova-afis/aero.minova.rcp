@@ -63,7 +63,7 @@ public class DetailUtilTests {
 		field.setTextAttribute("Testing");
 		field.setNumberRowsSpanned("THIS RESULTS IN AN EXCEPTION");
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
+		new DetailUtil(new DummyTranslationService(), broker).createField(field, composite, controls);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class DetailUtilTests {
 		Field field = new Field();
 		field.setVisible(false);
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
+		new DetailUtil(new DummyTranslationService(), broker).createField(field, composite, controls);
 		assertTrue(composite.getChildren().length == 0);
 	}
 
@@ -82,10 +82,10 @@ public class DetailUtilTests {
 		field.setLookup(new Lookup());
 
 		field.setNumberColumnsSpanned(new BigInteger("4"));
-		assertTrue(new DetailUtil(new DummyTranslationService()).getSpannedHintForElement(field, true) == 2);
+		assertTrue(new DetailUtil(new DummyTranslationService(), broker).getSpannedHintForElement(field, true) == 2);
 
 		field.setNumberColumnsSpanned(new BigInteger("2"));
-		assertTrue(new DetailUtil(new DummyTranslationService()).getSpannedHintForElement(field, true) == 2);
+		assertTrue(new DetailUtil(new DummyTranslationService(), broker).getSpannedHintForElement(field, true) == 2);
 
 	}
 
@@ -107,11 +107,12 @@ public class DetailUtilTests {
 		head.getFieldOrGrid().add(field);
 		head.getFieldOrGrid().add(lookup);
 
-		Composite co = new DetailUtil(new DummyTranslationService()).createSection(formToolkit, composite.getParent(), head);
+		Composite co = new DetailUtil(new DummyTranslationService(), broker).createSection(formToolkit,
+				composite.getParent(), head);
 		for (Object o2 : head.getFieldOrGrid()) {
 			if (o2 instanceof Field) {
 				Map<String, Control> controls = new HashMap<>();
-				new DetailUtil(new DummyTranslationService()).createField((Field) o2, co, controls, broker);
+				new DetailUtil(new DummyTranslationService(), broker).createField((Field) o2, co, controls);
 			}
 		}
 		Control[] children = co.getChildren();
@@ -163,7 +164,7 @@ public class DetailUtilTests {
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
+		new DetailUtil(new DummyTranslationService(), broker).createField(field, composite, controls);
 		Control[] children = composite.getChildren();
 		assertEquals(children.length, 3);
 		Object layoutData = children[0].getLayoutData();
@@ -191,7 +192,7 @@ public class DetailUtilTests {
 		field.setNumber(new Number());
 		field.setUnitText("L");
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
+		new DetailUtil(new DummyTranslationService(), broker).createField(field, composite, controls);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
 		Object layoutData = children[0].getLayoutData();
@@ -218,7 +219,7 @@ public class DetailUtilTests {
 		field.setLookup(new Lookup());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 		Map<String, Control> controls = new HashMap<>();
-		new DetailUtil(new DummyTranslationService()).createField(field, composite, controls, broker);
+		new DetailUtil(new DummyTranslationService(), broker).createField(field, composite, controls);
 		Control[] children = composite.getChildren();
 		assertTrue(children.length == 3);
 		Object layoutData = children[0].getLayoutData();
