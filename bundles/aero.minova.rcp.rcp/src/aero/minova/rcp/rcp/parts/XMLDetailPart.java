@@ -794,7 +794,9 @@ public class XMLDetailPart {
 	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
 	 * @param origin
 	 */
-	public void clearFields(String origin) {
+	@Optional
+	@Inject
+	public void clearFields(@UIEventTopic("clearFields") String origin) {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
@@ -823,6 +825,7 @@ public class XMLDetailPart {
 				lc.setData(Constants.CONTROL_KEYLONG, null);
 				lc.getDescription().setText("");
 			}
+			setKeys(null);
 		}
 	}
 
