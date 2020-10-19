@@ -69,8 +69,12 @@ public class ApplicationPreferenceWindow {
 
 		window.setSelectedTab(0);
 		if (window.open()) {
-			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE, window.getValueFor("language"));
-			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE, window.getValueFor("country"));
+			InstancePreferenceAccessor.putValue(preferences, "timezone", DisplayType.ZONEID,
+					window.getValueFor("timezone"));
+			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE,
+					window.getValueFor("language"));
+			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE,
+					window.getValueFor("country"));
 			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
