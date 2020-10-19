@@ -12,10 +12,9 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class CustomTimeZone {
-
-	public static Map<String, ZoneId> getZones() {
-		Locale locale = CustomLocale.getLocale();
-		Map<String, ZoneId> map = new HashMap<String, ZoneId>();
+	
+	public static Map<String, ZoneId> getZones(Locale locale) {
+		Map<String, ZoneId> map = new HashMap<>();
 		for (String zone : ZoneId.getAvailableZoneIds()) {
 			ZoneId zoneId = ZoneId.of(zone);
 			map.put(zoneId.getDisplayName(TextStyle.FULL, locale), zoneId);
@@ -29,7 +28,7 @@ public class CustomTimeZone {
 
 	public static List<String> getTimeZones() {
 		Locale locale = CustomLocale.getLocale();
-		Map<String, ZoneId> map = getZones();
+		Map<String, ZoneId> map = getZones(locale);
 		List<String> zones = new ArrayList<>();
 		ZoneId[]  zoneIds = map.values().toArray(new ZoneId[0]);
 		Arrays.sort(zoneIds, (o1, o2) -> {
