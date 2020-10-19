@@ -10,8 +10,23 @@ import org.osgi.service.prefs.Preferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
+/**
+ * Liefert Methoden zu holen und setzen von Wert aus und in die Preferences.
+ * 
+ * @author bauer
+ *
+ */
 public class InstancePreferenceAccessor {
 
+	/**
+	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen
+	 * Preferences.
+	 * 
+	 * @param preferences
+	 * @param preferenceKey
+	 * @param type
+	 * @return
+	 */
 	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type) {
 		switch (type) {
 		case STRING:
@@ -42,6 +57,14 @@ public class InstancePreferenceAccessor {
 		throw new RuntimeException("Keinen passenden Wert gefunden");
 	}
 
+	/**
+	 * Setzt den übergebenen Wert mit dem Key in die angegebenen Preferences.
+	 * 
+	 * @param preferences
+	 * @param preferenceKey
+	 * @param type
+	 * @param value
+	 */
 	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value) {
 		switch (type) {
 		case STRING:
