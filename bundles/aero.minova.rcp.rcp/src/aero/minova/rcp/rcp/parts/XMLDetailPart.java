@@ -168,6 +168,8 @@ public class XMLDetailPart {
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
+				//Hinzufügen von Keylistenern, sodass die Felder bei Eingaben 
+				//ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 				lc.addKeyListener(new KeyListener() {
 
 					@Override
@@ -178,14 +180,21 @@ public class XMLDetailPart {
 
 					@Override
 					public void keyReleased(KeyEvent e) {
-						if (e.keyCode != 25 && e.keyCode != 26 && e.keyCode != 27
-								&& e.keyCode != 28) {
+						//PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
+ 						if (e.keyCode != Constants.KEYBOARD_DOWN && e.keyCode != Constants.KEYBOARD_LEFT 
+ 								&& e.keyCode != Constants.KEYBOARD_RIGHT  && e.keyCode != Constants.KEYBOARD_TOP
+ 								&& e.keyCode != Constants.KEYBOARD_TAB && e.keyCode != Constants.KEYBOARD_ENTER) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								requestOptionsFromCAS(lc);
 							} else {
 								changeSelectionBoxList(lc, "");
 							}
 							// rescheduleTimer(timer, lc);
+						//Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen, 
+						//wie auch bei einem Klick auf das Twiste, angezeigt werden
+						}else if(e.keyCode == Constants.KEYBOARD_DOWN) {
+							Field field = (Field)lc.getData(Constants.CONTROL_FIELD);
+							broker.post("LoadAllLookUpValues", field.getName());
 						}
 					}
 
