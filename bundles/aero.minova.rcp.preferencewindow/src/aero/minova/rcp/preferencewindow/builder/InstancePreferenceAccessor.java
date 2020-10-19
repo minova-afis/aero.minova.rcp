@@ -68,7 +68,7 @@ public class InstancePreferenceAccessor {
 			break;
 		case ZONEID:
 			Locale l = CustomLocale.getLocale();
-			Map<String, ZoneId> zones = CustomTimeZone.getZones();
+			Map<String, ZoneId> zones = CustomTimeZone.getZones(l);
 			String id = value.toString().substring(value.toString().lastIndexOf(")") + 2);
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();
 			preferences.put(preferenceKey, zoneId);
