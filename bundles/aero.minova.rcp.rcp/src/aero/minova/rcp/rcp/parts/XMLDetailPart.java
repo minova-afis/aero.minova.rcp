@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -7,6 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +178,7 @@ public class XMLDetailPart {
 
 					@Override
 					public void keyReleased(KeyEvent e) {
-						if (e.character != '\b' && e.keyCode != 25 && e.keyCode != 26 && e.keyCode != 27
+						if (e.keyCode != 25 && e.keyCode != 26 && e.keyCode != 27
 								&& e.keyCode != 28) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								requestOptionsFromCAS(lc);
@@ -281,6 +283,8 @@ public class XMLDetailPart {
 			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
 			LookupControl lc = (LookupControl) c;
 			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
+			//Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die Eingabe gleich dem gesuchten Wert ist.
+			//Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der  Wert aus dem CAS als Option/Proposal aufgelistet
 			if (t.getRows().size() == 1) {
 				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
@@ -289,7 +293,7 @@ public class XMLDetailPart {
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					} else {
-
+						//Setzen der Proposals/Optionen
 						changeProposals((LookupControl) c, t);
 						// Eine Erneute CAS-Anfrage verliert dadurch, das sämtliche Optionen in einem
 						// Puffer gespeichert werden, ihren Sinn. Wenn der gegebene String nicht mit dem
@@ -326,13 +330,14 @@ public class XMLDetailPart {
 
 				}
 			} else {
-				// TODO
-				// Auswahl der Liste von Treffern anzeigen (Aufpoppen)
 				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
+					//Aufbau einer gefilterten Tabelle, welche nur die Werte aus dem CAS enthält, die den Text im Field am Anfang stehen haben
 					Table filteredTable = new Table();
+					//Übernahme sämtlicher Columns
 					for (aero.minova.rcp.model.Column column : t.getColumns()) {
 						filteredTable.addColumn(column);
 					}
+					//Trifft der Text nicht überein, so wird auserdem die Description überprüft
 					for (Row r : t.getRows()) {
 						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
 								.startsWith(lc.getText().toLowerCase()))) {
@@ -346,57 +351,30 @@ public class XMLDetailPart {
 						}
 
 					}
-					if (c instanceof LookupControl) {
-						changeProposals((LookupControl) c, filteredTable);
+					//Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100% übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der Wert gesetzt
+					if(filteredTable.getRows().size() == 1 && 
+							filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase().equals(lc.getText().toLowerCase())) {
+						c.setData(Constants.CONTROL_KEYLONG,
+								filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
+						//Setzen der Proposals/Optionen
+					}else if(filteredTable.getRows().size() == 1 && filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null &&
+							filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue().toLowerCase().equals(lc.getText().toLowerCase())){
+						c.setData(Constants.CONTROL_KEYLONG,
+								filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
+					}else {
+						changeProposals((LookupControl) lc, filteredTable);
 					}
+					//Setzen der Proposals/Optionen
 				} else {
-					if (c instanceof LookupControl) {
-						changeProposals((LookupControl) c, t);
-					}
+					changeProposals((LookupControl) lc, t);
 				}
 
 
 			}
 		}
 	}
-
-	/**
-	 * Wir erhalten den keyText aus der Tabelle, welcher auf unseren keylong passt
-	 *
-	 * @param keylong
-	 * @param t
-	 * @return
-	 */
-	/*
-	 * public String getFieldValueByKeylong(int keylong, Table t) { String keyText =
-	 * null; for (Row r : t.getRows()) { if
-	 * (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() ==
-	 * keylong) { keyText =
-	 * r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue(); } }
-	 * return keyText; }
-	 */
-	/**
-	 * Überprüft, on der gegebene String in der bereits ausgelesenen Tabelle vorhanden ist
-	 *
-	 * @param c
-	 * @param t
-	 * @param string
-	 */
-	/*
-	 * public void searchForStringInGivenTable(LookupControl lc, Table t,String
-	 * string) {
-	 *
-	 * for (Row r : t.getRows()) { if
-	 * (r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-	 * .equalsIgnoreCase(string)) { lc.setData(Constants.CONTROL_KEYLONG,
-	 * r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG))); lc.setText((String)
-	 * ValueBuilder
-	 * .value(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))).create()); if
-	 * (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-	 * lc.getDescription().setText((String) ValueBuilder
-	 * .value(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-	 * } } } }
-	 */
 	/**
 	 * Überprüft, ob der gegebene String im CAS eingetragen ist. Falls er es ist, so
 	 * werden die erhaltenen Treffer entsprechend ihrer anzahl zur verarbeitung
@@ -490,7 +468,7 @@ public class XMLDetailPart {
 			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
 
 			RowBuilder builder = RowBuilder.newRow();
-			List<Field> allFields = dataFormService.getFieldsFromForm(form, false);
+			List<Field> allFields = dataFormService.getFieldsFromForm(form);
 
 			// Hauptmaske
 
@@ -588,6 +566,14 @@ public class XMLDetailPart {
 				rb.withValue(key.get(1));
 				valuePosition++;
 			}
+		}else {
+			//TODO: Für sämtliche Keywerte müssen, falls es sich um einen Insert handelt, null gesetzt werden
+			List<Field> keyList = dataFormService.getAllKeyFieldsFromForm(form);
+			for(Field f : keyList) {
+				rb.withValue(null);
+				valuePosition++;
+			}
+
 		}
 		while (valuePosition < formTable.getColumnCount()) {
 			int i = 0;
@@ -618,7 +604,7 @@ public class XMLDetailPart {
 		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
 		// Row-Wertes ermittelt und der Row angefügt
 		Row r = rb.create();
-		List<Field> formFields = dataFormService.getFieldsFromForm(form, false);
+		List<Field> formFields = dataFormService.getFieldsFromForm(form);
 		if (controls.size() < formTable.getColumnCount()) {
 			for (int i = r.size(); i < formTable.getColumnCount(); i++) {
 				for (Field f : formFields) {
@@ -697,7 +683,7 @@ public class XMLDetailPart {
 	private void sendSaveRequest(Table t, boolean contradiction) {
 		if (t.getRows() != null && contradiction != true) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			if (!(t.getColumnName(0).equals("KeyLong"))) {
+			if (getKeys() == null) {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 					checkNewEntryInsert(tr.getReturnCode());
 				}));
@@ -728,6 +714,7 @@ public class XMLDetailPart {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
 					"Sucessfully updated the entry", shell);
 			notificationPopUp.open();
+			clearFields("Update");
 		}
 	}
 
@@ -745,6 +732,7 @@ public class XMLDetailPart {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
 					"Sucessfully added the entry", shell);
 			notificationPopUp.open();
+			clearFields("Insert");
 		}
 	}
 
@@ -798,14 +786,42 @@ public class XMLDetailPart {
 			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
 					"Sucessfully deleted the entry", shell);
 			notificationPopUp.open();
-
-			for (Control c : controls.values()) {
-				if (c instanceof Text) {
-					((Text) c).setText("");
+			clearFields("Delete");
+		}
+	}
+	
+	/**
+	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
+	 * @param origin
+	 */
+	public void clearFields(String origin) {
+		for (Control c : controls.values()) {
+			if (c instanceof Text) {
+				Text t = (Text) c;
+				if(origin.equals("Delete")) {
+					t.setText("");
+				}else if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+					Date date = new Date(System.currentTimeMillis());
+					t.setText(formatter.format(date));
 				}
-				if (c instanceof LookupControl) {
-					((LookupControl) c).setText("");
+				else if (c.getData("field") == controls.get("StartDate").getData("field") && origin.equals("Insert")) {
+					Text endDate = (Text) controls.get("EndDate");
+					t.setText(endDate.getText());
+				} else {
+					Field f = (Field) c.getData("field");
+					if (f.getNumber() != null) {
+						t.setText("0");
+					} else {
+						t.setText("");
+					}
 				}
+			}
+			if (c instanceof LookupControl) {
+				LookupControl lc = (LookupControl) c;
+				lc.setText("");
+				lc.setData(Constants.CONTROL_KEYLONG, null);
+				lc.getDescription().setText("");
 			}
 		}
 	}

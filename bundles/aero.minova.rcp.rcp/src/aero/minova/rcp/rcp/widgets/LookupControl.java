@@ -93,28 +93,9 @@ public class LookupControl extends Composite {
 		textControl = new Text(this, style);
 		simpleContentProposalProvider = new SimpleContentProposalProvider();
 		TextContentAdapter tca = new TextContentAdapter() {
-			@Override
-			public void setControlContents(Control control, String text, int cursorPosition) {
-				LookupControl lc = (LookupControl) control.getParent();
-				String proposalString = text;
-				Table options = (Table) lc.getData(Constants.CONTROL_OPTIONS);
-				Pattern p = Pattern.compile(" \\(.*\\)");
-				proposalString = p.matcher(proposalString).replaceAll("");
-				lc.setText(proposalString);
-				for (Row r : options.getRows()) {
-					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-							.equalsIgnoreCase(proposalString)) {
-						lc.setData(Constants.CONTROL_KEYLONG,
-								r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
-						if(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-							lc.getDescription().setText(
-									r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
-						}
-					}
-				}
-				((Text) control).setSelection(cursorPosition, cursorPosition);
-			}
-
+			/**
+			 * Wird bei auswahl eines Wertes in den Proposals aufgerufen. Der ausgewählte Wert wird in das Feld geschrieben und der Keylong abespeichert
+			 */
 			@Override
 			public void insertControlContents(Control control, String text, int cursorPosition) {
 				Point selection = ((Text) control).getSelection();
@@ -132,6 +113,8 @@ public class LookupControl extends Composite {
 						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 							lc.getDescription().setText(
 									r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						}else {
+							lc.getDescription().setText("");
 						}
 					}
 				}
@@ -159,6 +142,7 @@ public class LookupControl extends Composite {
 		}
 		simpleContentProposalProvider.setProposals(helper.toArray(new String[0]));
 		contentProposalAdapter.openProposalPopup();
+		contentProposalAdapter.refresh();
 	}
 
 	public void addTwistieMouseListener(MouseListener ml) {

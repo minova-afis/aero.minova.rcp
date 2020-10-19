@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.rcp.parts.XMLDetailPart;
+import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class NewDetailHandler {
@@ -51,8 +52,9 @@ public class NewDetailHandler {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupControl l = (LookupControl) c;
-				l.setText("");
+				LookupControl lc = (LookupControl) c;
+				lc.setText("");
+				lc.setData(Constants.CONTROL_KEYLONG, null);
 			}
 		}
 		xmlPart.setKeys(new ArrayList<ArrayList>());
