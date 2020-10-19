@@ -20,25 +20,25 @@ public class TestZoneIdTests {
 
 	@Test
 	public void testNotNull() {
-		Map<String, ZoneId> zones = CustomTimeZone.getZones();
+		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
 		assertNotNull(zones);
 	}
 
 	@Test
 	public void testGermanZones() {
-		Map<String, ZoneId> zones = CustomTimeZone.getZones();
-		assertEquals(196, zones.size());
+		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
+		assertEquals(198, zones.size());
 	}
 
 	@Test
 	public void testGermanyZones() {
-		Map<String, ZoneId> zones = CustomTimeZone.getZones();
-		assertEquals(196, zones.size());
+		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMANY);
+		assertEquals(198, zones.size());
 	}
 
 	@Test
 	public void testGetIdENGLISH() {
-		Map<String, ZoneId> zones = CustomTimeZone.getZones();
+		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.US);
 		assertNotNull(CustomTimeZone.getId(zones, "Central European Time", Locale.US));
 		assertEquals("Europe/Monaco", CustomTimeZone.getId(zones, "Central European Time", Locale.US).toString());
 	}
@@ -53,7 +53,7 @@ public class TestZoneIdTests {
 	public void testGetTimeZoneId() {
 		Object value = "Ulyanovsk Time";
 		Locale l = Locale.getDefault(Category.DISPLAY);
-		Map<String, ZoneId> zones = CustomTimeZone.getZones();
+		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
 		String id = value.toString().substring(value.toString().lastIndexOf(")") + 1);
 		String zoneId = CustomTimeZone.getId(zones, id, l).toString();
 		assertEquals("Europe/Ulyanovsk", zoneId);
