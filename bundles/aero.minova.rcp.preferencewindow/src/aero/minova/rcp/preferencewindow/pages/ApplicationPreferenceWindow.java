@@ -80,8 +80,9 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
-								window.getValueFor(pref.getKey()));
+						if (pref.getDisplayType() != DisplayType.ZONEID)
+							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
+									window.getValueFor(pref.getKey()));
 					}
 				}
 
