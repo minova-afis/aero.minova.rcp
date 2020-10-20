@@ -7,12 +7,26 @@ import java.util.Map;
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
-import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
+/**
+ * Liefert Methoden zu holen und setzen von Wert aus und in die Preferences.
+ * 
+ * @author bauer
+ *
+ */
 public class InstancePreferenceAccessor {
 
-	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type) {
+	/**
+	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen
+	 * Preferences.
+	 * 
+	 * @param preferences
+	 * @param preferenceKey
+	 * @param type
+	 * @return
+	 */
+	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -34,7 +48,7 @@ public class InstancePreferenceAccessor {
 			return (fd == null ? null : new FontData(fd));
 		case ZONEID:
 			String id = preferences.get(preferenceKey, "");
-			String result = CustomTimeZone.displayTimeZone(id);
+			String result = CustomTimeZone.displayTimeZone(id, l);
 			return result;
 		default:
 			break;
@@ -42,7 +56,15 @@ public class InstancePreferenceAccessor {
 		throw new RuntimeException("Keinen passenden Wert gefunden");
 	}
 
-	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value) {
+	/**
+	 * Setzt den übergebenen Wert mit dem Key in die angegebenen Preferences.
+	 * 
+	 * @param preferences
+	 * @param preferenceKey
+	 * @param type
+	 * @param value
+	 */
+	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value, Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -67,8 +89,7 @@ public class InstancePreferenceAccessor {
 			preferences.put(preferenceKey, ((FontData) value).toString());
 			break;
 		case ZONEID:
-			Locale l = CustomLocale.getLocale();
-			Map<String, ZoneId> zones = CustomTimeZone.getZones();
+			Map<String, ZoneId> zones = CustomTimeZone.getZones(l);
 			String id = value.toString().substring(value.toString().lastIndexOf(")") + 2);
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();
 			preferences.put(preferenceKey, zoneId);
