@@ -51,8 +51,7 @@ public class CustomTimeZone {
 	 * 
 	 * @return
 	 */
-	public static List<String> getTimeZones() {
-		Locale locale = CustomLocale.getLocale();
+	public static List<String> getTimeZones(Locale locale) {
 		Map<String, ZoneId> map = getZones(locale);
 		List<String> zones = new ArrayList<>();
 		ZoneId[] zoneIds = map.values().toArray(new ZoneId[0]);
@@ -64,7 +63,7 @@ public class CustomTimeZone {
 			}
 		});
 		for (ZoneId zoneId : zoneIds) {
-			zones.add(displayTimeZone(zoneId.getId()));
+			zones.add(displayTimeZone(zoneId.getId(), locale));
 		}
 		return zones;
 	}
@@ -75,8 +74,7 @@ public class CustomTimeZone {
 	 * @param timeZone
 	 * @return
 	 */
-	public static String displayTimeZone(String timeZone) {
-		Locale locale = CustomLocale.getLocale();
+	public static String displayTimeZone(String timeZone, Locale activeLocale) {
 		TimeZone tz = TimeZone.getTimeZone(timeZone);
 		long hours = TimeUnit.MILLISECONDS.toHours(tz.getRawOffset());
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(tz.getRawOffset()) - TimeUnit.HOURS.toMinutes(hours);
@@ -86,10 +84,10 @@ public class CustomTimeZone {
 		String result = "";
 		if (hours >= 0) {
 			result = String.format("(GMT+%d:%02d) %s", hours, minutes,
-					tz.toZoneId().getDisplayName(TextStyle.FULL, locale));
+					tz.toZoneId().getDisplayName(TextStyle.FULL, activeLocale));
 		} else {
 			result = String.format("(GMT%d:%02d) %s", hours, minutes,
-					tz.toZoneId().getDisplayName(TextStyle.FULL, locale));
+					tz.toZoneId().getDisplayName(TextStyle.FULL, activeLocale));
 		}
 
 		return result;

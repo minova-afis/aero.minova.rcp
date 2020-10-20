@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -30,9 +31,10 @@ import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
-	private final List<String> dataL = CustomLocale.getLanguages();
+	private final List<String> dataL;
 	private Combo comboCountries;
 	private Combo comboLanguage;
+	private IEclipseContext context;
 
 	/**
 	 * Constructor
@@ -40,8 +42,12 @@ public class PWLocale extends CustomPWWidget {
 	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public PWLocale(final String label, final String propertyKey) {
+	public PWLocale(final String label, final String propertyKey, IEclipseContext context) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
+		this.context = context;
+		Locale l = context.get(Locale.class);
+		if (l==null) l=Locale.getDefault();
+		dataL = CustomLocale.getLanguages(l);
 	}
 
 	/**
@@ -88,7 +94,8 @@ public class PWLocale extends CustomPWWidget {
 		for (int i = 0; i < dataL.size(); i++) {
 			final Object language = dataL.get(i);
 			comboLanguage.add(language.toString());
-			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE))) {
+			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE,
+					context.get(Locale.class)))) {
 				comboLanguage.select(i);
 			}
 
@@ -124,7 +131,8 @@ public class PWLocale extends CustomPWWidget {
 		for (int i = 0; i < getCountries().size(); i++) {
 			final Object country = getCountries().get(i);
 			comboCountries.add(country.toString());
-			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE))) {
+			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
+					context.get(Locale.class)))) {
 				comboCountries.select(i);
 			}
 		}

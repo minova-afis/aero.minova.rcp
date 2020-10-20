@@ -50,14 +50,16 @@ public class CustomLocale {
 	}
 
 	/**
-	 * Gibt den Locale gemäß der ausgewählten Sprache und Landes zurück. 
+	 * Gibt den Locale gemäß der ausgewählten Sprache und Landes zurück.
+	 * 
 	 * @return
 	 */
 	public static Locale getLocale() {
+		
 		Locale[] locales = CustomLocale.getLocales();
-		String language = InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE).toString();
-		String country = InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE).toString();
 		Locale locale = Locale.getDefault();
+		String language = InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE, locale).toString();
+		String country = InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, locale).toString();
 
 		for (Locale l : locales) {
 			if (l.getDisplayLanguage(l).equals(language) && l.getDisplayCountry(l).equals(country))
