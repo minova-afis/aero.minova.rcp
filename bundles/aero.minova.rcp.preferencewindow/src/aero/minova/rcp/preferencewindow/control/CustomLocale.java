@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +38,8 @@ public class CustomLocale {
 	 * 
 	 * @return
 	 */
-	public static List<String> getLanguages() {
+	public static List<String> getLanguages(Locale activeLocale) {
+		Collator collator = Collator.getInstance(activeLocale);
 		Locale[] locales = getLocales();
 		List<String> languages = new ArrayList<>();
 		for (Locale l : locales) {
@@ -45,7 +47,7 @@ public class CustomLocale {
 				languages.add(l.getDisplayLanguage(l));
 			}
 		}
-		Collections.sort(languages);
+		Collections.sort(languages, collator);
 		return languages;
 	}
 
