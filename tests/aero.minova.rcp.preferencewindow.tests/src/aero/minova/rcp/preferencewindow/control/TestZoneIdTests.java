@@ -17,6 +17,7 @@ public class TestZoneIdTests {
 
 	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
 	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
+	
 
 	@Test
 	public void testNotNull() {
@@ -45,7 +46,7 @@ public class TestZoneIdTests {
 
 	@Test
 	public void testListSize() {
-		List<String> zones = CustomTimeZone.getTimeZones();
+		List<String> zones = CustomTimeZone.getTimeZones(Locale.GERMAN);
 		assertEquals(196, zones.size());
 	}
 
