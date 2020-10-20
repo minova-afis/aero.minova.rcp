@@ -45,6 +45,9 @@ public class InstancePreferenceAccessor {
 			return preferences.getBoolean(preferenceKey, false);
 		case FONT:
 			String fd = preferences.get(preferenceKey, null);
+			if(fd == "") {
+				fd = null;
+			}
 			return (fd == null ? null : new FontData(fd));
 		case ZONEID:
 			String id = preferences.get(preferenceKey, "");
@@ -64,7 +67,8 @@ public class InstancePreferenceAccessor {
 	 * @param type
 	 * @param value
 	 */
-	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value, Locale l) {
+	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value,
+			Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -86,7 +90,11 @@ public class InstancePreferenceAccessor {
 			preferences.putBoolean(preferenceKey, Boolean.valueOf((boolean) value));
 			break;
 		case FONT:
-			preferences.put(preferenceKey, ((FontData) value).toString());
+			if (value != null) {
+				preferences.put(preferenceKey, ((FontData) value).toString());
+			} else {
+				preferences.put(preferenceKey, "");
+			}
 			break;
 		case ZONEID:
 			Map<String, ZoneId> zones = CustomTimeZone.getZones(l);
