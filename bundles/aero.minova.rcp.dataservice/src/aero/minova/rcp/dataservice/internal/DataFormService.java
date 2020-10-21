@@ -50,7 +50,6 @@ public class DataFormService implements IDataFormService {
 		dataTable.setName(tablename);
 		List<Field> allFields = null;
 		allFields = getFieldsFromForm(form);
-		
 
 		for (Field f : allFields) {
 			dataTable.addColumn(createColumnFromField(f, prefix));
@@ -74,14 +73,14 @@ public class DataFormService implements IDataFormService {
 		}
 		return allFields;
 	}
-	
+
 	@Override
-	public List<Field> getAllKeyFieldsFromForm(Form form){
+	public List<Field> getAllPrimaryFieldsFromForm(Form form) {
 		List<Field> keyFields = new ArrayList<Field>();
 		List<Field> allFields = new ArrayList<Field>();
 		allFields = getFieldsFromForm(form);
-		for(Field f : allFields) {
-			if("primary".equals(f.getKeyType())) {
+		for (Field f : allFields) {
+			if ("primary".equals(f.getKeyType())) {
 				keyFields.add(f);
 			}
 		}
@@ -93,7 +92,7 @@ public class DataFormService implements IDataFormService {
 		for (Object o : objects) {
 			if (o instanceof Field) {
 				Field f = (Field) o;
-					fields.add(f);
+				fields.add(f);
 			}
 			// TODO:Grid verarbeiten
 		}

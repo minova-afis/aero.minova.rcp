@@ -13,7 +13,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	/**
 	 * Wenn der Keylong nicht gesetzt wurde, so wird das Feld bereinigt
 	 */
-	public void clearColumn(LookupControl lc) {
+	private void clearColumn(LookupControl lc) {
 		if (lc.getData(Constants.CONTROL_KEYLONG) == null) {
 			lc.setText("");
 		} else {

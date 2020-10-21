@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -25,6 +26,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -181,19 +183,17 @@ public class XMLDetailPart {
 					@Override
 					public void keyReleased(KeyEvent e) {
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
-						if (e.keyCode != Constants.KEYBOARD_DOWN && e.keyCode != Constants.KEYBOARD_LEFT
-								&& e.keyCode != Constants.KEYBOARD_RIGHT && e.keyCode != Constants.KEYBOARD_TOP
-								&& e.keyCode != Constants.KEYBOARD_TAB && e.keyCode != Constants.KEYBOARD_ENTER) {
+						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
+								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								requestOptionsFromCAS(lc);
 							} else {
-								changeSelectionBoxList(lc, "");
+								changeSelectionBoxList(lc, false);
 							}
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						} else if (e.keyCode == Constants.KEYBOARD_DOWN
-								&& lc.getData(Constants.CONTROL_OPTIONS) == null) {
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
 						}
@@ -241,10 +241,10 @@ public class XMLDetailPart {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				changeOptionsForLookupField(sql.getResultSet(), c, "");
+				changeOptionsForLookupField(sql.getResultSet(), c, false);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				changeOptionsForLookupField(t, c, "");
+				changeOptionsForLookupField(t, c, false);
 			}
 
 		}));
@@ -256,9 +256,9 @@ public class XMLDetailPart {
 	 * @param ta
 	 * @param c
 	 */
-	public void changeOptionsForLookupField(Table ta, Control c, String sender) {
+	public void changeOptionsForLookupField(Table ta, Control c, boolean twisty) {
 		c.setData(Constants.CONTROL_OPTIONS, ta);
-		changeSelectionBoxList(c, sender);
+		changeSelectionBoxList(c, twisty);
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class XMLDetailPart {
 	 *
 	 * @param c
 	 */
-	public void changeSelectionBoxList(Control c, String sender) {
+	public void changeSelectionBoxList(Control c, boolean twisty) {
 		if (c.getData(Constants.CONTROL_OPTIONS) != null) {
 			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
 			LookupControl lc = (LookupControl) c;
@@ -277,7 +277,7 @@ public class XMLDetailPart {
 			// Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der Wert
 			// aus dem CAS als Option/Proposal aufgelistet
 			if (t.getRows().size() == 1) {
-				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
+				if (lc != null && lc.getText() != null && twisty == false) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 					if (value.getStringValue().equalsIgnoreCase(lc.getText().toString())) {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
@@ -295,7 +295,7 @@ public class XMLDetailPart {
 
 				}
 			} else {
-				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
+				if (lc != null && lc.getText() != null && twisty == false) {
 					// Aufbau einer gefilterten Tabelle, welche nur die Werte aus dem CAS enthält,
 					// die den Text im Field am Anfang stehen haben
 					Table filteredTable = new Table();
@@ -320,28 +320,28 @@ public class XMLDetailPart {
 					// Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100%
 					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
 					// Wert gesetzt
-					if (filteredTable.getRows().size() == 1 && filteredTable.getRows().get(0)
-							.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-							.toLowerCase().equals(lc.getText().toLowerCase())) {
-						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
-								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
-						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
-						// Setzen der Proposals/Optionen
-					} else if (filteredTable.getRows().size() == 1
-							&& filteredTable.getRows().get(0)
+					if (filteredTable.getRows().size() == 1
+							&& (filteredTable.getRows().get(0)
+									.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+									.toLowerCase().equals(lc.getText().toLowerCase()))
+							|| (filteredTable.getRows().get(0)
 									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
-							&& filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
-									.getStringValue().toLowerCase().equals(lc.getText().toLowerCase())) {
+									&& filteredTable.getRows().get(0)
+											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
+											.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
 						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
 								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
+						changeProposals(lc, t);
+						// Setzen der Proposals/Optionen
 					} else {
 						changeProposals((LookupControl) lc, filteredTable);
+						lc.setData(Constants.CONTROL_KEYLONG, null);
 					}
 					// Setzen der Proposals/Optionen
 				} else {
 					changeProposals((LookupControl) lc, t);
+					lc.setData(Constants.CONTROL_KEYLONG, null);
 				}
 
 			}
@@ -356,7 +356,6 @@ public class XMLDetailPart {
 	 */
 	public void changeProposals(LookupControl lc, Table t) {
 		lc.setProposals(t);
-		lc.setData(Constants.CONTROL_KEYLONG, null);
 	}
 
 	/**
@@ -378,10 +377,10 @@ public class XMLDetailPart {
 			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 				if (ta instanceof SqlProcedureResult) {
 					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					changeOptionsForLookupField(sql.getResultSet(), control, "twisty");
+					changeOptionsForLookupField(sql.getResultSet(), control, true);
 				} else if (ta instanceof Table) {
 					Table t1 = (Table) ta;
-					changeOptionsForLookupField(t1, control, "twisty");
+					changeOptionsForLookupField(t1, control, true);
 				}
 
 			}));
@@ -504,9 +503,7 @@ public class XMLDetailPart {
 				valuePosition++;
 			}
 		} else {
-			// TODO: Für sämtliche Keywerte müssen, falls es sich um einen Insert handelt,
-			// null gesetzt werden
-			List<Field> keyList = dataFormService.getAllKeyFieldsFromForm(form);
+			List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
 			for (Field f : keyList) {
 				rb.withValue(null);
 				valuePosition++;
@@ -621,7 +618,7 @@ public class XMLDetailPart {
 	private void sendSaveRequest(Table t, boolean contradiction) {
 		if (t.getRows() != null && contradiction != true) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			if (getKeys() == null) {
+			if (!Objects.isNull(getKeys())) {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 					checkNewEntryInsert(tr.getReturnCode());
 				}));
@@ -644,14 +641,9 @@ public class XMLDetailPart {
 	 */
 	private void checkEntryUpdate(int responce) {
 		if (responce != 1) {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Entry could not be updated", shell);
-			notificationPopUp.open();
-			return;
+			openNotificationPopup("Entry could not be updated");
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Sucessfully updated the entry", shell);
-			notificationPopUp.open();
+			openNotificationPopup("Sucessfully updated the entry");
 			clearFields("Update");
 		}
 	}
@@ -663,13 +655,9 @@ public class XMLDetailPart {
 	 */
 	private void checkNewEntryInsert(int responce) {
 		if (responce != 1) {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry could not be added",
-					shell);
-			notificationPopUp.open();
+			openNotificationPopup("Entry could not be added");
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Sucessfully added the entry", shell);
-			notificationPopUp.open();
+			openNotificationPopup("Sucessfully added the entry");
 			clearFields("Insert");
 		}
 	}
@@ -717,15 +705,22 @@ public class XMLDetailPart {
 	 */
 	public void deleteEntry(int responce) {
 		if (responce != 1) {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Entry could not be deleted", shell);
-			notificationPopUp.open();
+			openNotificationPopup("Entry could not be deleted");
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Sucessfully deleted the entry", shell);
-			notificationPopUp.open();
+			openNotificationPopup("Sucessfully deleted the entry");
 			clearFields("Delete");
 		}
+	}
+
+	/**
+	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner
+	 * Anfrage informiert
+	 * 
+	 * @param message
+	 */
+	public void openNotificationPopup(String message) {
+		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, shell);
+		notificationPopUp.open();
 	}
 
 	/**

@@ -16,6 +16,6 @@ public interface IDataFormService {
 
 	List<Field> getFieldsFromForm(Form form);
 
-	List<Field> getAllKeyFieldsFromForm(Form form);
+	List<Field> getAllPrimaryFieldsFromForm(Form form);
 
 }
