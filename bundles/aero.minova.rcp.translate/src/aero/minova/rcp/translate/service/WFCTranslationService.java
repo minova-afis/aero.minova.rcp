@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
@@ -226,66 +227,34 @@ public class WFCTranslationService extends TranslationService {
 	}
 
 	private void loadProperties(String path, String propertiesFilename) {
-		FileInputStream is = null;
-		File f;
 		URI uri;
 		try {
 			uri = new URI(path + propertiesFilename);
-			try {
-				f = new File(uri);
-				is = new FileInputStream(f);
-				resources.load(is);
-				logger.error("test");
-			} catch (FileNotFoundException e) {
-				// es gibt nicht alle Dateien
+		} catch (URISyntaxException e1) {
+			logger.error("URISyntaxException " + path + propertiesFilename);
+			return; 
+		}
+		
+		File f = new File(uri);
+		try (FileInputStream is = new FileInputStream(f)) {
+			resources.load(is);
+			logger.error("test");
+		} catch (IOException e) {
+			// es gibt nicht alle Dateien
 
+			CompletableFuture<String> fileFuture = dataService.getFile(propertiesFilename);
+			propertyFilesToLoadCount++;
+			fileFuture.thenAccept(content -> sync.asyncExec(() -> {
 				try {
-					CompletableFuture<String> fileFuture = dataService.getFile(propertiesFilename);
-					propertyFilesToLoadCount++;
-					fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
-						try {
-							byte[] file;
-							try {
-								String result = bytes.substring(1, bytes.length() - 2);
-								String byteValues[] = result.split(",");
-								file = new byte[byteValues.length];
-								int i = 0;
-								for (String string : byteValues) {
-									file[i++] = Byte.parseByte(string);
-								}
-							} catch (NumberFormatException nfe) {
-								// Es ist wohl keine Datei angekommen
-								file = new byte[0];
-							}
-							Files.write(Path.of(uri), file);
-							propertyFilesToLoadCount--;
-							if (propertyFilesToLoadCount == 0) {
-								loadResources();
-							}
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}));
-				} catch (NullPointerException npe) {
+					Files.writeString(Path.of(uri), content, StandardOpenOption.CREATE);
+					propertyFilesToLoadCount--;
+					if (propertyFilesToLoadCount == 0) {
+						loadResources();
+					}
+				} catch (NullPointerException | IOException npe) {
 					logger.error("NPE " + propertiesFilename);
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (is != null)
-					try {
-						is.close();
-					} catch (IOException e) {
-						if (logger != null) {
-							logger.error(e.toString());
-						} else {
-							e.printStackTrace();
-						}
-					}
-			}
-		} catch (URISyntaxException e2) {
-			e2.printStackTrace();
+			}));
 		}
 	}
 }

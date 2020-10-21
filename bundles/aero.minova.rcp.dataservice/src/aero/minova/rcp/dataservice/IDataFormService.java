@@ -14,6 +14,8 @@ public interface IDataFormService {
 
 	Table getTableFromFormDetail(Form form, String prefix);
 
-	List<Field> getFieldsFromForm(Form form, Boolean insert);
+	List<Field> getFieldsFromForm(Form form);
+
+	List<Field> getAllPrimaryFieldsFromForm(Form form);
 
 }

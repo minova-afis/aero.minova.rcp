@@ -49,11 +49,7 @@ public class DataFormService implements IDataFormService {
 		tablename += form.getDetail().getProcedureSuffix();
 		dataTable.setName(tablename);
 		List<Field> allFields = null;
-		if (prefix != "Insert") {
-			allFields = getFieldsFromForm(form, false);
-		} else {
-			allFields = getFieldsFromForm(form, true);
-		}
+		allFields = getFieldsFromForm(form);
 
 		for (Field f : allFields) {
 			dataTable.addColumn(createColumnFromField(f, prefix));
@@ -62,34 +58,41 @@ public class DataFormService implements IDataFormService {
 	}
 
 	@Override
-	public List<Field> getFieldsFromForm(Form form, Boolean insert) {
+	public List<Field> getFieldsFromForm(Form form) {
 		List<Field> allFields = new ArrayList<Field>();
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
 				List<Object> fields = head.getFieldOrGrid();
-				allFields = filterFields(fields, insert);
+				allFields = filterFields(fields);
 			} else if (o instanceof Page) {
 				Page page = (Page) o;
 				List<Object> fields = page.getFieldOrGrid();
-				allFields.addAll(filterFields(fields, insert));
+				allFields.addAll(filterFields(fields));
 			}
 		}
 		return allFields;
 	}
 
-	public List<Field> filterFields(List<Object> objects, Boolean insert) {
+	@Override
+	public List<Field> getAllPrimaryFieldsFromForm(Form form) {
+		List<Field> keyFields = new ArrayList<Field>();
+		List<Field> allFields = new ArrayList<Field>();
+		allFields = getFieldsFromForm(form);
+		for (Field f : allFields) {
+			if ("primary".equals(f.getKeyType())) {
+				keyFields.add(f);
+			}
+		}
+		return keyFields;
+	}
+
+	public List<Field> filterFields(List<Object> objects) {
 		List<Field> fields = new ArrayList<Field>();
 		for (Object o : objects) {
 			if (o instanceof Field) {
 				Field f = (Field) o;
-				if (insert == false) {
-					fields.add(f);
-				} else {
-					if (!"primary".equals(f.getKeyType())) {
-						fields.add(f);
-					}
-				}
+				fields.add(f);
 			}
 			// TODO:Grid verarbeiten
 		}
