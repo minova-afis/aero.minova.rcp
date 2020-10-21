@@ -90,7 +90,9 @@
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLj8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_hZQ74LufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.menu.master" label="Master">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_KPdTcOLKEeqIbaaiaTRUGA" elementId="aero.minova.rcp.rcp.handledmenuitem.sis" label="SIS" command="_4j7QUOOOEeqf6YlJmDESrg"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_KPdTcOLKEeqIbaaiaTRUGA" elementId="aero.minova.rcp.rcp.handledmenuitem.sis" label="SIS" command="_4j7QUOOOEeqf6YlJmDESrg">
+          <parameters xmi:id="_4AJskBOsEeu9RKEVp4XHkg" elementId="aero.minova.rcp.rcp.parameter.sis" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="WorkingTime.xml"/>
+        </children>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_oeKiALufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handledmenuitem.item" label="Item" command="_4p5JwLufEeqOjqZ1liG0LA">
           <parameters xmi:id="_CzjhYLugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.item" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.item"/>
         </children>
