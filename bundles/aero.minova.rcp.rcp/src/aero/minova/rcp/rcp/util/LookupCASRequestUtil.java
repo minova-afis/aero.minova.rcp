@@ -36,8 +36,12 @@ public class LookupCASRequestUtil {
 					.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
 					.withColumn(Constants.TABLE_DESCRIPTION, DataType.STRING)//
 					.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER);//
-			rb = rb.withValue(null);
-			rb = rb.withValue(null);
+			if (keyLong == 0) {
+				rb = rb.withValue(null);
+			} else {
+				rb = rb.withValue(keyLong);
+			}
+			rb = rb.withValue(keyText);
 			rb = rb.withValue(null);
 			rb = rb.withValue(">0");
 		} else {
