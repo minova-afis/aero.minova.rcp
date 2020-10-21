@@ -192,7 +192,8 @@ public class XMLDetailPart {
 							// rescheduleTimer(timer, lc);
 						//Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen, 
 						//wie auch bei einem Klick auf das Twiste, angezeigt werden
-						}else if(e.keyCode == Constants.KEYBOARD_DOWN) {
+						//PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
+						}else if(e.keyCode == Constants.KEYBOARD_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
 							Field field = (Field)lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
 						}
@@ -304,10 +305,8 @@ public class XMLDetailPart {
 					} else {
 						//Setzen der Proposals/Optionen
 						changeProposals((LookupControl) c, t);
-						// Eine Erneute CAS-Anfrage verliert dadurch, das sämtliche Optionen in einem
-						// Puffer gespeichert werden, ihren Sinn. Wenn der gegebene String nicht mit dem
-						// einzigen gefundenen Wert übereinstimmt, so ist der Wert nicht im CAS
-						// vorhanden. Alternative: Liste den tatsächlichen Wert als Option auf
+						//TODO: Eine erneute CAS-Anfrage ist hier unnötig. Stattdessen müsste diese Anfrage
+						// durch eine Tastenkombination ausgelöst werden
 						/*
 						 * // TODO "gu" != "MIN" es folgt: // TODO Hier muss aktiv eine neue Liste mit
 						 * Werten angefragt werden // Überprüfe, ob der der gegebene String in unserer
