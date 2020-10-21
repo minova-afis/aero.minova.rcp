@@ -18,14 +18,17 @@ public class LookupFieldFocusListener implements FocusListener {
 			lc.setText("");
 		} else {
 			Table t = (Table) lc.getData(Constants.CONTROL_OPTIONS);
-			for (Row r : t.getRows()) {
-				if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc
-						.getData(Constants.CONTROL_KEYLONG)) {
-					lc.setText(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+			if (t != null) {
+				for (Row r : t.getRows()) {
+					if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc
+							.getData(Constants.CONTROL_KEYLONG)) {
+						lc.setText(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+					}
 				}
 			}
 		}
 	}
+
 	@Override
 	public void focusGained(FocusEvent e) {
 		// TODO Auto-generated method stub
