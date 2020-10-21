@@ -27,8 +27,8 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -124,12 +124,7 @@ public class XMLDetailPart {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
 			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
 					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
-				c.addKeyListener(new KeyListener() {
-
-					@Override
-					public void keyPressed(KeyEvent e) {
-					}
-
+				c.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent e) {
 						updateQuantitys();
@@ -172,17 +167,16 @@ public class XMLDetailPart {
 				// Timer timer = new Timer();
 				// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
 				// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
-				lc.addKeyListener(new KeyListener() {
 
-					@Override
-					public void keyPressed(KeyEvent e) {
-						// TODO Auto-generated method stub
-
-					}
+				lc.addKeyListener(new KeyAdapter() {
+					Boolean isControlPressed = false;
 
 					@Override
 					public void keyReleased(KeyEvent e) {
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
+						if (e.keyCode == SWT.CONTROL) {
+							isControlPressed = false;
+						}
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
@@ -193,7 +187,19 @@ public class XMLDetailPart {
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
+								&& lc.isProposalPopupOpen() == false) {
+							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+							changeSelectionBoxList((Control) lc, false);
+						}
+					}
+
+					@Override
+					public void keyPressed(KeyEvent e) {
+						if (e.keyCode == SWT.CONTROL) {
+							isControlPressed = true;
+						}
+						if (e.keyCode == SWT.SPACE && isControlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
 						}
