@@ -618,7 +618,7 @@ public class XMLDetailPart {
 	private void sendSaveRequest(Table t, boolean contradiction) {
 		if (t.getRows() != null && contradiction != true) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			if (!Objects.isNull(getKeys())) {
+			if (Objects.isNull(getKeys())) {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 					checkNewEntryInsert(tr.getReturnCode());
 				}));
