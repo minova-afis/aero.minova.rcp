@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="main">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="action">
+					<xs:complexType>
+						<!-- wird ausgewertet -->
+						<xs:attribute name="id" type="xs:ID" use="required"/>
+						<xs:attribute name="text" use="required"/>
+						<xs:attribute name="action" type="xs:NCName" use="required"/>
+						<xs:attribute name="icon" type="xs:NCName"/>
+						<!-- Geändert auf "optional" -->
+						<xs:attribute name="param" use="optional"/>
+						<!-- /Geändert auf "optional" -->
+						<xs:attribute name="shortcut" type="xs:NCName"/>
+						<xs:attribute name="autostart" type="xs:boolean"/>
+						<xs:attribute name="visible" type="xs:boolean"/>
+						<xs:attribute name="dialog" type="xs:boolean"/>
+						<xs:attribute name="detail-visible" type="xs:boolean"/>
+						<xs:attribute name="suppress-print" type="xs:boolean"/>
+						<xs:attribute name="documentation" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Falls das Detail durch eine Klasse dargestellt wird, kann hier die zugehörige Dokumentation im DocBook-Format
+									angegeben werden. Die Erweiterungen für Sprache und und Länderkürzel bitte nicht mit angeben! Beispiel: &lt;action ...
+									action="ch.minova.afis.LuCustomerItemPriceForm" documentation="LuCustomerItemPriceForm" /&gt; Hier wird, je nach
+									Sprache, die DetailClass.doc.xml oder DetailClass_SPRACHE.doc.xml gesucht.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<!-- /wird ausgewertet -->
+						<!-- Laut Kommentar im Quellcode ch.minova.ui.form.Action nicht mehr verwendet -->
+						<xs:attribute name="generic" type="xs:boolean"/>
+						<!-- /Laut Kommentar im Quellcode ch.minova.ui.form.Action nicht mehr verwendet -->
+					</xs:complexType>
+				</xs:element>
+				<xs:group maxOccurs="1" minOccurs="0" ref="menus"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="toolbar">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:group maxOccurs="unbounded" minOccurs="0" ref="entry"/>
+						</xs:sequence>
+						<!-- wird ausgewertet -->
+						<xs:attribute name="flat" type="xs:boolean"/>
+						<!-- /wird ausgewertet -->
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<!-- wird ausgewertet -->
+			<xs:attribute name="icon" type="xs:NCName"/>
+			<xs:attribute name="title" type="xs:string"/>
+			<xs:attribute name="LCID" type="xs:string"/>
+			<xs:attribute default="de" name="language" type="xs:string"/>
+			<xs:attribute default="DE" name="country" type="xs:string"/>
+			<xs:attribute default="CH" name="variant" type="xs:string"/>
+			<!-- /wird ausgewertet -->
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="menus">
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="1" name="menu">
+				<xs:complexType>
+					<xs:choice maxOccurs="unbounded" minOccurs="0">
+						<xs:element maxOccurs="unbounded" minOccurs="0" name="menu" type="menuType"/>
+						<xs:group maxOccurs="unbounded" minOccurs="0" ref="entry"/>
+					</xs:choice>
+					<!-- wird !nicht! ausgewertet -->
+					<xs:attribute name="id" type="xs:NCName"/>
+					<!-- /wird !nicht! ausgewertet -->
+					<!-- wird ausgewertet -->
+					<xs:attribute name="text"/>
+					<!-- /wird ausgewertet -->
+				</xs:complexType>
+			</xs:element>
+			<xs:choice maxOccurs="unbounded" minOccurs="0">
+				<xs:group ref="entry"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:group>
+	<xs:complexType name="menuType">
+		<xs:choice maxOccurs="unbounded" minOccurs="0">
+			<xs:group maxOccurs="unbounded" minOccurs="0" ref="entry"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="menu" type="menuType"/>
+		</xs:choice>
+		<xs:attribute name="id" type="xs:ID"/>
+		<xs:attribute name="text"/>
+	</xs:complexType>
+	<xs:group name="entry">
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="1" name="entry">
+				<xs:complexType>
+					<!-- wird ausgewertet -->
+					<xs:attribute name="id" type="xs:IDREF"/>
+					<xs:attribute name="type" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:token">
+								<xs:enumeration value="action"/>
+								<xs:enumeration value="separator"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<!-- /wird ausgewertet -->
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+</xs:schema>
