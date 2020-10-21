@@ -2,7 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>aero.minova.rcp.form.model</artifactId>
+	<artifactId>aero.minova.rcp.form.menu</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,12 +52,6 @@
 					<argLine>--illegal-access=permit</argLine>
 				</configuration>
 			</plugin>
-			<!-- plugin> <groupId>org.apache.cxf</groupId> <artifactId>cxf-xjc-plugin</artifactId> 
-				<version>3.3.0</version> <executions> <execution> <id>xjc</id> <phase>generate-sources</phase> 
-				<goals> <goal>xsdtojava</goal> </goals> <configuration> <xsdOptions> <xsdOption> 
-				<xsd>${basedir}/src/aero/minova/rcp/form/model/XMLForm.xsd</xsd> <packagename>aero.minova.rcp.form.model.xsd</packagename> 
-				</xsdOption> </xsdOptions> <noGeneratedHeaderComments>true</noGeneratedHeaderComments> 
-				</configuration> </execution> </executions> </plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxb2-maven-plugin</artifactId>
@@ -74,9 +68,9 @@
 				<configuration>
 					<target>2.1</target>
 					<sources>
-						<source>${basedir}/src/aero/minova/rcp/form/model/XMLForm.xsd</source>
+						<source>${basedir}/src/aero/minova/rcp/form/menu/XMLMenu.xsd</source>
 					</sources>
-					<packageName>aero.minova.rcp.form.model.xsd</packageName>
+					<packageName>aero.minova.rcp.form.menu.mdi</packageName>
 					<noGeneratedHeaderComments>true</noGeneratedHeaderComments>
 				</configuration>
 				<dependencies>
@@ -103,69 +97,15 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/src/aero/minova/rcp/form/model/xsd/</outputDirectory>
+							<outputDirectory>${basedir}/src/aero/minova/rcp/form/menu/mdi/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/target/generated-sources/jaxb/aero/minova/rcp/form/model/xsd/</directory>
+									<directory>${basedir}/target/generated-sources/jaxb/aero/minova/rcp/form/menu/mdi/</directory>
 								</resource>
 							</resources>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<!--This plugin's configuration is used to store Eclipse m2e settings 
-				only. It has no influence on the Maven build itself. -->
-			<plugin>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>lifecycle-mapping</artifactId>
-				<version>1.0.0</version>
-				<configuration>
-					<lifecycleMappingMetadata>
-						<pluginExecutions>
-							<pluginExecution>
-								<pluginExecutionFilter>
-									<groupId>
-										org.eclipse.tycho
-									</groupId>
-									<artifactId>
-										tycho-packaging-plugin
-									</artifactId>
-									<versionRange>
-										[2.0.0,)
-									</versionRange>
-									<goals>
-										<goal>
-											validate-version
-										</goal>
-									</goals>
-								</pluginExecutionFilter>
-								<action>
-									<ignore></ignore>
-								</action>
-							</pluginExecution>
-							<pluginExecution>
-								<pluginExecutionFilter>
-									<groupId>
-										org.eclipse.tycho
-									</groupId>
-									<artifactId>
-										tycho-compiler-plugin
-									</artifactId>
-									<versionRange>
-										[2.0.0,)
-									</versionRange>
-									<goals>
-										<goal>compile</goal>
-									</goals>
-								</pluginExecutionFilter>
-								<action>
-									<ignore></ignore>
-								</action>
-							</pluginExecution>
-						</pluginExecutions>
-					</lifecycleMappingMetadata>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
