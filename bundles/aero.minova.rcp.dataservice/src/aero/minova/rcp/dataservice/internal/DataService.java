@@ -1,13 +1,19 @@
 package aero.minova.rcp.dataservice.internal;
 
+import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -17,6 +23,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
@@ -162,5 +170,46 @@ public class DataService implements IDataService {
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
 
 	}
+	
+	public void loadFile(UISynchronize sync, String filename) {
+		loadFile(sync, filename, false);
+	}
 
+	public void loadFile(UISynchronize sync, String filename, boolean reload) {
+		try {
+			String workspacePath = Platform.getInstanceLocation().getURL().toURI().toString().substring(5);
+			Path localPath = FileSystems.getDefault().getPath(workspacePath + filename);
+			if (!reload && Files.exists(localPath)) {
+				return; // Datei existiert lokal und muss nicht nachgeladen werden
+			}
+			Files.createDirectories(localPath.getParent());
+			try {
+				CompletableFuture<String> fileFuture = getFile(filename);
+				fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
+					try {
+						byte[] file;
+						try {
+							String result = bytes.substring(1, bytes.length() - 2);
+							String byteValues[] = result.split(",");
+							file = new byte[byteValues.length];
+							int i = 0;
+							for (String string : byteValues) {
+								file[i++] = Byte.parseByte(string);
+							}
+						} catch (NumberFormatException nfe) {
+							// Es ist wohl keine Datei angekommen
+							file = new byte[0];
+						}
+						Files.write(localPath, file);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}));
+			} catch (NullPointerException npe) {
+				npe.printStackTrace();
+			}
+		} catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

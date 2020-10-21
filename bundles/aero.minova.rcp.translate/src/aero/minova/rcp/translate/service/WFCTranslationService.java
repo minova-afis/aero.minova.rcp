@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -39,6 +40,7 @@ public class WFCTranslationService extends TranslationService {
 	private String applicationId = "WFC";
 	private Properties resources = new Properties();
 
+	@SuppressWarnings("restriction")
 	@Inject
 	protected UISynchronize sync;
 
@@ -189,29 +191,37 @@ public class WFCTranslationService extends TranslationService {
 			}
 			filename = "i18n/messages";
 			resources = new Properties();
-			loadProperties(basePath, filename + ".properties");
+			loadResources(filename + ".properties");
 			if (locale == null) {
 				return;
 			}
 			if (!isEmpty(locale.getLanguage())) {
-				loadProperties(basePath, filename + "_" + locale.getLanguage() + ".properties");
+				filename += "_" + locale.getLanguage();
+				dataService.loadFile(sync, filename + ".properties");
+				loadResources(filename + ".properties");
 				if (!isEmpty(locale.getCountry())) {
-					loadProperties(basePath,
-							filename + "_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties");
+					filename += "_" + locale.getCountry();
+					dataService.loadFile(sync, filename + ".properties");
+					loadResources(filename + ".properties");
 					if (!isEmpty(locale.getVariant())) {
-						loadProperties(basePath, filename + "_" + locale.getLanguage() + "_" + locale.getCountry() + "_"
-								+ locale.getVariant() + ".properties");
+						filename += "_" + locale.getVariant();
+						dataService.loadFile(sync, filename + ".properties");
+						loadResources(filename + ".properties");
 					}
 				}
+				filename = "i18n/messages" + "+" + locale.getDisplayLanguage();
 				if (!isEmpty(locale.getScript())) {
-					loadProperties(basePath,
-							filename + "_" + locale.getLanguage() + "_" + locale.getScript() + ".properties");
+					filename += "_" + locale.getScript();
+					dataService.loadFile(sync, filename + ".properties");
+					loadResources(filename + ".properties");
 					if (!isEmpty(locale.getCountry())) {
-						loadProperties(basePath, filename + "_" + locale.getLanguage() + "_" + locale.getScript() + "_"
-								+ locale.getCountry() + ".properties");
+						filename += "_" + locale.getCountry();
+						dataService.loadFile(sync, filename + ".properties");
+						loadResources(filename + ".properties");
 						if (!isEmpty(locale.getVariant())) {
-							loadProperties(basePath, filename + "_" + locale.getLanguage() + "_" + locale.getScript()
-									+ "_" + locale.getCountry() + "_" + locale.getVariant() + ".properties");
+							filename += "_" + locale.getVariant();
+							dataService.loadFile(sync, filename + ".properties");
+							loadResources(filename + ".properties");
 						}
 					}
 				}
@@ -221,71 +231,94 @@ public class WFCTranslationService extends TranslationService {
 		}
 	}
 
+	private void loadResources(String string) {
+		InputStream is = null;
+		try {
+			File propertiesFile = new File(
+					new URI(Platform.getInstanceLocation().getURL().toURI().toString() + string));
+			if (propertiesFile.exists()) {
+				is = new FileInputStream(propertiesFile);
+				resources.load(is);
+			}
+		} catch (FileNotFoundException | URISyntaxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+
 	private boolean isEmpty(String value) {
 		return value == null || value.isEmpty();
 	}
 
-	private void loadProperties(String path, String propertiesFilename) {
-		FileInputStream is = null;
-		File f;
-		URI uri;
-		try {
-			uri = new URI(path + propertiesFilename);
-			try {
-				f = new File(uri);
-				is = new FileInputStream(f);
-				resources.load(is);
-				logger.error("test");
-			} catch (FileNotFoundException e) {
-				// es gibt nicht alle Dateien
-
-				try {
-					CompletableFuture<String> fileFuture = dataService.getFile(propertiesFilename);
-					propertyFilesToLoadCount++;
-					fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
-						try {
-							byte[] file;
-							try {
-								String result = bytes.substring(1, bytes.length() - 2);
-								String byteValues[] = result.split(",");
-								file = new byte[byteValues.length];
-								int i = 0;
-								for (String string : byteValues) {
-									file[i++] = Byte.parseByte(string);
-								}
-							} catch (NumberFormatException nfe) {
-								// Es ist wohl keine Datei angekommen
-								file = new byte[0];
-							}
-							Files.write(Path.of(uri), file);
-							propertyFilesToLoadCount--;
-							if (propertyFilesToLoadCount == 0) {
-								loadResources();
-							}
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}));
-				} catch (NullPointerException npe) {
-					logger.error("NPE " + propertiesFilename);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (is != null)
-					try {
-						is.close();
-					} catch (IOException e) {
-						if (logger != null) {
-							logger.error(e.toString());
-						} else {
-							e.printStackTrace();
-						}
-					}
-			}
-		} catch (URISyntaxException e2) {
-			e2.printStackTrace();
-		}
-	}
+//	private void loadPssroperties(String path, String propertiesFilename) {
+//		FileInputStream is = null;
+//		File f;
+//		URI uri;
+//		try {
+//			uri = new URI(path + propertiesFilename);
+//			try {
+//				f = new File(uri);
+//				is = new FileInputStream(f);
+//				resources.load(is);
+//				logger.error("test");
+//			} catch (FileNotFoundException e) {
+//				// es gibt nicht alle Dateien
+//
+//				try {
+//					CompletableFuture<String> fileFuture = dataService.getFile(propertiesFilename);
+//					propertyFilesToLoadCount++;
+//					fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
+//						try {
+//							byte[] file;
+//							try {
+//								String result = bytes.substring(1, bytes.length() - 2);
+//								String byteValues[] = result.split(",");
+//								file = new byte[byteValues.length];
+//								int i = 0;
+//								for (String string : byteValues) {
+//									file[i++] = Byte.parseByte(string);
+//								}
+//							} catch (NumberFormatException nfe) {
+//								// Es ist wohl keine Datei angekommen
+//								file = new byte[0];
+//							}
+//							Files.write(Path.of(uri), file);
+//							propertyFilesToLoadCount--;
+//							if (propertyFilesToLoadCount == 0) {
+//								loadResources();
+//							}
+//						} catch (IOException e1) {
+//							// TODO Auto-generated catch block
+//							e1.printStackTrace();
+//						}
+//					}));
+//				} catch (NullPointerException npe) {
+//					logger.error("NPE " + propertiesFilename);
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} finally {
+//				if (is != null)
+//					try {
+//						is.close();
+//					} catch (IOException e) {
+//						if (logger != null) {
+//							logger.error(e.toString());
+//						} else {
+//							e.printStackTrace();
+//						}
+//					}
+//			}
+//		} catch (URISyntaxException e2) {
+//			e2.printStackTrace();
+//		}
+//	}
 }
