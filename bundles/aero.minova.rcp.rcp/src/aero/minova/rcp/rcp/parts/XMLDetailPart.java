@@ -189,7 +189,6 @@ public class XMLDetailPart {
 							} else {
 								changeSelectionBoxList(lc, "");
 							}
-							// rescheduleTimer(timer, lc);
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
@@ -204,27 +203,6 @@ public class XMLDetailPart {
 			}
 		}
 	}
-
-	/**
-	 * Diese Methode dient dem Zweck, eine Verzögerung für unsere Eingaben im Field
-	 * zu gewähren
-	 *
-	 * TODO: Wir benötigen einen Weg, aus dem durch den TimerTask erstellten Thread
-	 * heraus auf unsere Methoden des MainThreads zuzugreifen
-	 *
-	 * @param timer
-	 * @param lc
-	 */
-	/*
-	 * public void rescheduleTimer(Timer timer, LookupControl lc) { timer.cancel();
-	 * timer.purge(); timer = new Timer(); timer.schedule(new TimerTask() {
-	 *
-	 * @Override public void run() { if (lc.getData(Constants.CONTROL_OPTIONS) !=
-	 * null || lc.getText().equals("")) { requestOptionsFromCAS(lc); } else {
-	 * changeSelectionBoxList(lc, ""); }
-	 *
-	 * this.cancel(); } }, 500); }
-	 */
 
 	/**
 	 * Aktuellisiert die Quantityvalues, sobald sich einer der beiden Zeiteinträge
