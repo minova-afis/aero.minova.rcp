@@ -26,7 +26,7 @@ public class InstancePreferenceAccessor {
 	 * @param type
 	 * @return
 	 */
-	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Locale l) {
+	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue, Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -36,21 +36,21 @@ public class InstancePreferenceAccessor {
 		case PASSWORD:
 		case LOCALE:
 		case TEXT:
-			return preferences.get(preferenceKey, "");
+			return preferences.get(preferenceKey,(String) defaultValue);
 		case INTEGER:
-			return preferences.getInt(preferenceKey, 0);
+			return preferences.getInt(preferenceKey, (int) defaultValue);
 		case FLOAT:
-			return preferences.getFloat(preferenceKey, 0);
+			return preferences.getFloat(preferenceKey, (float) defaultValue);
 		case CHECK:
-			return preferences.getBoolean(preferenceKey, false);
+			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
-			String fd = preferences.get(preferenceKey, null);
+			String fd = preferences.get(preferenceKey, (String) defaultValue);
 			if(fd == "") {
 				fd = null;
 			}
 			return (fd == null ? null : new FontData(fd));
 		case ZONEID:
-			String id = preferences.get(preferenceKey, "");
+			String id = preferences.get(preferenceKey, (String) defaultValue);
 			String result = CustomTimeZone.displayTimeZone(id, l);
 			return result;
 		default:

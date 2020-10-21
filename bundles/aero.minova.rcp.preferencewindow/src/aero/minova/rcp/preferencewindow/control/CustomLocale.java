@@ -60,8 +60,8 @@ public class CustomLocale {
 		
 		Locale[] locales = CustomLocale.getLocales();
 		Locale locale = Locale.getDefault();
-		String language = InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE, locale).toString();
-		String country = InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, locale).toString();
+		String language = InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(locale), locale).toString();
+		String country = InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(locale), locale).toString();
 
 		for (Locale l : locales) {
 			if (l.getDisplayLanguage(l).equals(language) && l.getDisplayCountry(l).equals(country))

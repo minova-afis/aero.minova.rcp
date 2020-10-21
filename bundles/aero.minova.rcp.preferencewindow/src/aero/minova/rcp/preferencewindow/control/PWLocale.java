@@ -46,7 +46,8 @@ public class PWLocale extends CustomPWWidget {
 		super(label, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
 		Locale l = context.get(Locale.class);
-		if (l==null) l=Locale.getDefault();
+		if (l == null)
+			l = Locale.getDefault();
 		dataL = CustomLocale.getLanguages(l);
 	}
 
@@ -95,7 +96,7 @@ public class PWLocale extends CustomPWWidget {
 			final Object language = dataL.get(i);
 			comboLanguage.add(language.toString());
 			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE,
-					context.get(Locale.class)))) {
+					Locale.getDefault().getDisplayLanguage(Locale.getDefault()), context.get(Locale.class)))) {
 				comboLanguage.select(i);
 			}
 
@@ -132,7 +133,7 @@ public class PWLocale extends CustomPWWidget {
 			final Object country = getCountries().get(i);
 			comboCountries.add(country.toString());
 			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
-					context.get(Locale.class)))) {
+					Locale.getDefault().getDisplayCountry(Locale.getDefault()), context.get(Locale.class)))) {
 				comboCountries.select(i);
 			}
 		}

@@ -125,13 +125,14 @@ public class ApplicationPreferenceWindow {
 
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
+					Object defaultValue = pref.getDefaultValue();
 					data.put(key,
-							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(), s));
+							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(), defaultValue,  s));
 
 				}
 			}
 		}
-		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, s));
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(Locale.getDefault()), s));
 
 		return data;
 	}
