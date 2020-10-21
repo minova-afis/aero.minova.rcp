@@ -8,13 +8,15 @@ public class PreferenceDescriptor {
 	PreferenceAccessor valueAccessor;
 	DisplayType displayType;
 	private Object[] possibleValues;
+	Object defaultValue;
 	
 
-	public PreferenceDescriptor(String key, String label, double order, DisplayType displayType, Object... possibleValues) {
+	public PreferenceDescriptor(String key, String label, double order, DisplayType displayType, Object defaultValue, Object... possibleValues) {
 		this.key = key;
 		this.label = label;
 		this.order = order;
 		this.displayType = displayType;
+		this.defaultValue = defaultValue;
 		this.possibleValues = possibleValues;
 	}
 
@@ -43,6 +45,8 @@ public class PreferenceDescriptor {
 		return possibleValues;
 	}
 
-
+	public Object getDefaultValue() {
+		return defaultValue;
+	}
 
 }
