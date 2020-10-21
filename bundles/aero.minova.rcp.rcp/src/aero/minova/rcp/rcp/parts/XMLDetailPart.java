@@ -168,8 +168,8 @@ public class XMLDetailPart {
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
-				//Hinzufügen von Keylistenern, sodass die Felder bei Eingaben 
-				//ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
+				// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
+				// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 				lc.addKeyListener(new KeyListener() {
 
 					@Override
@@ -180,21 +180,22 @@ public class XMLDetailPart {
 
 					@Override
 					public void keyReleased(KeyEvent e) {
-						//PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
- 						if (e.keyCode != Constants.KEYBOARD_DOWN && e.keyCode != Constants.KEYBOARD_LEFT 
- 								&& e.keyCode != Constants.KEYBOARD_RIGHT  && e.keyCode != Constants.KEYBOARD_TOP
- 								&& e.keyCode != Constants.KEYBOARD_TAB && e.keyCode != Constants.KEYBOARD_ENTER) {
+						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
+						if (e.keyCode != Constants.KEYBOARD_DOWN && e.keyCode != Constants.KEYBOARD_LEFT
+								&& e.keyCode != Constants.KEYBOARD_RIGHT && e.keyCode != Constants.KEYBOARD_TOP
+								&& e.keyCode != Constants.KEYBOARD_TAB && e.keyCode != Constants.KEYBOARD_ENTER) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								requestOptionsFromCAS(lc);
 							} else {
 								changeSelectionBoxList(lc, "");
 							}
 							// rescheduleTimer(timer, lc);
-						//Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen, 
-						//wie auch bei einem Klick auf das Twiste, angezeigt werden
-						//PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						}else if(e.keyCode == Constants.KEYBOARD_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
-							Field field = (Field)lc.getData(Constants.CONTROL_FIELD);
+							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
+							// wie auch bei einem Klick auf das Twiste, angezeigt werden
+							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
+						} else if (e.keyCode == Constants.KEYBOARD_DOWN
+								&& lc.getData(Constants.CONTROL_OPTIONS) == null) {
+							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
 						}
 					}
@@ -293,8 +294,10 @@ public class XMLDetailPart {
 			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
 			LookupControl lc = (LookupControl) c;
 			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
-			//Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die Eingabe gleich dem gesuchten Wert ist.
-			//Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der  Wert aus dem CAS als Option/Proposal aufgelistet
+			// Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die
+			// Eingabe gleich dem gesuchten Wert ist.
+			// Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der Wert
+			// aus dem CAS als Option/Proposal aufgelistet
 			if (t.getRows().size() == 1) {
 				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
@@ -303,32 +306,8 @@ public class XMLDetailPart {
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					} else {
-						//Setzen der Proposals/Optionen
+						// Setzen der Proposals/Optionen
 						changeProposals((LookupControl) c, t);
-						//TODO: Eine erneute CAS-Anfrage ist hier unnötig. Stattdessen müsste diese Anfrage
-						// durch eine Tastenkombination ausgelöst werden
-						/*
-						 * // TODO "gu" != "MIN" es folgt: // TODO Hier muss aktiv eine neue Liste mit
-						 * Werten angefragt werden // Überprüfe, ob der der gegebene String in unserer
-						 * Tabelle bereits existiert searchForStringInGivenTable(lc, t,
-						 * lc.getText().toString());
-						 *
-						 * // Wenn der Wert nicht in den gegebenen Rows vorhanden ist, so wird der CAS
-						 * // abgefragt, ob ein solcher Wert im System existiert if
-						 * (lc.getData(Constants.CONTROL_KEYLONG) == null) {
-						 *
-						 * CompletableFuture<?> tableFuture; tableFuture =
-						 * LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) c).getText(),
-						 * field, controls, dataService, sync, "List"); tableFuture.thenAccept(ta ->
-						 * sync.asyncExec(() -> { if (ta instanceof SqlProcedureResult) {
-						 * SqlProcedureResult sql = (SqlProcedureResult) ta;
-						 * checkForCASEntryWithGivenString(c, sql.getResultSet(),
-						 * lc.getText().toString()); } else if (ta instanceof Table) { Table
-						 * employeeTable = (Table) ta; checkForCASEntryWithGivenString(c, employeeTable,
-						 * lc.getText().toString()); }
-						 *
-						 * })); }
-						 */
 					}
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
@@ -339,13 +318,14 @@ public class XMLDetailPart {
 				}
 			} else {
 				if (lc != null && lc.getText() != null && !sender.equals("twisty")) {
-					//Aufbau einer gefilterten Tabelle, welche nur die Werte aus dem CAS enthält, die den Text im Field am Anfang stehen haben
+					// Aufbau einer gefilterten Tabelle, welche nur die Werte aus dem CAS enthält,
+					// die den Text im Field am Anfang stehen haben
 					Table filteredTable = new Table();
-					//Übernahme sämtlicher Columns
+					// Übernahme sämtlicher Columns
 					for (aero.minova.rcp.model.Column column : t.getColumns()) {
 						filteredTable.addColumn(column);
 					}
-					//Trifft der Text nicht überein, so wird auserdem die Description überprüft
+					// Trifft der Text nicht überein, so wird auserdem die Description überprüft
 					for (Row r : t.getRows()) {
 						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
 								.startsWith(lc.getText().toLowerCase()))) {
@@ -359,66 +339,36 @@ public class XMLDetailPart {
 						}
 
 					}
-					//Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100% übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der Wert gesetzt
-					if(filteredTable.getRows().size() == 1 && 
-							filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase().equals(lc.getText().toLowerCase())) {
-						c.setData(Constants.CONTROL_KEYLONG,
-								filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+					// Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100%
+					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
+					// Wert gesetzt
+					if (filteredTable.getRows().size() == 1 && filteredTable.getRows().get(0)
+							.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+							.toLowerCase().equals(lc.getText().toLowerCase())) {
+						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
+								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
-						//Setzen der Proposals/Optionen
-					}else if(filteredTable.getRows().size() == 1 && filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null &&
-							filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue().toLowerCase().equals(lc.getText().toLowerCase())){
-						c.setData(Constants.CONTROL_KEYLONG,
-								filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+						// Setzen der Proposals/Optionen
+					} else if (filteredTable.getRows().size() == 1
+							&& filteredTable.getRows().get(0)
+									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+							&& filteredTable.getRows().get(0)
+									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
+									.getStringValue().toLowerCase().equals(lc.getText().toLowerCase())) {
+						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
+								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
-					}else {
+					} else {
 						changeProposals((LookupControl) lc, filteredTable);
 					}
-					//Setzen der Proposals/Optionen
+					// Setzen der Proposals/Optionen
 				} else {
 					changeProposals((LookupControl) lc, t);
 				}
 
-
 			}
 		}
 	}
-	/**
-	 * Überprüft, ob der gegebene String im CAS eingetragen ist. Falls er es ist, so
-	 * werden die erhaltenen Treffer entsprechend ihrer anzahl zur verarbeitung
-	 * weiterverwendet
-	 *
-	 * @param c
-	 * @param t
-	 * @param string
-	 */
-	/*
-	 * public void checkForCASEntryWithGivenString(Control c, Table t, String
-	 * string) { LookupControl lc = (LookupControl)c; Table filteredTable = new
-	 * Table(); for (aero.minova.rcp.model.Column column : t.getColumns()) {
-	 * filteredTable.addColumn(column); } for (Row r : t.getRows()) { if
-	 * ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().
-	 * startsWith(string))) { filteredTable.addRow(r); } } if
-	 * (filteredTable.getRows().size() == 0) { // TODO: KEIN TREFFER FÜR DEN
-	 * GEGEBENEN STRING! Wie gehen wir damit um? // Stand SIS: Stimmt der Wert mit
-	 * keinem gegebenen Feld überein, so wird der // Wert im Feld geleert, sobald es
-	 * den Fokus verliert // -> puffer?
-	 *
-	 * // c.setData(null); // lc.setText(""); } else if
-	 * (filteredTable.getRows().size() == 1) { c.setData(Constants.CONTROL_KEYLONG,
-	 * filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.
-	 * TABLE_KEYLONG))); lc.setText((String) ValueBuilder
-	 * .value(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT))
-	 * ).create()); if
-	 * (filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.
-	 * TABLE_DESCRIPTION)) != null) { lc.getDescription().setText((String)
-	 * ValueBuilder
-	 * .value(filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.
-	 * TABLE_DESCRIPTION))) .create()); } } else if (filteredTable.getRows().size()
-	 * > 1) { changeOptionsForLookupField(t, c, "");
-	 *
-	 * } }
-	 */
 
 	/**
 	 * Austauschen der gegebenen Optionen für das LookupField
@@ -515,9 +465,10 @@ public class XMLDetailPart {
 			}));
 		}
 	}
+
 	/**
-	 * 	Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
-	 *	den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
+	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
+	 * den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	 */
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
@@ -574,10 +525,11 @@ public class XMLDetailPart {
 				rb.withValue(key.get(1));
 				valuePosition++;
 			}
-		}else {
-			//TODO: Für sämtliche Keywerte müssen, falls es sich um einen Insert handelt, null gesetzt werden
+		} else {
+			// TODO: Für sämtliche Keywerte müssen, falls es sich um einen Insert handelt,
+			// null gesetzt werden
 			List<Field> keyList = dataFormService.getAllKeyFieldsFromForm(form);
-			for(Field f : keyList) {
+			for (Field f : keyList) {
 				rb.withValue(null);
 				valuePosition++;
 			}
@@ -797,9 +749,10 @@ public class XMLDetailPart {
 			clearFields("Delete");
 		}
 	}
-	
+
 	/**
 	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
+	 * 
 	 * @param origin
 	 */
 	@Optional
@@ -808,14 +761,14 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if(origin.equals("Delete")) {
+				if (origin.equals("Delete")) {
 					t.setText("");
-				}else if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+				} else if (c.getData("field") == controls.get("BookingDate").getData("field")) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
-				}
-				else if (c.getData("field") == controls.get("StartDate").getData("field") && origin.equals("Insert")) {
+				} else if (c.getData("field") == controls.get("StartDate").getData("field")
+						&& origin.equals("Insert")) {
 					Text endDate = (Text) controls.get("EndDate");
 					t.setText(endDate.getText());
 				} else {
