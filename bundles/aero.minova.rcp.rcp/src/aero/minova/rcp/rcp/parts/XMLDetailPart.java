@@ -769,6 +769,27 @@ public class XMLDetailPart {
 		}
 	}
 
+	/**
+	 * CAS-Anfragen, welche anhald einer Ticketnummer versendet wurden, werden hier
+	 * mit den gegebenen Werten ergänzt. Die vollständige Tabelle wird darauf hin in
+	 * die Detailview eingefügt
+	 * 
+	 * @param t
+	 */
+	@Inject
+	@Optional
+	public void receivedTicket(@Named("receivedTicket") Table t) {
+		Row r = t.getRows().get(0);
+		for (int i = 0; i < r.size(); i++) {
+			if (r.getValue(i).getValue() == null) {
+				Text text = (Text) controls.get(t.getColumnName(i));
+				r.setValue(new Value(text.getText()), i);
+			}
+		}
+		selectedTable = t;
+		updateSelectedEntry();
+	}
+
 	public Map<String, Control> getControls() {
 		return controls;
 	}
