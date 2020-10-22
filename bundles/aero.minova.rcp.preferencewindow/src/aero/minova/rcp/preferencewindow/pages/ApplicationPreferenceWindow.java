@@ -143,7 +143,7 @@ public class ApplicationPreferenceWindow {
 				}
 			}
 		}
-		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(Locale.getDefault()), s));
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(s), s));
 
 		return data;
 	}
