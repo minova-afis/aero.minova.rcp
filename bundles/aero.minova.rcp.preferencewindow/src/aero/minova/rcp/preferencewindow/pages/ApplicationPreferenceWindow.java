@@ -15,6 +15,7 @@ import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWButton;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
@@ -24,6 +25,8 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -84,6 +87,14 @@ public class ApplicationPreferenceWindow {
 
 				}
 			}
+			newTab.add(new PWButton("Standart", new SelectionAdapter() {
+				
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					InstancePreferenceAccessor.resetToDefaultValue(preferenceTabs, s);
+				}
+				
+			}).setAlignment(GridData.END));
 		}
 
 		window.setSelectedTab(0);
