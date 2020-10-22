@@ -1,9 +1,11 @@
 package aero.minova.rcp.preferencewindow.builder;
 
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
@@ -26,7 +28,8 @@ public class InstancePreferenceAccessor {
 	 * @param type
 	 * @return
 	 */
-	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue, Locale l) {
+	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue,
+			Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -45,7 +48,7 @@ public class InstancePreferenceAccessor {
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
 			String fd = preferences.get(preferenceKey, (String) defaultValue);
-			if (fd.equals("")) {
+			if (fd == "") {
 				fd = null;
 			}
 			return (fd == null ? null : new FontData(fd));
@@ -106,6 +109,28 @@ public class InstancePreferenceAccessor {
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * Setzt alle Werte auf die Default Werte zurück
+	 * 
+	 * @param preferenceTabs
+	 * @param l
+	 */
+	public static void resetToDefaultValue(List<PreferenceTabDescriptor> preferenceTabs, Locale l) {
+
+		for (PreferenceTabDescriptor tab : preferenceTabs) {
+
+			for (PreferenceSectionDescriptor section : tab.getSections()) { 
+
+				for (PreferenceDescriptor pref : section.getPreferences()) {
+					String key = pref.getKey();
+					Object defaultValue = pref.getDefaultValue();
+					PreferenceWindow.getInstance().setValue(key, defaultValue);
+				}
+			}
+		}
+		PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(l));
 	}
 
 }
