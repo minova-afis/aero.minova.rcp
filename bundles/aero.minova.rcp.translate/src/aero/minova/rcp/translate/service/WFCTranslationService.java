@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
@@ -160,13 +161,11 @@ public class WFCTranslationService extends TranslationService {
 	 * Resource Bundle Search and Loading Strategy
 	 *
 	 * <p>
-	 * getBundle uses the base name, the specified locale, and the default locale
-	 * (obtained from Locale.getDefault) to generate a sequence of candidate bundle
-	 * names. If the specified locale's language, script, country, and variant are
-	 * all empty strings, then the base name is the only candidate bundle name.
-	 * Otherwise, a list of candidate locales is generated from the attribute values
-	 * of the specified locale (language, script, country and variant) and appended
-	 * to the base name. Typically, this will look like the following:
+	 * getBundle uses the base name, the specified locale, and the default locale (obtained from Locale.getDefault) to
+	 * generate a sequence of candidate bundle names. If the specified locale's language, script, country, and variant
+	 * are all empty strings, then the base name is the only candidate bundle name. Otherwise, a list of candidate
+	 * locales is generated from the attribute values of the specified locale (language, script, country and variant)
+	 * and appended to the base name. Typically, this will look like the following:
 	 * </p>
 	 *
 	 * baseName + "_" + language + "_" + script + "_" + country + "_" + variant <br>
@@ -231,11 +230,14 @@ public class WFCTranslationService extends TranslationService {
 		}
 	}
 
-	private void loadResources(String string) {
+	private void loadResources(String filename) {
 		InputStream is = null;
+		String localpath;
 		try {
-			File propertiesFile = new File(
-					new URI(Platform.getInstanceLocation().getURL().toURI().toString() + string));
+			localpath = Platform.getInstanceLocation().getURL().toURI().toString();
+			File propertiesFile = new File(new URI(localpath + filename));
+			if (!propertiesFile.exists())
+				dataService.getFileSynch(localpath, filename);
 			if (propertiesFile.exists()) {
 				is = new FileInputStream(propertiesFile);
 				resources.load(is);
@@ -257,68 +259,4 @@ public class WFCTranslationService extends TranslationService {
 	private boolean isEmpty(String value) {
 		return value == null || value.isEmpty();
 	}
-
-//	private void loadPssroperties(String path, String propertiesFilename) {
-//		FileInputStream is = null;
-//		File f;
-//		URI uri;
-//		try {
-//			uri = new URI(path + propertiesFilename);
-//			try {
-//				f = new File(uri);
-//				is = new FileInputStream(f);
-//				resources.load(is);
-//				logger.error("test");
-//			} catch (FileNotFoundException e) {
-//				// es gibt nicht alle Dateien
-//
-//				try {
-//					CompletableFuture<String> fileFuture = dataService.getFile(propertiesFilename);
-//					propertyFilesToLoadCount++;
-//					fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
-//						try {
-//							byte[] file;
-//							try {
-//								String result = bytes.substring(1, bytes.length() - 2);
-//								String byteValues[] = result.split(",");
-//								file = new byte[byteValues.length];
-//								int i = 0;
-//								for (String string : byteValues) {
-//									file[i++] = Byte.parseByte(string);
-//								}
-//							} catch (NumberFormatException nfe) {
-//								// Es ist wohl keine Datei angekommen
-//								file = new byte[0];
-//							}
-//							Files.write(Path.of(uri), file);
-//							propertyFilesToLoadCount--;
-//							if (propertyFilesToLoadCount == 0) {
-//								loadResources();
-//							}
-//						} catch (IOException e1) {
-//							// TODO Auto-generated catch block
-//							e1.printStackTrace();
-//						}
-//					}));
-//				} catch (NullPointerException npe) {
-//					logger.error("NPE " + propertiesFilename);
-//				}
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			} finally {
-//				if (is != null)
-//					try {
-//						is.close();
-//					} catch (IOException e) {
-//						if (logger != null) {
-//							logger.error(e.toString());
-//						} else {
-//							e.printStackTrace();
-//						}
-//					}
-//			}
-//		} catch (URISyntaxException e2) {
-//			e2.printStackTrace();
-//		}
-//	}
 }

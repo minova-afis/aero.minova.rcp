@@ -302,6 +302,8 @@ public class DetailUtil {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder
 						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+			}else {
+				lc.getDescription().setText("");
 			}
 		}
 	}

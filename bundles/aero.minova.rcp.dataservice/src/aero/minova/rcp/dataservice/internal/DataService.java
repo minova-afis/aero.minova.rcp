@@ -1,5 +1,6 @@
 package aero.minova.rcp.dataservice.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -12,8 +13,8 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -37,12 +38,12 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 
+@Component
 public class DataService implements IDataService {
 
 	private static final boolean LOG = true;
 	private HttpRequest request;
 	private HttpClient httpClient;
-	private Authenticator authentication;
 	private Gson gson;
 
 	private String username = "admin";
@@ -51,7 +52,7 @@ public class DataService implements IDataService {
 
 	private void init() {
 
-		authentication = new Authenticator() {
+		Authenticator authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password.toCharArray());
@@ -80,13 +81,12 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
-
-		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+		// return CompletableFuture<Table> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			System.out.println(t);
 			return gson.fromJson(t.body(), Table.class);
 		});
 
-		return future;
 	}
 
 	@Override
@@ -98,15 +98,13 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
+		// return CompletableFuture<SqlProcedureResult> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			logBody(t.body());
+			return fromJson;
+		});
 
-		CompletableFuture<SqlProcedureResult> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> {
-					SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-					logBody(t.body());
-					return fromJson;
-				});
-
-		return future;
 	}
 
 	@Override
@@ -118,11 +116,10 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-
-		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+		// return CompletableFuture<Integer> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString())
 				.thenApply(t -> gson.fromJson(t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
 
-		return future;
 	}
 
 	public static SSLContext disabledSslVerificationContext() {
@@ -156,21 +153,51 @@ public class DataService implements IDataService {
 
 	void logBody(String body) {
 		if (LOG) {
+			// TODO Logging verbessern
 			System.out.println(body);
 		}
 
 	}
 
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	@Override
+	public File getFileSynch(String localPath, String filename) {
+		init();
+		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+				.header("Content-Type", "application/octet-stream") //
+				.build();
+
+		try {
+			String body = httpClient.send(request, BodyHandlers.ofString()).body();
+			URI uri = new URI(localPath + filename);
+			Files.writeString(Path.of(uri), body, StandardOpenOption.CREATE);
+			return new File(uri);
+		} catch (IOException | URISyntaxException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	/**
+	 * asynchrones Laden eines Files vom Server
+	 */
+	@Override
 	public CompletableFuture<String> getFile(String filename) {
 		init();
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
-				.header("Content-Type", "application/raw") //
+				.header("Content-Type", "application/octet-stream") //
 				.build();
-
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
 
 	}
-	
+
 	public void loadFile(UISynchronize sync, String filename) {
 		loadFile(sync, filename, false);
 	}
