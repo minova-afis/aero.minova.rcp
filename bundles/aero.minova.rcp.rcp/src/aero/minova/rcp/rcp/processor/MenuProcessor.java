@@ -44,10 +44,12 @@ public class MenuProcessor {
 		File mdiFile = null;
 		try {
 			basePath = Platform.getInstanceLocation().getURL().toURI().toString();
+			mdiFile = new File(new URI(basePath + mdiFileName));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		mdiFile = dataService.getFileSynch(basePath, mdiFileName);
+		if (mdiFile == null || !mdiFile.exists())
+			mdiFile = dataService.getFileSynch(basePath, mdiFileName);
 
 		// hier ist der FallBack auf eine bereits bestehendes MDI File aus dem Verzeichnis.
 		basePath = basePath + mdiFileName_old;
@@ -75,13 +77,12 @@ public class MenuProcessor {
 	}
 
 	/**
-	 * Diese Methode erstellt aus den übergebenen Pfad und der Datei ein Main
-	 * Element aus einer MDI. Wenn der File nicht eingelesen werden kann, gibt es
-	 * noch einen FallBack auf die URI, beim Aufruf könnten so unterschiedliche
+	 * Diese Methode erstellt aus den übergebenen Pfad und der Datei ein Main Element aus einer MDI. Wenn der File nicht
+	 * eingelesen werden kann, gibt es noch einen FallBack auf die URI, beim Aufruf könnten so unterschiedliche
 	 * Dateiorte übergeben werden.
 	 *
-	 * Zum Beispiel: basePath ist der default mit dem Standard, mdiFile könnte eine
-	 * neue Version der Datei sein, die erstmal in einem anderen Ordner liegt.
+	 * Zum Beispiel: basePath ist der default mit dem Standard, mdiFile könnte eine neue Version der Datei sein, die
+	 * erstmal in einem anderen Ordner liegt.
 	 *
 	 *
 	 * @param basePath
@@ -111,8 +112,7 @@ public class MenuProcessor {
 	}
 
 	/**
-	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der
-	 * Einträge
+	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der Einträge
 	 *
 	 * @param menu_MDI
 	 * @param menu
@@ -126,8 +126,7 @@ public class MenuProcessor {
 		// TODO Übersetzung einbauen
 		menuGen.setLabel(menu_MDI.getText());
 
-		
-		//TODO Sortierung des MENUS aus der MDI beachten!!!
+		// TODO Sortierung des MENUS aus der MDI beachten!!!
 		if (!menu_MDI.getEntryOrMenu().isEmpty() && menu_MDI.getEntryOrMenu() != null) {
 			for (Object object : menu_MDI.getEntryOrMenu()) {
 				if (object instanceof Entry) {
@@ -143,8 +142,7 @@ public class MenuProcessor {
 	}
 
 	/**
-	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen
-	 * MDI-Eintrag
+	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen MDI-Eintrag
 	 *
 	 * @param entry_MDI
 	 * @param action_MDI
