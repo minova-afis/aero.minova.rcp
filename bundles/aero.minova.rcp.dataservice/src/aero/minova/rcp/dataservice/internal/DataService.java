@@ -1,6 +1,5 @@
 package aero.minova.rcp.dataservice.internal;
 
-import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -40,7 +39,12 @@ public class DataService implements IDataService {
 
 	private String username = "admin";
 	private String password = "rqgzxTf71EAx8chvchMi";
+	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
 	private String server = "https://publictest.minova.com:17280";
+
+	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
+	// Ticket-Anfragen zu versenden
+	// private String server = "https://mintest.minova.com:8084";
 
 	private void init() {
 
@@ -73,8 +77,8 @@ public class DataService implements IDataService {
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
-		// return CompletableFuture<Table> future 
-		return  httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+		// return CompletableFuture<Table> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			System.out.println(t);
 			return gson.fromJson(t.body(), Table.class);
 		});
@@ -91,12 +95,11 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<SqlProcedureResult> future
-		return  httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> {
-					SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-					logBody(t.body());
-					return fromJson;
-				});
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			logBody(t.body());
+			return fromJson;
+		});
 
 	}
 
@@ -110,7 +113,7 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<Integer> future
-		 return httpClient.sendAsync(request, BodyHandlers.ofString())
+		return httpClient.sendAsync(request, BodyHandlers.ofString())
 				.thenApply(t -> gson.fromJson(t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
 
 	}
