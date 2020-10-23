@@ -91,7 +91,7 @@ public class ApplicationPreferenceWindow {
 
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					InstancePreferenceAccessor.resetToDefaultValue(preferenceTabs, s);
+					InstancePreferenceAccessor.resetToDefaultValue(tabDescriptor, s);
 				}
 
 			}).setAlignment(GridData.END));
