@@ -34,6 +34,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
+import sun.swing.UIAction;
 
 @Component
 public class DataService implements IDataService {
@@ -174,7 +175,7 @@ public class DataService implements IDataService {
 			String body = httpClient.send(request, BodyHandlers.ofString()).body();
 			URI uri = new URI(path + fileName);
 			Files.writeString(Path.of(uri), body, StandardOpenOption.CREATE);
-			return null;
+			return new File(uri);
 		} catch (IOException | URISyntaxException | InterruptedException e) {
 			e.printStackTrace();
 		}
