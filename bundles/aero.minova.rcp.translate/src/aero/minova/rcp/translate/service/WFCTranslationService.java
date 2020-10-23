@@ -94,7 +94,7 @@ public class WFCTranslationService extends TranslationService {
 			if (value != null)
 				return translate(value);
 			value = resources.getProperty(key);
-			return value == null ? key : value;
+			return value == null ? key : translate(value);
 		} else {
 			return key;
 		}
