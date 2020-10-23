@@ -126,6 +126,7 @@ public class InstancePreferenceAccessor {
 			}
 
 		}
+		if(tab.id.equals("designTab"))
 		PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(l));
 	}
 
