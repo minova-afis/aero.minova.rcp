@@ -55,7 +55,7 @@ public class ApplicationPreferenceWindow {
 
 	@Inject
 	IEclipseContext context;
-	
+
 	@Inject
 	ILocaleChangeService lcs;
 
@@ -88,12 +88,12 @@ public class ApplicationPreferenceWindow {
 				}
 			}
 			newTab.add(new PWButton("Standart", new SelectionAdapter() {
-				
+
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					InstancePreferenceAccessor.resetToDefaultValue(preferenceTabs, s);
 				}
-				
+
 			}).setAlignment(GridData.END));
 		}
 
@@ -122,7 +122,7 @@ public class ApplicationPreferenceWindow {
 			} catch (BackingStoreException e) {
 				e.printStackTrace();
 			}
-			
+
 			lcs.changeApplicationLocale(CustomLocale.getLocale());
 		}
 	}
@@ -137,13 +137,14 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
 					Object defaultValue = pref.getDefaultValue();
-					data.put(key,
-							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(), defaultValue,  s));
+					data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(),
+							defaultValue, s));
 
 				}
 			}
 		}
-		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(s), s));
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
+				Locale.getDefault().getDisplayCountry(s), s));
 
 		return data;
 	}
