@@ -1,5 +1,6 @@
 package aero.minova.rcp.dataservice;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -12,6 +13,9 @@ public interface IDataService {
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
 
 	CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable);
+
 	CompletableFuture<String> getFile(String path);
+
+	File getFileSynch(String path, String mdiFileName);
 
 }
