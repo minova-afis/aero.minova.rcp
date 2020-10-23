@@ -1,7 +1,6 @@
 package aero.minova.rcp.preferencewindow.builder;
 
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,7 +47,7 @@ public class InstancePreferenceAccessor {
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
 			String fd = preferences.get(preferenceKey, (String) defaultValue);
-			if (fd == "") {
+			if (fd.equals("")) {
 				fd = null;
 			}
 			return (fd == null ? null : new FontData(fd));
@@ -105,7 +104,6 @@ public class InstancePreferenceAccessor {
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();
 			preferences.put(preferenceKey, zoneId);
 			break;
-
 		default:
 			break;
 		}
