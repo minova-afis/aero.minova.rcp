@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="1024" height="800">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" bindingContexts="_6wlLesgZEeSyMNYR5xypkQ" width="1024" height="800">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack">
       <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.sis" label="SIS">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.main" horizontal="true">
@@ -117,11 +117,32 @@
   <handlers xmi:id="_jeEycNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handler.1" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.KeepPerspectiveHandler" command="_gqcNMNF7Eeq2n_R750bOVg"/>
   <handlers xmi:id="_656QQOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SISHandler" command="_4j7QUOOOEeqf6YlJmDESrg"/>
   <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindow" command="_WsjPEPDoEeqcqsgp84_JDA"/>
-  <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
+  <handlers xmi:id="_GxZz8BRpEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.handler.loadindexpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_xHFacOejEeq-Csq7J9vXlA"/>
+  <handlers xmi:id="_wNfcgBT0Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.help" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.HelpHandler" command="_DmBwABRcEeu_ctc0PBVTGw"/>
+  <handlers xmi:id="_BMBaMBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.loaddatawithmatcgcode" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadDataWithMatchCodeHandler" command="_aiYXABRcEeu_ctc0PBVTGw"/>
+  <handlers xmi:id="_Mt8lQBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectsearchpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectSearchPart" command="_prFbgBRcEeu_ctc0PBVTGw"/>
+  <handlers xmi:id="_RWePkBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart" command="_AOXbMBRdEeu_ctc0PBVTGw"/>
+  <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLesgZEeSyMNYR5xypkQ">
+    <tags>type:user</tags>
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
     <bindings xmi:id="_6wlLhcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1s" keySequence="M1+S"/>
     <bindings xmi:id="_6wlLiMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1a" keySequence="M1+A" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+    <bindings xmi:id="_Jv9isBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.help" keySequence="F1" command="_DmBwABRcEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_e39QIBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.loaddatawithmatchcode" keySequence="F3" command="_aiYXABRcEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_sWjjQBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.selectsearchpart" keySequence="F4" command="_prFbgBRcEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_4eWbgBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.loadindexpart" keySequence="F5" command="_xHFacOejEeq-Csq7J9vXlA">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_DbgsoBRdEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_AOXbMBRdEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
   </bindingTables>
   <rootContext xmi:id="_6wlLecgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
     <children xmi:id="_6wlLesgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
@@ -157,6 +178,10 @@
   <commands xmi:id="_7pSgkOg1Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.deletedetail" commandName="Delete Detail"/>
   <commands xmi:id="_9_ZcUOg1Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.revertdetail" commandName="Revert Detail"/>
   <commands xmi:id="_Awo04Og2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.printdetail" commandName="Print Detail"/>
+  <commands xmi:id="_DmBwABRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.help" commandName="Help"/>
+  <commands xmi:id="_aiYXABRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.loaddatawithmatchcode" commandName="Load Data With MatchCode"/>
+  <commands xmi:id="_prFbgBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.selectsearchpart" commandName="Select Search Part"/>
+  <commands xmi:id="_AOXbMBRdEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.selectdetailpart" commandName="Select Detail Part"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

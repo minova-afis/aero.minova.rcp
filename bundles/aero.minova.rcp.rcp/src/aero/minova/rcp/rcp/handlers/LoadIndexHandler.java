@@ -10,6 +10,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.core.ui.PartsID;
@@ -19,13 +20,16 @@ import aero.minova.rcp.model.Table;
 public class LoadIndexHandler {
 
 	@Inject
-	IEventBroker broker;
+	private IEventBroker broker;
 
 	@Inject
-	EModelService model;
+	private EModelService model;
 
 	@Inject
-	IDataService dataService;
+	private IDataService dataService;
+
+	@Inject
+	private EPartService partService;
 
 	@Execute
 	public void execute(MPart mpart, Shell shell, MPerspective mPerspective) {
@@ -37,6 +41,9 @@ public class LoadIndexHandler {
 		tableFuture.thenAccept(t -> {
 			broker.post("PLAPLA", t);
 		});
+
+		findElements = model.findElements(mPerspective, PartsID.INDEX_PART, MPart.class);
+		partService.activate(findElements.get(0));
 	}
 
 }

@@ -201,8 +201,7 @@ public class XMLDetailPart {
 							isControlPressed = true;
 						}
 						if (e.keyCode == SWT.SPACE && isControlPressed == true) {
-							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-							broker.post("LoadAllLookUpValues", field.getName());
+							requestOptionsFromCAS(c);
 						}
 					}
 
@@ -299,6 +298,7 @@ public class XMLDetailPart {
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					c.setData(Constants.CONTROL_KEYLONG,
 							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+					changeProposals((LookupControl) c, t);
 
 				}
 			} else {
@@ -447,10 +447,28 @@ public class XMLDetailPart {
 			}
 			Row r = builder.create();
 			rowIndexTable.addRow(r);
-
+			for (Control c : controls.values()) {
+				if (c instanceof LookupControl) {
+					LookupControl lc = (LookupControl) c;
+					lc.setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getDescription().setText("");
+					lc.getTextControl().setMessage("...");
+				} else if (c instanceof Text) {
+					Text t = (Text) c;
+					t.setText("");
+					t.setMessage("...");
+				}
+			}
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
 					rowIndexTable);
 			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+				for (Control c : controls.values()) {
+					if (c instanceof Text) {
+						Text text = (Text) c;
+						text.setMessage("");
+					}
+				}
 				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
 			}));
@@ -769,9 +787,11 @@ public class XMLDetailPart {
 			}
 			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
-				lc.setText("");
-				lc.setData(Constants.CONTROL_KEYLONG, null);
-				lc.getDescription().setText("");
+				if (lc != controls.get("EmployeeKey")) {
+					lc.setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getDescription().setText("");
+				}
 			}
 			setKeys(null);
 		}

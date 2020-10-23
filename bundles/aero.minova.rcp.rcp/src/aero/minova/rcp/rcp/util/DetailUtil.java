@@ -92,8 +92,7 @@ public class DetailUtil {
 		}
 	}
 
-	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls) {
+	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -263,7 +262,7 @@ public class DetailUtil {
 		return data;
 	}
 
-	public  Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
@@ -298,11 +297,12 @@ public class DetailUtil {
 		Value v = r.getValue(index);
 
 		lc.setText((String) ValueBuilder.value(v).create());
+		lc.getTextControl().setMessage("");
 		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder
 						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			}else {
+			} else {
 				lc.getDescription().setText("");
 			}
 		}
