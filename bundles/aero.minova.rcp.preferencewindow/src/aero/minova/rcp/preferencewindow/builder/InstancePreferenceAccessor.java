@@ -115,18 +115,16 @@ public class InstancePreferenceAccessor {
 	 * @param preferenceTabs
 	 * @param l
 	 */
-	public static void resetToDefaultValue(List<PreferenceTabDescriptor> preferenceTabs, Locale l) {
+	public static void resetToDefaultValue(PreferenceTabDescriptor tab, Locale l) {
 
-		for (PreferenceTabDescriptor tab : preferenceTabs) {
+		for (PreferenceSectionDescriptor section : tab.getSections()) {
 
-			for (PreferenceSectionDescriptor section : tab.getSections()) { 
-
-				for (PreferenceDescriptor pref : section.getPreferences()) {
-					String key = pref.getKey();
-					Object defaultValue = pref.getDefaultValue();
-					PreferenceWindow.getInstance().setValue(key, defaultValue);
-				}
+			for (PreferenceDescriptor pref : section.getPreferences()) {
+				String key = pref.getKey();
+				Object defaultValue = pref.getDefaultValue();
+				PreferenceWindow.getInstance().setValue(key, defaultValue);
 			}
+
 		}
 		PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(l));
 	}
