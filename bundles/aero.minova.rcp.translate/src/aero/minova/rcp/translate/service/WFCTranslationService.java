@@ -7,22 +7,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
@@ -41,12 +34,6 @@ public class WFCTranslationService extends TranslationService {
 	private String applicationId = "WFC";
 	private Properties resources = new Properties();
 
-	@SuppressWarnings("restriction")
-	@Inject
-	protected UISynchronize sync;
-
-	private int propertyFilesToLoadCount = 0;
-
 	public WFCTranslationService() {
 	}
 
@@ -54,12 +41,6 @@ public class WFCTranslationService extends TranslationService {
 	@Optional
 	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
 		System.out.println("Injected via context: " + s);
-	}
-
-	@Inject
-	@Optional
-	private void getNotified2(@UIEventTopic(ILocaleChangeService.LOCALE_CHANGE) Locale s) {
-		System.out.println("Injected via event broker: " + s);
 	}
 
 	@Override
@@ -196,30 +177,24 @@ public class WFCTranslationService extends TranslationService {
 			}
 			if (!isEmpty(locale.getLanguage())) {
 				filename += "_" + locale.getLanguage();
-				dataService.loadFile(sync, filename + ".properties");
 				loadResources(filename + ".properties");
 				if (!isEmpty(locale.getCountry())) {
 					filename += "_" + locale.getCountry();
-					dataService.loadFile(sync, filename + ".properties");
 					loadResources(filename + ".properties");
 					if (!isEmpty(locale.getVariant())) {
 						filename += "_" + locale.getVariant();
-						dataService.loadFile(sync, filename + ".properties");
 						loadResources(filename + ".properties");
 					}
 				}
 				filename = "i18n/messages" + "+" + locale.getDisplayLanguage();
 				if (!isEmpty(locale.getScript())) {
 					filename += "_" + locale.getScript();
-					dataService.loadFile(sync, filename + ".properties");
 					loadResources(filename + ".properties");
 					if (!isEmpty(locale.getCountry())) {
 						filename += "_" + locale.getCountry();
-						dataService.loadFile(sync, filename + ".properties");
 						loadResources(filename + ".properties");
 						if (!isEmpty(locale.getVariant())) {
 							filename += "_" + locale.getVariant();
-							dataService.loadFile(sync, filename + ".properties");
 							loadResources(filename + ".properties");
 						}
 					}
