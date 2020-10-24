@@ -45,7 +45,7 @@ public class InstancePreferenceAccessor {
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
 			String fd = preferences.get(preferenceKey, (String) defaultValue);
-			if (fd == "") {
+			if (fd == null || fd.length() == 0) {
 				fd = null;
 			}
 			return (fd == null ? null : new FontData(fd));
