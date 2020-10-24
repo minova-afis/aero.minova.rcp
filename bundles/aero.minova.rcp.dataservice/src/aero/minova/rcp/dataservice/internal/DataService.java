@@ -167,6 +167,26 @@ public class DataService implements IDataService {
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
 	@Override
+	public File getFileSynch(String filename) {
+		String path = null;
+		try {
+			path = Platform.getInstanceLocation().getURL().toURI().toString();
+			File cachedFile = new File(new URI(path + filename));
+			if (cachedFile.exists())
+				return cachedFile;
+		} catch (URISyntaxException e) {
+		}
+		return getFileSynch(path, filename);
+	}
+
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	@Override
 	public File getFileSynch(String localPath, String filename) {
 		init();
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))

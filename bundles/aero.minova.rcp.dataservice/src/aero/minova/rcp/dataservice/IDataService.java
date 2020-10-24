@@ -31,4 +31,12 @@ public interface IDataService {
 	void loadFile(UISynchronize sync, String filename);
 
 	File getFileSynch(String path, String mdiFileName);
+
+	/**
+	 * synchrones laden einer Datei vom Cache.
+	 *
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	File getFileSynch(String filename);
 }
