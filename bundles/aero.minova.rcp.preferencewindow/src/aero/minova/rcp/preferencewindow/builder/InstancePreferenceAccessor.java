@@ -18,15 +18,15 @@ import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 public class InstancePreferenceAccessor {
 
 	/**
-	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen
-	 * Preferences.
+	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen Preferences.
 	 * 
 	 * @param preferences
 	 * @param preferenceKey
 	 * @param type
 	 * @return
 	 */
-	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue, Locale l) {
+	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue,
+			Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -36,7 +36,7 @@ public class InstancePreferenceAccessor {
 		case PASSWORD:
 		case LOCALE:
 		case TEXT:
-			return preferences.get(preferenceKey,(String) defaultValue);
+			return preferences.get(preferenceKey, (String) defaultValue);
 		case INTEGER:
 			return preferences.getInt(preferenceKey, (int) defaultValue);
 		case FLOAT:
@@ -45,7 +45,7 @@ public class InstancePreferenceAccessor {
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
 			String fd = preferences.get(preferenceKey, (String) defaultValue);
-			if(fd == "") {
+			if (fd == "") {
 				fd = null;
 			}
 			return (fd == null ? null : new FontData(fd));
