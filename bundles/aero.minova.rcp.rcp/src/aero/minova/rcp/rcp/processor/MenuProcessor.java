@@ -158,13 +158,12 @@ public class MenuProcessor {
 		MParameter mParameter = modelService.createModelElement(MParameter.class);
 		handledMenuItem.setCommand(command);
 		mParameter.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId" + entry_MDI.getId());
-		mParameter.setName("org.eclipse.e4.ui.perspectives.parameters.perspectiveId");
+		mParameter.setName("aero.minova.rcp.perspectiveswitcher.parameters.formName");
 		mParameter.setValue(action_MDI.getAction());
 
 		handledMenuItem.getParameters().add(mParameter);
 		handledMenuItem.setElementId(action_MDI.getId());
 
-		// TODO Übersetzung
 		handledMenuItem.setLabel(action_MDI.getText());
 		// TODO Icon setzen
 		handledMenuItem.setIconURI(action_MDI.getIcon());

@@ -192,7 +192,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 				@Override
 				public void widgetSelected(SelectionEvent event) {
-					Map<String, String> parameter = Map.of("org.eclipse.e4.ui.perspectives.parameters.perspectiveId",
+					Map<String, String> parameter = Map.of("aero.minova.rcp.perspectiveswitcher.parameters.formName",
 							perspective.getElementId());
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform",
 							parameter);

@@ -119,7 +119,8 @@ public class SwitchPerspectiveHandler {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
-			perspective.setLabel(toolLabel);
+//			perspective.setLabel(toolLabel);
+			perspective.setLabel("@Form.Index");
 			perspectiveStack.getChildren().add(0, perspective);
 			switchTo(context, perspective, perspectiveID, window);
 
