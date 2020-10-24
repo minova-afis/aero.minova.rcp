@@ -40,7 +40,8 @@ public class WFCTranslationService extends TranslationService {
 	@Inject
 	@Optional
 	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
-		System.out.println("Injected via context: " + s);
+		locale = s;
+		loadResources();
 	}
 
 	@Override
