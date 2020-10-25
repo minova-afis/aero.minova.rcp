@@ -21,8 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
@@ -43,7 +41,7 @@ public class SwitchPerspectiveHandler {
 	
 	@Execute
 	public void execute(IEclipseContext context,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
+			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
 			MWindow window) throws InvocationTargetException, InterruptedException {
 
@@ -112,6 +110,7 @@ public class SwitchPerspectiveHandler {
 				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
+		window.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
 		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
 
 		if (element == null) {
@@ -120,7 +119,8 @@ public class SwitchPerspectiveHandler {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
-			perspective.setLabel(toolLabel);
+//			perspective.setLabel(toolLabel);
+			perspective.setLabel("@Form.Index");
 			perspectiveStack.getChildren().add(0, perspective);
 			switchTo(context, perspective, perspectiveID, window);
 
@@ -134,7 +134,7 @@ public class SwitchPerspectiveHandler {
 	 * @param element
 	 */
 	public void switchTo(IEclipseContext context, MUIElement element,
-			@Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID, MWindow window) {
+			@Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID, MWindow window) {
 		EPartService partService = context.get(EPartService.class);
 		
 		if (element instanceof MPerspective) {

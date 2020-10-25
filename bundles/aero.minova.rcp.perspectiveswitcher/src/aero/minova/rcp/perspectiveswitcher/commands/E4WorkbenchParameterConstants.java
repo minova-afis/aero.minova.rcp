@@ -6,7 +6,7 @@ public class E4WorkbenchParameterConstants {
      * Id for command parameter "Perspective ID"
      * (value is <code>"org.eclipse.e4.ui.perspectives.parameters.perspectiveId"</code>).
      */
-	public static final String COMMAND_PERSPECTIVE_ID = "org.eclipse.e4.ui.perspectives.parameters.perspectiveId"; //$NON-NLS-1$
+	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
 
 	 /**
      * Id for command parameter "New Window"

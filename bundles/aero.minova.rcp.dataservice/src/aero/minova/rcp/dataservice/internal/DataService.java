@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -23,6 +24,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
@@ -34,7 +37,6 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
-import sun.swing.UIAction;
 
 @Component
 public class DataService implements IDataService {
@@ -160,20 +162,40 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param path
-	 * @param filename
-	 * @return
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
 	@Override
-	public File getFileSynch(String path, String fileName) {
+	public File getFileSynch(String filename) {
+		String path = null;
+		try {
+			path = Platform.getInstanceLocation().getURL().toURI().toString();
+			File cachedFile = new File(new URI(path + filename));
+			if (cachedFile.exists())
+				return cachedFile;
+		} catch (URISyntaxException e) {
+		}
+		return getFileSynch(path, filename);
+	}
+
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	@Override
+	public File getFileSynch(String localPath, String filename) {
 		init();
-		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName))
+		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
 
 		try {
 			String body = httpClient.send(request, BodyHandlers.ofString()).body();
-			URI uri = new URI(path + fileName);
+			URI uri = new URI(localPath + filename);
 			Files.writeString(Path.of(uri), body, StandardOpenOption.CREATE);
 			return new File(uri);
 		} catch (IOException | URISyntaxException | InterruptedException e) {
@@ -196,4 +218,45 @@ public class DataService implements IDataService {
 
 	}
 
+	public void loadFile(UISynchronize sync, String filename) {
+		loadFile(sync, filename, false);
+	}
+
+	public void loadFile(UISynchronize sync, String filename, boolean reload) {
+		try {
+			String workspacePath = Platform.getInstanceLocation().getURL().toURI().toString().substring(5);
+			Path localPath = FileSystems.getDefault().getPath(workspacePath + filename);
+			if (!reload && Files.exists(localPath)) {
+				return; // Datei existiert lokal und muss nicht nachgeladen werden
+			}
+			Files.createDirectories(localPath.getParent());
+			try {
+				CompletableFuture<String> fileFuture = getFile(filename);
+				fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
+					try {
+						byte[] file;
+						try {
+							String result = bytes.substring(1, bytes.length() - 2);
+							String byteValues[] = result.split(",");
+							file = new byte[byteValues.length];
+							int i = 0;
+							for (String string : byteValues) {
+								file[i++] = Byte.parseByte(string);
+							}
+						} catch (NumberFormatException nfe) {
+							// Es ist wohl keine Datei angekommen
+							file = new byte[0];
+						}
+						Files.write(localPath, file);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}));
+			} catch (NullPointerException npe) {
+				npe.printStackTrace();
+			}
+		} catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

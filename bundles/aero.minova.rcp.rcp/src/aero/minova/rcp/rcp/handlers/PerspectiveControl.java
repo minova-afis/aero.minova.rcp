@@ -104,7 +104,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
 	 */
 	@PostConstruct
-	public void createGui(Composite parent, MWindow window, @Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveId) {
+	public void createGui(Composite parent, MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 		perspectiveSwitcher.setControlProvider(this);
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
@@ -192,7 +192,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 				@Override
 				public void widgetSelected(SelectionEvent event) {
-					Map<String, String> parameter = Map.of("org.eclipse.e4.ui.perspectives.parameters.perspectiveId",
+					Map<String, String> parameter = Map.of("aero.minova.rcp.perspectiveswitcher.parameters.formName",
 							perspective.getElementId());
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform",
 							parameter);
@@ -363,7 +363,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID,
+				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME,
 						perspectiveId);
 				ParameterizedCommand command = commandService
 						.createCommand("aero.minova.rcp.rcp.command.closeperspective", parameter);
@@ -382,7 +382,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID,
+				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME,
 						perspectiveId);
 				ParameterizedCommand command = commandService
 						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
