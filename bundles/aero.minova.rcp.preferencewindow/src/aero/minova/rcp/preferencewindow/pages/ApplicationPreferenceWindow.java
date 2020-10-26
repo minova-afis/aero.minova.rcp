@@ -144,7 +144,7 @@ public class ApplicationPreferenceWindow {
 			}
 		}
 		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
-				Locale.getDefault().getDisplayCountry(s), s));
+				Locale.getDefault().getDisplayCountry(Locale.getDefault()), s));
 
 		return data;
 	}
