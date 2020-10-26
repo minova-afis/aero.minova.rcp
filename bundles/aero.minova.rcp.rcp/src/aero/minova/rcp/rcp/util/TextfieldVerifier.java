@@ -9,6 +9,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.rcp.parts.XMLDetailPart;
 
 public class TextfieldVerifier implements FocusListener {
 
@@ -70,6 +71,8 @@ public class TextfieldVerifier implements FocusListener {
 				t.setText(verifyDate(newString));
 			} else {
 				t.setText(verifyTime(newString));
+				XMLDetailPart xml = (XMLDetailPart) t.getData("XMLDetailPart");
+				xml.updateQuantitys();
 			}
 		}
 

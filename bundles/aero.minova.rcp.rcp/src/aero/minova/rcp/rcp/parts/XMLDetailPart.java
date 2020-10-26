@@ -153,6 +153,7 @@ public class XMLDetailPart {
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
+					text.setData("XMLDetailPart", this);
 					text.addFocusListener(tfv);
 				}
 				if (field.getText() != null) {
