@@ -124,10 +124,9 @@ public class InstancePreferenceAccessor {
 				Object defaultValue = pref.getDefaultValue();
 				PreferenceWindow.getInstance().setValue(key, defaultValue);
 			}
-
 		}
-		if(tab.id.equals("designTab"))
-		PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(l));
+		if (tab.id.equals("designTab"))
+			PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(l));
 	}
 
 }
