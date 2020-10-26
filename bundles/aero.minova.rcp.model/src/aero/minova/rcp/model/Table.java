@@ -44,6 +44,10 @@ public class Table {
 		return -1;
 	}
 
+	public List<Column> getColumns() {
+		return columns;
+	}
+
 	public void addRow(Row r) {
 		if (columns.size() != r.values.size()) {
 			throw new RuntimeException("Mehr Columns definiert, als Wert übergeben!");

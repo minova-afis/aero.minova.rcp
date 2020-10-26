@@ -9,11 +9,15 @@ import aero.minova.rcp.model.Table;
 public interface IDataFormService {
 
 	Form getForm();
+	
+	Form getForm(String name);
 
 	Table getTableFromFormIndex(Form form);
 
 	Table getTableFromFormDetail(Form form, String prefix);
 
-	List<Field> getFieldsFromForm(Form form, Boolean insert);
+	List<Field> getFieldsFromForm(Form form);
+
+	List<Field> getAllPrimaryFieldsFromForm(Form form);
 
 }

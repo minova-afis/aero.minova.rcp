@@ -77,7 +77,7 @@
           </children>
         </children>
         <children xsi:type="basic:PartStack" xmi:id="_T04rYLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_r6jD0LqjEeqSa5ZfLepYaA">
-          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" label="Details"/>
+          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="Details"/>
         </children>
       </children>
     </snippets>
@@ -88,21 +88,6 @@
       </children>
       <children xsi:type="menu:Menu" xmi:id="_6wlLjsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.menu" label="Help">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLj8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
-      </children>
-      <children xsi:type="menu:Menu" xmi:id="_hZQ74LufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.menu.master" label="Master">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_KPdTcOLKEeqIbaaiaTRUGA" elementId="aero.minova.rcp.rcp.handledmenuitem.sis" label="SIS" command="_4j7QUOOOEeqf6YlJmDESrg"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_oeKiALufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handledmenuitem.item" label="Item" command="_4p5JwLufEeqOjqZ1liG0LA">
-          <parameters xmi:id="_CzjhYLugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.item" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.item"/>
-        </children>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_m8ZJELumEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handledmenuitem.tank" label="Tank" command="_4p5JwLufEeqOjqZ1liG0LA">
-          <parameters xmi:id="_pWmhsLumEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.parameter.tank" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.tank"/>
-        </children>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_5BzFYLz9EeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.handledmenuitem.dispo" label="DISPO" command="_4p5JwLufEeqOjqZ1liG0LA">
-          <parameters xmi:id="_8clxQLz9EeqfN4F3ENBZmg" elementId="aero.minova.rcp.rcp.parameter.dispo" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.dispo"/>
-        </children>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_6fT-sL-OEeqZxdHjk084tw" elementId="aero.minova.rcp.rcp.handledmenuitem.kunde" label="Kunde" command="_4p5JwLufEeqOjqZ1liG0LA">
-          <parameters xmi:id="_9HjMQL-OEeqZxdHjk084tw" elementId="aero.minova.rcp.rcp.parameter.kunde" name="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" value="aero.minova.rcp.rcp.perspective.kunde"/>
-        </children>
       </children>
     </mainMenu>
     <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top"/>
@@ -130,7 +115,7 @@
   <commands xmi:id="_6wlLfMgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.exit" commandName="exitCommand"/>
   <commands xmi:id="_6wlLhsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
   <commands xmi:id="_4p5JwLufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
-    <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="FormName" optional="false"/>
+    <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="FormName" optional="false"/>
   </commands>
   <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
     <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="ClosePerspective"/>

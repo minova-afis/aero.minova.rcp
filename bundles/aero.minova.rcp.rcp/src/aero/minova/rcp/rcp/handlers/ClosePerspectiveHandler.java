@@ -33,7 +33,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 
 	@Execute
 	public void execute(MWindow window,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveId) {
+			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
 		List<MPerspective> perspective = modelService.findElements(application, perspectiveId, MPerspective.class);
 
