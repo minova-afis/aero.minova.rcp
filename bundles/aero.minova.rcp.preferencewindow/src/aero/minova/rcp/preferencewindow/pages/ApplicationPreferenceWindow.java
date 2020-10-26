@@ -91,10 +91,20 @@ public class ApplicationPreferenceWindow {
 
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					InstancePreferenceAccessor.resetToDefaultValue(tabDescriptor, s);
+					for (PreferenceSectionDescriptor section : tabDescriptor.getSections()) {
+						for (PreferenceDescriptor pref : section.getPreferences()) {
+							String key = pref.getKey();
+							Object defaultValue = pref.getDefaultValue();
+							window.setValue(key, defaultValue);
+							
+						}
+					}
+					if (tabDescriptor.getId().equals("designTab"))
+						PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(Locale.getDefault()));
 				}
 
 			}).setAlignment(GridData.END));
+
 		}
 
 		window.setSelectedTab(0);
