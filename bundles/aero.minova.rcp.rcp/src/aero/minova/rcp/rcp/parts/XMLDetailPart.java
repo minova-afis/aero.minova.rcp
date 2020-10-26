@@ -794,6 +794,7 @@ public class XMLDetailPart {
 				}
 			}
 			setKeys(null);
+			selectedTable = null;
 		}
 	}
 
@@ -871,8 +872,9 @@ public class XMLDetailPart {
 				}
 			}
 		}
-		selectedTable = t;
-		updateSelectedEntry();
+		// Lösung wenn Keylongs anstatt KeyTexts übergeben werden:
+		// selectedTable = t;
+		// updateSelectedEntry();
 	}
 
 	public Map<String, Control> getControls() {
