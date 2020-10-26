@@ -107,7 +107,7 @@ public class Manager {
 		preferences.putBoolean("deactivateinternpreview", deactivateinternpreview);
 		int maxCharacter = preferences.getInt("maxCharacter", 24000);
 		preferences.putInt("maxCharacter", maxCharacter);
-		String user = preferences.get("user", "bauer");
+		String user = preferences.get("user", System.getProperty("user.name"));
 		preferences.put("user", user);
 		String fd = preferences.get("fontChooser", null);
 		if ("".equals(fd))
