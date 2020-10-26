@@ -121,6 +121,7 @@ public class WFCTranslationService extends TranslationService {
 			logger.info(Platform.getInstallLocation().toString());
 		}
 		this.dataService = dataService;
+		loadResources();
 	}
 
 	public void setTranslationService(TranslationService o) {
@@ -163,6 +164,8 @@ public class WFCTranslationService extends TranslationService {
 	private void loadResources() {
 		String basePath, i18nPath;
 		String filename;
+		if (dataService == null) return;
+		
 		try {
 			basePath = Platform.getInstanceLocation().getURL().toURI().toString();
 			i18nPath = basePath + "i18n";
