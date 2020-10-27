@@ -760,11 +760,8 @@ public class XMLDetailPart {
 					t.setText(lastEndDate);
 				} else {
 					Field f = (Field) c.getData(Constants.CONTROL_FIELD);
-					if (f.getNumber() != null) {
-						t.setText("0");
-					} else {
-						t.setText("");
-					}
+					t.setText("");
+
 				}
 			}
 			if (c instanceof LookupControl) {
@@ -774,22 +771,37 @@ public class XMLDetailPart {
 				lc.getDescription().setText("");
 			}
 			setKeys(null);
-			/*
-			 * // Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus
-			 * den // preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS
-			 * versendet // um zu gewährleisten, das wir diesen Eintrag auch derzeit in der
-			 * Anwendung // haben LookupControl lc = (LookupControl)
-			 * controls.get("EmployeeText"); lc.setText(employee); CompletableFuture<?>
-			 * tableFuture; tableFuture = LookupCASRequestUtil.getRequestedTable(0, null,
-			 * lc.getData(), controls, dataService, sync, "List");
-			 * 
-			 * tableFuture.thenAccept(ta -> sync.asyncExec(() -> { if (ta instanceof Table)
-			 * { Table t1 = (Table) ta; changeOptionsForLookupField(t1, lc, true); }
-			 * 
-			 * }));
-			 */
-
 		}
+		/*
+		 * Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den
+		 * preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS versendet
+		 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
+		 * haben
+		 */
+		LookupControl lc = (LookupControl) controls.get("EmployeeKey");
+		lc.setText(employee);
+		CompletableFuture<?> tableFuture;
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),
+				controls, dataService, sync, "List");
+
+		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+			if (ta instanceof Table) {
+				Table t1 = (Table) ta;
+				for (Row r : t1.getRows()) {
+					if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+							.equals(employee.toLowerCase())) {
+						lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+						if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							lc.getDescription().setText(
+									r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						}
+						lc.setData(Constants.CONTROL_KEYLONG, r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
+					}
+				}
+				// changeOptionsForLookupField(t1, lc, true);
+			}
+
+		}));
 	}
 
 	public Map<String, Control> getControls() {
