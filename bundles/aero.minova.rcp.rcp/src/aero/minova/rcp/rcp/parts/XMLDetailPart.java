@@ -94,6 +94,7 @@ public class XMLDetailPart {
 	private List<ArrayList> keys = null;
 	private Table selectedTable;
 	private Form form;
+	private String lastEndDate = "";
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -740,16 +741,16 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if (origin.equals("Delete")) {
-					t.setText("");
-				} else if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+				if (c.getData("field") == controls.get("BookingDate").getData("field")) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
-				} else if (c.getData("field") == controls.get("StartDate").getData("field")
-						&& origin.equals("Insert")) {
+				} else if (c.getData("field") == controls.get("StartDate").getData("field")) {
 					Text endDate = (Text) controls.get("EndDate");
-					t.setText(endDate.getText());
+					if (endDate.getText() != "") {
+						lastEndDate = endDate.getText();
+					}
+					t.setText(lastEndDate);
 				} else {
 					Field f = (Field) c.getData("field");
 					if (f.getNumber() != null) {
