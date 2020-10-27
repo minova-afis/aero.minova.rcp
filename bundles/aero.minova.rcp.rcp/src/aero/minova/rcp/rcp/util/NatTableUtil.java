@@ -27,6 +27,7 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -112,5 +113,23 @@ public class NatTableUtil {
 
 		natTable.configure();
 		return natTable;
+	}
+
+	public static void resizeTable(NatTable table) {
+		if (!table.isDisposed()) {
+
+			int[] selectedColumnPositions = new int[table.getColumnCount()];
+
+			for (int i = table.getColumnCount() - 1; i > -1; i--) {
+
+				selectedColumnPositions[i] = i;
+
+			}
+
+			AutoResizeColumnsCommand columnCommand = new AutoResizeColumnsCommand(table, false,
+					selectedColumnPositions);
+
+			table.doCommand(columnCommand);
+		}
 	}
 }

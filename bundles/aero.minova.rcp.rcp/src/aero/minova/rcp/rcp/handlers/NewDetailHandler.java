@@ -12,11 +12,11 @@ public class NewDetailHandler {
 
 	@Inject
 	EModelService model;
-	@Inject 
+	@Inject
 	private IEventBroker broker;
 
 	@Execute
 	public void execute(MPart mpart, MPerspective mPerspective) {
-		broker.post("clearFields", "Delete");
+		broker.post("clearFields", "clear");
 	}
 }
