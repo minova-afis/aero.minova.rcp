@@ -407,46 +407,48 @@ public class XMLDetailPart {
 		if (rows != null) {
 
 			Row row = rows.get(0);
-			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
+			if (row.getValue(0).getValue() != null) {
+				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
 
-			RowBuilder builder = RowBuilder.newRow();
-			List<Field> allFields = dataFormService.getFieldsFromForm(form);
+				RowBuilder builder = RowBuilder.newRow();
+				List<Field> allFields = dataFormService.getFieldsFromForm(form);
 
-			// Hauptmaske
+				// Hauptmaske
 
-			List<Column> indexColumns = form.getIndexView().getColumn();
-			setKeys(new ArrayList<ArrayList>());
-			for (Field f : allFields) {
-				boolean found = false;
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					if (indexColumns.get(i).getName().equals(f.getName())) {
-						found = true;
-						if ("primary".equals(f.getKeyType())) {
-							builder.withValue(row.getValue(i).getValue());
-							ArrayList al = new ArrayList();
-							al.add(indexColumns.get(i).getName());
-							al.add(row.getValue(i).getValue());
-							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-							keys.add(al);
-						} else {
-							builder.withValue(null);
+				List<Column> indexColumns = form.getIndexView().getColumn();
+				setKeys(new ArrayList<ArrayList>());
+				for (Field f : allFields) {
+					boolean found = false;
+					for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+						if (indexColumns.get(i).getName().equals(f.getName())) {
+							found = true;
+							if ("primary".equals(f.getKeyType())) {
+								builder.withValue(row.getValue(i).getValue());
+								ArrayList al = new ArrayList();
+								al.add(indexColumns.get(i).getName());
+								al.add(row.getValue(i).getValue());
+								al.add(ValueBuilder.value(row.getValue(i)).getDataType());
+								keys.add(al);
+							} else {
+								builder.withValue(null);
+							}
 						}
 					}
-				}
-				if (!found) {
-					builder.withValue(null);
-				}
+					if (!found) {
+						builder.withValue(null);
+					}
 
+				}
+				Row r = builder.create();
+				rowIndexTable.addRow(r);
+
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService
+						.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+					selectedTable = t.getOutputParameters();
+					updateSelectedEntry();
+				}));
 			}
-			Row r = builder.create();
-			rowIndexTable.addRow(r);
-
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
-					rowIndexTable);
-			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-				selectedTable = t.getOutputParameters();
-				updateSelectedEntry();
-			}));
 		}
 	}
 
