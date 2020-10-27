@@ -86,6 +86,10 @@ public class XMLDetailPart {
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
 
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "employee")
+	String employee;
+
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
 
@@ -743,18 +747,19 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+				if (c.getData("field") == controls.get("BookingDate").getData(Constants.CONTROL_FIELD)) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
-				} else if (c.getData("field") == controls.get("StartDate").getData("field")) {
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate")
+						.getData(Constants.CONTROL_FIELD)) {
 					Text endDate = (Text) controls.get("EndDate");
 					if (endDate.getText() != "") {
 						lastEndDate = endDate.getText();
 					}
 					t.setText(lastEndDate);
 				} else {
-					Field f = (Field) c.getData("field");
+					Field f = (Field) c.getData(Constants.CONTROL_FIELD);
 					if (f.getNumber() != null) {
 						t.setText("0");
 					} else {
@@ -769,6 +774,24 @@ public class XMLDetailPart {
 				lc.getDescription().setText("");
 			}
 			setKeys(null);
+			// Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den
+			// preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS versendet
+			// um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
+			// haben
+			LookupControl lc = (LookupControl) controls.get("EmployeeText");
+			lc.setText(employee);
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, lc.getData(), controls, dataService, sync,
+					"List");
+
+			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+				if (ta instanceof Table) {
+					Table t1 = (Table) ta;
+					changeOptionsForLookupField(t1, lc, true);
+				}
+
+			}));
+
 		}
 	}
 
