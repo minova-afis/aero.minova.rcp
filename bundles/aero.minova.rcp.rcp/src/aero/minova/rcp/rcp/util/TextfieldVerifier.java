@@ -31,9 +31,9 @@ public class TextfieldVerifier implements FocusListener {
 		}
 	}
 
-	public static String verifyDate(String newString) {
+	public static String verifyDate(String newString, String timezone) {
 		String date = "";
-		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.systemDefault());
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.of(timezone));
 		Instant instant = DateTimeUtil.getDate(newString);
 		if (instant != null) {
 			date = df.format(instant);
@@ -43,10 +43,10 @@ public class TextfieldVerifier implements FocusListener {
 		return date;
 	}
 
-	public static String verifyTime(String newString) {
+	public static String verifyTime(String newString, String timezone) {
 		String time = "";
-		DateTimeFormatter df = DateTimeFormatter.ofPattern("hh:mm").withZone(ZoneId.systemDefault());
-		Instant instant = TimeUtil.getTime(newString);
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("hh:mm").withZone(ZoneId.of(timezone));
+		Instant instant = TimeUtil.getTime(newString, timezone);
 		if (instant != null) {
 			time = df.format(instant);
 		} else {
@@ -66,12 +66,12 @@ public class TextfieldVerifier implements FocusListener {
 		final String newString = ((Text) e.getSource()).getText();
 		if (newString != "") {
 			Text t = (Text) e.getSource();
+			XMLDetailPart xml = (XMLDetailPart) t.getData("XMLDetailPart");
 			Field field = (Field) t.getData("field");
 			if (field.getShortDate() != null || field.getLongDate() != null) {
-				t.setText(verifyDate(newString));
+				t.setText(verifyDate(newString, xml.getTimeZone()));
 			} else {
-				t.setText(verifyTime(newString));
-				XMLDetailPart xml = (XMLDetailPart) t.getData("XMLDetailPart");
+				t.setText(verifyTime(newString, xml.getTimeZone()));
 				xml.updateQuantitys();
 			}
 		}

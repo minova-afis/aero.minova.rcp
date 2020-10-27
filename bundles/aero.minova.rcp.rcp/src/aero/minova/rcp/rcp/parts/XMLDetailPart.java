@@ -781,4 +781,8 @@ public class XMLDetailPart {
 		this.keys = keys;
 	}
 
+	public String getTimeZone() {
+		return timezone;
+	}
+
 }

@@ -6,25 +6,25 @@ import java.time.ZoneId;
 
 public class TimeUtil {
 
-	static public Instant getTime(String input) {
+	static public Instant getTime(String input, String timezone) {
 
-		return getTime(Instant.now(), input);
+		return getTime(Instant.now(), input, timezone);
 	}
 
-	static public Instant getTime(Instant today, String input) {
+	static public Instant getTime(Instant today, String input, String timezone) {
 
 		if (input.contains("-") || input.contains("+")) {
-			today = changeHours(today, input);
+			today = changeHours(today, input, timezone);
 		} else {
-			today = getTimeFromNumbers(input);
+			today = getTimeFromNumbers(input, timezone);
 		}
 		return today;
 	}
 
-	private static Instant changeHours(Instant instant, String input) {
+	private static Instant changeHours(Instant instant, String input, String timezone) {
 
 		boolean correctInput = true;
-		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
 
 		for (int i = 0; i < input.length(); i++) {
 			if (correctInput = true) {
@@ -38,14 +38,14 @@ public class TimeUtil {
 			}
 		}
 		if (correctInput == true) {
-			instant = lt.toInstant(ZoneId.systemDefault().getRules().getOffset(lt));
+			instant = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
 		} else {
 			instant = null;
 		}
 		return instant;
 	}
 
-	private static Instant getTimeFromNumbers(String subString) {
+	private static Instant getTimeFromNumbers(String subString, String timezone) {
 
 		Integer hours = 0;
 		Integer minutes = 0;
@@ -70,7 +70,7 @@ public class TimeUtil {
 		}
 
 		LocalDateTime localDateTime = LocalDateTime.now().withHour(hours).withMinute(minutes).withSecond(0);
-		Instant instant = localDateTime.toInstant(ZoneId.systemDefault().getRules().getOffset(localDateTime));
+		Instant instant = localDateTime.toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
 		return instant;
 	}
 
