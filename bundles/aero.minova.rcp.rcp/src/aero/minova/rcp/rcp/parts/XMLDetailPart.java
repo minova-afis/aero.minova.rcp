@@ -87,7 +87,7 @@ public class XMLDetailPart {
 	String timezone;
 
 	@Inject
-	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "employee")
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "user")
 	String employee;
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
