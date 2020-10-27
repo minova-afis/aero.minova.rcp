@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -80,6 +81,10 @@ public class XMLDetailPart {
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
+
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
@@ -585,16 +590,16 @@ public class XMLDetailPart {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		LocalDate localDate = LocalDate.parse(bookingDate, df);
 		LocalDateTime localDateTime = localDate.atTime(0, 0);
-		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of("Europe/Berlin"));
+		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of(timezone));
 		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex("BookingDate"));
 		LocalTime timeEndDate = LocalTime.parse(endDate);
 		LocalTime timeStartDate = LocalTime.parse(startDate);
 
 		LocalDateTime localEndDate = localDate.atTime(timeEndDate);
-		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of("Europe/Berlin"));
+		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
 		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex("EndDate"));
 		LocalDateTime localStartDate = localDate.atTime(timeStartDate);
-		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of("Europe/Berlin"));
+		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
 		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex("StartDate"));
 		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex("ChargedQuantity"));
 		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex("RenderedQuantity"));
