@@ -15,7 +15,6 @@ import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWButton;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
@@ -25,9 +24,8 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -63,13 +61,18 @@ public class ApplicationPreferenceWindow {
 	@Named(TranslationService.LOCALE)
 	Locale s;
 
+	@Inject
+	TranslationService translationService;
+
 	@Execute
 	public void execute() {
 		pwm = new PreferenceWindowModel(s);
 
+		Shell shell = new Shell();
+
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
 		Map<String, Object> data = fillData(preferenceTabs);
-		PreferenceWindow window = PreferenceWindow.create(data);
+		PreferenceWindow window = PreferenceWindow.create(shell, data);
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -84,27 +87,8 @@ public class ApplicationPreferenceWindow {
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
 					createWidgets(newTab, pref, key, values);
-
 				}
 			}
-			newTab.add(new PWButton("Standart", new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					for (PreferenceSectionDescriptor section : tabDescriptor.getSections()) {
-						for (PreferenceDescriptor pref : section.getPreferences()) {
-							String key = pref.getKey();
-							Object defaultValue = pref.getDefaultValue();
-							window.setValue(key, defaultValue);
-							
-						}
-					}
-					if (tabDescriptor.getId().equals("designTab"))
-						PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(Locale.getDefault()));
-				}
-
-			}).setAlignment(GridData.END));
-
 		}
 
 		window.setSelectedTab(0);

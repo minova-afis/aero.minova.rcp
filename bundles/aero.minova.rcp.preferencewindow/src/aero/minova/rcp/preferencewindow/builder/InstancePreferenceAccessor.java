@@ -4,7 +4,6 @@ import java.time.ZoneId;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
@@ -108,25 +107,4 @@ public class InstancePreferenceAccessor {
 			break;
 		}
 	}
-
-	/**
-	 * Setzt alle Werte auf die Default Werte zurück
-	 * 
-	 * @param preferenceTabs
-	 * @param l
-	 */
-	public static void resetToDefaultValue(PreferenceTabDescriptor tab, Locale l) {
-
-		for (PreferenceSectionDescriptor section : tab.getSections()) {
-
-			for (PreferenceDescriptor pref : section.getPreferences()) {
-				String key = pref.getKey();
-				Object defaultValue = pref.getDefaultValue();
-				PreferenceWindow.getInstance().setValue(key, defaultValue);
-			}
-		}
-		if (tab.id.equals("designTab"))
-			PreferenceWindow.getInstance().setValue("country", Locale.getDefault().getDisplayCountry(l));
-	}
-
 }
