@@ -70,7 +70,7 @@ public class ApplicationPreferenceWindow {
 
 		Shell shell = new Shell();
 
-		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
+		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
 		PreferenceWindow window = PreferenceWindow.create(shell, data);
 
@@ -183,7 +183,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), "language", context).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
 			break;
 		default:
 			break;
