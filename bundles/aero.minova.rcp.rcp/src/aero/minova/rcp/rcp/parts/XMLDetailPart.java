@@ -132,8 +132,10 @@ public class XMLDetailPart {
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
-			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
-					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
+			if ((c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
+					.getData(Constants.CONTROL_FIELD))
+					|| (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_ENDDATE)
+							.getData(Constants.CONTROL_FIELD))) {
 				c.addKeyListener(new KeyListener() {
 
 					@Override
@@ -163,7 +165,7 @@ public class XMLDetailPart {
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
-					text.setData("XMLDetailPart", this);
+					text.setData(Constants.FOCUSED_ORIGIN, this);
 					text.addFocusListener(tfv);
 				}
 				if (field.getText() != null) {
@@ -220,16 +222,16 @@ public class XMLDetailPart {
 	 * verändert
 	 */
 	public void updateQuantitys() {
-		Text endDate = (Text) controls.get("EndDate");
-		Text startDate = (Text) controls.get("StartDate");
+		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+		Text startDate = (Text) controls.get(Constants.FORM_STARTDATE);
 		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
 			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
 			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
 			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
 					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
 			timeDifference = timeDifference / 60;
-			Text renderedField = (Text) controls.get("RenderedQuantity");
-			Text chargedField = (Text) controls.get("ChargedQuantity");
+			Text renderedField = (Text) controls.get(Constants.FORM_RENDEREDQUANTITY);
+			Text chargedField = (Text) controls.get(Constants.FORM_CHARGEDQUANTITY);
 			String renderedValue;
 			String chargedValue;
 			if (timeDifference >= 0) {
@@ -416,7 +418,7 @@ public class XMLDetailPart {
 
 			Row row = rows.get(0);
 			if (row.getValue(0).getValue() != null) {
-				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
+				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
 
 				RowBuilder builder = RowBuilder.newRow();
 				List<Field> allFields = dataFormService.getFieldsFromForm(form);
@@ -509,9 +511,9 @@ public class XMLDetailPart {
 		RowBuilder rb = RowBuilder.newRow();
 
 		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(form, "Update");
+			formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
 		} else {
-			formTable = dataFormService.getTableFromFormDetail(form, "Insert");
+			formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
 		}
 		int valuePosition = 0;
 		if (getKeys() != null) {
@@ -576,9 +578,11 @@ public class XMLDetailPart {
 		}
 
 		formTable.addRow(r);
-		checkWorkingTime(((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
-				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
-				((Text) controls.get("ChargedQuantity")).getText(), formTable, r);
+		checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
+				((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
+				((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
+				((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
+				((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 	}
 
 	/**
@@ -602,18 +606,18 @@ public class XMLDetailPart {
 		LocalDate localDate = LocalDate.parse(bookingDate, df);
 		LocalDateTime localDateTime = localDate.atTime(0, 0);
 		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of(timezone));
-		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex("BookingDate"));
+		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex(Constants.FORM_BOOKINGDATE));
 		LocalTime timeEndDate = LocalTime.parse(endDate);
 		LocalTime timeStartDate = LocalTime.parse(startDate);
 
 		LocalDateTime localEndDate = localDate.atTime(timeEndDate);
 		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
-		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex("EndDate"));
+		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex(Constants.FORM_ENDDATE));
 		LocalDateTime localStartDate = localDate.atTime(timeStartDate);
 		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
-		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex("StartDate"));
-		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex("ChargedQuantity"));
-		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex("RenderedQuantity"));
+		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex(Constants.FORM_STARTDATE));
+		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex(Constants.FORM_CHARGEDQUANTITY));
+		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex(Constants.FORM_RENDEREDQUANTITY));
 
 		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
 				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
@@ -661,7 +665,7 @@ public class XMLDetailPart {
 			openNotificationPopup("Entry could not be updated");
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
-			clearFields("Update");
+			clearFields(Constants.UPDATE_REQUEST);
 		}
 	}
 
@@ -675,7 +679,7 @@ public class XMLDetailPart {
 			openNotificationPopup("Entry could not be added");
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
-			clearFields("Insert");
+			clearFields(Constants.INSERT_REQUEST);
 		}
 	}
 
@@ -725,7 +729,7 @@ public class XMLDetailPart {
 			openNotificationPopup("Entry could not be deleted");
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
-			clearFields("Delete");
+			clearFields(Constants.DELETE_REQUEST);
 		}
 	}
 
@@ -751,16 +755,17 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if (origin.equals("Delete")) {
+				if (origin.equals(Constants.DELETE_REQUEST)) {
 					t.setText("");
-				} else if (c.getData("field") == controls.get("BookingDate").getData(Constants.CONTROL_FIELD)) {
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE)
+						.getData(Constants.CONTROL_FIELD)) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
-				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate")
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
 						.getData(Constants.CONTROL_FIELD)) {
-					Text endDate = (Text) controls.get("EndDate");
-					if (endDate.getText() != "" && !origin.equals("clear")) {
+					Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+					if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
 						lastEndDate = endDate.getText();
 					}
 					t.setText(lastEndDate);
@@ -785,8 +790,8 @@ public class XMLDetailPart {
 		 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
 		 * haben
 		 */
-		if (!origin.equals("Delete")) {
-			LookupControl lc = (LookupControl) controls.get("EmployeeKey");
+		if (!origin.equals(Constants.DELETE_REQUEST)) {
+			LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
 			lc.setText(employee);
 			CompletableFuture<?> tableFuture;
 			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),

@@ -39,8 +39,6 @@ public class TextfieldVerifier implements FocusListener {
 		Instant instant = DateTimeUtil.getDate(newString);
 		if (instant != null) {
 			date = df.format(instant);
-		} else {
-			date = "";
 		}
 		return date;
 	}
@@ -51,8 +49,6 @@ public class TextfieldVerifier implements FocusListener {
 		Instant instant = TimeUtil.getTime(newString, timezone);
 		if (instant != null) {
 			time = df.format(instant);
-		} else {
-			time = "";
 		}
 		return time;
 	}

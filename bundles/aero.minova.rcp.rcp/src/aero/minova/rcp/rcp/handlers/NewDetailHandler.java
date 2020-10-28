@@ -8,6 +8,8 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
+import aero.minova.rcp.rcp.util.Constants;
+
 public class NewDetailHandler {
 
 	@Inject
@@ -17,6 +19,6 @@ public class NewDetailHandler {
 
 	@Execute
 	public void execute(MPart mpart, MPerspective mPerspective) {
-		broker.post("clearFields", "clear");
+		broker.post("clearFields", Constants.CLEAR_REQUEST);
 	}
 }
