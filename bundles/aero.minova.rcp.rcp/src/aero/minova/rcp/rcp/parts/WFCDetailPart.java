@@ -6,17 +6,23 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -37,7 +43,16 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
+import aero.minova.rcp.rcp.util.WFCDetailUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 @SuppressWarnings("restriction")
@@ -61,6 +76,9 @@ public class WFCDetailPart {
 	private IDataFormService dataFormService;
 
 	@Inject
+	private IEventBroker broker;
+
+	@Inject
 	private IDataService dataService;
 
 	private Form form;
@@ -70,6 +88,8 @@ public class WFCDetailPart {
 	private Composite composite;
 
 	private Map<String, Control> controls = new HashMap<>();
+
+	private WFCDetailUtil wfcDetailUtil = null;
 
 	public WFCDetailPart() {
 
@@ -99,6 +119,9 @@ public class WFCDetailPart {
 		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		layoutForm(parent);
 		translate(translationService);
+		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
+		// steuert
+		wfcDetailUtil = new WFCDetailUtil(form, controls);
 	}
 
 	private void layoutForm(Composite parent) {
@@ -255,6 +278,9 @@ public class WFCDetailPart {
 
 		button.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
 		button.setLayoutData(formData);
+		button.setData(Constants.CONTROL_FIELD, field);
+		button.setData(Constants.CONTROL_DATATYPE, DataType.BOOLEAN);
+		addConsumer(button, field);
 
 		return button;
 	}
@@ -270,6 +296,9 @@ public class WFCDetailPart {
 		Button button = formToolkit.createButton(composite, field.getTextAttribute(), SWT.CHECK);
 		button.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
 		button.setLayoutData(formData);
+		button.setData(Constants.CONTROL_FIELD, field);
+		button.setData(Constants.CONTROL_DATATYPE, DataType.INSTANT);
+		addConsumer(button, field);
 
 		return button;
 	}
@@ -305,8 +334,57 @@ public class WFCDetailPart {
 
 		lookupControl.setLayoutData(lookupFormData);
 		lookupControl.setDescription(descriptionLabel);
+		lookupControl.setData(Constants.CONTROL_FIELD, field);
+		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
+		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
+		// gestartet, um die Werte des zugehörigen Keys zu erhalten
+		lookupControl.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
+
+			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
+			lookupControl.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
+			lookupControl.setData(Constants.CONTROL_KEYLONG, keyLong);
+
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
+			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
+				Table t = null;
+				if (ta instanceof SqlProcedureResult) {
+					SqlProcedureResult sql = (SqlProcedureResult) ta;
+					t = sql.getResultSet();
+				} else if (ta instanceof Table) {
+					t = (Table) ta;
+				}
+				updateSelectedLookupEntry(t, (Control) m.get("control"));
+
+			}));
+		});
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
+
+		lookupControl.addTwistieMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			/*
+			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
+			 * LookUpFelder eingetragen wurden
+			 */
+			public void mouseDown(MouseEvent e) {
+				broker.post("LoadAllLookUpValues", field.getName());
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
 
 		return lookupControl;
 	}
@@ -316,6 +394,8 @@ public class WFCDetailPart {
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
+		addDataToText(text, field, DataType.DOUBLE);
+		addConsumer(text, field);
 		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
@@ -368,6 +448,8 @@ public class WFCDetailPart {
 		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
+		addDataToText(text, field, DataType.INSTANT);
+		addConsumer(text, field);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -392,6 +474,8 @@ public class WFCDetailPart {
 		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
+		addDataToText(text, field, DataType.INSTANT);
+		addConsumer(text, field);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -417,6 +501,8 @@ public class WFCDetailPart {
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "",
 				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
+		addDataToText(text, field, DataType.STRING);
+		addConsumer(text, field);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -442,6 +528,33 @@ public class WFCDetailPart {
 		text.setLayoutData(textFormData);
 
 		return text;
+	}
+
+	public void addDataToText(Text t, Field f, DataType datatype) {
+		t.setData(Constants.CONTROL_FIELD, f);
+		t.setData(Constants.CONTROL_DATATYPE, datatype);
+	}
+
+	public void addConsumer(Object o, Field field) {
+		if (o instanceof Text) {
+			Text text = (Text) o;
+			text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
+
+				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
+				text.setText(ValueBuilder.value(value, f).getText());
+				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
+			});
+		} else if (o instanceof Button) {
+			Button b = (Button) o;
+			b.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
+
+				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
+				Field f = (Field) b.getData(Constants.CONTROL_FIELD);
+				b.setText(ValueBuilder.value(value, f).getText());
+				b.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
+			});
+		}
 	}
 
 	private int getWidth(Field field) {
@@ -483,4 +596,27 @@ public class WFCDetailPart {
 		}
 	}
 
+	/**
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
+	 * Bindung zur Componente
+	 *
+	 * @param ta
+	 * @param c
+	 */
+	public static void updateSelectedLookupEntry(Table ta, Control c) {
+		Row r = ta.getRows().get(0);
+		LookupControl lc = (LookupControl) c;
+		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
+		Value v = r.getValue(index);
+
+		lc.setText((String) ValueBuilder.value(v).create());
+		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
+			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+			} else {
+				lc.getDescription().setText("");
+			}
+		}
+	}
 }
