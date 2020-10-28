@@ -119,6 +119,33 @@ public class NatTableUtil {
 	public static void resizeTable(NatTable table) {
 		if (!table.isDisposed()) {
 
+			/*
+			 * Collection<ILayer> underlyingLayersByColumnPosition =
+			 * table.getUnderlyingLayersByColumnPosition(0); int[] selectedColumnPositions =
+			 * null; for (ILayer iLayer : underlyingLayersByColumnPosition) {
+			 * 
+			 * if (iLayer instanceof ViewportLayer)
+			 * 
+			 * { int minColumnPosition = ((ViewportLayer)
+			 * iLayer).getMinimumOriginColumnPosition();
+			 * 
+			 * int columnCount = ((ViewportLayer) iLayer).getColumnCount();
+			 * 
+			 * int maxColumnPosition = minColumnPosition + columnCount - 1;
+			 * 
+			 * selectedColumnPositions = new int[columnCount];
+			 * 
+			 * for (int i = minColumnPosition; i <= maxColumnPosition; i++) {
+			 * 
+			 * int idx = i - minColumnPosition;
+			 * 
+			 * selectedColumnPositions[idx] = i;
+			 * 
+			 * }
+			 * 
+			 * }
+			 */
+
 			int[] selectedColumnPositions = new int[table.getColumnCount()];
 
 			for (int i = table.getColumnCount() - 1; i > -1; i--) {
@@ -127,6 +154,7 @@ public class NatTableUtil {
 
 			}
 
+			// }
 			AutoResizeColumnsCommand columnCommand = new AutoResizeColumnsCommand(table, false,
 					selectedColumnPositions);
 

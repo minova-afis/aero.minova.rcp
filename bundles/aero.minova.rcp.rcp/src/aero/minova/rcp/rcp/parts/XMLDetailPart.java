@@ -747,7 +747,9 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if (c.getData("field") == controls.get("BookingDate").getData(Constants.CONTROL_FIELD)) {
+				if (origin.equals("Delete")) {
+					t.setText("");
+				} else if (c.getData("field") == controls.get("BookingDate").getData(Constants.CONTROL_FIELD)) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
@@ -764,6 +766,7 @@ public class XMLDetailPart {
 
 				}
 			}
+
 			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
 				lc.setText("");
@@ -778,30 +781,33 @@ public class XMLDetailPart {
 		 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
 		 * haben
 		 */
-		LookupControl lc = (LookupControl) controls.get("EmployeeKey");
-		lc.setText(employee);
-		CompletableFuture<?> tableFuture;
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),
-				controls, dataService, sync, "List");
+		if (!origin.equals("Delete")) {
+			LookupControl lc = (LookupControl) controls.get("EmployeeKey");
+			lc.setText(employee);
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),
+					controls, dataService, sync, "List");
 
-		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-			if (ta instanceof Table) {
-				Table t1 = (Table) ta;
-				for (Row r : t1.getRows()) {
-					if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-							.equals(employee.toLowerCase())) {
-						lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
-						if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-							lc.getDescription().setText(
-									r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+				if (ta instanceof Table) {
+					Table t1 = (Table) ta;
+					for (Row r : t1.getRows()) {
+						if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.equals(employee.toLowerCase())) {
+							lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+							if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+								lc.getDescription().setText(
+										r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+							}
+							lc.setData(Constants.CONTROL_KEYLONG,
+									r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
 						}
-						lc.setData(Constants.CONTROL_KEYLONG, r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
 					}
+					// changeOptionsForLookupField(t1, lc, true);
 				}
-				// changeOptionsForLookupField(t1, lc, true);
-			}
 
-		}));
+			}));
+		}
 	}
 
 	public Map<String, Control> getControls() {
