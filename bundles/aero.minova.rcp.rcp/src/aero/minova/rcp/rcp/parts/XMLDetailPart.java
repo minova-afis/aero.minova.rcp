@@ -233,8 +233,12 @@ public class XMLDetailPart {
 			String renderedValue;
 			String chargedValue;
 			if (timeDifference >= 0) {
-				renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
-				chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
+				Double half = (double) Math.round(timeDifference * 2) / 2f;
+				chargedValue = String.format("%1.2f", half);
+				chargedValue = chargedValue.replace(',', '.');
+				renderedValue = String.format("%1.2f", quarter);
+				renderedValue = renderedValue.replace(',', '.');
 			} else {
 				renderedValue = "0";
 				chargedValue = "0";
