@@ -15,10 +15,12 @@ public class TextfieldVerifier implements FocusListener {
 
 	public static boolean verifyDouble(String newString) {
 		boolean correctDouble = true;
-		try {
-			Float.parseFloat(newString);
-		} catch (NumberFormatException ex) {
-			correctDouble = false;
+		if (!newString.equals("")) {
+			try {
+				Float.parseFloat(newString);
+			} catch (NumberFormatException ex) {
+				correctDouble = false;
+			}
 		}
 		return correctDouble;
 	}
