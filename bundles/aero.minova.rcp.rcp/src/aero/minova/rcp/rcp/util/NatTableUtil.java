@@ -70,6 +70,7 @@ public class NatTableUtil {
 					bodyDataProvider);
 			e4SelectionListener.setFullySelectedRowsOnly(false);
 			e4SelectionListener.setHandleSameRowSelection(false);
+			e4SelectionListener.setProcessColumnSelection(false);
 			selectionLayer.addLayerListener(e4SelectionListener);
 			viewportLayer = new ViewportLayer(selectionLayer);
 		} else {
