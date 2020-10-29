@@ -1,6 +1,11 @@
 package aero.minova.rcp.rcp.util;
 
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -11,7 +16,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailLookupFieldUtil {
@@ -19,11 +30,11 @@ public class WFCDetailLookupFieldUtil {
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	private static final int COLUMN_WIDTH = 140;
 	private static final int MARGIN_LEFT = 5;
-	private static final int MARGIN_TOP = 5;
+	private static final int MARGIN_TOP = 5; // Zwischenräume
 	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control createLookupField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit, IEventBroker broker) {
+			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls) {
 		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
@@ -81,8 +92,55 @@ public class WFCDetailLookupFieldUtil {
 			}
 
 		});
+		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
+		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
+		// gestartet, um die Werte des zugehörigen Keys zu erhalten
+		lookupControl.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
+
+			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
+			lookupControl.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
+			lookupControl.setData(Constants.CONTROL_KEYLONG, keyLong);
+
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
+			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
+				Table t = null;
+				if (ta instanceof SqlProcedureResult) {
+					SqlProcedureResult sql = (SqlProcedureResult) ta;
+					t = sql.getResultSet();
+				} else if (ta instanceof Table) {
+					t = (Table) ta;
+				}
+				updateSelectedLookupEntry(t, (Control) m.get("control"));
+
+			}));
+		});
 
 		return lookupControl;
 	}
 
+	/**
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
+	 * Bindung zur Componente
+	 *
+	 * @param ta
+	 * @param c
+	 */
+	public static void updateSelectedLookupEntry(Table ta, Control c) {
+		Row r = ta.getRows().get(0);
+		LookupControl lc = (LookupControl) c;
+		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
+		Value v = r.getValue(index);
+
+		lc.setText((String) ValueBuilder.value(v).create());
+		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
+			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+			} else {
+				lc.getDescription().setText("");
+			}
+		}
+	}
 }

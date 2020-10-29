@@ -5,8 +5,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -16,7 +14,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
@@ -39,18 +36,10 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.model.Row;
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
-import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.util.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart {
@@ -257,32 +246,9 @@ public class WFCDetailPart {
 		} else if (field.getShortTime() != null) {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
-			LookupControl c = (LookupControl) WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column,
-					formToolkit, broker);
-			// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
-			// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
-			// gestartet, um die Werte des zugehörigen Keys zu erhalten
-			c.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
+			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
+					controls);
 
-				int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
-				c.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
-				c.setData(Constants.CONTROL_KEYLONG, keyLong);
-
-				CompletableFuture<?> tableFuture;
-				tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
-						(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
-				tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
-					Table t = null;
-					if (ta instanceof SqlProcedureResult) {
-						SqlProcedureResult sql = (SqlProcedureResult) ta;
-						t = sql.getResultSet();
-					} else if (ta instanceof Table) {
-						t = (Table) ta;
-					}
-					updateSelectedLookupEntry(t, (Control) m.get("control"));
-
-				}));
-			});
 		} else if (field.getText() != null) {
 			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
 		}
@@ -326,29 +292,5 @@ public class WFCDetailPart {
 	private int getWidth(Field field) {
 		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
-	}
-
-	/**
-	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
-	 * Bindung zur Componente
-	 *
-	 * @param ta
-	 * @param c
-	 */
-	public static void updateSelectedLookupEntry(Table ta, Control c) {
-		Row r = ta.getRows().get(0);
-		LookupControl lc = (LookupControl) c;
-		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
-		Value v = r.getValue(index);
-
-		lc.setText((String) ValueBuilder.value(v).create());
-		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
-			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder
-						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			} else {
-				lc.getDescription().setText("");
-			}
-		}
 	}
 }
