@@ -106,7 +106,7 @@ public class WFCDetailUtil {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener();
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, null);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();

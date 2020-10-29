@@ -42,7 +42,7 @@ public class LoadIndexHandler {
 			broker.post("PLAPLA", t);
 		});
 
-		findElements = model.findElements(mPerspective, PartsID.INDEX_PART, MPart.class);
+		findElements = model.findElements(window, PartsID.INDEX_PART, MPart.class);
 		partService.activate(findElements.get(0));
 	}
 
