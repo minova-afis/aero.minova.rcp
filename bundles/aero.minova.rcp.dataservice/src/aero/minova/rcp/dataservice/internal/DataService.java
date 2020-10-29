@@ -48,7 +48,12 @@ public class DataService implements IDataService {
 
 	private String username = "admin";
 	private String password = "rqgzxTf71EAx8chvchMi";
+	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
 	private String server = "https://publictest.minova.com:17280";
+
+	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
+	// Ticket-Anfragen zu versenden
+	// private String server = "https://mintest.minova.com:8084";
 
 	private void init() {
 
@@ -172,8 +177,7 @@ public class DataService implements IDataService {
 		try {
 			path = Platform.getInstanceLocation().getURL().toURI().toString();
 			File cachedFile = new File(new URI(path + filename));
-			if (cachedFile.exists())
-				return cachedFile;
+			if (cachedFile.exists()) return cachedFile;
 		} catch (URISyntaxException e) {
 		}
 		return getFileSynch(path, filename);

@@ -300,6 +300,7 @@ public class DetailUtil {
 		Value v = r.getValue(index);
 
 		lc.setText((String) ValueBuilder.value(v).create());
+		lc.getTextControl().setMessage("");
 		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder

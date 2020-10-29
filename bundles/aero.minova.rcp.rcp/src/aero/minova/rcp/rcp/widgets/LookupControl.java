@@ -94,7 +94,8 @@ public class LookupControl extends Composite {
 		simpleContentProposalProvider = new SimpleContentProposalProvider();
 		TextContentAdapter tca = new TextContentAdapter() {
 			/**
-			 * Wird bei auswahl eines Wertes in den Proposals aufgerufen. Der ausgewählte Wert wird in das Feld geschrieben und der Keylong abespeichert
+			 * Wird bei auswahl eines Wertes in den Proposals aufgerufen. Der ausgewählte
+			 * Wert wird in das Feld geschrieben und der Keylong abespeichert
 			 */
 			@Override
 			public void insertControlContents(Control control, String text, int cursorPosition) {
@@ -113,7 +114,7 @@ public class LookupControl extends Composite {
 						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 							lc.getDescription().setText(
 									r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
-						}else {
+						} else {
 							lc.getDescription().setText("");
 						}
 					}
@@ -123,8 +124,8 @@ public class LookupControl extends Composite {
 				}
 			}
 		};
-		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, tca,
-				simpleContentProposalProvider, null, null);
+		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, tca, simpleContentProposalProvider,
+				null, null);
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
 	}
 
@@ -219,5 +220,9 @@ public class LookupControl extends Composite {
 
 	public void setDescription(Label description) {
 		this.description = description;
+	}
+
+	public boolean isProposalPopupOpen() {
+		return contentProposalAdapter.isProposalPopupOpen();
 	}
 }

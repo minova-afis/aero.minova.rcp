@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_6wlLcMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.application" bindingContexts="_6wlLecgZEeSyMNYR5xypkQ">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" width="1024" height="800">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.window.main" label="Eclipse 4 RCP Application" bindingContexts="_6wlLesgZEeSyMNYR5xypkQ" width="1024" height="800">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_zNk5ALYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspectivestack">
       <children xsi:type="advanced:Perspective" xmi:id="_zkeWELYjEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.perspective.sis" label="SIS">
         <children xsi:type="basic:PartSashContainer" xmi:id="_a8dzoLYlEeqEVOzPNoSbhw" elementId="aero.minova.rcp.rcp.partsashcontainer.main" horizontal="true">
@@ -70,14 +70,60 @@
       <children xsi:type="basic:PartSashContainer" xmi:id="_RRPC4LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partsashcontainer.main" selectedElement="_S7uOwLqjEeqSa5ZfLepYaA" horizontal="true">
         <children xsi:type="basic:PartSashContainer" xmi:id="_S7uOwLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partsashcontainer.left" selectedElement="_ZHU1YLqjEeqSa5ZfLepYaA">
           <children xsi:type="basic:PartStack" xmi:id="_ZHU1YLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_ijnJoLqjEeqSa5ZfLepYaA">
-            <children xsi:type="basic:Part" xmi:id="_ijnJoLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.search" label="Search"/>
+            <children xsi:type="basic:Part" xmi:id="_ijnJoLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCSearchPart" label="Search">
+              <handlers xmi:id="_jr8RMBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.revertsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertSearchHandler" command="_y3TngNDREeqZdekMGDv2pg"/>
+              <handlers xmi:id="_tp-AkBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_rnXZkNDSEeqZdekMGDv2pg"/>
+              <handlers xmi:id="_7_nQcBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.savesearchcriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveSearchCriteriaHandler" command="_sAqqYNDSEeqZdekMGDv2pg"/>
+              <handlers xmi:id="_CVRK8Bm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.load" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadSearchCriteriaHandler" command="_r5Qa0NDSEeqZdekMGDv2pg"/>
+              <handlers xmi:id="_JtsKABm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.optimize" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeSearchHandler" command="_sJJQ8NDSEeqZdekMGDv2pg"/>
+              <toolbar xmi:id="_ZSi0cBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.toolbar.3">
+                <children xsi:type="menu:HandledToolItem" xmi:id="_bneEcBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert" command="_y3TngNDREeqZdekMGDv2pg"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_q2z8cBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="Clear" command="_rnXZkNDSEeqZdekMGDv2pg"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_3XmjgBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save" command="_sAqqYNDSEeqZdekMGDv2pg"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="__vusEBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load" command="_r5Qa0NDSEeqZdekMGDv2pg"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_Fh5fABm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize" command="_sJJQ8NDSEeqZdekMGDv2pg"/>
+              </toolbar>
+            </children>
           </children>
           <children xsi:type="basic:PartStack" xmi:id="_Zc6q4LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_nezRQLqjEeqSa5ZfLepYaA">
-            <children xsi:type="basic:Part" xmi:id="_nezRQLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.index" label="Index"/>
+            <children xsi:type="basic:Part" xmi:id="_nezRQLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPart" label="Index">
+              <handlers xmi:id="_W9rZYBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_xHFacOejEeq-Csq7J9vXlA"/>
+              <handlers xmi:id="_jCCjIBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.expandindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandIndexHandler" command="_Mt6KEOg0Eeq4vM3bKRf1IQ"/>
+              <handlers xmi:id="_rQADEBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.collapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.CollapseIndexHandler" command="_ZtzH8Og0Eeq4vM3bKRf1IQ"/>
+              <handlers xmi:id="_zAot0Bm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_c0UM8Og0Eeq4vM3bKRf1IQ"/>
+              <handlers xmi:id="_5jsLIBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_ks22gOg0Eeq4vM3bKRf1IQ"/>
+              <handlers xmi:id="_AKMlEBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.resizeindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ResizeIndexHandler" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
+              <toolbar xmi:id="_ROaJcBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.toolbar.4">
+                <children xsi:type="menu:HandledToolItem" xmi:id="_S7qVcBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="Load" command="_xHFacOejEeq-Csq7J9vXlA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_fIgFwBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="Expand" command="_Mt6KEOg0Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_n1d14Bm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="Collapse" command="_ZtzH8Og0Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_vUZsoBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.export" label="Export" command="_c0UM8Og0Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_3ElrcBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="Print" command="_ks22gOg0Eeq4vM3bKRf1IQ"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_9N7oQBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.resize" label="Resize" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
+              </toolbar>
+            </children>
           </children>
         </children>
         <children xsi:type="basic:PartStack" xmi:id="_T04rYLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_r6jD0LqjEeqSa5ZfLepYaA">
-          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="Details"/>
+          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="Details">
+            <handlers xmi:id="_Q2Rg0Bm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
+            <handlers xmi:id="_YBX1kBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.newdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewDetailHandler" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
+            <handlers xmi:id="_ieacMBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
+            <handlers xmi:id="_oL3HMBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_9_ZcUOg1Eeq4vM3bKRf1IQ"/>
+            <handlers xmi:id="_2eYKkBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_Awo04Og2Eeq4vM3bKRf1IQ"/>
+            <handlers xmi:id="_86Qo4Bm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.optimizedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeDetailHandler" command="_wuFbkNWPEeq9oeSITNqxdw"/>
+            <toolbar xmi:id="_JbBQMBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.toolbar.5">
+              <children xsi:type="menu:HandledToolItem" xmi:id="_MCPxIBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="Save" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/save_edit.png" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_TZ57MBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="New" iconURI="platform:/plugin/aero.minova.rcp.rcp/icons/new.png" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_ckpzgBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.delete" label="Delete" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_ludQoBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="Revert" command="_9_ZcUOg1Eeq4vM3bKRf1IQ"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_snUl4Bm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.booking" visible="false" label="Booking"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_vhkwgBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.cancel" visible="false" label="Cancel"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_xlvAoBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.correct" visible="false" label="Correct"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_z3-JABm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="Print" command="_Awo04Og2Eeq4vM3bKRf1IQ"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_5wQLABm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="Optimize" command="_wuFbkNWPEeq9oeSITNqxdw"/>
+            </toolbar>
+          </children>
         </children>
       </children>
     </snippets>
@@ -102,11 +148,32 @@
   <handlers xmi:id="_jeEycNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handler.1" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.KeepPerspectiveHandler" command="_gqcNMNF7Eeq2n_R750bOVg"/>
   <handlers xmi:id="_656QQOOOEeqf6YlJmDESrg" elementId="aero.minova.rcp.rcp.handler.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SISHandler" command="_4j7QUOOOEeqf6YlJmDESrg"/>
   <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindow" command="_WsjPEPDoEeqcqsgp84_JDA"/>
-  <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLecgZEeSyMNYR5xypkQ">
+  <handlers xmi:id="_GxZz8BRpEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.handler.loadindexpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_xHFacOejEeq-Csq7J9vXlA"/>
+  <handlers xmi:id="_wNfcgBT0Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.help" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.HelpHandler" command="_DmBwABRcEeu_ctc0PBVTGw"/>
+  <handlers xmi:id="_BMBaMBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.loaddatawithmatcgcode" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadDataWithMatchCodeHandler" command="_aiYXABRcEeu_ctc0PBVTGw"/>
+  <handlers xmi:id="_Mt8lQBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectsearchpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectSearchPart" command="_prFbgBRcEeu_ctc0PBVTGw"/>
+  <handlers xmi:id="_RWePkBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart" command="_AOXbMBRdEeu_ctc0PBVTGw"/>
+  <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLesgZEeSyMNYR5xypkQ">
+    <tags>type:user</tags>
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
     <bindings xmi:id="_6wlLhcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1s" keySequence="M1+S"/>
     <bindings xmi:id="_6wlLiMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1a" keySequence="M1+A" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+    <bindings xmi:id="_Jv9isBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.help" keySequence="F1" command="_DmBwABRcEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_e39QIBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.loaddatawithmatchcode" keySequence="F3" command="_aiYXABRcEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_sWjjQBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.selectsearchpart" keySequence="F4" command="_prFbgBRcEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_4eWbgBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.loadindexpart" keySequence="F5" command="_xHFacOejEeq-Csq7J9vXlA">
+      <tags>type:user</tags>
+    </bindings>
+    <bindings xmi:id="_DbgsoBRdEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_AOXbMBRdEeu_ctc0PBVTGw">
+      <tags>type:user</tags>
+    </bindings>
   </bindingTables>
   <rootContext xmi:id="_6wlLecgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
     <children xmi:id="_6wlLesgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
@@ -142,6 +209,10 @@
   <commands xmi:id="_7pSgkOg1Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.deletedetail" commandName="Delete Detail"/>
   <commands xmi:id="_9_ZcUOg1Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.revertdetail" commandName="Revert Detail"/>
   <commands xmi:id="_Awo04Og2Eeq4vM3bKRf1IQ" elementId="aero.minova.rcp.rcp.command.printdetail" commandName="Print Detail"/>
+  <commands xmi:id="_DmBwABRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.help" commandName="Help"/>
+  <commands xmi:id="_aiYXABRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.loaddatawithmatchcode" commandName="Load Data With MatchCode"/>
+  <commands xmi:id="_prFbgBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.selectsearchpart" commandName="Select Search Part"/>
+  <commands xmi:id="_AOXbMBRdEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.selectdetailpart" commandName="Select Detail Part"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

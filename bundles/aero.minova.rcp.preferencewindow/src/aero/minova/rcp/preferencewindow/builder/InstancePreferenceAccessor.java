@@ -18,7 +18,8 @@ import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 public class InstancePreferenceAccessor {
 
 	/**
-	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen Preferences.
+	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen
+	 * Preferences.
 	 * 
 	 * @param preferences
 	 * @param preferenceKey
@@ -102,10 +103,8 @@ public class InstancePreferenceAccessor {
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();
 			preferences.put(preferenceKey, zoneId);
 			break;
-
 		default:
 			break;
 		}
 	}
-
 }

@@ -179,7 +179,7 @@ public class XMLDetailPart {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener();
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
@@ -237,11 +237,9 @@ public class XMLDetailPart {
 			if (timeDifference >= 0) {
 				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
 				Double half = (double) Math.round(timeDifference * 2) / 2f;
-				String chargedFormat = "%1." + chargedField.getData(Constants.CONTROL_DECIMALS) + "f";
-				String renderedFormat = "%1." + renderedField.getData(Constants.CONTROL_DECIMALS) + "f";
-				chargedValue = String.format(chargedFormat, half);
+				chargedValue = String.format("%1.2f", half);
 				chargedValue = chargedValue.replace(',', '.');
-				renderedValue = String.format(renderedFormat, quarter);
+				renderedValue = String.format("%1.2f", quarter);
 				renderedValue = renderedValue.replace(',', '.');
 			} else {
 				renderedValue = "0";
