@@ -22,30 +22,6 @@ public class TextfieldVerifierTest {
 	}
 
 	@Test
-	public void testh() {
-		String verifyTime = TextfieldVerifier.verifyDate("h", ZoneId.systemDefault().getId());
-		assertEquals(LocalDate.now().format(formatter), verifyTime);
-	}
-
-	@Test
-	public void testH() {
-		String verifyTime = TextfieldVerifier.verifyDate("H", ZoneId.systemDefault().getId());
-		assertEquals(LocalDate.now().format(formatter), verifyTime);
-	}
-
-	@Test
-	public void testHeute() {
-		String verifyTime = TextfieldVerifier.verifyDate("heute", ZoneId.systemDefault().getId());
-		assertEquals(LocalDate.now().format(formatter), verifyTime);
-	}
-
-	@Test
-	public void testm() {
-		String verifyTime = TextfieldVerifier.verifyDate("m", ZoneId.systemDefault().getId());
-		assertEquals(LocalDate.now().plusDays(1).format(formatter), verifyTime);
-	}
-
-	@Test
 	public void testPlusPlusPlus() {
 		String verifyTime = TextfieldVerifier.verifyDate("+++", ZoneId.systemDefault().getId());
 		assertEquals(LocalDate.now().plusDays(3).format(formatter), verifyTime);
