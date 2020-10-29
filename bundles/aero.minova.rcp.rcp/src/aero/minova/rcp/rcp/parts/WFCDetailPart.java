@@ -14,8 +14,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -30,19 +28,15 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 import aero.minova.rcp.rcp.util.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
 
 @SuppressWarnings("restriction")
-public class WFCDetailPart {
+public class WFCDetailPart extends WFCFormPart {
 
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	private static final int COLUMN_WIDTH = 140;
@@ -59,15 +53,7 @@ public class WFCDetailPart {
 	private static final int MARGIN_BORDER = 2;
 
 	@Inject
-	private IDataFormService dataFormService;
-
-	@Inject
 	private IEventBroker broker;
-
-	@Inject
-	private IDataService dataService;
-
-	private Form form;
 
 	private FormToolkit formToolkit;
 
@@ -81,28 +67,15 @@ public class WFCDetailPart {
 
 	}
 
-	@Inject
-	@Named(E4WorkbenchParameterConstants.FORM_NAME)
-	String formName;
-
-	@Inject
-	MPerspective perspective;
 	private TranslationService translationService;
 
 	@PostConstruct
 	public void postConstruct(Composite parent) {
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
-		form = perspective.getContext().get(Form.class);
-		if (form == null) {
-			dataService.getFileSynch(formName); // Datei ggf. vom Server holen
-			form = dataFormService.getForm(formName);
-		}
-		if (form == null) {
-			LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
+		if (getForm(parent) == null) {
 			return;
 		}
-		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		layoutForm(parent);
 		translate(translationService);
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht

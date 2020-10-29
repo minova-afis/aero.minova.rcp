@@ -7,27 +7,20 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
-import org.eclipse.jface.widgets.LabelFactory;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
-import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
-public class WFCSearchPart {
+public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	@Preference
@@ -37,29 +30,7 @@ public class WFCSearchPart {
 	private IMinovaJsonService mjs;
 
 	@Inject
-	private IDataFormService dataFormService;
-
-	@Inject
-	private ESelectionService selectionService;
-
-	@Inject
-	private IDataService dataService;
-
-	@Inject
-	private IEventBroker broker;
-
-	@Inject
 	private MPerspective perspective;
-
-	@Inject
-	@Named(E4WorkbenchParameterConstants.FORM_NAME)
-	private String formName;
-
-	private Form form;
-
-	private FormToolkit formToolkit;
-
-	private Composite composite;
 
 	private Table data;
 
@@ -69,15 +40,8 @@ public class WFCSearchPart {
 	@PostConstruct
 	public void createComposite(Composite parent) {
 
-		composite = parent;
-		formToolkit = new FormToolkit(parent.getDisplay());
-		form = perspective.getContext().get(Form.class);
-		if (form == null) {
-			dataService.getFileSynch(formName); // Datei ggf. vom Server holen
-			form = dataFormService.getForm(formName);
-		}
-		if (form == null) {
-			LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
+		new FormToolkit(parent.getDisplay());
+		if (getForm(parent) == null) {
 			return;
 		}
 
