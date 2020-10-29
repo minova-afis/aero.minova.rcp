@@ -21,8 +21,6 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -52,6 +50,7 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
+import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -260,7 +259,32 @@ public class WFCDetailPart {
 		} else if (field.getShortTime() != null) {
 			return createShortTimeField(composite, field, row, column);
 		} else if (field.getLookup() != null) {
-			return createLookupField(composite, field, row, column);
+			LookupControl c = (LookupControl) WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column,
+					formToolkit, broker);
+			// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
+			// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
+			// gestartet, um die Werte des zugehörigen Keys zu erhalten
+			c.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
+
+				int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
+				c.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
+				c.setData(Constants.CONTROL_KEYLONG, keyLong);
+
+				CompletableFuture<?> tableFuture;
+				tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+						(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
+				tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
+					Table t = null;
+					if (ta instanceof SqlProcedureResult) {
+						SqlProcedureResult sql = (SqlProcedureResult) ta;
+						t = sql.getResultSet();
+					} else if (ta instanceof Table) {
+						t = (Table) ta;
+					}
+					updateSelectedLookupEntry(t, (Control) m.get("control"));
+
+				}));
+			});
 		} else if (field.getText() != null) {
 			return createTextField(composite, field, row, column);
 		}
@@ -301,92 +325,6 @@ public class WFCDetailPart {
 		addConsumer(button, field);
 
 		return button;
-	}
-
-	private Control createLookupField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
-		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
-		FormData lookupFormData = new FormData();
-		FormData labelFormData = new FormData();
-		FormData descriptionLabelFormData = new FormData();
-
-		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		lookupFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		lookupFormData.width = COLUMN_WIDTH;
-
-		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(lookupControl, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
-		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
-//		descriptionLabelFormData.right = new FormAttachment(composite, 0, SWT.RIGHT);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
-			descriptionLabelFormData.width = MARGIN_LEFT * 2 + COLUMN_WIDTH * 2;
-		} else {
-			descriptionLabelFormData.width = 0;
-		}
-
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		lookupControl.setLayoutData(lookupFormData);
-		lookupControl.setDescription(descriptionLabel);
-		lookupControl.setData(Constants.CONTROL_FIELD, field);
-		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
-		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
-		// gestartet, um die Werte des zugehörigen Keys zu erhalten
-		lookupControl.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
-
-			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
-			lookupControl.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
-			lookupControl.setData(Constants.CONTROL_KEYLONG, keyLong);
-
-			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
-					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
-			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
-				Table t = null;
-				if (ta instanceof SqlProcedureResult) {
-					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					t = sql.getResultSet();
-				} else if (ta instanceof Table) {
-					t = (Table) ta;
-				}
-				updateSelectedLookupEntry(t, (Control) m.get("control"));
-
-			}));
-		});
-
-		descriptionLabel.setLayoutData(descriptionLabelFormData);
-
-		lookupControl.addTwistieMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			/*
-			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
-			 * LookUpFelder eingetragen wurden
-			 */
-			public void mouseDown(MouseEvent e) {
-				broker.post("LoadAllLookUpValues", field.getName());
-			}
-
-			@Override
-			public void mouseUp(MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-		});
-
-		return lookupControl;
 	}
 
 	private Control createNumberField(Composite composite, Field field, int row, int column) {
