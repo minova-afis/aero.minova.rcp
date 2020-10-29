@@ -27,6 +27,7 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -69,6 +70,7 @@ public class NatTableUtil {
 					bodyDataProvider);
 			e4SelectionListener.setFullySelectedRowsOnly(false);
 			e4SelectionListener.setHandleSameRowSelection(false);
+			e4SelectionListener.setProcessColumnSelection(false);
 			selectionLayer.addLayerListener(e4SelectionListener);
 			viewportLayer = new ViewportLayer(selectionLayer);
 		} else {
@@ -112,5 +114,51 @@ public class NatTableUtil {
 
 		natTable.configure();
 		return natTable;
+	}
+
+	public static void resizeTable(NatTable table) {
+		if (!table.isDisposed()) {
+
+			/*
+			 * Collection<ILayer> underlyingLayersByColumnPosition =
+			 * table.getUnderlyingLayersByColumnPosition(0); int[] selectedColumnPositions =
+			 * null; for (ILayer iLayer : underlyingLayersByColumnPosition) {
+			 * 
+			 * if (iLayer instanceof ViewportLayer)
+			 * 
+			 * { int minColumnPosition = ((ViewportLayer)
+			 * iLayer).getMinimumOriginColumnPosition();
+			 * 
+			 * int columnCount = ((ViewportLayer) iLayer).getColumnCount();
+			 * 
+			 * int maxColumnPosition = minColumnPosition + columnCount - 1;
+			 * 
+			 * selectedColumnPositions = new int[columnCount];
+			 * 
+			 * for (int i = minColumnPosition; i <= maxColumnPosition; i++) {
+			 * 
+			 * int idx = i - minColumnPosition;
+			 * 
+			 * selectedColumnPositions[idx] = i;
+			 * 
+			 * }
+			 * 
+			 * }
+			 */
+
+			int[] selectedColumnPositions = new int[table.getColumnCount()];
+
+			for (int i = table.getColumnCount() - 1; i > -1; i--) {
+
+				selectedColumnPositions[i] = i;
+
+			}
+
+			// }
+			AutoResizeColumnsCommand columnCommand = new AutoResizeColumnsCommand(table, false,
+					selectedColumnPositions);
+
+			table.doCommand(columnCommand);
+		}
 	}
 }
