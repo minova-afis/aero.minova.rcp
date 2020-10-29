@@ -2,11 +2,14 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Component;
 import org.xml.sax.SAXException;
 
@@ -266,6 +269,22 @@ public class DataFormService implements IDataFormService {
 //
 //		form.setDetail(detail);
 
+		return form;
+	}
+
+	@Override
+	public Form getForm(String name) {
+		Form form = null;
+		try {
+			File formFile = new File(new URI(Platform.getInstanceLocation().getURL().toURI().toString() + name));
+			if (!formFile.exists()) {
+				// Datei vom Server holen
+			}
+			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
+			form = (Form) xmlProcessor.load(formFile);
+		} catch (URISyntaxException | JAXBException | SAXException | IOException e) {
+			e.printStackTrace();
+		}
 		return form;
 	}
 

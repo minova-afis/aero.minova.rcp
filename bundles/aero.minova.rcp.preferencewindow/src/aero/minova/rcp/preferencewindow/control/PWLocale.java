@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,17 +37,21 @@ public class PWLocale extends CustomPWWidget {
 	private Combo comboLanguage;
 	private IEclipseContext context;
 
+	TranslationService translationService;
+
 	/**
 	 * Constructor
 	 *
 	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, IEclipseContext context) {
+	public PWLocale(final String label, final String propertyKey, IEclipseContext context, TranslationService translationService) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
+		this.translationService = translationService;
 		Locale l = context.get(Locale.class);
-		if (l==null) l=Locale.getDefault();
+		if (l == null)
+			l = Locale.getDefault();
 		dataL = CustomLocale.getLanguages(l);
 	}
 
@@ -81,7 +86,7 @@ public class PWLocale extends CustomPWWidget {
 	public Control build(final Composite parent) {
 		// Label für Sprachauswahl erstellen
 		final Label languageLabel = new Label(parent, SWT.NONE);
-		languageLabel.setText("Sprache");
+		languageLabel.setText(translationService.translate("@Preferences.General.LocalLanguage", null));
 		final GridData labelLGridData = new GridData(GridData.END, getAlignment(), false, false);
 		labelLGridData.horizontalIndent = getIndent();
 		languageLabel.setLayoutData(labelLGridData);
@@ -95,7 +100,7 @@ public class PWLocale extends CustomPWWidget {
 			final Object language = dataL.get(i);
 			comboLanguage.add(language.toString());
 			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE,
-					context.get(Locale.class)))) {
+					Locale.getDefault().getDisplayLanguage(Locale.getDefault()), context.get(Locale.class)))) {
 				comboLanguage.select(i);
 			}
 
@@ -115,7 +120,7 @@ public class PWLocale extends CustomPWWidget {
 
 		// Label für Landauswahl erstellen
 		final Label countryLabel = new Label(parent, SWT.NONE);
-		countryLabel.setText("Land");
+		countryLabel.setText(translationService.translate("@CountryCode", null));
 		final GridData labelCGridData = new GridData(GridData.END, getAlignment(), false, false);
 		labelCGridData.horizontalIndent = getIndent();
 		countryLabel.setLayoutData(labelCGridData);
@@ -132,7 +137,7 @@ public class PWLocale extends CustomPWWidget {
 			final Object country = getCountries().get(i);
 			comboCountries.add(country.toString());
 			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
-					context.get(Locale.class)))) {
+					Locale.getDefault().getDisplayCountry(Locale.getDefault()), context.get(Locale.class)))) {
 				comboCountries.select(i);
 			}
 		}

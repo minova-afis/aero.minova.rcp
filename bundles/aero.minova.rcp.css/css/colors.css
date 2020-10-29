@@ -6,8 +6,15 @@ CTabItem, LayoutComposite, ExpandableComposite,
 Label, MinovaSection, Button {
 	color: #666666;
 	background-color: inherit;
+	/*
+	background-color: #eeee88;
+	*/
 }
-
+/*
+Composite.TEST {
+	background-color: #ee8888;
+}
+*/
 Label.DescriptionLabel {
 	color: black;
 }

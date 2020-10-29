@@ -25,6 +25,7 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -52,7 +53,7 @@ public class ApplicationPreferenceWindow {
 
 	@Inject
 	IEclipseContext context;
-	
+
 	@Inject
 	ILocaleChangeService lcs;
 
@@ -60,13 +61,18 @@ public class ApplicationPreferenceWindow {
 	@Named(TranslationService.LOCALE)
 	Locale s;
 
+	@Inject
+	TranslationService translationService;
+
 	@Execute
 	public void execute() {
 		pwm = new PreferenceWindowModel(s);
 
-		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
+		Shell shell = new Shell();
+
+		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
-		PreferenceWindow window = PreferenceWindow.create(data);
+		PreferenceWindow window = PreferenceWindow.create(shell, data);
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -81,7 +87,6 @@ public class ApplicationPreferenceWindow {
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
 					createWidgets(newTab, pref, key, values);
-
 				}
 			}
 		}
@@ -111,7 +116,7 @@ public class ApplicationPreferenceWindow {
 			} catch (BackingStoreException e) {
 				e.printStackTrace();
 			}
-			
+
 			lcs.changeApplicationLocale(CustomLocale.getLocale());
 		}
 	}
@@ -125,13 +130,15 @@ public class ApplicationPreferenceWindow {
 
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
-					data.put(key,
-							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(), s));
+					Object defaultValue = pref.getDefaultValue();
+					data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(),
+							defaultValue, s));
 
 				}
 			}
 		}
-		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE, s));
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
+				Locale.getDefault().getDisplayCountry(Locale.getDefault()), s));
 
 		return data;
 	}
@@ -176,7 +183,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), "language", context).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
 			break;
 		default:
 			break;

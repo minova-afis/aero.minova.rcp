@@ -1,8 +1,12 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import java.time.ZoneId;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
@@ -16,171 +20,182 @@ public class PreferenceWindowModel {
 		this.locale = locale;
 	}
 
-	public List<PreferenceTabDescriptor> createModel() {
+	public List<PreferenceTabDescriptor> createModel(TranslationService translationService) {
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
-		cprf.add(buildAnwendungsTab());
+		cprf.add(buildAnwendungsTab(translationService));
 
-		cprf.add(buildDarstellungsTab());
+		cprf.add(buildDarstellungsTab(translationService));
 
-		cprf.add(buildErweiterungTab());
+		cprf.add(buildErweiterungTab(translationService));
 
-		cprf.add(buildDruckenTab());
+		cprf.add(buildDruckenTab(translationService));
 
-		cprf.add(buildConsoleTab());
+		cprf.add(buildConsoleTab(translationService));
 
-		cprf.add(buildSISTab());
+		cprf.add(buildSISTab(translationService));
 
 		return cprf;
 	}
 
-	private PreferenceTabDescriptor buildAnwendungsTab() {
+	private PreferenceTabDescriptor buildAnwendungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow",
-				"icons/application.png", "applicationTab", "Anwendung", 0.1);
-		PreferenceSectionDescriptor psd = new PreferenceSectionDescriptor("executionplace", "Ausführungsort", 0.1);
+				"icons/application.png", "applicationTab",
+				translationService.translate("@Preferences.Application", null), 0.1);
+		PreferenceSectionDescriptor psd = new PreferenceSectionDescriptor("generalexecution",
+				translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		PreferenceDescriptor pd = new PreferenceDescriptor("file", "Programmverzeichnis", 0.1, DisplayType.FILE);
-		psd.add(pd);
-
-		psd = new PreferenceSectionDescriptor("generalexecution", "Allgemeines", 0.2);
-		ptd.add(psd);
-		pd = new PreferenceDescriptor("licenceWarning", "LizenzWarnung [wochen]", 0.1, DisplayType.INTEGER);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("licenceWarning",
+				translationService.translate("@Preferences.General.LicenceWarningBeforeWeeks", null), 0.1,
+				DisplayType.INTEGER, 0));
 		return ptd;
 	}
 
-	private PreferenceTabDescriptor buildDarstellungsTab() {
+	private PreferenceTabDescriptor buildDarstellungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		PreferenceDescriptor pd;
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/design.png", "designTab",
-				"Darstellung", 0.2);
-		psd = new PreferenceSectionDescriptor("generaldesign", "Allgemeines", 0.1);
+				translationService.translate("@Preferences.Layout", null), 0.2);
+		psd = new PreferenceSectionDescriptor("generaldesign",
+				translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("language", "Sprache", 0.1, DisplayType.LOCALE);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
-				CustomTimeZone.getTimeZones(locale).toArray());
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("language", translationService.translate("@Preferences.General.LocalLanguage", null),
+				0.1, DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(Locale.getDefault())));
+		psd.add(new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
+				CustomTimeZone.displayTimeZone(ZoneId.systemDefault().getDisplayName(TextStyle.FULL, locale), locale),
+				CustomTimeZone.getTimeZones(locale).toArray()));
 
-		psd = new PreferenceSectionDescriptor("designpreferences", "Design-Einstellungen", 0.2);
+		psd = new PreferenceSectionDescriptor("designpreferences",
+				translationService.translate("@Preference.Themes", null), 0.2);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("font", "Schriftgröße", 0.1, DisplayType.COMBO, "S", "M", "L", "XL");
-		psd.add(pd);
-		pd = new PreferenceDescriptor("symbolMenu", "Symbole(Menü, Details)", 0.2, DisplayType.COMBO, "16x16", "24x24",
-				"32x32", "48x48", "64x64");
-		psd.add(pd);
-		pd = new PreferenceDescriptor("symbolToolbar", "Symbole (Toolbar)", 0.3, DisplayType.COMBO, "16x16", "24x24",
-				"32x32", "48x48", "64x64");
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("font", translationService.translate("@Preferences.FontSize", null), 0.1,
+				DisplayType.COMBO, "M", "S", "M", "L", "XL"));
+		psd.add(new PreferenceDescriptor("symbolMenu", translationService.translate("@Preferences.IconSize", null), 0.2,
+				DisplayType.COMBO, "24x24", "16x16", "24x24", "32x32", "48x48", "64x64"));
+		psd.add(new PreferenceDescriptor("symbolToolbar",
+				translationService.translate("@Preferences.IconSizeBig", null), 0.3, DisplayType.COMBO, "32x32",
+				"16x16", "24x24", "32x32", "48x48", "64x64"));
 		return ptd;
 	}
 
-	private PreferenceTabDescriptor buildErweiterungTab() {
+	private PreferenceTabDescriptor buildErweiterungTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		PreferenceDescriptor pd;
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/erweitert.png", "expandedTab",
-				"Erweitert", 0.3);
+				translationService.translate("@Preferences.Advanced", null), 0.3);
 		psd = new PreferenceSectionDescriptor("generalexpanded", "Allgemeines", 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("masks", "Masken mehrfach öffnen", 0.1, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("dragdrop", "DragDrop deaktivieren", 0.2, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("icons", "Alle Icons in Symbolleiste einblenden ", 0.3, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("indexautoload", "Index beim Öffnen der Maske automatisch laden", 0.4,
-				DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("indexautoupdate", "Index automatisch nach dem Speichern aktualisieren", 0.5,
-				DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("reportwindow", "Meldungsfenster an Menüleiste", 0.6, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("descriptionButton", "Beschreibung für Schaltflächen einblenden", 0.7,
-				DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("maskbuffer", "Masken Puffer benutzen", 0.8, DisplayType.CHECK);
-		psd.add(pd);
-		psd = new PreferenceSectionDescriptor("buffer", "Puffer", 0.2);
-		ptd.add(psd);
-		pd = new PreferenceDescriptor("displaybuffer", "Anzeige Puffer [ms]", 0.1, DisplayType.INTEGER);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("maxbuffer", "Max. Puffer [ms]", 0.2, DisplayType.INTEGER);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("masks", translationService.translate("@Preferences.AllowMultipleForms", null),
+				0.1, DisplayType.CHECK, false));
+		psd.add(new PreferenceDescriptor("dragdrop",
+				translationService.translate("@Preferences.General.DisallowDragAndDrop", null), 0.2, DisplayType.CHECK,
+				false));
+		psd.add(new PreferenceDescriptor("icons",
+				translationService.translate("@Preferences.General.ShowAllActioninToolbar", null), 0.3,
+				DisplayType.CHECK, false));
+		psd.add(new PreferenceDescriptor("indexautoload",
+				translationService.translate("@Preferences.General.AutoLoadIndex", null), 0.4, DisplayType.CHECK,
+				false));
+		psd.add(new PreferenceDescriptor("indexautoupdate",
+				translationService.translate("@Preferences.General.AutoReloadIndex", null), 0.5, DisplayType.CHECK,
+				false));
+		psd.add(new PreferenceDescriptor("reportwindow",
+				translationService.translate("@Preferences.General.SheetStylesMessageBoxes", null), 0.6,
+				DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("descriptionButton",
+				translationService.translate("@Preferences.General.ShowDetailButtonText", null), 0.7, DisplayType.CHECK,
+				true));
+		psd.add(new PreferenceDescriptor("maskbuffer", translationService.translate("@Preferences.UseFormBuffer", null),
+				0.8, DisplayType.CHECK, true));
 
-		psd = new PreferenceSectionDescriptor("table", "Tabelle", 0.3);
+		psd = new PreferenceSectionDescriptor("buffer", translationService.translate("@Preferences.Buffer", null), 0.2);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("selectiondelay", "Auswahltverzögerung [ms]", 0.1, DisplayType.INTEGER);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("sizeautoadjust", "Größe automatisch anpassen", 0.2, DisplayType.CHECK);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("displaybuffer",
+				translationService.translate("@Preferences.Buffer.DisplayBufferMs", null), 0.1, DisplayType.INTEGER,
+				20));
+		psd.add(new PreferenceDescriptor("maxbuffer",
+				translationService.translate("@Preferences.Buffer.MaxBufferMs", null), 0.2, DisplayType.INTEGER, 90));
 
-		psd = new PreferenceSectionDescriptor("parttable", "Teiltabelle", 0.5);
+		psd = new PreferenceSectionDescriptor("table", translationService.translate("@Preferences.Table", null), 0.3);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("fadeinbuttontext", "Schaltflächentext einblenden", 0.1, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("buttondetailarea", "Schaltfläche im Detailbereich", 0.2, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("showlookups", "Zeige Nachschläge", 0.3, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("fadeingroups", "Gruppen einblenden", 0.4, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("showchangedrow", "Zeige geänderte Zeilen", 0.5, DisplayType.CHECK);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("selectiondelay",
+				translationService.translate("@Preferences.Table.TableSelectionBufferMs", null), 0.1,
+				DisplayType.INTEGER, 150));
+
+		psd = new PreferenceSectionDescriptor("lookup", translationService.translate("@Preferences.Lookup", null), 0.5);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor("sizeautoadjust",
+				translationService.translate("@Preferences.Table.AutoResize", null), 0.1, DisplayType.CHECK, false));
+
+		psd = new PreferenceSectionDescriptor("parttable", translationService.translate("@Preferences.Grid", null),
+				0.6);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor("fadeinbuttontext",
+				translationService.translate("@Preferences.Grid.ShowButtonText", null), 0.1, DisplayType.CHECK, false));
+		psd.add(new PreferenceDescriptor("buttondetailarea",
+				translationService.translate("@Preferences.Grid.ShowButtonsInSection", null), 0.2, DisplayType.CHECK,
+				true));
+		psd.add(new PreferenceDescriptor("showlookups",
+				translationService.translate("@Preferences.Grid.ShowLookups", null), 0.3, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("fadeingroups",
+				translationService.translate("@Preferences.Grid.ShowGroups", null), 0.4, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("showchangedrow",
+				translationService.translate("@Preferences.CHANGED.ShowChangedRows", null), 0.5, DisplayType.CHECK,
+				true));
 
 		return ptd;
 	}
 
-	private PreferenceTabDescriptor buildDruckenTab() {
+	private PreferenceTabDescriptor buildDruckenTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		PreferenceDescriptor pd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "printTab", "Drucken", 0.4);
-		psd = new PreferenceSectionDescriptor("print", "Drucken", 0.1);
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "printTab",
+				translationService.translate("@Action.Print", null), 0.4);
+		psd = new PreferenceSectionDescriptor("print", translationService.translate("@Action.Print", null), 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("xmlxsdcreate", "XML + XDS erstellen", 0.1, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("fontChooser", "Schriftart Inhaltsverzeichnis", 0.2, DisplayType.FONT);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("optimizewidth", "Breiten optimieren", 0.3, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("hideemptycolumn", "Leere Spalten verbergen", 0.4, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("hidegoupcolumns", "Gruppenspalten verbergen", 0.5, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("hidesearchdetails", "Suchkriterien verbergen", 0.6, DisplayType.CHECK);
-		psd.add(pd);
-		pd = new PreferenceDescriptor("deactivateinternpreview", "Gruppenspalten verbergen", 0.7, DisplayType.CHECK);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("xmlxsdcreate", translationService.translate("@CreateXMLXS", null), 0.1,
+				DisplayType.CHECK, false));
+		psd.add(new PreferenceDescriptor("fontChooser", translationService.translate("@IndexFont", null), 0.2,
+				DisplayType.FONT, null));
+		psd.add(new PreferenceDescriptor("optimizewidth", translationService.translate("@OptimizeWidths", null), 0.3,
+				DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("hideemptycolumn", translationService.translate("@HideEmptyCols", null), 0.4,
+				DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("hidegoupcolumns", translationService.translate("@HideGroupCols", null), 0.5,
+				DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("hidesearchdetails",
+				translationService.translate("@HideSearchCriterias", null), 0.6, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("deactivateinternpreview",
+				translationService.translate("@DisablePreview", null), 0.7, DisplayType.CHECK, false));
 
 		return ptd;
 	}
 
-	private PreferenceTabDescriptor buildConsoleTab() {
+	private PreferenceTabDescriptor buildConsoleTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		PreferenceDescriptor pd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "consoleTab", "Konsole", 0.5);
-		psd = new PreferenceSectionDescriptor("console", "Konsole", 0.1);
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "consoleTab",
+				translationService.translate("@Form.Console", null), 0.5);
+		psd = new PreferenceSectionDescriptor("console", translationService.translate("@Form.Console", null), 0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("maxCharacter", "Max. Zeichen", 0.1, DisplayType.INTEGER);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("maxCharacter", translationService.translate("@Preferences.MaxChars", null),
+				0.1, DisplayType.INTEGER, 24000));
 
 		return ptd;
 	}
 
-	private PreferenceTabDescriptor buildSISTab() {
+	private PreferenceTabDescriptor buildSISTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		PreferenceDescriptor pd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "sisTab", "Stundenerfassung", 0.6);
-		psd = new PreferenceSectionDescriptor("user", "Benutzer vorbelegen", 0.1);
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "sisTab",
+				translationService.translate("@WorkingTime", null), 0.6);
+		psd = new PreferenceSectionDescriptor("user", translationService.translate("@WorkingTime.UserPreselect", null),
+				0.1);
 		ptd.add(psd);
-		pd = new PreferenceDescriptor("user", "Hier können Sie Ihren Benutzer vorbelegen", 0.1, DisplayType.STRING);
-		psd.add(pd);
+		psd.add(new PreferenceDescriptor("user",
+				translationService.translate("@WorkingTime.UserPreselectDescription", null), 0.1, DisplayType.STRING,
+				"bauer"));
 
 		return ptd;
 	}
