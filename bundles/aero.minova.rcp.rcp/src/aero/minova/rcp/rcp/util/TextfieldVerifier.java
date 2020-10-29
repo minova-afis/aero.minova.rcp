@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.form.model.xsd.Field;
 
-public class TextfieldVerifier implements FocusListener{
+public class TextfieldVerifier implements FocusListener {
 
 	public static boolean verifyDouble(String newString) {
 		boolean correctDouble = true;
@@ -49,6 +49,14 @@ public class TextfieldVerifier implements FocusListener{
 				date = checkForRegularDate(newString);
 			}
 		}
+		// TODO: nach implementierung des DateTimeUtils müssen sämtliche prüfungen der
+		// Datewerte über diesen verlaufen. Des weiteren muss der selbe aufbau auch für
+		// die Zeitwerte verwendet werden
+		/*
+		 * DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy"); String date
+		 * = null; Instant instant = DateTimeUtil.getDate(newString); if(instant !=
+		 * null){ date = df.format(instant); }else{ date = ""; }
+		 */
 		return date;
 	}
 
@@ -126,8 +134,7 @@ public class TextfieldVerifier implements FocusListener{
 			} else {
 				date = getDateFromNumbers(subString, df);
 			}
-		}
-		else {
+		} else {
 			date = df.format(localDate);
 		}
 
@@ -213,8 +220,7 @@ public class TextfieldVerifier implements FocusListener{
 			else if (subString.contentEquals("0")) {
 				localDate = localDate.now();
 				subString.replaceFirst("0", "");
-			}
-			else if (subString.contains("heute")) {
+			} else if (subString.contains("heute")) {
 				localDate = localDate.now();
 				subString.replaceFirst("heute", "");
 			} else if (subString.contains("h")) {
@@ -290,6 +296,7 @@ public class TextfieldVerifier implements FocusListener{
 
 		return date;
 	}
+
 	private static LocalDate checkForReductionAndAddition(LocalDate localDate, String subString) {
 
 		if (subString.contains("+") || subString.contains("-")) {

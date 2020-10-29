@@ -27,8 +27,8 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -124,12 +124,7 @@ public class XMLDetailPart {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
 			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
 					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
-				c.addKeyListener(new KeyListener() {
-
-					@Override
-					public void keyPressed(KeyEvent e) {
-					}
-
+				c.addKeyListener(new KeyAdapter() {
 					@Override
 					public void keyReleased(KeyEvent e) {
 						updateQuantitys();
@@ -166,25 +161,25 @@ public class XMLDetailPart {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener();
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
 				// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
 				// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
-				lc.addKeyListener(new KeyListener() {
 
-					@Override
-					public void keyPressed(KeyEvent e) {
-						// TODO Auto-generated method stub
-
-					}
+				lc.addKeyListener(new KeyAdapter() {
+					Boolean isControlPressed = false;
 
 					@Override
 					public void keyReleased(KeyEvent e) {
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
-						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
-								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
+						if (e.keyCode == SWT.CONTROL) {
+							isControlPressed = false;
+						}
+						if (e.character != '#' && e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT
+								&& e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB
+								&& e.keyCode != SWT.CR) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								requestOptionsFromCAS(lc);
 							} else {
@@ -193,9 +188,20 @@ public class XMLDetailPart {
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
+								&& lc.isProposalPopupOpen() == false) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-							broker.post("LoadAllLookUpValues", field.getName());
+							changeSelectionBoxList((Control) lc, false);
+						}
+					}
+
+					@Override
+					public void keyPressed(KeyEvent e) {
+						if (e.keyCode == SWT.CONTROL) {
+							isControlPressed = true;
+						}
+						if (e.keyCode == SWT.SPACE && isControlPressed == true) {
+							requestOptionsFromCAS(c);
 						}
 					}
 
@@ -292,6 +298,7 @@ public class XMLDetailPart {
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					c.setData(Constants.CONTROL_KEYLONG,
 							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+					changeProposals((LookupControl) c, t);
 
 				}
 			} else {
@@ -305,14 +312,17 @@ public class XMLDetailPart {
 					}
 					// Trifft der Text nicht überein, so wird auserdem die Description überprüft
 					for (Row r : t.getRows()) {
-						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-								.startsWith(lc.getText().toLowerCase()))) {
-							filteredTable.addRow(r);
-						} else if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+						if (r != null) {
 							if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-									.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))
-											.getStringValue().toLowerCase()))) {
+									.startsWith(lc.getText().toLowerCase()))) {
 								filteredTable.addRow(r);
+							} else if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+								if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+										.toLowerCase()
+										.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))
+												.getStringValue().toLowerCase()))) {
+									filteredTable.addRow(r);
+								}
 							}
 						}
 
@@ -320,20 +330,24 @@ public class XMLDetailPart {
 					// Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100%
 					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
 					// Wert gesetzt
-					if (filteredTable.getRows().size() == 1
-							&& (filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-									.toLowerCase().equals(lc.getText().toLowerCase()))
-							|| (filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
-									&& filteredTable.getRows().get(0)
-											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
-											.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
-						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
-								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
-						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
-						changeProposals(lc, t);
-						// Setzen der Proposals/Optionen
+					if (filteredTable.getRows().size() == 1) {
+						if (filteredTable.getRows().get(0)
+								.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+								.toLowerCase().equals(lc.getText().toLowerCase())
+								|| (filteredTable.getRows().get(0)
+										.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+										&& filteredTable.getRows().get(0)
+												.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
+												.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
+							c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
+									.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+							sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
+							changeProposals(lc, t);
+							// Setzen der Proposals/Optionen
+						} else {
+							changeProposals((LookupControl) lc, filteredTable);
+							lc.setData(Constants.CONTROL_KEYLONG, null);
+						}
 					} else {
 						changeProposals((LookupControl) lc, filteredTable);
 						lc.setData(Constants.CONTROL_KEYLONG, null);
@@ -433,10 +447,28 @@ public class XMLDetailPart {
 			}
 			Row r = builder.create();
 			rowIndexTable.addRow(r);
-
+			for (Control c : controls.values()) {
+				if (c instanceof LookupControl) {
+					LookupControl lc = (LookupControl) c;
+					lc.setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getDescription().setText("");
+					lc.getTextControl().setMessage("...");
+				} else if (c instanceof Text) {
+					Text t = (Text) c;
+					t.setText("");
+					t.setMessage("...");
+				}
+			}
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
 					rowIndexTable);
 			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+				for (Control c : controls.values()) {
+					if (c instanceof Text) {
+						Text text = (Text) c;
+						text.setMessage("");
+					}
+				}
 				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
 			}));
@@ -755,12 +787,94 @@ public class XMLDetailPart {
 			}
 			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
+				if (lc != controls.get("EmployeeKey")) {
+					lc.setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getDescription().setText("");
+				}
+			}
+			setKeys(null);
+			selectedTable = null;
+		}
+	}
+
+	/**
+	 * CAS-Anfragen, welche anhald einer Ticketnummer versendet wurden, erhalten
+	 * hier ihre Antwort. Nachdem die Lookups bereinigt werden wird für jedes Feld
+	 * der CAS angefragt, um sämtliche Optionen aufzulisten. Ist dies vollbracht, so
+	 * werden nun die Optionen mit den zurückgegebenen Werten des CAS verglichen und
+	 * die richtige Option gewählt
+	 * 
+	 * @param t
+	 */
+	@Inject
+	@Optional
+	public void receivedTicket(@Named("receivedTicket") Table t) {
+		Row r = t.getRows().get(0);
+		// bereiningen aller LokupControlls, damit wir ohne Parameter alle optionen
+		// erhalten
+		for (Control c : controls.values()) {
+			if (c instanceof LookupControl) {
+				LookupControl lc = (LookupControl) c;
 				lc.setText("");
 				lc.setData(Constants.CONTROL_KEYLONG, null);
 				lc.getDescription().setText("");
 			}
-			setKeys(null);
 		}
+		// Laden aller Optionen aus dem CAS
+		for (Control c : controls.values()) {
+			if (c instanceof LookupControl) {
+				Field field = (Field) c.getData(Constants.CONTROL_FIELD);
+				CompletableFuture<?> tableFuture;
+				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
+						"List");
+
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					if (ta instanceof SqlProcedureResult) {
+						SqlProcedureResult sql = (SqlProcedureResult) ta;
+						c.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
+					} else if (ta instanceof Table) {
+						Table t1 = (Table) ta;
+						c.setData(Constants.CONTROL_OPTIONS, t1);
+					}
+
+				}));
+			}
+		}
+		// Anmerkung: diese abfragen könnten ausgelassen werden, sollte der server
+		// anstatt des keytextes den keylong zurückgeben
+		// ->aufruf der updateSelectEntry()funktion nach neusetzen der selected Table
+		for (int i = 0; i < r.size(); i++) {
+			if (controls.get(t.getColumnName(i)) != null) {
+				Control c = controls.get(t.getColumnName(i));
+				if (c != null) {
+					if (c instanceof LookupControl) {
+						LookupControl lc = (LookupControl) c;
+						lc.setText(r.getValue(i).getStringValue());
+						Table options = (Table) lc.getData(Constants.CONTROL_OPTIONS);
+						for (Row optionRow : options.getRows()) {
+							if (optionRow.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+									.equals(r.getValue(i).getStringValue())) {
+								lc.setData(Constants.CONTROL_KEYLONG,
+										optionRow.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)));
+								if (optionRow.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+									lc.getDescription()
+											.setText(optionRow
+													.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION))
+													.getStringValue());
+								}
+							}
+						}
+					} else if (c instanceof Text) {
+						Text text = (Text) c;
+						text.setText(r.getValue(i).getStringValue());
+					}
+				}
+			}
+		}
+		// Lösung wenn Keylongs anstatt KeyTexts übergeben werden:
+		// selectedTable = t;
+		// updateSelectedEntry();
 	}
 
 	public Map<String, Control> getControls() {
