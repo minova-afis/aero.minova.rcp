@@ -31,7 +31,7 @@ public abstract class WFCFormPart {
 	}
 
 	public Form getForm(Composite parent) {
-		Form form = perspective.getContext().get(Form.class);
+		form = perspective.getContext().get(Form.class);
 		if (form == null) {
 			dataService.getFileSynch(formName); // Datei ggf. vom Server holen
 			form = dataFormService.getForm(formName);
