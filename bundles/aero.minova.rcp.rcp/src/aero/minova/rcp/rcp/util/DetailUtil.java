@@ -92,8 +92,7 @@ public class DetailUtil {
 		}
 	}
 
-	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls) {
+	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -120,6 +119,9 @@ public class DetailUtil {
 		text.setData(Constants.CONTROL_DATATYPE, getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
+		if (field.getNumber() != null) {
+			text.setData(Constants.CONTROL_DECIMALS, field.getNumber().getDecimals());
+		}
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 
 			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
@@ -263,7 +265,7 @@ public class DetailUtil {
 		return data;
 	}
 
-	public  Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
@@ -302,7 +304,7 @@ public class DetailUtil {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder
 						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			}else {
+			} else {
 				lc.getDescription().setText("");
 			}
 		}

@@ -15,6 +15,7 @@ public class Constants {
 	public static final String CONTROL_LOOKUPCONSUMER = "lookupConsumer";
 	public static final String CONTROL_KEYLONG = "keyLong";
 	public static final String CONTROL_DATATYPE = "dataType";
+	public static final String CONTROL_DECIMALS = "decimals";
 
 	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
 	// textfieldVerifier zuzugreifen
