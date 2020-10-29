@@ -119,6 +119,9 @@ public class DetailUtil {
 		text.setData(Constants.CONTROL_DATATYPE, getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
+		if (field.getNumber() != null) {
+			text.setData(Constants.CONTROL_DECIMALS, field.getNumber().getDecimals());
+		}
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 
 			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));

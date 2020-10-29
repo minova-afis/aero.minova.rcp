@@ -17,4 +17,24 @@ public class Constants {
 	public static final String CONTROL_LOOKUPCONSUMER = "lookupConsumer";
 	public static final String CONTROL_KEYLONG = "keyLong";
 	public static final String CONTROL_DATATYPE = "dataType";
+	public static final String CONTROL_DECIMALS = "decimals";
+
+	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
+	// textfieldVerifier zuzugreifen
+	public static final String FOCUSED_ORIGIN = "XMLDetailPart";
+
+	public static final String CLEAR_REQUEST = "Clear";
+	public static final String DELETE_REQUEST = "Delete";
+	public static final String INSERT_REQUEST = "Insert";
+	public static final String UPDATE_REQUEST = "Update";
+	public static final String READ_REQUEST = "Read";
+
+	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden
+	// müssen
+	public static final String FORM_BOOKINGDATE = "BookingDate";
+	public static final String FORM_STARTDATE = "StartDate";
+	public static final String FORM_ENDDATE = "EndDate";
+	public static final String FORM_RENDEREDQUANTITY = "RenderedQuantity";
+	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
+	public static final String EMPLOYEEKEY = "EmployeeKey";
 }
