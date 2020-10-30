@@ -64,14 +64,26 @@ public class TextfieldVerifier implements FocusListener {
 		final String newString = ((Text) e.getSource()).getText();
 		if (newString != "") {
 			Text t = (Text) e.getSource();
-			XMLDetailPart xml = (XMLDetailPart) t.getData("XMLDetailPart");
-			Field field = (Field) t.getData("field");
-			if (field.getShortDate() != null || field.getLongDate() != null) {
-				t.setText(verifyDate(newString, xml.getTimeZone()));
+			if (t.getData(Constants.FOCUSED_ORIGIN) instanceof WFCDetailUtil) {
+				WFCDetailUtil xml = (WFCDetailUtil) t.getData(Constants.FOCUSED_ORIGIN);
+				Field field = (Field) t.getData("field");
+				if (field.getShortDate() != null || field.getLongDate() != null) {
+					t.setText(verifyDate(newString, xml.getTimeZone()));
+				} else {
+					t.setText(verifyTime(newString, xml.getTimeZone()));
+					xml.updateQuantitys();
+				}
 			} else {
-				t.setText(verifyTime(newString, xml.getTimeZone()));
-				xml.updateQuantitys();
+				XMLDetailPart xml = (XMLDetailPart) t.getData(Constants.FOCUSED_ORIGIN);
+				Field field = (Field) t.getData("field");
+				if (field.getShortDate() != null || field.getLongDate() != null) {
+					t.setText(verifyDate(newString, xml.getTimeZone()));
+				} else {
+					t.setText(verifyTime(newString, xml.getTimeZone()));
+					xml.updateQuantitys();
+				}
 			}
+
 		}
 
 	}

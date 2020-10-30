@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -23,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
@@ -43,6 +45,13 @@ public class WFCDetailUtil {
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
 
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
+
+	@Inject
+	protected IDataService dataService;
+
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
 
@@ -58,12 +67,13 @@ public class WFCDetailUtil {
 		this.controls = controls;
 		this.form = form;
 		this.lookupUtil = new WFCDetailsLookupUtil(controls);
-		this.casRequests = new WFCDetailCASRequestsUtil(controls, keys, selectedTable, form);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
-			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
-					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
+			if ((c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
+					.getData(Constants.CONTROL_FIELD))
+					|| (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_ENDDATE)
+							.getData(Constants.CONTROL_FIELD))) {
 				c.addKeyListener(new KeyListener() {
 
 					@Override
@@ -93,6 +103,7 @@ public class WFCDetailUtil {
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
+					text.setData(Constants.FOCUSED_ORIGIN, this);
 					text.addFocusListener(tfv);
 				}
 				if (field.getText() != null) {
@@ -106,7 +117,7 @@ public class WFCDetailUtil {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, null);
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
@@ -149,21 +160,25 @@ public class WFCDetailUtil {
 	 * verändert
 	 */
 	public void updateQuantitys() {
-		Text endDate = (Text) controls.get("EndDate");
-		Text startDate = (Text) controls.get("StartDate");
+		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+		Text startDate = (Text) controls.get(Constants.FORM_STARTDATE);
 		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
 			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
 			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
 			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
 					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
 			timeDifference = timeDifference / 60;
-			Text renderedField = (Text) controls.get("RenderedQuantity");
-			Text chargedField = (Text) controls.get("ChargedQuantity");
+			Text renderedField = (Text) controls.get(Constants.FORM_RENDEREDQUANTITY);
+			Text chargedField = (Text) controls.get(Constants.FORM_CHARGEDQUANTITY);
 			String renderedValue;
 			String chargedValue;
 			if (timeDifference >= 0) {
-				renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
-				chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
+				Double half = (double) Math.round(timeDifference * 2) / 2f;
+				chargedValue = String.format("%1.2f", half);
+				chargedValue = chargedValue.replace(',', '.');
+				renderedValue = String.format("%1.2f", quarter);
+				renderedValue = renderedValue.replace(',', '.');
 			} else {
 				renderedValue = "0";
 				chargedValue = "0";
@@ -173,4 +188,7 @@ public class WFCDetailUtil {
 		}
 	}
 
+	public String getTimeZone() {
+		return timezone;
+	}
 }

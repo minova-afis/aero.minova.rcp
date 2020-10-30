@@ -31,6 +31,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.util.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
@@ -63,6 +64,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private WFCDetailUtil wfcDetailUtil = null;
 
+	private WFCDetailCASRequestsUtil casRequestsUtil = null;
+
 	public WFCDetailPart() {
 
 	}
@@ -80,6 +83,7 @@ public class WFCDetailPart extends WFCFormPart {
 		translate(translationService);
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
 		// steuert
+		casRequestsUtil = new WFCDetailCASRequestsUtil(controls, form);
 		wfcDetailUtil = new WFCDetailUtil(form, controls);
 	}
 
