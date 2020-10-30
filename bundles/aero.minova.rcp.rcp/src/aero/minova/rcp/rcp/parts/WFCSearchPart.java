@@ -18,7 +18,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.rcp.util.NatTableUtil;
+import aero.minova.rcp.rcp.util.NatTableWrapper;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
 public class WFCSearchPart extends WFCFormPart {
@@ -59,7 +59,8 @@ public class WFCSearchPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		NatTableUtil.createNatTable(parent, form, data, false, null, context);
+		new NatTableWrapper().createNatTable(parent, form, data, false, null, context);
+
 	}
 
 	@PersistTableSelection
