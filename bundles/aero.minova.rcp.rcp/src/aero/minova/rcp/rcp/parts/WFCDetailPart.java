@@ -92,7 +92,6 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
-		localContext.dispose();
 	}
 
 	private void layoutForm(Composite parent) {
