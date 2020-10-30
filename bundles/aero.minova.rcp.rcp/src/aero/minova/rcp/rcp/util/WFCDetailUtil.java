@@ -55,17 +55,18 @@ public class WFCDetailUtil {
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
 
+	@Inject
 	private Map<String, Control> controls = new HashMap<>();
 	private List<ArrayList> keys = null;
 	private Table selectedTable;
+	@Inject
 	private Form form;
 	private WFCDetailsLookupUtil lookupUtil = null;
 
 	private WFCDetailCASRequestsUtil casRequests = null;
 
-	public WFCDetailUtil(Form form, Map<String, Control> controls) {
-		this.controls = controls;
-		this.form = form;
+	@Inject
+	public WFCDetailUtil() {
 		this.lookupUtil = new WFCDetailsLookupUtil(controls);
 
 		for (Control c : controls.values()) {

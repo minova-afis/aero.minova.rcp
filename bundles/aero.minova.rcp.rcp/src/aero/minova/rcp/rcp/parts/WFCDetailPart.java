@@ -10,6 +10,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.EclipseContextFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -29,6 +32,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
@@ -66,14 +70,10 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
-	public WFCDetailPart() {
-
-	}
-
 	private TranslationService translationService;
 
 	@PostConstruct
-	public void postConstruct(Composite parent) {
+	public void postConstruct(Composite parent, IEclipseContext partContext) {
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
@@ -83,8 +83,16 @@ public class WFCDetailPart extends WFCFormPart {
 		translate(translationService);
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
 		// steuert
-		casRequestsUtil = new WFCDetailCASRequestsUtil(controls, form);
-		wfcDetailUtil = new WFCDetailUtil(form, controls);
+
+		// erzeuge die util Methoden mit DI
+		IEclipseContext localContext = EclipseContextFactory.create();
+		localContext.set(Form.class, form);
+		localContext.set(Map.class, controls);
+
+		localContext.setParent(partContext);
+		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
+		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
+		localContext.dispose();
 	}
 
 	private void layoutForm(Composite parent) {

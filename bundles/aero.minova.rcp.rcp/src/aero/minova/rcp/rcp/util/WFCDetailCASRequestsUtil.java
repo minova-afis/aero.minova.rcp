@@ -67,21 +67,17 @@ public class WFCDetailCASRequestsUtil {
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
 
+	@Inject
 	private Map<String, Control> controls = null;
 
 	private List<ArrayList> keys = null;
 
 	private Table selectedTable = null;
 
+	@Inject
 	private Form form;
 
 	private String lastEndDate = "";
-
-	public WFCDetailCASRequestsUtil(Map<String, Control> controls, Form form) {
-		this.controls = controls;
-		this.form = form;
-
-	}
 
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
