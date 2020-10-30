@@ -35,14 +35,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.service.component.annotations.Component;
+
 import aero.minova.rcp.core.ui.Util;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 @SuppressWarnings("restriction")
-@Component
 public class WorkspaceDialog extends Dialog{
 
 	private Text username;

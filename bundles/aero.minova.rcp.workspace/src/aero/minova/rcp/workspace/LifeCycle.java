@@ -47,6 +47,10 @@ public class LifeCycle {
 			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
 										// ausgesucht
 		}
+		
+		workbenchContext.set("username", workspaceDialog.getUsername());
+		workbenchContext.set("password", workspaceDialog.getPassword());
+		workbenchContext.set("connection", workspaceDialog.getConnection());
 
 //		workspaceDialog.getWorkspaceData();
 
