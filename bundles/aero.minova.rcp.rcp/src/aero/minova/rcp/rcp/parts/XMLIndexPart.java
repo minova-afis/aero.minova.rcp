@@ -14,16 +14,14 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.e4.ui.workbench.modeling.ISelectionListener;
-import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.rcp.util.NatTableUtil;
+import aero.minova.rcp.rcp.util.NatTableWrapper;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
 public class XMLIndexPart {
@@ -46,7 +44,7 @@ public class XMLIndexPart {
 	@Inject
 	ESelectionService selectionService;
 
-	private NatTable natTable;
+	private NatTableWrapper natTable;
 
 	private MPerspective perspective = null;
 
@@ -142,7 +140,7 @@ public class XMLIndexPart {
 			}
 		};
 
-		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService, context);
+		natTable = new NatTableWrapper().createNatTable(parent, form, data, true, selectionService, context);
 	}
 
 	@PersistTableSelection
@@ -159,17 +157,16 @@ public class XMLIndexPart {
 	public void load(@UIEventTopic("PLAPLA") Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
-
-			data.getRows().clear();
-			for (Row r : table.getRows()) {
-				data.addRow(r);
-			}
-			natTable.refresh(false);
-			natTable.requestLayout();
+			natTable.updateData(table.getRows());
 		}
 	}
+	public void load(@UIEventTopic("PLAPLA") Table table) {
+		natTable.updateData(table.getRows());
+	}
 
-	public NatTable getNatTable() {
+	// Aufruf von resize handler, ev. Umstellen auf Event auf welches die NatTable
+	// reagiert
+	public NatTableWrapper getNatTable() {
 		return natTable;
 	}
 
