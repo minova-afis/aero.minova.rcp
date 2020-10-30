@@ -1,15 +1,6 @@
 package aero.minova.rcp.workspace.dialogs;
 
-import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.PASSWORD;
-import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.URL;
-import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.USER;
-import static aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +19,9 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -36,26 +30,28 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
+import org.osgi.service.component.annotations.Component;
 import aero.minova.rcp.core.ui.Util;
 import aero.minova.rcp.workspace.WorkspaceException;
+import aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 @SuppressWarnings("restriction")
-public class WorkspaceDialog extends Dialog {
+@Component
+public class WorkspaceDialog extends Dialog{
 
 	private Text username;
 	private Text password;
-	private Text text;
+	private Text applicationArea;
 	private Button btnOK;
 	private Button btnConnect;
 	private Text message;
 	private Text connectionString;
-	private Text remoteUsername;
 	private Combo profile;
 
 	private WorkspaceHandler workspaceHandler;
@@ -85,18 +81,52 @@ public class WorkspaceDialog extends Dialog {
 
 		profile = new Combo(container, SWT.NONE);
 		profile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1));
+		for (ISecurePreferences prefs : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
+			try {
+				profile.add(prefs.get(WorkspaceAccessPreferences.PROFILE, ""));
+			} catch (StorageException e1) {
+				logger.error(e1, e1.getMessage());
+			}
+		}
 		profile.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				int i = profile.getSelectionIndex();
-				logger.info("Item " + i + " selected");
+				logger.info("Item " + i + " selected (" + profile.getText() + ")");
+				username.setText("");
+				password.setText("");
+				connectionString.setText("");
+				applicationArea.setText("");
+				checkWorkspace();
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+		profile.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				int i = profile.getSelectionIndex();
+				logger.info("Item " + i + " selected (" + profile.getText() + ")");
+				try {
+					username.setText("");
+					password.setText("");
+					connectionString.setText("");
+					applicationArea.setText("");
+					checkWorkspace();
+				} catch (NullPointerException ex) {
+
+				}
 			}
 		});
+		
+//		Button delete = new Button(container, SWT.PUSH);
+//		GridData gd_delete = new GridData(GridData.VERTICAL_ALIGN_END);
+//		gd_delete.verticalAlignment = SWT.FILL;
+//		delete.setLayoutData(gd_delete);
+//		delete.setText("List Applications");
+		
 
 		Label lblUsername = new Label(container, SWT.NONE);
 		lblUsername.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
@@ -144,6 +174,22 @@ public class WorkspaceDialog extends Dialog {
 		});
 		// new Label(container, SWT.NONE);
 
+		Label lblConnectionString = new Label(container, SWT.NONE);
+		GridData gd5 = new GridData();
+		gd5.horizontalAlignment = SWT.BEGINNING;
+		gd5.widthHint = 120;
+		gd5.horizontalSpan = 1;
+		gd5.verticalSpan = 1;
+		gd5.horizontalAlignment = SWT.FILL;
+		lblConnectionString.setLayoutData(gd5);
+		labelGridData.applyTo(lblConnectionString);
+		lblConnectionString.setText("Connection String");
+
+		connectionString = new Text(container, SWT.BORDER);
+		GridData gd_connectionString = new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1);
+		gd_connectionString.widthHint = 400;
+		connectionString.setLayoutData(gd_connectionString);
+
 		Label lblApplicationArea = new Label(container, SWT.NONE);
 		GridData gd_lblApplicationArea = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd_lblApplicationArea.verticalAlignment = SWT.FILL;
@@ -152,20 +198,28 @@ public class WorkspaceDialog extends Dialog {
 
 		lblApplicationArea.setText("Application Area");
 
-		text = new Text(container, SWT.BORDER);
+		applicationArea = new Text(container, SWT.BORDER);
 		GridData gd = new GridData(GridData.FILL);
 		gd.widthHint = 365;
 		gd.verticalSpan = 1;
 		gd.horizontalSpan = 4;
 		gd.grabExcessVerticalSpace = false;
 		gd.horizontalAlignment = SWT.FILL;
-		text.setLayoutData(gd);
+		applicationArea.setLayoutData(gd);
 
 		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
 		GridData gd_btnNewButton = new GridData(GridData.VERTICAL_ALIGN_END);
 		gd_btnNewButton.verticalAlignment = SWT.FILL;
 		btnNewButton.setLayoutData(gd_btnNewButton);
 		btnNewButton.setText("List Applications");
+		
+		btnNewButton.addSelectionListener(new SelectionAdapter() {@Override
+		public void widgetSelected(SelectionEvent e) {
+			DirectoryDialog dialog = new DirectoryDialog(parent.getShell());
+			dialog.setText("Select Directory");
+			String text = dialog.open();
+			applicationArea.setText(text);
+		}});
 
 		Label lblMessage = new Label(container, SWT.NONE);
 		labelGridData.applyTo(lblMessage);
@@ -180,29 +234,6 @@ public class WorkspaceDialog extends Dialog {
 		gd2.horizontalAlignment = SWT.FILL;
 		message.setLayoutData(gd2);
 		new Label(container, SWT.NONE);
-
-		Label lblConnectionString = new Label(container, SWT.NONE);
-		GridData gd5 = new GridData();
-		gd5.horizontalAlignment = SWT.BEGINNING;
-		gd5.widthHint = 120;
-		gd5.horizontalSpan = 1;
-		gd5.verticalSpan = 1;
-		gd5.horizontalAlignment = SWT.FILL;
-		lblConnectionString.setLayoutData(gd5);
-		labelGridData.applyTo(lblConnectionString);
-		lblConnectionString.setText("Connection String");
-
-		connectionString = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-		GridData gd_connectionString = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-		gd_connectionString.widthHint = 80;
-		connectionString.setLayoutData(gd_connectionString);
-
-		Label lblRemoteUsername = new Label(container, SWT.NONE);
-		labelGridData.applyTo(lblRemoteUsername);
-		lblRemoteUsername.setText("Remote Username");
-
-		remoteUsername = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-		remoteUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
 		progressBar = new ProgressBar(container, SWT.BORDER | SWT.SMOOTH);
 		progressBar.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
@@ -239,36 +270,26 @@ public class WorkspaceDialog extends Dialog {
 		Job job = new Job("Check Connection") {
 			protected IStatus run(IProgressMonitor monitor) {
 				subMonitor = SubMonitor.convert(monitor, 2);
-				for (int i = 0; i < 4; i++) {
+				subMonitor.split(1);
+				sync.asyncExec(() -> {
+					workspaceHandler = null;
 					try {
-						TimeUnit.SECONDS.sleep(1);
-						subMonitor.split(1);
-						sync.asyncExec(() -> {
-							workspaceHandler = null;
-							try {
-								if (Util.isAvailable(message)) {
-									message.setText("");
-									workspaceHandler = WorkspaceHandler.newInstance(new URL(text.getText()), logger);
-									btnOK.setEnabled(
-											workspaceHandler.checkConnection(username.getText(), password.getText()));
-								}
-							} catch (MalformedURLException | WorkspaceException e1) {
-								logger.error(e1);
-								message.setText(e1.getMessage());
-								btnOK.setEnabled(false);
-							}
-							if (workspaceHandler != null) {
-								if (Util.isAvailable(message)) {
-									connectionString.setText(workspaceHandler.getConnectionString());
-									remoteUsername.setText(workspaceHandler.getRemoteUsername());
-									profile.setText(workspaceHandler.getDisplayName());
-								}
-							}
-						});
-					} catch (InterruptedException e) {
-						return Status.CANCEL_STATUS;
+						if (Util.isAvailable(message)) {
+							message.setText("");
+							workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
+							btnOK.setEnabled(workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText()));
+							profile.setText(workspaceHandler.getProfile());
+							username.setText(workspaceHandler.getUsername());
+							password.setText(workspaceHandler.getPassword());
+							applicationArea.setText(workspaceHandler.getApplicationArea());
+							connectionString.setText(workspaceHandler.getConnectionString());
+						}
+					} catch (WorkspaceException e1) {
+						logger.error(e1);
+						message.setText(e1.getMessage());
+						btnOK.setEnabled(false);
 					}
-				}
+				});
 				return Status.OK_STATUS;
 			}
 		};
@@ -278,23 +299,23 @@ public class WorkspaceDialog extends Dialog {
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		try {
-			Optional<ISecurePreferences> primaryWorkspaceHandler = getSavedPrimaryWorkspaceAccessData(logger);
-			if (primaryWorkspaceHandler.isPresent()) {
-				text.setText(//
-						primaryWorkspaceHandler.get().get(URL, null));
-				password.setText(//
-						primaryWorkspaceHandler.get().get(PASSWORD, "Minova+0"));
-				username.setText(//
-						primaryWorkspaceHandler.get().get(USER, "sa"));
-			} else {
-				text.setText("file:/Users/bauer/Documents/Entwicklung/MINOVA");
-				password.setText("Minova+0");
-				username.setText("sa");
-			}
-		} catch (StorageException e) {
-			throw new RuntimeException(e);
-		}
+//		try {
+//			Optional<ISecurePreferences> primaryWorkspaceHandler = getSavedPrimaryWorkspaceAccessData(logger);
+//			if (primaryWorkspaceHandler.isPresent()) {
+//				applicationArea.setText(//
+//						primaryWorkspaceHandler.get().get(URL, null));
+//				password.setText(//
+//						primaryWorkspaceHandler.get().get(PASSWORD, "Minova+0"));
+//				username.setText(//
+//						primaryWorkspaceHandler.get().get(USER, "sa"));
+//			} else {
+//				text.setText("file:/Users/bauer/Documents/Entwicklung/MINOVA");
+//				password.setText("Minova+0");
+//				username.setText("sa");
+//			}
+//		} catch (StorageException e) {
+//			throw new RuntimeException(e);
+//		}
 		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
 		btnConnect = createButton(parent, IDialogConstants.RETRY_ID, "Check", false);
 		btnOK.setEnabled(false);
@@ -306,8 +327,7 @@ public class WorkspaceDialog extends Dialog {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		btnOK.addSelectionListener(new SelectionListener() {
 
@@ -317,8 +337,7 @@ public class WorkspaceDialog extends Dialog {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 	}
 
@@ -356,7 +375,7 @@ public class WorkspaceDialog extends Dialog {
 
 				@Override
 				public void run() {
-					if (progressBar!=null && !progressBar.isDisposed()) {
+					if (progressBar != null && !progressBar.isDisposed()) {
 						progressBar.setSelection(progressBar.getSelection() + work);
 					}
 				}
@@ -395,6 +414,7 @@ public class WorkspaceDialog extends Dialog {
 			return this;
 		}
 	}
+
 	@Override
 	protected void okPressed() {
 		// TODO
@@ -412,25 +432,15 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	public String getUsername() {
-		// TODO
-		// return workspaceData.getUsername();
-		return "";
-	}
-
-	public void setUsername(String username) {
-		// TODO
-		// workspaceData.setUsername(username);
+		return workspaceHandler.getUsername();
 	}
 
 	public String getPassword() {
-		// TODO
-		// return workspaceData.getPassword();
-		return "";
+		return workspaceHandler.getPassword();
 	}
 
-	public void setPassword(String password) {
-		// TODO
-		// workspaceData.setPassword(password);
+	public String getConnection() {
+		return workspaceHandler.getConnectionString();
 	}
 
 }

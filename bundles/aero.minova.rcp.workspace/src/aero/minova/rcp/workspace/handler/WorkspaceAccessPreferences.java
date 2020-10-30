@@ -15,17 +15,17 @@ import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
 /**
- * Stores preferences that are required in order to access a workspace and
- * therefore to set the current platform.
+ * Stores preferences that are required in order to access a workspace and therefore to set the current platform.
  * 
  * @author avots
- *
  */
 @SuppressWarnings("restriction")
 public class WorkspaceAccessPreferences {
 	public static final String USER = "user";
 	public static final String URL = "url";
 	public static final String PASSWORD = "password";
+	public static final String PROFILE = "profile";
+	public static final String APPLICATION_AREA = "applicationArea";
 
 	private static final String AERO_MINOVA_RCP_WORKSPACE = "aero.minova.rcp.workspace";
 	private static final String WORKSPACES = "aero.minova.rcp.workspace";
@@ -35,7 +35,7 @@ public class WorkspaceAccessPreferences {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password,
+	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password, String profile, String applicationArea,
 			boolean isPrimaryWorksace) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
@@ -56,6 +56,8 @@ public class WorkspaceAccessPreferences {
 			workspacePrefs.put(URL, url, false);
 			workspacePrefs.put(PASSWORD, password, true);
 			workspacePrefs.putBoolean(IS_PRIMARY_WORKSPACE, isPrimaryWorksace, false);
+			workspacePrefs.put(PROFILE, profile, false);
+			workspacePrefs.put(APPLICATION_AREA, applicationArea, false);
 			workspacePrefs.flush();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -63,8 +65,7 @@ public class WorkspaceAccessPreferences {
 	}
 
 	/**
-	 * @return a list of all WorkspaceHandler that are store in the preferences. The
-	 *         password is not available before the the workspace is set (#active())
+	 * @return a list of all WorkspaceHandler that are store in the preferences. The password is not available before the the workspace is set (#active())
 	 */
 	public static List<ISecurePreferences> getSavedWorkspaceAccessData(Logger logger) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//

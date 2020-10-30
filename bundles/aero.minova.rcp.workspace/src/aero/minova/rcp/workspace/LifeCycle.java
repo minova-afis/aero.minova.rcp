@@ -16,6 +16,7 @@ import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
 
+import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.FileWorkspace;
 import aero.minova.rcp.workspace.handler.SpringBootWorkspace;
@@ -35,6 +36,8 @@ public class LifeCycle {
 		WorkspaceDialog workspaceDialog;
 		WorkspaceHandler workspaceHandler;
 		int returnCode;
+		Manager manager = new Manager();
+		manager.postContextCreate(workbenchContext);
 
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
@@ -47,46 +50,46 @@ public class LifeCycle {
 
 //		workspaceDialog.getWorkspaceData();
 
-		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
+//		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
+//
+//		String userName = "Test1";// get username from login dialog;
+//		String workspaceName = "xyz1"; // muss noch ermittelt werden
 
-		String userName = "Test1";// get username from login dialog;
-		String workspaceName = "xyz1"; // muss noch ermittelt werden
+//		URL connection = new URL("file:///Users/saak/Documents/Entwicklung/MINOVA");
+//		switch (connection.getProtocol()) {
+//		case "file":
+//			workspaceHandler = new FileWorkspace(connection, logger);
+//			break;
+//		case "http":
+//		case "https":
+//			workspaceHandler = new SpringBootWorkspace(profile, connection, logger);
+//			break;
+//		default:
+//			workspaceHandler = null;
+//			break;
+//		}
 
-		URL connection = new URL("file:///Users/saak/Documents/Entwicklung/MINOVA");
-		switch (connection.getProtocol()) {
-		case "file":
-			workspaceHandler = new FileWorkspace(connection, logger);
-			break;
-		case "http":
-		case "https":
-			workspaceHandler = new SpringBootWorkspace(connection, logger);
-			break;
-		default:
-			workspaceHandler = null;
-			break;
-		}
-
-		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
-		// check if the instance location is already set,
-		// otherwise setting another one will throw an IllegalStateException
-		if (!Platform.getInstanceLocation().isSet()) {
-			String defaultPath = System.getProperty("user.home");
-
-			// build the desired path for the workspace
-			String path = defaultPath + "/.minwfc/" + workspaceName + "/";
-			URL instanceLocationUrl = new URL("file", null, path);
-			Platform.getInstanceLocation().set(instanceLocationUrl, false);
-			URL workspaceURL = Platform.getInstanceLocation().getURL();
-			File workspaceDir = new File(workspaceURL.getPath());
-			if (!workspaceDir.exists()) {
-				workspaceDir.mkdir();
-				logger.info(MessageFormat.format("Workspace {0} neu angelegt.", workspaceDir));
-			}
-			checkDir(workspaceDir, "config");
-			checkDir(workspaceDir, "data");
-			checkDir(workspaceDir, "i18n");
-			checkDir(workspaceDir, "plugins");
-		}
+//		logger.info("Platform's working directory is set: " + Platform.getInstanceLocation().isSet());
+//		// check if the instance location is already set,
+//		// otherwise setting another one will throw an IllegalStateException
+//		if (!Platform.getInstanceLocation().isSet()) {
+//			String defaultPath = System.getProperty("user.home");
+//
+//			// build the desired path for the workspace
+//			String path = defaultPath + "/.minwfc/" + workspaceName + "/";
+//			URL instanceLocationUrl = new URL("file", null, path);
+//			Platform.getInstanceLocation().set(instanceLocationUrl, false);
+//			URL workspaceURL = Platform.getInstanceLocation().getURL();
+//			File workspaceDir = new File(workspaceURL.getPath());
+//			if (!workspaceDir.exists()) {
+//				workspaceDir.mkdir();
+//				logger.info(MessageFormat.format("Workspace {0} neu angelegt.", workspaceDir));
+//			}
+//			checkDir(workspaceDir, "config");
+//			checkDir(workspaceDir, "data");
+//			checkDir(workspaceDir, "i18n");
+//			checkDir(workspaceDir, "plugins");
+//		}
 	}
 
 	/**
