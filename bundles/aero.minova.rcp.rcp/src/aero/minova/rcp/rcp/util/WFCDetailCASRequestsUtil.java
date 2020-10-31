@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -58,22 +59,25 @@ public class WFCDetailCASRequestsUtil {
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	private Shell shell;
 
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "user")
+	String employee;
+
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
+
+	@Inject
 	private Map<String, Control> controls = null;
 
 	private List<ArrayList> keys = null;
 
 	private Table selectedTable = null;
 
+	@Inject
 	private Form form;
 
-	public WFCDetailCASRequestsUtil(Map<String, Control> controls, List<ArrayList> keys, Table selectedTable,
-			Form form) {
-		this.controls = controls;
-		this.keys = keys;
-		this.selectedTable = selectedTable;
-		this.form = form;
-
-	}
+	private String lastEndDate = "";
 
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
@@ -87,46 +91,48 @@ public class WFCDetailCASRequestsUtil {
 		if (rows != null) {
 
 			Row row = rows.get(0);
-			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
+			if (row.getValue(0).getValue() != null) {
+				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
 
-			RowBuilder builder = RowBuilder.newRow();
-			List<Field> allFields = dataFormService.getFieldsFromForm(form);
+				RowBuilder builder = RowBuilder.newRow();
+				List<Field> allFields = dataFormService.getFieldsFromForm(form);
 
-			// Hauptmaske
+				// Hauptmaske
 
-			List<Column> indexColumns = form.getIndexView().getColumn();
-			setKeys(new ArrayList<ArrayList>());
-			for (Field f : allFields) {
-				boolean found = false;
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					if (indexColumns.get(i).getName().equals(f.getName())) {
-						found = true;
-						if ("primary".equals(f.getKeyType())) {
-							builder.withValue(row.getValue(i).getValue());
-							ArrayList al = new ArrayList();
-							al.add(indexColumns.get(i).getName());
-							al.add(row.getValue(i).getValue());
-							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-							keys.add(al);
-						} else {
-							builder.withValue(null);
+				List<Column> indexColumns = form.getIndexView().getColumn();
+				setKeys(new ArrayList<ArrayList>());
+				for (Field f : allFields) {
+					boolean found = false;
+					for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+						if (indexColumns.get(i).getName().equals(f.getName())) {
+							found = true;
+							if ("primary".equals(f.getKeyType())) {
+								builder.withValue(row.getValue(i).getValue());
+								ArrayList al = new ArrayList();
+								al.add(indexColumns.get(i).getName());
+								al.add(row.getValue(i).getValue());
+								al.add(ValueBuilder.value(row.getValue(i)).getDataType());
+								keys.add(al);
+							} else {
+								builder.withValue(null);
+							}
 						}
 					}
-				}
-				if (!found) {
-					builder.withValue(null);
-				}
+					if (!found) {
+						builder.withValue(null);
+					}
 
+				}
+				Row r = builder.create();
+				rowIndexTable.addRow(r);
+
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService
+						.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+					selectedTable = t.getOutputParameters();
+					updateSelectedEntry();
+				}));
 			}
-			Row r = builder.create();
-			rowIndexTable.addRow(r);
-
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
-					rowIndexTable);
-			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-				selectedTable = t.getOutputParameters();
-				updateSelectedEntry();
-			}));
 		}
 	}
 
@@ -179,9 +185,9 @@ public class WFCDetailCASRequestsUtil {
 		RowBuilder rb = RowBuilder.newRow();
 
 		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(form, "Update");
+			formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
 		} else {
-			formTable = dataFormService.getTableFromFormDetail(form, "Insert");
+			formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
 		}
 		int valuePosition = 0;
 		if (getKeys() != null) {
@@ -246,9 +252,11 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		formTable.addRow(r);
-		checkWorkingTime(((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
-				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
-				((Text) controls.get("ChargedQuantity")).getText(), formTable, r);
+		checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
+				((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
+				((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
+				((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
+				((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 	}
 
 	/**
@@ -271,19 +279,19 @@ public class WFCDetailCASRequestsUtil {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		LocalDate localDate = LocalDate.parse(bookingDate, df);
 		LocalDateTime localDateTime = localDate.atTime(0, 0);
-		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of("Europe/Berlin"));
-		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex("BookingDate"));
+		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of(timezone));
+		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex(Constants.FORM_BOOKINGDATE));
 		LocalTime timeEndDate = LocalTime.parse(endDate);
 		LocalTime timeStartDate = LocalTime.parse(startDate);
 
 		LocalDateTime localEndDate = localDate.atTime(timeEndDate);
-		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of("Europe/Berlin"));
-		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex("EndDate"));
+		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
+		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex(Constants.FORM_ENDDATE));
 		LocalDateTime localStartDate = localDate.atTime(timeStartDate);
-		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of("Europe/Berlin"));
-		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex("StartDate"));
-		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex("ChargedQuantity"));
-		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex("RenderedQuantity"));
+		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
+		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex(Constants.FORM_STARTDATE));
+		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex(Constants.FORM_CHARGEDQUANTITY));
+		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex(Constants.FORM_RENDEREDQUANTITY));
 
 		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
 				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
@@ -331,7 +339,7 @@ public class WFCDetailCASRequestsUtil {
 			openNotificationPopup("Entry could not be updated");
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
-			clearFields("Update");
+			clearFields(Constants.UPDATE_REQUEST);
 		}
 	}
 
@@ -345,7 +353,7 @@ public class WFCDetailCASRequestsUtil {
 			openNotificationPopup("Entry could not be added");
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
-			clearFields("Insert");
+			clearFields(Constants.INSERT_REQUEST);
 		}
 	}
 
@@ -395,7 +403,7 @@ public class WFCDetailCASRequestsUtil {
 			openNotificationPopup("Entry could not be deleted");
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
-			clearFields("Delete");
+			clearFields(Constants.DELETE_REQUEST);
 		}
 	}
 
@@ -421,25 +429,27 @@ public class WFCDetailCASRequestsUtil {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if (origin.equals("Delete")) {
+				if (origin.equals(Constants.DELETE_REQUEST)) {
 					t.setText("");
-				} else if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE)
+						.getData(Constants.CONTROL_FIELD)) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
-				} else if (c.getData("field") == controls.get("StartDate").getData("field")
-						&& origin.equals("Insert")) {
-					Text endDate = (Text) controls.get("EndDate");
-					t.setText(endDate.getText());
-				} else {
-					Field f = (Field) c.getData("field");
-					if (f.getNumber() != null) {
-						t.setText("0");
-					} else {
-						t.setText("");
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
+						.getData(Constants.CONTROL_FIELD)) {
+					Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+					if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
+						lastEndDate = endDate.getText();
 					}
+					t.setText(lastEndDate);
+				} else {
+					Field f = (Field) c.getData(Constants.CONTROL_FIELD);
+					t.setText("");
+
 				}
 			}
+
 			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
 				lc.setText("");
@@ -447,6 +457,39 @@ public class WFCDetailCASRequestsUtil {
 				lc.getDescription().setText("");
 			}
 			setKeys(null);
+		}
+		/*
+		 * Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den
+		 * preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS versendet
+		 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
+		 * haben
+		 */
+		if (!origin.equals(Constants.DELETE_REQUEST)) {
+			LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
+			lc.setText(employee);
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),
+					controls, dataService, sync, "List");
+
+			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+				if (ta instanceof Table) {
+					Table t1 = (Table) ta;
+					for (Row r : t1.getRows()) {
+						if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.equals(employee.toLowerCase())) {
+							lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+							if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+								lc.getDescription().setText(
+										r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+							}
+							lc.setData(Constants.CONTROL_KEYLONG,
+									r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
+						}
+					}
+					// changeOptionsForLookupField(t1, lc, true);
+				}
+
+			}));
 		}
 	}
 
