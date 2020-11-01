@@ -15,7 +15,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Führt eine Methode innerhalb eines definierten
- * 				Objektes aus. Die Objekte können mit instance angelegt werden.
+ * 				Objektes aus. Die Objekte können mit instance
+ * 				angelegt werden.
  * 			
  * 
  * <p>Java-Klasse für method complex type.
