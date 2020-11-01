@@ -37,7 +37,7 @@ public class ShortDateField {
 
 	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit,
 			Locale locale) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
