@@ -70,7 +70,7 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(field.getLabel())
+		labelFactory.text(field.getTextAttribute())
 				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
 				.create(composite);
 

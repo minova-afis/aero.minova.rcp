@@ -49,7 +49,7 @@ public class NatTableUtil {
 		String[] propertyNames = new String[columns.size()];
 		int i = 0;
 		for (Column column : columns) {
-			tableHeadersMap.put(column.getName(), column.getLabel());
+			tableHeadersMap.put(column.getName(), column.getTextAttribute());
 			propertyNames[i++] = column.getName();
 		}
 

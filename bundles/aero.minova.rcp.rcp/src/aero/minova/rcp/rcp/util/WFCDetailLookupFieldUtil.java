@@ -35,7 +35,7 @@ public class WFCDetailLookupFieldUtil {
 
 	public static Control createLookupField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls) {
-		String labelText = field.getLabel() == null ? "" : field.getLabel();
+		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
 		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
