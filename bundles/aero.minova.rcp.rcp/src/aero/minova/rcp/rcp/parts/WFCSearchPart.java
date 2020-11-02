@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -38,7 +39,7 @@ public class WFCSearchPart extends WFCFormPart {
 	MPart mPart;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent, IEclipseContext context) {
 
 		new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
@@ -58,7 +59,7 @@ public class WFCSearchPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		NatTableUtil.createNatTable(parent, form, data, false, null);
+		NatTableUtil.createNatTable(parent, form, data, false, null, context);
 	}
 
 	@PersistTableSelection

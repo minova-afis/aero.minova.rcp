@@ -8,6 +8,9 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
@@ -45,7 +48,7 @@ public class WFCIndexPart extends WFCFormPart {
 	private NatTable natTable;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent, MPart part, EModelService modelService) {
 
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
@@ -64,7 +67,8 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		parent.setLayout(new GridLayout());
-		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService);
+		MPerspective perspectiveFor = modelService.getPerspectiveFor(part);
+		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService, perspectiveFor.getContext());
 	}
 
 	@PersistTableSelection

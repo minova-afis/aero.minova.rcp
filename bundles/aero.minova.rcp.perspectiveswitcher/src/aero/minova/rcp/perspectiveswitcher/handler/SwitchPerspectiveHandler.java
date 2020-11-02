@@ -22,7 +22,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
-import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 public class SwitchPerspectiveHandler {
@@ -35,10 +34,10 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	EModelService model;
-	
-	@Inject 
+
+	@Inject
 	IEventBroker broker;
-	
+
 	@Execute
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
@@ -110,16 +109,16 @@ public class SwitchPerspectiveHandler {
 				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
+		IEclipseContext ctx = window.getContext().createChild();
 		window.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
-		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
+//		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
+		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
 
 		if (element == null) {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.setContext(context);
-//			perspective.setLabel(toolLabel);
 			perspective.setLabel("@Form.Index");
 			perspectiveStack.getChildren().add(0, perspective);
 			switchTo(context, perspective, perspectiveID, window);
@@ -136,7 +135,7 @@ public class SwitchPerspectiveHandler {
 	public void switchTo(IEclipseContext context, MUIElement element,
 			@Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID, MWindow window) {
 		EPartService partService = context.get(EPartService.class);
-		
+
 		if (element instanceof MPerspective) {
 			partService.switchPerspective(element.getElementId());
 		} else {

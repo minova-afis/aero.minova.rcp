@@ -4,11 +4,13 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
+import org.eclipse.e4.ui.workbench.modeling.ISelectionListener;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -33,7 +35,6 @@ public class XMLIndexPart {
 	@Inject
 	private IDataFormService dataFormService;
 
-
 	private Table data;
 
 	@Inject
@@ -45,7 +46,7 @@ public class XMLIndexPart {
 	private NatTable natTable;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent, IEclipseContext context) {
 
 		Form form = dataFormService.getForm();
 		String tableName = form.getIndexView().getSource();
@@ -58,7 +59,83 @@ public class XMLIndexPart {
 		}
 
 		parent.setLayout(new GridLayout());
-		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService);
+
+		ESelectionService x = new ESelectionService() {
+
+			@Override
+			public void setSelection(Object selection) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void setPostSelection(Object selection) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void removeSelectionListener(String partId, ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void removeSelectionListener(ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void removePostSelectionListener(String partId, ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void removePostSelectionListener(ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public Object getSelection(String partId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public Object getSelection() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void addSelectionListener(String partId, ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void addSelectionListener(ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void addPostSelectionListener(String partId, ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void addPostSelectionListener(ISelectionListener listener) {
+				// TODO Auto-generated method stub
+
+			}
+		};
+
+		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService, context);
 	}
 
 	@PersistTableSelection
@@ -84,6 +161,5 @@ public class XMLIndexPart {
 	public NatTable getNatTable() {
 		return natTable;
 	}
-
 
 }
