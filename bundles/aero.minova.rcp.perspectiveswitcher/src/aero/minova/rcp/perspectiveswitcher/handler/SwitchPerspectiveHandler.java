@@ -19,6 +19,7 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
@@ -78,7 +79,6 @@ public class SwitchPerspectiveHandler {
 	 * @throws ExecutionException If the perspective could not be opened.
 	 */
 	private void openNewWindowPerspective(IEclipseContext context, String perspectiveID) {
-		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
 		EPartService partService = context.get(EPartService.class);
 
@@ -98,12 +98,16 @@ public class SwitchPerspectiveHandler {
 	 * @return die neue Perspektive
 	 */
 	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID) {
-		MApplication application = context.get(MApplication.class);
 		MWindow window = context.get(MWindow.class);
 		EModelService modelService = context.get(EModelService.class);
-
-		String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
-		String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
+		String[] ids = perspectiveID.split(".xml");
+		String id = ids[0];
+		List<MHandledMenuItem> items = modelService.findElements(window.getMainMenu(), id, MHandledMenuItem.class);
+		MHandledMenuItem item = items.get(0);
+		String label = item.getLabel();
+		
+//		String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
+//		String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
 
 		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService
@@ -119,8 +123,8 @@ public class SwitchPerspectiveHandler {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.setContext(context);
-//			perspective.setLabel(toolLabel);
-			perspective.setLabel("@Form.Index");
+			perspective.setLabel(label);
+//			perspective.setLabel("@Form.Index");
 			perspectiveStack.getChildren().add(0, perspective);
 			switchTo(context, perspective, perspectiveID, window);
 
