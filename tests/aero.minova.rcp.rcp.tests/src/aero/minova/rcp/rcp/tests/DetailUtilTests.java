@@ -58,7 +58,7 @@ public class DetailUtilTests {
 	public void ensureWeCannotHandleNumberParsingExceptionsinNumberRowsSpanned() {
 		Field field = new Field();
 		field.setVisible(true);
-		field.setLabel("Testing");
+		field.setTextAttribute("Testing");
 		field.setNumberRowsSpanned("THIS RESULTS IN AN EXCEPTION");
 		Map<String, Control> controls = new HashMap<>();
 		new DetailUtil(new DummyTranslationService(), broker).createField(field, composite, controls);
@@ -92,12 +92,12 @@ public class DetailUtilTests {
 
 		Field field = new Field();
 		field.setName("BookingDate");
-		field.setLabel("Test");
+		field.setTextAttribute("Test");
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 
 		Field lookup = new Field();
-		lookup.setLabel("Test");
+		lookup.setTextAttribute("Test");
 		lookup.setLookup(new Lookup());
 		lookup.setNumberColumnsSpanned(new BigInteger("4"));
 
@@ -155,7 +155,7 @@ public class DetailUtilTests {
 	@Test
 	public void testNee3e3ame() throws Exception {
 		Field field = new Field();
-		field.setLabel("Test");
+		field.setTextAttribute("Test");
 		field.setDateTime(new Object());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 		Map<String, Control> controls = new HashMap<>();
@@ -183,7 +183,7 @@ public class DetailUtilTests {
 	@Test
 	public void testName() throws Exception {
 		Field field = new Field();
-		field.setLabel("Test");
+		field.setTextAttribute("Test");
 		field.setNumber(new Number());
 		field.setUnitText("L");
 		Map<String, Control> controls = new HashMap<>();
@@ -210,7 +210,7 @@ public class DetailUtilTests {
 	@Test
 	public void createLookUpLayoutRow() throws Exception {
 		Field field = new Field();
-		field.setLabel("Test");
+		field.setTextAttribute("Test");
 		field.setLookup(new Lookup());
 		field.setNumberColumnsSpanned(new BigInteger("4"));
 		Map<String, Control> controls = new HashMap<>();
