@@ -96,6 +96,8 @@ public class WFCDetailsLookupUtil {
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					c.setData(Constants.CONTROL_KEYLONG,
 							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
 
 				}
 			} else {
