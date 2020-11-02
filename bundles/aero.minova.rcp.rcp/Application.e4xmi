@@ -118,7 +118,7 @@
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="FormName" optional="false"/>
   </commands>
   <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
-    <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="ClosePerspective"/>
+    <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="ClosePerspective"/>
   </commands>
   <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand">
     <parameters xmi:id="_DNFBAOw6Eeq18tKVLNTMYA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="KeepPerspective"/>
