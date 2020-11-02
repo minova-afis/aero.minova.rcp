@@ -87,11 +87,13 @@ public class WFCDetailPart extends WFCFormPart {
 		// erzeuge die util Methoden mit DI
 		IEclipseContext localContext = EclipseContextFactory.create();
 		localContext.set(Form.class, form);
-		localContext.set(Map.class, controls);
 
 		localContext.setParent(partContext);
+
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
+		wfcDetailUtil.bindValues(controls);
+		casRequestsUtil.setControls(controls);
 	}
 
 	private void layoutForm(Composite parent) {

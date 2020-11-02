@@ -67,7 +67,6 @@ public class WFCDetailCASRequestsUtil {
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
 
-	@Inject
 	private Map<String, Control> controls = null;
 
 	private List<ArrayList> keys = null;
@@ -85,6 +84,10 @@ public class WFCDetailCASRequestsUtil {
 	 *
 	 * @param rows
 	 */
+
+	public void setControls(Map<String, Control> controls) {
+		this.controls = controls;
+	}
 
 	@Inject
 	public void changeSelectedEntry(@Optional @Named("ActiveRows") List<Row> rows) {

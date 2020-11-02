@@ -55,7 +55,6 @@ public class WFCDetailUtil {
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
 
-	@Inject
 	private Map<String, Control> controls = new HashMap<>();
 	private List<ArrayList> keys = null;
 	private Table selectedTable;
@@ -67,6 +66,11 @@ public class WFCDetailUtil {
 
 	@Inject
 	public WFCDetailUtil() {
+	}
+
+	public void bindValues(Map<String, Control> controls) {
+		this.controls = controls;
+
 		this.lookupUtil = new WFCDetailsLookupUtil(controls);
 
 		for (Control c : controls.values()) {
