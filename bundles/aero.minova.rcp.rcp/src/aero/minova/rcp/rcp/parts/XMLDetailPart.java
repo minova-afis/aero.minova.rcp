@@ -247,9 +247,13 @@ public class XMLDetailPart {
 			if (timeDifference >= 0) {
 				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
 				Double half = (double) Math.round(timeDifference * 2) / 2f;
-				chargedValue = String.format("%1.2f", half);
+				String chargedFormat = "%1."
+						+ ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				String renderedFormat = "%1."
+						+ ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				chargedValue = String.format(chargedFormat, half);
 				chargedValue = chargedValue.replace(',', '.');
-				renderedValue = String.format("%1.2f", quarter);
+				renderedValue = String.format(renderedFormat, quarter);
 				renderedValue = renderedValue.replace(',', '.');
 			} else {
 				renderedValue = "0";
