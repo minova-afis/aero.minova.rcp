@@ -187,15 +187,21 @@ public class XMLDetailPart {
 				// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
 				// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 				lc.addKeyListener(new KeyListener() {
+					boolean controlPressed = false;
 
 					@Override
 					public void keyPressed(KeyEvent e) {
 						// TODO Auto-generated method stub
-
+						if (e.keyCode == SWT.CONTROL) {
+							controlPressed = true;
+						}
 					}
 
 					@Override
 					public void keyReleased(KeyEvent e) {
+						if (e.keyCode == SWT.CONTROL) {
+							controlPressed = false;
+						} else
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
@@ -207,9 +213,12 @@ public class XMLDetailPart {
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
+						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
+								&& lc.isProposalPopupOpen() == false) {
+							changeSelectionBoxList(c, false);
 						}
 					}
 
@@ -301,10 +310,10 @@ public class XMLDetailPart {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					} else {
-						// Setzen der Proposals/Optionen
-						changeProposals((LookupControl) c, t);
 					}
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
+
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));

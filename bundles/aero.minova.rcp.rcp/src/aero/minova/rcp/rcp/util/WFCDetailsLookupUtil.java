@@ -87,10 +87,10 @@ public class WFCDetailsLookupUtil {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					} else {
-						// Setzen der Proposals/Optionen
-						changeProposals((LookupControl) c, t);
 					}
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
+
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
