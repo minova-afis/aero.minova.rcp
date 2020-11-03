@@ -180,8 +180,8 @@ public class Field {
     protected aero.minova.rcp.form.model.xsd.Boolean _boolean;
     protected Color color;
     protected List<Field.Msg> msg;
-    @XmlAttribute(name = "text")
-    protected String textAttribute;
+    @XmlAttribute(name = "label")
+    protected String label;
     @XmlAttribute(name = "tab-index")
     protected BigInteger tabIndex;
     @XmlAttribute(name = "name", required = true)
@@ -663,8 +663,8 @@ public class Field {
      *     {@link String }
      *     
      */
-    public String getTextAttribute() {
-        return textAttribute;
+    public String getLabel() {
+        return label;
     }
 
     /**
@@ -675,8 +675,8 @@ public class Field {
      *     {@link String }
      *     
      */
-    public void setTextAttribute(String value) {
-        this.textAttribute = value;
+    public void setLabel(String value) {
+        this.label = value;
     }
 
     /**
