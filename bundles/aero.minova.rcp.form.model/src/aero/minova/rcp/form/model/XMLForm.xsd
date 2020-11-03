@@ -25,8 +25,11 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="label" type="xs:string" use="optional">
+		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
+				<xs:appinfo>
+					<jxb:property name="label" />
+				</xs:appinfo>
 				<xs:documentation> Hier wird der zu übersetzende text eingetragten.
 					'@' Muss voran gestellt werden.
 				</xs:documentation>
@@ -354,8 +357,11 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="label" type="xs:string" use="optional">
+		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
+				<xs:appinfo>
+					<jxb:property name="label" />
+				</xs:appinfo>
 				<xs:documentation>
 					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Spaltenname. Dieser Name sollte immer mit '@' beginnen.
 						Dann wird der Name in den Messages
