@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -9,6 +11,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.e4.ui.workbench.modeling.ISelectionListener;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -45,8 +48,12 @@ public class XMLIndexPart {
 
 	private NatTable natTable;
 
+	private MPerspective perspective = null;
+
 	@PostConstruct
-	public void createComposite(Composite parent, IEclipseContext context) {
+	public void createComposite(Composite parent, IEclipseContext context, MPerspective perspective) {
+
+		this.perspective = perspective;
 
 		Form form = dataFormService.getForm();
 		String tableName = form.getIndexView().getSource();
@@ -149,13 +156,17 @@ public class XMLIndexPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic("PLAPLA") Table table) {
-		data.getRows().clear();
-		for (Row r : table.getRows()) {
-			data.addRow(r);
+	public void load(@UIEventTopic("PLAPLA") Map<MPerspective, Table> map) {
+		if (map.get(perspective) != null) {
+			Table table = map.get(perspective);
+
+			data.getRows().clear();
+			for (Row r : table.getRows()) {
+				data.addRow(r);
+			}
+			natTable.refresh(false);
+			natTable.requestLayout();
 		}
-		natTable.refresh(false);
-		natTable.requestLayout();
 	}
 
 	public NatTable getNatTable() {

@@ -13,7 +13,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 import aero.minova.rcp.translate.service.WFCTranslationService;
 
 public class Manager {

@@ -188,7 +188,7 @@
     <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="ClosePerspective"/>
   </commands>
   <commands xmi:id="_gqcNMNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand">
-    <parameters xmi:id="_DNFBAOw6Eeq18tKVLNTMYA" elementId="org.eclipse.e4.ui.perspectives.parameters.perspectiveId" name="KeepPerspective"/>
+    <parameters xmi:id="_DNFBAOw6Eeq18tKVLNTMYA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="KeepPerspective"/>
   </commands>
   <commands xmi:id="_y3TngNDREeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.revertsearch" commandName="RevertSearch"/>
   <commands xmi:id="_rnXZkNDSEeqZdekMGDv2pg" elementId="aero.minova.rcp.rcp.command.clearsearch" commandName="ClearSearch"/>
