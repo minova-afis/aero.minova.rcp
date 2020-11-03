@@ -23,6 +23,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -67,6 +68,8 @@ public class WFCDetailCASRequestsUtil {
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
 
+	private MPerspective perspective = null;
+
 	private Map<String, Control> controls = null;
 
 	private List<ArrayList> keys = null;
@@ -85,8 +88,9 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setControls(Map<String, Control> controls) {
+	public void setControls(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
+		this.perspective = perspective;
 	}
 
 	@Inject

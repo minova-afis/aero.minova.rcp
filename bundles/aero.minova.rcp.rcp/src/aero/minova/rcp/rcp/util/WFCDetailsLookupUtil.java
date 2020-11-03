@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -30,10 +31,13 @@ public class WFCDetailsLookupUtil {
 	@Inject
 	private IDataService dataService;
 
+	private MPerspective perspective = null;
+
 	private Map<String, Control> controls = null;
 
-	public WFCDetailsLookupUtil(Map<String, Control> controls) {
+	public WFCDetailsLookupUtil(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
+		this.perspective = perspective;
 
 	}
 
@@ -173,24 +177,28 @@ public class WFCDetailsLookupUtil {
 	 */
 	@Inject
 	@Optional
-	public void requestLookUpEntriesAll(@UIEventTopic("LoadAllLookUpValues") String name) {
-		Control control = controls.get(name);
-		if (control instanceof LookupControl) {
-			Field field = (Field) control.getData(Constants.CONTROL_FIELD);
-			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync, "List");
+	public void requestLookUpEntriesAll(@UIEventTopic("WFCLoadAllLookUpValues") Map<MPerspective, String> map) {
+		if (map.get(perspective) != null) {
+			String name = map.get(perspective);
+			Control control = controls.get(name);
+			if (control instanceof LookupControl) {
+				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
+				CompletableFuture<?> tableFuture;
+				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
+						"List");
 
-			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-				if (ta instanceof SqlProcedureResult) {
-					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					changeOptionsForLookupField(sql.getResultSet(), control, true);
-				} else if (ta instanceof Table) {
-					Table t1 = (Table) ta;
-					changeOptionsForLookupField(t1, control, true);
-				}
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					if (ta instanceof SqlProcedureResult) {
+						SqlProcedureResult sql = (SqlProcedureResult) ta;
+						changeOptionsForLookupField(sql.getResultSet(), control, true);
+					} else if (ta instanceof Table) {
+						Table t1 = (Table) ta;
+						changeOptionsForLookupField(t1, control, true);
+					}
 
-			}));
+				}));
+			}
+
 		}
-
 	}
 }

@@ -92,8 +92,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
-		wfcDetailUtil.bindValues(controls);
-		casRequestsUtil.setControls(controls);
+		wfcDetailUtil.bindValues(controls, perspective);
+		casRequestsUtil.setControls(controls, perspective);
 	}
 
 	private void layoutForm(Composite parent) {
@@ -233,7 +233,7 @@ public class WFCDetailPart extends WFCFormPart {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
 			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
-					controls);
+					controls, perspective);
 
 		} else if (field.getText() != null) {
 			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);

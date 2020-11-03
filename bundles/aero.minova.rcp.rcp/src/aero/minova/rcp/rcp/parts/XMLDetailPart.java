@@ -26,6 +26,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.swt.SWT;
@@ -100,9 +101,12 @@ public class XMLDetailPart {
 	private Table selectedTable;
 	private Form form;
 	private String lastEndDate = "";
+	private MPerspective perspective = null;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent, MPerspective perspective) {
+
+		this.perspective = perspective;
 		// Top-Level_Elemen
 		parent.setLayout(new GridLayout(1, true));
 		this.parent = parent;
@@ -400,6 +404,7 @@ public class XMLDetailPart {
 	@Inject
 	@Optional
 	public void requestLookUpEntriesAll(@UIEventTopic("LoadAllLookUpValues") String name) {
+
 		Control control = controls.get(name);
 		if (control instanceof LookupControl) {
 			Field field = (Field) control.getData(Constants.CONTROL_FIELD);

@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -64,14 +65,17 @@ public class WFCDetailUtil {
 
 	private WFCDetailCASRequestsUtil casRequests = null;
 
+	private MPerspective perspective = null;
+
 	@Inject
 	public WFCDetailUtil() {
 	}
 
-	public void bindValues(Map<String, Control> controls) {
+	public void bindValues(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
+		this.perspective = perspective;
 
-		this.lookupUtil = new WFCDetailsLookupUtil(controls);
+		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
@@ -157,7 +161,9 @@ public class WFCDetailUtil {
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
 						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-							broker.post("LoadAllLookUpValues", field.getName());
+							Map<MPerspective, String> brokerObject = new HashMap<>();
+							brokerObject.put(perspective, field.getName());
+							broker.post("WFCLoadAllLookUpValues", brokerObject);
 						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
 								&& lc.isProposalPopupOpen() == false) {
 							lookupUtil.changeSelectionBoxList(c, false);
