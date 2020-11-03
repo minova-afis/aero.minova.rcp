@@ -104,7 +104,8 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
 	 */
 	@PostConstruct
-	public void createGui(Composite parent, MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
+	public void createGui(Composite parent, MWindow window,
+			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 		perspectiveSwitcher.setControlProvider(this);
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
@@ -363,8 +364,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME,
-						perspectiveId);
+				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME, perspectiveId);
 				ParameterizedCommand command = commandService
 						.createCommand("aero.minova.rcp.rcp.command.closeperspective", parameter);
 				handlerService.executeHandler(command);
@@ -382,21 +382,20 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME,
-						perspectiveId);
+				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME, perspectiveId);
 				ParameterizedCommand command = commandService
 						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
-				
-				//Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
-				if(!(keepItToolitems != null && keepItToolitems.contains(perspectiveId)) && perspective == null) {
+
+				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
+				// Kennzeichen gelöscht wird.
+				if (!(keepItToolitems != null && keepItToolitems.contains(perspectiveId)) && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
 				}
 			}
 		});
 		menuItem.setSelection(keepItToolitems != null && keepItToolitems.contains(perspectiveId));
-		
 
 	}
 }

@@ -13,7 +13,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 import aero.minova.rcp.translate.service.WFCTranslationService;
 
 public class Manager {
@@ -50,8 +49,7 @@ public class Manager {
 		preferences.put("language", language);
 		String country = preferences.get("country", Locale.getDefault().getDisplayCountry(Locale.getDefault()));
 		preferences.put("country", country);
-		String timezone = preferences.get("timezone", CustomTimeZone.displayTimeZone(
-				ZoneId.systemDefault().getDisplayName(TextStyle.FULL, Locale.getDefault()), Locale.getDefault()));
+		String timezone = preferences.get("timezone", ZoneId.systemDefault().getDisplayName(TextStyle.FULL, Locale.getDefault()));
 		preferences.put("timezone", timezone);
 		String font = preferences.get("font", "M");
 		preferences.put("font", font);
