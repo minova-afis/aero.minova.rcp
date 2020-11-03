@@ -21,11 +21,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -81,6 +83,14 @@ public class XMLDetailPart {
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
 
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
+
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "user")
+	String employee;
+
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Composite parent;
 
@@ -89,6 +99,7 @@ public class XMLDetailPart {
 	private List<ArrayList> keys = null;
 	private Table selectedTable;
 	private Form form;
+	private String lastEndDate = "";
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -122,8 +133,10 @@ public class XMLDetailPart {
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
-			if ((c.getData(Constants.CONTROL_FIELD) == controls.get("StartDate").getData(Constants.CONTROL_FIELD)) || (c
-					.getData(Constants.CONTROL_FIELD) == controls.get("EndDate").getData(Constants.CONTROL_FIELD))) {
+			if ((c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
+					.getData(Constants.CONTROL_FIELD))
+					|| (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_ENDDATE)
+							.getData(Constants.CONTROL_FIELD))) {
 				c.addKeyListener(new KeyListener() {
 
 					@Override
@@ -153,6 +166,7 @@ public class XMLDetailPart {
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
+					text.setData(Constants.FOCUSED_ORIGIN, this);
 					text.addFocusListener(tfv);
 				}
 				if (field.getText() != null) {
@@ -166,22 +180,28 @@ public class XMLDetailPart {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener();
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
 				// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
 				// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 				lc.addKeyListener(new KeyListener() {
+					boolean controlPressed = false;
 
 					@Override
 					public void keyPressed(KeyEvent e) {
 						// TODO Auto-generated method stub
-
+						if (e.keyCode == SWT.CONTROL) {
+							controlPressed = true;
+						}
 					}
 
 					@Override
 					public void keyReleased(KeyEvent e) {
+						if (e.keyCode == SWT.CONTROL) {
+							controlPressed = false;
+						} else
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
@@ -193,9 +213,12 @@ public class XMLDetailPart {
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
+						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
+								&& lc.isProposalPopupOpen() == false) {
+							changeSelectionBoxList(c, false);
 						}
 					}
 
@@ -209,21 +232,29 @@ public class XMLDetailPart {
 	 * verändert
 	 */
 	public void updateQuantitys() {
-		Text endDate = (Text) controls.get("EndDate");
-		Text startDate = (Text) controls.get("StartDate");
+		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+		Text startDate = (Text) controls.get(Constants.FORM_STARTDATE);
 		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
 			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
 			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
 			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
 					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
 			timeDifference = timeDifference / 60;
-			Text renderedField = (Text) controls.get("RenderedQuantity");
-			Text chargedField = (Text) controls.get("ChargedQuantity");
+			Text renderedField = (Text) controls.get(Constants.FORM_RENDEREDQUANTITY);
+			Text chargedField = (Text) controls.get(Constants.FORM_CHARGEDQUANTITY);
 			String renderedValue;
 			String chargedValue;
 			if (timeDifference >= 0) {
-				renderedValue = String.valueOf(Math.round(timeDifference * 4) / 4f);
-				chargedValue = String.valueOf(Math.round(timeDifference * 2) / 2f);
+				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
+				Double half = (double) Math.round(timeDifference * 2) / 2f;
+				String chargedFormat = "%1."
+						+ ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				String renderedFormat = "%1."
+						+ ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				chargedValue = String.format(chargedFormat, half);
+				chargedValue = chargedValue.replace(',', '.');
+				renderedValue = String.format(renderedFormat, quarter);
+				renderedValue = renderedValue.replace(',', '.');
 			} else {
 				renderedValue = "0";
 				chargedValue = "0";
@@ -283,16 +314,17 @@ public class XMLDetailPart {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					} else {
-						// Setzen der Proposals/Optionen
-						changeProposals((LookupControl) c, t);
 					}
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
+
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					c.setData(Constants.CONTROL_KEYLONG,
 							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
-
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
 				}
 			} else {
 				if (lc != null && lc.getText() != null && twisty == false) {
@@ -396,50 +428,54 @@ public class XMLDetailPart {
 	 */
 
 	@Inject
-	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
+	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows,
+			ESelectionService selectionService) {
+
 		if (rows != null) {
 
 			Row row = rows.get(0);
-			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, "Read");
+			if (row.getValue(0).getValue() != null) {
+				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
 
-			RowBuilder builder = RowBuilder.newRow();
-			List<Field> allFields = dataFormService.getFieldsFromForm(form);
+				RowBuilder builder = RowBuilder.newRow();
+				List<Field> allFields = dataFormService.getFieldsFromForm(form);
 
-			// Hauptmaske
+				// Hauptmaske
 
-			List<Column> indexColumns = form.getIndexView().getColumn();
-			setKeys(new ArrayList<ArrayList>());
-			for (Field f : allFields) {
-				boolean found = false;
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					if (indexColumns.get(i).getName().equals(f.getName())) {
-						found = true;
-						if ("primary".equals(f.getKeyType())) {
-							builder.withValue(row.getValue(i).getValue());
-							ArrayList al = new ArrayList();
-							al.add(indexColumns.get(i).getName());
-							al.add(row.getValue(i).getValue());
-							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-							keys.add(al);
-						} else {
-							builder.withValue(null);
+				List<Column> indexColumns = form.getIndexView().getColumn();
+				setKeys(new ArrayList<ArrayList>());
+				for (Field f : allFields) {
+					boolean found = false;
+					for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+						if (indexColumns.get(i).getName().equals(f.getName())) {
+							found = true;
+							if ("primary".equals(f.getKeyType())) {
+								builder.withValue(row.getValue(i).getValue());
+								ArrayList al = new ArrayList();
+								al.add(indexColumns.get(i).getName());
+								al.add(row.getValue(i).getValue());
+								al.add(ValueBuilder.value(row.getValue(i)).getDataType());
+								keys.add(al);
+							} else {
+								builder.withValue(null);
+							}
 						}
 					}
-				}
-				if (!found) {
-					builder.withValue(null);
-				}
+					if (!found) {
+						builder.withValue(null);
+					}
 
+				}
+				Row r = builder.create();
+				rowIndexTable.addRow(r);
+
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService
+						.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+					selectedTable = t.getOutputParameters();
+					updateSelectedEntry();
+				}));
 			}
-			Row r = builder.create();
-			rowIndexTable.addRow(r);
-
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
-					rowIndexTable);
-			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-				selectedTable = t.getOutputParameters();
-				updateSelectedEntry();
-			}));
 		}
 	}
 
@@ -492,9 +528,9 @@ public class XMLDetailPart {
 		RowBuilder rb = RowBuilder.newRow();
 
 		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(form, "Update");
+			formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
 		} else {
-			formTable = dataFormService.getTableFromFormDetail(form, "Insert");
+			formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
 		}
 		int valuePosition = 0;
 		if (getKeys() != null) {
@@ -559,9 +595,11 @@ public class XMLDetailPart {
 		}
 
 		formTable.addRow(r);
-		checkWorkingTime(((Text) controls.get("BookingDate")).getText(), ((Text) controls.get("StartDate")).getText(),
-				((Text) controls.get("EndDate")).getText(), ((Text) controls.get("RenderedQuantity")).getText(),
-				((Text) controls.get("ChargedQuantity")).getText(), formTable, r);
+		checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
+				((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
+				((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
+				((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
+				((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 	}
 
 	/**
@@ -584,19 +622,19 @@ public class XMLDetailPart {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		LocalDate localDate = LocalDate.parse(bookingDate, df);
 		LocalDateTime localDateTime = localDate.atTime(0, 0);
-		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of("Europe/Berlin"));
-		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex("BookingDate"));
+		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of(timezone));
+		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex(Constants.FORM_BOOKINGDATE));
 		LocalTime timeEndDate = LocalTime.parse(endDate);
 		LocalTime timeStartDate = LocalTime.parse(startDate);
 
 		LocalDateTime localEndDate = localDate.atTime(timeEndDate);
-		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of("Europe/Berlin"));
-		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex("EndDate"));
+		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
+		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex(Constants.FORM_ENDDATE));
 		LocalDateTime localStartDate = localDate.atTime(timeStartDate);
-		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of("Europe/Berlin"));
-		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex("StartDate"));
-		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex("ChargedQuantity"));
-		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex("RenderedQuantity"));
+		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
+		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex(Constants.FORM_STARTDATE));
+		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex(Constants.FORM_CHARGEDQUANTITY));
+		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex(Constants.FORM_RENDEREDQUANTITY));
 
 		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
 				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
@@ -644,7 +682,7 @@ public class XMLDetailPart {
 			openNotificationPopup("Entry could not be updated");
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
-			clearFields("Update");
+			clearFields(Constants.UPDATE_REQUEST);
 		}
 	}
 
@@ -658,7 +696,7 @@ public class XMLDetailPart {
 			openNotificationPopup("Entry could not be added");
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
-			clearFields("Insert");
+			clearFields(Constants.INSERT_REQUEST);
 		}
 	}
 
@@ -708,7 +746,7 @@ public class XMLDetailPart {
 			openNotificationPopup("Entry could not be deleted");
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
-			clearFields("Delete");
+			clearFields(Constants.DELETE_REQUEST);
 		}
 	}
 
@@ -734,25 +772,27 @@ public class XMLDetailPart {
 		for (Control c : controls.values()) {
 			if (c instanceof Text) {
 				Text t = (Text) c;
-				if (origin.equals("Delete")) {
+				if (origin.equals(Constants.DELETE_REQUEST)) {
 					t.setText("");
-				} else if (c.getData("field") == controls.get("BookingDate").getData("field")) {
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE)
+						.getData(Constants.CONTROL_FIELD)) {
 					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 					Date date = new Date(System.currentTimeMillis());
 					t.setText(formatter.format(date));
-				} else if (c.getData("field") == controls.get("StartDate").getData("field")
-						&& origin.equals("Insert")) {
-					Text endDate = (Text) controls.get("EndDate");
-					t.setText(endDate.getText());
-				} else {
-					Field f = (Field) c.getData("field");
-					if (f.getNumber() != null) {
-						t.setText("0");
-					} else {
-						t.setText("");
+				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
+						.getData(Constants.CONTROL_FIELD)) {
+					Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+					if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
+						lastEndDate = endDate.getText();
 					}
+					t.setText(lastEndDate);
+				} else {
+					Field f = (Field) c.getData(Constants.CONTROL_FIELD);
+					t.setText("");
+
 				}
 			}
+
 			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
 				lc.setText("");
@@ -760,6 +800,39 @@ public class XMLDetailPart {
 				lc.getDescription().setText("");
 			}
 			setKeys(null);
+		}
+		/*
+		 * Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den
+		 * preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS versendet
+		 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
+		 * haben
+		 */
+		if (!origin.equals(Constants.DELETE_REQUEST)) {
+			LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
+			lc.setText(employee);
+			CompletableFuture<?> tableFuture;
+			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),
+					controls, dataService, sync, "List");
+
+			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+				if (ta instanceof Table) {
+					Table t1 = (Table) ta;
+					for (Row r : t1.getRows()) {
+						if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.equals(employee.toLowerCase())) {
+							lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+							if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+								lc.getDescription().setText(
+										r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+							}
+							lc.setData(Constants.CONTROL_KEYLONG,
+									r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
+						}
+					}
+					// changeOptionsForLookupField(t1, lc, true);
+				}
+
+			}));
 		}
 	}
 
@@ -773,6 +846,10 @@ public class XMLDetailPart {
 
 	public void setKeys(List<ArrayList> keys) {
 		this.keys = keys;
+	}
+
+	public String getTimeZone() {
+		return timezone;
 	}
 
 }

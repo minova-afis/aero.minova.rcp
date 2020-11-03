@@ -11,7 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in Instant
+ * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in
+ * Instant
  * 
  * @author Wilfried Saak
  *
@@ -25,16 +26,19 @@ public class DateTimeUtil {
 	private static String shortcuts = day + month + year + week;
 
 	/**
-	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet
-	 * werden. Alle Kürzel müssen als Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
-	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol bestehen.
+	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es
+	 * dürfen keine doppelten Kürzel verwendet werden. Alle Kürzel müssen als
+	 * Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
+	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol
+	 * bestehen.
 	 * 
 	 * @param day   das Kürzel für Tag. Default (englisch) ist "d"
 	 * @param month das Kürzel für Monat. Default (englisch) ist "m"
 	 * @param year  das Kürzel für Jahr. Default (englisch) ist "y"
 	 * @param week  das Kürzel für Woche. Default (englisch) ist "w"
 	 * 
-	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
+	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen
+	 *                                     Bedingungen nicht erfüllt ist
 	 */
 	static public void setShortcuts(String day, String month, String year, String week) {
 		// Es muss immer genau ein Zeichen übergeben werden
@@ -84,7 +88,8 @@ public class DateTimeUtil {
 		LocalDateTime startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
 
 		if (formulars.length == 0) {
-			// Kein input oder nicht sauber aufteilbarer input (nicht interpretierbar) führt zu null
+			// Kein input oder nicht sauber aufteilbarer input (nicht interpretierbar) führt
+			// zu null
 			return null;
 		}
 
