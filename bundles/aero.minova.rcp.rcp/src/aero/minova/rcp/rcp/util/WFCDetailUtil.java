@@ -65,15 +65,12 @@ public class WFCDetailUtil {
 
 	private WFCDetailCASRequestsUtil casRequests = null;
 
-	private MPerspective perspective = null;
-
 	@Inject
 	public WFCDetailUtil() {
 	}
 
 	public void bindValues(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
-		this.perspective = perspective;
 
 		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective);
 
