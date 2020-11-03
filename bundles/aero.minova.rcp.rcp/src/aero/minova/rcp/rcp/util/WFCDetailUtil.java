@@ -72,7 +72,7 @@ public class WFCDetailUtil {
 	public void bindValues(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
 
-		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective);
+		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
@@ -147,15 +147,13 @@ public class WFCDetailUtil {
 						} else
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
-								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
+								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
+								&& e.keyCode != SWT.SPACE) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								lookupUtil.requestOptionsFromCAS(lc);
 							} else {
 								lookupUtil.changeSelectionBoxList(lc, false);
 							}
-							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
-							// wie auch bei einem Klick auf das Twiste, angezeigt werden
-							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
 						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							Map<MPerspective, String> brokerObject = new HashMap<>();
@@ -218,4 +216,13 @@ public class WFCDetailUtil {
 	public String getTimeZone() {
 		return timezone;
 	}
+
+	public WFCDetailsLookupUtil getLookupUtil() {
+		return lookupUtil;
+	}
+
+	public void setLookupUtil(WFCDetailsLookupUtil lookupUtil) {
+		this.lookupUtil = lookupUtil;
+	}
+
 }
