@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -21,7 +22,10 @@ public class NewDetailHandler {
 	private IEventBroker broker;
 
 	@Execute
-	public void execute(MPart mpart, MPerspective perspective) {
+	public void execute(MPart mpart, @Optional MPerspective perspective) {
+		if (perspective == null) {
+			return;
+		}
 		Map<MPerspective, String> map = new HashMap<>();
 		map.put(perspective, Constants.CLEAR_REQUEST);
 		broker.post("clearFields", map);

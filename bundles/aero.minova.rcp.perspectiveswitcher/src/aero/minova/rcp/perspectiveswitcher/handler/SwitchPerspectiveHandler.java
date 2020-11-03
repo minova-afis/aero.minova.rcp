@@ -128,10 +128,9 @@ public class SwitchPerspectiveHandler {
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.setContext(context);
 			perspective.setLabel(translationService.translate("@" + id, null));
 			perspectiveStack.getChildren().add(0, perspective);
-			switchTo(context, perspective, perspectiveID, window);
+			switchTo(ctx, perspective, perspectiveID, window);
 
 		}
 		return perspective;
