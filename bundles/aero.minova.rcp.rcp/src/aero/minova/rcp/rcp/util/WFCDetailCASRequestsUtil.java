@@ -23,6 +23,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -67,6 +68,8 @@ public class WFCDetailCASRequestsUtil {
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
 
+	private MPerspective perspective = null;
+
 	private Map<String, Control> controls = null;
 
 	private List<ArrayList> keys = null;
@@ -85,8 +88,9 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setControls(Map<String, Control> controls) {
+	public void setControls(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
+		this.perspective = perspective;
 	}
 
 	@Inject
@@ -184,83 +188,85 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Inject
 	@Optional
-	public void buildSaveTable(@UIEventTopic("SaveEntry") Object obj) {
-		Table formTable = null;
-		RowBuilder rb = RowBuilder.newRow();
+	public void buildSaveTable(@UIEventTopic("SaveEntry") MPerspective perspective) {
+		if (perspective == this.perspective) {
+			Table formTable = null;
+			RowBuilder rb = RowBuilder.newRow();
 
-		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
-		} else {
-			formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
-		}
-		int valuePosition = 0;
-		if (getKeys() != null) {
-			for (ArrayList key : getKeys()) {
-				rb.withValue(key.get(1));
-				valuePosition++;
+			if (getKeys() != null) {
+				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
+			} else {
+				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
 			}
-		} else {
-			List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
-			for (Field f : keyList) {
-				rb.withValue(null);
-				valuePosition++;
+			int valuePosition = 0;
+			if (getKeys() != null) {
+				for (ArrayList key : getKeys()) {
+					rb.withValue(key.get(1));
+					valuePosition++;
+				}
+			} else {
+				List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
+				for (Field f : keyList) {
+					rb.withValue(null);
+					valuePosition++;
+				}
+
 			}
+			while (valuePosition < formTable.getColumnCount()) {
+				int i = 0;
+				for (Control c : controls.values()) {
+					String s = (String) controls.keySet().toArray()[i];
+					if (s.equals(formTable.getColumnName(valuePosition))) {
+						if (c instanceof Text) {
+							if (!(((Text) c).getText().isBlank())) {
+								rb.withValue(((Text) c).getText());
+							} else {
+								rb.withValue(null);
 
-		}
-		while (valuePosition < formTable.getColumnCount()) {
-			int i = 0;
-			for (Control c : controls.values()) {
-				String s = (String) controls.keySet().toArray()[i];
-				if (s.equals(formTable.getColumnName(valuePosition))) {
-					if (c instanceof Text) {
-						if (!(((Text) c).getText().isBlank())) {
-							rb.withValue(((Text) c).getText());
-						} else {
-							rb.withValue(null);
-
+							}
+						}
+						if (c instanceof LookupControl) {
+							if (c.getData(Constants.CONTROL_KEYLONG) != null) {
+								rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
+							} else {
+								rb.withValue(null);
+							}
 						}
 					}
-					if (c instanceof LookupControl) {
-						if (c.getData(Constants.CONTROL_KEYLONG) != null) {
-							rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
-						} else {
-							rb.withValue(null);
+					i++;
+				}
+				valuePosition++;
+			}
+
+			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
+			// Row-Wertes ermittelt und der Row angefügt
+			Row r = rb.create();
+			List<Field> formFields = dataFormService.getFieldsFromForm(form);
+			if (controls.size() < formTable.getColumnCount()) {
+				for (int i = r.size(); i < formTable.getColumnCount(); i++) {
+					for (Field f : formFields) {
+						if (f.getName().equals(formTable.getColumnName(i))) {
+							if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
+								r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
+							} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
+								r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
+							} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
+								r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
+							} else {
+								r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
+							}
 						}
 					}
 				}
-				i++;
 			}
-			valuePosition++;
-		}
 
-		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
-		// Row-Wertes ermittelt und der Row angefügt
-		Row r = rb.create();
-		List<Field> formFields = dataFormService.getFieldsFromForm(form);
-		if (controls.size() < formTable.getColumnCount()) {
-			for (int i = r.size(); i < formTable.getColumnCount(); i++) {
-				for (Field f : formFields) {
-					if (f.getName().equals(formTable.getColumnName(i))) {
-						if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
-							r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
-						} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
-							r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
-						} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
-							r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
-						} else {
-							r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
-						}
-					}
-				}
-			}
+			formTable.addRow(r);
+			checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
+					((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
+					((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
+					((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
+					((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 		}
-
-		formTable.addRow(r);
-		checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
-				((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
-				((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
-				((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
-				((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 	}
 
 	/**
@@ -369,29 +375,31 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Inject
 	@Optional
-	public void buildDeleteTable(@UIEventTopic("DeleteEntry") Object obj) {
-		if (getKeys() != null) {
-			String tablename = form.getIndexView() != null ? "sp" : "op";
-			if ((!"sp".equals(form.getDetail().getProcedurePrefix())
-					&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
-				tablename = form.getDetail().getProcedurePrefix();
-			}
-			tablename += "Delete";
-			tablename += form.getDetail().getProcedureSuffix();
-			TableBuilder tb = TableBuilder.newTable(tablename);
-			RowBuilder rb = RowBuilder.newRow();
-			for (ArrayList key : getKeys()) {
-				tb.withColumn((String) key.get(0), (DataType) key.get(2));
-				rb.withValue(key.get(1));
-			}
-			Table t = tb.create();
-			Row r = rb.create();
-			t.addRow(r);
-			if (t.getRows() != null) {
-				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-					deleteEntry(ta.getReturnCode());
-				}));
+	public void buildDeleteTable(@UIEventTopic("DeleteEntry") MPerspective perspective) {
+		if (perspective == this.perspective) {
+			if (getKeys() != null) {
+				String tablename = form.getIndexView() != null ? "sp" : "op";
+				if ((!"sp".equals(form.getDetail().getProcedurePrefix())
+						&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
+					tablename = form.getDetail().getProcedurePrefix();
+				}
+				tablename += "Delete";
+				tablename += form.getDetail().getProcedureSuffix();
+				TableBuilder tb = TableBuilder.newTable(tablename);
+				RowBuilder rb = RowBuilder.newRow();
+				for (ArrayList key : getKeys()) {
+					tb.withColumn((String) key.get(0), (DataType) key.get(2));
+					rb.withValue(key.get(1));
+				}
+				Table t = tb.create();
+				Row r = rb.create();
+				t.addRow(r);
+				if (t.getRows() != null) {
+					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+						deleteEntry(ta.getReturnCode());
+					}));
+				}
 			}
 		}
 	}

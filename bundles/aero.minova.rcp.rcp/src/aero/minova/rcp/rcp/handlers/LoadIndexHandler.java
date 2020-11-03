@@ -1,6 +1,8 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -42,7 +44,10 @@ public class LoadIndexHandler {
 		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(table.getName(), table);
 		tableFuture.join();
 		tableFuture.thenAccept(t -> {
-			broker.post("PLAPLA", t);
+			Map<MPerspective, Table> brokerObject = new HashMap<>();
+			brokerObject.put(perspective, t);
+
+			broker.post("PLAPLA", brokerObject);
 		});
 
 		findElements = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);

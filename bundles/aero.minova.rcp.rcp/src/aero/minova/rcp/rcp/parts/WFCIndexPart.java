@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -57,6 +59,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+
 		String tableName = form.getIndexView().getSource();
 
 		String string = prefs.get(tableName, null);
@@ -82,13 +85,17 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic("PLAPLA") Table table) {
-		data.getRows().clear();
-		for (Row r : table.getRows()) {
-			data.addRow(r);
+	public void load(@UIEventTopic("PLAPLA") Map<MPerspective, Table> map) {
+		if (map.get(perspective) != null) {
+			Table table = map.get(perspective);
+
+			data.getRows().clear();
+			for (Row r : table.getRows()) {
+				data.addRow(r);
+			}
+			natTable.refresh(false);
+			natTable.requestLayout();
 		}
-		natTable.refresh(false);
-		natTable.requestLayout();
 	}
 
 	public NatTable getNatTable() {
