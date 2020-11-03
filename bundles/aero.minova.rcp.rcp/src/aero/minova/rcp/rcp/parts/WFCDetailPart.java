@@ -2,7 +2,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -11,11 +10,13 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.EclipseContextFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -26,22 +27,21 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import aero.minova.rcp.dataservice.IDataFormService;
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
-import aero.minova.rcp.rcp.widgets.LookupControl;
+import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.util.WFCDetailFieldUtil;
+import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
+import aero.minova.rcp.rcp.util.WFCDetailUtil;
 
 @SuppressWarnings("restriction")
-public class WFCDetailPart {
+public class WFCDetailPart extends WFCFormPart {
 
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	private static final int COLUMN_WIDTH = 140;
@@ -58,12 +58,7 @@ public class WFCDetailPart {
 	private static final int MARGIN_BORDER = 2;
 
 	@Inject
-	private IDataFormService dataFormService;
-
-	@Inject
-	private IDataService dataService;
-
-	private Form form;
+	private IEventBroker broker;
 
 	private FormToolkit formToolkit;
 
@@ -71,34 +66,34 @@ public class WFCDetailPart {
 
 	private Map<String, Control> controls = new HashMap<>();
 
-	public WFCDetailPart() {
+	private WFCDetailUtil wfcDetailUtil = null;
 
-	}
+	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
-	@Inject
-	@Named(E4WorkbenchParameterConstants.FORM_NAME)
-	String formName;
-
-	@Inject
-	MPerspective perspective;
 	private TranslationService translationService;
 
 	@PostConstruct
-	public void postConstruct(Composite parent) {
+	public void postConstruct(Composite parent, IEclipseContext partContext) {
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
-		form = perspective.getContext().get(Form.class);
-		if (form == null) {
-			dataService.getFileSynch(formName); // Datei ggf. vom Server holen
-			form = dataFormService.getForm(formName);
-		}
-		if (form == null) {
-			LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
+		if (getForm(parent) == null) {
 			return;
 		}
-		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		layoutForm(parent);
 		translate(translationService);
+		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
+		// steuert
+
+		// erzeuge die util Methoden mit DI
+		IEclipseContext localContext = EclipseContextFactory.create();
+		localContext.set(Form.class, form);
+
+		localContext.setParent(partContext);
+
+		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
+		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
+		wfcDetailUtil.bindValues(controls);
+		casRequestsUtil.setControls(controls);
 	}
 
 	private void layoutForm(Composite parent) {
@@ -227,226 +222,23 @@ public class WFCDetailPart {
 
 	private Control createField(Composite composite, Field field, int row, int column) {
 		if (field.getBoolean() != null) {
-			return createBooleanField(composite, field, row, column);
+			return WFCDetailFieldUtil.createBooleanField(composite, field, row, column, formToolkit);
 		} else if (field.getNumber() != null) {
-			return createNumberField(composite, field, row, column);
+			return WFCDetailFieldUtil.createNumberField(composite, field, row, column, formToolkit);
 		} else if (field.getDateTime() != null) {
-			return createDateTimeField(composite, field, row, column);
+			return WFCDetailFieldUtil.createDateTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getShortDate() != null) {
-			return createShortDateField(composite, field, row, column);
+			return WFCDetailFieldUtil.createShortDateField(composite, field, row, column, formToolkit);
 		} else if (field.getShortTime() != null) {
-			return createShortTimeField(composite, field, row, column);
+			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
-			return createLookupField(composite, field, row, column);
+			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
+					controls);
+
 		} else if (field.getText() != null) {
-			return createTextField(composite, field, row, column);
+			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
 		}
 		return null;
-	}
-
-	private Control createBooleanField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		FormData formData = new FormData();
-		Button button = formToolkit.createButton(composite, field.getTextAttribute(), SWT.CHECK);
-
-		formData.width = COLUMN_WIDTH;
-		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		formData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-
-		button.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		button.setLayoutData(formData);
-
-		return button;
-	}
-
-	private Control createDateTimeField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-
-		FormData formData = new FormData();
-		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		formData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		formData.width = COLUMN_WIDTH;
-
-		Button button = formToolkit.createButton(composite, field.getTextAttribute(), SWT.CHECK);
-		button.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		button.setLayoutData(formData);
-
-		return button;
-	}
-
-	private Control createLookupField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
-		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
-		FormData lookupFormData = new FormData();
-		FormData labelFormData = new FormData();
-		FormData descriptionLabelFormData = new FormData();
-
-		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		lookupFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		lookupFormData.width = COLUMN_WIDTH;
-
-		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(lookupControl, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
-		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
-//		descriptionLabelFormData.right = new FormAttachment(composite, 0, SWT.RIGHT);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
-			descriptionLabelFormData.width = MARGIN_LEFT * 2 + COLUMN_WIDTH * 2;
-		} else {
-			descriptionLabelFormData.width = 0;
-		}
-
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		lookupControl.setLayoutData(lookupFormData);
-		lookupControl.setDescription(descriptionLabel);
-
-		descriptionLabel.setLayoutData(descriptionLabelFormData);
-
-		return lookupControl;
-	}
-
-	private Control createNumberField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
-		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
-		FormData unitFormData = new FormData();
-
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		textFormData.width = NUMBER_WIDTH;
-
-		unitFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		unitFormData.left = new FormAttachment(text, 0, SWT.RIGHT);
-		unitFormData.width = COLUMN_WIDTH - NUMBER_WIDTH;
-
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		int decimals = field.getNumber().getDecimals();
-		String format = "";
-		while (decimals > format.length()) {
-			format += "0";
-		}
-		if (format.length() > 0)
-			format = "." + format;
-		int x = 1;
-		while (format.length() < 11) {
-			x %= 4;
-			if (x == 0)
-				format = "," + format;
-			else
-				format = "0" + format;
-			x++;
-
-		}
-		if (format.startsWith(","))
-			format = format.substring(1);
-		text.setMessage(MessageFormat.format(format, 0.0));
-		text.setLayoutData(textFormData);
-
-		unit.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, unitText);
-		unit.setLayoutData(unitFormData);
-
-		return text;
-	}
-
-	private Control createShortDateField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "", SWT.BORDER);
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
-
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		textFormData.width = SHORT_DATE_WIDTH;
-
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		text.setMessage("01.01.2000");
-		text.setLayoutData(textFormData);
-
-		return text;
-	}
-
-	private Control createShortTimeField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "", SWT.BORDER);
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
-
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		textFormData.width = SHORT_TIME_WIDTH;
-
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		text.setMessage("23:59");
-		text.setLayoutData(textFormData);
-
-		return text;
-	}
-
-	private Control createTextField(Composite composite, Field field, int row, int column) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "",
-				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
-
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2
-				&& "toright".equals(field.getFill())) {
-			textFormData.width = COLUMN_WIDTH * 3 + MARGIN_LEFT * 2 + MARGIN_BORDER;
-		} else {
-			textFormData.width = TEXT_WIDTH;
-		}
-		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
-			textFormData.height = COLUMN_HEIGHT * Integer.parseInt(field.getNumberRowsSpanned()) - MARGIN_TOP;
-		}
-
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		text.setLayoutData(textFormData);
-
-		return text;
-	}
-
-	private int getWidth(Field field) {
-		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
-		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
 
 	@Inject
@@ -483,4 +275,8 @@ public class WFCDetailPart {
 		}
 	}
 
+	private int getWidth(Field field) {
+		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
+		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
+	}
 }

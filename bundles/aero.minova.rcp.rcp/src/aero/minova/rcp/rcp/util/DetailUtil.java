@@ -92,8 +92,7 @@ public class DetailUtil {
 		}
 	}
 
-	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns,
-			Map<String, Control> controls) {
+	private void buildMiddlePart(Field field, Composite composite, boolean twoColumns, Map<String, Control> controls) {
 		Text text;
 		GridData gd;
 		Integer numberRowSpand = null;
@@ -120,11 +119,21 @@ public class DetailUtil {
 		text.setData(Constants.CONTROL_DATATYPE, getDataType(field));
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten
+		if (field.getNumber() != null) {
+			text.setData(Constants.CONTROL_DECIMALS, field.getNumber().getDecimals());
+		}
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 
 			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
 			Field f = (Field) text.getData(Constants.CONTROL_FIELD);
-			text.setText(ValueBuilder.value(value, f).getText());
+			String rowText = ValueBuilder.value(value, f).getText();
+			if (ValueBuilder.value(value, f).getDataType() == DataType.DOUBLE) {
+				String format = "%1." + f.getNumber().getDecimals() + "f";
+				Double doublevalue = Double.valueOf(rowText);
+				rowText = String.format(format, doublevalue);
+				rowText = rowText.replace(',', '.');
+			}
+			text.setText(rowText);
 			text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
 		});
 		controls.put(field.getName(), text);
@@ -263,7 +272,7 @@ public class DetailUtil {
 		return data;
 	}
 
-	public  Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
+	public Composite createSection(FormToolkit formToolkit, Composite parent, Object ob) {
 		Section section;
 		if (ob instanceof Head) {
 			section = formToolkit.createSection(parent, Section.TITLE_BAR | Section.NO_TITLE_FOCUS_BOX);
@@ -298,11 +307,12 @@ public class DetailUtil {
 		Value v = r.getValue(index);
 
 		lc.setText((String) ValueBuilder.value(v).create());
+		lc.getTextControl().setMessage("");
 		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder
 						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			}else {
+			} else {
 				lc.getDescription().setText("");
 			}
 		}
