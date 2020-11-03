@@ -161,9 +161,15 @@ public class WFCDetailUtil {
 							Map<MPerspective, String> brokerObject = new HashMap<>();
 							brokerObject.put(perspective, field.getName());
 							broker.post("WFCLoadAllLookUpValues", brokerObject);
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
-								&& lc.isProposalPopupOpen() == false) {
-							lookupUtil.changeSelectionBoxList(c, false);
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
+							if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
+								lookupUtil.changeSelectionBoxList(c, false);
+							} else {
+								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+								Map<MPerspective, String> brokerObject = new HashMap<>();
+								brokerObject.put(perspective, field.getName());
+								broker.post("WFCLoadAllLookUpValues", brokerObject);
+							}
 						}
 					}
 
