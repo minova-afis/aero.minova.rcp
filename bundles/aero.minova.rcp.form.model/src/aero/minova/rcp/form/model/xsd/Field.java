@@ -63,12 +63,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="label" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="tab-index" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *       &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
- *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="sql-index" type="{http://www.w3.org/2001/XMLSchema}integer" default="0" /&gt;
  *       &lt;attribute name="validation-order" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
@@ -656,7 +656,7 @@ public class Field {
     }
 
     /**
-     * Ruft den Wert der textAttribute-Eigenschaft ab.
+     * Ruft den Wert der label-Eigenschaft ab.
      * 
      * @return
      *     possible object is
@@ -668,7 +668,7 @@ public class Field {
     }
 
     /**
-     * Legt den Wert der textAttribute-Eigenschaft fest.
+     * Legt den Wert der label-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
@@ -787,12 +787,8 @@ public class Field {
      *     {@link java.lang.Boolean }
      *     
      */
-    public boolean isOffline() {
-        if (offline == null) {
-            return false;
-        } else {
-            return offline;
-        }
+    public java.lang.Boolean isOffline() {
+        return offline;
     }
 
     /**
