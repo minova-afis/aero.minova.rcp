@@ -3,8 +3,6 @@ package aero.minova.rcp.rcp.util;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.widgets.Control;
@@ -20,7 +18,6 @@ import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailsLookupUtil {
 
-	@Inject
 	protected UISynchronize sync;
 
 	private IDataService dataService;
@@ -29,11 +26,12 @@ public class WFCDetailsLookupUtil {
 
 	private Map<String, Control> controls = null;
 
-	public WFCDetailsLookupUtil(Map<String, Control> controls, MPerspective perspective, IDataService dataService) {
+	public WFCDetailsLookupUtil(Map<String, Control> controls, MPerspective perspective, IDataService dataService,
+			UISynchronize sync) {
 		this.controls = controls;
 		this.perspective = perspective;
 		this.dataService = dataService;
-
+		this.sync = sync;
 	}
 
 	public void requestOptionsFromCAS(Control c) {

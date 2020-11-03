@@ -72,7 +72,7 @@ public class WFCDetailUtil {
 	public void bindValues(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
 
-		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService);
+		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService, sync);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
