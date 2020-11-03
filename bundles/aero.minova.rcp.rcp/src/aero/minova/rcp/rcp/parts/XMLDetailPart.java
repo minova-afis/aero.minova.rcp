@@ -220,9 +220,13 @@ public class XMLDetailPart {
 						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) != null
-								&& lc.isProposalPopupOpen() == false) {
-							changeSelectionBoxList(c, false);
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
+							if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
+								changeSelectionBoxList(c, false);
+							} else {
+								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+								broker.post("WFCLoadAllLookUpValues", field.getName());
+							}
 						}
 					}
 
