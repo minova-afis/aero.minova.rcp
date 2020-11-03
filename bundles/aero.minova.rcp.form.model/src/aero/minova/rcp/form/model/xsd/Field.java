@@ -63,7 +63,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="label" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="tab-index" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *       &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
@@ -180,7 +180,7 @@ public class Field {
     protected aero.minova.rcp.form.model.xsd.Boolean _boolean;
     protected Color color;
     protected List<Field.Msg> msg;
-    @XmlAttribute(name = "label")
+    @XmlAttribute(name = "text")
     protected String label;
     @XmlAttribute(name = "tab-index")
     protected BigInteger tabIndex;
