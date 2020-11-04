@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +15,8 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.css.swt.dom.ToolItemElement;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
@@ -28,6 +31,8 @@ import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.EPerspectiveSwitche
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.IPerspectiveSwitcherControl;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -41,11 +46,15 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
