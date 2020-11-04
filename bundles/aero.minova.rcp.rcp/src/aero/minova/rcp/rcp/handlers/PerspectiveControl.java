@@ -75,6 +75,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	@Inject
 	MApplication application;
 
+	@Inject
+	private TranslationService translationService;
+
 	/*
 	 * Set preferences for showShortcutText
 	 */
