@@ -365,8 +365,9 @@ public class XMLDetailPart {
 							&& (filteredTable.getRows().get(0)
 									.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
 									.toLowerCase().equals(lc.getText().toLowerCase()))
-							|| (filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+							|| (filteredTable.getRows().size() != 0
+									&& filteredTable.getRows().get(0)
+											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
 									&& filteredTable.getRows().get(0)
 											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
 											.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
