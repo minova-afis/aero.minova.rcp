@@ -97,7 +97,9 @@ public class SwitchPerspectiveHandler {
 		MWindow window = context.get(MWindow.class);
 		EModelService modelService = context.get(EModelService.class);
 		String[] ids = perspectiveID.split(".xml");
-		id = ids[0];
+		String id = ids[0];
+		List<MHandledMenuItem> items = model.findElements(window.getMainMenu(), id, MHandledMenuItem.class);
+		MHandledMenuItem item = items.get(0);
 
 		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService
@@ -114,9 +116,10 @@ public class SwitchPerspectiveHandler {
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.setLabel(translationService.translate("@" + id, null));
+			perspective.setContext(context);
+			perspective.setLabel(item.getLabel());
 			perspectiveStack.getChildren().add(0, perspective);
-			switchTo(ctx, perspective, perspectiveID, window);
+			switchTo(context, perspective, perspectiveID, window);
 
 		}
 		return perspective;
