@@ -86,6 +86,8 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	private boolean showShortcutText;
 	static String _null = ""; //$NON-NLS-1$
 
+	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
+
 	//
 	Composite composite;
 	ToolBar toolBar;
@@ -150,9 +152,31 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered())
 						addPerspectiveShortcut(perspective);
-					;
 
 				}
+		}
+		translate(translationService);
+	}
+
+	@Inject
+	@Optional
+	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
+		translate(translationService);
+	}
+
+	@Inject
+	private void translate(TranslationService translationService) {
+		this.translationService = translationService;
+		if (translationService != null && toolBar != null)
+			translate();
+	}
+
+	private void translate() {
+		for (ToolItem item : toolBar.getItems()) {
+			List<MPerspective> perspectives = modelService.findElements(application, item.getData().toString(), MPerspective.class);
+			MPerspective perspective = perspectives.get(0);
+			String value = translationService.translate(perspective.getLocalizedLabel(), null);
+			item.setText(value);
 		}
 	}
 
@@ -178,7 +202,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		if (!(keepit != null && keepit.contains(perspective.getElementId()))) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspective.getElementId());
-
 			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
 
 			if (descriptor != null) {
