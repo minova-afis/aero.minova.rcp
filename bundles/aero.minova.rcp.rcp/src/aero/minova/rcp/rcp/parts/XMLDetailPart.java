@@ -167,6 +167,7 @@ public class XMLDetailPart {
 							e.doit = tfv.verifyDouble(newString);
 						}
 					});
+					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {

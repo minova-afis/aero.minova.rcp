@@ -102,6 +102,9 @@ public class WFCDetailFieldUtil {
 		label.setLayoutData(labelFormData);
 
 		int decimals = field.getNumber().getDecimals();
+		if (field.isReadOnly() == true) {
+			text.setEditable(false);
+		}
 		String format = "";
 		while (decimals > format.length()) {
 			format += "0";

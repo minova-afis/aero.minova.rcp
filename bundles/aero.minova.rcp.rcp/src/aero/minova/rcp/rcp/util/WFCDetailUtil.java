@@ -106,6 +106,7 @@ public class WFCDetailUtil {
 							e.doit = tfv.verifyDouble(newString);
 						}
 					});
+					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
@@ -205,8 +206,8 @@ public class WFCDetailUtil {
 				renderedValue = String.format(renderedFormat, quarter);
 				renderedValue = renderedValue.replace(',', '.');
 			} else {
-				renderedValue = "0";
-				chargedValue = "0";
+				renderedValue = "0.00";
+				chargedValue = "0.00";
 			}
 			chargedField.setText(chargedValue);
 			renderedField.setText(renderedValue);
