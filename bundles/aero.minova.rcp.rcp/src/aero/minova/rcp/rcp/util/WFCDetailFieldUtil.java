@@ -29,9 +29,6 @@ public class WFCDetailFieldUtil {
 	private static final int SHORT_TIME_WIDTH = 52;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5;
-	private static final int MARGIN_SECTION = 8;
-	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION; // 4 Spalten = 5
-																										// Zwischenräume
 	private static final int COLUMN_HEIGHT = 28;
 	private static final int MARGIN_BORDER = 2;
 

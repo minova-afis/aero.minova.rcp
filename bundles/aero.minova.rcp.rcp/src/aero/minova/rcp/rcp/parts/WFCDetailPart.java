@@ -55,17 +55,12 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	private static final int COLUMN_WIDTH = 140;
-	private static final int TEXT_WIDTH = COLUMN_WIDTH;
-	private static final int NUMBER_WIDTH = 104;
-	private static final int SHORT_DATE_WIDTH = 88;
-	private static final int SHORT_TIME_WIDTH = 52;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5;
 	private static final int MARGIN_SECTION = 8;
 	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION; // 4 Spalten = 5
 																										// Zwischenräume
 	private static final int COLUMN_HEIGHT = 28;
-	private static final int MARGIN_BORDER = 2;
 
 	@Inject
 	private IEventBroker broker;

@@ -1,9 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -11,24 +9,18 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailUtil {
@@ -38,9 +30,6 @@ public class WFCDetailUtil {
 
 	@Inject
 	private IEventBroker broker;
-
-	@Inject
-	private TranslationService translationService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -53,17 +42,9 @@ public class WFCDetailUtil {
 	@Inject
 	protected IDataService dataService;
 
-	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
-	private Composite parent;
-
 	private Map<String, Control> controls = new HashMap<>();
-	private List<ArrayList> keys = null;
-	private Table selectedTable;
-	@Inject
-	private Form form;
-	private WFCDetailsLookupUtil lookupUtil = null;
 
-	private WFCDetailCASRequestsUtil casRequests = null;
+	private WFCDetailsLookupUtil lookupUtil = null;
 
 	@Inject
 	public WFCDetailUtil() {
