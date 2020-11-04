@@ -96,7 +96,7 @@ public class LookupFieldFocusListener implements FocusListener {
 		if (lc.getText().startsWith("#")) {
 			getTicketFromCAS(lc);
 		} else {
-			clearColumn(lc);
+			// clearColumn(lc);
 		}
 
 	}
