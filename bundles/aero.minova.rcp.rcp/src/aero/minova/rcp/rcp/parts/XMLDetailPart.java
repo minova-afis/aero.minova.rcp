@@ -671,11 +671,11 @@ public class XMLDetailPart {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 			if (Objects.isNull(getKeys())) {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkNewEntryInsert(tr.getReturnCode());
+					checkNewEntryInsert(tr);
 				}));
 			} else {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkEntryUpdate(tr.getReturnCode());
+					checkEntryUpdate(tr);
 				}));
 			}
 		} else {
@@ -690,8 +690,8 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	private void checkEntryUpdate(int responce) {
-		if (responce != 1) {
+	private void checkEntryUpdate(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be updated");
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
@@ -706,8 +706,8 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	private void checkNewEntryInsert(int responce) {
-		if (responce != 1) {
+	private void checkNewEntryInsert(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be added");
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
@@ -747,7 +747,7 @@ public class XMLDetailPart {
 				if (t.getRows() != null) {
 					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-						deleteEntry(ta.getReturnCode());
+						deleteEntry(ta);
 					}));
 				}
 			}
@@ -760,8 +760,8 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	public void deleteEntry(int responce) {
-		if (responce != 1) {
+	public void deleteEntry(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be deleted");
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
