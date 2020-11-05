@@ -34,9 +34,9 @@ public class WFCDetailFieldUtil {
 
 	public static Control createBooleanField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		FormData formData = new FormData();
-		Button button = formToolkit.createButton(composite, field.getTextAttribute(), SWT.CHECK);
+		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
 
 		formData.width = COLUMN_WIDTH;
 		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
@@ -53,14 +53,14 @@ public class WFCDetailFieldUtil {
 
 	public static Control createDateTimeField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 
 		FormData formData = new FormData();
 		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		formData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
 		formData.width = COLUMN_WIDTH;
 
-		Button button = formToolkit.createButton(composite, field.getTextAttribute(), SWT.CHECK);
+		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
 		button.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
 		button.setLayoutData(formData);
 		button.setData(Constants.CONTROL_FIELD, field);
@@ -72,7 +72,7 @@ public class WFCDetailFieldUtil {
 
 	public static Control createNumberField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
@@ -131,7 +131,7 @@ public class WFCDetailFieldUtil {
 
 	public static Control createShortDateField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
 		addDataToText(text, field, DataType.INSTANT);
@@ -158,7 +158,7 @@ public class WFCDetailFieldUtil {
 
 	public static Control createShortTimeField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
 		addDataToText(text, field, DataType.INSTANT);
@@ -185,7 +185,7 @@ public class WFCDetailFieldUtil {
 
 	public static Control createTextField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
-		String labelText = field.getTextAttribute() == null ? "" : field.getTextAttribute();
+		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "",
 				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));

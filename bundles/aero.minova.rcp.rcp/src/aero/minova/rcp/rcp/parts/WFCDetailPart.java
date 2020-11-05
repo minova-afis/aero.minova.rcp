@@ -1,6 +1,8 @@
 
 package aero.minova.rcp.rcp.parts;
 
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
@@ -35,16 +37,19 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.fields.ShortDateField;
+import aero.minova.rcp.rcp.fields.DateTimeField;
+import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.util.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
 import aero.minova.rcp.rcp.util.WFCDetailsLookupUtil;
@@ -53,7 +58,6 @@ import aero.minova.rcp.rcp.widgets.LookupControl;
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
-	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	private static final int COLUMN_WIDTH = 140;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5;
@@ -79,6 +83,7 @@ public class WFCDetailPart extends WFCFormPart {
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
 	private TranslationService translationService;
+	private Locale locale;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
@@ -125,7 +130,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		headSection.setLayoutData(headLayoutData);
 		headSection.setText("@Head");
-		headSection.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, "@Head");
+		headSection.setData(TRANSLATE_PROPERTY, "@Head");
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(headSection);
@@ -147,7 +152,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		pageSection.setLayoutData(pageLayoutData);
 		pageSection.setText(page.getText());
-		pageSection.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, page.getText());
+		pageSection.setData(TRANSLATE_PROPERTY, page.getText());
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(pageSection);
@@ -166,19 +171,16 @@ public class WFCDetailPart extends WFCFormPart {
 		int width = 2;
 		Control control = null;
 		for (Object fieldOrGrid : head.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field))
-				continue; // erst einmal nur Felder
+			if (!(fieldOrGrid instanceof Field)) continue; // erst einmal nur Felder
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible())
-				continue; // nur sichtbare Felder
+			if (!field.isVisible()) continue; // nur sichtbare Felder
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null)
-				controls.put(field.getName(), control);
+			if (control != null) controls.put(field.getName(), control);
 			column += width;
 		}
 
@@ -191,19 +193,16 @@ public class WFCDetailPart extends WFCFormPart {
 		int width;
 		Control control;
 		for (Object fieldOrGrid : page.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field))
-				continue; // erst einmal nur Felder
+			if (!(fieldOrGrid instanceof Field)) continue; // erst einmal nur Felder
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible())
-				continue; // nur sichtbare Felder
+			if (!field.isVisible()) continue; // nur sichtbare Felder
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null)
-				controls.put(field.getName(), control);
+			if (control != null) controls.put(field.getName(), control);
 			column += width;
 			row += getExtraHeight(field);
 		}
@@ -232,11 +231,11 @@ public class WFCDetailPart extends WFCFormPart {
 		if (field.getBoolean() != null) {
 			return WFCDetailFieldUtil.createBooleanField(composite, field, row, column, formToolkit);
 		} else if (field.getNumber() != null) {
-			return WFCDetailFieldUtil.createNumberField(composite, field, row, column, formToolkit);
+			return NumberField.create(composite, field, row, column, formToolkit, locale);
 		} else if (field.getDateTime() != null) {
-			return WFCDetailFieldUtil.createDateTimeField(composite, field, row, column, formToolkit);
+			return DateTimeField.create(composite, field, row, column, formToolkit);
 		} else if (field.getShortDate() != null) {
-			return WFCDetailFieldUtil.createShortDateField(composite, field, row, column, formToolkit);
+			return ShortDateField.create(composite, field, row, column, formToolkit, locale);
 		} else if (field.getShortTime() != null) {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
@@ -252,20 +251,20 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	@Optional
 	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
+		this.locale = s;
 		translate(translationService);
 	}
 
 	@Inject
 	private void translate(TranslationService translationService) {
 		this.translationService = translationService;
-		if (translationService != null && composite != null)
-			translate(composite);
+		if (translationService != null && composite != null) translate(composite);
 	}
 
 	private void translate(Composite composite) {
 		for (Control control : composite.getChildren()) {
-			if (control.getData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY) != null) {
-				String property = (String) control.getData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY);
+			if (control.getData(TRANSLATE_PROPERTY) != null) {
+				String property = (String) control.getData(TRANSLATE_PROPERTY);
 				String value = translationService.translate(property, null);
 				if (control instanceof ExpandableComposite) {
 					ExpandableComposite expandableComposite = (ExpandableComposite) control;
@@ -289,9 +288,8 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
-	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
-	 * dem benutzer zur verfügung gestellt.
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von
+	 * Ergebnissen Erstellt, diese wird dem benutzer zur verfügung gestellt.
 	 *
 	 * @param luc
 	 */

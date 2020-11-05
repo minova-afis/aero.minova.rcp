@@ -71,7 +71,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *       &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
- *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="sql-index" type="{http://www.w3.org/2001/XMLSchema}integer" default="0" /&gt;
  *       &lt;attribute name="validation-order" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
@@ -139,70 +139,70 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 		"msg" })
 public class Field {
 
-	protected Number number;
-	protected Bignumber bignumber;
-	protected Lookup lookup;
-	protected Percentage percentage;
-	protected Text text;
-	@XmlElement(name = "short-date")
-	protected Object shortDate;
-	@XmlElement(name = "long-date")
-	protected Object longDate;
-	@XmlElement(name = "short-time")
-	protected Object shortTime;
-	@XmlElement(name = "long-time")
-	protected Object longTime;
-	@XmlElement(name = "date-time")
-	protected Object dateTime;
-	@XmlElement(name = "week-day")
-	protected Object weekDay;
-	protected Editor editor;
-	protected Money money;
-	@XmlElement(name = "param-string")
-	protected ParamString paramString;
-	@XmlElement(name = "void")
-	protected Object _void;
-	@XmlElement(name = "boolean")
-	protected aero.minova.rcp.form.model.xsd.Boolean _boolean;
-	protected Color color;
-	protected List<Field.Msg> msg;
-	@XmlAttribute(name = "text")
-	protected String textAttribute;
-	@XmlAttribute(name = "tab-index")
-	protected BigInteger tabIndex;
-	@XmlAttribute(name = "name", required = true)
-	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-	@XmlID
-	@XmlSchemaType(name = "ID")
-	protected String name;
-	@XmlAttribute(name = "default")
-	protected String _default;
-	@XmlAttribute(name = "required")
-	protected java.lang.Boolean required;
-	@XmlAttribute(name = "offline")
-	protected java.lang.Boolean offline;
-	@XmlAttribute(name = "total")
-	protected java.lang.Boolean total;
-	@XmlAttribute(name = "sql-index")
-	protected BigInteger sqlIndex;
-	@XmlAttribute(name = "validation-order")
-	protected BigInteger validationOrder;
-	@XmlAttribute(name = "number-columns-spanned")
-	protected BigInteger numberColumnsSpanned;
-	@XmlAttribute(name = "number-rows-spanned")
-	protected String numberRowsSpanned;
-	@XmlAttribute(name = "fill")
-	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-	protected String fill;
-	@XmlAttribute(name = "key-type")
-	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-	protected String keyType;
-	@XmlAttribute(name = "visible")
-	protected java.lang.Boolean visible;
-	@XmlAttribute(name = "unit-text")
-	protected String unitText;
-	@XmlAttribute(name = "read-only")
-	protected java.lang.Boolean readOnly;
+    protected Number number;
+    protected Bignumber bignumber;
+    protected Lookup lookup;
+    protected Percentage percentage;
+    protected Text text;
+    @XmlElement(name = "short-date")
+    protected Object shortDate;
+    @XmlElement(name = "long-date")
+    protected Object longDate;
+    @XmlElement(name = "short-time")
+    protected Object shortTime;
+    @XmlElement(name = "long-time")
+    protected Object longTime;
+    @XmlElement(name = "date-time")
+    protected Object dateTime;
+    @XmlElement(name = "week-day")
+    protected Object weekDay;
+    protected Editor editor;
+    protected Money money;
+    @XmlElement(name = "param-string")
+    protected ParamString paramString;
+    @XmlElement(name = "void")
+    protected Object _void;
+    @XmlElement(name = "boolean")
+    protected aero.minova.rcp.form.model.xsd.Boolean _boolean;
+    protected Color color;
+    protected List<Field.Msg> msg;
+    @XmlAttribute(name = "text")
+    protected String label;
+    @XmlAttribute(name = "tab-index")
+    protected BigInteger tabIndex;
+    @XmlAttribute(name = "name", required = true)
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlID
+    @XmlSchemaType(name = "ID")
+    protected String name;
+    @XmlAttribute(name = "default")
+    protected String _default;
+    @XmlAttribute(name = "required")
+    protected java.lang.Boolean required;
+    @XmlAttribute(name = "offline")
+    protected java.lang.Boolean offline;
+    @XmlAttribute(name = "total")
+    protected java.lang.Boolean total;
+    @XmlAttribute(name = "sql-index")
+    protected BigInteger sqlIndex;
+    @XmlAttribute(name = "validation-order")
+    protected BigInteger validationOrder;
+    @XmlAttribute(name = "number-columns-spanned")
+    protected BigInteger numberColumnsSpanned;
+    @XmlAttribute(name = "number-rows-spanned")
+    protected String numberRowsSpanned;
+    @XmlAttribute(name = "fill")
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String fill;
+    @XmlAttribute(name = "key-type")
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String keyType;
+    @XmlAttribute(name = "visible")
+    protected java.lang.Boolean visible;
+    @XmlAttribute(name = "unit-text")
+    protected String unitText;
+    @XmlAttribute(name = "read-only")
+    protected java.lang.Boolean readOnly;
 
 	/**
 	 * Ruft den Wert der number-Eigenschaft ab.
@@ -545,54 +545,58 @@ public class Field {
 		this.color = value;
 	}
 
-	/**
-	 * Gets the value of the msg property.
-	 * 
-	 * <p>
-	 * This accessor method returns a reference to the live list, not a snapshot.
-	 * Therefore any modification you make to the returned list will be present
-	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method
-	 * for the msg property.
-	 * 
-	 * <p>
-	 * For example, to add a new item, do as follows:
-	 * 
-	 * <pre>
-	 * getMsg().add(newItem);
-	 * </pre>
-	 * 
-	 * 
-	 * <p>
-	 * Objects of the following type(s) are allowed in the list {@link Field.Msg }
-	 * 
-	 * 
-	 */
-	public List<Field.Msg> getMsg() {
-		if (msg == null) {
-			msg = new ArrayList<Field.Msg>();
-		}
-		return this.msg;
-	}
+    /**
+     * Gets the value of the msg property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the msg property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getMsg().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Field.Msg }
+     * 
+     * 
+     */
+    public List<Field.Msg> getMsg() {
+        if (msg == null) {
+            msg = new ArrayList<Field.Msg>();
+        }
+        return this.msg;
+    }
 
-	/**
-	 * Ruft den Wert der textAttribute-Eigenschaft ab.
-	 * 
-	 * @return possible object is {@link String }
-	 * 
-	 */
-	public String getTextAttribute() {
-		return textAttribute;
-	}
+    /**
+     * Ruft den Wert der label-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getLabel() {
+        return label;
+    }
 
-	/**
-	 * Legt den Wert der textAttribute-Eigenschaft fest.
-	 * 
-	 * @param value allowed object is {@link String }
-	 * 
-	 */
-	public void setTextAttribute(String value) {
-		this.textAttribute = value;
-	}
+    /**
+     * Legt den Wert der label-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setLabel(String value) {
+        this.label = value;
+    }
 
 	/**
 	 * Ruft den Wert der tabIndex-Eigenschaft ab.
@@ -668,29 +672,17 @@ public class Field {
 		}
 	}
 
-	/**
-	 * Legt den Wert der required-Eigenschaft fest.
-	 * 
-	 * @param value allowed object is {@link java.lang.Boolean }
-	 * 
-	 */
-	public void setRequired(java.lang.Boolean value) {
-		this.required = value;
-	}
-
-	/**
-	 * Ruft den Wert der offline-Eigenschaft ab.
-	 * 
-	 * @return possible object is {@link java.lang.Boolean }
-	 * 
-	 */
-	public boolean isOffline() {
-		if (offline == null) {
-			return false;
-		} else {
-			return offline;
-		}
-	}
+    /**
+     * Ruft den Wert der offline-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public java.lang.Boolean isOffline() {
+        return offline;
+    }
 
 	/**
 	 * Legt den Wert der offline-Eigenschaft fest.
