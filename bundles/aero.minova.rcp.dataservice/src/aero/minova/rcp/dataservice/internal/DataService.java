@@ -30,7 +30,9 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.EventAdmin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -58,12 +60,13 @@ public class DataService implements IDataService {
 	// Ticket-Anfragen zu versenden
 	// private String server = "https://mintest.minova.com:8084";
 	
-//	@Reference 
-	private void setCredentials(MApplication app) {
-		username = (String)app.getContext().get("username");
-		password = (String)app.getContext().get("password");
-		server = (String)app.getContext().get("server");
+	@Override
+	public void setCredentials(String username, String password, String server) {
+		this.username = username;
+		this.password = password;
+		this.server = server;
 	}
+	
 
 	private void init() {
 
