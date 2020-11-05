@@ -17,7 +17,11 @@ public class RowBuilder {
 
 	public RowBuilder withValue(Object value) {
 		if (value != null) {
-			row.addValue(new Value(value));
+			if (value instanceof Value) {
+				row.addValue((Value) value);
+			} else {
+				row.addValue(new Value(value));
+			}
 		} else {
 			row.addValue(null);
 		}

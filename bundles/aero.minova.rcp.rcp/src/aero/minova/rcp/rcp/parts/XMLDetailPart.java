@@ -26,7 +26,9 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -99,9 +101,12 @@ public class XMLDetailPart {
 	private Table selectedTable;
 	private Form form;
 	private String lastEndDate = "";
+	private MPerspective perspective = null;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent, MPerspective perspective) {
+
+		this.perspective = perspective;
 		// Top-Level_Elemen
 		parent.setLayout(new GridLayout(1, true));
 		this.parent = parent;
@@ -162,6 +167,7 @@ public class XMLDetailPart {
 							e.doit = tfv.verifyDouble(newString);
 						}
 					});
+					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
@@ -186,15 +192,21 @@ public class XMLDetailPart {
 				// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
 				// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 				lc.addKeyListener(new KeyListener() {
+					boolean controlPressed = false;
 
 					@Override
 					public void keyPressed(KeyEvent e) {
 						// TODO Auto-generated method stub
-
+						if (e.keyCode == SWT.CONTROL) {
+							controlPressed = true;
+						}
 					}
 
 					@Override
 					public void keyReleased(KeyEvent e) {
+						if (e.keyCode == SWT.CONTROL) {
+							controlPressed = false;
+						} else
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
@@ -206,9 +218,16 @@ public class XMLDetailPart {
 							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
 							// wie auch bei einem Klick auf das Twiste, angezeigt werden
 							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.getData(Constants.CONTROL_OPTIONS) == null) {
+						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							broker.post("LoadAllLookUpValues", field.getName());
+						} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
+							if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
+								changeSelectionBoxList(c, false);
+							} else {
+								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+								broker.post("WFCLoadAllLookUpValues", field.getName());
+							}
 						}
 					}
 
@@ -237,9 +256,13 @@ public class XMLDetailPart {
 			if (timeDifference >= 0) {
 				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
 				Double half = (double) Math.round(timeDifference * 2) / 2f;
-				chargedValue = String.format("%1.2f", half);
+				String chargedFormat = "%1."
+						+ ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				String renderedFormat = "%1."
+						+ ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				chargedValue = String.format(chargedFormat, half);
 				chargedValue = chargedValue.replace(',', '.');
-				renderedValue = String.format("%1.2f", quarter);
+				renderedValue = String.format(renderedFormat, quarter);
 				renderedValue = renderedValue.replace(',', '.');
 			} else {
 				renderedValue = "0";
@@ -300,16 +323,17 @@ public class XMLDetailPart {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					} else {
-						// Setzen der Proposals/Optionen
-						changeProposals((LookupControl) c, t);
 					}
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
+
 				} else {
 					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					c.setData(Constants.CONTROL_KEYLONG,
 							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
-
+					// Setzen der Proposals/Optionen
+					changeProposals((LookupControl) c, t);
 				}
 			} else {
 				if (lc != null && lc.getText() != null && twisty == false) {
@@ -341,8 +365,9 @@ public class XMLDetailPart {
 							&& (filteredTable.getRows().get(0)
 									.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
 									.toLowerCase().equals(lc.getText().toLowerCase()))
-							|| (filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+							|| (filteredTable.getRows().size() != 0
+									&& filteredTable.getRows().get(0)
+											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
 									&& filteredTable.getRows().get(0)
 											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
 											.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
@@ -385,6 +410,7 @@ public class XMLDetailPart {
 	@Inject
 	@Optional
 	public void requestLookUpEntriesAll(@UIEventTopic("LoadAllLookUpValues") String name) {
+
 		Control control = controls.get(name);
 		if (control instanceof LookupControl) {
 			Field field = (Field) control.getData(Constants.CONTROL_FIELD);
@@ -413,7 +439,9 @@ public class XMLDetailPart {
 	 */
 
 	@Inject
-	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows) {
+	public void changeSelectedEntry(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows,
+			ESelectionService selectionService) {
+
 		if (rows != null) {
 
 			Row row = rows.get(0);
@@ -469,6 +497,19 @@ public class XMLDetailPart {
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
 
+		for (Control c : controls.values()) {
+			if (c instanceof Text) {
+				Text t = (Text) c;
+				t.setText("");
+
+			} else if (c instanceof LookupControl) {
+				LookupControl lc = (LookupControl) c;
+				lc.setText("");
+				lc.getDescription().setText("");
+				lc.getTextControl().setMessage("...");
+			}
+		}
+
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = table.getColumnName(i);
 			Control c = controls.get(name);
@@ -506,83 +547,85 @@ public class XMLDetailPart {
 	 */
 	@Inject
 	@Optional
-	public void buildSaveTable(@UIEventTopic("SaveEntry") Object obj) {
-		Table formTable = null;
-		RowBuilder rb = RowBuilder.newRow();
+	public void buildSaveTable(@UIEventTopic("SaveEntry") MPerspective perspective) {
+		if (perspective == this.perspective) {
+			Table formTable = null;
+			RowBuilder rb = RowBuilder.newRow();
 
-		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
-		} else {
-			formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
-		}
-		int valuePosition = 0;
-		if (getKeys() != null) {
-			for (ArrayList key : getKeys()) {
-				rb.withValue(key.get(1));
-				valuePosition++;
+			if (getKeys() != null) {
+				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
+			} else {
+				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
 			}
-		} else {
-			List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
-			for (Field f : keyList) {
-				rb.withValue(null);
-				valuePosition++;
+			int valuePosition = 0;
+			if (getKeys() != null) {
+				for (ArrayList key : getKeys()) {
+					rb.withValue(key.get(1));
+					valuePosition++;
+				}
+			} else {
+				List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
+				for (Field f : keyList) {
+					rb.withValue(null);
+					valuePosition++;
+				}
+
 			}
+			while (valuePosition < formTable.getColumnCount()) {
+				int i = 0;
+				for (Control c : controls.values()) {
+					String s = (String) controls.keySet().toArray()[i];
+					if (s.equals(formTable.getColumnName(valuePosition))) {
+						if (c instanceof Text) {
+							if (!(((Text) c).getText().isBlank())) {
+								rb.withValue(((Text) c).getText());
+							} else {
+								rb.withValue(null);
 
-		}
-		while (valuePosition < formTable.getColumnCount()) {
-			int i = 0;
-			for (Control c : controls.values()) {
-				String s = (String) controls.keySet().toArray()[i];
-				if (s.equals(formTable.getColumnName(valuePosition))) {
-					if (c instanceof Text) {
-						if (!(((Text) c).getText().isBlank())) {
-							rb.withValue(((Text) c).getText());
-						} else {
-							rb.withValue(null);
-
+							}
+						}
+						if (c instanceof LookupControl) {
+							if (c.getData(Constants.CONTROL_KEYLONG) != null) {
+								rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
+							} else {
+								rb.withValue(null);
+							}
 						}
 					}
-					if (c instanceof LookupControl) {
-						if (c.getData(Constants.CONTROL_KEYLONG) != null) {
-							rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
-						} else {
-							rb.withValue(null);
+					i++;
+				}
+				valuePosition++;
+			}
+
+			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
+			// Row-Wertes ermittelt und der Row angefügt
+			Row r = rb.create();
+			List<Field> formFields = dataFormService.getFieldsFromForm(form);
+			if (controls.size() < formTable.getColumnCount()) {
+				for (int i = r.size(); i < formTable.getColumnCount(); i++) {
+					for (Field f : formFields) {
+						if (f.getName().equals(formTable.getColumnName(i))) {
+							if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
+								r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
+							} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
+								r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
+							} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
+								r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
+							} else {
+								r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
+							}
 						}
 					}
 				}
-				i++;
 			}
-			valuePosition++;
-		}
 
-		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
-		// Row-Wertes ermittelt und der Row angefügt
-		Row r = rb.create();
-		List<Field> formFields = dataFormService.getFieldsFromForm(form);
-		if (controls.size() < formTable.getColumnCount()) {
-			for (int i = r.size(); i < formTable.getColumnCount(); i++) {
-				for (Field f : formFields) {
-					if (f.getName().equals(formTable.getColumnName(i))) {
-						if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
-							r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
-						} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
-							r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
-						} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
-							r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
-						} else {
-							r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
-						}
-					}
-				}
-			}
+			formTable.addRow(r);
+			checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
+					((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
+					((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
+					((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
+					((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 		}
-
-		formTable.addRow(r);
-		checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
-				((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
-				((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
-				((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
-				((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
 	}
 
 	/**
@@ -641,11 +684,11 @@ public class XMLDetailPart {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 			if (Objects.isNull(getKeys())) {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkNewEntryInsert(tr.getReturnCode());
+					checkNewEntryInsert(tr);
 				}));
 			} else {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkEntryUpdate(tr.getReturnCode());
+					checkEntryUpdate(tr);
 				}));
 			}
 		} else {
@@ -660,12 +703,14 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	private void checkEntryUpdate(int responce) {
-		if (responce != 1) {
+	private void checkEntryUpdate(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be updated");
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
-			clearFields(Constants.UPDATE_REQUEST);
+			Map<MPerspective, String> map = new HashMap<>();
+			map.put(perspective, Constants.UPDATE_REQUEST);
+			clearFields(map);
 		}
 	}
 
@@ -674,12 +719,14 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	private void checkNewEntryInsert(int responce) {
-		if (responce != 1) {
+	private void checkNewEntryInsert(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be added");
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
-			clearFields(Constants.INSERT_REQUEST);
+			Map<MPerspective, String> map = new HashMap<>();
+			map.put(perspective, Constants.INSERT_REQUEST);
+			clearFields(map);
 		}
 	}
 
@@ -691,29 +738,31 @@ public class XMLDetailPart {
 	 */
 	@Inject
 	@Optional
-	public void buildDeleteTable(@UIEventTopic("DeleteEntry") Object obj) {
-		if (getKeys() != null) {
-			String tablename = form.getIndexView() != null ? "sp" : "op";
-			if ((!"sp".equals(form.getDetail().getProcedurePrefix())
-					&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
-				tablename = form.getDetail().getProcedurePrefix();
-			}
-			tablename += "Delete";
-			tablename += form.getDetail().getProcedureSuffix();
-			TableBuilder tb = TableBuilder.newTable(tablename);
-			RowBuilder rb = RowBuilder.newRow();
-			for (ArrayList key : getKeys()) {
-				tb.withColumn((String) key.get(0), (DataType) key.get(2));
-				rb.withValue(key.get(1));
-			}
-			Table t = tb.create();
-			Row r = rb.create();
-			t.addRow(r);
-			if (t.getRows() != null) {
-				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-					deleteEntry(ta.getReturnCode());
-				}));
+	public void buildDeleteTable(@UIEventTopic("DeleteEntry") MPerspective perspective) {
+		if (perspective == this.perspective) {
+			if (getKeys() != null) {
+				String tablename = form.getIndexView() != null ? "sp" : "op";
+				if ((!"sp".equals(form.getDetail().getProcedurePrefix())
+						&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
+					tablename = form.getDetail().getProcedurePrefix();
+				}
+				tablename += "Delete";
+				tablename += form.getDetail().getProcedureSuffix();
+				TableBuilder tb = TableBuilder.newTable(tablename);
+				RowBuilder rb = RowBuilder.newRow();
+				for (ArrayList key : getKeys()) {
+					tb.withColumn((String) key.get(0), (DataType) key.get(2));
+					rb.withValue(key.get(1));
+				}
+				Table t = tb.create();
+				Row r = rb.create();
+				t.addRow(r);
+				if (t.getRows() != null) {
+					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+						deleteEntry(ta);
+					}));
+				}
 			}
 		}
 	}
@@ -724,12 +773,14 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	public void deleteEntry(int responce) {
-		if (responce != 1) {
+	public void deleteEntry(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be deleted");
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
-			clearFields(Constants.DELETE_REQUEST);
+			Map<MPerspective, String> map = new HashMap<>();
+			map.put(perspective, Constants.DELETE_REQUEST);
+			clearFields(map);
 		}
 	}
 
@@ -751,71 +802,74 @@ public class XMLDetailPart {
 	 */
 	@Optional
 	@Inject
-	public void clearFields(@UIEventTopic("clearFields") String origin) {
-		for (Control c : controls.values()) {
-			if (c instanceof Text) {
-				Text t = (Text) c;
-				if (origin.equals(Constants.DELETE_REQUEST)) {
-					t.setText("");
-				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE)
-						.getData(Constants.CONTROL_FIELD)) {
-					SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-					Date date = new Date(System.currentTimeMillis());
-					t.setText(formatter.format(date));
-				} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
-						.getData(Constants.CONTROL_FIELD)) {
-					Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
-					if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
-						lastEndDate = endDate.getText();
-					}
-					t.setText(lastEndDate);
-				} else {
-					Field f = (Field) c.getData(Constants.CONTROL_FIELD);
-					t.setText("");
-
-				}
-			}
-
-			if (c instanceof LookupControl) {
-				LookupControl lc = (LookupControl) c;
-				lc.setText("");
-				lc.setData(Constants.CONTROL_KEYLONG, null);
-				lc.getDescription().setText("");
-			}
-			setKeys(null);
-		}
-		/*
-		 * Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den
-		 * preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS versendet
-		 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
-		 * haben
-		 */
-		if (!origin.equals(Constants.DELETE_REQUEST)) {
-			LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
-			lc.setText(employee);
-			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD),
-					controls, dataService, sync, "List");
-
-			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-				if (ta instanceof Table) {
-					Table t1 = (Table) ta;
-					for (Row r : t1.getRows()) {
-						if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-								.equals(employee.toLowerCase())) {
-							lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
-							if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-								lc.getDescription().setText(
-										r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
-							}
-							lc.setData(Constants.CONTROL_KEYLONG,
-									r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
+	public void clearFields(@UIEventTopic("clearFields") Map<MPerspective, String> map) {
+		if (map.get(perspective) != null) {
+			String origin = map.get(perspective);
+			for (Control c : controls.values()) {
+				if (c instanceof Text) {
+					Text t = (Text) c;
+					if (origin.equals(Constants.DELETE_REQUEST)) {
+						t.setText("");
+					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE)
+							.getData(Constants.CONTROL_FIELD)) {
+						SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+						Date date = new Date(System.currentTimeMillis());
+						t.setText(formatter.format(date));
+					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
+							.getData(Constants.CONTROL_FIELD)) {
+						Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+						if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
+							lastEndDate = endDate.getText();
 						}
+						t.setText(lastEndDate);
+					} else {
+						Field f = (Field) c.getData(Constants.CONTROL_FIELD);
+						t.setText("");
+
 					}
-					// changeOptionsForLookupField(t1, lc, true);
 				}
 
-			}));
+				if (c instanceof LookupControl) {
+					LookupControl lc = (LookupControl) c;
+					lc.setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getDescription().setText("");
+				}
+				setKeys(null);
+			}
+			/*
+			 * Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den
+			 * preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS versendet
+			 * um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung
+			 * haben
+			 */
+			if (!origin.equals(Constants.DELETE_REQUEST)) {
+				LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
+				lc.setText(employee);
+				CompletableFuture<?> tableFuture;
+				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null,
+						(Field) lc.getData(Constants.CONTROL_FIELD), controls, dataService, sync, "List");
+
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					if (ta instanceof Table) {
+						Table t1 = (Table) ta;
+						for (Row r : t1.getRows()) {
+							if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+									.equals(employee.toLowerCase())) {
+								lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+								if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+									lc.getDescription().setText(r
+											.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+								}
+								lc.setData(Constants.CONTROL_KEYLONG,
+										r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
+							}
+						}
+						// changeOptionsForLookupField(t1, lc, true);
+					}
+
+				}));
+			}
 		}
 	}
 

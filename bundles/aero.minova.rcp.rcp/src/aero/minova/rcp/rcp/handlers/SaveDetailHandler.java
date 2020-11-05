@@ -3,7 +3,9 @@ package aero.minova.rcp.rcp.handlers;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 
 public class SaveDetailHandler {
 
@@ -19,8 +21,11 @@ public class SaveDetailHandler {
 	// eine Abfrage an den CAS zusammen. Anhand eines gegebenen oder nicht gegebenen
 	// KeyLongs wird zwischen update und neuem Eintrag unterschieden
 	@Execute
-	public void execute() {
-		broker.post("SaveEntry", null);
+	public void execute(@Optional MPerspective perspective) {
+		if (perspective == null) {
+			return;
+		}
+		broker.post("SaveEntry", perspective);
 
 	}
 }

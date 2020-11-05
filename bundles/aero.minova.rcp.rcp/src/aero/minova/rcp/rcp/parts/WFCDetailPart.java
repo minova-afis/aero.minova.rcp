@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -19,6 +20,9 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -33,6 +37,8 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
@@ -41,28 +47,30 @@ import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
+import aero.minova.rcp.rcp.util.WFCDetailsLookupUtil;
+import aero.minova.rcp.rcp.widgets.LookupControl;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
 	private static final int COLUMN_WIDTH = 140;
-	private static final int TEXT_WIDTH = COLUMN_WIDTH;
-	private static final int NUMBER_WIDTH = 104;
-	private static final int SHORT_DATE_WIDTH = 88;
-	private static final int SHORT_TIME_WIDTH = 52;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5;
 	private static final int MARGIN_SECTION = 8;
 	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION; // 4 Spalten = 5
 																										// Zwischenräume
 	private static final int COLUMN_HEIGHT = 28;
-	private static final int MARGIN_BORDER = 2;
 
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	protected UISynchronize sync;
 
 	private FormToolkit formToolkit;
 
@@ -92,11 +100,13 @@ public class WFCDetailPart extends WFCFormPart {
 		// erzeuge die util Methoden mit DI
 		IEclipseContext localContext = EclipseContextFactory.create();
 		localContext.set(Form.class, form);
-		localContext.set(Map.class, controls);
 
 		localContext.setParent(partContext);
+
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
+		wfcDetailUtil.bindValues(controls, perspective);
+		casRequestsUtil.setControls(controls, perspective);
 	}
 
 	private void layoutForm(Composite parent) {
@@ -230,7 +240,7 @@ public class WFCDetailPart extends WFCFormPart {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
 			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
-					controls);
+					controls, perspective);
 
 		} else if (field.getText() != null) {
 			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
@@ -275,5 +285,39 @@ public class WFCDetailPart extends WFCFormPart {
 	private int getWidth(Field field) {
 		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
+	}
+
+	/**
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von
+	 * Ergebnissen Erstellt, diese wird dem benutzer zur verfügung gestellt.
+	 *
+	 * @param luc
+	 */
+	@Inject
+	@Optional
+	public void requestLookUpEntriesAll(@UIEventTopic("WFCLoadAllLookUpValues") Map<MPerspective, String> map) {
+		if (map.get(perspective) != null) {
+			String name = map.get(perspective);
+			Control control = controls.get(name);
+			if (control instanceof LookupControl) {
+				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
+				CompletableFuture<?> tableFuture;
+				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
+						"List");
+
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
+					if (ta instanceof SqlProcedureResult) {
+						SqlProcedureResult sql = (SqlProcedureResult) ta;
+						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, true);
+					} else if (ta instanceof Table) {
+						Table t1 = (Table) ta;
+						lookupUtil.changeOptionsForLookupField(t1, control, true);
+					}
+
+				}));
+			}
+
+		}
 	}
 }

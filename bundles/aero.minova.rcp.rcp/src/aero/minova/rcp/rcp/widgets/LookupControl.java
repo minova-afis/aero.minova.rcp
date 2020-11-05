@@ -48,6 +48,11 @@ public class LookupControl extends Composite {
 			super.openProposalPopup();
 		}
 
+		@Override
+		public void closeProposalPopup() {
+			super.closeProposalPopup();
+		}
+
 	}
 
 	protected Text textControl;
@@ -100,25 +105,7 @@ public class LookupControl extends Composite {
 			@Override
 			public void insertControlContents(Control control, String text, int cursorPosition) {
 				Point selection = ((Text) control).getSelection();
-				LookupControl lc = (LookupControl) control.getParent();
-				String proposalString = text;
-				Table options = (Table) lc.getData(Constants.CONTROL_OPTIONS);
-				Pattern p = Pattern.compile(" \\(.*\\)");
-				proposalString = p.matcher(proposalString).replaceAll("");
-				lc.setText(proposalString);
-				for (Row r : options.getRows()) {
-					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-							.equalsIgnoreCase(proposalString)) {
-						lc.setData(Constants.CONTROL_KEYLONG,
-								r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
-						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-							lc.getDescription().setText(
-									r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
-						} else {
-							lc.getDescription().setText("");
-						}
-					}
-				}
+				selectOption(control, text);
 				if (cursorPosition < text.length()) {
 					((Text) control).setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
 				}
@@ -127,6 +114,28 @@ public class LookupControl extends Composite {
 		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, tca, simpleContentProposalProvider,
 				null, null);
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
+	}
+
+	public void selectOption(Control control, String text) {
+		LookupControl lc = (LookupControl) control.getParent();
+		String proposalString = text;
+		Table options = (Table) lc.getData(Constants.CONTROL_OPTIONS);
+		Pattern p = Pattern.compile(" \\(.*\\)");
+		proposalString = p.matcher(proposalString).replaceAll("");
+		lc.setText(proposalString);
+		for (Row r : options.getRows()) {
+			if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+					.equalsIgnoreCase(proposalString)) {
+				lc.setData(Constants.CONTROL_KEYLONG,
+						r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+				if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+					lc.getDescription()
+							.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+				} else {
+					lc.getDescription().setText("");
+				}
+			}
+		}
 	}
 
 	public void setProposals(Table table) {
@@ -144,6 +153,13 @@ public class LookupControl extends Composite {
 		simpleContentProposalProvider.setProposals(helper.toArray(new String[0]));
 		contentProposalAdapter.openProposalPopup();
 		contentProposalAdapter.refresh();
+	}
+
+	public void closeProposalPopup() {
+		// TODO:diese funktion muss, neben dem schließen des Popups, auch den
+		// ausgewählten Eintrag identifizieren und an die selectOption()-Methode
+		// weitergeben
+		contentProposalAdapter.closeProposalPopup();
 	}
 
 	public void addTwistieMouseListener(MouseListener ml) {

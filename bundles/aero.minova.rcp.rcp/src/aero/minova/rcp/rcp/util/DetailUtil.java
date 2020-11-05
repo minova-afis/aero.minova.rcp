@@ -121,12 +121,22 @@ public class DetailUtil {
 		// Indexes in der Detailview aufzulisten
 		if (field.getNumber() != null) {
 			text.setData(Constants.CONTROL_DECIMALS, field.getNumber().getDecimals());
+			if (field.isReadOnly() == true) {
+				text.setEditable(false);
+			}
 		}
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 
 			Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
 			Field f = (Field) text.getData(Constants.CONTROL_FIELD);
-			text.setText(ValueBuilder.value(value, f).getText());
+			String rowText = ValueBuilder.value(value, f).getText();
+			if (ValueBuilder.value(value, f).getDataType() == DataType.DOUBLE) {
+				String format = "%1." + f.getNumber().getDecimals() + "f";
+				Double doublevalue = Double.valueOf(rowText);
+				rowText = String.format(format, doublevalue);
+				rowText = rowText.replace(',', '.');
+			}
+			text.setText(rowText);
 			text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
 		});
 		controls.put(field.getName(), text);

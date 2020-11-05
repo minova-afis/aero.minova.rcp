@@ -64,7 +64,17 @@ public class TextfieldVerifier implements FocusListener {
 		final String newString = ((Text) e.getSource()).getText();
 		if (newString != "") {
 			Text t = (Text) e.getSource();
-			if (t.getData(Constants.FOCUSED_ORIGIN) instanceof WFCDetailUtil) {
+			Field f = (Field) t.getData(Constants.CONTROL_FIELD);
+			if (f.getNumber() != null) {
+				if (t.getText() != null && !t.getText().equals("")) {
+					int decimals = f.getNumber().getDecimals();
+					String formatedString = t.getText();
+					String format = "%1." + decimals + "f";
+					formatedString = String.format(format, Double.valueOf(formatedString));
+					formatedString = formatedString.replace(',', '.');
+					t.setText(formatedString);
+				}
+			} else if (t.getData(Constants.FOCUSED_ORIGIN) instanceof WFCDetailUtil) {
 				WFCDetailUtil xml = (WFCDetailUtil) t.getData(Constants.FOCUSED_ORIGIN);
 				Field field = (Field) t.getData("field");
 				if (field.getShortDate() != null || field.getLongDate() != null) {

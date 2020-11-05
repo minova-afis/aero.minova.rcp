@@ -1,11 +1,13 @@
 package aero.minova.rcp.rcp.util;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -34,7 +36,7 @@ public class WFCDetailLookupFieldUtil {
 	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control createLookupField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls) {
+			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
@@ -82,7 +84,9 @@ public class WFCDetailLookupFieldUtil {
 			 * LookUpFelder eingetragen wurden
 			 */
 			public void mouseDown(MouseEvent e) {
-				broker.post("LoadAllLookUpValues", field.getName());
+				Map<MPerspective, String> brokerObject = new HashMap<>();
+				brokerObject.put(perspective, field.getName());
+				broker.post("WFCLoadAllLookUpValues", brokerObject);
 			}
 
 			@Override

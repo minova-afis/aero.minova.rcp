@@ -1,13 +1,17 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.layout.GridLayout;
@@ -31,9 +35,6 @@ public class WFCIndexPart extends WFCFormPart {
 	private IMinovaJsonService mjs;
 
 	@Inject
-	private IEventBroker broker;
-
-	@Inject
 	private ESelectionService selectionService;
 
 	private Table data;
@@ -45,7 +46,7 @@ public class WFCIndexPart extends WFCFormPart {
 	private NatTable natTable;
 
 	@PostConstruct
-	public void createComposite(Composite parent) {
+	public void createComposite(Composite parent, MPart part, EModelService modelService) {
 
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
@@ -54,6 +55,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+
 		String tableName = form.getIndexView().getSource();
 
 		String string = prefs.get(tableName, null);
@@ -64,7 +66,8 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		parent.setLayout(new GridLayout());
-		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService);
+		MPerspective perspectiveFor = modelService.getPerspectiveFor(part);
+		natTable = NatTableUtil.createNatTable(parent, form, data, true, selectionService, perspectiveFor.getContext());
 	}
 
 	@PersistTableSelection
@@ -78,13 +81,17 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic("PLAPLA") Table table) {
-		data.getRows().clear();
-		for (Row r : table.getRows()) {
-			data.addRow(r);
+	public void load(@UIEventTopic("PLAPLA") Map<MPerspective, Table> map) {
+		if (map.get(perspective) != null) {
+			Table table = map.get(perspective);
+
+			data.getRows().clear();
+			for (Row r : table.getRows()) {
+				data.addRow(r);
+			}
+			natTable.refresh(false);
+			natTable.requestLayout();
 		}
-		natTable.refresh(false);
-		natTable.requestLayout();
 	}
 
 	public NatTable getNatTable() {

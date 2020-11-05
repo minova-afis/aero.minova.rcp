@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -26,9 +27,12 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.widgets.Composite;
@@ -42,7 +46,7 @@ import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 public class NatTableUtil {
 
 	public static NatTable createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer,
-			ESelectionService selectionService) {
+			ESelectionService selectionService, IEclipseContext context) {
 
 		Map<String, String> tableHeadersMap = new HashMap<>();
 		List<Column> columns = form.getIndexView().getColumn();
@@ -76,6 +80,15 @@ public class NatTableUtil {
 		} else {
 			viewportLayer = new ViewportLayer(columnReorderLayer);
 		}
+
+		selectionLayer.addLayerListener(new ILayerListener() {
+
+			@Override
+			public void handleLayerEvent(ILayerEvent event) {
+				Object c = SelectionUtils.getSelectedRowObjects(selectionLayer, bodyDataProvider, false);
+				context.set("ActiveRows", c);
+			}
+		});
 
 		// build the column header layer stack
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
