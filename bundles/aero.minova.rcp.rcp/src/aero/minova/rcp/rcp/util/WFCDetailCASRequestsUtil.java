@@ -151,6 +151,19 @@ public class WFCDetailCASRequestsUtil {
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
 
+		for (Control c : controls.values()) {
+			if (c instanceof Text) {
+				Text t = (Text) c;
+				t.setText("");
+
+			} else if (c instanceof LookupControl) {
+				LookupControl lc = (LookupControl) c;
+				lc.setText("");
+				lc.getDescription().setText("");
+				lc.getTextControl().setMessage("...");
+			}
+		}
+
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = table.getColumnName(i);
 			Control c = controls.get(name);
