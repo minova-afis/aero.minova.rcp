@@ -146,7 +146,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered())
 						addPerspectiveShortcut(perspective);
-
+					if (perspective == modelService.getActivePerspective(window)) {
+						setSelectedElement(perspective);
+					}
 				}
 		}
 		translate(translationService);
