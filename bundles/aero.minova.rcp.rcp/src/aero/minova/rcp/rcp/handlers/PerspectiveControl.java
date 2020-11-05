@@ -380,7 +380,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	private void addCloseMenuItem(Menu menu, String perspectiveId) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.Activate);
-		menuItem.setText(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE$_NAME);
+		menuItem.setText(translationService.translate("@Close", null));
 
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
