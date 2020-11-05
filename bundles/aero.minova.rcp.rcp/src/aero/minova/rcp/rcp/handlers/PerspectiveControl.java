@@ -141,7 +141,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 		// The perspectives currently open
 		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
-		if (appPerspectiveStacks.size() > 0) {
+		if (appPerspectiveStacks.isEmpty()) {
 			for (MPerspectiveStack stack : appPerspectiveStacks)
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered())
@@ -156,7 +156,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Inject
 	@Optional
-	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
 		translate(translationService);
 	}
 
