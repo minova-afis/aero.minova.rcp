@@ -197,28 +197,28 @@ public class WorkspaceDialog extends Dialog{
 
 		lblApplicationArea.setText("Application Area");
 
-		applicationArea = new Text(container, SWT.BORDER);
+		applicationArea = new Text(container, SWT.BORDER | SWT.READ_ONLY);
 		GridData gd = new GridData(GridData.FILL);
 		gd.widthHint = 365;
 		gd.verticalSpan = 1;
-		gd.horizontalSpan = 4;
+		gd.horizontalSpan = 5;
 		gd.grabExcessVerticalSpace = false;
 		gd.horizontalAlignment = SWT.FILL;
 		applicationArea.setLayoutData(gd);
 
-		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
-		GridData gd_btnNewButton = new GridData(GridData.VERTICAL_ALIGN_END);
-		gd_btnNewButton.verticalAlignment = SWT.FILL;
-		btnNewButton.setLayoutData(gd_btnNewButton);
-		btnNewButton.setText("List Applications");
+//		Button btnNewButton = new Button(container, SWT.ARROW | SWT.DOWN);
+//		GridData gd_btnNewButton = new GridData(GridData.VERTICAL_ALIGN_END);
+//		gd_btnNewButton.verticalAlignment = SWT.FILL;
+//		btnNewButton.setLayoutData(gd_btnNewButton);
+//		btnNewButton.setText("List Applications");
 		
-		btnNewButton.addSelectionListener(new SelectionAdapter() {@Override
-		public void widgetSelected(SelectionEvent e) {
-			DirectoryDialog dialog = new DirectoryDialog(parent.getShell());
-			dialog.setText("Select Directory");
-			String text = dialog.open();
-			applicationArea.setText(text);
-		}});
+//		btnNewButton.addSelectionListener(new SelectionAdapter() {@Override
+//		public void widgetSelected(SelectionEvent e) {
+//			DirectoryDialog dialog = new DirectoryDialog(parent.getShell());
+//			dialog.setText("Select Directory");
+//			String text = dialog.open();
+//			applicationArea.setText(text);
+//		}});
 
 		Label lblMessage = new Label(container, SWT.NONE);
 		labelGridData.applyTo(lblMessage);
@@ -426,7 +426,12 @@ public class WorkspaceDialog extends Dialog{
 //		wd.setProfile(workspaceHandler.getProfile());
 //		wd.setUsername(username.getText());
 //		wd.setPassword(password.getText());
-//		workspaceHandler.open();
+		try {
+			workspaceHandler.open();
+		} catch (WorkspaceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		super.okPressed();
 	}
 

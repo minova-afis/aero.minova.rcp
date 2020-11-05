@@ -15,7 +15,7 @@ import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
-
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.FileWorkspace;
@@ -30,15 +30,16 @@ public class LifeCycle {
 
 	@Inject
 	UISynchronize sync;
+	
+	@Inject
+	IDataService dataService;
 
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
 		WorkspaceDialog workspaceDialog;
 		WorkspaceHandler workspaceHandler;
 		int returnCode;
-		Manager manager = new Manager();
-		manager.postContextCreate(workbenchContext);
-
+		
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
@@ -48,9 +49,10 @@ public class LifeCycle {
 										// ausgesucht
 		}
 		
-		workbenchContext.set("username", workspaceDialog.getUsername());
-		workbenchContext.set("password", workspaceDialog.getPassword());
-		workbenchContext.set("connection", workspaceDialog.getConnection());
+		dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(), workspaceDialog.getConnection());
+		
+		Manager manager = new Manager();
+		manager.postContextCreate(workbenchContext);
 
 //		workspaceDialog.getWorkspaceData();
 

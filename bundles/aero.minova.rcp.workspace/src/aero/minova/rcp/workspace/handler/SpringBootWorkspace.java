@@ -1,10 +1,14 @@
 package aero.minova.rcp.workspace.handler;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -15,7 +19,7 @@ import aero.minova.rcp.workspace.WorkspaceException;
 public class SpringBootWorkspace extends WorkspaceHandler {
 
 	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
-		super(logger);	
+		super(logger);
 		workspaceData.setConnection(connection);
 		workspaceData.setProfile(profile);
 	}
@@ -65,7 +69,52 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	@Override
 	public void open() throws WorkspaceException {
-		// TODO Auto-generated method stub
+		if (!Platform.getInstanceLocation().isSet()) {
+			String defaultPath = System.getProperty("user.home");
+
+			// build the desired path for the workspace
+			String path = defaultPath + "/.minwfc/" + workspaceData.getWorkspaceHashHex() + "/";
+			URL instanceLocationUrl = null;
+			try {
+				instanceLocationUrl = new URL("file", null, path);
+				Platform.getInstanceLocation().set(instanceLocationUrl, false);
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			URL workspaceURL = Platform.getInstanceLocation().getURL();
+			File workspaceDir = new File(workspaceURL.getPath());
+			if (!workspaceDir.exists()) {
+				workspaceDir.mkdir();
+				logger.info(MessageFormat.format("Workspace {0} neu angelegt.", workspaceDir));
+			}
+			checkDir(workspaceDir, "config");
+			checkDir(workspaceDir, "data");
+			checkDir(workspaceDir, "i18n");
+			checkDir(workspaceDir, "plugins");
+
+			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
+				try {
+					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
+						store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
+						store.put(WorkspaceAccessPreferences.APPLICATION_AREA, instanceLocationUrl.toString(), false);
+						store.flush();
+						break;
+					}
+				} catch (StorageException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+//		} else {
+//			System.exit(0);
+		}
 
 	}
 

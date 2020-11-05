@@ -54,7 +54,7 @@ public class WorkspaceAccessPreferences {
 			final ISecurePreferences workspacePrefs = workspaces.node(workspaceName);
 			workspacePrefs.put(USER, userName, false);
 			workspacePrefs.put(URL, url, false);
-			workspacePrefs.put(PASSWORD, password, true);
+			workspacePrefs.put(PASSWORD, password, false);
 			workspacePrefs.putBoolean(IS_PRIMARY_WORKSPACE, isPrimaryWorksace, false);
 			workspacePrefs.put(PROFILE, profile, false);
 			workspacePrefs.put(APPLICATION_AREA, applicationArea, false);
