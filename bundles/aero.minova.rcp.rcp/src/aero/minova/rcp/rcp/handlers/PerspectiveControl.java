@@ -141,7 +141,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 		// The perspectives currently open
 		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
-		if (appPerspectiveStacks.isEmpty()) {
+		if (appPerspectiveStacks.size() >= 0) {
 			for (MPerspectiveStack stack : appPerspectiveStacks)
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered())
@@ -175,6 +175,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			String value = translationService.translate(perspective.getLocalizedLabel(), null);
 			item.setText(value);
 		}
+		toolBar.pack(true);
 	}
 
 	ImageDescriptor getIconFor(String iconURI) {
