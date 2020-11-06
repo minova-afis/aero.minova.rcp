@@ -22,7 +22,7 @@ import aero.minova.rcp.workspace.WorkspaceException;
  * <li>configuration data (e.g. forms, reports, menu definition, xbs file)</li>
  * <li>data functions</li>
  * </ul>
- * 
+ *
  * @author Wilfried Saak
  */
 @SuppressWarnings("restriction")
@@ -38,11 +38,11 @@ public abstract class WorkspaceHandler {
 	 * <li>http:</li>
 	 * <li>https: returns a new {@link aero.minova.rcp.workspace.handler.SpringBootWorkspace}</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param profile
 	 * @param connection
 	 * @return
-	 * @throws MalformedURLException 
+	 * @throws MalformedURLException
 	 */
 	public static WorkspaceHandler newInstance(String profile, String connection, Logger logger) throws WorkspaceException {
 		if (connection == null || connection.length() == 0) {
@@ -59,6 +59,9 @@ public abstract class WorkspaceHandler {
 			}
 		}
 		URL url;
+		if (connection.isEmpty()) {
+			return null;
+		}
 		try {
 			url = new URL(connection);
 		} catch (MalformedURLException e) {
@@ -96,7 +99,7 @@ public abstract class WorkspaceHandler {
 
 	/**
 	 * prüft, ob ein Verzeichnis existiert und erstellt es ggf.
-	 * 
+	 *
 	 * @param workspaceDir
 	 */
 	protected void checkDir(File workspaceDir, String name) {
@@ -109,7 +112,7 @@ public abstract class WorkspaceHandler {
 
 	/**
 	 * This method verifies, if the connection is accessible.
-	 * 
+	 *
 	 * @param connection
 	 *            The connection URL. For instance there will be a possibility to connect to a web service (http / https) or to a directory (file://).
 	 * @param username
@@ -152,7 +155,7 @@ public abstract class WorkspaceHandler {
 
 	/**
 	 * Activate this workspace, if no workspace is set
-	 * 
+	 *
 	 * @exception WorkspaceException
 	 *                if the Platform has alreadry a workspace
 	 */
