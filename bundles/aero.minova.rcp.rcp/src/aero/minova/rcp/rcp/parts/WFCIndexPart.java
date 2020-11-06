@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -34,9 +33,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
 	private IMinovaJsonService mjs;
-
-	@Inject
-	private IEventBroker broker;
 
 	@Inject
 	private ESelectionService selectionService;

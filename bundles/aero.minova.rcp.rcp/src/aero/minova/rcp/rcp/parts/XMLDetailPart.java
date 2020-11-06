@@ -167,6 +167,7 @@ public class XMLDetailPart {
 							e.doit = tfv.verifyDouble(newString);
 						}
 					});
+					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
@@ -364,8 +365,9 @@ public class XMLDetailPart {
 							&& (filteredTable.getRows().get(0)
 									.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
 									.toLowerCase().equals(lc.getText().toLowerCase()))
-							|| (filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+							|| (filteredTable.getRows().size() != 0
+									&& filteredTable.getRows().get(0)
+											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
 									&& filteredTable.getRows().get(0)
 											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
 											.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
@@ -494,6 +496,19 @@ public class XMLDetailPart {
 	 */
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
+
+		for (Control c : controls.values()) {
+			if (c instanceof Text) {
+				Text t = (Text) c;
+				t.setText("");
+
+			} else if (c instanceof LookupControl) {
+				LookupControl lc = (LookupControl) c;
+				lc.setText("");
+				lc.getDescription().setText("");
+				lc.getTextControl().setMessage("...");
+			}
+		}
 
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = table.getColumnName(i);
@@ -669,11 +684,11 @@ public class XMLDetailPart {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 			if (Objects.isNull(getKeys())) {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkNewEntryInsert(tr.getReturnCode());
+					checkNewEntryInsert(tr);
 				}));
 			} else {
 				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-					checkEntryUpdate(tr.getReturnCode());
+					checkEntryUpdate(tr);
 				}));
 			}
 		} else {
@@ -688,8 +703,8 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	private void checkEntryUpdate(int responce) {
-		if (responce != 1) {
+	private void checkEntryUpdate(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be updated");
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
@@ -704,8 +719,8 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	private void checkNewEntryInsert(int responce) {
-		if (responce != 1) {
+	private void checkNewEntryInsert(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be added");
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
@@ -745,7 +760,7 @@ public class XMLDetailPart {
 				if (t.getRows() != null) {
 					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-						deleteEntry(ta.getReturnCode());
+						deleteEntry(ta);
 					}));
 				}
 			}
@@ -758,8 +773,8 @@ public class XMLDetailPart {
 	 *
 	 * @param responce
 	 */
-	public void deleteEntry(int responce) {
-		if (responce != 1) {
+	public void deleteEntry(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be deleted");
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");

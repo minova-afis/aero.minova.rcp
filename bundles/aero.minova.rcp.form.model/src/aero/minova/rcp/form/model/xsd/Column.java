@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;/choice&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="key" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="aggregate"&gt;
@@ -105,7 +105,7 @@ public class Column {
     @XmlSchemaType(name = "NCName")
     protected String name;
     @XmlAttribute(name = "text")
-    protected String textAttribute;
+    protected String label;
     @XmlAttribute(name = "offline")
     protected java.lang.Boolean offline;
     @XmlAttribute(name = "key")
@@ -441,27 +441,27 @@ public class Column {
     }
 
     /**
-     * Ruft den Wert der textAttribute-Eigenschaft ab.
+     * Ruft den Wert der label-Eigenschaft ab.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getTextAttribute() {
-        return textAttribute;
+    public String getLabel() {
+        return label;
     }
 
     /**
-     * Legt den Wert der textAttribute-Eigenschaft fest.
+     * Legt den Wert der label-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setTextAttribute(String value) {
-        this.textAttribute = value;
+    public void setLabel(String value) {
+        this.label = value;
     }
 
     /**
@@ -472,12 +472,8 @@ public class Column {
      *     {@link java.lang.Boolean }
      *     
      */
-    public boolean isOffline() {
-        if (offline == null) {
-            return false;
-        } else {
-            return offline;
-        }
+    public java.lang.Boolean isOffline() {
+        return offline;
     }
 
     /**

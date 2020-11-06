@@ -5,7 +5,12 @@ Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
 Bundle-Version: 1.2.0.qualifier
 Export-Package: aero.minova.rcp.rcp.util,
  aero.minova.rcp.rcp.widgets
-Require-Bundle: javax.inject;bundle-version="0.0.0",
+Require-Bundle: 
+ aero.minova.rcp.form.model,
+ aero.minova.rcp.form.menu,
+ aero.minova.rcp.preferencewindow,
+ aero.minova.rcp.model,
+ javax.inject;bundle-version="0.0.0",
  org.eclipse.core.runtime;bundle-version="0.0.0",
  org.eclipse.swt;bundle-version="0.0.0",
  org.eclipse.e4.ui.model.workbench;bundle-version="0.0.0",
@@ -28,8 +33,6 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.core.services,
  org.eclipse.e4.ui.workbench.renderers.swt,
  org.eclipse.ui.workbench;bundle-version="3.119.0",
- aero.minova.rcp.form.model,
- aero.minova.rcp.form.menu,
  javax.xml.bind;bundle-version="2.2.0",
  aero.minova.rcp.dataservice;bundle-version="1.2.0",
  org.eclipse.ui.forms;bundle-version="3.9.100",
@@ -40,9 +43,7 @@ Require-Bundle: javax.inject;bundle-version="0.0.0",
  org.eclipse.e4.core.commands,
  org.eclipse.core.commands,
  org.eclipse.e4.ui.workbench.perspectiveswitcher,
- aero.minova.rcp.model;bundle-version="1.2.0",
  org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0",
- aero.minova.rcp.preferencewindow;bundle-version="1.0.0",
  org.eclipse.nebula.widgets.opal.preferencewindow,
  org.eclipse.jface.notifications
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

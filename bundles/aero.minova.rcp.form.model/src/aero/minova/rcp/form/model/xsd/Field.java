@@ -4,6 +4,7 @@ package aero.minova.rcp.form.model.xsd;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -14,11 +15,13 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-
 /**
- * <p>Java-Klasse für field complex type.
+ * <p>
+ * Java-Klasse für field complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>
+ * Das folgende Schemafragment gibt den erwarteten Content an, der in dieser
+ * Klasse enthalten ist.
  * 
  * <pre>
  * &lt;complexType name="field"&gt;
@@ -63,7 +66,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="label" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="tab-index" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *       &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
@@ -131,26 +134,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "field", propOrder = {
-    "number",
-    "bignumber",
-    "lookup",
-    "percentage",
-    "text",
-    "shortDate",
-    "longDate",
-    "shortTime",
-    "longTime",
-    "dateTime",
-    "weekDay",
-    "editor",
-    "money",
-    "paramString",
-    "_void",
-    "_boolean",
-    "color",
-    "msg"
-})
+@XmlType(name = "field", propOrder = { "number", "bignumber", "lookup", "percentage", "text", "shortDate", "longDate",
+		"shortTime", "longTime", "dateTime", "weekDay", "editor", "money", "paramString", "_void", "_boolean", "color",
+		"msg" })
 public class Field {
 
     protected Number number;
@@ -181,7 +167,7 @@ public class Field {
     protected Color color;
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
-    protected String textAttribute;
+    protected String label;
     @XmlAttribute(name = "tab-index")
     protected BigInteger tabIndex;
     @XmlAttribute(name = "name", required = true)
@@ -218,413 +204,346 @@ public class Field {
     @XmlAttribute(name = "read-only")
     protected java.lang.Boolean readOnly;
 
-    /**
-     * Ruft den Wert der number-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Number }
-     *     
-     */
-    public Number getNumber() {
-        return number;
-    }
+	/**
+	 * Ruft den Wert der number-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Number }
+	 * 
+	 */
+	public Number getNumber() {
+		return number;
+	}
 
-    /**
-     * Legt den Wert der number-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Number }
-     *     
-     */
-    public void setNumber(Number value) {
-        this.number = value;
-    }
+	/**
+	 * Legt den Wert der number-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Number }
+	 * 
+	 */
+	public void setNumber(Number value) {
+		this.number = value;
+	}
 
-    /**
-     * Ruft den Wert der bignumber-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Bignumber }
-     *     
-     */
-    public Bignumber getBignumber() {
-        return bignumber;
-    }
+	/**
+	 * Ruft den Wert der bignumber-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Bignumber }
+	 * 
+	 */
+	public Bignumber getBignumber() {
+		return bignumber;
+	}
 
-    /**
-     * Legt den Wert der bignumber-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Bignumber }
-     *     
-     */
-    public void setBignumber(Bignumber value) {
-        this.bignumber = value;
-    }
+	/**
+	 * Legt den Wert der bignumber-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Bignumber }
+	 * 
+	 */
+	public void setBignumber(Bignumber value) {
+		this.bignumber = value;
+	}
 
-    /**
-     * Ruft den Wert der lookup-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Lookup }
-     *     
-     */
-    public Lookup getLookup() {
-        return lookup;
-    }
+	/**
+	 * Ruft den Wert der lookup-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Lookup }
+	 * 
+	 */
+	public Lookup getLookup() {
+		return lookup;
+	}
 
-    /**
-     * Legt den Wert der lookup-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Lookup }
-     *     
-     */
-    public void setLookup(Lookup value) {
-        this.lookup = value;
-    }
+	/**
+	 * Legt den Wert der lookup-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Lookup }
+	 * 
+	 */
+	public void setLookup(Lookup value) {
+		this.lookup = value;
+	}
 
-    /**
-     * Ruft den Wert der percentage-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Percentage }
-     *     
-     */
-    public Percentage getPercentage() {
-        return percentage;
-    }
+	/**
+	 * Ruft den Wert der percentage-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Percentage }
+	 * 
+	 */
+	public Percentage getPercentage() {
+		return percentage;
+	}
 
-    /**
-     * Legt den Wert der percentage-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Percentage }
-     *     
-     */
-    public void setPercentage(Percentage value) {
-        this.percentage = value;
-    }
+	/**
+	 * Legt den Wert der percentage-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Percentage }
+	 * 
+	 */
+	public void setPercentage(Percentage value) {
+		this.percentage = value;
+	}
 
-    /**
-     * Ruft den Wert der text-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Text }
-     *     
-     */
-    public Text getText() {
-        return text;
-    }
+	/**
+	 * Ruft den Wert der text-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Text }
+	 * 
+	 */
+	public Text getText() {
+		return text;
+	}
 
-    /**
-     * Legt den Wert der text-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Text }
-     *     
-     */
-    public void setText(Text value) {
-        this.text = value;
-    }
+	/**
+	 * Legt den Wert der text-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Text }
+	 * 
+	 */
+	public void setText(Text value) {
+		this.text = value;
+	}
 
-    /**
-     * Ruft den Wert der shortDate-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getShortDate() {
-        return shortDate;
-    }
+	/**
+	 * Ruft den Wert der shortDate-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getShortDate() {
+		return shortDate;
+	}
 
-    /**
-     * Legt den Wert der shortDate-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setShortDate(Object value) {
-        this.shortDate = value;
-    }
+	/**
+	 * Legt den Wert der shortDate-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setShortDate(Object value) {
+		this.shortDate = value;
+	}
 
-    /**
-     * Ruft den Wert der longDate-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getLongDate() {
-        return longDate;
-    }
+	/**
+	 * Ruft den Wert der longDate-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getLongDate() {
+		return longDate;
+	}
 
-    /**
-     * Legt den Wert der longDate-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setLongDate(Object value) {
-        this.longDate = value;
-    }
+	/**
+	 * Legt den Wert der longDate-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setLongDate(Object value) {
+		this.longDate = value;
+	}
 
-    /**
-     * Ruft den Wert der shortTime-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getShortTime() {
-        return shortTime;
-    }
+	/**
+	 * Ruft den Wert der shortTime-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getShortTime() {
+		return shortTime;
+	}
 
-    /**
-     * Legt den Wert der shortTime-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setShortTime(Object value) {
-        this.shortTime = value;
-    }
+	/**
+	 * Legt den Wert der shortTime-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setShortTime(Object value) {
+		this.shortTime = value;
+	}
 
-    /**
-     * Ruft den Wert der longTime-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getLongTime() {
-        return longTime;
-    }
+	/**
+	 * Ruft den Wert der longTime-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getLongTime() {
+		return longTime;
+	}
 
-    /**
-     * Legt den Wert der longTime-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setLongTime(Object value) {
-        this.longTime = value;
-    }
+	/**
+	 * Legt den Wert der longTime-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setLongTime(Object value) {
+		this.longTime = value;
+	}
 
-    /**
-     * Ruft den Wert der dateTime-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getDateTime() {
-        return dateTime;
-    }
+	/**
+	 * Ruft den Wert der dateTime-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getDateTime() {
+		return dateTime;
+	}
 
-    /**
-     * Legt den Wert der dateTime-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setDateTime(Object value) {
-        this.dateTime = value;
-    }
+	/**
+	 * Legt den Wert der dateTime-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setDateTime(Object value) {
+		this.dateTime = value;
+	}
 
-    /**
-     * Ruft den Wert der weekDay-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getWeekDay() {
-        return weekDay;
-    }
+	/**
+	 * Ruft den Wert der weekDay-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getWeekDay() {
+		return weekDay;
+	}
 
-    /**
-     * Legt den Wert der weekDay-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setWeekDay(Object value) {
-        this.weekDay = value;
-    }
+	/**
+	 * Legt den Wert der weekDay-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setWeekDay(Object value) {
+		this.weekDay = value;
+	}
 
-    /**
-     * Ruft den Wert der editor-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Editor }
-     *     
-     */
-    public Editor getEditor() {
-        return editor;
-    }
+	/**
+	 * Ruft den Wert der editor-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Editor }
+	 * 
+	 */
+	public Editor getEditor() {
+		return editor;
+	}
 
-    /**
-     * Legt den Wert der editor-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Editor }
-     *     
-     */
-    public void setEditor(Editor value) {
-        this.editor = value;
-    }
+	/**
+	 * Legt den Wert der editor-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Editor }
+	 * 
+	 */
+	public void setEditor(Editor value) {
+		this.editor = value;
+	}
 
-    /**
-     * Ruft den Wert der money-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Money }
-     *     
-     */
-    public Money getMoney() {
-        return money;
-    }
+	/**
+	 * Ruft den Wert der money-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Money }
+	 * 
+	 */
+	public Money getMoney() {
+		return money;
+	}
 
-    /**
-     * Legt den Wert der money-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Money }
-     *     
-     */
-    public void setMoney(Money value) {
-        this.money = value;
-    }
+	/**
+	 * Legt den Wert der money-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Money }
+	 * 
+	 */
+	public void setMoney(Money value) {
+		this.money = value;
+	}
 
-    /**
-     * Ruft den Wert der paramString-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ParamString }
-     *     
-     */
-    public ParamString getParamString() {
-        return paramString;
-    }
+	/**
+	 * Ruft den Wert der paramString-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link ParamString }
+	 * 
+	 */
+	public ParamString getParamString() {
+		return paramString;
+	}
 
-    /**
-     * Legt den Wert der paramString-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ParamString }
-     *     
-     */
-    public void setParamString(ParamString value) {
-        this.paramString = value;
-    }
+	/**
+	 * Legt den Wert der paramString-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link ParamString }
+	 * 
+	 */
+	public void setParamString(ParamString value) {
+		this.paramString = value;
+	}
 
-    /**
-     * Ruft den Wert der void-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getVoid() {
-        return _void;
-    }
+	/**
+	 * Ruft den Wert der void-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Object }
+	 * 
+	 */
+	public Object getVoid() {
+		return _void;
+	}
 
-    /**
-     * Legt den Wert der void-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setVoid(Object value) {
-        this._void = value;
-    }
+	/**
+	 * Legt den Wert der void-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Object }
+	 * 
+	 */
+	public void setVoid(Object value) {
+		this._void = value;
+	}
 
-    /**
-     * Ruft den Wert der boolean-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link aero.minova.rcp.form.model.xsd.Boolean }
-     *     
-     */
-    public aero.minova.rcp.form.model.xsd.Boolean getBoolean() {
-        return _boolean;
-    }
+	/**
+	 * Ruft den Wert der boolean-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link aero.minova.rcp.form.model.xsd.Boolean }
+	 * 
+	 */
+	public aero.minova.rcp.form.model.xsd.Boolean getBoolean() {
+		return _boolean;
+	}
 
-    /**
-     * Legt den Wert der boolean-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link aero.minova.rcp.form.model.xsd.Boolean }
-     *     
-     */
-    public void setBoolean(aero.minova.rcp.form.model.xsd.Boolean value) {
-        this._boolean = value;
-    }
+	/**
+	 * Legt den Wert der boolean-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is
+	 *              {@link aero.minova.rcp.form.model.xsd.Boolean }
+	 * 
+	 */
+	public void setBoolean(aero.minova.rcp.form.model.xsd.Boolean value) {
+		this._boolean = value;
+	}
 
-    /**
-     * Ruft den Wert der color-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Color }
-     *     
-     */
-    public Color getColor() {
-        return color;
-    }
+	/**
+	 * Ruft den Wert der color-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link Color }
+	 * 
+	 */
+	public Color getColor() {
+		return color;
+	}
 
-    /**
-     * Legt den Wert der color-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Color }
-     *     
-     */
-    public void setColor(Color value) {
-        this.color = value;
-    }
+	/**
+	 * Legt den Wert der color-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link Color }
+	 * 
+	 */
+	public void setColor(Color value) {
+		this.color = value;
+	}
 
     /**
      * Gets the value of the msg property.
@@ -663,8 +582,8 @@ public class Field {
      *     {@link String }
      *     
      */
-    public String getTextAttribute() {
-        return textAttribute;
+    public String getLabel() {
+        return label;
     }
 
     /**
@@ -675,109 +594,83 @@ public class Field {
      *     {@link String }
      *     
      */
-    public void setTextAttribute(String value) {
-        this.textAttribute = value;
+    public void setLabel(String value) {
+        this.label = value;
     }
 
-    /**
-     * Ruft den Wert der tabIndex-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getTabIndex() {
-        return tabIndex;
-    }
+	/**
+	 * Ruft den Wert der tabIndex-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link BigInteger }
+	 * 
+	 */
+	public BigInteger getTabIndex() {
+		return tabIndex;
+	}
 
-    /**
-     * Legt den Wert der tabIndex-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setTabIndex(BigInteger value) {
-        this.tabIndex = value;
-    }
+	/**
+	 * Legt den Wert der tabIndex-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link BigInteger }
+	 * 
+	 */
+	public void setTabIndex(BigInteger value) {
+		this.tabIndex = value;
+	}
 
-    /**
-     * Ruft den Wert der name-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Ruft den Wert der name-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getName() {
+		return name;
+	}
 
-    /**
-     * Legt den Wert der name-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+	/**
+	 * Legt den Wert der name-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link String }
+	 * 
+	 */
+	public void setName(String value) {
+		this.name = value;
+	}
 
-    /**
-     * Ruft den Wert der default-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDefault() {
-        return _default;
-    }
+	/**
+	 * Ruft den Wert der default-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getDefault() {
+		return _default;
+	}
 
-    /**
-     * Legt den Wert der default-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDefault(String value) {
-        this._default = value;
-    }
+	/**
+	 * Legt den Wert der default-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link String }
+	 * 
+	 */
+	public void setDefault(String value) {
+		this._default = value;
+	}
 
-    /**
-     * Ruft den Wert der required-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public boolean isRequired() {
-        if (required == null) {
-            return true;
-        } else {
-            return required;
-        }
-    }
-
-    /**
-     * Legt den Wert der required-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public void setRequired(java.lang.Boolean value) {
-        this.required = value;
-    }
+	/**
+	 * Ruft den Wert der required-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public boolean isRequired() {
+		if (required == null) {
+			return true;
+		} else {
+			return required;
+		}
+	}
 
     /**
      * Ruft den Wert der offline-Eigenschaft ab.
@@ -791,366 +684,318 @@ public class Field {
         return offline;
     }
 
-    /**
-     * Legt den Wert der offline-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public void setOffline(java.lang.Boolean value) {
-        this.offline = value;
-    }
+	/**
+	 * Legt den Wert der offline-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public void setOffline(java.lang.Boolean value) {
+		this.offline = value;
+	}
 
-    /**
-     * Ruft den Wert der total-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public boolean isTotal() {
-        if (total == null) {
-            return false;
-        } else {
-            return total;
-        }
-    }
+	/**
+	 * Ruft den Wert der total-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public boolean isTotal() {
+		if (total == null) {
+			return false;
+		} else {
+			return total;
+		}
+	}
 
-    /**
-     * Legt den Wert der total-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public void setTotal(java.lang.Boolean value) {
-        this.total = value;
-    }
+	/**
+	 * Legt den Wert der total-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public void setTotal(java.lang.Boolean value) {
+		this.total = value;
+	}
 
-    /**
-     * Ruft den Wert der sqlIndex-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getSqlIndex() {
-        if (sqlIndex == null) {
-            return new BigInteger("0");
-        } else {
-            return sqlIndex;
-        }
-    }
+	/**
+	 * Ruft den Wert der sqlIndex-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link BigInteger }
+	 * 
+	 */
+	public BigInteger getSqlIndex() {
+		if (sqlIndex == null) {
+			return new BigInteger("0");
+		} else {
+			return sqlIndex;
+		}
+	}
 
-    /**
-     * Legt den Wert der sqlIndex-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setSqlIndex(BigInteger value) {
-        this.sqlIndex = value;
-    }
+	/**
+	 * Legt den Wert der sqlIndex-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link BigInteger }
+	 * 
+	 */
+	public void setSqlIndex(BigInteger value) {
+		this.sqlIndex = value;
+	}
 
-    /**
-     * Ruft den Wert der validationOrder-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getValidationOrder() {
-        return validationOrder;
-    }
+	/**
+	 * Ruft den Wert der validationOrder-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link BigInteger }
+	 * 
+	 */
+	public BigInteger getValidationOrder() {
+		return validationOrder;
+	}
 
-    /**
-     * Legt den Wert der validationOrder-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setValidationOrder(BigInteger value) {
-        this.validationOrder = value;
-    }
+	/**
+	 * Legt den Wert der validationOrder-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link BigInteger }
+	 * 
+	 */
+	public void setValidationOrder(BigInteger value) {
+		this.validationOrder = value;
+	}
 
-    /**
-     * Ruft den Wert der numberColumnsSpanned-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getNumberColumnsSpanned() {
-        if (numberColumnsSpanned == null) {
-            return new BigInteger("2");
-        } else {
-            return numberColumnsSpanned;
-        }
-    }
+	/**
+	 * Ruft den Wert der numberColumnsSpanned-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link BigInteger }
+	 * 
+	 */
+	public BigInteger getNumberColumnsSpanned() {
+		if (numberColumnsSpanned == null) {
+			return new BigInteger("2");
+		} else {
+			return numberColumnsSpanned;
+		}
+	}
 
-    /**
-     * Legt den Wert der numberColumnsSpanned-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setNumberColumnsSpanned(BigInteger value) {
-        this.numberColumnsSpanned = value;
-    }
+	/**
+	 * Legt den Wert der numberColumnsSpanned-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link BigInteger }
+	 * 
+	 */
+	public void setNumberColumnsSpanned(BigInteger value) {
+		this.numberColumnsSpanned = value;
+	}
 
-    /**
-     * Ruft den Wert der numberRowsSpanned-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getNumberRowsSpanned() {
-        return numberRowsSpanned;
-    }
+	/**
+	 * Ruft den Wert der numberRowsSpanned-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getNumberRowsSpanned() {
+		return numberRowsSpanned;
+	}
 
-    /**
-     * Legt den Wert der numberRowsSpanned-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setNumberRowsSpanned(String value) {
-        this.numberRowsSpanned = value;
-    }
+	/**
+	 * Legt den Wert der numberRowsSpanned-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link String }
+	 * 
+	 */
+	public void setNumberRowsSpanned(String value) {
+		this.numberRowsSpanned = value;
+	}
 
-    /**
-     * Ruft den Wert der fill-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFill() {
-        return fill;
-    }
+	/**
+	 * Ruft den Wert der fill-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getFill() {
+		return fill;
+	}
 
-    /**
-     * Legt den Wert der fill-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFill(String value) {
-        this.fill = value;
-    }
+	/**
+	 * Legt den Wert der fill-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link String }
+	 * 
+	 */
+	public void setFill(String value) {
+		this.fill = value;
+	}
 
-    /**
-     * Ruft den Wert der keyType-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getKeyType() {
-        return keyType;
-    }
+	/**
+	 * Ruft den Wert der keyType-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getKeyType() {
+		return keyType;
+	}
 
-    /**
-     * Legt den Wert der keyType-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setKeyType(String value) {
-        this.keyType = value;
-    }
+	/**
+	 * Legt den Wert der keyType-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link String }
+	 * 
+	 */
+	public void setKeyType(String value) {
+		this.keyType = value;
+	}
 
-    /**
-     * Ruft den Wert der visible-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public boolean isVisible() {
-        if (visible == null) {
-            return true;
-        } else {
-            return visible;
-        }
-    }
+	/**
+	 * Ruft den Wert der visible-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public boolean isVisible() {
+		if (visible == null) {
+			return true;
+		} else {
+			return visible;
+		}
+	}
 
-    /**
-     * Legt den Wert der visible-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public void setVisible(java.lang.Boolean value) {
-        this.visible = value;
-    }
+	/**
+	 * Legt den Wert der visible-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public void setVisible(java.lang.Boolean value) {
+		this.visible = value;
+	}
 
-    /**
-     * Ruft den Wert der unitText-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getUnitText() {
-        return unitText;
-    }
+	/**
+	 * Ruft den Wert der unitText-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getUnitText() {
+		return unitText;
+	}
 
-    /**
-     * Legt den Wert der unitText-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setUnitText(String value) {
-        this.unitText = value;
-    }
+	/**
+	 * Legt den Wert der unitText-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link String }
+	 * 
+	 */
+	public void setUnitText(String value) {
+		this.unitText = value;
+	}
 
-    /**
-     * Ruft den Wert der readOnly-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public boolean isReadOnly() {
-        if (readOnly == null) {
-            return true;
-        } else {
-            return readOnly;
-        }
-    }
+	/**
+	 * Ruft den Wert der readOnly-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public boolean isReadOnly() {
+		if (readOnly == null) {
+			return false;
+		} else {
+			return readOnly;
+		}
+	}
 
-    /**
-     * Legt den Wert der readOnly-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public void setReadOnly(java.lang.Boolean value) {
-        this.readOnly = value;
-    }
+	/**
+	 * Legt den Wert der readOnly-Eigenschaft fest.
+	 * 
+	 * @param value allowed object is {@link java.lang.Boolean }
+	 * 
+	 */
+	public void setReadOnly(java.lang.Boolean value) {
+		this.readOnly = value;
+	}
 
+	/**
+	 * <p>
+	 * Java-Klasse für anonymous complex type.
+	 * 
+	 * <p>
+	 * Das folgende Schemafragment gibt den erwarteten Content an, der in dieser
+	 * Klasse enthalten ist.
+	 * 
+	 * <pre>
+	 * &lt;complexType&gt;
+	 *   &lt;complexContent&gt;
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+	 *       &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+	 *       &lt;attribute name="type" default="okcancel"&gt;
+	 *         &lt;simpleType&gt;
+	 *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+	 *             &lt;enumeration value="okcancel"/&gt;
+	 *             &lt;enumeration value="yesnocancel"/&gt;
+	 *             &lt;enumeration value="yesno"/&gt;
+	 *           &lt;/restriction&gt;
+	 *         &lt;/simpleType&gt;
+	 *       &lt;/attribute&gt;
+	 *     &lt;/restriction&gt;
+	 *   &lt;/complexContent&gt;
+	 * &lt;/complexType&gt;
+	 * </pre>
+	 * 
+	 * 
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+	@XmlType(name = "")
+	public static class Msg {
 
-    /**
-     * <p>Java-Klasse für anonymous complex type.
-     * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-     * 
-     * <pre>
-     * &lt;complexType&gt;
-     *   &lt;complexContent&gt;
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *       &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
-     *       &lt;attribute name="type" default="okcancel"&gt;
-     *         &lt;simpleType&gt;
-     *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
-     *             &lt;enumeration value="okcancel"/&gt;
-     *             &lt;enumeration value="yesnocancel"/&gt;
-     *             &lt;enumeration value="yesno"/&gt;
-     *           &lt;/restriction&gt;
-     *         &lt;/simpleType&gt;
-     *       &lt;/attribute&gt;
-     *     &lt;/restriction&gt;
-     *   &lt;/complexContent&gt;
-     * &lt;/complexType&gt;
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "")
-    public static class Msg {
+		@XmlAttribute(name = "key", required = true)
+		protected String key;
+		@XmlAttribute(name = "type")
+		protected String type;
 
-        @XmlAttribute(name = "key", required = true)
-        protected String key;
-        @XmlAttribute(name = "type")
-        protected String type;
+		/**
+		 * Ruft den Wert der key-Eigenschaft ab.
+		 * 
+		 * @return possible object is {@link String }
+		 * 
+		 */
+		public String getKey() {
+			return key;
+		}
 
-        /**
-         * Ruft den Wert der key-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getKey() {
-            return key;
-        }
+		/**
+		 * Legt den Wert der key-Eigenschaft fest.
+		 * 
+		 * @param value allowed object is {@link String }
+		 * 
+		 */
+		public void setKey(String value) {
+			this.key = value;
+		}
 
-        /**
-         * Legt den Wert der key-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setKey(String value) {
-            this.key = value;
-        }
+		/**
+		 * Ruft den Wert der type-Eigenschaft ab.
+		 * 
+		 * @return possible object is {@link String }
+		 * 
+		 */
+		public String getType() {
+			if (type == null) {
+				return "okcancel";
+			} else {
+				return type;
+			}
+		}
 
-        /**
-         * Ruft den Wert der type-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getType() {
-            if (type == null) {
-                return "okcancel";
-            } else {
-                return type;
-            }
-        }
+		/**
+		 * Legt den Wert der type-Eigenschaft fest.
+		 * 
+		 * @param value allowed object is {@link String }
+		 * 
+		 */
+		public void setType(String value) {
+			this.type = value;
+		}
 
-        /**
-         * Legt den Wert der type-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setType(String value) {
-            this.type = value;
-        }
-
-    }
+	}
 
 }

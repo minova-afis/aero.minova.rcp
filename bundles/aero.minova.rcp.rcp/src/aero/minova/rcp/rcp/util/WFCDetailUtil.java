@@ -1,9 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -11,24 +9,18 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailUtil {
@@ -38,9 +30,6 @@ public class WFCDetailUtil {
 
 	@Inject
 	private IEventBroker broker;
-
-	@Inject
-	private TranslationService translationService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -53,17 +42,9 @@ public class WFCDetailUtil {
 	@Inject
 	protected IDataService dataService;
 
-	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
-	private Composite parent;
-
 	private Map<String, Control> controls = new HashMap<>();
-	private List<ArrayList> keys = null;
-	private Table selectedTable;
-	@Inject
-	private Form form;
-	private WFCDetailsLookupUtil lookupUtil = null;
 
-	private WFCDetailCASRequestsUtil casRequests = null;
+	private WFCDetailsLookupUtil lookupUtil = null;
 
 	@Inject
 	public WFCDetailUtil() {
@@ -72,7 +53,7 @@ public class WFCDetailUtil {
 	public void bindValues(Map<String, Control> controls, MPerspective perspective) {
 		this.controls = controls;
 
-		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective);
+		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService, sync);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
@@ -106,6 +87,7 @@ public class WFCDetailUtil {
 							e.doit = tfv.verifyDouble(newString);
 						}
 					});
+					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
@@ -147,15 +129,13 @@ public class WFCDetailUtil {
 						} else
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
-								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
+								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
+								&& e.keyCode != SWT.SPACE) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								lookupUtil.requestOptionsFromCAS(lc);
 							} else {
 								lookupUtil.changeSelectionBoxList(lc, false);
 							}
-							// Wird die untere Pfeiltaste eingeben, so sollen sämtliche Optionen,
-							// wie auch bei einem Klick auf das Twiste, angezeigt werden
-							// PROBLEM: durch die Optionen wechseln via pfeiltasten so nicht möglich
 						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							Map<MPerspective, String> brokerObject = new HashMap<>();
@@ -207,8 +187,8 @@ public class WFCDetailUtil {
 				renderedValue = String.format(renderedFormat, quarter);
 				renderedValue = renderedValue.replace(',', '.');
 			} else {
-				renderedValue = "0";
-				chargedValue = "0";
+				renderedValue = "0.00";
+				chargedValue = "0.00";
 			}
 			chargedField.setText(chargedValue);
 			renderedField.setText(renderedValue);
@@ -218,4 +198,13 @@ public class WFCDetailUtil {
 	public String getTimeZone() {
 		return timezone;
 	}
+
+	public WFCDetailsLookupUtil getLookupUtil() {
+		return lookupUtil;
+	}
+
+	public void setLookupUtil(WFCDetailsLookupUtil lookupUtil) {
+		this.lookupUtil = lookupUtil;
+	}
+
 }

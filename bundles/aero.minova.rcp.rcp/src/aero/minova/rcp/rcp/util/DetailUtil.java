@@ -70,7 +70,7 @@ public class DetailUtil {
 		}
 
 		// Immer am Anfang ein Label
-		labelFactory.text(field.getTextAttribute())
+		labelFactory.text(field.getLabel())
 				.supplyLayoutData(gridDataFactory.align(SWT.RIGHT, SWT.TOP).hint(LABEL_WIDTH_HINT, SWT.DEFAULT)::create)
 				.create(composite);
 
@@ -121,6 +121,9 @@ public class DetailUtil {
 		// Indexes in der Detailview aufzulisten
 		if (field.getNumber() != null) {
 			text.setData(Constants.CONTROL_DECIMALS, field.getNumber().getDecimals());
+			if (field.isReadOnly() == true) {
+				text.setEditable(false);
+			}
 		}
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 

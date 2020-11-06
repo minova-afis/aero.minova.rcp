@@ -3,42 +3,35 @@ package aero.minova.rcp.rcp.util;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
-
-import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.widgets.Control;
 
-import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailsLookupUtil {
 
-	@Inject
 	protected UISynchronize sync;
 
-	@Inject
-	private IDataFormService dataFormService;
-
-	@Inject
 	private IDataService dataService;
 
 	private MPerspective perspective = null;
 
 	private Map<String, Control> controls = null;
 
-	public WFCDetailsLookupUtil(Map<String, Control> controls, MPerspective perspective) {
+	public WFCDetailsLookupUtil(Map<String, Control> controls, MPerspective perspective, IDataService dataService,
+			UISynchronize sync) {
 		this.controls = controls;
 		this.perspective = perspective;
-
+		this.dataService = dataService;
+		this.sync = sync;
 	}
 
 	public void requestOptionsFromCAS(Control c) {
@@ -88,7 +81,7 @@ public class WFCDetailsLookupUtil {
 				if (lc != null && lc.getText() != null && twisty == false) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 					if (value.getStringValue().equalsIgnoreCase(lc.getText().toString())) {
-						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
+						updateSelectedLookupEntry(t, c);
 						lc.setData(Constants.CONTROL_KEYLONG,
 								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					}
@@ -96,7 +89,7 @@ public class WFCDetailsLookupUtil {
 					changeProposals((LookupControl) c, t);
 
 				} else {
-					sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(t, c));
+					updateSelectedLookupEntry(t, c);
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					c.setData(Constants.CONTROL_KEYLONG,
 							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
@@ -134,8 +127,9 @@ public class WFCDetailsLookupUtil {
 							&& (filteredTable.getRows().get(0)
 									.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
 									.toLowerCase().equals(lc.getText().toLowerCase()))
-							|| (filteredTable.getRows().get(0)
-									.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+							|| (filteredTable.getRows().size() != 0
+									&& filteredTable.getRows().get(0)
+											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
 									&& filteredTable.getRows().get(0)
 											.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
 											.getStringValue().toLowerCase().equals(lc.getText().toLowerCase()))) {
@@ -168,37 +162,21 @@ public class WFCDetailsLookupUtil {
 		lc.setProposals(t);
 	}
 
-	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
-	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
-	 * dem benutzer zur verfügung gestellt.
-	 *
-	 * @param luc
-	 */
-	@Inject
-	@Optional
-	public void requestLookUpEntriesAll(@UIEventTopic("WFCLoadAllLookUpValues") Map<MPerspective, String> map) {
-		if (map.get(perspective) != null) {
-			String name = map.get(perspective);
-			Control control = controls.get(name);
-			if (control instanceof LookupControl) {
-				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
-				CompletableFuture<?> tableFuture;
-				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
-						"List");
+	public static void updateSelectedLookupEntry(Table ta, Control c) {
+		Row r = ta.getRows().get(0);
+		LookupControl lc = (LookupControl) c;
+		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
+		Value v = r.getValue(index);
 
-				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-					if (ta instanceof SqlProcedureResult) {
-						SqlProcedureResult sql = (SqlProcedureResult) ta;
-						changeOptionsForLookupField(sql.getResultSet(), control, true);
-					} else if (ta instanceof Table) {
-						Table t1 = (Table) ta;
-						changeOptionsForLookupField(t1, control, true);
-					}
-
-				}));
+		lc.setText((String) ValueBuilder.value(v).create());
+		lc.getTextControl().setMessage("");
+		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
+			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+				lc.getDescription().setText((String) ValueBuilder
+						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+			} else {
+				lc.getDescription().setText("");
 			}
-
 		}
 	}
 }
