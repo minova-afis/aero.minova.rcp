@@ -25,7 +25,6 @@ import aero.minova.rcp.workspace.WorkspaceException;
 @SuppressWarnings("restriction")
 public class FileWorkspace extends WorkspaceHandler {
 
-	private String remoteUsername = "";
 	private String connectionString = "";
 
 	/**
@@ -37,9 +36,8 @@ public class FileWorkspace extends WorkspaceHandler {
 	}
 
 	@Override
-	public boolean checkConnection(String username, String password) throws WorkspaceException {
+	public boolean checkConnection(String username, String password, String applicationArea) throws WorkspaceException {
 		// Verbindungswerte zurücksetzen
-		setRemoteUsername("");
 		workspaceData.setUsername(username);
 		workspaceData.setPassword(password);
 
@@ -157,9 +155,9 @@ public class FileWorkspace extends WorkspaceHandler {
 			try {
 				statement = connection.prepareStatement(sqlQuery);
 				ResultSet resultSet = statement.executeQuery();
-				if (resultSet.next()) {
-					setRemoteUsername(resultSet.getString("username"));
-				}
+//				if (resultSet.next()) {
+//					setRemoteUsername(resultSet.getString("username"));
+//				}
 				statement.close();
 				connection.close();
 			} catch (SQLException e) {
@@ -172,15 +170,6 @@ public class FileWorkspace extends WorkspaceHandler {
 		} catch (URISyntaxException e) {
 			throw new WorkspaceException("Error connecting to application", e);
 		}
-	}
-
-	@Override
-	public String getRemoteUsername() {
-		return remoteUsername;
-	}
-
-	private void setRemoteUsername(String remoteUsername) {
-		this.remoteUsername = remoteUsername;
 	}
 
 	@Override

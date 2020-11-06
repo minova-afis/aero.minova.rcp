@@ -22,6 +22,7 @@ class WorkspaceData {
 	private String password = "";
 	private String profile = "";
 	private String username = "";
+	private String applicationArea = "";
 	private Integer workspaceHash;
 	
 	public static WorkspaceData[] getWorkspaceData() {
@@ -149,5 +150,13 @@ class WorkspaceData {
 
 	private void updateWorkspaceHash() {
 		this.workspaceHash = getDisplayName().hashCode();
+	}
+
+	public String getApplicationArea() {
+		return applicationArea;
+	}
+
+	public void setApplicationArea(String applicationArea) {
+		this.applicationArea = applicationArea;
 	}
 }
