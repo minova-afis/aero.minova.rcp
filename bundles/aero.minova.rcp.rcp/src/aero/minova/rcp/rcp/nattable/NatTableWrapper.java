@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.rcp.nattable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,15 +8,13 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
@@ -34,24 +32,18 @@ import org.eclipse.nebula.widgets.nattable.layer.AbstractLayerTransform;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.persistence.command.DisplayPersistenceDialogCommandHandler;
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
+import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
-import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
-import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
-import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandToLevelCommand;
-import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
-import org.eclipse.nebula.widgets.nattable.ui.menu.IMenuItemProvider;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuBuilder;
+import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -67,10 +59,12 @@ public class NatTableWrapper {
 
 	private NatTable natTable;
 	private BodyLayerStack<Row> bodyLayerStack;
+	private IEclipseContext context;
 
 	public NatTableWrapper createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer,
 			ESelectionService selectionService, IEclipseContext context) {
 
+		this.context = context;
 		Map<String, String> tableHeadersMap = new HashMap<>();
 		List<Column> columns = form.getIndexView().getColumn();
 		String[] propertyNames = new String[columns.size()];
@@ -81,26 +75,23 @@ public class NatTableWrapper {
 		}
 
 		// Datenmodel für die Eingaben
-
+		ConfigRegistry configRegistry = new ConfigRegistry();
 		IColumnPropertyAccessor<Row> columnPropertyAccessor = new MinovaColumnPropertyAccessor(table);
 
+		// create the body stack
 		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
 
-		// TODO Add this again, after selection works again
-//		selectionLayer.addLayerListener(new ILayerListener() {
-//
-//			@Override
-//			public void handleLayerEvent(ILayerEvent event) {
-//				Object c = SelectionUtils.getSelectedRowObjects(selectionLayer, bodyDataProvider, false);
-//				context.set("ActiveRows", c);
-//			}
-//		});
 
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
+		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer,
+				bodyLayerStack,
 				bodyLayerStack.getSelectionLayer());
+
+		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry,
+						columnHeaderDataLayer));
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyLayerStack.getBodyDataProvider());
@@ -115,7 +106,7 @@ public class NatTableWrapper {
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// build the grid layer
-		GridLayer gridLayer = new GridLayer(bodyLayerStack, columnHeaderLayer, rowHeaderLayer, cornerLayer);
+		GridLayer gridLayer = new GridLayer(bodyLayerStack, sortHeaderLayer, rowHeaderLayer, cornerLayer);
 
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
@@ -126,7 +117,7 @@ public class NatTableWrapper {
 
 		natTable = new NatTable(parent, compositeGridLayer, false);
 
-		ConfigRegistry configRegistry = new ConfigRegistry();
+
 
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
@@ -134,87 +125,85 @@ public class NatTableWrapper {
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 		natTable.addConfiguration(new SingleClickSortConfiguration());
-		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
-
-		// add group by configuration
+//		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
+//
+//		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, groupByHeaderLayer));
-		natTable.addConfiguration(new HeaderMenuConfiguration(natTable) {
-			@Override
-			protected PopupMenuBuilder createCornerMenu(NatTable natTable) {
-				return super.createCornerMenu(natTable).withStateManagerMenuItemProvider()
-						.withMenuItemProvider(new IMenuItemProvider() {
+		// adds the key bindings that allow space bar to be pressed to
+        // expand/collapse tree nodes
+		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(),
+				bodyLayerStack.getSelectionLayer()));
+		// natTable.addConfiguration(new HeaderMenuConfiguration(natTable) {
+//			@Override
+//			protected PopupMenuBuilder createCornerMenu(NatTable natTable) {
+//				return super.createCornerMenu(natTable).withStateManagerMenuItemProvider()
+//						.withMenuItemProvider(new IMenuItemProvider() {
+//
+//							@Override
+//							public void addMenuItem(NatTable natTable, Menu popupMenu) {
+//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
+//								menuItem.setText("Toggle Group By Header"); //$NON-NLS-1$
+//								menuItem.setEnabled(true);
+//
+//								menuItem.addSelectionL	istener(new SelectionAdapter() {
+//									@Override
+//									public void widgetSelected(SelectionEvent event) {
+//										groupByHeaderLayer.setVisible(!groupByHeaderLayer.isVisible());
+//									}
+//								});
+//							}
+//						}).withMenuItemProvider(new IMenuItemProvider() {
+//
+//							@Override
+//							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
+//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
+//								menuItem.setText("Collapse All"); //$NON-NLS-1$
+//								menuItem.setEnabled(true);
+//
+//								menuItem.addSelectionListener(new SelectionAdapter() {
+//									@Override
+//									public void widgetSelected(SelectionEvent event) {
+//										natTable.doCommand(new TreeCollapseAllCommand());
+//									}
+//								});
+//							}
+//						}).withMenuItemProvider(new IMenuItemProvider() {
+//
+//							@Override
+//							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
+//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
+//								menuItem.setText("Expand All"); //$NON-NLS-1$
+//								menuItem.setEnabled(true);
+//
+//								menuItem.addSelectionListener(new SelectionAdapter() {
+//									@Override
+//									public void widgetSelected(SelectionEvent event) {
+//										natTable.doCommand(new TreeExpandAllCommand());
+//									}
+//								});
+//							}
+//						}).withMenuItemProvider(new IMenuItemProvider() {
+//
+//							@Override
+//							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
+//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
+//								menuItem.setText("Expand to Level 2"); //$NON-NLS-1$
+//								menuItem.setEnabled(true);
+//
+//								menuItem.addSelectionListener(new SelectionAdapter() {
+//									@Override
+//									public void widgetSelected(SelectionEvent event) {
+//										natTable.doCommand(new TreeExpandToLevelCommand(2));
+//									}
+//								});
+//							}
+//						});
+//			}
+//		});
+//
 
-							@Override
-							public void addMenuItem(NatTable natTable, Menu popupMenu) {
-								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-								menuItem.setText("Toggle Group By Header"); //$NON-NLS-1$
-								menuItem.setEnabled(true);
 
-								menuItem.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent event) {
-										groupByHeaderLayer.setVisible(!groupByHeaderLayer.isVisible());
-									}
-								});
-							}
-						}).withMenuItemProvider(new IMenuItemProvider() {
-
-							@Override
-							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
-								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-								menuItem.setText("Collapse All"); //$NON-NLS-1$
-								menuItem.setEnabled(true);
-
-								menuItem.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent event) {
-										natTable.doCommand(new TreeCollapseAllCommand());
-									}
-								});
-							}
-						}).withMenuItemProvider(new IMenuItemProvider() {
-
-							@Override
-							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
-								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-								menuItem.setText("Expand All"); //$NON-NLS-1$
-								menuItem.setEnabled(true);
-
-								menuItem.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent event) {
-										natTable.doCommand(new TreeExpandAllCommand());
-									}
-								});
-							}
-						}).withMenuItemProvider(new IMenuItemProvider() {
-
-							@Override
-							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
-								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-								menuItem.setText("Expand to Level 2"); //$NON-NLS-1$
-								menuItem.setEnabled(true);
-
-								menuItem.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent event) {
-										natTable.doCommand(new TreeExpandToLevelCommand(2));
-									}
-								});
-							}
-						});
-			}
-		});
-
-		natTable.addConfiguration(new AbstractRegistryConfiguration() {
-			@Override
-			public void configureRegistry(IConfigRegistry configRegistry) {
-				configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE,
-						IEditableRule.ALWAYS_EDITABLE);
-			}
-		});
-
-//		natTable.addConfiguration(new EditorConfiguration());
+		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns()));
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 //		
@@ -243,6 +232,12 @@ public class NatTableWrapper {
 //		natTable.addConfiguration(new SingleClickSortConfiguration());
 
 		natTable.configure();
+		// set the modern theme to visualize the summary better
+
+//		ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration();
+//		modernTheme.addThemeExtension(new ModernGroupByThemeExtension());
+//
+//		natTable.setTheme(modernTheme);
 
 		return this;
 
@@ -266,6 +261,10 @@ public class NatTableWrapper {
 
 		private EventList<T> eventList;
 
+		private GroupByDataLayer<T> bodyDataLayer;
+
+		private TreeLayer treeLayer;
+
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
@@ -275,26 +274,52 @@ public class NatTableWrapper {
 			// will be set by configuration
 			this.sortedList = new SortedList<>(rowObjectsGlazedList, null);
 
-			// Use the GroupByDataLayer instead of the default DataLayer
-			GroupByDataLayer<T> bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList,
+			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList,
 					columnPropertyAccessor);
 
-			// TODO Configure editors
-//			final ColumnOverrideLabelAccumulator columnLabelAccumulator = new ColumnOverrideLabelAccumulator(
-//					bodyDataLayer);
-//			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
-//			registerColumnLabels(columnLabelAccumulator);
+			// we register a custom UpdateDataCommandHandler so that we could add a new
+			// value if desired
+			// alternative we could add a new line during line selection
+//			this.bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
+//			this.bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(this.bodyDataLayer) {
+//				@SuppressWarnings("unchecked")
+//				@Override
+//				protected boolean doCommand(UpdateDataCommand command) {
+//					if (super.doCommand(command)) {
+//						System.out.println("Custom update handler called");
+//						return true;
+//					}
+//					return false;
+//				}
+//			});
+
 
 			// get the IDataProvider that was created by the GroupByDataLayer
 			this.bodyDataProvider = bodyDataLayer.getDataProvider();
+
+			// Apply a ColumnLabelAccumulator to address the columns in the
+			// EditConfiguration class
+			// first colum starts at 0, etc
+			ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(bodyDataProvider);
+			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
+
 			// layer for event handling of GlazedLists and PropertyChanges
 			GlazedListsEventLayer<T> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
 					this.sortedList);
 
 			this.selectionLayer = new SelectionLayer(glazedListsEventLayer);
+			
+			selectionLayer.addLayerListener(new ILayerListener() {
+	
+				@Override
+				public void handleLayerEvent(ILayerEvent event) {
+					Object c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
+					context.set("ActiveRows", c);
+				}
+			});
+			
 
-			// add a tree layer to visualise the grouping
-			TreeLayer treeLayer = new TreeLayer(this.selectionLayer, bodyDataLayer.getTreeRowModel());
+			treeLayer = new TreeLayer(this.selectionLayer, bodyDataLayer.getTreeRowModel());
 
 			ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
 
@@ -309,6 +334,13 @@ public class NatTableWrapper {
 			return this.sortedList;
 		}
 
+		public GroupByDataLayer<T> getBodyDataLayer() {
+			return this.bodyDataLayer;
+		}
+
+		public TreeLayer getTreeLayer() {
+			return this.treeLayer;
+		}
 		public IDataProvider getBodyDataProvider() {
 			return this.bodyDataProvider;
 		}

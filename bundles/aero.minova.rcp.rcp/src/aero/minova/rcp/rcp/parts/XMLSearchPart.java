@@ -18,7 +18,7 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.rcp.util.NatTableWrapper;
+import aero.minova.rcp.rcp.nattable.NatTableWrapper;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
 public class XMLSearchPart {
