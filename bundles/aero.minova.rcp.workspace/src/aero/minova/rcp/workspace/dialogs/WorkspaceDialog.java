@@ -125,7 +125,7 @@ public class WorkspaceDialog extends Dialog {
 		CLabel deleteProfile = new CLabel(container, SWT.CENTER | SWT.VERTICAL);
 		deleteProfile.setLayoutData(GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(false, true)
 				.hint(25, SWT.DEFAULT).create());
-		deleteProfile.setText("🗑️");
+		deleteProfile.setText("\uD83D\uDDD1\uFE0F");
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
@@ -227,6 +227,11 @@ public class WorkspaceDialog extends Dialog {
 				logger.error(e1, e1.getMessage());
 			}
 		}
+	}
+
+	private static String stringFromCharArray() {
+		char[] c = { '\\', 'u', '1', 'F', '5', 'D', '1' };
+		return new String(c);
 	}
 
 	/**
