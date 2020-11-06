@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +15,7 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
@@ -21,7 +23,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4PerspectiveSwitcherPreferences;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4Util;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.EPerspectiveSwitcher;
@@ -31,8 +32,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -49,6 +48,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
+@SuppressWarnings("restriction")
 public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Inject
@@ -74,6 +74,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Inject
 	MApplication application;
+
+	@Inject
+	private TranslationService translationService;
 
 	/*
 	 * Set preferences for showShortcutText
@@ -112,24 +115,20 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		composite.setLayout(rowLayout);
 
 		toolBar = new ToolBar(composite, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-		toolBar.addMenuDetectListener(new MenuDetectListener() {
+		toolBar.addMenuDetectListener(event -> {
+			ToolBar tb = (ToolBar) event.widget;
+			Point p = new Point(event.x, event.y);
 
-			@Override
-			public void menuDetected(MenuDetectEvent event) {
-				ToolBar tb = (ToolBar) event.widget;
-				Point p = new Point(event.x, event.y);
+			p = toolBar.getDisplay().map(null, toolBar, p);
+			ToolItem item = tb.getItem(p);
+			if (!item.getData().equals(null)) {
+				if (item != null && item.getData() != null) {
+					openMenuFor(item, (String) item.getData());
+				} else if (item == null || item.getData().equals(null))
+					logger.debug("No item found");
+			} else
+				logger.debug("Perspective not associated with item");
 
-				p = toolBar.getDisplay().map(null, toolBar, p);
-				ToolItem item = tb.getItem(p);
-				if (!item.getData().equals(null)) {
-					if (item != null && item.getData() != null) {
-						openMenuFor(item, (String) item.getData());
-					} else if (item == null || item.getData().equals(null))
-						logger.debug("No item found");
-				} else
-					logger.debug("Perspective not associated with item");
-
-			}
 		});
 
 		toolBar.addDisposeListener(new DisposeListener() {
@@ -142,15 +141,41 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 		// The perspectives currently open
 		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
-		if (appPerspectiveStacks.size() > 0) {
+		if (appPerspectiveStacks.size() >= 0) {
 			for (MPerspectiveStack stack : appPerspectiveStacks)
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered())
 						addPerspectiveShortcut(perspective);
-					;
-
+					if (perspective == modelService.getActivePerspective(window)) {
+						setSelectedElement(perspective);
+					}
 				}
 		}
+		translate(translationService);
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		translate(translationService);
+	}
+
+	@Inject
+	private void translate(TranslationService translationService) {
+		this.translationService = translationService;
+		if (translationService != null && toolBar != null)
+			translate();
+	}
+
+	private void translate() {
+		for (ToolItem item : toolBar.getItems()) {
+			List<MPerspective> perspectives = modelService.findElements(application, item.getData().toString(),
+					MPerspective.class);
+			MPerspective perspective = perspectives.get(0);
+			String value = translationService.translate(perspective.getLocalizedLabel(), null);
+			item.setText(value);
+		}
+		toolBar.pack(true);
 	}
 
 	ImageDescriptor getIconFor(String iconURI) {
@@ -175,7 +200,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		if (!(keepit != null && keepit.contains(perspective.getElementId()))) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspective.getElementId());
-
 			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
 
 			if (descriptor != null) {
@@ -203,7 +227,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		} else {
 			shortcut = getToolItemFor(perspective.getElementId());
 		}
-		shortcut.setSelection(true);
 	}
 
 	/*
@@ -358,7 +381,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	private void addCloseMenuItem(Menu menu, String perspectiveId) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.Activate);
-		menuItem.setText(E4WorkbenchCommandConstants.PERSPECTIVES_CLOSE$_NAME);
+		menuItem.setText(translationService.translate("@Close", null));
 
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
