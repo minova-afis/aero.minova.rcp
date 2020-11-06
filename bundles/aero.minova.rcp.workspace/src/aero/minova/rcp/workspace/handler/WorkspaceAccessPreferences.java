@@ -1,22 +1,19 @@
 package aero.minova.rcp.workspace.handler;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
 /**
- * Stores preferences that are required in order to access a workspace and therefore to set the current platform.
- * 
+ * Stores preferences that are required in order to access a workspace and
+ * therefore to set the current platform.
+ *
  * @author avots
  */
 @SuppressWarnings("restriction")
@@ -35,8 +32,8 @@ public class WorkspaceAccessPreferences {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password, String profile, String applicationArea,
-			boolean isPrimaryWorksace) {
+	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password,
+			String profile, String applicationArea, boolean isPrimaryWorksace) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
 				.node(WORKSPACES);
@@ -54,7 +51,6 @@ public class WorkspaceAccessPreferences {
 			final ISecurePreferences workspacePrefs = workspaces.node(workspaceName);
 			workspacePrefs.put(USER, userName, false);
 			workspacePrefs.put(URL, url, false);
-			workspacePrefs.put(PASSWORD, password, false);
 			workspacePrefs.putBoolean(IS_PRIMARY_WORKSPACE, isPrimaryWorksace, false);
 			workspacePrefs.put(PROFILE, profile, false);
 			workspacePrefs.put(APPLICATION_AREA, applicationArea, false);
@@ -64,8 +60,20 @@ public class WorkspaceAccessPreferences {
 		}
 	}
 
+	public static void deleteSavedWorkspace(String name) {
+		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
+				.node(AERO_MINOVA_RCP_WORKSPACE)//
+				.node(WORKSPACES);
+		if (workspaces.nodeExists(name)) {
+			ISecurePreferences node = workspaces.node(name);
+			node.clear();
+			node.removeNode();
+		}
+	}
+
 	/**
-	 * @return a list of all WorkspaceHandler that are store in the preferences. The password is not available before the the workspace is set (#active())
+	 * @return a list of all WorkspaceHandler that are store in the preferences. The
+	 *         password is not available before the the workspace is set (#active())
 	 */
 	public static List<ISecurePreferences> getSavedWorkspaceAccessData(Logger logger) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
