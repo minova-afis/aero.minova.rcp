@@ -1,5 +1,6 @@
 package aero.minova.rcp.workspace.handler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -68,6 +69,11 @@ public class WorkspaceAccessPreferences {
 			ISecurePreferences node = workspaces.node(name);
 			node.clear();
 			node.removeNode();
+			try {
+				node.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
