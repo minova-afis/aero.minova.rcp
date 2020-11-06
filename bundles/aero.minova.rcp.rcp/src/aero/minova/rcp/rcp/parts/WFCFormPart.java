@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
@@ -22,9 +21,6 @@ public abstract class WFCFormPart {
 	@Inject
 	protected IDataService dataService;
 	protected Form form;
-	@Inject
-	@Named(E4WorkbenchParameterConstants.FORM_NAME)
-	protected String formName;
 
 	public WFCFormPart() {
 		super();
@@ -33,12 +29,13 @@ public abstract class WFCFormPart {
 	public Form getForm(Composite parent) {
 		form = perspective.getContext().get(Form.class);
 		if (form == null) {
+			String formName = perspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
 			dataService.getFileSynch(formName); // Datei ggf. vom Server holen
 			form = dataFormService.getForm(formName);
-		}
-		if (form == null) {
-			LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
-			return null;
+			if (form == null) {
+				LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
+				return null;
+			}
 		}
 		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		return form;
