@@ -3,7 +3,6 @@ package aero.minova.rcp.workspace.handler;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
@@ -40,9 +39,6 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				if (username == null || username.length() == 0) {
 					username = store.get(WorkspaceAccessPreferences.USER, "");
 				}
-				if (password == null || password.length() == 0) {
-					password = store.get(WorkspaceAccessPreferences.PASSWORD, "");
-				}
 				if (applicationArea == null || applicationArea.length() == 0) {
 					applicationArea = store.get(WorkspaceAccessPreferences.APPLICATION_AREA, "");
 				}
@@ -53,16 +49,14 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		} catch (StorageException | MalformedURLException e) {
 			throw new WorkspaceException(e.getMessage());
 		}
-
 		workspaceData.setUsername(username);
 		workspaceData.setPassword(password);
 		workspaceData.setProfile(profile);
 		workspaceData.setApplicationArea(applicationArea);
 
-		// Verbindung zu URL prüfen
-
 		// Profil speichern
-		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(), getPassword(), getProfile(), applicationArea, false);
+		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(),
+				getPassword(), getProfile(), applicationArea, false);
 
 		return true;
 	}
@@ -73,19 +67,16 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			String defaultPath = System.getProperty("user.home");
 
 			// build the desired path for the workspace
-			String path = defaultPath + "/.minwfc/" + workspaceData.getWorkspaceHashHex() + "/";
 			URL instanceLocationUrl = null;
 			try {
-				instanceLocationUrl = new URL("file", null, path);
+				if (!getApplicationArea().isEmpty()) {
+					instanceLocationUrl = new URL(getApplicationArea());
+				} else {
+					String path = defaultPath + "/.minwfc/" + workspaceData.getWorkspaceHashHex() + "/";
+					instanceLocationUrl = new URL("file", null, path);
+				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+			} catch (IllegalStateException | IOException e) {
 				e.printStackTrace();
 			}
 			URL workspaceURL = Platform.getInstanceLocation().getURL();
@@ -102,18 +93,22 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
 				try {
 					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
-						store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
+
+						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+							// ausgelesendes Passwort vom Store nehmen
+							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
+						} else {
+							// ausgelesendes Passwort vom Dialog in den Store setzen
+							store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
+						}
 						store.put(WorkspaceAccessPreferences.APPLICATION_AREA, instanceLocationUrl.toString(), false);
 						store.flush();
 						break;
 					}
 				} catch (StorageException | IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-//		} else {
-//			System.exit(0);
 		}
 
 	}
