@@ -32,6 +32,9 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
+	
+	@Inject
+	EPartService partService;
 
 	@Inject
 	EModelService model;
@@ -65,7 +68,7 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID);
 		} else {
-			switchTo(context, element, perspectiveID, window);
+			switchTo(element, perspectiveID, window);
 		}
 	}
 
@@ -107,8 +110,6 @@ public class SwitchPerspectiveHandler {
 				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
-		IEclipseContext ctx = window.getContext().createChild();
-		window.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
 //		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
 		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
 
@@ -117,10 +118,12 @@ public class SwitchPerspectiveHandler {
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.setContext(context);
+//			perspective.setContext(context);
+			perspective.getPersistedState().put(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
+//			perspective.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
 			perspective.setLabel(item.getLabel());
-			perspectiveStack.getChildren().add(0, perspective);
-			switchTo(context, perspective, perspectiveID, window);
+			perspectiveStack.getChildren().add(perspective);
+			switchTo(perspective, perspectiveID, window);
 
 		}
 		return perspective;
@@ -131,9 +134,8 @@ public class SwitchPerspectiveHandler {
 	 * 
 	 * @param element
 	 */
-	public void switchTo(IEclipseContext context, MUIElement element,
-			@Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID, MWindow window) {
-		EPartService partService = context.get(EPartService.class);
+	public void switchTo(MUIElement element, @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
+			MWindow window) {
 
 		if (element instanceof MPerspective) {
 			partService.switchPerspective(element.getElementId());
