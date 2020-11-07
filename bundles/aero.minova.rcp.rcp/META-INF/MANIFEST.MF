@@ -45,7 +45,8 @@ Require-Bundle:
  org.eclipse.e4.ui.workbench.perspectiveswitcher,
  org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0",
  org.eclipse.nebula.widgets.opal.preferencewindow,
- org.eclipse.jface.notifications
+ org.eclipse.jface.notifications,
+ org.eclipse.nebula.widgets.opal.textassist;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: aero.minova.rcp.core.ui,
  aero.minova.rcp.perspectiveswitcher.commands,
