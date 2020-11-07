@@ -10,6 +10,8 @@ import aero.minova.rcp.model.Table;
 
 public interface IDataService {
 
+	void setCredentials(String username, String password, String server);
+	
 	CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable);
 
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);

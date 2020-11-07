@@ -8,11 +8,9 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.nebula.widgets.nattable.NatTable;
 
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.rcp.parts.XMLSearchPart;
-import aero.minova.rcp.rcp.util.NatTableUtil;
 
 public class OptimizeSearchHandler {
 
@@ -24,8 +22,8 @@ public class OptimizeSearchHandler {
 
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
 		XMLSearchPart searchPart = (XMLSearchPart) findElements.get(0).getObject();
-		NatTable table = searchPart.getNatTable();
-		NatTableUtil.resizeTable(table);
+//		NatTable table = searchPart.getNatTable();
+		// TODO update table
 
 	}
 

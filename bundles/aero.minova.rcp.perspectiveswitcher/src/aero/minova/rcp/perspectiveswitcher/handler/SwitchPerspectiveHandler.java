@@ -14,33 +14,27 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 public class SwitchPerspectiveHandler {
-
-	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
-	private Composite composite;
-	private String id;
 
 	@Inject
 	MApplication application;
 
 	@Inject
 	ECommandService commandService;
+	
+	@Inject
+	EPartService partService;
 
 	@Inject
 	EModelService model;
@@ -48,15 +42,11 @@ public class SwitchPerspectiveHandler {
 	@Inject
 	IEventBroker broker;
 
-	@Inject
-	private TranslationService translationService;
-
 	@Execute
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
 			MWindow window) throws InvocationTargetException, InterruptedException {
-		translate(translationService);
 		if (Boolean.parseBoolean(newWindow)) {
 			openNewWindowPerspective(context, perspectiveID);
 		} else {
@@ -78,7 +68,7 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID);
 		} else {
-			switchTo(context, element, perspectiveID, window);
+			switchTo(element, perspectiveID, window);
 		}
 	}
 
@@ -111,15 +101,15 @@ public class SwitchPerspectiveHandler {
 		MWindow window = context.get(MWindow.class);
 		EModelService modelService = context.get(EModelService.class);
 		String[] ids = perspectiveID.split(".xml");
-		id = ids[0];
+		String id = ids[0];
+		List<MHandledMenuItem> items = model.findElements(window.getMainMenu(), id, MHandledMenuItem.class);
+		MHandledMenuItem item = items.get(0);
 
 		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService
 				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
-		IEclipseContext ctx = window.getContext().createChild();
-		window.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
 //		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
 		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
 
@@ -128,40 +118,15 @@ public class SwitchPerspectiveHandler {
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.setLabel(translationService.translate("@" + id, null));
-			perspectiveStack.getChildren().add(0, perspective);
-			switchTo(ctx, perspective, perspectiveID, window);
+//			perspective.setContext(context);
+			perspective.getPersistedState().put(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
+//			perspective.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
+			perspective.setLabel(item.getLabel());
+			perspectiveStack.getChildren().add(perspective);
+			switchTo(perspective, perspectiveID, window);
 
 		}
 		return perspective;
-	}
-
-	@Inject
-	private void translate(TranslationService translationService) {
-		this.translationService = translationService;
-		if (translationService != null && composite != null)
-			translate(composite);
-	}
-
-	private void translate(Composite composite) {
-		for (Control control : composite.getChildren()) {
-			if (control.getData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY) != null) {
-				String property = (String) control.getData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY);
-				String value = translationService.translate(property, null);
-				if (control instanceof ExpandableComposite) {
-					ExpandableComposite expandableComposite = (ExpandableComposite) control;
-					expandableComposite.setText(value);
-					translate((Composite) expandableComposite.getClient());
-				} else if (control instanceof Label) {
-					((Label) control).setText(value);
-				} else if (control instanceof Button) {
-					((Button) control).setText(value);
-				}
-				if (control instanceof Composite) {
-					translate((Composite) control);
-				}
-			}
-		}
 	}
 
 	/**
@@ -169,9 +134,8 @@ public class SwitchPerspectiveHandler {
 	 * 
 	 * @param element
 	 */
-	public void switchTo(IEclipseContext context, MUIElement element,
-			@Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID, MWindow window) {
-		EPartService partService = context.get(EPartService.class);
+	public void switchTo(MUIElement element, @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
+			MWindow window) {
 
 		if (element instanceof MPerspective) {
 			partService.switchPerspective(element.getElementId());

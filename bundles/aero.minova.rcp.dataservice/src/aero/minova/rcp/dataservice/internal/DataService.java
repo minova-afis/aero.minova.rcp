@@ -26,8 +26,13 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.EventAdmin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -46,14 +51,22 @@ public class DataService implements IDataService {
 	private HttpClient httpClient;
 	private Gson gson;
 
-	private String username = "admin";
-	private String password = "rqgzxTf71EAx8chvchMi";
+	private String username = null;//"admin";
+	private String password = null;//"rqgzxTf71EAx8chvchMi";
 	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
-	private String server = "https://publictest.minova.com:17280";
+	private String server = null;//"https://publictest.minova.com:17280";
 
 	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
 	// Ticket-Anfragen zu versenden
 	// private String server = "https://mintest.minova.com:8084";
+	
+	@Override
+	public void setCredentials(String username, String password, String server) {
+		this.username = username;
+		this.password = password;
+		this.server = server;
+	}
+	
 
 	private void init() {
 
