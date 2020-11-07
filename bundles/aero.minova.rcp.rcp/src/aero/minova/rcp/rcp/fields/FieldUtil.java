@@ -2,8 +2,10 @@ package aero.minova.rcp.rcp.fields;
 
 import java.util.function.Consumer;
 
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
@@ -41,9 +43,9 @@ public class FieldUtil {
 	private FieldUtil() {
 	}
 
-	protected static void addDataToText(Text t, Field f, DataType datatype) {
-		t.setData(Constants.CONTROL_FIELD, f);
-		t.setData(Constants.CONTROL_DATATYPE, datatype);
+	protected static void addDataToText(Widget control, Field f, DataType datatype) {
+		control.setData(Constants.CONTROL_FIELD, f);
+		control.setData(Constants.CONTROL_DATATYPE, datatype);
 	}
 
 	protected static void addConsumer(Object o, Field field) {
