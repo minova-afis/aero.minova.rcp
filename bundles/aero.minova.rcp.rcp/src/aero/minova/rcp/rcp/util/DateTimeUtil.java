@@ -6,7 +6,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,6 +70,20 @@ public class DateTimeUtil {
 		DateTimeUtil.year = year;
 		DateTimeUtil.week = week;
 		DateTimeUtil.shortcuts = day + month + year + week;
+	}
+
+	public static Instant getDate(String input, Locale locale) {
+		Instant date = getDate(input);
+		LocalDate ld;
+		if (date == null && !input.isEmpty()) {
+			try {
+				ld = LocalDate.parse(input, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
+				date = ld.atStartOfDay().toInstant(ZoneOffset.UTC);
+			} catch (DateTimeParseException dtpe) {
+				date = null;
+			}
+		}
+		return date;
 	}
 
 	public static Instant getDate(String input) {

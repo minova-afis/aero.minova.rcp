@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.FIELD_VALUE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
@@ -13,9 +14,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 import java.util.function.Consumer;
 
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -23,16 +24,11 @@ import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.form.model.xsd.Field;
@@ -54,8 +50,8 @@ public class ShortDateField {
 
 			@Override
 			public List<String> getContent(String entry) {
-				Vector<String> result = new Vector<>();
-				Instant date = DateTimeUtil.getDate(entry);
+				ArrayList<String> result = new ArrayList<>();
+				Instant date = DateTimeUtil.getDate(entry, locale);
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
@@ -88,28 +84,14 @@ public class ShortDateField {
 		text.setLayoutData(textFormData);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
-			Instant i = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getInstantValue();
-			LocalDate ld = LocalDate.ofInstant(i, ZoneId.of("UTC"));
-			Locale l = (Locale) text.getData(TRANSLATE_LOCALE);
-			text.setText(ld.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(l)));
+			Instant date = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getInstantValue();
+			updateValue(text, date);
 		});
-		text.addVerifyListener(new VerifyListener() {
-
-			@Override
-			public void verifyText(VerifyEvent e) {
-				System.out.println(e.text + " Short Date " + ((Text) e.widget).getText());
-				if (",".equals(e.text)) {
-					((Text) e.widget).setText("100,00");
-					((Text) e.widget).setSelection(4);
-					e.doit = false;
-				}
-			}
-		});
-
 		text.addFocusListener(new FocusListener() {
-
 			@Override
 			public void focusLost(FocusEvent e) {
+				String input = text.getText();
+				updateValue(text, DateTimeUtil.getDate(input, locale));
 			}
 
 			@Override
@@ -117,15 +99,15 @@ public class ShortDateField {
 				text.selectAll();
 			}
 		});
-		text.addListener(SWT.None, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-
-			}
-		});
 
 		return text;
+	}
+
+	public static void updateValue(TextAssist text, Instant date) {
+		text.setData(FIELD_VALUE, date);
+		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
+		Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
+		text.setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 	}
 
 }
