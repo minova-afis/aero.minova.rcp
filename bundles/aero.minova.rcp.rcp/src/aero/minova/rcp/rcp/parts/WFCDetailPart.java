@@ -2,6 +2,7 @@
 package aero.minova.rcp.rcp.parts;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -278,6 +279,11 @@ public class WFCDetailPart extends WFCFormPart {
 				if (control instanceof Composite) {
 					translate((Composite) control);
 				}
+			}
+		}
+		for (Control control : composite.getChildren()) {
+			if (control.getData(TRANSLATE_LOCALE) != null) {
+				control.setData(TRANSLATE_LOCALE, locale);
 			}
 		}
 	}
