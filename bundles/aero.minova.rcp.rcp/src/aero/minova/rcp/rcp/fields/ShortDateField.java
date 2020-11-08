@@ -114,18 +114,7 @@ public class ShortDateField {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-//				Text actionWidget = (Text) e.widget;
-//				Point loc = actionWidget.toDisplay(actionWidget.getLocation());
-//				Point size = actionWidget.getSize();
-//				System.out.println(loc);
-//				System.out.println(size);
-////				Point loc = actionWidget.getLocation();
-//				tip.setLocation(loc.x, loc.y);
-////				tip.setMessage(actionWidget.getText());
-//				tip.setText("TT");
-//				tip.setVisible(true);
-//				System.out.println("Integer: " + Integer.MAX_VALUE);
-//				System.out.println("Long: " + Long.MAX_VALUE);
+				text.selectAll();
 			}
 		});
 		text.addListener(SWT.None, new Listener() {
