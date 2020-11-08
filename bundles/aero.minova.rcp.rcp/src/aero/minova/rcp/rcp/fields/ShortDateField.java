@@ -1,37 +1,12 @@
 package aero.minova.rcp.rcp.fields;
 
-import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
-import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolTip;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.REUtil;
-
-import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.DataType;
-import aero.minova.rcp.rcp.util.DateTimeUtil;
-
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -40,6 +15,27 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+
+import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
 
 public class ShortDateField {
 
@@ -83,10 +79,6 @@ public class ShortDateField {
 		label.setData(TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);
 
-		final ToolTip tip = new ToolTip(composite.getShell(), SWT.NONE);
-		tip.setMessage(
-				"Here is a message for the user. When the message is too long it wraps. I should say something cool but nothing comes to my mind.");
-
 		text.setMessage("01.01.2000");
 		text.setLayoutData(textFormData);
 		text.setData(TRANSLATE_LOCALE, locale);
@@ -101,7 +93,6 @@ public class ShortDateField {
 					((Text) e.widget).setSelection(4);
 					e.doit = false;
 				}
-				tip.setMessage("test" + ((Text) e.widget).getText());
 			}
 		});
 
@@ -109,7 +100,6 @@ public class ShortDateField {
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				tip.setVisible(false);
 			}
 
 			@Override
