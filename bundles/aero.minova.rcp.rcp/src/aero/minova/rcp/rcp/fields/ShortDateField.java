@@ -12,9 +12,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
@@ -35,6 +37,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
 
 public class ShortDateField {
@@ -46,25 +50,25 @@ public class ShortDateField {
 			Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		TextAssistContentProvider s = new TextAssistContentProvider() {
+		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
 
 			@Override
 			public List<String> getContent(String entry) {
 				Vector<String> result = new Vector<>();
 				Instant date = DateTimeUtil.getDate(entry);
-				if (date==null && !entry.isEmpty()) {
+				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
 					LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
-					result.add(localDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+					result.add(
+							localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 				}
 				return result;
 			}
 
 		};
-		TextAssist text = new TextAssist(composite, SWT.BORDER, s);
+		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
-		FieldUtil.addConsumer(text, field);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -80,9 +84,15 @@ public class ShortDateField {
 		label.setLayoutData(labelFormData);
 
 		text.setMessage("01.01.2000");
+		text.setNumberOfLines(1);
 		text.setLayoutData(textFormData);
 		text.setData(TRANSLATE_LOCALE, locale);
-
+		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
+			Instant i = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getInstantValue();
+			LocalDate ld = LocalDate.ofInstant(i, ZoneId.of("UTC"));
+			Locale l = (Locale) text.getData(TRANSLATE_LOCALE);
+			text.setText(ld.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(l)));
+		});
 		text.addVerifyListener(new VerifyListener() {
 
 			@Override
