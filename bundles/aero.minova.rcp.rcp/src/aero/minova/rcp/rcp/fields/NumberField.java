@@ -71,7 +71,7 @@ public class NumberField {
 		text.setData(FIELD_MIN_VALUE, minimum);
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
-		text.addVerifyListener(new NumberFieldVerifier(text));
+		text.addVerifyListener(new NumberFieldVerifier());
 
 		unit.setData(TRANSLATE_PROPERTY, unitText);
 		unit.setLayoutData(unitFormData);
