@@ -19,10 +19,13 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class LookupCASRequestUtil {
+	private LookupCASRequestUtil() {
+	}
+
 	public static CompletableFuture<?> getRequestedTable(int keyLong, String keyText, Field field,
 			Map<String, Control> controls, IDataService dataService, UISynchronize sync, String purpose) {
 		String tableName;
-		Boolean isTable = false;
+		boolean isTable = false;
 		if (field.getLookup().getTable() != null) {
 			tableName = field.getLookup().getTable();
 			isTable = true;

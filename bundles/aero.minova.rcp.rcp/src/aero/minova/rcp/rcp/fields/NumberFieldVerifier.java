@@ -4,12 +4,9 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Text;
-
-import static aero.minova.rcp.rcp.fields.ValueChangedEvent.SourceType;
 
 public class NumberFieldVerifier implements VerifyListener {
 
@@ -35,13 +32,10 @@ public class NumberFieldVerifier implements VerifyListener {
 		numberFormat.setGroupingUsed(true);
 		String insertion = e.text;
 		String text = field.getText();
-		// String selection = text.substring(e.start, e.end);
-		if (e.text.equals("" + dfs.getDecimalSeparator())) {
-			if (text.indexOf(dfs.getDecimalSeparator()) > 0) {
-				field.setSelection(text.indexOf(dfs.getDecimalSeparator()) + 1);
-				e.doit = false;
-				return;
-			}
+		if (e.text.equals("" + dfs.getDecimalSeparator()) && text.indexOf(dfs.getDecimalSeparator()) >= 0) {
+			field.setSelection(text.indexOf(dfs.getDecimalSeparator()) + 1);
+			e.doit = false;
+			return;
 		}
 
 		int caretPosition = field.getCaretPosition();
@@ -53,15 +47,18 @@ public class NumberFieldVerifier implements VerifyListener {
 		}
 		newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
 		newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
-		double newValue = Double.parseDouble(newText);
-		Double oldValue = (Double) field.getData(FieldUtil.FIELD_VALUE);
-		newText = numberFormat.format(newValue);
-		verificationActive = true;
-		field.setText(newText);
+		Double newValue;
+		if (newText.isEmpty()) {
+			newValue = null;
+		} else {
+			newValue = Double.parseDouble(newText);
+			newText = numberFormat.format(newValue);
+			verificationActive = true;
+			field.setText(newText);
+			field.setSelection(caretPosition + insertion.length());
+			verificationActive = false;
+		}
 		field.setData(FieldUtil.FIELD_VALUE, newValue);
-		field.notifyListeners(SWT.NONE, new ValueChangedEvent(field, oldValue, newValue, SourceType.USER));
-		field.setSelection(caretPosition + insertion.length());
-		verificationActive = false;
 		e.doit = false;
 	}
 

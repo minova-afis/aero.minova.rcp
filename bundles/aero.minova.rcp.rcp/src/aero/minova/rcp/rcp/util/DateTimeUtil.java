@@ -6,50 +6,49 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Vector;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in
- * Instant
+ * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in Instant
  * 
  * @author Wilfried Saak
  *
  */
 public class DateTimeUtil {
-
 	private static String day = "d";
 	private static String month = "m";
 	private static String year = "y";
 	private static String week = "w";
 	private static String shortcuts = day + month + year + week;
 
+	private DateTimeUtil() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	/**
-	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es
-	 * dürfen keine doppelten Kürzel verwendet werden. Alle Kürzel müssen als
-	 * Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
-	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol
-	 * bestehen.
+	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet
+	 * werden. Alle Kürzel müssen als Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
+	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol bestehen.
 	 * 
 	 * @param day   das Kürzel für Tag. Default (englisch) ist "d"
 	 * @param month das Kürzel für Monat. Default (englisch) ist "m"
 	 * @param year  das Kürzel für Jahr. Default (englisch) ist "y"
 	 * @param week  das Kürzel für Woche. Default (englisch) ist "w"
 	 * 
-	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen
-	 *                                     Bedingungen nicht erfüllt ist
+	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
 	 */
-	static public void setShortcuts(String day, String month, String year, String week) {
+	public static void setShortcuts(String day, String month, String year, String week) {
 		// Es muss immer genau ein Zeichen übergeben werden
-		if (day.length() != 1)
-			throw new IllegalArgumentException("Shortcut for day must have length of 1!");
-		if (month.length() != 1)
-			throw new IllegalArgumentException("Shortcut for month must have length of 1!");
-		if (year.length() != 1)
-			throw new IllegalArgumentException("Shortcut for year must have length of 1!");
-		if (week.length() != 1)
-			throw new IllegalArgumentException("Shortcut for week must have length of 1!");
+		if (day.length() != 1) throw new IllegalArgumentException("Shortcut for day must have length of 1!");
+		if (month.length() != 1) throw new IllegalArgumentException("Shortcut for month must have length of 1!");
+		if (year.length() != 1) throw new IllegalArgumentException("Shortcut for year must have length of 1!");
+		if (week.length() != 1) throw new IllegalArgumentException("Shortcut for week must have length of 1!");
 
 		// nur Kleinbuchstaben zulassen
 		day = day.toLowerCase();
@@ -58,18 +57,12 @@ public class DateTimeUtil {
 		week = week.toLowerCase();
 
 		// keine Symbol darf doppelt verwendet werden
-		if (day.equals(month))
-			throw new IllegalArgumentException("Shortcut for day and month must be different!");
-		if (day.equals(year))
-			throw new IllegalArgumentException("Shortcut for day and year must be different!");
-		if (day.equals(week))
-			throw new IllegalArgumentException("Shortcut for day and week must be different!");
-		if (month.equals(year))
-			throw new IllegalArgumentException("Shortcut for month and year must be different!");
-		if (month.equals(week))
-			throw new IllegalArgumentException("Shortcut for month and week must be different!");
-		if (year.equals(week))
-			throw new IllegalArgumentException("Shortcut for year and week must be different!");
+		if (day.equals(month)) throw new IllegalArgumentException("Shortcut for day and month must be different!");
+		if (day.equals(year)) throw new IllegalArgumentException("Shortcut for day and year must be different!");
+		if (day.equals(week)) throw new IllegalArgumentException("Shortcut for day and week must be different!");
+		if (month.equals(year)) throw new IllegalArgumentException("Shortcut for month and year must be different!");
+		if (month.equals(week)) throw new IllegalArgumentException("Shortcut for month and week must be different!");
+		if (year.equals(week)) throw new IllegalArgumentException("Shortcut for year and week must be different!");
 
 		// jetzt können wir uns die Werte merken
 		DateTimeUtil.day = day;
@@ -79,12 +72,26 @@ public class DateTimeUtil {
 		DateTimeUtil.shortcuts = day + month + year + week;
 	}
 
-	static public Instant getDate(String input) {
+	public static Instant getDate(String input, Locale locale) {
+		Instant date = getDate(input);
+		LocalDate ld;
+		if (date == null && !input.isEmpty()) {
+			try {
+				ld = LocalDate.parse(input, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
+				date = ld.atStartOfDay().toInstant(ZoneOffset.UTC);
+			} catch (DateTimeParseException dtpe) {
+				date = null;
+			}
+		}
+		return date;
+	}
+
+	public static Instant getDate(String input) {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	static public Instant getDate(Instant today, String input) {
-		String formulars[] = splitInput(input);
+	public static Instant getDate(Instant today, String input) {
+		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
 
 		if (formulars.length == 0) {
@@ -101,7 +108,7 @@ public class DateTimeUtil {
 					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC"))
 							.atStartOfDay();
 				}
-				while (pos < formulars.length) {
+				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
 				}
 			}
@@ -113,7 +120,7 @@ public class DateTimeUtil {
 	}
 
 	static String[] splitInput(String input) {
-		Vector<String> splits = new Vector<String>();
+		ArrayList<String> splits = new ArrayList<>();
 		String regex;
 		Pattern pattern;
 		Matcher matcher;
@@ -136,8 +143,7 @@ public class DateTimeUtil {
 		while (input.length() > 0) {
 			matcher = pattern.matcher(input);
 			boolean b = matcher.find();
-			if (!b)
-				break;
+			if (!b) break;
 			String result = matcher.group(0);
 			splits.add(checkMissingDay(result));
 			input = input.substring(result.length());
@@ -148,18 +154,18 @@ public class DateTimeUtil {
 			return new String[0];
 		}
 
-		return (String[]) splits.toArray(new String[0]);
+		return splits.toArray(new String[0]);
 	}
 
 	static String checkMissingDay(String result) {
-		if ((result.endsWith("+") || result.endsWith("-")))
-			return result + day;
-		else
-			return result;
+		if ((result.endsWith("+") || result.endsWith("-"))) return result + day;
+		else return result;
 	}
 
 	static Instant getNumericDate(Instant now, String input) {
-		int day, month, year;
+		int day;
+		int month;
+		int year;
 		LocalDateTime startOfToday = LocalDate.ofInstant(now, ZoneId.of("UTC")).atStartOfDay();
 
 		if ("0".equals(input)) {
@@ -169,9 +175,6 @@ public class DateTimeUtil {
 		case 1: // nur der Tag im aktuellen Monat
 			return startOfToday.withDayOfMonth(Integer.parseInt(input)).toInstant(ZoneOffset.UTC);
 		case 2: // 1. Stelle Tag im Monat, 2. Stelle Monat
-			day = Integer.parseInt(input.substring(0, 1));
-			month = Integer.parseInt(input.substring(1));
-			return startOfToday.withMonth(month).withDayOfMonth(day).toInstant(ZoneOffset.UTC);
 		case 3: // 1. Stelle Tag im Monat, Stelle 3-4 Monat
 			day = Integer.parseInt(input.substring(0, 1));
 			month = Integer.parseInt(input.substring(1));
@@ -204,8 +207,9 @@ public class DateTimeUtil {
 			month = Integer.parseInt(input.substring(2, 4));
 			year = Integer.parseInt(input.substring(4));
 			return LocalDate.of(year, month, day).atStartOfDay().toInstant(ZoneOffset.UTC);
+		default:
+			return null;
 		}
-		return null;
 	}
 
 	static LocalDateTime addRelativeDate(LocalDateTime startOfDay, String input) {

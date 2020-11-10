@@ -41,7 +41,7 @@ public class PreferenceWindowModel {
 
 	private PreferenceTabDescriptor buildAnwendungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow",
-				"icons/application.png", "applicationTab",
+				"icons/Application.png", "applicationTab",
 				translationService.translate("@Preferences.Application", null), 0.1);
 		PreferenceSectionDescriptor psd = new PreferenceSectionDescriptor("generalexecution",
 				translationService.translate("@Preferences.General", null), 0.1);
@@ -55,7 +55,7 @@ public class PreferenceWindowModel {
 	private PreferenceTabDescriptor buildDarstellungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/design.png", "designTab",
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Locale.png", "designTab",
 				translationService.translate("@Preferences.Layout", null), 0.2);
 		psd = new PreferenceSectionDescriptor("generaldesign",
 				translationService.translate("@Preferences.General", null), 0.1);
@@ -82,7 +82,7 @@ public class PreferenceWindowModel {
 	private PreferenceTabDescriptor buildErweiterungTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/erweitert.png", "expandedTab",
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Extended.png", "expandedTab",
 				translationService.translate("@Preferences.Advanced", null), 0.3);
 		psd = new PreferenceSectionDescriptor("generalexpanded", "Allgemeines", 0.1);
 		ptd.add(psd);
@@ -150,7 +150,7 @@ public class PreferenceWindowModel {
 	private PreferenceTabDescriptor buildDruckenTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "printTab",
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Print.png", "printTab",
 				translationService.translate("@Action.Print", null), 0.4);
 		psd = new PreferenceSectionDescriptor("print", translationService.translate("@Action.Print", null), 0.1);
 		ptd.add(psd);
@@ -175,7 +175,7 @@ public class PreferenceWindowModel {
 	private PreferenceTabDescriptor buildConsoleTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "consoleTab",
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Console.png", "consoleTab",
 				translationService.translate("@Form.Console", null), 0.5);
 		psd = new PreferenceSectionDescriptor("console", translationService.translate("@Form.Console", null), 0.1);
 		ptd.add(psd);
@@ -188,7 +188,7 @@ public class PreferenceWindowModel {
 	private PreferenceTabDescriptor buildSISTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "", "sisTab",
+		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/SIS.png", "sisTab",
 				translationService.translate("@WorkingTime", null), 0.6);
 		psd = new PreferenceSectionDescriptor("user", translationService.translate("@WorkingTime.UserPreselect", null),
 				0.1);

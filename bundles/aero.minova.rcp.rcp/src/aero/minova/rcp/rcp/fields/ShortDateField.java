@@ -1,34 +1,41 @@
 package aero.minova.rcp.rcp.fields;
 
+import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
+import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.FIELD_VALUE;
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
+import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
+
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
-
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
-
-import java.util.Locale;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
 
 public class ShortDateField {
 
@@ -39,9 +46,25 @@ public class ShortDateField {
 			Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "", SWT.BORDER);
+		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
+
+			@Override
+			public List<String> getContent(String entry) {
+				ArrayList<String> result = new ArrayList<>();
+				Instant date = DateTimeUtil.getDate(entry, locale);
+				if (date == null && !entry.isEmpty()) {
+					result.add("!Error converting");
+				} else {
+					LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
+					result.add(
+							localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+				}
+				return result;
+			}
+
+		};
+		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
-		FieldUtil.addConsumer(text, field);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -56,60 +79,35 @@ public class ShortDateField {
 		label.setData(TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);
 
-		final ToolTip tip = new ToolTip(composite.getShell(), SWT.NONE);
-		tip.setMessage(
-				"Here is a message for the user. When the message is too long it wraps. I should say something cool but nothing comes to my mind.");
-
 		text.setMessage("01.01.2000");
+		text.setNumberOfLines(1);
 		text.setLayoutData(textFormData);
 		text.setData(TRANSLATE_LOCALE, locale);
-
-		text.addVerifyListener(new VerifyListener() {
-
-			@Override
-			public void verifyText(VerifyEvent e) {
-				System.out.println(e.text + " " + ((Text) e.widget).getText());
-				if (",".equals(e.text)) {
-					((Text) e.widget).setText("100,00");
-					((Text) e.widget).setSelection(4);
-					e.doit = false;
-				}
-				tip.setMessage("test" + ((Text) e.widget).getText());
-			}
+		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
+			Instant date = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getInstantValue();
+			updateValue(text, date);
 		});
-
 		text.addFocusListener(new FocusListener() {
-
 			@Override
 			public void focusLost(FocusEvent e) {
-				tip.setVisible(false);
+				String input = text.getText();
+				updateValue(text, DateTimeUtil.getDate(input, locale));
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				Text actionWidget = (Text) e.widget;
-				Point loc = actionWidget.toDisplay(actionWidget.getLocation());
-				Point size = actionWidget.getSize();
-				System.out.println(loc);
-				System.out.println(size);
-//				Point loc = actionWidget.getLocation();
-				tip.setLocation(loc.x, loc.y);
-//				tip.setMessage(actionWidget.getText());
-				tip.setText("TT");
-				tip.setVisible(true);
-				System.out.println("Integer: " + Integer.MAX_VALUE);
-				System.out.println("Long: " + Long.MAX_VALUE);
-			}
-		});
-		text.addListener(SWT.None, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-
+				text.selectAll();
 			}
 		});
 
 		return text;
+	}
+
+	public static void updateValue(TextAssist text, Instant date) {
+		text.setData(FIELD_VALUE, date);
+		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
+		Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
+		text.setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 	}
 
 }

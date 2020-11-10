@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -196,6 +197,11 @@ public class DateTimeUtilTests {
 				.toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(2020, DECEMBER, 31).atStartOfDay().toInstant(ZoneOffset.UTC);
 		assertEquals(expected, DateTimeUtil.getDate(bithday, "11+1j-"));
+	}
+
+	@Test
+	public void testGetDate0minus1() {
+		assertNull(DateTimeUtil.getDate("0-1", Locale.GERMANY));
 	}
 
 	@Test
