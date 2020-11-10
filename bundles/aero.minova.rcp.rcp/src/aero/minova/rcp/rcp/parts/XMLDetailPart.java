@@ -42,7 +42,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -71,9 +70,6 @@ public class XMLDetailPart {
 
 	@Inject
 	private IDataFormService dataFormService;
-
-	@Inject
-	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	private IDataService dataService;
@@ -216,13 +212,7 @@ public class XMLDetailPart {
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
-								if (localTable != null) {
-									changeOptionsForLookupField(localTable, c, false);
-								} else {
-									requestOptionsFromCAS(lc);
-
-								}
+								requestOptionsFromCAS(lc);
 							} else {
 								changeSelectionBoxList(lc, false);
 							}
@@ -237,13 +227,7 @@ public class XMLDetailPart {
 								changeSelectionBoxList(c, false);
 							} else {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
-								if (localTable != null) {
-									changeOptionsForLookupField(localTable, c, false);
-								} else {
-									broker.post("LoadAllLookUpValues", field.getName());
-
-								}
+								broker.post("LoadAllLookUpValues", field.getName());
 							}
 						}
 					}
@@ -298,11 +282,9 @@ public class XMLDetailPart {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
 				changeOptionsForLookupField(sql.getResultSet(), c, false);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				localDatabaseService.replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, c, false);
 			}
 
@@ -439,11 +421,9 @@ public class XMLDetailPart {
 			tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 				if (ta instanceof SqlProcedureResult) {
 					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
 					changeOptionsForLookupField(sql.getResultSet(), control, true);
 				} else if (ta instanceof Table) {
 					Table t1 = (Table) ta;
-					localDatabaseService.replaceResultsForLookupField(field.getName(), t1);
 					changeOptionsForLookupField(t1, control, true);
 				}
 

@@ -152,11 +152,7 @@ public class WFCDetailCASRequestsUtil {
 		Table table = selectedTable;
 
 		for (Control c : controls.values()) {
-			if (c instanceof Text) {
-				Text t = (Text) c;
-				t.setText("");
-
-			} else if (c instanceof LookupControl) {
+			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
 				lc.setText("");
 				lc.getDescription().setText("");

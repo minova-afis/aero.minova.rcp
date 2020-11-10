@@ -3,10 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
 Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
 Bundle-Version: 1.2.0.qualifier
-Export-Package: aero.minova.rcp.rcp.util,
- aero.minova.rcp.rcp.widgets
-Require-Bundle: 
- aero.minova.rcp.form.model,
+Export-Package: aero.minova.rcp.rcp.util,aero.minova.rcp.rcp.widgets
+Require-Bundle: aero.minova.rcp.form.model,
  aero.minova.rcp.form.menu,
  aero.minova.rcp.preferencewindow,
  aero.minova.rcp.model,
@@ -49,10 +47,9 @@ Require-Bundle:
  ca.odell.glazedlists;bundle-version="1.9.0",
  org.eclipse.nebula.widgets.nattable.extension.glazedlists;bundle-version="1.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: aero.minova.rcp.core.ui,
- aero.minova.rcp.perspectiveswitcher.commands,
- aero.minova.rcp.perspectiveswitcher.handler,
- javax.annotation;version="1.0.0";resolution:=optional,
- javax.inject;version="1.0.0",
- org.eclipse.e4.ui.css.swt.theme
+Import-Package: aero.minova.rcp.core.ui,aero.minova.rcp.perspectiveswitc
+ her.commands,aero.minova.rcp.perspectiveswitcher.handler,javax.annotati
+ on;version="1.0.0";resolution:=optional,javax.inject;version="1.0.0",or
+ g.eclipse.e4.ui.css.swt.theme
 Automatic-Module-Name: aero.minova.rcp.rcp
+

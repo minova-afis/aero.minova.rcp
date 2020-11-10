@@ -37,15 +37,16 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.Table;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.rcp.fields.ShortDateField;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
@@ -68,6 +69,9 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	protected UISynchronize sync;
@@ -105,7 +109,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
-		wfcDetailUtil.bindValues(controls, perspective);
+		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
 		casRequestsUtil.setControls(controls, perspective);
 	}
 
@@ -171,16 +175,19 @@ public class WFCDetailPart extends WFCFormPart {
 		int width = 2;
 		Control control = null;
 		for (Object fieldOrGrid : head.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field)) continue; // erst einmal nur Felder
+			if (!(fieldOrGrid instanceof Field))
+				continue; // erst einmal nur Felder
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible()) continue; // nur sichtbare Felder
+			if (!field.isVisible())
+				continue; // nur sichtbare Felder
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null) controls.put(field.getName(), control);
+			if (control != null)
+				controls.put(field.getName(), control);
 			column += width;
 		}
 
@@ -193,16 +200,19 @@ public class WFCDetailPart extends WFCFormPart {
 		int width;
 		Control control;
 		for (Object fieldOrGrid : page.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field)) continue; // erst einmal nur Felder
+			if (!(fieldOrGrid instanceof Field))
+				continue; // erst einmal nur Felder
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible()) continue; // nur sichtbare Felder
+			if (!field.isVisible())
+				continue; // nur sichtbare Felder
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null) controls.put(field.getName(), control);
+			if (control != null)
+				controls.put(field.getName(), control);
 			column += width;
 			row += getExtraHeight(field);
 		}
@@ -258,7 +268,8 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private void translate(TranslationService translationService) {
 		this.translationService = translationService;
-		if (translationService != null && composite != null) translate(composite);
+		if (translationService != null && composite != null)
+			translate(composite);
 	}
 
 	private void translate(Composite composite) {
@@ -288,8 +299,9 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von
-	 * Ergebnissen Erstellt, diese wird dem benutzer zur verfügung gestellt.
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
+	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
+	 * dem benutzer zur verfügung gestellt.
 	 *
 	 * @param luc
 	 */
@@ -309,10 +321,12 @@ public class WFCDetailPart extends WFCFormPart {
 					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
 					if (ta instanceof SqlProcedureResult) {
 						SqlProcedureResult sql = (SqlProcedureResult) ta;
-						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, true);
+						localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
+						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, false);
 					} else if (ta instanceof Table) {
-						Table t1 = (Table) ta;
-						lookupUtil.changeOptionsForLookupField(t1, control, true);
+						Table t = (Table) ta;
+						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+						lookupUtil.changeOptionsForLookupField(t, control, false);
 					}
 
 				}));
