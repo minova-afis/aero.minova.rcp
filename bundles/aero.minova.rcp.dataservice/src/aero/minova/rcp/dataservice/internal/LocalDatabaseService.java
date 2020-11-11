@@ -82,6 +82,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			collumn = new Column("Description", DataType.STRING);
 			t.addColumn(collumn);
 			try {
+				s = conn.createStatement();
 				rs = s.executeQuery("SELECT * FROM Lookupvalues WHERE Lookup ='" + name + "'");
 				if (!rs.next()) {
 					return null;
@@ -97,10 +98,13 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			} catch (SQLException e) {
 				System.out.println("Auslesen der Datenbank fehlgeschlagen.");
 				e.printStackTrace();
+				disconnect();
 				return null;
 			}
+			disconnect();
 			return t;
 		} else {
+			disconnect();
 			return null;
 		}
 	}
@@ -122,18 +126,24 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					insertEntryOfLookup.setString(1, name);
 					insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
 					insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
-					insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex("Description")).getStringValue());
+					if (r.getValue(table.getColumnIndex("Description")) != null) {
+						insertEntryOfLookup.setString(4,
+								r.getValue(table.getColumnIndex("Description")).getStringValue());
+					} else {
+						insertEntryOfLookup.setString(4, "");
+					}
 
 					i++;
 				}
 				deleteAllEntriesOfLookup.execute();
 				insertEntryOfLookup.execute();
 			} catch (SQLException e) {
+				disconnect();
 				System.out.println("Austausch der Werte der Datenbank fehlgeschlagen.");
 				e.printStackTrace();
 			}
 		}
-
+		disconnect();
 	}
 
 	private void disconnect() {
