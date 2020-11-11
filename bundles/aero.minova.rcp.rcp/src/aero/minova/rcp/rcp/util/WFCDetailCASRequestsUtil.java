@@ -527,6 +527,37 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
+	@Inject
+	public void getTicket(@UIEventTopic("WFCReceivedTicket") Table recievedTable) {
+
+		for (Control c : controls.values()) {
+			if (c instanceof LookupControl) {
+				LookupControl lc = (LookupControl) c;
+				lc.setText("");
+				lc.setData(Constants.CONTROL_KEYLONG, null);
+				lc.getDescription().setText("");
+			}
+		}
+		Row recievedRow = recievedTable.getRows().get(0);
+		Row r = selectedTable.getRows().get(0);
+		for (int i = 0; i < r.size(); i++) {
+			if ((recievedTable.getColumnIndex(selectedTable.getColumnName(i))) >= 0) {
+				r.setValue(recievedRow.getValue(recievedTable.getColumnIndex(selectedTable.getColumnName(i))), i);
+			} else {
+				Control c = controls.get(selectedTable.getColumnName(i));
+				if (c instanceof LookupControl) {
+					LookupControl lc = (LookupControl) c;
+					r.setValue(new Value(lc.getText(), DataType.INTEGER), i);
+				} else {
+					Text t = (Text) c;
+					r.setValue(new Value(t.getText(), DataType.STRING), i);
+				}
+			}
+		}
+
+		updateSelectedEntry();
+	}
+
 	public Map<String, Control> getControls() {
 		return controls;
 	}
