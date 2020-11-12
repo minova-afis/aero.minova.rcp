@@ -130,7 +130,7 @@ public class WFCDetailUtil {
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
-								&& e.keyCode != SWT.SPACE) {
+								&& e.keyCode != SWT.SPACE && !lc.getText().startsWith("#")) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								lookupUtil.requestOptionsFromCAS(lc);
 							} else {
