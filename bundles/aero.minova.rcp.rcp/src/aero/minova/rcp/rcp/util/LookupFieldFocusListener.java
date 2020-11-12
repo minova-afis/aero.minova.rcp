@@ -2,8 +2,6 @@ package aero.minova.rcp.rcp.util;
 
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.events.FocusEvent;
@@ -24,10 +22,8 @@ public class LookupFieldFocusListener implements FocusListener {
 
 	protected UISynchronize sync;
 
-	@Inject
 	private IDataService dataService;
 
-	@Inject
 	private IEventBroker broker;
 
 	public LookupFieldFocusListener(IEventBroker broker, IDataService dataService, UISynchronize sync) {
@@ -75,7 +71,7 @@ public class LookupFieldFocusListener implements FocusListener {
 				ticketTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			if (t.getResultSet() != null) {
-				broker.post("WFCReceivedTicket", t);
+				broker.post("WFCReceivedTicket", t.getResultSet());
 			} else {
 				lc.setText("");
 			}

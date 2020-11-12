@@ -546,6 +546,12 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 		Row recievedRow = recievedTable.getRows().get(0);
+		if (selectedTable == null) {
+			selectedTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
+			selectedTable.addRow();
+		} else if (selectedTable.getRows() == null) {
+			selectedTable.addRow();
+		}
 		Row r = selectedTable.getRows().get(0);
 		for (int i = 0; i < r.size(); i++) {
 			if ((recievedTable.getColumnIndex(selectedTable.getColumnName(i))) >= 0) {
@@ -555,9 +561,13 @@ public class WFCDetailCASRequestsUtil {
 				if (c instanceof LookupControl) {
 					LookupControl lc = (LookupControl) c;
 					r.setValue(new Value(lc.getText(), DataType.INTEGER), i);
-				} else {
+				} else if (c instanceof Text) {
 					Text t = (Text) c;
-					r.setValue(new Value(t.getText(), DataType.STRING), i);
+					if (t.getText() != null) {
+						r.setValue(new Value(t.getText(), DataType.STRING), i);
+					} else {
+						r.setValue(new Value("", DataType.STRING), i);
+					}
 				}
 			}
 		}
