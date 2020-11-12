@@ -118,8 +118,9 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 						"INSERT INTO Lookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
 				deleteAllEntriesOfLookup = conn
 						.prepareStatement("DELETE FROM Lookupvalues WHERE Lookup='" + name + "'");
-				int i = 0;
+				deleteAllEntriesOfLookup.execute();
 
+				int i = 0;
 				while (i < table.getRows().size()) {
 					Row r = table.getRows().get(i);
 					insertEntryOfLookup.setString(1, name);
@@ -131,11 +132,10 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					} else {
 						insertEntryOfLookup.setString(4, "");
 					}
+					insertEntryOfLookup.execute();
 
 					i++;
 				}
-				deleteAllEntriesOfLookup.execute();
-				insertEntryOfLookup.execute();
 				conn.commit();
 			} catch (SQLException e) {
 				System.out.println("Austausch der Werte der Datenbank fehlgeschlagen.");
