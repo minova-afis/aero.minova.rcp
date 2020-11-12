@@ -88,7 +88,11 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					Row r = new Row();
 					r.addValue(new Value(rs.getInt(3), DataType.INTEGER));
 					r.addValue(new Value(rs.getString(4), DataType.STRING));
-					r.addValue(new Value(rs.getString(5), DataType.STRING));
+					if (rs.getString(5).equals("")) {
+						r.addValue(null);
+					} else {
+						r.addValue(new Value(rs.getString(5), DataType.STRING));
+					}
 					t.addRow(r);
 
 				}
