@@ -150,45 +150,48 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void updateSelectedEntry() {
 		Table table = selectedTable;
+		if (selectedTable != null) {
+			for (Control c : controls.values()) {
+				if (c instanceof Text) {
+					Text t = (Text) c;
+					t.setText("");
 
-		for (Control c : controls.values()) {
-			if (c instanceof Text) {
-				Text t = (Text) c;
-				t.setText("");
+				} else if (c instanceof LookupControl) {
+					LookupControl lc = (LookupControl) c;
+					lc.setText("");
+					lc.getDescription().setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getTextControl().setMessage("...");
 
-			} else if (c instanceof LookupControl) {
-				LookupControl lc = (LookupControl) c;
-				lc.setText("");
-				lc.getDescription().setText("");
-				lc.getTextControl().setMessage("...");
+				}
 			}
-		}
 
-		for (int i = 0; i < table.getColumnCount(); i++) {
-			String name = table.getColumnName(i);
-			Control c = controls.get(name);
-			if (c != null) {
-				Consumer<Table> consumer = (Consumer<Table>) c.getData(Constants.CONTROL_CONSUMER);
-				if (consumer != null) {
-					try {
-						consumer.accept(table);
-					} catch (Exception e) {
+			for (int i = 0; i < table.getColumnCount(); i++) {
+				String name = table.getColumnName(i);
+				Control c = controls.get(name);
+				if (c != null) {
+					Consumer<Table> consumer = (Consumer<Table>) c.getData(Constants.CONTROL_CONSUMER);
+					if (consumer != null) {
+						try {
+							consumer.accept(table);
+						} catch (Exception e) {
+						}
 					}
-				}
-				Map hash = new HashMap<>();
-				hash.put("value", table.getRows().get(0).getValue(i));
-				hash.put("sync", sync);
-				hash.put("dataService", dataService);
-				hash.put("control", c);
+					Map hash = new HashMap<>();
+					hash.put("value", table.getRows().get(0).getValue(i));
+					hash.put("sync", sync);
+					hash.put("dataService", dataService);
+					hash.put("control", c);
 
-				Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
-				if (lookupConsumer != null) {
-					try {
-						lookupConsumer.accept(hash);
-					} catch (Exception e) {
+					Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
+					if (lookupConsumer != null) {
+						try {
+							lookupConsumer.accept(hash);
+						} catch (Exception e) {
+						}
 					}
-				}
 
+				}
 			}
 		}
 	}
@@ -540,9 +543,11 @@ public class WFCDetailCASRequestsUtil {
 		for (Control c : controls.values()) {
 			if (c instanceof LookupControl) {
 				LookupControl lc = (LookupControl) c;
-				lc.setText("");
-				lc.setData(Constants.CONTROL_KEYLONG, null);
-				lc.getDescription().setText("");
+				if (!(lc == controls.get(Constants.EMPLOYEEKEY))) {
+					lc.setText("");
+					lc.setData(Constants.CONTROL_KEYLONG, null);
+					lc.getDescription().setText("");
+				}
 			}
 		}
 		Row recievedRow = recievedTable.getRows().get(0);
@@ -560,7 +565,7 @@ public class WFCDetailCASRequestsUtil {
 				Control c = controls.get(selectedTable.getColumnName(i));
 				if (c instanceof LookupControl) {
 					LookupControl lc = (LookupControl) c;
-					r.setValue(new Value(lc.getText(), DataType.INTEGER), i);
+					r.setValue(new Value(lc.getData(Constants.CONTROL_KEYLONG), DataType.INTEGER), i);
 				} else if (c instanceof Text) {
 					Text t = (Text) c;
 					if (t.getText() != null) {
