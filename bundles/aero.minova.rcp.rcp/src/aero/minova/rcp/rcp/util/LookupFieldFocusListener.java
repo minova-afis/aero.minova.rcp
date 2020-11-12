@@ -30,9 +30,10 @@ public class LookupFieldFocusListener implements FocusListener {
 	@Inject
 	private IEventBroker broker;
 
-	public LookupFieldFocusListener(IEventBroker broker, IDataService dataService) {
+	public LookupFieldFocusListener(IEventBroker broker, IDataService dataService, UISynchronize sync) {
 		this.broker = broker;
 		this.dataService = dataService;
+		this.sync = sync;
 	}
 
 	/**
@@ -73,7 +74,6 @@ public class LookupFieldFocusListener implements FocusListener {
 		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(),
 				ticketTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-			System.out.println("returnwert");
 			if (t.getResultSet() != null) {
 				broker.post("WFCReceivedTicket", t);
 			} else {
