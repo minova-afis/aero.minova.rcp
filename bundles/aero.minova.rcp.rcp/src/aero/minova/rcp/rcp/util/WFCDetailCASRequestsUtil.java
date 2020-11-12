@@ -527,6 +527,13 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
+	/**
+	 * Antworten des CAS für Ticketnummern werden hier ausgelesen, so das sie wie
+	 * bei einem Aufruf in der Index-Tabelle ausgewertet werden können
+	 * 
+	 * @param recievedTable
+	 */
+	@Optional
 	@Inject
 	public void getTicket(@UIEventTopic("WFCReceivedTicket") Table recievedTable) {
 
