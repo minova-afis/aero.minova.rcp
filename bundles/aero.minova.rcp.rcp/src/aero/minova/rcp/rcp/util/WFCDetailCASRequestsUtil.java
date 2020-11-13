@@ -538,7 +538,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Optional
 	@Inject
-	public void getTicket(@UIEventTopic(Constants.AERO_MINOVA_RCP_WFCRECEIVEDTICKET) Table recievedTable) {
+	public void getTicket(@UIEventTopic(Constants.RECEIVEDTICKET) Table recievedTable) {
 
 		for (Control c : controls.values()) {
 			if (c instanceof LookupControl) {
