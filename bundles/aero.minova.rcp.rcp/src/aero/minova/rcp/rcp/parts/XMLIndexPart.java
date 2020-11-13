@@ -22,6 +22,7 @@ import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.nattable.NatTableWrapper;
+import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
 public class XMLIndexPart {
@@ -154,13 +155,14 @@ public class XMLIndexPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic("PLAPLA") Map<MPerspective, Table> map) {
+	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
 			natTable.updateData(table.getRows());
 		}
 	}
-	public void load(@UIEventTopic("PLAPLA") Table table) {
+
+	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Table table) {
 		natTable.updateData(table.getRows());
 	}
 

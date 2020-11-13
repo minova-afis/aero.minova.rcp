@@ -1,8 +1,8 @@
 
 package aero.minova.rcp.rcp.parts;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -38,15 +38,15 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.rcp.fields.ShortDateField;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
@@ -172,16 +172,19 @@ public class WFCDetailPart extends WFCFormPart {
 		int width = 2;
 		Control control = null;
 		for (Object fieldOrGrid : head.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field)) continue; // erst einmal nur Felder
+			if (!(fieldOrGrid instanceof Field))
+				continue; // erst einmal nur Felder
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible()) continue; // nur sichtbare Felder
+			if (!field.isVisible())
+				continue; // nur sichtbare Felder
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null) controls.put(field.getName(), control);
+			if (control != null)
+				controls.put(field.getName(), control);
 			column += width;
 		}
 
@@ -194,16 +197,19 @@ public class WFCDetailPart extends WFCFormPart {
 		int width;
 		Control control;
 		for (Object fieldOrGrid : page.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field)) continue; // erst einmal nur Felder
+			if (!(fieldOrGrid instanceof Field))
+				continue; // erst einmal nur Felder
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible()) continue; // nur sichtbare Felder
+			if (!field.isVisible())
+				continue; // nur sichtbare Felder
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null) controls.put(field.getName(), control);
+			if (control != null)
+				controls.put(field.getName(), control);
 			column += width;
 			row += getExtraHeight(field);
 		}
@@ -259,7 +265,8 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private void translate(TranslationService translationService) {
 		this.translationService = translationService;
-		if (translationService != null && composite != null) translate(composite);
+		if (translationService != null && composite != null)
+			translate(composite);
 	}
 
 	private void translate(Composite composite) {
@@ -294,14 +301,16 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von
-	 * Ergebnissen Erstellt, diese wird dem benutzer zur verfügung gestellt.
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
+	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
+	 * dem benutzer zur verfügung gestellt.
 	 *
 	 * @param luc
 	 */
 	@Inject
 	@Optional
-	public void requestLookUpEntriesAll(@UIEventTopic("WFCLoadAllLookUpValues") Map<MPerspective, String> map) {
+	public void requestLookUpEntriesAll(
+			@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
 			String name = map.get(perspective);
 			Control control = controls.get(name);

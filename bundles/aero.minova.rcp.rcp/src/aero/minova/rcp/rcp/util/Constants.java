@@ -37,4 +37,11 @@ public class Constants {
 	public static final String FORM_RENDEREDQUANTITY = "RenderedQuantity";
 	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
 	public static final String EMPLOYEEKEY = "EmployeeKey";
+
+	public static final String BROKER_SAVEENTRY = "SaveEntry";
+	public static final String BROKER_DELETEENTRY = "DeleteEntry";
+	public static final String BROKER_CLEARFIELDS = "clearFields";
+	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "WFCLoadAllLookUpValues";
+	public static final String BROKER_LOADINDEXTABLE = "LoadIndexTable";
+	public static final String BROKER_ACTIVEROWS = "ActiveRows";
 }

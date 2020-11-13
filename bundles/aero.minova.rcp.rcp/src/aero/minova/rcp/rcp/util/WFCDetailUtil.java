@@ -140,7 +140,7 @@ public class WFCDetailUtil {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							Map<MPerspective, String> brokerObject = new HashMap<>();
 							brokerObject.put(perspective, field.getName());
-							broker.post("WFCLoadAllLookUpValues", brokerObject);
+							broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
 						} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
 								lookupUtil.changeSelectionBoxList(c, false);
@@ -148,7 +148,7 @@ public class WFCDetailUtil {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 								Map<MPerspective, String> brokerObject = new HashMap<>();
 								brokerObject.put(perspective, field.getName());
-								broker.post("WFCLoadAllLookUpValues", brokerObject);
+								broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
 							}
 						}
 					}
