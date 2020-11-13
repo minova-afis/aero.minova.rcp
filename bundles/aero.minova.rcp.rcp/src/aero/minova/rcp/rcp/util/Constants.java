@@ -38,10 +38,10 @@ public class Constants {
 	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
 	public static final String EMPLOYEEKEY = "EmployeeKey";
 
-	public static final String BROKER_SAVEENTRY = "SaveEntry";
-	public static final String BROKER_DELETEENTRY = "DeleteEntry";
-	public static final String BROKER_CLEARFIELDS = "clearFields";
-	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "WFCLoadAllLookUpValues";
-	public static final String BROKER_LOADINDEXTABLE = "LoadIndexTable";
-	public static final String BROKER_ACTIVEROWS = "ActiveRows";
+	public static final String BROKER_SAVEENTRY = "aero.minova.rcp.SaveEntry";
+	public static final String BROKER_DELETEENTRY = "aero.minova.rcp.DeleteEntry";
+	public static final String BROKER_CLEARFIELDS = "aero.minova.rcp.clearFields";
+	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero.minova.rcp.WFCLoadAllLookUpValues";
+	public static final String BROKER_LOADINDEXTABLE = "aero.minova.rcp.LoadIndexTable";
+	public static final String BROKER_ACTIVEROWS = "aero.minova.rcp.ActiveRows";
 }
