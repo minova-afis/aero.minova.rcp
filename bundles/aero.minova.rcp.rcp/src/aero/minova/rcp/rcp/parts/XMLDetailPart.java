@@ -185,7 +185,7 @@ public class XMLDetailPart {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService, sync);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
