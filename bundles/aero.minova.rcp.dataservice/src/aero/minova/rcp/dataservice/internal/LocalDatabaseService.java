@@ -71,8 +71,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 	@Override
 	public Table getResultsForLookupField(String name) {
-
-		activateComponent();
 		if (conn != null) {
 			Table t = new Table();
 			Column collumn = new Column("KeyLong", DataType.INTEGER);
@@ -114,7 +112,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 	@Override
 	public void replaceResultsForLookupField(String name, Table table) {
-		activateComponent();
 		// Connection conn = connect();
 		if (conn != null) {
 			try {
