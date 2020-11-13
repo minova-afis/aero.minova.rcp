@@ -71,7 +71,7 @@ public class LookupFieldFocusListener implements FocusListener {
 				ticketTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			if (t.getResultSet() != null) {
-				broker.post(Constants.RECEIVEDTICKET, t.getResultSet());
+				broker.post(Constants.RECEIVED_TICKET, t.getResultSet());
 			} else {
 				lc.setText("");
 			}

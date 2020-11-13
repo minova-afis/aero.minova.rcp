@@ -39,5 +39,5 @@ public class Constants {
 	public static final String EMPLOYEEKEY = "EmployeeKey";
 
 	// Liste an Broker-Konstanten
-	public static final String RECEIVEDTICKET = "aero.minova.rcp.WFCReceivedTicket";
+	public static final String RECEIVED_TICKET = "aero.minova.rcp.WFCReceivedTicket";
 }
