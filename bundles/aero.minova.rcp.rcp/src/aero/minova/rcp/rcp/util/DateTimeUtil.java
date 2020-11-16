@@ -11,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Locale.Category;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +73,10 @@ public class DateTimeUtil {
 		DateTimeUtil.shortcuts = day + month + year + week;
 	}
 
+	public static Instant getDate(Instant today, String input) {
+		return getDate(today, input, Locale.getDefault(Category.FORMAT));
+	}
+
 	public static Instant getDate(String input, Locale locale) {
 		Instant date = getDate(input);
 		LocalDate ld;
@@ -90,14 +95,12 @@ public class DateTimeUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDate(Instant today, String input) {
+	public static Instant getDate(Instant today, String input, Locale locale) {
 		String[] formulars = splitInput(input);
-		LocalDateTime startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
+		LocalDateTime startOfToday = null;
 
-		if (formulars.length == 0) {
-			// Kein input oder nicht sauber aufteilbarer input (nicht interpretierbar) führt
-			// zu null
-			return null;
+		if (formulars.length > 0) {
+			startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
 		}
 
 		int pos = 0;
@@ -116,7 +119,23 @@ public class DateTimeUtil {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
+
+		if (!input.isEmpty() && startOfToday == null) {
+			DateTimeFormatter dtf;
+			for (FormatStyle formatStyle : FormatStyle.values()) {
+				try {
+					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					LocalDate ld = LocalDate.parse(input, dtf);
+					startOfToday = ld.atStartOfDay();
+					break;
+				} catch (Exception e) {
+					// dann war is nicht in diesem Format
+				}
+			}
+		}
+
 		return startOfToday == null ? null : startOfToday.toInstant(ZoneOffset.UTC);
+
 	}
 
 	static String[] splitInput(String input) {
@@ -248,5 +267,4 @@ public class DateTimeUtil {
 			return null;
 		}
 	}
-
 }

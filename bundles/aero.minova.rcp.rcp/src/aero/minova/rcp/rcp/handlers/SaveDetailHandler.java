@@ -7,6 +7,8 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 
+import aero.minova.rcp.rcp.util.Constants;
+
 public class SaveDetailHandler {
 
 	@Inject
@@ -25,7 +27,7 @@ public class SaveDetailHandler {
 		if (perspective == null) {
 			return;
 		}
-		broker.post("SaveEntry", perspective);
+		broker.post(Constants.BROKER_SAVEENTRY, perspective);
 
 	}
 }

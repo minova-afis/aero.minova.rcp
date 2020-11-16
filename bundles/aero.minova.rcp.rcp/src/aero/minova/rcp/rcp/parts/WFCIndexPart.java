@@ -21,6 +21,7 @@ import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.nattable.NatTableWrapper;
+import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
 public class WFCIndexPart extends WFCFormPart {
@@ -65,7 +66,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 		MPerspective perspectiveFor = modelService.getPerspectiveFor(part);
-		natTable = new NatTableWrapper().createNatTable(parent, form, data, true, selectionService, perspectiveFor.getContext());
+		natTable = new NatTableWrapper().createNatTable(parent, form, data, true, selectionService,
+				perspectiveFor.getContext());
 	}
 
 	@PersistTableSelection
@@ -79,12 +81,11 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic("PLAPLA") Map<MPerspective, Table> map) {
+	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
 			natTable.updateData(table.getRows());
 		}
 	}
-
 
 }

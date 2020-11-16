@@ -111,7 +111,7 @@ public class WFCDetailUtil {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService, sync);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
@@ -136,7 +136,7 @@ public class WFCDetailUtil {
 						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
-								&& e.keyCode != SWT.SPACE) {
+								&& e.keyCode != SWT.SPACE && !lc.getText().startsWith("#")) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
@@ -152,7 +152,7 @@ public class WFCDetailUtil {
 							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 							Map<MPerspective, String> brokerObject = new HashMap<>();
 							brokerObject.put(perspective, field.getName());
-							broker.post("WFCLoadAllLookUpValues", brokerObject);
+							broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
 						} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
 								lookupUtil.changeSelectionBoxList(c, false);
@@ -164,10 +164,9 @@ public class WFCDetailUtil {
 								} else {
 									Map<MPerspective, String> brokerObject = new HashMap<>();
 									brokerObject.put(perspective, field.getName());
-									broker.post("WFCLoadAllLookUpValues", brokerObject);
+									broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
 
 								}
-
 							}
 						}
 					}
