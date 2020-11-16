@@ -107,8 +107,10 @@ public class WFCIndexPart extends WFCFormPart {
 				String indexjson = m.results().toString();
 				indexjson = indexjson.replace("<Index>", "");
 				indexjson = indexjson.replace("<\\/Index>", "");
-				Table indexTable = gson.fromJson(indexjson, Table.class);
-				natTable.updateData(indexTable.getRows());
+				if (indexjson != "") {
+					Table indexTable = gson.fromJson(indexjson, Table.class);
+					natTable.updateData(indexTable.getRows());
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

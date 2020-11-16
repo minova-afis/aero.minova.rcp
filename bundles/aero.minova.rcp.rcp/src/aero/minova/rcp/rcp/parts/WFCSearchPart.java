@@ -102,8 +102,10 @@ public class WFCSearchPart extends WFCFormPart {
 				String searchjson = m.results().toString();
 				searchjson = searchjson.replace("<Search>", "");
 				searchjson = searchjson.replace("<\\/Search>", "");
-				Table searchTable = gson.fromJson(searchjson, Table.class);
-				natTable.updateData(searchTable.getRows());
+				if (searchjson != "") {
+					Table searchTable = gson.fromJson(searchjson, Table.class);
+					natTable.updateData(searchTable.getRows());
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
