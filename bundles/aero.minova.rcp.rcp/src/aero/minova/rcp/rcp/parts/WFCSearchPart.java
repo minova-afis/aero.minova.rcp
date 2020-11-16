@@ -1,10 +1,19 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -15,9 +24,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.rcp.nattable.NatTableWrapper;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
@@ -34,6 +49,10 @@ public class WFCSearchPart extends WFCFormPart {
 	private MPerspective perspective;
 
 	private Table data;
+
+	private NatTableWrapper natTable;
+
+	private Gson gson;
 
 	@Inject
 	MPart mPart;
@@ -59,7 +78,37 @@ public class WFCSearchPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		new NatTableWrapper().createNatTable(parent, form, data, false, null, context);
+		natTable = new NatTableWrapper().createNatTable(parent, form, data, false, null, context);
+
+		gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
+
+		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/tablejson.json");
+		try {
+			File jsonFile = new File(path.toString());
+			jsonFile.createNewFile();
+			String content = Files.readString(path, StandardCharsets.UTF_8);
+			if (content == "") {
+				Files.write(path, "<Search><\\/Search><Index><\\\\/Index>".getBytes(StandardCharsets.UTF_8));
+			}
+			String sequence = "<Search>[\\s\\S]*?<\\/Search>";
+			Pattern p = Pattern.compile(sequence);
+			Matcher m = p.matcher(content);
+			if (m.results() != null) {
+				String searchjson = m.results().toString();
+				searchjson = searchjson.replace("<Search>", "");
+				searchjson = searchjson.replace("<\\/Search>", "");
+				Table searchTable = gson.fromJson(searchjson, Table.class);
+				natTable.updateData(searchTable.getRows());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
