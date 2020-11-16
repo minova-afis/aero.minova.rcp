@@ -7,12 +7,27 @@ import java.util.Map;
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
-import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
+/**
+ * Liefert Methoden zu holen und setzen von Wert aus und in die Preferences.
+ * 
+ * @author bauer
+ *
+ */
 public class InstancePreferenceAccessor {
 
-	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type) {
+	/**
+	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen
+	 * Preferences.
+	 * 
+	 * @param preferences
+	 * @param preferenceKey
+	 * @param type
+	 * @return
+	 */
+	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue,
+			Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -22,19 +37,22 @@ public class InstancePreferenceAccessor {
 		case PASSWORD:
 		case LOCALE:
 		case TEXT:
-			return preferences.get(preferenceKey, "");
+			return preferences.get(preferenceKey, (String) defaultValue);
 		case INTEGER:
-			return preferences.getInt(preferenceKey, 0);
+			return preferences.getInt(preferenceKey, (int) defaultValue);
 		case FLOAT:
-			return preferences.getFloat(preferenceKey, 0);
+			return preferences.getFloat(preferenceKey, (float) defaultValue);
 		case CHECK:
-			return preferences.getBoolean(preferenceKey, false);
+			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
-			String fd = preferences.get(preferenceKey, null);
+			String fd = preferences.get(preferenceKey, (String) defaultValue);
+			if (fd == null || fd.length() == 0) {
+				fd = null;
+			}
 			return (fd == null ? null : new FontData(fd));
 		case ZONEID:
-			String id = preferences.get(preferenceKey, "");
-			String result = CustomTimeZone.displayTimeZone(CustomLocale.getLocale("land", "language"), id);
+			String id = preferences.get(preferenceKey, (String) defaultValue);
+			String result = CustomTimeZone.displayTimeZone(id, l);
 			return result;
 		default:
 			break;
@@ -42,7 +60,16 @@ public class InstancePreferenceAccessor {
 		throw new RuntimeException("Keinen passenden Wert gefunden");
 	}
 
-	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value) {
+	/**
+	 * Setzt den übergebenen Wert mit dem Key in die angegebenen Preferences.
+	 * 
+	 * @param preferences
+	 * @param preferenceKey
+	 * @param type
+	 * @param value
+	 */
+	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value,
+			Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -64,10 +91,13 @@ public class InstancePreferenceAccessor {
 			preferences.putBoolean(preferenceKey, Boolean.valueOf((boolean) value));
 			break;
 		case FONT:
-			preferences.put(preferenceKey, ((FontData) value).toString());
+			if (value != null) {
+				preferences.put(preferenceKey, ((FontData) value).toString());
+			} else {
+				preferences.put(preferenceKey, "");
+			}
 			break;
 		case ZONEID:
-			Locale l = CustomLocale.getLocale("land", "language");
 			Map<String, ZoneId> zones = CustomTimeZone.getZones(l);
 			String id = value.toString().substring(value.toString().lastIndexOf(")") + 2);
 			String zoneId = CustomTimeZone.getId(zones, id, l).toString();
@@ -77,5 +107,4 @@ public class InstancePreferenceAccessor {
 			break;
 		}
 	}
-
 }

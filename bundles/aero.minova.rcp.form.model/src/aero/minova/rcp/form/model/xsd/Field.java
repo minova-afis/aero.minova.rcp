@@ -67,8 +67,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="tab-index" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *       &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
- *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="sql-index" type="{http://www.w3.org/2001/XMLSchema}integer" default="0" /&gt;
  *       &lt;attribute name="validation-order" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
@@ -181,7 +181,7 @@ public class Field {
     protected Color color;
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
-    protected String textAttribute;
+    protected String label;
     @XmlAttribute(name = "tab-index")
     protected BigInteger tabIndex;
     @XmlAttribute(name = "name", required = true)
@@ -656,27 +656,27 @@ public class Field {
     }
 
     /**
-     * Ruft den Wert der textAttribute-Eigenschaft ab.
+     * Ruft den Wert der label-Eigenschaft ab.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getTextAttribute() {
-        return textAttribute;
+    public String getLabel() {
+        return label;
     }
 
     /**
-     * Legt den Wert der textAttribute-Eigenschaft fest.
+     * Legt den Wert der label-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setTextAttribute(String value) {
-        this.textAttribute = value;
+    public void setLabel(String value) {
+        this.label = value;
     }
 
     /**
@@ -761,7 +761,7 @@ public class Field {
      */
     public boolean isRequired() {
         if (required == null) {
-            return true;
+            return false;
         } else {
             return required;
         }
@@ -787,12 +787,8 @@ public class Field {
      *     {@link java.lang.Boolean }
      *     
      */
-    public boolean isOffline() {
-        if (offline == null) {
-            return false;
-        } else {
-            return offline;
-        }
+    public java.lang.Boolean isOffline() {
+        return offline;
     }
 
     /**

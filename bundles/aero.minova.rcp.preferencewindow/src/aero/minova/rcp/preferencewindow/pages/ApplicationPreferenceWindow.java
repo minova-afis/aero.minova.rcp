@@ -2,10 +2,17 @@ package aero.minova.rcp.preferencewindow.pages;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.nls.ILocaleChangeService;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
@@ -18,14 +25,17 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -39,13 +49,30 @@ public class ApplicationPreferenceWindow {
 	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
 
 	// Widget Builder Impelentierung
-	private PreferenceWindowModel pwm = new PreferenceWindowModel();
+	private PreferenceWindowModel pwm;
+
+	@Inject
+	IEclipseContext context;
+
+	@Inject
+	ILocaleChangeService lcs;
+
+	@Inject
+	@Named(TranslationService.LOCALE)
+	Locale s;
+
+	@Inject
+	TranslationService translationService;
 
 	@Execute
 	public void execute() {
+		pwm = new PreferenceWindowModel(s);
 
-		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel();
-		PreferenceWindow window = PreferenceWindow.create(fillData(preferenceTabs));
+		Shell shell = new Shell();
+
+		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
+		Map<String, Object> data = fillData(preferenceTabs);
+		PreferenceWindow window = PreferenceWindow.create(shell, data);
 
 		for (PreferenceTabDescriptor tabDescriptor : preferenceTabs) {
 			// Tab erstellen und hinzufügen
@@ -60,20 +87,26 @@ public class ApplicationPreferenceWindow {
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
 					createWidgets(newTab, pref, key, values);
-
 				}
 			}
 		}
 
 		window.setSelectedTab(0);
 		if (window.open()) {
+			InstancePreferenceAccessor.putValue(preferences, "timezone", DisplayType.ZONEID,
+					window.getValueFor("timezone"), s);
+			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE,
+					window.getValueFor("language"), s);
+			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE,
+					window.getValueFor("country"), s);
 			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
-								window.getValueFor(pref.getKey()));
+						if (pref.getDisplayType() != DisplayType.ZONEID)
+							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
+									window.getValueFor(pref.getKey()), s);
 					}
 				}
 
@@ -83,6 +116,8 @@ public class ApplicationPreferenceWindow {
 			} catch (BackingStoreException e) {
 				e.printStackTrace();
 			}
+
+			lcs.changeApplicationLocale(CustomLocale.getLocale());
 		}
 	}
 
@@ -95,12 +130,15 @@ public class ApplicationPreferenceWindow {
 
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
-					data.put(key,
-							InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType()));
+					Object defaultValue = pref.getDefaultValue();
+					data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(),
+							defaultValue, s));
 
 				}
 			}
 		}
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
+				Locale.getDefault().getDisplayCountry(Locale.getDefault()), s));
 
 		return data;
 	}
@@ -127,7 +165,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
 			break;
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
@@ -145,7 +183,7 @@ public class ApplicationPreferenceWindow {
 			widget = new CustomPWFontChooser(pref.getLabel(), key);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), key).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
 			break;
 		default:
 			break;

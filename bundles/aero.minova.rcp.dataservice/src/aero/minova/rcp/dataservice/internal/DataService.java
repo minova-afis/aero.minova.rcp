@@ -1,12 +1,20 @@
 package aero.minova.rcp.dataservice.internal;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -16,8 +24,15 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.EventAdmin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -31,18 +46,31 @@ import aero.minova.rcp.model.ValueSerializer;
 @Component
 public class DataService implements IDataService {
 
+	private static final boolean LOG = true;
 	private HttpRequest request;
 	private HttpClient httpClient;
-	private Authenticator authentication;
 	private Gson gson;
 
-	private String username = "admin";
-	private String password = "rqgzxTf71EAx8chvchMi";
-	private String server = "https://publictest.minova.com:17280";
+	private String username = null;//"admin";
+	private String password = null;//"rqgzxTf71EAx8chvchMi";
+	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
+	private String server = null;//"https://publictest.minova.com:17280";
+
+	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
+	// Ticket-Anfragen zu versenden
+	// private String server = "https://mintest.minova.com:8084";
+	
+	@Override
+	public void setCredentials(String username, String password, String server) {
+		this.username = username;
+		this.password = password;
+		this.server = server;
+	}
+	
 
 	private void init() {
 
-		authentication = new Authenticator() {
+		Authenticator authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password.toCharArray());
@@ -51,8 +79,7 @@ public class DataService implements IDataService {
 		// TODO: fix certificate-problems
 		httpClient = HttpClient.newBuilder()//
 				.sslContext(disabledSslVerificationContext())//
-				.authenticator(authentication)
-				.build();
+				.authenticator(authentication).build();
 
 		gson = new Gson();
 		gson = new GsonBuilder() //
@@ -66,48 +93,51 @@ public class DataService implements IDataService {
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
 		init();
 		String body = gson.toJson(seachTable);
+		logBody(body);
+
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
+		// return CompletableFuture<Table> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+			System.out.println(t);
+			return gson.fromJson(t.body(), Table.class);
+		});
 
-		CompletableFuture<Table> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> {
-					System.out.println(t);
-					return gson.fromJson(t.body(), Table.class);
-				});
-
-		return future;
 	}
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
+		logBody(body);
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
+		// return CompletableFuture<SqlProcedureResult> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			logBody(t.body());
+			return fromJson;
+		});
 
-		CompletableFuture<SqlProcedureResult> future = httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> gson.fromJson(t.body(), SqlProcedureResult.class));
-
-		return future;
 	}
 
 	@Override
 	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
+		logBody(body);
 		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-
-		CompletableFuture<Integer> future = httpClient.sendAsync(request, BodyHandlers.ofString())
+		// return CompletableFuture<Integer> future
+		return httpClient.sendAsync(request, BodyHandlers.ofString())
 				.thenApply(t -> gson.fromJson(t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
 
-		return future;
 	}
 
 	public static SSLContext disabledSslVerificationContext() {
@@ -139,4 +169,111 @@ public class DataService implements IDataService {
 		return sslContext;
 	}
 
+	void logBody(String body) {
+		if (LOG) {
+			// TODO Logging verbessern
+			System.out.println(body);
+		}
+
+	}
+
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	@Override
+	public File getFileSynch(String filename) {
+		String path = null;
+		try {
+			path = Platform.getInstanceLocation().getURL().toURI().toString();
+			File cachedFile = new File(new URI(path + filename));
+			if (cachedFile.exists()) return cachedFile;
+		} catch (URISyntaxException e) {
+		}
+		return getFileSynch(path, filename);
+	}
+
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	@Override
+	public File getFileSynch(String localPath, String filename) {
+		init();
+		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+				.header("Content-Type", "application/octet-stream") //
+				.build();
+
+		try {
+			String body = httpClient.send(request, BodyHandlers.ofString()).body();
+			URI uri = new URI(localPath + filename);
+			Files.writeString(Path.of(uri), body, StandardOpenOption.CREATE);
+			return new File(uri);
+		} catch (IOException | URISyntaxException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	/**
+	 * asynchrones Laden eines Files vom Server
+	 */
+	@Override
+	public CompletableFuture<String> getFile(String filename) {
+		init();
+		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+				.header("Content-Type", "application/octet-stream") //
+				.build();
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
+
+	}
+
+	public void loadFile(UISynchronize sync, String filename) {
+		loadFile(sync, filename, false);
+	}
+
+	public void loadFile(UISynchronize sync, String filename, boolean reload) {
+		try {
+			String workspacePath = Platform.getInstanceLocation().getURL().toURI().toString().substring(5);
+			Path localPath = FileSystems.getDefault().getPath(workspacePath + filename);
+			if (!reload && Files.exists(localPath)) {
+				return; // Datei existiert lokal und muss nicht nachgeladen werden
+			}
+			Files.createDirectories(localPath.getParent());
+			try {
+				CompletableFuture<String> fileFuture = getFile(filename);
+				fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
+					try {
+						byte[] file;
+						try {
+							String result = bytes.substring(1, bytes.length() - 2);
+							String byteValues[] = result.split(",");
+							file = new byte[byteValues.length];
+							int i = 0;
+							for (String string : byteValues) {
+								file[i++] = Byte.parseByte(string);
+							}
+						} catch (NumberFormatException nfe) {
+							// Es ist wohl keine Datei angekommen
+							file = new byte[0];
+						}
+						Files.write(localPath, file);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}));
+			} catch (NullPointerException npe) {
+				npe.printStackTrace();
+			}
+		} catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

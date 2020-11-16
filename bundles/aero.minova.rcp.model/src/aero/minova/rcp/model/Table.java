@@ -44,6 +44,10 @@ public class Table {
 		return -1;
 	}
 
+	public List<Column> getColumns() {
+		return columns;
+	}
+
 	public void addRow(Row r) {
 		if (columns.size() != r.values.size()) {
 			throw new RuntimeException("Mehr Columns definiert, als Wert übergeben!");
@@ -62,20 +66,24 @@ public class Table {
 	public void addRow() {
 		Row row = new Row();
 		for (Column c : columns) {
-			if (c.type.equals(DataType.STRING)) {
+			if (c.getType().equals(DataType.STRING)) {
 				row.addValue(new Value((String) null));
-			} else if (c.type.equals(DataType.INTEGER)) {
+			} else if (c.getType().equals(DataType.INTEGER)) {
 				row.addValue(new Value((Integer) null));
-			} else if (c.type.equals(DataType.INSTANT)) {
+			} else if (c.getType().equals(DataType.INSTANT)) {
 				row.addValue(new Value((Instant) null));
-			} else if (c.type.equals(DataType.ZONED)) {
+			} else if (c.getType().equals(DataType.ZONED)) {
 				row.addValue(new Value((ZonedDateTime) null));
-			} else if (c.type.equals(DataType.DOUBLE)) {
+			} else if (c.getType().equals(DataType.DOUBLE)) {
 				row.addValue(new Value((Double) null));
-			} else if (c.type.equals(DataType.BOOLEAN)) {
+			} else if (c.getType().equals(DataType.BOOLEAN)) {
 				row.addValue(new Value((Boolean) null));
 			}
 		}
 		rows.add(row);
+	}
+
+	public void deleteRow(Row row) {
+		rows.remove(row);
 	}
 }

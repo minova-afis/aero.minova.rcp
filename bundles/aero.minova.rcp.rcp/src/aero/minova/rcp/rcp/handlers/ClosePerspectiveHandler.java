@@ -33,7 +33,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 
 	@Execute
 	public void execute(MWindow window,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveId) {
+			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
 		List<MPerspective> perspective = modelService.findElements(application, perspectiveId, MPerspective.class);
 
@@ -49,7 +49,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat.
 		 */
 		List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
-		switchTo(window.getContext(), perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
+		switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
 
 	}
 

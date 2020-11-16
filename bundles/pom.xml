@@ -2,6 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>aero.minova.rcp.bundles</artifactId>
 	<packaging>pom</packaging>
+	<name>[mvn] Bundles</name>
 
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
@@ -14,6 +15,7 @@
 		<module>aero.minova.rcp.css</module>
 		<module>aero.minova.rcp.core</module>
 		<module>aero.minova.rcp.form.model</module>
+		<module>aero.minova.rcp.form.menu</module>
 		<module>aero.minova.rcp.model</module>
 		<module>aero.minova.rcp.workspace</module>
 		<module>aero.minova.rcp.rcp</module>
@@ -22,6 +24,7 @@
 		<module>aero.minova.rcp.translate</module>
 		<module>org.eclipse.e4.ui.workbench.perspectiveswitcher</module>
 		<module>aero.minova.rcp.preferencewindow</module>
+		<module>aero.minova.rcp.images</module>
 	</modules>
 	<build>
 		<pluginManagement>

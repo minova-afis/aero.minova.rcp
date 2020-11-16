@@ -2,12 +2,13 @@ package aero.minova.rcp.workspace.handler;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
 import aero.minova.rcp.workspace.WorkspaceException;
@@ -21,7 +22,7 @@ import aero.minova.rcp.workspace.WorkspaceException;
  * <li>configuration data (e.g. forms, reports, menu definition, xbs file)</li>
  * <li>data functions</li>
  * </ul>
- * 
+ *
  * @author Wilfried Saak
  */
 @SuppressWarnings("restriction")
@@ -37,31 +38,57 @@ public abstract class WorkspaceHandler {
 	 * <li>http:</li>
 	 * <li>https: returns a new {@link aero.minova.rcp.workspace.handler.SpringBootWorkspace}</li>
 	 * </ul>
-	 * 
+	 *
+	 * @param profile
 	 * @param connection
 	 * @return
+	 * @throws MalformedURLException
 	 */
-	public static WorkspaceHandler newInstance(URL connection, Logger logger) {
-		switch (connection.getProtocol()) {
+	public static WorkspaceHandler newInstance(String profile, String connection, Logger logger) throws WorkspaceException {
+		if (connection == null || connection.length() == 0) {
+			try {
+				List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger);
+				for (ISecurePreferences store : workspaceAccessDatas) {
+					if (profile.equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
+						connection = store.get(WorkspaceAccessPreferences.URL, "");
+						break;
+					}
+				}
+			} catch (StorageException e) {
+				logger.error(e, e.getMessage());
+			}
+		}
+		URL url;
+		if (connection.isEmpty()) {
+			return null;
+		}
+		try {
+			url = new URL(connection);
+		} catch (MalformedURLException e) {
+			throw new WorkspaceException(e.getMessage());
+		}
+
+		switch (url.getProtocol()) {
 		case "file":
-			return new FileWorkspace(connection, logger);
+			return new FileWorkspace(url, logger);
 		case "http":
 		case "https":
-			return new SpringBootWorkspace(connection, logger);
+			return new SpringBootWorkspace(profile, url, logger);
 		default:
 			return null;
 		}
 	}
 
-	public static WorkspaceHandler newInstance(ISecurePreferences node, Logger logger) throws MalformedURLException, StorageException {
-		URL connection = new URL(node.get("url", "N/A"));
+	public static WorkspaceHandler newInstance(ISecurePreferences node, Logger logger) throws MalformedURLException, StorageException, WorkspaceException {
+		String connection = node.get(WorkspaceAccessPreferences.URL, "N/A");
+		String profile = node.get(WorkspaceAccessPreferences.PROFILE, "N/A");
 
-		WorkspaceHandler instance = newInstance(connection, logger);
-		instance.workspaceData.setConnection(connection);
+		WorkspaceHandler instance = newInstance(profile, connection, logger);
+		instance.workspaceData.setConnection(new URL(connection));
 		instance.workspaceData.setProfile(node.get("profile", "unknown"));
 		instance.workspaceData.setUsername(node.get("username", ""));
 		instance.workspaceData.setInBackingStore(true);
-		
+
 		return instance;
 	}
 
@@ -72,7 +99,7 @@ public abstract class WorkspaceHandler {
 
 	/**
 	 * prüft, ob ein Verzeichnis existiert und erstellt es ggf.
-	 * 
+	 *
 	 * @param workspaceDir
 	 */
 	protected void checkDir(File workspaceDir, String name) {
@@ -85,41 +112,50 @@ public abstract class WorkspaceHandler {
 
 	/**
 	 * This method verifies, if the connection is accessible.
-	 * 
+	 *
 	 * @param connection
 	 *            The connection URL. For instance there will be a possibility to connect to a web service (http / https) or to a directory (file://).
 	 * @param username
 	 *            The username for login
 	 * @param password
 	 *            The passordword for the user to login
+	 * @param the
+	 *            Application Area to read / store files
 	 * @return true, if the connection could be established.
 	 */
-	public abstract boolean checkConnection(String username, String password) throws WorkspaceException;
+	public abstract boolean checkConnection(String username, String password, String applicationArea) throws WorkspaceException;
 
 	/**
 	 * @return Connection String to service, if different from connectionURL of constructor
 	 */
 	public String getConnectionString() {
-		return "";
+		try {
+			return workspaceData.getConnection().toURI().toURL().toString();
+		} catch (MalformedURLException | URISyntaxException e) {
+			logger.error(e, e.getMessage());
+			return null;
+		}
 	}
 
-	/**
-	 * @return Profile name of application to display
-	 */
 	public String getProfile() {
 		return workspaceData.getProfile();
 	}
 
-	/**
-	 * @return username in remote system. This value can differ from the username, used for establishing the connection.
-	 */
-	public String getRemoteUsername() {
-		return "";
+	public String getUsername() {
+		return workspaceData.getUsername();
+	}
+
+	public String getPassword() {
+		return workspaceData.getPassword();
+	}
+
+	public String getApplicationArea() {
+		return workspaceData.getApplicationArea();
 	}
 
 	/**
 	 * Activate this workspace, if no workspace is set
-	 * 
+	 *
 	 * @exception WorkspaceException
 	 *                if the Platform has alreadry a workspace
 	 */
@@ -128,4 +164,5 @@ public abstract class WorkspaceHandler {
 	public String getDisplayName() {
 		return workspaceData.getDisplayName();
 	}
+
 }

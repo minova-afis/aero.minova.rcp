@@ -38,7 +38,7 @@ public class KeepPerspectiveHandler {
 
 	@SuppressWarnings("unchecked")
 	@Execute
-	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveId) {
+	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
 		List<String> keepItToolitems;
 

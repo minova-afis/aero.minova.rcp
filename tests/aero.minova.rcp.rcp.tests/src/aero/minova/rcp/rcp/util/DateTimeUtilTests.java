@@ -223,6 +223,11 @@ public class DateTimeUtilTests {
 	}
 	
 	@Test
+	public void testGetDate0minus1() {
+		assertNull(DateTimeUtil.getDate("0-1", Locale.GERMANY));
+	}
+
+	@Test
 	public void testSplitInputPlus4t() {
 		String splits[] = DateTimeUtil.splitInput("123+4t");
 		assertEquals("123", splits[0]);

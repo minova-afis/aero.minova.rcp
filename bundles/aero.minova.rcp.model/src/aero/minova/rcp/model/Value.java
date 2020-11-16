@@ -27,6 +27,11 @@ public class Value {
 		this.value = valueNew;
 	}
 
+	public Value(Object valueNew, DataType dataType) {
+		type = dataType;
+		value = valueNew;
+	}
+
 	public Value(Integer integerValue) {
 		type = DataType.INTEGER;
 		value = integerValue;

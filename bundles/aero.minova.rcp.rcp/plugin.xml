@@ -17,10 +17,18 @@
                name="cssTheme"
                value="aero.minova.rcp.defaulttheme">
          </property>
-         <property
-               name="lifeCycleURI"
-               value="bundleclass://aero.minova.rcp.translate/aero.minova.rcp.translate.lifecycle.Manager">
-         </property>
       </product>
+   </extension>
+   <extension
+         id="id1"
+         point="org.eclipse.e4.workbench.model">
+      <processor
+            apply="always"
+            beforefragment="true"
+            class="aero.minova.rcp.rcp.processor.MenuProcessor">
+         <element
+               id="org.eclipse.ui.main.menu">
+         </element>
+      </processor>
    </extension>
 </plugin>

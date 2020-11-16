@@ -19,12 +19,10 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 
-import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchCommandConstants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 public class SwitchPerspectiveHandler {
@@ -34,24 +32,25 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
+	
+	@Inject
+	EPartService partService;
 
 	@Inject
 	EModelService model;
-	
-	@Inject 
+
+	@Inject
 	IEventBroker broker;
-	
+
 	@Execute
 	public void execute(IEclipseContext context,
-			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID,
+			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
 			MWindow window) throws InvocationTargetException, InterruptedException {
-
 		if (Boolean.parseBoolean(newWindow)) {
 			openNewWindowPerspective(context, perspectiveID);
 		} else {
 			openPerspective(context, perspectiveID, window);
-
 		}
 	}
 
@@ -69,7 +68,7 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID);
 		} else {
-			switchTo(context, element, perspectiveID, window);
+			switchTo(element, perspectiveID, window);
 		}
 	}
 
@@ -80,7 +79,6 @@ public class SwitchPerspectiveHandler {
 	 * @throws ExecutionException If the perspective could not be opened.
 	 */
 	private void openNewWindowPerspective(IEclipseContext context, String perspectiveID) {
-		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
 		EPartService partService = context.get(EPartService.class);
 
@@ -100,29 +98,32 @@ public class SwitchPerspectiveHandler {
 	 * @return die neue Perspektive
 	 */
 	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID) {
-		MApplication application = context.get(MApplication.class);
 		MWindow window = context.get(MWindow.class);
 		EModelService modelService = context.get(EModelService.class);
-
-		String toolitemLabel = perspectiveID.substring(perspectiveID.lastIndexOf(".") + 1);
-		String toolLabel = toolitemLabel.substring(0, 1).toUpperCase() + toolitemLabel.substring(1);
+		String[] ids = perspectiveID.split(".xml");
+		String id = ids[0];
+		List<MHandledMenuItem> items = model.findElements(window.getMainMenu(), id, MHandledMenuItem.class);
+		MHandledMenuItem item = items.get(0);
 
 		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService
 				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
-		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
+//		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
+		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
 
 		if (element == null) {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.setContext(context);
-			perspective.setLabel(toolLabel);
-			perspectiveStack.getChildren().add(0, perspective);
-			switchTo(context, perspective, perspectiveID, window);
+//			perspective.setContext(context);
+			perspective.getPersistedState().put(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
+//			perspective.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
+			perspective.setLabel(item.getLabel());
+			perspectiveStack.getChildren().add(perspective);
+			switchTo(perspective, perspectiveID, window);
 
 		}
 		return perspective;
@@ -133,10 +134,9 @@ public class SwitchPerspectiveHandler {
 	 * 
 	 * @param element
 	 */
-	public void switchTo(IEclipseContext context, MUIElement element,
-			@Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_ID) String perspectiveID, MWindow window) {
-		EPartService partService = context.get(EPartService.class);
-		
+	public void switchTo(MUIElement element, @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
+			MWindow window) {
+
 		if (element instanceof MPerspective) {
 			partService.switchPerspective(element.getElementId());
 		} else {

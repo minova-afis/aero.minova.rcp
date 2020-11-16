@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Preferencewindow
 Bundle-SymbolicName: aero.minova.rcp.preferencewindow
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.preferencewindow
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.eclipse.e4.core.di.annotations,
@@ -19,6 +19,8 @@ Require-Bundle: org.eclipse.e4.core.di.annotations,
  org.eclipse.osgi,
  org.eclipse.core.runtime,
  org.eclipse.swt,
- org.eclipse.nebula.widgets.opal.preferencewindow
-Export-Package: aero.minova.rcp.preferencewindow.builder
+ org.eclipse.nebula.widgets.opal.preferencewindow,
+ org.eclipse.e4.core.contexts;bundle-version="1.8.400"
+Export-Package: aero.minova.rcp.preferencewindow.builder,
+ aero.minova.rcp.preferencewindow.control
 Import-Package: org.eclipse.jface.resource

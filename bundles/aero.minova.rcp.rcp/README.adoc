@@ -1,1 +1,60 @@
 Beschreibung dieses Plugins
+
+== Felder
+
+Die verschiedenen Feldinhalte werden entsprechend interprtiert.
+
+=== Datumsfelder
+
+Heute können wir Datumsangaben nach bestimmten Regeln angeben.
+Diese werden dann vom UI in entsprechende Werte übersetzt.
+Dabei wird ein Datum immer als Instant mit der Uhrzeit mit 0:00 Uhr UTC gespeichert.
+Auf dem Server werden alle Datums und Zeitpunktangaben in der Zeitzone UTC gespeichert.
+
+==== Zeitzone
+Da an den Server immer nur link:https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html[Instant] - Werte geschickt werden, muss die Zeitzone des Anwenders berücksichtigt werden.
+
+==== Shortcuts
+Wir haben für das Datum bestimmte Shortcuts definiert.
+
+|===
+| Eingabe | Wert
+| `0` | heute 
+| `1` | der 1. des Monats im Dezember 2020 -> 01.12.2020
+| `11` | der 1. Januar des Jahres im Dezember 2020 -> 01.01.2020
+| `111` | der 1. des Monats November im aktuellen Jahr -> 01.11.2020 
+| `102` | der 1. Februar des aktuellen Jahres -> 01.02.2020
+| `1205` | der 12. Mai des aktuellen Jahres -> 12.05.2020 
+| `80921` | der 8. September 2021 -> 0**8**.**09**.20**21**
+| `180921` | der 18. September 2021 -> **18**.**09**.20**21**
+| `8091967` | der 8 September 1967 -> 0**8**.**09**.**1967**
+| `18091967` | der 18 September 1967 -> **18**.**09**.**1967**
+| `+` | morgen
+| `++` | übermorgen 
+| `+++` | ...
+| `-` | gestern
+| `--` | vorgestern
+| `---` | ...
+| `0+2w` | heute + 14 Tage (2 Wochen)
+| `1+1m-1t` | der letzte des aktuellen Monats (m = Monat, t = Tag)
+| `1+1m-` | wenn man - und + ohne Ziffer am Ende hat, kann man es als Tage interpretieren. Also auch der letzte des Monats.
+| `11+1j-` | Der letzte Tag des Jahres
+| `11+2m-` | der letzte Tag im Februar im aktuellen Jahr
+|===
+
+Es gibt 4 Kürzel, die sowohl klein- als auch großgeschrieben werden können.
+Die Kürzel können global für die Benutzersprache gesetzt werden.
+
+|===
+| Kürzel (deutsch) | Bedeutung
+| `T` `t` | Tage (in deutsch, muss internationalisiert werden)
+| `M` `m` | Monate (in deutsch, muss internationalisiert werden)
+| `J` `j` | Jahre (in deutsch, muss internationalisiert werden)
+| `W` `w` | Wochen (7 Tage)
+|===
+
+Wenn man Selektionskriterien speichert, müssen die Formeln gespeichert werden. 
+Wenn man Datumsinformationen an den CAS übergibt, muss der Zeitpunkt ausgerechnet sein.
+
+Bei der Anzeige könnte man sich überlegen, den Wert bei Verlassen auszurechnen. 
+Sobald der Anwender das Feld wieder anspringt (OnFocus) wird die Formel eingeblendet.
