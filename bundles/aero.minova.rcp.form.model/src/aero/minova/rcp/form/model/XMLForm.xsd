@@ -374,7 +374,7 @@
 		<!--xs:attribute name="tab-index" type="xs:IDREF"/ -->
 		<xs:attribute name="name" type="xs:ID" use="required" />
 		<xs:attribute name="default" type="xs:string" use="optional" />
-		<xs:attribute default="true" name="required" type="xs:boolean" />
+		<xs:attribute default="false" name="required" type="xs:boolean" />
 		<xs:attribute name="offline" type="xs:boolean" use="optional">
 			<xs:annotation>
 				<xs:documentation>Wenn true, dann wird das Feld nicht mit den
@@ -576,7 +576,7 @@
 		</xs:sequence>
 		<!-- Entweder oder -->
 		<xs:attribute name="procedure-suffix" type="xs:NCName" />
-		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="op">
+		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="sp">
 			<xs:annotation>
 				<xs:documentation>Prozedurprefix (z.B. 'op', 'sp' usw.)
 				</xs:documentation>

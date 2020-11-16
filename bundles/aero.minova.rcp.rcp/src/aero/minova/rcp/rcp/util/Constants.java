@@ -37,4 +37,7 @@ public class Constants {
 	public static final String FORM_RENDEREDQUANTITY = "RenderedQuantity";
 	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
 	public static final String EMPLOYEEKEY = "EmployeeKey";
+
+	// Liste an Broker-Konstanten
+	public static final String RECEIVED_TICKET = "aero.minova.rcp.WFCReceivedTicket";
 }
