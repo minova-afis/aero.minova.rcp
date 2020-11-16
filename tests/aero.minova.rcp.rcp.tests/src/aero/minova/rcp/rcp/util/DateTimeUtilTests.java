@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -198,6 +199,29 @@ public class DateTimeUtilTests {
 		assertEquals(expected, DateTimeUtil.getDate(bithday, "11+1j-"));
 	}
 
+	@Test
+	public void testGetDate07_01_1967() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
+				.toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDate.of(1967, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
+		assertEquals(expected, DateTimeUtil.getDate(bithday, "07.01.1967", Locale.GERMANY));
+	}
+
+	@Test
+	public void testGetDate7_1_1967() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
+				.toInstant(ZoneOffset.UTC);
+		assertNull(DateTimeUtil.getDate(bithday, "7.1.1967", Locale.GERMANY));
+	}
+	
+	@Test
+	public void testGetDate07_01_20() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
+				.toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDate.of(20, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
+		assertEquals(expected, DateTimeUtil.getDate(bithday, "07.01.20", Locale.GERMANY));
+	}
+	
 	@Test
 	public void testSplitInputPlus4t() {
 		String splits[] = DateTimeUtil.splitInput("123+4t");
