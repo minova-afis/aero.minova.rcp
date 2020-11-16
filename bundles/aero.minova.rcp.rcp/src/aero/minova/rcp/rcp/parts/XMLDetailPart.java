@@ -211,7 +211,6 @@ public class XMLDetailPart {
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
-								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 								requestOptionsFromCAS(lc);
 							} else {
 								changeSelectionBoxList(lc, false);
