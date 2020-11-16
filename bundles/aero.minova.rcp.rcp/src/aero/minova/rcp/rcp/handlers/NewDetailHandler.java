@@ -28,6 +28,6 @@ public class NewDetailHandler {
 		}
 		Map<MPerspective, String> map = new HashMap<>();
 		map.put(perspective, Constants.CLEAR_REQUEST);
-		broker.post("clearFields", map);
+		broker.post(Constants.BROKER_CLEARFIELDS, map);
 	}
 }
