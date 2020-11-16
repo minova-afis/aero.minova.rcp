@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -87,25 +85,14 @@ public class WFCSearchPart extends WFCFormPart {
 				.setPrettyPrinting() //
 				.create();
 
-		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/tablejson.json");
+		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
 		try {
 			File jsonFile = new File(path.toString());
 			jsonFile.createNewFile();
 			String content = Files.readString(path, StandardCharsets.UTF_8);
-			if (content == "") {
-				Files.write(path, "<Search><\\/Search><Index><\\\\/Index>".getBytes(StandardCharsets.UTF_8));
-			}
-			String sequence = "<Search>[\\s\\S]*?<\\/Search>";
-			Pattern p = Pattern.compile(sequence);
-			Matcher m = p.matcher(content);
-			if (m.results() != null) {
-				String searchjson = m.results().toString();
-				searchjson = searchjson.replace("<Search>", "");
-				searchjson = searchjson.replace("<\\/Search>", "");
-				if (searchjson != "") {
-					Table searchTable = gson.fromJson(searchjson, Table.class);
-					natTable.updateData(searchTable.getRows());
-				}
+			if (!content.equals("")) {
+				Table searchTable = gson.fromJson(content, Table.class);
+				natTable.updateData(searchTable.getRows());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

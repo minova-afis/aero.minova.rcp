@@ -45,7 +45,8 @@ public class LoadIndexHandler {
 	@Inject
 	private EPartService partService;
 
-	private Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/tablejson");
+	private Path path = Path
+			.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
 
 	private Gson gson;
 
@@ -66,9 +67,7 @@ public class LoadIndexHandler {
 				.create();
 
 		try {
-			String content = Files.readString(path, StandardCharsets.UTF_8);
-			content.replace("<Search>[\\s\\S]*?<\\/Search>", "<Search>" + gson.toJson(table) + "<\\/Search>");
-			Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+			Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

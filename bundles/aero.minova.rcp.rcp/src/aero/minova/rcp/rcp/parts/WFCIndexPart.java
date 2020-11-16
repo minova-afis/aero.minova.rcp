@@ -6,8 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -59,7 +57,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private Gson gson;
 
-	private Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/tablejson");
+	private Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableIndex");
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -97,21 +95,11 @@ public class WFCIndexPart extends WFCFormPart {
 			File jsonFile = new File(path.toString());
 			jsonFile.createNewFile();
 			String content = Files.readString(path, StandardCharsets.UTF_8);
-			if (content == "") {
-				Files.write(path, "<Search><\\/Search><Index><\\\\/Index>".getBytes(StandardCharsets.UTF_8));
+			if (!content.equals("")) {
+				Table indexTable = gson.fromJson(content, Table.class);
+				natTable.updateData(indexTable.getRows());
 			}
-			String sequence = "<Index>[\\s\\S]*?<\\/Index>";
-			Pattern p = Pattern.compile(sequence);
-			Matcher m = p.matcher(content);
-			if (m.results() != null) {
-				String indexjson = m.results().toString();
-				indexjson = indexjson.replace("<Index>", "");
-				indexjson = indexjson.replace("<\\/Index>", "");
-				if (indexjson != "") {
-					Table indexTable = gson.fromJson(indexjson, Table.class);
-					natTable.updateData(indexTable.getRows());
-				}
-			}
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,9 +123,7 @@ public class WFCIndexPart extends WFCFormPart {
 			natTable.updateData(table.getRows());
 
 			try {
-				String content = Files.readString(path, StandardCharsets.UTF_8);
-				content.replace("<Index>[\\s\\S]*?<\\/Index>", "<Index>" + gson.toJson(table) + "<\\/Index>");
-				Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+				Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
