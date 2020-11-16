@@ -38,6 +38,8 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
@@ -69,6 +71,9 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	protected UISynchronize sync;
@@ -106,7 +111,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
-		wfcDetailUtil.bindValues(controls, perspective);
+		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
 		casRequestsUtil.setControls(controls, perspective);
 	}
 
@@ -324,10 +329,12 @@ public class WFCDetailPart extends WFCFormPart {
 					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
 					if (ta instanceof SqlProcedureResult) {
 						SqlProcedureResult sql = (SqlProcedureResult) ta;
-						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, true);
+						localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
+						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, false);
 					} else if (ta instanceof Table) {
-						Table t1 = (Table) ta;
-						lookupUtil.changeOptionsForLookupField(t1, control, true);
+						Table t = (Table) ta;
+						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+						lookupUtil.changeOptionsForLookupField(t, control, false);
 					}
 
 				}));

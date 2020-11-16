@@ -20,7 +20,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailUtil {
@@ -30,6 +32,8 @@ public class WFCDetailUtil {
 
 	@Inject
 	private IEventBroker broker;
+
+	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -50,10 +54,12 @@ public class WFCDetailUtil {
 	public WFCDetailUtil() {
 	}
 
-	public void bindValues(Map<String, Control> controls, MPerspective perspective) {
+	public void bindValues(Map<String, Control> controls, MPerspective perspective,
+			ILocalDatabaseService localDatabaseService) {
 		this.controls = controls;
+		this.localDatabaseService = localDatabaseService;
 
-		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService, sync);
+		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService, sync, localDatabaseService);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
@@ -132,7 +138,13 @@ public class WFCDetailUtil {
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
 								&& e.keyCode != SWT.SPACE && !lc.getText().startsWith("#")) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
-								lookupUtil.requestOptionsFromCAS(lc);
+								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
+								if (localTable != null) {
+									lookupUtil.changeOptionsForLookupField(localTable, c, false);
+								} else {
+									lookupUtil.requestOptionsFromCAS(lc);
+								}
 							} else {
 								lookupUtil.changeSelectionBoxList(lc, false);
 							}
@@ -146,9 +158,15 @@ public class WFCDetailUtil {
 								lookupUtil.changeSelectionBoxList(c, false);
 							} else {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Map<MPerspective, String> brokerObject = new HashMap<>();
-								brokerObject.put(perspective, field.getName());
-								broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
+								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
+								if (localTable != null) {
+									lookupUtil.changeOptionsForLookupField(localTable, c, false);
+								} else {
+									Map<MPerspective, String> brokerObject = new HashMap<>();
+									brokerObject.put(perspective, field.getName());
+									broker.post("WFCLoadAllLookUpValues", brokerObject);
+
+								}
 							}
 						}
 					}
