@@ -1,10 +1,16 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -17,9 +23,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.rcp.nattable.NatTableWrapper;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -43,6 +55,10 @@ public class WFCIndexPart extends WFCFormPart {
 	private Composite composite;
 
 	private NatTableWrapper natTable;
+
+	private Gson gson;
+
+	private Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableIndex");
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -68,6 +84,29 @@ public class WFCIndexPart extends WFCFormPart {
 		MPerspective perspectiveFor = modelService.getPerspectiveFor(part);
 		natTable = new NatTableWrapper().createNatTable(parent, form, data, true, selectionService,
 				perspectiveFor.getContext());
+
+		gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
+
+		try {
+			File jsonFile = new File(path.toString());
+			jsonFile.createNewFile();
+			String content = Files.readString(path, StandardCharsets.UTF_8);
+			if (!content.equals("")) {
+				Table indexTable = gson.fromJson(content, Table.class);
+				if (indexTable.getRows() != null) {
+					natTable.updateData(indexTable.getRows());
+				}
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@PersistTableSelection
@@ -85,6 +124,14 @@ public class WFCIndexPart extends WFCFormPart {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
 			natTable.updateData(table.getRows());
+
+			try {
+				Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
+				System.out.println("Table saved");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

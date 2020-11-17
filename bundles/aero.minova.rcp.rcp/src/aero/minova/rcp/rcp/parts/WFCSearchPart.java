@@ -15,9 +15,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.ValueDeserializer;
+import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.rcp.nattable.NatTableWrapper;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 
@@ -34,6 +40,10 @@ public class WFCSearchPart extends WFCFormPart {
 	private MPerspective perspective;
 
 	private Table data;
+
+	private NatTableWrapper natTable;
+
+	private Gson gson;
 
 	@Inject
 	MPart mPart;
@@ -59,7 +69,31 @@ public class WFCSearchPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		new NatTableWrapper().createNatTable(parent, form, data, false, null, context);
+		natTable = new NatTableWrapper().createNatTable(parent, form, data, false, null, context);
+
+		gson = new Gson();
+		gson = new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.setPrettyPrinting() //
+				.create();
+
+//		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
+//		try {
+//			File jsonFile = new File(path.toString());
+//			jsonFile.createNewFile();
+//			String content = Files.readString(path, StandardCharsets.UTF_8);
+//			if (!content.equals("")) {
+//				Table searchTable = gson.fromJson(content, Table.class);
+//				if (searchTable.getRows() != null) {
+//					natTable.updateData(searchTable.getRows());
+//					mPart.getContext().set("NatTableDataSearchArea", natTable);
+//				}
+//			}
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 	}
 
