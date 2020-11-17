@@ -1,17 +1,10 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -85,23 +78,22 @@ public class WFCSearchPart extends WFCFormPart {
 				.setPrettyPrinting() //
 				.create();
 
-		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
-		try {
-			File jsonFile = new File(path.toString());
-			jsonFile.createNewFile();
-			String content = Files.readString(path, StandardCharsets.UTF_8);
-			if (!content.equals("")) {
-				Table searchTable = gson.fromJson(content, Table.class);
-				if (searchTable.getRows() != null) {
-					// TODO: Das update der Daten der NatTable blockiert die gefilterte Suche,
-					// diesem Fehler auf den Grund gehen
-					natTable.updateData(searchTable.getRows());
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
+//		try {
+//			File jsonFile = new File(path.toString());
+//			jsonFile.createNewFile();
+//			String content = Files.readString(path, StandardCharsets.UTF_8);
+//			if (!content.equals("")) {
+//				Table searchTable = gson.fromJson(content, Table.class);
+//				if (searchTable.getRows() != null) {
+//					natTable.updateData(searchTable.getRows());
+//					mPart.getContext().set("NatTableDataSearchArea", natTable);
+//				}
+//			}
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 	}
 

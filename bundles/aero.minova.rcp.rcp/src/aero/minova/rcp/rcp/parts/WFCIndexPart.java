@@ -126,6 +126,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 			try {
 				Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
+				System.out.println("Table saved");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
