@@ -226,7 +226,7 @@ public class XMLDetailPart {
 								changeSelectionBoxList(c, false);
 							} else {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								broker.post("WFCLoadAllLookUpValues", field.getName());
+								broker.post("LoadAllLookUpValues", field.getName());
 							}
 						}
 					}
