@@ -94,7 +94,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	@Inject
-	public void changeSelectedEntry(@Optional @Named("ActiveRows") List<Row> rows) {
+	public void changeSelectedEntry(@Optional @Named(Constants.BROKER_ACTIVEROWS) List<Row> rows) {
 		if (rows != null) {
 			if (rows.size() != 0) {
 				Row row = rows.get(0);
@@ -160,9 +160,7 @@ public class WFCDetailCASRequestsUtil {
 					LookupControl lc = (LookupControl) c;
 					lc.setText("");
 					lc.getDescription().setText("");
-					lc.setData(Constants.CONTROL_KEYLONG, null);
 					lc.getTextControl().setMessage("...");
-
 				}
 			}
 
@@ -204,7 +202,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Inject
 	@Optional
-	public void buildSaveTable(@UIEventTopic("SaveEntry") MPerspective perspective) {
+	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			Table formTable = null;
 			RowBuilder rb = RowBuilder.newRow();
@@ -395,7 +393,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Inject
 	@Optional
-	public void buildDeleteTable(@UIEventTopic("DeleteEntry") MPerspective perspective) {
+	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			if (getKeys() != null) {
 				String tablename = form.getIndexView() != null ? "sp" : "op";
@@ -459,7 +457,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Optional
 	@Inject
-	public void clearFields(@UIEventTopic("clearFields") Map<MPerspective, String> map) {
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
 			String origin = map.get(perspective);
 			for (Control c : controls.values()) {

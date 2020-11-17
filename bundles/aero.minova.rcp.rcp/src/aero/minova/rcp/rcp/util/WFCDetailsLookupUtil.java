@@ -8,6 +8,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -20,6 +21,8 @@ public class WFCDetailsLookupUtil {
 
 	protected UISynchronize sync;
 
+	private ILocalDatabaseService localDatabaseService;
+
 	private IDataService dataService;
 
 	private MPerspective perspective = null;
@@ -27,11 +30,12 @@ public class WFCDetailsLookupUtil {
 	private Map<String, Control> controls = null;
 
 	public WFCDetailsLookupUtil(Map<String, Control> controls, MPerspective perspective, IDataService dataService,
-			UISynchronize sync) {
+			UISynchronize sync, ILocalDatabaseService localDatabaseService) {
 		this.controls = controls;
 		this.perspective = perspective;
 		this.dataService = dataService;
 		this.sync = sync;
+		this.localDatabaseService = localDatabaseService;
 	}
 
 	public void requestOptionsFromCAS(Control c) {
@@ -42,9 +46,11 @@ public class WFCDetailsLookupUtil {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
+				localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
 				changeOptionsForLookupField(sql.getResultSet(), c, false);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
+				localDatabaseService.replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, c, false);
 			}
 

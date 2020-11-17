@@ -226,7 +226,7 @@ public class XMLDetailPart {
 								changeSelectionBoxList(c, false);
 							} else {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								broker.post("WFCLoadAllLookUpValues", field.getName());
+								broker.post("LoadAllLookUpValues", field.getName());
 							}
 						}
 					}
@@ -547,7 +547,7 @@ public class XMLDetailPart {
 	 */
 	@Inject
 	@Optional
-	public void buildSaveTable(@UIEventTopic("SaveEntry") MPerspective perspective) {
+	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			Table formTable = null;
 			RowBuilder rb = RowBuilder.newRow();
@@ -738,7 +738,7 @@ public class XMLDetailPart {
 	 */
 	@Inject
 	@Optional
-	public void buildDeleteTable(@UIEventTopic("DeleteEntry") MPerspective perspective) {
+	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			if (getKeys() != null) {
 				String tablename = form.getIndexView() != null ? "sp" : "op";
@@ -802,7 +802,7 @@ public class XMLDetailPart {
 	 */
 	@Optional
 	@Inject
-	public void clearFields(@UIEventTopic("clearFields") Map<MPerspective, String> map) {
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
 			String origin = map.get(perspective);
 			for (Control c : controls.values()) {
