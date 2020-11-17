@@ -86,7 +86,7 @@ public class WFCDetailLookupFieldUtil {
 			public void mouseDown(MouseEvent e) {
 				Map<MPerspective, String> brokerObject = new HashMap<>();
 				brokerObject.put(perspective, field.getName());
-				broker.post("WFCLoadAllLookUpValues", brokerObject);
+				broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
 			}
 
 			@Override

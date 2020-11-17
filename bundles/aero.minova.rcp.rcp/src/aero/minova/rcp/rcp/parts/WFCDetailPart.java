@@ -1,8 +1,8 @@
 
 package aero.minova.rcp.rcp.parts;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+
 
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -313,7 +314,8 @@ public class WFCDetailPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void requestLookUpEntriesAll(@UIEventTopic("WFCLoadAllLookUpValues") Map<MPerspective, String> map) {
+	public void requestLookUpEntriesAll(
+			@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
 			String name = map.get(perspective);
 			Control control = controls.get(name);

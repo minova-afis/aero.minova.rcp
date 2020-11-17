@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="page" type="{}page" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="procedure-suffix" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
- *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="op" /&gt;
+ *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="sp" /&gt;
  *       &lt;attribute name="import" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="clear-after-save" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="button-delete-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
@@ -192,7 +192,7 @@ public class Detail {
      */
     public String getProcedurePrefix() {
         if (procedurePrefix == null) {
-            return "op";
+            return "sp";
         } else {
             return procedurePrefix;
         }

@@ -185,7 +185,7 @@ public class XMLDetailPart {
 				}
 			}
 			if (c instanceof LookupControl) {
-				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService);
+				LookupFieldFocusListener lfl = new LookupFieldFocusListener(broker, dataService, sync);
 				LookupControl lc = (LookupControl) c;
 				lc.addFocusListener(lfl);
 				// Timer timer = new Timer();
@@ -211,7 +211,6 @@ public class XMLDetailPart {
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR) {
 							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
-								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 								requestOptionsFromCAS(lc);
 							} else {
 								changeSelectionBoxList(lc, false);
@@ -548,7 +547,7 @@ public class XMLDetailPart {
 	 */
 	@Inject
 	@Optional
-	public void buildSaveTable(@UIEventTopic("SaveEntry") MPerspective perspective) {
+	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			Table formTable = null;
 			RowBuilder rb = RowBuilder.newRow();
@@ -739,7 +738,7 @@ public class XMLDetailPart {
 	 */
 	@Inject
 	@Optional
-	public void buildDeleteTable(@UIEventTopic("DeleteEntry") MPerspective perspective) {
+	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			if (getKeys() != null) {
 				String tablename = form.getIndexView() != null ? "sp" : "op";
@@ -803,7 +802,7 @@ public class XMLDetailPart {
 	 */
 	@Optional
 	@Inject
-	public void clearFields(@UIEventTopic("clearFields") Map<MPerspective, String> map) {
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
 			String origin = map.get(perspective);
 			for (Control c : controls.values()) {

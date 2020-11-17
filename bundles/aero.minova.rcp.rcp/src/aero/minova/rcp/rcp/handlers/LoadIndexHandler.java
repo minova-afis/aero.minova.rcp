@@ -30,6 +30,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
+import aero.minova.rcp.rcp.util.Constants;
 
 public class LoadIndexHandler {
 
@@ -64,7 +65,7 @@ public class LoadIndexHandler {
 			Map<MPerspective, Table> brokerObject = new HashMap<>();
 			brokerObject.put(perspective, t);
 
-			broker.post("PLAPLA", brokerObject);
+			broker.post(Constants.BROKER_LOADINDEXTABLE, brokerObject);
 		});
 
 		findElements = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);
