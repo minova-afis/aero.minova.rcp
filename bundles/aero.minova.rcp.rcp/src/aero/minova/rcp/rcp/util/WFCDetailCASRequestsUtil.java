@@ -156,12 +156,12 @@ public class WFCDetailCASRequestsUtil {
 					Text t = (Text) c;
 					t.setText("");
 
-		for (Control c : controls.values()) {
-			if (c instanceof LookupControl) {
-				LookupControl lc = (LookupControl) c;
-				lc.setText("");
-				lc.getDescription().setText("");
-				lc.getTextControl().setMessage("...");
+				} else if (c instanceof LookupControl) {
+					LookupControl lc = (LookupControl) c;
+					lc.setText("");
+					lc.getDescription().setText("");
+					lc.getTextControl().setMessage("...");
+				}
 			}
 
 			for (int i = 0; i < table.getColumnCount(); i++) {
