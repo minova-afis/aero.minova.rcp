@@ -59,6 +59,17 @@ public class LoadIndexHandler {
 		Table table = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
 		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(table.getName(), table);
 
+		tableFuture.join();
+		tableFuture.thenAccept(t -> {
+			Map<MPerspective, Table> brokerObject = new HashMap<>();
+			brokerObject.put(perspective, t);
+
+			broker.post("PLAPLA", brokerObject);
+		});
+
+		findElements = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);
+		partService.activate(findElements.get(0));
+
 		gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
@@ -72,17 +83,6 @@ public class LoadIndexHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		tableFuture.join();
-		tableFuture.thenAccept(t -> {
-			Map<MPerspective, Table> brokerObject = new HashMap<>();
-			brokerObject.put(perspective, t);
-
-			broker.post("PLAPLA", brokerObject);
-		});
-
-		findElements = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);
-		partService.activate(findElements.get(0));
 	}
 
 }

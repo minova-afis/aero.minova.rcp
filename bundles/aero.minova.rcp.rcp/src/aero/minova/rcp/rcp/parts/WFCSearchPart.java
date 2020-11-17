@@ -92,7 +92,11 @@ public class WFCSearchPart extends WFCFormPart {
 			String content = Files.readString(path, StandardCharsets.UTF_8);
 			if (!content.equals("")) {
 				Table searchTable = gson.fromJson(content, Table.class);
-				natTable.updateData(searchTable.getRows());
+				if (searchTable.getRows() != null) {
+					// TODO: Das update der Daten der NatTable blockiert die gefilterte Suche,
+					// diesem Fehler auf den Grund gehen
+					natTable.updateData(searchTable.getRows());
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

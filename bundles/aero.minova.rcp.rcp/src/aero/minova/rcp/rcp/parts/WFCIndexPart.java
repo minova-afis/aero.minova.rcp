@@ -97,7 +97,9 @@ public class WFCIndexPart extends WFCFormPart {
 			String content = Files.readString(path, StandardCharsets.UTF_8);
 			if (!content.equals("")) {
 				Table indexTable = gson.fromJson(content, Table.class);
-				natTable.updateData(indexTable.getRows());
+				if (indexTable.getRows() != null) {
+					natTable.updateData(indexTable.getRows());
+				}
 			}
 
 		} catch (IOException e) {
