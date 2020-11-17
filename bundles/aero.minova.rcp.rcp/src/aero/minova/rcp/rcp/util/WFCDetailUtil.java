@@ -88,8 +88,9 @@ public class WFCDetailUtil {
 				if (field.getNumber() != null) {
 					text.addVerifyListener(e -> {
 						if (e.character != '\b') {
-							final String oldString = ((Text) e.getSource()).getText();
-							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+//							final String oldString = ((Text) e.getSource()).getText();
+//							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+							String newString = e.text;
 							e.doit = tfv.verifyDouble(newString);
 						}
 					});
