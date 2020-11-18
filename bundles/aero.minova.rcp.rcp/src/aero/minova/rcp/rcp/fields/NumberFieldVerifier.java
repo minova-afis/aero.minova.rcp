@@ -32,6 +32,7 @@ public class NumberFieldVerifier implements VerifyListener {
 		int end = e.end;
 		String textBefore = field.getText();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+		int newCaretPosition = getNewCaretPosition(insertion, dfs, caretPosition);
 
 		String newText = getNewText(decimals, locale, textBefore, newCaretPosition, start, end, insertion, dfs);
 		Double newValue = getNewValue(newText, dfs);
@@ -55,9 +56,12 @@ public class NumberFieldVerifier implements VerifyListener {
 		return newValue;
 	}
 
-	protected int getNewCaretPosition(int decimals, Locale locale, String textBefore, int caretPosition, int start,
-			int end, String insertion, String newText) {
-		return 0;
+	protected int getNewCaretPosition(String insertion, DecimalFormatSymbols dfs, int caretPosition) {
+		int newCaretPosition = caretPosition;
+		if (!insertion.equals("") && dfs.getDecimalSeparator() == insertion.charAt(0))
+			newCaretPosition = 1;
+
+		return newCaretPosition;
 	}
 
 	protected String getNewText(int decimals, Locale locale, String textBefore, int caretPosition, int start, int end,
