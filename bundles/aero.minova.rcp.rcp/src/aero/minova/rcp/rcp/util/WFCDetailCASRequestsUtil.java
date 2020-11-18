@@ -74,6 +74,7 @@ public class WFCDetailCASRequestsUtil {
 	private MPerspective perspective = null;
 
 	private Map<String, Control> controls = null;
+	private Map<String, Integer> lookups = new HashMap();
 
 	private List<ArrayList> keys = null;
 
@@ -201,6 +202,25 @@ public class WFCDetailCASRequestsUtil {
 							if (lookupConsumer != null) {
 								try {
 									lookupConsumer.accept(hash);
+
+									// Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die
+									// Latenz zwischen Index und Detail zu vermindern
+//									Table t = new Table();
+//									aero.minova.rcp.model.Column keyLong = new aero.minova.rcp.model.Column(
+//											Constants.TABLE_KEYLONG, DataType.INTEGER);
+//									t.addColumn(keyLong);
+//									aero.minova.rcp.model.Column keyText = new aero.minova.rcp.model.Column(
+//											Constants.TABLE_KEYTEXT, DataType.STRING);
+//									t.addColumn(keyText);
+//									aero.minova.rcp.model.Column description = new aero.minova.rcp.model.Column(
+//											Constants.TABLE_DESCRIPTION, DataType.STRING);
+//									t.addColumn(description);
+//									Row r = new Row();
+//									r.addValue(new Value(lc.getData(Constants.CONTROL_KEYLONG)));
+//									r.addValue(new Value(lc.getText()));
+//									r.addValue(new Value(lc.getDescription().getText()));
+//									t.addRow(r);
+//									localDatabaseService.addResultsForLookupField(field.getName(), t);
 								} catch (Exception e) {
 								}
 							}
@@ -209,7 +229,37 @@ public class WFCDetailCASRequestsUtil {
 
 				}
 			}
+			// Dieser Ansatz kommt in Frage, falls wir stehts die Optionen austauschen
+			// möchten und die Latenz gesamt kleinhalten möchten
+			for (Control co : controls.values()) {
+				if (co instanceof LookupControl) {
+					LookupControl lc = (LookupControl) co;
+					Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+					if ((int) lc.getData(Constants.CONTROL_KEYLONG) != lookups.get(field.getName())) {
+						CompletableFuture<?> tableFuture;
+						tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService,
+								sync, "List");
+
+						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+							if (ta instanceof SqlProcedureResult) {
+								SqlProcedureResult sql = (SqlProcedureResult) ta;
+								localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
+								lc.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
+							} else if (ta instanceof Table) {
+								Table t = (Table) ta;
+								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+								lc.setData(Constants.CONTROL_OPTIONS, ta);
+
+							}
+
+						}));
+					}
+
+				}
+			}
+
 		}
+
 	}
 
 	/**

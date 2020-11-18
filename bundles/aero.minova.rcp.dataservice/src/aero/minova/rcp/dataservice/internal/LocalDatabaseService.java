@@ -215,6 +215,48 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 		}
 	}
 
+	/**
+	 * Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die
+	 * Latenz zwischen Index und Detail zu vermindern
+	 * 
+	 * @param name  Name des Lookupfields, für welches wir die die Optionen Anfragen
+	 * @param Table Der Eintrag, welchen wir in die Datenbank schreiben möchten
+	 * @return void
+	 */
+	@Override
+	public void addResultsForLookupField(String name, Table table) {
+		if (conn != null) {
+			if (table != null || name != null) {
+				try {
+					insertEntryOfLookup = conn.prepareStatement(
+							"INSERT IF NOT EXISTS INTO Lookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
+					int i = 0;
+					while (i < table.getRows().size()) {
+						Row r = table.getRows().get(i);
+						insertEntryOfLookup.setString(1, name);
+						insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
+						insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
+						if (r.getValue(table.getColumnIndex("Description")) != null) {
+							insertEntryOfLookup.setString(4,
+									r.getValue(table.getColumnIndex("Description")).getStringValue());
+						} else {
+							insertEntryOfLookup.setString(4, "");
+						}
+						insertEntryOfLookup.execute();
+
+						i++;
+					}
+					conn.commit();
+				} catch (SQLException e) {
+					System.out.println("Eintragen der Werte der Datenbank fehlgeschlagen.");
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Kein Gültiges TableObject oder fehlende LookupField-Bezeichnung");
+			}
+		}
+	}
+
 	private void disconnect() {
 		try {
 //			DriverManager.getConnection(protocol + database + ";shutdown=true");

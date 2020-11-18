@@ -11,4 +11,6 @@ public interface ILocalDatabaseService {
 	void replaceResultsForLookupField(String name, Table table);
 
 	Map getResultsForKeyLong(String name, Integer keyLong);
+
+	void addResultsForLookupField(String name, Table table);
 }

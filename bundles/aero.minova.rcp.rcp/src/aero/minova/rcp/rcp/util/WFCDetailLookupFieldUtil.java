@@ -136,7 +136,6 @@ public class WFCDetailLookupFieldUtil {
 		LookupControl lc = (LookupControl) c;
 		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
-
 		lc.setText((String) ValueBuilder.value(v).create());
 		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
