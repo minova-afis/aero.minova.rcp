@@ -12,9 +12,10 @@ import org.eclipse.osgi.service.datalocation.Location;
 /**
  * This class stores workspace definition data. They can be stored in the configuration properties (except the password). The password can only be stored in the
  * workspace istself.
- * 
+ *
  * @author Wilfried Saak
  */
+@SuppressWarnings("unused")
 class WorkspaceData {
 	private URL connection;
 	private boolean isInBackingStore = false;
@@ -24,7 +25,8 @@ class WorkspaceData {
 	private String username = "";
 	private String applicationArea = "";
 	private Integer workspaceHash;
-	
+	private String message = "";
+
 	public static WorkspaceData[] getWorkspaceData() {
 		ISecurePreferences securePreferences = SecurePreferencesFactory.getDefault();
 		ISecurePreferences nodeWorkspaces = securePreferences.node("aero.minova.rcp.workspace").node("workspaces");
@@ -52,10 +54,10 @@ class WorkspaceData {
 		}
 		return workspaces;
 	}
-	
+
 	public WorkspaceData() {
 	}
-	
+
 	/**
 	 * @return Connection to the server.
 	 * @see WorkspaceHandler#newInstance(URL)
@@ -158,5 +160,13 @@ class WorkspaceData {
 
 	public void setApplicationArea(String applicationArea) {
 		this.applicationArea = applicationArea;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

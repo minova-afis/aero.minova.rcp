@@ -2,10 +2,26 @@ package aero.minova.rcp.workspace.handler;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
@@ -24,7 +40,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	}
 
 	@Override
-	public boolean checkConnection(String username, String password, String applicationArea) throws WorkspaceException {
+	public boolean checkConnection(String username, String password, String applicationArea, Boolean saveAsDefault)
+			throws WorkspaceException {
 		String profile = getProfile();
 		List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger);
 		ISecurePreferences store = null;
@@ -44,6 +61,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				}
 				if (getConnectionString() == null || getConnectionString().length() == 0) {
 					workspaceData.setConnection(new URL(store.get(WorkspaceAccessPreferences.URL, "")));
+					// Check if this is an valid value
+					URI.create(getConnectionString());
 				}
 			}
 		} catch (StorageException | MalformedURLException e) {
@@ -56,14 +75,19 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 		// Profil speichern
 		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(),
-				getPassword(), getProfile(), applicationArea, false);
+				getPassword(), getProfile(), applicationArea, saveAsDefault);
 
 		return true;
 	}
 
 	@Override
 	public void open() throws WorkspaceException {
+		if (!getPassword().isEmpty() && !getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+			// Manuell wurde hier das Psswort eingetragten / geändert
+			checkCredentials(getPassword());
+		}
 		if (!Platform.getInstanceLocation().isSet()) {
+			// 1. Auslesen aus dem Store, ggf. Setzen
 			String defaultPath = System.getProperty("user.home");
 
 			// build the desired path for the workspace
@@ -97,6 +121,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
 							// ausgelesendes Passwort vom Store nehmen
 							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
+
 						} else {
 							// ausgelesendes Passwort vom Dialog in den Store setzen
 							store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
@@ -109,8 +134,108 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 					e.printStackTrace();
 				}
 			}
-		}
 
+		} else {
+			// 2. Auslesen aus dem Store dieser wurde bereits gestezt!
+			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
+				try {
+					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
+						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+							// ausgelesendes Passwort vom Store nehmen
+							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
+						}
+						break;
+					}
+				} catch (StorageException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		checkCredentials(workspaceData.getPassword());
+	}
+
+	public static SSLContext disabledSslVerificationContext() {
+		SSLContext sslContext = null;
+
+		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+			@Override
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+
+			@Override
+			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+			}
+
+			@Override
+			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+			}
+		} };
+
+		try {
+			sslContext = SSLContext.getInstance("TLS");
+			sslContext.init(null, trustAllCerts, new SecureRandom());
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			throw new RuntimeException(e);
+		}
+		return sslContext;
+	}
+
+	/**
+	 * Diese Methode überprüft die angegebenen Einträge und versucht eine verbindung
+	 * zum Server herzustellen
+	 *
+	 * @throws WorkspaceException
+	 *
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	private void checkCredentials(String pw) throws WorkspaceException {
+
+		Authenticator authentication = new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(getUsername(), pw.toCharArray());
+			}
+		};
+
+		String body = "{\n" + "  \"name\": \"tEmployee\",\n" + "  \"columns\": [\n" + "    {\n"
+				+ "      \"name\": \"KeyLong\",\n" + "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n"
+				+ "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
+				+ "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
+				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n"
+				+ "  \"rows\": [\n" + "    {\n" + "      \"values\": [\n" + "        null,\n" + "        null,\n"
+				+ "        null,\n" + "        \"s-\\u003e0\"\n" + "      ]\n" + "    }\n" + "  ]\n" + "}";
+		try {
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //
+					.header("Content-Type", "application/json") //
+					.method("GET", BodyPublishers.ofString(body))//
+					.build();
+
+			HttpClient httpClient = HttpClient.newBuilder()//
+					.sslContext(disabledSslVerificationContext())//
+					.authenticator(authentication).build();
+
+			HttpResponse<String> answer;
+			answer = httpClient.send(request, BodyHandlers.ofString());
+			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
+				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
+			}
+		} catch (ConnectException ex) {
+			throw new WorkspaceException("Server nicht bekannt!");
+		} catch (IOException e) {
+			throw new WorkspaceException("User oder Passwort nicht korrekt");
+		} catch (InterruptedException i) {
+			throw new WorkspaceException("Try Again!");
+		} catch (IllegalArgumentException i) {
+			throw new WorkspaceException("Ungültige URL!");
+		}
+	}
+
+	@Override
+	public String getMessage() {
+		return workspaceData.getMessage();
 	}
 
 }

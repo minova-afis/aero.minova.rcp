@@ -123,7 +123,8 @@ public abstract class WorkspaceHandler {
 	 *            Application Area to read / store files
 	 * @return true, if the connection could be established.
 	 */
-	public abstract boolean checkConnection(String username, String password, String applicationArea) throws WorkspaceException;
+	public abstract boolean checkConnection(String username, String password, String applicationArea,
+			Boolean saveAsDefault) throws WorkspaceException;
 
 	/**
 	 * @return Connection String to service, if different from connectionURL of constructor
@@ -163,6 +164,10 @@ public abstract class WorkspaceHandler {
 
 	public String getDisplayName() {
 		return workspaceData.getDisplayName();
+	}
+
+	public String getMessage() {
+		return workspaceData.getMessage();
 	}
 
 }
