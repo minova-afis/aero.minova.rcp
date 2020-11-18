@@ -23,6 +23,7 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.fields.NumberFieldVerifier;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailUtil {
@@ -86,15 +87,18 @@ public class WFCDetailUtil {
 				Text text = (Text) c;
 				Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 				if (field.getNumber() != null) {
-					text.addVerifyListener(e -> {
-						if (e.character != '\b') {
-//							final String oldString = ((Text) e.getSource()).getText();
-//							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
-							String newString = e.text;
-							e.doit = tfv.verifyDouble(newString);
-						}
-					});
-					text.addFocusListener(tfv);
+					text.addVerifyListener(new NumberFieldVerifier());
+					
+//					
+//					text.addVerifyListener(e -> {
+//						if (e.character != '\b') {
+////							final String oldString = ((Text) e.getSource()).getText();
+////							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+//							String newString = e.text;
+//							e.doit = tfv.verifyDouble(newString);
+//						}
+//					});
+//					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
@@ -227,3 +231,4 @@ public class WFCDetailUtil {
 	}
 
 }
+
