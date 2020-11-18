@@ -186,7 +186,7 @@ public class WFCDetailCASRequestsUtil {
 						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(),
 								table.getRows().get(0).getValue(i).getIntegerValue());
 						if (databaseMap != null) {
-							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.CONTROL_KEYLONG));
+							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.TABLE_KEYLONG));
 							lc.setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
 							if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
 								lc.getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
@@ -235,20 +235,28 @@ public class WFCDetailCASRequestsUtil {
 				if (co instanceof LookupControl) {
 					LookupControl lc = (LookupControl) co;
 					Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-					if ((int) lc.getData(Constants.CONTROL_KEYLONG) != lookups.get(field.getName())) {
+					if (lookups.get(field.getName()) == null || lc.getData(Constants.CONTROL_KEYLONG) == null
+							|| (int) lc.getData(Constants.CONTROL_KEYLONG) != lookups.get(field.getName())) {
+						lookups.remove(field.getName());
+
 						CompletableFuture<?> tableFuture;
 						tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService,
 								sync, "List");
-
 						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 							if (ta instanceof SqlProcedureResult) {
 								SqlProcedureResult sql = (SqlProcedureResult) ta;
 								localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
 								lc.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
+								lookups.put(field.getName(),
+										sql.getResultSet().getRows().get(0)
+												.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYLONG))
+												.getIntegerValue());
 							} else if (ta instanceof Table) {
 								Table t = (Table) ta;
 								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
 								lc.setData(Constants.CONTROL_OPTIONS, ta);
+								lookups.put(field.getName(), t.getRows().get(0)
+										.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
 
 							}
 
