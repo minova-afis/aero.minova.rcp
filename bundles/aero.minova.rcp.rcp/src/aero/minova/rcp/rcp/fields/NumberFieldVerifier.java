@@ -81,8 +81,8 @@ public class NumberFieldVerifier implements VerifyListener {
 		}
 		newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
 		newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
-		Double newValue = getNewValue(newText);
-		newText = numberFormat.format(newValue);
+		if (!newText.isEmpty())
+			newText = numberFormat.format(getNewValue(newText, dfs));
 
 		return newText;
 	}
