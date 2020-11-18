@@ -2,17 +2,6 @@ package aero.minova.rcp.workspace.dialogs;
 
 import static org.eclipse.jface.widgets.WidgetFactory.label;
 
-import java.util.Objects;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.core.runtime.jobs.ProgressProvider;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -36,11 +25,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.core.ui.Util;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
@@ -52,21 +39,20 @@ public class WorkspaceDialog extends Dialog {
 	private Text password;
 	private Text applicationArea;
 	private Button btnOK;
+	private Button btnDefault;
 	private Text message;
 	private Text connectionString;
 	private Combo profile;
 
-	private WorkspaceHandler workspaceHandler;
+	private String usernameText;
+	private String pwText;
+	private String connectionText;
+
 	private Logger logger;
-	private ProgressBar progressBar;
-	private GlobalProgressMonitor monitor;
-	private final UISynchronize sync;
-	private SubMonitor subMonitor;
 	private boolean loadedProfile = false;
 
 	public WorkspaceDialog(Shell parentShell, Logger logger, UISynchronize sync) {
 		super(parentShell);
-		this.sync = Objects.requireNonNull(sync);
 		this.logger = logger;
 	}
 
@@ -80,7 +66,7 @@ public class WorkspaceDialog extends Dialog {
 
 		label(SWT.NONE).text("Profile").supplyLayoutData(labelGridData::create).create(container);
 		profile = new Combo(container, SWT.NONE);
-		profile.setLayoutData(new GridData(SWT.FILL, SWT.END, true, false, 4, 1));
+		profile.setLayoutData(new GridData(SWT.FILL, SWT.END, true, false, 3, 1));
 		fillProfiles();
 		profile.addSelectionListener(new SelectionListener() {
 
@@ -93,7 +79,7 @@ public class WorkspaceDialog extends Dialog {
 				password.setText("xxxxxxxxxxxxxxxxxxxx");
 				connectionString.setText("");
 				applicationArea.setText("");
-				checkWorkspace();
+				loadProfileData();
 			}
 
 			@Override
@@ -115,12 +101,16 @@ public class WorkspaceDialog extends Dialog {
 					System.out.println("Profil ist gesetzt: " + loadedProfile);
 					connectionString.setText("");
 					applicationArea.setText("");
-					checkWorkspace();
+					loadProfileData();
 				} catch (NullPointerException ex) {
 
 				}
 			}
 		});
+
+		btnDefault = new Button(container, SWT.CHECK);
+		btnDefault.setText("Default");
+		btnDefault.setLayoutData(GridDataFactory.fillDefaults().grab(false, false).hint(75, SWT.DEFAULT).create());
 
 		CLabel deleteProfile = new CLabel(container, SWT.CENTER | SWT.VERTICAL);
 		deleteProfile.setLayoutData(GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(false, true)
@@ -129,14 +119,14 @@ public class WorkspaceDialog extends Dialog {
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				if (!profile.getText().isEmpty()) {
-					WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
-					profile.clearSelection();
-					profile.removeAll();
-					loadedProfile = false;
-					fillProfiles();
-					deleteDialogEntries();
-				}
+				// if (!profile.getText().isEmpty()) {
+				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
+				profile.clearSelection();
+				profile.removeAll();
+				loadedProfile = false;
+				fillProfiles();
+				deleteDialogEntries();
+				//
 			}
 		});
 
@@ -145,17 +135,14 @@ public class WorkspaceDialog extends Dialog {
 		 */
 		label(SWT.NONE).text("Username").supplyLayoutData(labelGridData::create).create(container);
 		username = new Text(container, SWT.BORDER);
-		username.addFocusListener(new FocusAdapterExtension());
 		username.setLayoutData(GridDataFactory.fillDefaults().hint(130, SWT.DEFAULT).span(2, 1).create());
 
 		/**
 		 * PASSWORD
 		 */
-		label(SWT.NONE).text("Password").layoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1))
-				.create(container);
+		label(SWT.NONE).text("Password").supplyLayoutData(labelGridData::create).create(container);
 		password = new Text(container, SWT.BORDER | SWT.PASSWORD);
 		password.setLayoutData(GridDataFactory.fillDefaults().hint(130, SWT.DEFAULT).span(2, 1).create());
-		password.addFocusListener(new FocusAdapterExtension());
 
 		/**
 		 * CONNECTION STRING
@@ -163,7 +150,6 @@ public class WorkspaceDialog extends Dialog {
 		label(SWT.NONE).text("Connection String").layoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1))
 				.create(container);
 		connectionString = new Text(container, SWT.BORDER);
-		connectionString.addFocusListener(new FocusAdapterExtension());
 		connectionString.setLayoutData(GridDataFactory.fillDefaults().hint(400, SWT.DEFAULT).span(5, 1).create());
 
 		/**
@@ -185,22 +171,8 @@ public class WorkspaceDialog extends Dialog {
 		message.setEnabled(false);
 		// Wird benötigt, damit 2 Zeilen für das Message-Feld angezeigt werden.
 		new Label(container, SWT.NONE);
-
-		/**
-		 * PROGRESSBAR
-		 */
-		progressBar = new ProgressBar(container, SWT.BORDER | SWT.SMOOTH);
-		progressBar.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-		progressBar.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 20).span(6, 1).create());
-		progressBar.setBounds(100, 10, 200, SWT.NONE);
-
-		monitor = new GlobalProgressMonitor();
-		Job.getJobManager().setProgressProvider(new ProgressProvider() {
-			@Override
-			public IProgressMonitor createMonitor(Job job) {
-				return monitor.addJob(job);
-			}
-		});
+		// initialisieren --> alle Felder leer setzen
+		deleteDialogEntries();
 
 		return container;
 	}
@@ -213,7 +185,8 @@ public class WorkspaceDialog extends Dialog {
 		password.setText("");
 		connectionString.setText("");
 		applicationArea.setText("");
-		checkWorkspace();
+		message.setText("");
+		loadProfileData();
 	}
 
 	/**
@@ -229,172 +202,74 @@ public class WorkspaceDialog extends Dialog {
 		}
 	}
 
-	private static String stringFromCharArray() {
-		char[] c = { '\\', 'u', '1', 'F', '5', 'D', '1' };
-		return new String(c);
-	}
-
 	/**
-	 * Prüft die eingetragenen Daten. Wenn das Profil vorhanden ist, werden die Dialog-Felder entsprechend der gespeicherten Werte gesetzt.
-	 * Passwort wird nicht gesetzt!
+	 * Prüft die eingetragenen Daten. Wenn das Profil vorhanden ist, werden die
+	 * Dialog-Felder entsprechend der gespeicherten Werte gesetzt. Passwort wird
+	 * nicht gesetzt!
 	 */
-	private void checkWorkspace() {
-		Job job = new Job("Check Connection") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				subMonitor = SubMonitor.convert(monitor, 2);
-				subMonitor.split(1);
-				sync.asyncExec(() -> {
-					workspaceHandler = null;
-					try {
-						if (Util.isAvailable(message)) {
-							message.setText("");
-							workspaceHandler = WorkspaceHandler.newInstance(profile.getText(),
-									connectionString.getText(), logger);
-							if (workspaceHandler != null) {
-								btnOK.setEnabled(workspaceHandler.checkConnection(username.getText(),
-										password.getText(), applicationArea.getText()));
-								profile.setText(workspaceHandler.getProfile());
-								username.setText(workspaceHandler.getUsername());
-								password.setText(workspaceHandler.getPassword());
-								applicationArea.setText(workspaceHandler.getApplicationArea());
-								connectionString.setText(workspaceHandler.getConnectionString());
-							}
-						}
-					} catch (WorkspaceException e1) {
-						logger.error(e1);
-						message.setText(e1.getMessage());
-						btnOK.setEnabled(false);
-					}
-				});
-				return Status.OK_STATUS;
+	private void loadProfileData() {
+		WorkspaceHandler workspaceHandler = null;
+		try {
+			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
+			if (workspaceHandler != null) {
+				workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(),
+						btnDefault.getSelection());
+				profile.setText(workspaceHandler.getProfile());
+				username.setText(workspaceHandler.getUsername());
+				password.setText(workspaceHandler.getPassword());
+				applicationArea.setText(workspaceHandler.getApplicationArea());
+				connectionString.setText(workspaceHandler.getConnectionString());
+				message.setText(workspaceHandler.getMessage());
 			}
-		};
-		job.schedule();
+		} catch (WorkspaceException e1) {
+			logger.error(e1);
+			message.setText(e1.getMessage());
+		}
 
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		btnOK = createButton(parent, IDialogConstants.OPEN_ID, IDialogConstants.OPEN_LABEL, true);
-		btnOK.setEnabled(false);
 		btnOK.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setWorkspaceData2WorkspaceHandler();
 				okPressed();
 			}
 		});
 	}
 
-	private final class FocusAdapterExtension extends FocusAdapter {
-		@Override
-		public void focusLost(FocusEvent e) {
-			checkWorkspace();
-		}
-	}
-
-	private final class GlobalProgressMonitor extends NullProgressMonitor {
-		// thread-Safe via thread confinement of the UI-Thread
-		// (means access only via UI-Thread)
-		private long runningTasks = 0L;
-
-		@Override
-		public void beginTask(final String name, final int totalWork) {
-			sync.syncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					if (runningTasks <= 0) {
-						// --- no task is running at the moment ---
-						progressBar.setSelection(0);
-						progressBar.setMaximum(totalWork);
-
-					} else {
-						// --- other tasks are running ---
-						progressBar.setMaximum(progressBar.getMaximum() + totalWork);
-					}
-
-					runningTasks++;
-					progressBar.setToolTipText("Currently running: " + runningTasks + "\nLast task: " + name);
-				}
-			});
-		}
-
-		@Override
-		public void worked(final int work) {
-			sync.syncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					if (progressBar != null && !progressBar.isDisposed()) {
-						progressBar.setSelection(progressBar.getSelection() + work);
-					}
-				}
-			});
-		}
-
-		public IProgressMonitor addJob(Job job) {
-			if (job != null) {
-				job.addJobChangeListener(new JobChangeAdapter() {
-					@Override
-					public void done(IJobChangeEvent event) {
-						sync.syncExec(new Runnable() {
-
-							@Override
-							public void run() {
-								runningTasks--;
-								if (!progressBar.isDisposed()) {
-									if (runningTasks > 0) {
-										// --- some tasks are still running ---
-										progressBar.setToolTipText("Currently running: " + runningTasks);
-
-									} else {
-										// --- all tasks are done (a reset of selection could also be done) ---
-										progressBar.setToolTipText("No background progress running.");
-										progressBar.setSelection(0);
-									}
-								}
-							}
-						});
-
-						// clean-up
-						event.getJob().removeJobChangeListener(this);
-					}
-				});
-			}
-			return this;
-		}
-	}
-
 	@Override
 	protected void okPressed() {
+		WorkspaceHandler workspaceHandler = null;
 		try {
+			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
+			workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(),
+					btnDefault.getSelection());
 			workspaceHandler.open();
 		} catch (WorkspaceException e) {
-			e.printStackTrace();
+			message.setText(e.getMessage());
+			return;
+		} catch (NullPointerException ex) {
+			message.setText("Was stimmt denn nicht mit DIR ?!");
+			return;
 		}
+		usernameText = username.getText();
+		pwText = password.getText();
+		connectionText = connectionString.getText();
 		super.okPressed();
 	}
 
-	public void setWorkspaceData2WorkspaceHandler() {
-		try {
-			workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText());
-		} catch (WorkspaceException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public String getUsername() {
-		return workspaceHandler.getUsername();
+		return usernameText;
 	}
 
 	public String getPassword() {
-		return workspaceHandler.getPassword();
+		return pwText;
 	}
 
 	public String getConnection() {
-		return workspaceHandler.getConnectionString();
+		return connectionText;
 	}
 
 }
