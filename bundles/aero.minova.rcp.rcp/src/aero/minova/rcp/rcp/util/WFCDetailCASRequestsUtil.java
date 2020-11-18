@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -55,6 +56,8 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private IDataService dataService;
+
+	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -88,9 +91,11 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setControls(Map<String, Control> controls, MPerspective perspective) {
+	public void setControls(Map<String, Control> controls, MPerspective perspective,
+			ILocalDatabaseService localDatabaseService) {
 		this.controls = controls;
 		this.perspective = perspective;
+		this.localDatabaseService = localDatabaseService;
 	}
 
 	@Inject
@@ -174,17 +179,31 @@ public class WFCDetailCASRequestsUtil {
 						} catch (Exception e) {
 						}
 					}
-					Map hash = new HashMap<>();
-					hash.put("value", table.getRows().get(0).getValue(i));
-					hash.put("sync", sync);
-					hash.put("dataService", dataService);
-					hash.put("control", c);
+					if (c instanceof LookupControl) {
+						LookupControl lc = (LookupControl) c;
+						Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(),
+								table.getRows().get(0).getValue(i).getIntegerValue());
+						if (databaseMap != null) {
+							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.CONTROL_KEYLONG));
+							lc.setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
+							if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
+								lc.getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
+							}
+						} else {
+							Map hash = new HashMap<>();
+							hash.put("value", table.getRows().get(0).getValue(i));
+							hash.put("sync", sync);
+							hash.put("dataService", dataService);
+							hash.put("control", c);
 
-					Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
-					if (lookupConsumer != null) {
-						try {
-							lookupConsumer.accept(hash);
-						} catch (Exception e) {
+							Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
+							if (lookupConsumer != null) {
+								try {
+									lookupConsumer.accept(hash);
+								} catch (Exception e) {
+								}
+							}
 						}
 					}
 

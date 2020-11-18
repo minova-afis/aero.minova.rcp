@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.Platform;
@@ -113,6 +115,46 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 				}
 				if (t.getRows() != null) {
 					return t;
+				} else {
+					return null;
+				}
+
+			} else {
+				System.out.println("Fehlende LookupField-Bezeichnung");
+				return null;
+			}
+		} else {
+			System.out.println("Fehlende Verbindung zur Datenbank");
+			return null;
+		}
+	}
+
+	@Override
+	public Map getResultsForKeyLong(String name, Integer keyLong) {
+		Map map = new HashMap();
+		if (conn != null) {
+			if (name != null && keyLong != null) {
+				try {
+					s = conn.createStatement();
+					rs = s.executeQuery(
+							"SELECT * FROM Lookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
+					while (rs.next()) {
+						map.put("KeyLong", rs.getInt(3));
+						map.put("KeyText", rs.getString(4));
+						if (rs.getString(5).equals("")) {
+							map.put("Description", null);
+						} else {
+							map.put("Description", rs.getString(5));
+						}
+
+					}
+				} catch (SQLException e) {
+					System.out.println("Auslesen der Datenbank fehlgeschlagen.");
+					e.printStackTrace();
+					return null;
+				}
+				if (map.get("KeyLong") != null) {
+					return map;
 				} else {
 					return null;
 				}

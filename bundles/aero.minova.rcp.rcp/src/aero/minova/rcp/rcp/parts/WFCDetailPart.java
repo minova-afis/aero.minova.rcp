@@ -111,7 +111,7 @@ public class WFCDetailPart extends WFCFormPart {
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
 		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setControls(controls, perspective);
+		casRequestsUtil.setControls(controls, perspective, localDatabaseService);
 	}
 
 	private void layoutForm(Composite parent) {
