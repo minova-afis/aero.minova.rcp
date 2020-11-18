@@ -1,9 +1,12 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Shell;
 
 import com.google.gson.Gson;
@@ -46,13 +50,23 @@ public class LoadIndexHandler {
 	@Inject
 	private EPartService partService;
 
-	private Path path = Path
-			.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
-
 	private Gson gson;
 
+	public LoadIndexHandler() {
+		
+	}
+
+	private Path getStoragePath() throws URISyntaxException {
+		Location instanceLocation = Platform.getInstanceLocation();
+		// Muss getrennt gebaut werden, siehe Commit message
+		Path p = Paths.get(instanceLocation.getURL().toURI());
+		Path path = Paths.get(p + "/cache/jsonTableSearch");
+		return path;
+
+	}
 	@Execute
-	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective) {
+	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective)
+			throws URISyntaxException, IOException {
 		if (perspective == null)
 			return;
 
@@ -78,12 +92,10 @@ public class LoadIndexHandler {
 				.setPrettyPrinting() //
 				.create();
 
-		try {
-			Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			Path storagePath = getStoragePath();
+			File jsonFile = new File(storagePath.toString());
+			jsonFile.createNewFile();
+			Files.write(storagePath, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 	}
 
 }
