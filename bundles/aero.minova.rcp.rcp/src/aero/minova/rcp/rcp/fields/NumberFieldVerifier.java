@@ -26,11 +26,11 @@ public class NumberFieldVerifier implements VerifyListener {
 
 		int decimals = (int) field.getData(FieldUtil.FIELD_DECIMALS);
 		Locale locale = (Locale) field.getData(FieldUtil.TRANSLATE_LOCALE);
+		String insertion = e.text;
 		int caretPosition = field.getCaretPosition();
 		int start = e.start;
 		int end = e.end;
 		String textBefore = field.getText();
-		String insertion = e.text;
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
 		if (insertion.equals("" + dfs.getDecimalSeparator()) && textBefore.indexOf(dfs.getDecimalSeparator()) >= 0) {
