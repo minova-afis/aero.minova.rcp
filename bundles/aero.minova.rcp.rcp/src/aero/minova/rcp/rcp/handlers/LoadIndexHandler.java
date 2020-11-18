@@ -1,6 +1,8 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -46,13 +47,12 @@ public class LoadIndexHandler {
 	@Inject
 	private EPartService partService;
 
-	private Path path = Path
-			.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
-
 	private Gson gson;
 
+
 	@Execute
-	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective) {
+	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective)
+			throws URISyntaxException, IOException {
 		if (perspective == null)
 			return;
 
@@ -77,13 +77,11 @@ public class LoadIndexHandler {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
+		Path path = Path.of(dataService.getStoragePath().toString(), "cache", "jsonTableSearch");
 
-		try {
-			Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		File jsonFile = new File(path.toString());
+		jsonFile.createNewFile();
+		Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 	}
 
 }

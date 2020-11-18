@@ -10,7 +10,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
 import aero.minova.rcp.core.ui.PartsID;
-import aero.minova.rcp.rcp.parts.XMLIndexPart;
 
 public class ResizeIndexHandler {
 
@@ -21,7 +20,6 @@ public class ResizeIndexHandler {
 	public void execute(MPart mpart, MPerspective mPerspective) {
 
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.INDEX_PART, MPart.class);
-		XMLIndexPart indexPart = (XMLIndexPart) findElements.get(0).getObject();
 //		NatTable table = indexPart.getNatTable();
 //		NatTableUtil.resizeTable(table);
 
