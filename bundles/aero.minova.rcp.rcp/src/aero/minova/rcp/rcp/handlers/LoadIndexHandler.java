@@ -14,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -22,7 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Shell;
 
 import com.google.gson.Gson;
@@ -52,18 +50,7 @@ public class LoadIndexHandler {
 
 	private Gson gson;
 
-	public LoadIndexHandler() {
-		
-	}
 
-	private Path getStoragePath() throws URISyntaxException {
-		Location instanceLocation = Platform.getInstanceLocation();
-		// Muss getrennt gebaut werden, siehe Commit message
-		Path p = Paths.get(instanceLocation.getURL().toURI());
-		Path path = Paths.get(p + "/cache/jsonTableSearch");
-		return path;
-
-	}
 	@Execute
 	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective)
 			throws URISyntaxException, IOException {
@@ -91,11 +78,11 @@ public class LoadIndexHandler {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
+		Path path = Paths.get(dataService.getStoragePath() + "/cache/jsonTableSearch");
 
-			Path storagePath = getStoragePath();
-			File jsonFile = new File(storagePath.toString());
-			jsonFile.createNewFile();
-			Files.write(storagePath, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
+		File jsonFile = new File(path.toString());
+		jsonFile.createNewFile();
+		Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 	}
 
 }

@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -58,7 +58,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private Gson gson;
 
-	private Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableIndex");
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -93,8 +92,11 @@ public class WFCIndexPart extends WFCFormPart {
 				.create();
 
 		try {
+
+			Path path = Paths.get(dataService.getStoragePath() + "/cache/jsonTableIndex");
 			File jsonFile = new File(path.toString());
 			jsonFile.createNewFile();
+
 			String content = Files.readString(path, StandardCharsets.UTF_8);
 			if (!content.equals("")) {
 				Table indexTable = gson.fromJson(content, Table.class);
@@ -126,7 +128,7 @@ public class WFCIndexPart extends WFCFormPart {
 			natTable.updateData(table.getRows());
 
 			try {
-				Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
+				Files.write(dataService.getStoragePath(), gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 				System.out.println("Table saved");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
