@@ -159,9 +159,7 @@ public class WFCDetailCASRequestsUtil {
 					LookupControl lc = (LookupControl) c;
 					lc.setText("");
 					lc.getDescription().setText("");
-					lc.setData(Constants.CONTROL_KEYLONG, null);
 					lc.getTextControl().setMessage("...");
-
 				}
 			}
 
