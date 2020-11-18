@@ -33,16 +33,8 @@ public class NumberFieldVerifier implements VerifyListener {
 		String textBefore = field.getText();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
-		if (insertion.equals("" + dfs.getDecimalSeparator()) && textBefore.indexOf(dfs.getDecimalSeparator()) >= 0) {
-			field.setSelection(textBefore.indexOf(dfs.getDecimalSeparator()) + 1);
-			e.doit = false;
-			return;
-		}
-
-		String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
-		Double newValue = getNewValue(newText);
-//		int newCaretPosition = getNewCaretPosition(decimals, locale, textBefore, caretPosition, start, end, insertion,
-//				newText);
+		String newText = getNewText(decimals, locale, textBefore, newCaretPosition, start, end, insertion, dfs);
+		Double newValue = getNewValue(newText, dfs);
 
 		verificationActive = true;
 		field.setText(newText);
