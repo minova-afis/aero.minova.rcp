@@ -17,13 +17,10 @@ public class NumberFieldVerifier implements VerifyListener {
 
 	@Override
 	public void verifyText(VerifyEvent e) {
-		Text field = (Text) e.getSource();
-
 		if (verificationActive)
 			return; // Wir setzen gerade den Wert
-		if (e.widget != field)
-			return; // ist nicht unser Feld
 
+		Text field = (Text) e.getSource();
 		int decimals = (int) field.getData(FieldUtil.FIELD_DECIMALS);
 		Locale locale = (Locale) field.getData(FieldUtil.TRANSLATE_LOCALE);
 		String insertion = e.text;
