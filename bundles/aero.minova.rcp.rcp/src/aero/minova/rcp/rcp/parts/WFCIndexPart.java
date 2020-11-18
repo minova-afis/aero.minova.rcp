@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -93,7 +92,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		try {
 
-			Path path = Paths.get(dataService.getStoragePath() + "/cache/jsonTableIndex");
+			Path path = Path.of(dataService.getStoragePath().toString(), "cache", "jsonTableIndex");
 			File jsonFile = new File(path.toString());
 			jsonFile.createNewFile();
 
@@ -131,7 +130,6 @@ public class WFCIndexPart extends WFCFormPart {
 				Files.write(dataService.getStoragePath(), gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 				System.out.println("Table saved");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
