@@ -88,17 +88,6 @@ public class WFCDetailUtil {
 				Field field = (Field) c.getData(Constants.CONTROL_FIELD);
 				if (field.getNumber() != null) {
 					text.addVerifyListener(new NumberFieldVerifier());
-					
-//					
-//					text.addVerifyListener(e -> {
-//						if (e.character != '\b') {
-////							final String oldString = ((Text) e.getSource()).getText();
-////							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
-//							String newString = e.text;
-//							e.doit = tfv.verifyDouble(newString);
-//						}
-//					});
-//					text.addFocusListener(tfv);
 				}
 				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
 						|| field.getShortTime() != null) {
@@ -127,7 +116,6 @@ public class WFCDetailUtil {
 
 					@Override
 					public void keyPressed(KeyEvent e) {
-						// TODO Auto-generated method stub
 						if (e.keyCode == SWT.CONTROL) {
 							controlPressed = true;
 						}

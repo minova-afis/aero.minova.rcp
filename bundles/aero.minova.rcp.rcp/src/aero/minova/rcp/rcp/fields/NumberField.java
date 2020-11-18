@@ -25,7 +25,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
 
-@SuppressWarnings("restriction")
 public class NumberField {
 
 	private NumberField() {

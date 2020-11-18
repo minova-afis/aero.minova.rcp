@@ -77,8 +77,6 @@ public class NumberFieldVerifier implements VerifyListener {
 		} else {
 			newText = textBefore.substring(0, caretPosition) + insertion + textBefore.substring(caretPosition);
 		}
-//		newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
-//		newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
 		if (!newText.isEmpty())
 			newText = numberFormat.format(getNewValue(newText, dfs));
 
