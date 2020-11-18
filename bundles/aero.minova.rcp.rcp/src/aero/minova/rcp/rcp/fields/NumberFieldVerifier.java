@@ -37,8 +37,8 @@ public class NumberFieldVerifier implements VerifyListener {
 		verificationActive = true;
 		field.setText(newText);
 		field.setSelection(caretPosition + insertion.length());
-		verificationActive = false;
 		field.setData(FieldUtil.FIELD_VALUE, newValue);
+		verificationActive = false;
 		e.doit = false;
 	}
 
