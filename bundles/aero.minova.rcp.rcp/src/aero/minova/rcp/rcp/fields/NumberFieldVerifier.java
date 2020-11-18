@@ -45,12 +45,12 @@ public class NumberFieldVerifier implements VerifyListener {
 		e.doit = false;
 	}
 
-	protected Double getNewValue(String newText) {
-
+	protected Double getNewValue(String newText, DecimalFormatSymbols dfs) {
 		Double newValue;
 		if (newText.isEmpty()) {
 			newValue = null;
 		} else {
+			newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
 			newValue = Double.parseDouble(newText);
 		}
 		return newValue;
