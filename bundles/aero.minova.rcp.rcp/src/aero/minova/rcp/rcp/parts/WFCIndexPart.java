@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -58,7 +58,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private Gson gson;
 
-	private Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableIndex");
+
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -85,6 +85,7 @@ public class WFCIndexPart extends WFCFormPart {
 		natTable = new NatTableWrapper().createNatTable(parent, form, data, true, selectionService,
 				perspectiveFor.getContext());
 
+
 		gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
@@ -93,8 +94,10 @@ public class WFCIndexPart extends WFCFormPart {
 				.create();
 
 		try {
+			Path path = Path.of(dataService.getStoragePath().toString(), "cache", "jsonTableIndex");
 			File jsonFile = new File(path.toString());
 			jsonFile.createNewFile();
+
 			String content = Files.readString(path, StandardCharsets.UTF_8);
 			if (!content.equals("")) {
 				Table indexTable = gson.fromJson(content, Table.class);
@@ -126,10 +129,10 @@ public class WFCIndexPart extends WFCFormPart {
 			natTable.updateData(table.getRows());
 
 			try {
-				Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
+				Path file = Path.of(dataService.getStoragePath().toString(), "cache" + "jsonTableIndex");
+				Files.write(file, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 				System.out.println("Table saved");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

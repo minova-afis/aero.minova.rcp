@@ -10,7 +10,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
 import aero.minova.rcp.core.ui.PartsID;
-import aero.minova.rcp.rcp.parts.XMLDetailPart;
 
 public class RevertDetailHandler {
 
@@ -20,7 +19,5 @@ public class RevertDetailHandler {
 
 	public void execute(MPart mpart, MPerspective mPerspective) {
 		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
-		XMLDetailPart xmlPart = (XMLDetailPart) findElements.get(0).getObject();
-		xmlPart.updateSelectedEntry();
 	}
 }
