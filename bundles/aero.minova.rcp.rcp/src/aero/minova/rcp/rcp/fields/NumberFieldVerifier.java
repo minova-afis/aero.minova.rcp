@@ -47,6 +47,7 @@ public class NumberFieldVerifier implements VerifyListener {
 		if (newText.isEmpty()) {
 			newValue = null;
 		} else {
+			newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
 			newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
 			newValue = Double.parseDouble(newText);
 		}
@@ -76,8 +77,8 @@ public class NumberFieldVerifier implements VerifyListener {
 		} else {
 			newText = textBefore.substring(0, caretPosition) + insertion + textBefore.substring(caretPosition);
 		}
-		newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
-		newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
+//		newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
+//		newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
 		if (!newText.isEmpty())
 			newText = numberFormat.format(getNewValue(newText, dfs));
 
