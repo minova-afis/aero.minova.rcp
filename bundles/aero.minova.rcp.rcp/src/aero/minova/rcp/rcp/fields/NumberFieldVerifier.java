@@ -74,6 +74,8 @@ public class NumberFieldVerifier implements VerifyListener {
 
 		if ("".equals(insertion)) {
 			newText = textBefore.substring(0, start) + textBefore.substring(end);
+		} else if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
+			newText = textBefore.substring(0, start) + textBefore.substring(end);
 		} else {
 			newText = textBefore.substring(0, caretPosition) + insertion + textBefore.substring(caretPosition);
 		}
