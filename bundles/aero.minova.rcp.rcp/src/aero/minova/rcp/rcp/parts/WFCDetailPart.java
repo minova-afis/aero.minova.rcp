@@ -251,7 +251,7 @@ public class WFCDetailPart extends WFCFormPart {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
 			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
-					controls, perspective);
+					controls, perspective, localDatabaseService);
 
 		} else if (field.getText() != null) {
 			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);

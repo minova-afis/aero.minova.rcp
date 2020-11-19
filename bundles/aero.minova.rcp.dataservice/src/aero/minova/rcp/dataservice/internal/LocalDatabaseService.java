@@ -61,6 +61,9 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			createTableIfNotExisting = conn.prepareStatement(
 					"CREATE TABLE IF NOT EXISTS Lookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
 			createTableIfNotExisting.execute();
+			createTableIfNotExisting = conn.prepareStatement(
+					"CREATE TABLE IF NOT EXISTS AllLookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
+			createTableIfNotExisting.execute();
 		} catch (SQLException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,7 +140,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 				try {
 					s = conn.createStatement();
 					rs = s.executeQuery(
-							"SELECT * FROM Lookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
+							"SELECT * FROM AllLookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
 					while (rs.next()) {
 						map.put("KeyLong", rs.getInt(3));
 						map.put("KeyText", rs.getString(4));
@@ -228,25 +231,32 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 		if (conn != null) {
 			if (table != null || name != null) {
 				try {
-					insertEntryOfLookup = conn.prepareStatement(
-							"INSERT IF NOT EXISTS INTO Lookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
-					int i = 0;
-					while (i < table.getRows().size()) {
-						Row r = table.getRows().get(i);
-						insertEntryOfLookup.setString(1, name);
-						insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
-						insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
-						if (r.getValue(table.getColumnIndex("Description")) != null) {
-							insertEntryOfLookup.setString(4,
-									r.getValue(table.getColumnIndex("Description")).getStringValue());
-						} else {
-							insertEntryOfLookup.setString(4, "");
-						}
-						insertEntryOfLookup.execute();
+					Row row = table.getRows().get(0);
+					int keyLong = row.getValue(table.getColumnIndex("KeyLong")).getIntegerValue();
+					Map found = getResultsForKeyLong(name, keyLong);
+					if (found == null) {
+						insertEntryOfLookup = conn.prepareStatement(
+								"INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
+						int i = 0;
+						while (i < table.getRows().size()) {
+							Row r = table.getRows().get(i);
+							insertEntryOfLookup.setString(1, name);
+							insertEntryOfLookup.setInt(2,
+									r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
+							insertEntryOfLookup.setString(3,
+									r.getValue(table.getColumnIndex("KeyText")).getStringValue());
+							if (r.getValue(table.getColumnIndex("Description")) != null) {
+								insertEntryOfLookup.setString(4,
+										r.getValue(table.getColumnIndex("Description")).getStringValue());
+							} else {
+								insertEntryOfLookup.setString(4, "");
+							}
+							insertEntryOfLookup.execute();
 
-						i++;
+							i++;
+						}
+						conn.commit();
 					}
-					conn.commit();
 				} catch (SQLException e) {
 					System.out.println("Eintragen der Werte der Datenbank fehlgeschlagen.");
 					e.printStackTrace();

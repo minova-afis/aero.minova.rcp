@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -36,7 +37,8 @@ public class WFCDetailLookupFieldUtil {
 	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control createLookupField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls, MPerspective perspective) {
+			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls, MPerspective perspective,
+			ILocalDatabaseService localDatabaseService) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
@@ -116,6 +118,7 @@ public class WFCDetailLookupFieldUtil {
 				} else if (ta instanceof Table) {
 					t = (Table) ta;
 				}
+				localDatabaseService.addResultsForLookupField(field.getName(), t);
 				updateSelectedLookupEntry(t, (Control) m.get("control"));
 
 			}));

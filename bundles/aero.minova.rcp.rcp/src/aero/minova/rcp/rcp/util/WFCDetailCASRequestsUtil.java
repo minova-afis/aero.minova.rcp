@@ -204,24 +204,6 @@ public class WFCDetailCASRequestsUtil {
 								try {
 									lookupConsumer.accept(hash);
 
-									// Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die
-									// Latenz zwischen Index und Detail zu vermindern
-//									Table t = new Table();
-//									aero.minova.rcp.model.Column keyLong = new aero.minova.rcp.model.Column(
-//											Constants.TABLE_KEYLONG, DataType.INTEGER);
-//									t.addColumn(keyLong);
-//									aero.minova.rcp.model.Column keyText = new aero.minova.rcp.model.Column(
-//											Constants.TABLE_KEYTEXT, DataType.STRING);
-//									t.addColumn(keyText);
-//									aero.minova.rcp.model.Column description = new aero.minova.rcp.model.Column(
-//											Constants.TABLE_DESCRIPTION, DataType.STRING);
-//									t.addColumn(description);
-//									Row r = new Row();
-//									r.addValue(new Value(lc.getData(Constants.CONTROL_KEYLONG)));
-//									r.addValue(new Value(lc.getText()));
-//									r.addValue(new Value(lc.getDescription().getText()));
-//									t.addRow(r);
-//									localDatabaseService.addResultsForLookupField(field.getName(), t);
 								} catch (Exception e) {
 								}
 							}
