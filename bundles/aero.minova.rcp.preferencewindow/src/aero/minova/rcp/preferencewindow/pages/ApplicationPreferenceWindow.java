@@ -106,20 +106,21 @@ public class ApplicationPreferenceWindow {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
 						if (pref.getDisplayType() != DisplayType.ZONEID
-								&& pref.getDisplayType() != DisplayType.CUSTOMCHECK)
+								&& pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
 							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
 									window.getValueFor(pref.getKey()), s);
+						}
 					}
 				}
 
 			}
 			try {
 				preferences.flush();
-			} catch (BackingStoreException e) {
+				// eventuell muss es synchronisiert ausgeführt werden.
+				lcs.changeApplicationLocale(CustomLocale.getLocale());
+			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
-
-			lcs.changeApplicationLocale(CustomLocale.getLocale());
 		}
 	}
 
@@ -133,9 +134,10 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
 					Object defaultValue = pref.getDefaultValue();
-					if (pref.getDisplayType() != DisplayType.CUSTOMCHECK)
+					if (pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
 						data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(),
 								pref.getDisplayType(), defaultValue, s));
+					}
 
 				}
 			}

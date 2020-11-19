@@ -1,4 +1,4 @@
-package aero.minova.rcp.workspace.handler;
+package aero.minova.rcp.preferences;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class WorkspaceAccessPreferences {
 
 	private static final String AERO_MINOVA_RCP_WORKSPACE = "aero.minova.rcp.workspace";
 	private static final String WORKSPACES = "aero.minova.rcp.workspace";
-	private static final String IS_PRIMARY_WORKSPACE = "isPrimaryWorkspace";
+	public static final String IS_PRIMARY_WORKSPACE = "isPrimaryWorkspace";
 
 	public WorkspaceAccessPreferences() {
 		throw new UnsupportedOperationException();
