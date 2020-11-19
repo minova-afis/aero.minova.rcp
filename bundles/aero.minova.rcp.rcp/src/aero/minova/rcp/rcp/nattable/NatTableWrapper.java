@@ -61,7 +61,7 @@ public class NatTableWrapper {
 	private BodyLayerStack<Row> bodyLayerStack;
 	private IEclipseContext context;
 
-	public NatTableWrapper createNatTable(Composite parent, Form form, Table table, Boolean groupByLayer,
+	public NatTable createNatTable(Composite parent, Form form, Table table,
 			ESelectionService selectionService, IEclipseContext context) {
 
 		this.context = context;
@@ -110,7 +110,7 @@ public class NatTableWrapper {
 
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
-		final GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(),
+		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(),
 				gridLayer, columnHeaderDataProvider, columnHeaderLayer);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
@@ -133,113 +133,12 @@ public class NatTableWrapper {
         // expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(),
 				bodyLayerStack.getSelectionLayer()));
-		// natTable.addConfiguration(new HeaderMenuConfiguration(natTable) {
-//			@Override
-//			protected PopupMenuBuilder createCornerMenu(NatTable natTable) {
-//				return super.createCornerMenu(natTable).withStateManagerMenuItemProvider()
-//						.withMenuItemProvider(new IMenuItemProvider() {
-//
-//							@Override
-//							public void addMenuItem(NatTable natTable, Menu popupMenu) {
-//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-//								menuItem.setText("Toggle Group By Header"); //$NON-NLS-1$
-//								menuItem.setEnabled(true);
-//
-//								menuItem.addSelectionL	istener(new SelectionAdapter() {
-//									@Override
-//									public void widgetSelected(SelectionEvent event) {
-//										groupByHeaderLayer.setVisible(!groupByHeaderLayer.isVisible());
-//									}
-//								});
-//							}
-//						}).withMenuItemProvider(new IMenuItemProvider() {
-//
-//							@Override
-//							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
-//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-//								menuItem.setText("Collapse All"); //$NON-NLS-1$
-//								menuItem.setEnabled(true);
-//
-//								menuItem.addSelectionListener(new SelectionAdapter() {
-//									@Override
-//									public void widgetSelected(SelectionEvent event) {
-//										natTable.doCommand(new TreeCollapseAllCommand());
-//									}
-//								});
-//							}
-//						}).withMenuItemProvider(new IMenuItemProvider() {
-//
-//							@Override
-//							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
-//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-//								menuItem.setText("Expand All"); //$NON-NLS-1$
-//								menuItem.setEnabled(true);
-//
-//								menuItem.addSelectionListener(new SelectionAdapter() {
-//									@Override
-//									public void widgetSelected(SelectionEvent event) {
-//										natTable.doCommand(new TreeExpandAllCommand());
-//									}
-//								});
-//							}
-//						}).withMenuItemProvider(new IMenuItemProvider() {
-//
-//							@Override
-//							public void addMenuItem(final NatTable natTable, Menu popupMenu) {
-//								MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
-//								menuItem.setText("Expand to Level 2"); //$NON-NLS-1$
-//								menuItem.setEnabled(true);
-//
-//								menuItem.addSelectionListener(new SelectionAdapter() {
-//									@Override
-//									public void widgetSelected(SelectionEvent event) {
-//										natTable.doCommand(new TreeExpandToLevelCommand(2));
-//									}
-//								});
-//							}
-//						});
-//			}
-//		});
-//
 
 
-		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns()));
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-//		
 
-//		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-//
-//		SelectionLayer selectionLayer = new SelectionLayer(bodyDataLayer);
-//		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
-//
-//		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
-//				propertyNames,propertyToLabelMap);
-//		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-//		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
-//
-//		SortHeaderLayer<Person> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-//				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer));
-//
-//		CompositeLayer compositeLayer = new CompositeLayer(1, 2);
-//		compositeLayer.setChildLayer(GridRegion.COLUMN_HEADER, sortHeaderLayer, 0, 0);
-//		compositeLayer.setChildLayer(GridRegion.BODY, viewportLayer, 0, 1);
-
-//		NatTable natTable = new NatTable(parent, compositeLayer, false);
-//
-//		natTable.setConfigRegistry(configRegistry);
-//		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
-//		natTable.addConfiguration(new SingleClickSortConfiguration());
-
-		natTable.configure();
-		// set the modern theme to visualize the summary better
-
-//		ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration();
-//		modernTheme.addThemeExtension(new ModernGroupByThemeExtension());
-//
-//		natTable.setTheme(modernTheme);
-
-		return this;
+		return natTable;
 
 	}
 

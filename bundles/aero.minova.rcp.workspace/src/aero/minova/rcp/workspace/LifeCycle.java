@@ -8,10 +8,13 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.StorageException;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
+import aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences;
 
 @SuppressWarnings("restriction")
 public class LifeCycle {
@@ -32,14 +35,26 @@ public class LifeCycle {
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
-		if ((returnCode = workspaceDialog.open()) != 0) {
-			logger.info("RecurtnCode: " + returnCode);
-			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
-										// ausgesucht
-		}
-		dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
-				workspaceDialog.getConnection());
+		// TODO hier wird aktuell noch dran gearbeitet. HOM & ERC 18.11.2020 17:30Uhr
+		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty() && false) {
 
+			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
+			try {
+				dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null),
+						sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
+						sPrefs.get(WorkspaceAccessPreferences.URL, null));
+			} catch (StorageException e) {
+				e.printStackTrace();
+			}
+		} else {
+			if ((returnCode = workspaceDialog.open()) != 0) {
+				logger.info("RecurtnCode: " + returnCode);
+				System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
+											// ausgesucht
+			}
+			dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
+					workspaceDialog.getConnection());
+		}
 		Manager manager = new Manager();
 		manager.postContextCreate(workbenchContext);
 

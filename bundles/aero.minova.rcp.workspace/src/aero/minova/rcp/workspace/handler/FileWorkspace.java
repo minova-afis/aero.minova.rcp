@@ -20,6 +20,7 @@ import java.util.prefs.Preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
+
 import aero.minova.rcp.workspace.WorkspaceException;
 
 @SuppressWarnings("restriction")
@@ -36,7 +37,8 @@ public class FileWorkspace extends WorkspaceHandler {
 	}
 
 	@Override
-	public boolean checkConnection(String username, String password, String applicationArea) throws WorkspaceException {
+	public boolean checkConnection(String username, String password, String applicationArea, Boolean setAsDefault)
+			throws WorkspaceException {
 		// Verbindungswerte zurücksetzen
 		workspaceData.setUsername(username);
 		workspaceData.setPassword(password);

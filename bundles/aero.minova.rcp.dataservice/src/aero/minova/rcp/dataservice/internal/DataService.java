@@ -14,6 +14,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -26,13 +27,9 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.osgi.service.component.annotations.Activate;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.event.EventAdmin;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -235,6 +232,7 @@ public class DataService implements IDataService {
 
 	}
 
+	@Override
 	public void loadFile(UISynchronize sync, String filename) {
 		loadFile(sync, filename, false);
 	}
@@ -275,5 +273,18 @@ public class DataService implements IDataService {
 		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public Path getStoragePath() {
+		Location instanceLocation = Platform.getInstanceLocation();
+		Path p;
+		try {
+			p = Paths.get(instanceLocation.getURL().toURI());
+		} catch (URISyntaxException e) {
+			Platform.getLog(this.getClass()).error(e.getMessage());
+			throw new RuntimeException(e);
+		}
+		return p;
 	}
 }

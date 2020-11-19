@@ -11,6 +11,7 @@ import org.eclipse.nebula.widgets.nattable.data.convert.DefaultBooleanDisplayCon
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultDoubleDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.editor.CheckBoxCellEditor;
+import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.painter.cell.CheckBoxPainter;
@@ -52,7 +53,9 @@ public class MinovaEditConfiguration extends AbstractRegistryConfiguration {
 	private void registerTextEditor(IConfigRegistry configRegistry, int columnIndex) {
 		// register a TextCellEditor for column two that commits on key up/down
 		// moves the selection after commit by enter
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TextCellEditor(true, true),
+		TextCellEditor attributeValue = new TextCellEditor(true, true);
+		attributeValue.setSelectionMode(EditorSelectionEnum.START);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue,
 				DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
 		// configure to open the adjacent editor after commit
