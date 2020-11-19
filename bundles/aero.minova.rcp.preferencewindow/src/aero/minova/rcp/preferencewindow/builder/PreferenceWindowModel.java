@@ -49,6 +49,8 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor("licenceWarning",
 				translationService.translate("@Preferences.General.LicenceWarningBeforeWeeks", null), 0.1,
 				DisplayType.INTEGER, 0));
+		psd.add(new PreferenceDescriptor("defaultworkspace", translationService.translate("@Default.Workspace", null),
+				0.2, DisplayType.CUSTOMCHECK, false));
 		return ptd;
 	}
 
@@ -60,8 +62,9 @@ public class PreferenceWindowModel {
 		psd = new PreferenceSectionDescriptor("generaldesign",
 				translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor("language", translationService.translate("@Preferences.General.LocalLanguage", null),
-				0.1, DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(Locale.getDefault())));
+		psd.add(new PreferenceDescriptor("language",
+				translationService.translate("@Preferences.General.LocalLanguage", null), 0.1, DisplayType.LOCALE,
+				Locale.getDefault().getDisplayLanguage(Locale.getDefault())));
 		psd.add(new PreferenceDescriptor("timezone", "Zeitzone", 0.3, DisplayType.ZONEID,
 				CustomTimeZone.displayTimeZone(ZoneId.systemDefault().getDisplayName(TextStyle.FULL, locale), locale),
 				CustomTimeZone.getTimeZones(locale).toArray()));
