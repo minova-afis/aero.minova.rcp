@@ -240,9 +240,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			menu.setData(perspective.getElementId());
 
 			if (perspective.isVisible()) {
-				if (!"aero.minova.rcp.rcp.perspective.sis".equals(perspective.getElementId())) {
-					addCloseMenuItem(menu, perspectiveId);
-				}
+//				if (!"aero.minova.rcp.rcp.perspective.sis".equals(perspective.getElementId())) {
+				addCloseMenuItem(menu, perspectiveId);
+//				}
 			}
 		}
 
