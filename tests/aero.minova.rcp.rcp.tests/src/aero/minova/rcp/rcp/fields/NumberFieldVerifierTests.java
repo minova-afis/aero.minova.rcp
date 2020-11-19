@@ -32,7 +32,25 @@ public class NumberFieldVerifierTests {
 
 		assertEquals("9.999,95", nfv.getNewText(2, Locale.GERMANY, "99,95", 2, 2, 2, "99", dfs));
 	}
-	
+
+	@Test
+	public void testFrom0_00To1_00() {
+		NumberFieldVerifier nfv = new NumberFieldVerifier();
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
+
+		assertEquals("get text", "1,00", nfv.getNewText(2, Locale.GERMANY, "0,00", 1, 1, 1, "1", dfs));
+		assertEquals("get caret", 1, nfv.getNewCaretPosition("0,00", "1", dfs, 1));
+	}
+
+	@Test
+	public void testFrom1_00To12_00() {
+		NumberFieldVerifier nfv = new NumberFieldVerifier();
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
+
+		assertEquals("get text", "12,00", nfv.getNewText(2, Locale.GERMANY, "1,00", 1, 1, 1, "2", dfs));
+		assertEquals("get caret", 2, nfv.getNewCaretPosition("1,00", "2", dfs, 1));
+	}
+
 	@Test
 	public void testFrom99_95To999_95() {
 		NumberFieldVerifier nfv = new NumberFieldVerifier();
