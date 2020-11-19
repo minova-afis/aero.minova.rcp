@@ -238,10 +238,6 @@ public class WFCDetailCASRequestsUtil {
 														.getIntegerValue());
 									}
 								}
-								lookups.put(field.getName(),
-										sql.getResultSet().getRows().get(0)
-												.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYLONG))
-												.getIntegerValue());
 							} else if (ta instanceof Table) {
 								Table t = (Table) ta;
 								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
