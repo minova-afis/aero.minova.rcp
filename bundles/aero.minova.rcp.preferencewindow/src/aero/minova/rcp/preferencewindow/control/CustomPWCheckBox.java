@@ -3,6 +3,7 @@ package aero.minova.rcp.preferencewindow.control;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -15,6 +16,9 @@ public class CustomPWCheckBox extends CustomPWWidget {
 
 	@Inject
 	Logger logger;
+	
+	@Inject
+	TranslationService translationService;
 	/**
 	 * Constructor
 	 *
@@ -30,24 +34,19 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("Please specify a label for a checkbox");
-		}
+		buildLabel(parent, GridData.CENTER);
+		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
+		addControl(text);
+		final GridData textGridData = new GridData(GridData.FILL, GridData.BEGINNING, true, false);
+		textGridData.horizontalIndent = getIndent();
+		text.setLayoutData(textGridData);
+		
 		final Button button = new Button(parent, SWT.PUSH);
-		addControl(button);
-		final GridData buttonGridData = new GridData(GridData.FILL, GridData.BEGINNING, false, false);
-		buttonGridData.horizontalIndent = getIndent();
-		buttonGridData.widthHint = 100;
-		button.setText(getLabel());
-		final boolean originalSelection = (Boolean) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		button.setSelection(originalSelection);
+		final GridData buttonGridData = new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false);
+		buttonGridData.widthHint = 75;
+		button.setText("Reset");
 		button.setLayoutData(buttonGridData);
 		
-		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
-		final GridData textGridData = new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false);
-		textGridData.horizontalIndent = getIndent();
-		textGridData.widthHint = 150;
-		text.setLayoutData(textGridData);
 
 ////		Optional<ISecurePreferences> sP = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
 //		if(sP.isEmpty()) {
@@ -67,13 +66,11 @@ public class CustomPWCheckBox extends CustomPWWidget {
 //		}
 		
 		button.addListener(SWT.Selection, e -> {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), button.getSelection());
-			text.setText("");
 			
 		});
 		
 
-		return button;
+		return text;
 	}
 
 	/**

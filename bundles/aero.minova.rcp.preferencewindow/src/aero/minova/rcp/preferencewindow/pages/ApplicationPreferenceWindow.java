@@ -105,7 +105,8 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						if (pref.getDisplayType() != DisplayType.ZONEID)
+						if (pref.getDisplayType() != DisplayType.ZONEID
+								&& pref.getDisplayType() != DisplayType.CUSTOMCHECK)
 							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
 									window.getValueFor(pref.getKey()), s);
 					}
@@ -132,8 +133,9 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
 					Object defaultValue = pref.getDefaultValue();
-					data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(),
-							defaultValue, s));
+					if (pref.getDisplayType() != DisplayType.CUSTOMCHECK)
+						data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(),
+								pref.getDisplayType(), defaultValue, s));
 
 				}
 			}
