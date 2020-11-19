@@ -103,8 +103,6 @@ public class Manager {
 		preferences.putBoolean("hidesearchdetails", hidesearchdetails);
 		boolean deactivateinternpreview = preferences.getBoolean("deactivateinternpreview", false);
 		preferences.putBoolean("deactivateinternpreview", deactivateinternpreview);
-		boolean defaultworkspace = preferences.getBoolean("defaultworkspace", false);
-		preferences.putBoolean("defaultworkspace", defaultworkspace);
 		int maxCharacter = preferences.getInt("maxCharacter", 24000);
 		preferences.putInt("maxCharacter", maxCharacter);
 		String user = preferences.get("user", System.getProperty("user.name"));
