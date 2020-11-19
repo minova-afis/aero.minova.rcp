@@ -31,7 +31,7 @@ public class NumberFieldVerifier implements VerifyListener {
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 		int newCaretPosition = getNewCaretPosition(textBefore, insertion, dfs, caretPosition);
 
-		String newText = getNewText(decimals, locale, textBefore, newCaretPosition, start, end, insertion, dfs);
+		String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
 		Double newValue = getNewValue(newText, dfs);
 
 		verificationActive = true;
@@ -56,9 +56,18 @@ public class NumberFieldVerifier implements VerifyListener {
 
 	protected int getNewCaretPosition(String textBefore, String insertion, DecimalFormatSymbols dfs,
 			int caretPosition) {
-		int newCaretPosition = insertion.length() + (textBefore.length() - 3);
-		if (!insertion.equals("") && dfs.getDecimalSeparator() == insertion.charAt(0))
+		int newCaretPosition;
+		if (insertion.equals("")) {
+			newCaretPosition = (textBefore.length() - 3);
+		} else if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
 			newCaretPosition = (textBefore.length() - 3) + 1;
+		} else if (dfs.getGroupingSeparator() == insertion.charAt(0)) {
+			newCaretPosition = (textBefore.length() - 3);
+		} else if (textBefore.equals("0" + dfs.getDecimalSeparator() + "00")) {
+			newCaretPosition = insertion.length();
+		} else {
+			newCaretPosition = insertion.length() + (textBefore.length() - 3);
+		}
 
 		return newCaretPosition;
 	}
