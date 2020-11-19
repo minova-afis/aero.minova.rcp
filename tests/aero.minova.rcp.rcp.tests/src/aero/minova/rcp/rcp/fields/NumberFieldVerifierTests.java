@@ -87,32 +87,32 @@ public class NumberFieldVerifierTests {
 	public void testGetNewCaretPositionForLocaleUS() {
 		NumberFieldVerifier nfv = new NumberFieldVerifier();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-		
-		assertEquals(2, nfv.getNewCaretPosition("9000", dfs, 2));
+
+		assertEquals(4, nfv.getNewCaretPosition("0,00", "9000", dfs, 1));
 	}
 
 	@Test
 	public void testGetNewCaretPositionForLocaleGERMANY() {
 		NumberFieldVerifier nfv = new NumberFieldVerifier();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-		
-		assertEquals( 2, nfv.getNewCaretPosition("9000", dfs, 2));
+
+		assertEquals(4, nfv.getNewCaretPosition("0,00", "9000", dfs, 1));
 	}
 
 	@Test
 	public void testGetNewCaretPositionInsertCommaUS() {
 		NumberFieldVerifier nfv = new NumberFieldVerifier();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-		
-		assertEquals(1, nfv.getNewCaretPosition(".", dfs, 2));
+
+		assertEquals(2, nfv.getNewCaretPosition("0.00", ".", dfs, 1));
 	}
 
 	@Test
 	public void testGetNewCaretPositionInsertCommaGER() {
 		NumberFieldVerifier nfv = new NumberFieldVerifier();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-		
-		assertEquals(1, nfv.getNewCaretPosition(",", dfs, 2));
+
+		assertEquals(2, nfv.getNewCaretPosition("0,00", ",", dfs, 1));
 	}
 
 }
