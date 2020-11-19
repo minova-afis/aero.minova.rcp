@@ -36,6 +36,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.preferencewindow.control.CustomPWCheckBox;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -184,6 +185,9 @@ public class ApplicationPreferenceWindow {
 			break;
 		case LOCALE:
 			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
+			break;
+		case CUSTOMCHECK:
+			widget = new CustomPWCheckBox(pref.getLabel(), key).setWidth(200).setIndent(25);
 			break;
 		default:
 			break;
