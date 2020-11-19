@@ -16,7 +16,7 @@ public class NotificationPopUp extends AbstractNotificationPopup {
 		this.fText = text;
 		setParentShell(shell);
 		// TODO: Einstellung in die Preferences übernehmen?
-		setDelayClose(1000);
+		setDelayClose(2000);
 	}
 
 	@Override

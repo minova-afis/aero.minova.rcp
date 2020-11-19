@@ -122,11 +122,6 @@ public class DataService implements IDataService {
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
-				// Achtung hier kam eine Nachricht! keine Table
-				// "com.microsoft.sqlserver.jdbc.SQLServerException:" Parsen
-				// Pipe 2 x Mal
-				// Text bis zum Anführungszeichen entnehmen: losing | Datum muss nach dem
-				// letzten Monatsabschluss liegen","pat
 				String errorMessage = null;
 				Pattern fullError = Pattern
 						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
