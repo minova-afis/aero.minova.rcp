@@ -34,6 +34,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -56,14 +59,14 @@ public class DataService implements IDataService {
 	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
 	// Ticket-Anfragen zu versenden
 	// private String server = "https://mintest.minova.com:8084";
-	
+
 	@Override
 	public void setCredentials(String username, String password, String server) {
 		this.username = username;
 		this.password = password;
 		this.server = server;
 	}
-	
+
 
 	private void init() {
 
@@ -116,6 +119,24 @@ public class DataService implements IDataService {
 		// return CompletableFuture<SqlProcedureResult> future
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			if (fromJson.getOutputParameters() == null) {
+				//Achtung hier kam eine Nachricht! keine Table
+				// "com.microsoft.sqlserver.jdbc.SQLServerException:" Parsen
+				// Pipe 2 x Mal
+				// Text bis zum Anführungszeichen entnehmen: losing | Datum muss nach dem
+				// letzten Monatsabschluss liegen","pat
+				Table error = new Table();
+				error.setName("Error");
+				error.addColumn(new Column("Message", DataType.STRING));
+				Row r = new Row();
+				r.setValue(new Value("Message"), 0);
+				error.addRow(r);
+				fromJson = new SqlProcedureResult();
+				fromJson.setResultSet(error);
+				// FehlerCode
+				fromJson.setReturnCode(-1);
+
+			}
 			logBody(t.body());
 			return fromJson;
 		});
@@ -187,7 +208,9 @@ public class DataService implements IDataService {
 		try {
 			path = Platform.getInstanceLocation().getURL().toURI().toString();
 			File cachedFile = new File(new URI(path + filename));
-			if (cachedFile.exists()) return cachedFile;
+			if (cachedFile.exists()) {
+	return cachedFile;
+}
 		} catch (URISyntaxException e) {
 		}
 		return getFileSynch(path, filename);
