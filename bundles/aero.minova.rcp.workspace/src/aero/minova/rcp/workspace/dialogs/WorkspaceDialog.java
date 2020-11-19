@@ -255,7 +255,7 @@ public class WorkspaceDialog extends Dialog {
 			return;
 		}
 		usernameText = username.getText();
-		pwText = password.getText();
+		pwText = workspaceHandler.getPassword();
 		connectionText = connectionString.getText();
 		super.okPressed();
 	}
