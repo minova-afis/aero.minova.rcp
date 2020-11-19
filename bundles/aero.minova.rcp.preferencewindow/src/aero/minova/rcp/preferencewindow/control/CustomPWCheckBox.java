@@ -1,5 +1,8 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -10,6 +13,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class CustomPWCheckBox extends CustomPWWidget {
 
+	@Inject
+	Logger logger;
 	/**
 	 * Constructor
 	 *
@@ -28,7 +33,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		if (getLabel() == null) {
 			throw new UnsupportedOperationException("Please specify a label for a checkbox");
 		}
-		final Button button = new Button(parent, SWT.CHECK);
+		final Button button = new Button(parent, SWT.PUSH);
 		addControl(button);
 		final GridData buttonGridData = new GridData(GridData.FILL, GridData.BEGINNING, false, false);
 		buttonGridData.horizontalIndent = getIndent();
@@ -44,13 +49,27 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		textGridData.widthHint = 150;
 		text.setLayoutData(textGridData);
 
+////		Optional<ISecurePreferences> sP = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
+//		if(sP.isEmpty()) {
+//			button.setSelection(false);
+//			text.setText("");
+//		}else {
+//			button.setSelection(true);
+//			ISecurePreferences isp = sP.get();
+//			String profileName = "Default";
+//			try {
+//				profileName = isp.get(WorkspaceAccessPreferences.PROFILE, null);
+//			} catch (StorageException e1) {
+//				e1.printStackTrace();
+//			}
+//			text.setText(profileName);
+//			
+//		}
+		
 		button.addListener(SWT.Selection, e -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), button.getSelection());
-			if (button.getSelection() == true) {
-				text.setText("Funktioniert");
-			} else {
-				text.setText("");
-			}
+			text.setText("");
+			
 		});
 		
 
