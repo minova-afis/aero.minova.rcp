@@ -25,6 +25,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -342,12 +343,33 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			formTable.addRow(r);
-			checkWorkingTime(((Text) controls.get(Constants.FORM_BOOKINGDATE)).getText(),
-					((Text) controls.get(Constants.FORM_STARTDATE)).getText(),
-					((Text) controls.get(Constants.FORM_ENDDATE)).getText(),
-					((Text) controls.get(Constants.FORM_RENDEREDQUANTITY)).getText(),
-					((Text) controls.get(Constants.FORM_CHARGEDQUANTITY)).getText(), formTable, r);
+
+			checkWorkingTime(getTextFromControl(Constants.FORM_BOOKINGDATE),
+					getTextFromControl(Constants.FORM_STARTDATE), //
+					getTextFromControl(Constants.FORM_ENDDATE), //
+					getTextFromControl(Constants.FORM_RENDEREDQUANTITY), //
+					getTextFromControl(Constants.FORM_CHARGEDQUANTITY), //
+					formTable, //
+					r);
 		}
+	}
+
+	/**
+	 * Diese Methode ließt die Daten aus den Feldern / Controls und gibt einen
+	 * String zurück. Der String kann auch null sein.
+	 *
+	 * @param constant
+	 * @return
+	 */
+	String getTextFromControl(String constant) {
+		Control control = controls.get(constant);
+		String text = null;
+		if (control instanceof Text) {
+			text = ((Text) controls.get(constant)).getText();
+		} else if (control instanceof TextAssist) {
+			text = ((TextAssist) controls.get(constant)).getMessage();
+		}
+		return text;
 	}
 
 	/**
@@ -426,6 +448,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param responce
 	 */
 	private void checkEntryUpdate(SqlProcedureResult responce) {
+		// Wenn es Hier negativ ist dann haben wir einen Fehler
 		if (responce.getReturnCode() == null) {
 			openNotificationPopup("Entry could not be updated");
 		} else {
@@ -509,7 +532,7 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner
 	 * Anfrage informiert
-	 * 
+	 *
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
@@ -519,7 +542,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
-	 * 
+	 *
 	 * @param origin
 	 */
 	@Optional
@@ -598,7 +621,7 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Antworten des CAS für Ticketnummern werden hier ausgelesen, so das sie wie
 	 * bei einem Aufruf in der Index-Tabelle ausgewertet werden können
-	 * 
+	 *
 	 * @param recievedTable
 	 */
 	@Optional
