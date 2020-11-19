@@ -29,7 +29,7 @@ public class NumberFieldVerifier implements VerifyListener {
 		int end = e.end;
 		String textBefore = field.getText();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		int newCaretPosition = getNewCaretPosition(insertion, dfs, caretPosition);
+		int newCaretPosition = getNewCaretPosition(textBefore, insertion, dfs, caretPosition);
 
 		String newText = getNewText(decimals, locale, textBefore, newCaretPosition, start, end, insertion, dfs);
 		Double newValue = getNewValue(newText, dfs);
@@ -54,10 +54,11 @@ public class NumberFieldVerifier implements VerifyListener {
 		return newValue;
 	}
 
-	protected int getNewCaretPosition(String insertion, DecimalFormatSymbols dfs, int caretPosition) {
-		int newCaretPosition = caretPosition;
+	protected int getNewCaretPosition(String textBefore, String insertion, DecimalFormatSymbols dfs,
+			int caretPosition) {
+		int newCaretPosition = insertion.length() + (textBefore.length() - 3);
 		if (!insertion.equals("") && dfs.getDecimalSeparator() == insertion.charAt(0))
-			newCaretPosition = 1;
+			newCaretPosition = (textBefore.length() - 3) + 1;
 
 		return newCaretPosition;
 	}
