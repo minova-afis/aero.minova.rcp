@@ -323,7 +323,8 @@ public class WFCDetailPart extends WFCFormPart {
 				CompletableFuture<?> tableFuture;
 				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
 						"List");
-
+				LookupControl lc = (LookupControl) control;
+				lc.getTextControl().setText("...");
 				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
 					if (ta instanceof SqlProcedureResult) {
@@ -335,6 +336,7 @@ public class WFCDetailPart extends WFCFormPart {
 						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
 						lookupUtil.changeOptionsForLookupField(t, control, false);
 					}
+					lc.getTextControl().setText("");
 
 				}));
 			}
