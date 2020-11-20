@@ -27,12 +27,14 @@ public class NumberFieldVerifier implements VerifyListener {
 		int caretPosition = field.getCaretPosition();
 		int start = e.start;
 		int end = e.end;
+		int keyCode = e.keyCode;
 		String textBefore = field.getText();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 		int newCaretPosition = getNewCaretPosition(textBefore, insertion, dfs, caretPosition);
 
 		String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
 		Double newValue = getNewValue(newText, dfs);
+		int newCaretPosition = getNewCaretPosition(textBefore, insertion, newText, dfs, caretPosition, keyCode);
 
 		verificationActive = true;
 		field.setText(newText);
