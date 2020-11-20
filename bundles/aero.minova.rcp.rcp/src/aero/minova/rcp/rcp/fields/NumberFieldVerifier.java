@@ -30,7 +30,6 @@ public class NumberFieldVerifier implements VerifyListener {
 		int keyCode = e.keyCode;
 		String textBefore = field.getText();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		int newCaretPosition = getNewCaretPosition(textBefore, insertion, dfs, caretPosition);
 
 		String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
 		Double newValue = getNewValue(newText, dfs);
