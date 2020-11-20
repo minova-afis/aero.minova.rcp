@@ -162,6 +162,7 @@ public class WFCDetailCASRequestsUtil {
 				if (c instanceof Text) {
 					Text t = (Text) c;
 					t.setText("");
+
 				} else if (c instanceof LookupControl) {
 					LookupControl lc = (LookupControl) c;
 					lc.setText("");
