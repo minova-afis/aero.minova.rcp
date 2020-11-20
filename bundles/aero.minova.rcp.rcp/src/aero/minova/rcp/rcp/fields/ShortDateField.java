@@ -43,7 +43,7 @@ public class ShortDateField {
 	}
 
 	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit,
-			Locale locale) {
+			Locale locale, String timezone) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
@@ -85,13 +85,13 @@ public class ShortDateField {
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
 			Instant date = t.getRows().get(0).getValue(t.getColumnIndex(field.getName())).getInstantValue();
-			updateValue(text, date);
+			updateValue(text, date, timezone);
 		});
 		text.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
 				String input = text.getText();
-				updateValue(text, DateTimeUtil.getDate(input, locale));
+				updateValue(text, DateTimeUtil.getDate(input, locale), timezone);
 			}
 
 			@Override
@@ -103,11 +103,13 @@ public class ShortDateField {
 		return text;
 	}
 
-	public static void updateValue(TextAssist text, Instant date) {
+	public static void updateValue(TextAssist text, Instant date, String timezone) {
 		text.setData(FIELD_VALUE, date);
-		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
+		// Hier auch die Preferences beachten
+		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of(timezone));
 		Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
-		text.setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
+		text.setMessage(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 	}
 
 }

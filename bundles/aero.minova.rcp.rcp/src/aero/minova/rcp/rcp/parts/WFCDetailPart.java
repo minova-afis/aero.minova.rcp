@@ -18,6 +18,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
@@ -37,7 +38,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-
 
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -77,6 +77,10 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	protected UISynchronize sync;
+
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
 
 	private FormToolkit formToolkit;
 
@@ -247,7 +251,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field.getDateTime() != null) {
 			return DateTimeField.create(composite, field, row, column, formToolkit);
 		} else if (field.getShortDate() != null) {
-			return ShortDateField.create(composite, field, row, column, formToolkit, locale);
+			return ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field.getShortTime() != null) {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
