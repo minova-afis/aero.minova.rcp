@@ -54,19 +54,25 @@ public class NumberFieldVerifier implements VerifyListener {
 		return newValue;
 	}
 
-	protected int getNewCaretPosition(String textBefore, String insertion, DecimalFormatSymbols dfs,
-			int caretPosition) {
+	protected int getNewCaretPosition(String textBefore, String insertion, String newText, DecimalFormatSymbols dfs,
+			int caretPosition, int keyCode) {
 		int newCaretPosition;
-		if (insertion.equals("")) {
-			newCaretPosition = (textBefore.length() - 3);
+		if (keyCode == 8) {
+			if (newText.length() <= 1) {
+				newCaretPosition = caretPosition;
+			} else {
+				newCaretPosition = newText.length() - 3;
+			}
+		} else if (keyCode == 127) {
+			newCaretPosition = caretPosition;
 		} else if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
-			newCaretPosition = (textBefore.length() - 3) + 1;
-		} else if (dfs.getGroupingSeparator() == insertion.charAt(0)) {
-			newCaretPosition = (textBefore.length() - 3);
+			newCaretPosition = newText.length() - 3 + 1;
 		} else if (textBefore.equals("0" + dfs.getDecimalSeparator() + "00")) {
 			newCaretPosition = insertion.length();
+		} else if (insertion.equals("")) {
+			newCaretPosition = caretPosition;
 		} else {
-			newCaretPosition = insertion.length() + (textBefore.length() - 3);
+			newCaretPosition = newText.length() - 3;
 		}
 
 		return newCaretPosition;
