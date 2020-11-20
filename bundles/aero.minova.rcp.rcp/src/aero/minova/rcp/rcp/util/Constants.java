@@ -44,7 +44,7 @@ public class Constants {
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/clearFields";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
-	public static final String BROKER_ACTIVEROWS = "ActiveRows";
+	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 
 }

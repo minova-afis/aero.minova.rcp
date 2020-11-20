@@ -106,7 +106,6 @@ public class WFCIndexPart extends WFCFormPart {
 	private BodyLayerStack<Row> bodyLayerStack;
 	private IEclipseContext context;
 
-
 	@Inject
 	TranslationService translationService;
 
@@ -133,7 +132,6 @@ public class WFCIndexPart extends WFCFormPart {
 		parent.setLayout(new GridLayout());
 
 		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
-
 
 		gson = new Gson();
 		gson = new GsonBuilder() //
@@ -208,7 +206,6 @@ public class WFCIndexPart extends WFCFormPart {
 		// create the body stack
 		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
 
-
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
@@ -241,7 +238,6 @@ public class WFCIndexPart extends WFCFormPart {
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		natTable = new NatTable(parent, compositeGridLayer, false);
-
 
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
@@ -315,7 +311,6 @@ public class WFCIndexPart extends WFCFormPart {
 //				}
 //			});
 
-
 			// get the IDataProvider that was created by the GroupByDataLayer
 			this.bodyDataProvider = bodyDataLayer.getDataProvider();
 
@@ -337,10 +332,9 @@ public class WFCIndexPart extends WFCFormPart {
 				public void handleLayerEvent(ILayerEvent event) {
 					Object c = SelectionUtils.getSelectedRowObjects(selectionLayer,
 							(IRowDataProvider<T>) bodyDataProvider, false);
-					context.set("ActiveRows", c);
+					context.set(Constants.BROKER_ACTIVEROWS, c);
 				}
 			});
-
 
 			treeLayer = new TreeLayer(this.selectionLayer, bodyDataLayer.getTreeRowModel());
 
@@ -364,6 +358,7 @@ public class WFCIndexPart extends WFCFormPart {
 		public TreeLayer getTreeLayer() {
 			return this.treeLayer;
 		}
+
 		public IDataProvider getBodyDataProvider() {
 			return this.bodyDataProvider;
 		}
@@ -422,6 +417,7 @@ public class WFCIndexPart extends WFCFormPart {
 			table.doCommand(columnCommand);
 		}
 	}
+
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
