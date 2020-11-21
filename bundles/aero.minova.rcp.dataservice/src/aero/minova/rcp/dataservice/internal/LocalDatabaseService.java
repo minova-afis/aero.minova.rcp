@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.Platform;
@@ -58,6 +60,9 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			conn.setAutoCommit(false);
 			createTableIfNotExisting = conn.prepareStatement(
 					"CREATE TABLE IF NOT EXISTS Lookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
+			createTableIfNotExisting.execute();
+			createTableIfNotExisting = conn.prepareStatement(
+					"CREATE TABLE IF NOT EXISTS AllLookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
 			createTableIfNotExisting.execute();
 		} catch (SQLException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -127,6 +132,46 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 		}
 	}
 
+	@Override
+	public Map getResultsForKeyLong(String name, Integer keyLong) {
+		Map map = new HashMap();
+		if (conn != null) {
+			if (name != null && keyLong != null) {
+				try {
+					s = conn.createStatement();
+					rs = s.executeQuery(
+							"SELECT * FROM AllLookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
+					while (rs.next()) {
+						map.put("KeyLong", rs.getInt(3));
+						map.put("KeyText", rs.getString(4));
+						if (rs.getString(5).equals("")) {
+							map.put("Description", null);
+						} else {
+							map.put("Description", rs.getString(5));
+						}
+
+					}
+				} catch (SQLException e) {
+					System.out.println("Auslesen der Datenbank fehlgeschlagen.");
+					e.printStackTrace();
+					return null;
+				}
+				if (map.get("KeyLong") != null) {
+					return map;
+				} else {
+					return null;
+				}
+
+			} else {
+				System.out.println("Fehlende LookupField-Bezeichnung");
+				return null;
+			}
+		} else {
+			System.out.println("Fehlende Verbindung zur Datenbank");
+			return null;
+		}
+	}
+
 	/**
 	 * Wir löschen sämtlichen Optionen, welche wir für ein bestimmtes Lookupfield
 	 * gespeichert haben und hinterlegen die neuen Ergebnisse des CAS
@@ -165,6 +210,55 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					conn.commit();
 				} catch (SQLException e) {
 					System.out.println("Austausch der Werte der Datenbank fehlgeschlagen.");
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Kein Gültiges TableObject oder fehlende LookupField-Bezeichnung");
+			}
+		}
+	}
+
+	/**
+	 * Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die
+	 * Latenz zwischen Index und Detail zu vermindern
+	 * 
+	 * @param name  Name des Lookupfields, für welches wir die die Optionen Anfragen
+	 * @param Table Der Eintrag, welchen wir in die Datenbank schreiben möchten
+	 * @return void
+	 */
+	@Override
+	public void addResultsForLookupField(String name, Table table) {
+		if (conn != null) {
+			if (table != null || name != null) {
+				try {
+					Row row = table.getRows().get(0);
+					int keyLong = row.getValue(table.getColumnIndex("KeyLong")).getIntegerValue();
+					Map found = getResultsForKeyLong(name, keyLong);
+					if (found == null) {
+						insertEntryOfLookup = conn.prepareStatement(
+								"INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
+						int i = 0;
+						while (i < table.getRows().size()) {
+							Row r = table.getRows().get(i);
+							insertEntryOfLookup.setString(1, name);
+							insertEntryOfLookup.setInt(2,
+									r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
+							insertEntryOfLookup.setString(3,
+									r.getValue(table.getColumnIndex("KeyText")).getStringValue());
+							if (r.getValue(table.getColumnIndex("Description")) != null) {
+								insertEntryOfLookup.setString(4,
+										r.getValue(table.getColumnIndex("Description")).getStringValue());
+							} else {
+								insertEntryOfLookup.setString(4, "");
+							}
+							insertEntryOfLookup.execute();
+
+							i++;
+						}
+						conn.commit();
+					}
+				} catch (SQLException e) {
+					System.out.println("Eintragen der Werte der Datenbank fehlgeschlagen.");
 					e.printStackTrace();
 				}
 			} else {

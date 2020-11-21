@@ -50,7 +50,8 @@ public class WFCDetailsLookupUtil {
 				changeOptionsForLookupField(sql.getResultSet(), c, false);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+				// Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die
+				// Latenz zwischen Index und Detail zu vermindern
 				changeOptionsForLookupField(t, c, false);
 			}
 
@@ -144,8 +145,11 @@ public class WFCDetailsLookupUtil {
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
 						changeProposals(lc, t);
 						// Setzen der Proposals/Optionen
-					} else {
+					} else if (filteredTable.getRows().size() != 0) {
 						changeProposals((LookupControl) lc, filteredTable);
+						lc.setData(Constants.CONTROL_KEYLONG, null);
+					} else {
+						changeProposals((LookupControl) lc, t);
 						lc.setData(Constants.CONTROL_KEYLONG, null);
 					}
 					// Setzen der Proposals/Optionen
@@ -169,6 +173,7 @@ public class WFCDetailsLookupUtil {
 	}
 
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
+		System.out.println("Ich habe die Werte gesetzt");
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
 		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
@@ -184,5 +189,6 @@ public class WFCDetailsLookupUtil {
 				lc.getDescription().setText("");
 			}
 		}
+
 	}
 }
