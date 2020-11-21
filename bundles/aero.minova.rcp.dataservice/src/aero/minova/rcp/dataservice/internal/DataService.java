@@ -20,6 +20,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -34,11 +36,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
+import aero.minova.rcp.model.builder.RowBuilder;
 
 @Component
 public class DataService implements IDataService {
@@ -48,22 +54,21 @@ public class DataService implements IDataService {
 	private HttpClient httpClient;
 	private Gson gson;
 
-	private String username = null;//"admin";
-	private String password = null;//"rqgzxTf71EAx8chvchMi";
+	private String username = null;// "admin";
+	private String password = null;// "rqgzxTf71EAx8chvchMi";
 	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
-	private String server = null;//"https://publictest.minova.com:17280";
+	private String server = null;// "https://publictest.minova.com:17280";
 
 	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
 	// Ticket-Anfragen zu versenden
 	// private String server = "https://mintest.minova.com:8084";
-	
+
 	@Override
 	public void setCredentials(String username, String password, String server) {
 		this.username = username;
 		this.password = password;
 		this.server = server;
 	}
-	
 
 	private void init() {
 
@@ -116,6 +121,29 @@ public class DataService implements IDataService {
 		// return CompletableFuture<SqlProcedureResult> future
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			if (fromJson.getReturnCode() == null) {
+				String errorMessage = null;
+				Pattern fullError = Pattern
+						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Matcher m = fullError.matcher(t.body());
+				if (m.find()) {
+					errorMessage = m.group(0);
+				}
+				Pattern cutError = Pattern
+						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				errorMessage = cutError.matcher(errorMessage).replaceAll("");
+				errorMessage.replace("\"", "");
+				Table error = new Table();
+				Row r = new Row();
+				error.setName("Error");
+				error.addColumn(new Column("Message", DataType.STRING));
+				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
+				fromJson = new SqlProcedureResult();
+				fromJson.setResultSet(error);
+				// FehlerCode
+				fromJson.setReturnCode(-1);
+
+			}
 			logBody(t.body());
 			return fromJson;
 		});
@@ -177,7 +205,8 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
+	 *                  mit angehängt.
 	 * @param filename  relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
@@ -187,7 +216,9 @@ public class DataService implements IDataService {
 		try {
 			path = Platform.getInstanceLocation().getURL().toURI().toString();
 			File cachedFile = new File(new URI(path + filename));
-			if (cachedFile.exists()) return cachedFile;
+			if (cachedFile.exists()) {
+				return cachedFile;
+			}
 		} catch (URISyntaxException e) {
 		}
 		return getFileSynch(path, filename);
@@ -196,7 +227,8 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
+	 *                  mit angehängt.
 	 * @param filename  relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */

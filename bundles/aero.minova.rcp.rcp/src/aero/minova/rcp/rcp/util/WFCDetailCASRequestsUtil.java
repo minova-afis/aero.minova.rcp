@@ -382,8 +382,8 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private void checkEntryUpdate(SqlProcedureResult responce) {
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
-		if (responce.getReturnCode() == null) {
-			openNotificationPopup("Entry could not be updated");
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be updated:" + responce.getResultSet());
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -398,8 +398,8 @@ public class WFCDetailCASRequestsUtil {
 	 * @param responce
 	 */
 	private void checkNewEntryInsert(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == null) {
-			openNotificationPopup("Entry could not be added");
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be added:" + responce.getResultSet());
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -452,8 +452,8 @@ public class WFCDetailCASRequestsUtil {
 	 * @param responce
 	 */
 	public void deleteEntry(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == null) {
-			openNotificationPopup("Entry could not be deleted");
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
 			Map<MPerspective, String> map = new HashMap<>();
