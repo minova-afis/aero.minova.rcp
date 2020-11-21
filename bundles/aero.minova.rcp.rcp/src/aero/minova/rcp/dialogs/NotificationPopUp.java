@@ -7,26 +7,26 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-	public class NotificationPopUp extends AbstractNotificationPopup {
+public class NotificationPopUp extends AbstractNotificationPopup {
 
-		private String fText;
+	private String fText;
 
-		public NotificationPopUp(Display display, String text, Shell shell) {
-			super(display);
-			this.fText = text;
-			setParentShell(shell);
-			// TODO: Einstellung in die Preferences übernehmen?
-			setDelayClose(200);
-		}
-
-		@Override
-		protected String getPopupShellTitle() {
-			return "Notification";
-		}
-
-		@Override
-		protected void createContentArea(Composite parent) {
-			Label label = new Label(parent, SWT.WRAP);
-			label.setText(fText);
-		}
+	public NotificationPopUp(Display display, String text, Shell shell) {
+		super(display);
+		this.fText = text;
+		setParentShell(shell);
+		// TODO: Einstellung in die Preferences übernehmen?
+		setDelayClose(2000);
 	}
+
+	@Override
+	protected String getPopupShellTitle() {
+		return "Notification";
+	}
+
+	@Override
+	protected void createContentArea(Composite parent) {
+		Label label = new Label(parent, SWT.WRAP);
+		label.setText(fText);
+	}
+}

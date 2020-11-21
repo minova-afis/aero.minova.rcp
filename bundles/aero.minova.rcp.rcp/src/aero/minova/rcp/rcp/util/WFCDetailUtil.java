@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.fields.NumberFieldVerifier;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -33,8 +32,6 @@ public class WFCDetailUtil {
 
 	@Inject
 	private IEventBroker broker;
-
-	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -52,27 +49,21 @@ public class WFCDetailUtil {
 	private WFCDetailsLookupUtil lookupUtil = null;
 
 	@Inject
-	public WFCDetailUtil() {
-	}
+	public WFCDetailUtil() {}
 
-	public void bindValues(Map<String, Control> controls, MPerspective perspective,
-			ILocalDatabaseService localDatabaseService) {
+	public void bindValues(Map<String, Control> controls, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
 		this.controls = controls;
-		this.localDatabaseService = localDatabaseService;
 
 		this.lookupUtil = new WFCDetailsLookupUtil(controls, perspective, dataService, sync, localDatabaseService);
 
 		for (Control c : controls.values()) {
 			// Automatische anpassung der Quantitys, sobald sich die Zeiteinträge verändern
-			if ((c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
-					.getData(Constants.CONTROL_FIELD))
-					|| (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_ENDDATE)
-							.getData(Constants.CONTROL_FIELD))) {
+			if ((c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE).getData(Constants.CONTROL_FIELD))
+					|| (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_ENDDATE).getData(Constants.CONTROL_FIELD))) {
 				c.addKeyListener(new KeyListener() {
 
 					@Override
-					public void keyPressed(KeyEvent e) {
-					}
+					public void keyPressed(KeyEvent e) {}
 
 					@Override
 					public void keyReleased(KeyEvent e) {
@@ -89,8 +80,7 @@ public class WFCDetailUtil {
 				if (field.getNumber() != null) {
 					text.addVerifyListener(new NumberFieldVerifier());
 				}
-				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null
-						|| field.getShortTime() != null) {
+				if (field.getShortDate() != null || field.getLongDate() != null || field.getDateTime() != null || field.getShortTime() != null) {
 					text.setData(Constants.FOCUSED_ORIGIN, this);
 					text.addFocusListener(tfv);
 				}
@@ -99,7 +89,7 @@ public class WFCDetailUtil {
 						if (e.character != '\b') {
 							final String oldString = ((Text) e.getSource()).getText();
 							String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
-							e.doit = tfv.verifyText(newString, field.getText().getLength());
+							e.doit = TextfieldVerifier.verifyText(newString, field.getText().getLength());
 						}
 					});
 				}
@@ -126,42 +116,30 @@ public class WFCDetailUtil {
 						if (e.keyCode == SWT.CONTROL) {
 							controlPressed = false;
 						} else
-						// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
-						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
-								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
-								&& e.keyCode != SWT.SPACE && !lc.getText().startsWith("#")) {
-							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
-								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
-								if (localTable != null) {
-									lookupUtil.changeOptionsForLookupField(localTable, c, false);
-								} else {
-									lookupUtil.requestOptionsFromCAS(lc);
-								}
-							} else {
-								lookupUtil.changeSelectionBoxList(lc, false);
-							}
-						} else if (e.keyCode == SWT.SPACE && controlPressed == true) {
-							Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-							Map<MPerspective, String> brokerObject = new HashMap<>();
-							brokerObject.put(perspective, field.getName());
-							broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
-						} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
-							if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
-								lookupUtil.changeSelectionBoxList(c, false);
-							} else {
-								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
-								if (localTable != null) {
-									lookupUtil.changeOptionsForLookupField(localTable, c, false);
-								} else {
+							// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
+							if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
+									&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE && !lc.getText().startsWith("#")) {
+										if (lc.getData(Constants.CONTROL_OPTIONS) == null) {
+											lookupUtil.requestOptionsFromCAS(lc);
+										} else {
+											lookupUtil.changeSelectionBoxList(lc, false);
+										}
+									} else
+								if (e.keyCode == SWT.SPACE && controlPressed == true) {
+									Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
 									Map<MPerspective, String> brokerObject = new HashMap<>();
 									brokerObject.put(perspective, field.getName());
-									broker.post("WFCLoadAllLookUpValues", brokerObject);
-
+									broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
+								} else if (e.keyCode == SWT.ARROW_DOWN && lc.isProposalPopupOpen() == false) {
+									if (lc.getData(Constants.CONTROL_OPTIONS) != null) {
+										lookupUtil.changeSelectionBoxList(c, false);
+									} else {
+										Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+										Map<MPerspective, String> brokerObject = new HashMap<>();
+										brokerObject.put(perspective, field.getName());
+										broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
+									}
 								}
-							}
-						}
 					}
 
 				});
@@ -170,8 +148,7 @@ public class WFCDetailUtil {
 	}
 
 	/**
-	 * Aktuellisiert die Quantityvalues, sobald sich einer der beiden Zeiteinträge
-	 * verändert
+	 * Aktuellisiert die Quantityvalues, sobald sich einer der beiden Zeiteinträge verändert
 	 */
 	public void updateQuantitys() {
 		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
@@ -179,8 +156,7 @@ public class WFCDetailUtil {
 		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
 			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
 			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
-			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
-					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute()) - ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
 			timeDifference = timeDifference / 60;
 			Text renderedField = (Text) controls.get(Constants.FORM_RENDEREDQUANTITY);
 			Text chargedField = (Text) controls.get(Constants.FORM_CHARGEDQUANTITY);
@@ -189,10 +165,8 @@ public class WFCDetailUtil {
 			if (timeDifference >= 0) {
 				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
 				Double half = (double) Math.round(timeDifference * 2) / 2f;
-				String chargedFormat = "%1."
-						+ ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
-				String renderedFormat = "%1."
-						+ ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				String chargedFormat = "%1." + ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+				String renderedFormat = "%1." + ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
 				chargedValue = String.format(chargedFormat, half);
 				chargedValue = chargedValue.replace(',', '.');
 				renderedValue = String.format(renderedFormat, quarter);
@@ -219,4 +193,3 @@ public class WFCDetailUtil {
 	}
 
 }
-

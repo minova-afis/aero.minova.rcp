@@ -20,6 +20,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -42,6 +44,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
+import aero.minova.rcp.model.builder.RowBuilder;
 
 @Component
 public class DataService implements IDataService {
@@ -51,10 +54,10 @@ public class DataService implements IDataService {
 	private HttpClient httpClient;
 	private Gson gson;
 
-	private String username = null;//"admin";
-	private String password = null;//"rqgzxTf71EAx8chvchMi";
+	private String username = null;// "admin";
+	private String password = null;// "rqgzxTf71EAx8chvchMi";
 	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
-	private String server = null;//"https://publictest.minova.com:17280";
+	private String server = null;// "https://publictest.minova.com:17280";
 
 	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
 	// Ticket-Anfragen zu versenden
@@ -66,7 +69,6 @@ public class DataService implements IDataService {
 		this.password = password;
 		this.server = server;
 	}
-
 
 	private void init() {
 
@@ -119,18 +121,23 @@ public class DataService implements IDataService {
 		// return CompletableFuture<SqlProcedureResult> future
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			if (fromJson.getOutputParameters() == null) {
-				//Achtung hier kam eine Nachricht! keine Table
-				// "com.microsoft.sqlserver.jdbc.SQLServerException:" Parsen
-				// Pipe 2 x Mal
-				// Text bis zum Anführungszeichen entnehmen: losing | Datum muss nach dem
-				// letzten Monatsabschluss liegen","pat
+			if (fromJson.getReturnCode() == null) {
+				String errorMessage = null;
+				Pattern fullError = Pattern
+						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Matcher m = fullError.matcher(t.body());
+				if (m.find()) {
+					errorMessage = m.group(0);
+				}
+				Pattern cutError = Pattern
+						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				errorMessage = cutError.matcher(errorMessage).replaceAll("");
+				errorMessage.replace("\"", "");
 				Table error = new Table();
+				Row r = new Row();
 				error.setName("Error");
 				error.addColumn(new Column("Message", DataType.STRING));
-				Row r = new Row();
-				r.setValue(new Value("Message"), 0);
-				error.addRow(r);
+				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
 				fromJson = new SqlProcedureResult();
 				fromJson.setResultSet(error);
 				// FehlerCode
@@ -198,7 +205,8 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
+	 *                  mit angehängt.
 	 * @param filename  relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
@@ -209,8 +217,8 @@ public class DataService implements IDataService {
 			path = Platform.getInstanceLocation().getURL().toURI().toString();
 			File cachedFile = new File(new URI(path + filename));
 			if (cachedFile.exists()) {
-	return cachedFile;
-}
+				return cachedFile;
+			}
 		} catch (URISyntaxException e) {
 		}
 		return getFileSynch(path, filename);
@@ -219,7 +227,8 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
+	 *                  mit angehängt.
 	 * @param filename  relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */

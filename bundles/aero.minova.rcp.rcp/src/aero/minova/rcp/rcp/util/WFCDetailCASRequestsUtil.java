@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -57,6 +58,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	private IDataService dataService;
 
+	private ILocalDatabaseService localDatabaseService;
+
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	private Shell shell;
@@ -72,6 +75,7 @@ public class WFCDetailCASRequestsUtil {
 	private MPerspective perspective = null;
 
 	private Map<String, Control> controls = null;
+	private Map<String, Integer> lookups = new HashMap();
 
 	private List<ArrayList> keys = null;
 
@@ -89,9 +93,11 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setControls(Map<String, Control> controls, MPerspective perspective) {
+	public void setControls(Map<String, Control> controls, MPerspective perspective,
+			ILocalDatabaseService localDatabaseService) {
 		this.controls = controls;
 		this.perspective = perspective;
+		this.localDatabaseService = localDatabaseService;
 	}
 
 	@Inject
@@ -176,23 +182,85 @@ public class WFCDetailCASRequestsUtil {
 						} catch (Exception e) {
 						}
 					}
-					Map hash = new HashMap<>();
-					hash.put("value", table.getRows().get(0).getValue(i));
-					hash.put("sync", sync);
-					hash.put("dataService", dataService);
-					hash.put("control", c);
+					if (c instanceof LookupControl) {
+						LookupControl lc = (LookupControl) c;
+						Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(),
+								table.getRows().get(0).getValue(i).getIntegerValue());
+						if (databaseMap != null) {
+							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.TABLE_KEYLONG));
+							lc.setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
+							lc.getTextControl().setMessage("");
+							if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
+								lc.getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
+							}
+						} else {
+							Map hash = new HashMap<>();
+							hash.put("value", table.getRows().get(0).getValue(i));
+							hash.put("sync", sync);
+							hash.put("dataService", dataService);
+							hash.put("control", c);
 
-					Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
-					if (lookupConsumer != null) {
-						try {
-							lookupConsumer.accept(hash);
-						} catch (Exception e) {
+							Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
+							if (lookupConsumer != null) {
+								try {
+									lookupConsumer.accept(hash);
+
+								} catch (Exception e) {
+								}
+							}
 						}
 					}
 
 				}
 			}
+			// Dieser Ansatz kommt in Frage, falls wir stehts die Optionen austauschen
+			// möchten und die Latenz gesamt kleinhalten möchten
+			for (Control co : controls.values()) {
+				if (co instanceof LookupControl) {
+					LookupControl lc = (LookupControl) co;
+					Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+					if (lookups.get(field.getName()) == null || lc.getData(Constants.CONTROL_KEYLONG) == null
+							|| (int) lc.getData(Constants.CONTROL_KEYLONG) != lookups.get(field.getName())) {
+						lookups.remove(field.getName());
+
+						CompletableFuture<?> tableFuture;
+						tableFuture = LookupCASRequestUtil.getRequestedTable(0, (String) lc.getText(), field, controls,
+								dataService, sync, "List");
+						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+							if (ta instanceof SqlProcedureResult) {
+								SqlProcedureResult sql = (SqlProcedureResult) ta;
+								localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
+								lc.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
+								for (Row row : sql.getResultSet().getRows()) {
+									if (row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYTEXT))
+											.getStringValue().equals(lc.getText())) {
+										lookups.put(field.getName(),
+												row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYLONG))
+														.getIntegerValue());
+									}
+								}
+							} else if (ta instanceof Table) {
+								Table t = (Table) ta;
+								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+								lc.setData(Constants.CONTROL_OPTIONS, ta);
+								for (Row row : t.getRows()) {
+									if (row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+											.equals(lc.getText())) {
+										lookups.put(field.getName(), row
+												.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+									}
+								}
+							}
+
+						}));
+					}
+
+				}
+			}
+
 		}
+
 	}
 
 	/**
@@ -382,8 +450,8 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private void checkEntryUpdate(SqlProcedureResult responce) {
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
-		if (responce.getReturnCode() == null) {
-			openNotificationPopup("Entry could not be updated");
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be updated:" + responce.getResultSet());
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -398,8 +466,8 @@ public class WFCDetailCASRequestsUtil {
 	 * @param responce
 	 */
 	private void checkNewEntryInsert(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == null) {
-			openNotificationPopup("Entry could not be added");
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be added:" + responce.getResultSet());
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -452,8 +520,8 @@ public class WFCDetailCASRequestsUtil {
 	 * @param responce
 	 */
 	public void deleteEntry(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == null) {
-			openNotificationPopup("Entry could not be deleted");
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
 			Map<MPerspective, String> map = new HashMap<>();
