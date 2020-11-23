@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +73,10 @@ import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Column;
+import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -103,11 +111,19 @@ public class WFCIndexPart extends WFCFormPart {
 	private Gson gson;
 
 	private NatTable natTable;
+
 	private BodyLayerStack<Row> bodyLayerStack;
+
 	private IEclipseContext context;
+
+	private Map<String, Field> fields = new HashMap();
 
 	@Inject
 	TranslationService translationService;
+
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -127,6 +143,19 @@ public class WFCIndexPart extends WFCFormPart {
 		data.addRow();
 		if (string != null) {
 			data = mjs.json2Table(string);
+		}
+
+		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
+			if (headOrPage instanceof Page) {
+				Page page = (Page) headOrPage;
+				for (Object fieldOrGrid : page.getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						Field field = (Field) fieldOrGrid;
+						fields.put(field.getName(), field);
+					}
+				}
+
+			}
 		}
 
 		parent.setLayout(new GridLayout());
@@ -173,6 +202,24 @@ public class WFCIndexPart extends WFCFormPart {
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
+			for (Row r : table.getRows()) {
+				for (int i = 0; i < r.size(); i++) {
+					Field field = fields.get(table.getColumnName(i));
+					if (field != null) {
+						if (field.getShortDate() != null) {
+							LocalDate localDate = LocalDate.ofInstant(r.getValue(i).getInstantValue(),
+									ZoneId.of(timezone));
+							String date = localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
+							r.setValue(new Value(date, DataType.STRING), i);
+						} else if (field.getShortTime() != null) {
+							LocalDateTime localDatetime = LocalDateTime.ofInstant(r.getValue(i).getInstantValue(),
+									ZoneId.of(timezone));
+							String date = localDatetime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM));
+							r.setValue(new Value(date, DataType.STRING), i);
+						}
+					}
+				}
+			}
 			updateData(table.getRows());
 
 			try {
