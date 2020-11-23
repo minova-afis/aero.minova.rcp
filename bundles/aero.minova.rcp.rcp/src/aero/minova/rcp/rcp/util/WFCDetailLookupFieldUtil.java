@@ -104,24 +104,33 @@ public class WFCDetailLookupFieldUtil {
 		lookupControl.setData(Constants.CONTROL_LOOKUPCONSUMER, (Consumer<Map>) m -> {
 
 			int keyLong = (Integer) ValueBuilder.value((Value) m.get("value")).create();
-			lookupControl.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value((Value) m.get("value")).getDataType());
-			lookupControl.setData(Constants.CONTROL_KEYLONG, keyLong);
+			if (keyLong != 0) {
+				lookupControl.setData(Constants.CONTROL_DATATYPE,
+						ValueBuilder.value((Value) m.get("value")).getDataType());
+				lookupControl.setData(Constants.CONTROL_KEYLONG, keyLong);
 
-			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
-					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
-			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
-				Table t = null;
-				if (ta instanceof SqlProcedureResult) {
-					SqlProcedureResult sql = (SqlProcedureResult) ta;
-					t = sql.getResultSet();
-				} else if (ta instanceof Table) {
-					t = (Table) ta;
-				}
-				localDatabaseService.addResultsForLookupField(field.getName(), t);
-				updateSelectedLookupEntry(t, (Control) m.get("control"));
+				CompletableFuture<?> tableFuture;
+				tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
+						(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
+				tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
+					Table t = null;
+					if (ta instanceof SqlProcedureResult) {
+						SqlProcedureResult sql = (SqlProcedureResult) ta;
+						t = sql.getResultSet();
+					} else if (ta instanceof Table) {
+						t = (Table) ta;
+					}
+					localDatabaseService.addResultsForLookupField(field.getName(), t);
+					updateSelectedLookupEntry(t, (Control) m.get("control"));
 
-			}));
+				}));
+			} else {
+				LookupControl lc = (LookupControl) m.get("control");
+				lc.getDescription().setText("");
+				lc.setText("");
+				lc.setData(Constants.CONTROL_KEYLONG, null);
+				lc.getTextControl().setMessage("");
+			}
 		});
 
 		return lookupControl;
