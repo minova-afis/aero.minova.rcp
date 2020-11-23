@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -212,9 +213,9 @@ public class WFCIndexPart extends WFCFormPart {
 							String date = localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
 							r.setValue(new Value(date, DataType.STRING), i);
 						} else if (field.getShortTime() != null) {
-							LocalDateTime localDatetime = LocalDateTime.ofInstant(r.getValue(i).getInstantValue(),
-									ZoneId.of(timezone));
-							String date = localDatetime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM));
+							Instant instant = r.getValue(i).getInstantValue();
+							LocalDateTime localDatetime = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+							String date = localDatetime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
 							r.setValue(new Value(date, DataType.STRING), i);
 						}
 					}
