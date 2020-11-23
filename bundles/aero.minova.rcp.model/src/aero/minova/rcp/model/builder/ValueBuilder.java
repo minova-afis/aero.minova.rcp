@@ -15,7 +15,7 @@ public class ValueBuilder {
 	private DataType dataType;
 
 	private ValueBuilder(Value v, Field f) {
-		dtfHour = DateTimeFormatter.ofPattern("hh:mm");
+		dtfHour = DateTimeFormatter.ofPattern("HH:mm");
 		if (v.getBooleanValue() != null) {
 			translatedValue = v.getBooleanValue();
 			dataType = DataType.BOOLEAN;
