@@ -12,13 +12,9 @@ public class NumberFieldVerifier implements VerifyListener {
 
 	private boolean verificationActive = false;
 
-	public NumberFieldVerifier() {
-	}
-
 	@Override
 	public void verifyText(VerifyEvent e) {
-		if (verificationActive)
-			return; // Wir setzen gerade den Wert
+		if (verificationActive) return; // Wir setzen gerade den Wert
 
 		Text field = (Text) e.getSource();
 		int decimals = (int) field.getData(FieldUtil.FIELD_DECIMALS);
@@ -55,8 +51,7 @@ public class NumberFieldVerifier implements VerifyListener {
 		return newValue;
 	}
 
-	protected int getNewCaretPosition(String textBefore, String insertion, String newText, DecimalFormatSymbols dfs,
-			int caretPosition, int keyCode) {
+	protected int getNewCaretPosition(String textBefore, String insertion, String newText, DecimalFormatSymbols dfs, int caretPosition, int keyCode) {
 		int newCaretPosition;
 		if (keyCode == 8) {
 			if (newText.length() <= 1) {
@@ -79,8 +74,8 @@ public class NumberFieldVerifier implements VerifyListener {
 		return newCaretPosition;
 	}
 
-	protected String getNewText(int decimals, Locale locale, String textBefore, int caretPosition, int start, int end,
-			String insertion, DecimalFormatSymbols dfs) {
+	protected String getNewText(int decimals, Locale locale, String textBefore, int caretPosition, int start, int end, String insertion,
+			DecimalFormatSymbols dfs) {
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
@@ -94,8 +89,7 @@ public class NumberFieldVerifier implements VerifyListener {
 		} else {
 			newText = textBefore.substring(0, caretPosition) + insertion + textBefore.substring(caretPosition);
 		}
-		if (!newText.isEmpty())
-			newText = numberFormat.format(getNewValue(newText, dfs));
+		if (!newText.isEmpty()) newText = numberFormat.format(getNewValue(newText, dfs));
 
 		return newText;
 	}
