@@ -308,6 +308,14 @@ public class WFCDetailCASRequestsUtil {
 
 							}
 						}
+						if (c instanceof TextAssist) {
+							if (!(((TextAssist) c).getText().isBlank())) {
+								rb.withValue(((TextAssist) c).getText());
+							} else {
+								rb.withValue(null);
+
+							}
+						}
 						if (c instanceof LookupControl) {
 							if (c.getData(Constants.CONTROL_KEYLONG) != null) {
 								rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
@@ -368,7 +376,7 @@ public class WFCDetailCASRequestsUtil {
 		if (control instanceof Text) {
 			text = ((Text) controls.get(constant)).getText();
 		} else if (control instanceof TextAssist) {
-			text = ((TextAssist) controls.get(constant)).getMessage();
+			text = ((TextAssist) controls.get(constant)).getText();
 		}
 		return text;
 	}

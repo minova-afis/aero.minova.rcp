@@ -121,7 +121,8 @@ public class DataService implements IDataService {
 		// return CompletableFuture<SqlProcedureResult> future
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			if (fromJson.getReturnCode() == null) {
+			if (fromJson.getReturnCode() == null && fromJson.getResultSet() == null
+					&& fromJson.getOutputParameters() == null) {
 				String errorMessage = null;
 				Pattern fullError = Pattern
 						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");

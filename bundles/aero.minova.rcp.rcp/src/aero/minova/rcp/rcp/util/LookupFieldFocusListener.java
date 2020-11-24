@@ -9,6 +9,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.OutputType;
@@ -89,7 +90,8 @@ public class LookupFieldFocusListener implements FocusListener {
 	public void focusLost(FocusEvent e) {
 		Text t = (Text) e.getSource();
 		LookupControl lc = (LookupControl) t.getParent();
-		if (lc.getText().startsWith("#")) {
+		Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
+		if (lc.getText().startsWith("#") && !field.getName().equals(Constants.EMPLOYEEKEY)) {
 			getTicketFromCAS(lc);
 		} else {
 			// clearColumn(lc);
