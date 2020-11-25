@@ -127,14 +127,41 @@ public class WFCDetailPart extends WFCFormPart {
 		casRequestsUtil.setControls(controls, perspective, localDatabaseService);
 	}
 
+	private static class HeadOrPageWrapper {
+		private Object headOrPage;
+		public boolean isHead = false;
+
+		public HeadOrPageWrapper(Object headOrPage) {
+			this.headOrPage = headOrPage;
+			if (headOrPage instanceof Head) {
+				isHead = true;
+			}
+		}
+
+		public String getTranslationText() {
+			if (isHead) {
+				return "@Head";
+			}
+			return ((Page) headOrPage).getText();
+		}
+
+		public List<Object> getFieldOrGrid() {
+			if (isHead) {
+				return ((Head) headOrPage).getFieldOrGrid();
+			}
+			return ((Page) headOrPage).getFieldOrGrid();
+		}
+
+	}
+
 	private void layoutForm(Composite parent) {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
-
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
+			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			if (headOrPage instanceof Head) {
-				layoutHead(parent, (Head) headOrPage);
+				layoutHead(parent, wrapper);
 			} else if (headOrPage instanceof Page) {
-				layoutPage(parent, (Page) headOrPage);
+				layoutPage(parent, wrapper);
 			}
 		}
 		// Helper-Klasse initialisieren
@@ -147,15 +174,21 @@ public class WFCDetailPart extends WFCFormPart {
 		iHelper.setControls(controls);
 	}
 
-	private void layoutHead(Composite parent, Head head) {
+	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
 		RowData headLayoutData = new RowData();
-		Section headSection = formToolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		Section headSection;
+		if (head.isHead) {
+			headSection = formToolkit.createSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		} else {
+			headSection = formToolkit.createSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		}
 
 		headLayoutData.width = SECTION_WIDTH;
 
 		headSection.setLayoutData(headLayoutData);
-		headSection.setText("@Head");
+		headSection.setText(head.getTranslationText());
 		headSection.setData(TRANSLATE_PROPERTY, "@Head");
 
 		// Client Area
@@ -169,7 +202,7 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, head);
 	}
 
-	private void layoutPage(Composite parent, Page page) {
+	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
 		RowData pageLayoutData = new RowData();
 		Section pageSection = formToolkit.createSection(parent,
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
@@ -177,8 +210,8 @@ public class WFCDetailPart extends WFCFormPart {
 		pageLayoutData.width = SECTION_WIDTH;
 
 		pageSection.setLayoutData(pageLayoutData);
-		pageSection.setText(page.getText());
-		pageSection.setData(TRANSLATE_PROPERTY, page.getText());
+		pageSection.setText(page.getTranslationText());
+		pageSection.setData(TRANSLATE_PROPERTY, page.getTranslationText());
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(pageSection);
@@ -191,19 +224,17 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, page);
 	}
 
-	private void createFields(Composite composite, Head head) {
+	private void createFields(Composite composite, HeadOrPageWrapper headOrPage) {
 		int row = 0;
 		int column = 0;
 		int width = 2;
 		Control control = null;
-		for (Object fieldOrGrid : head.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field))
-			 {
+		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
+			if (!(fieldOrGrid instanceof Field)) {
 				continue; // erst einmal nur Felder
 			}
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible())
-			 {
+			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
 			}
 			width = getWidth(field);
@@ -216,6 +247,9 @@ public class WFCDetailPart extends WFCFormPart {
 				controls.put(field.getName(), control);
 			}
 			column += width;
+			if (!headOrPage.isHead) {
+				row += getExtraHeight(field);
+			}
 		}
 
 		addBottonMargin(composite, row + 1, column);
@@ -227,13 +261,11 @@ public class WFCDetailPart extends WFCFormPart {
 		int width;
 		Control control;
 		for (Object fieldOrGrid : page.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field))
-			 {
+			if (!(fieldOrGrid instanceof Field)) {
 				continue; // erst einmal nur Felder
 			}
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible())
-			 {
+			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
 			}
 			width = getWidth(field);
