@@ -118,7 +118,11 @@ public class WFCDetailLookupFieldUtil {
 				} else if (ta instanceof Table) {
 					t = (Table) ta;
 				}
-				localDatabaseService.addResultsForLookupField(field.getName(), t);
+				if (field.getLookup().getTable() != null) {
+					localDatabaseService.addResultsForLookupField(field.getLookup().getTable(), t);
+				} else {
+					localDatabaseService.addResultsForLookupField(field.getLookup().getProcedurePrefix(), t);
+				}
 				updateSelectedLookupEntry(t, (Control) m.get("control"));
 
 			}));

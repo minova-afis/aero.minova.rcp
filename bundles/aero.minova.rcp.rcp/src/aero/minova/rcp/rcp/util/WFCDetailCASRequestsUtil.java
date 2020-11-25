@@ -185,8 +185,15 @@ public class WFCDetailCASRequestsUtil {
 					if (c instanceof LookupControl) {
 						LookupControl lc = (LookupControl) c;
 						Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(),
-								table.getRows().get(0).getValue(i).getIntegerValue());
+						Map databaseMap = null;
+						if (field.getLookup().getTable() != null) {
+							databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookup().getTable(),
+									table.getRows().get(0).getValue(i).getIntegerValue());
+						} else {
+							databaseMap = localDatabaseService.getResultsForKeyLong(
+									field.getLookup().getProcedurePrefix(),
+									table.getRows().get(0).getValue(i).getIntegerValue());
+						}
 						if (databaseMap != null) {
 							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.TABLE_KEYLONG));
 							lc.setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
@@ -230,7 +237,13 @@ public class WFCDetailCASRequestsUtil {
 						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 							if (ta instanceof SqlProcedureResult) {
 								SqlProcedureResult sql = (SqlProcedureResult) ta;
-								localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
+								if (field.getLookup().getTable() != null) {
+									localDatabaseService.replaceResultsForLookupField(field.getLookup().getTable(),
+											sql.getResultSet());
+								} else {
+									localDatabaseService.replaceResultsForLookupField(
+											field.getLookup().getProcedurePrefix(), sql.getResultSet());
+								}
 								lc.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
 								for (Row row : sql.getResultSet().getRows()) {
 									if (row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYTEXT))
@@ -242,7 +255,12 @@ public class WFCDetailCASRequestsUtil {
 								}
 							} else if (ta instanceof Table) {
 								Table t = (Table) ta;
-								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+								if (field.getLookup().getTable() != null) {
+									localDatabaseService.replaceResultsForLookupField(field.getLookup().getTable(), t);
+								} else {
+									localDatabaseService
+											.replaceResultsForLookupField(field.getLookup().getProcedurePrefix(), t);
+								}
 								lc.setData(Constants.CONTROL_OPTIONS, ta);
 								for (Row row : t.getRows()) {
 									if (row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
