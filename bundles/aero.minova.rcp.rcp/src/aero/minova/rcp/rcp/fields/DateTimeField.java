@@ -8,9 +8,6 @@ import aero.minova.rcp.form.model.xsd.Field;
 
 public class DateTimeField {
 
-	private DateTimeField() {
-	}
-
 	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit) {
 		return null;
 	}

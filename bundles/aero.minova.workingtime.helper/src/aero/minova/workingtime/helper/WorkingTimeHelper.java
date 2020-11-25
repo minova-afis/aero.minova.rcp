@@ -10,9 +10,7 @@ import org.eclipse.swt.widgets.Control;
 import org.osgi.service.component.annotations.Component;
 
 import aero.minova.rcp.dataservice.IHelper;
-import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.ValueAccessor;
 
@@ -70,9 +68,8 @@ public class WorkingTimeHelper implements IHelper {
 		float chargedQty = getChargedQuantity(renderedQty);
 		Value valueRe = new Value((double) renderedQty);
 		Value valueCh = new Value((double) chargedQty);
-		Row row = RowBuilder.newRow().withValue(valueRe).withValue(valueCh).create();
-		reQty.setValue(row);
-		chQty.setValue(row);
+		reQty.setValue(valueRe);
+		chQty.setValue(valueCh);
 	}
 
 	public float getFloatFromMinutes(long min) {

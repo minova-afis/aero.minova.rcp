@@ -24,12 +24,11 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.ValueAccessor;
 
 @SuppressWarnings("restriction")
 public class NumberField {
-
-	private NumberField() {
-	}
 
 	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit,
 			Locale locale) {
@@ -38,7 +37,9 @@ public class NumberField {
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
 		FieldUtil.addDataToText(text, field, DataType.DOUBLE);
-		FieldUtil.addConsumer(text, field);
+//		FieldUtil.addConsumer(text, field);
+		text.setData(Constants.VALUE_ACCESSOR,
+				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.DOUBLE));
 		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();

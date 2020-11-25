@@ -36,11 +36,9 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.ValueAccessor;
 
 public class ShortDateField {
-
-	private ShortDateField() {
-	}
 
 	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit,
 			Locale locale, String timezone) {
@@ -65,6 +63,9 @@ public class ShortDateField {
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
+		text.setData(Constants.VALUE_ACCESSOR,
+				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.INSTANT));
+
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 

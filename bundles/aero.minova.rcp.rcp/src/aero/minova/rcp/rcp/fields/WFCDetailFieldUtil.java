@@ -45,25 +45,6 @@ public class WFCDetailFieldUtil {
 		return button;
 	}
 
-	public static Control createDateTimeField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit) {
-		String labelText = field.getLabel() == null ? "" : field.getLabel();
-
-		FormData formData = new FormData();
-		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		formData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		formData.width = COLUMN_WIDTH;
-
-		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
-		button.setData(TRANSLATE_PROPERTY, labelText);
-		button.setLayoutData(formData);
-		button.setData(Constants.CONTROL_FIELD, field);
-		button.setData(Constants.CONTROL_DATATYPE, DataType.INSTANT);
-		FieldUtil.addConsumer(button, field);
-
-		return button;
-	}
-
 	public static Control createShortTimeField(Composite composite, Field field, int row, int column,
 			FormToolkit formToolkit) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
@@ -71,7 +52,8 @@ public class WFCDetailFieldUtil {
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
 //		FieldUtil.addConsumer(text, field);
-		text.setData(Constants.VALUE_ACCESSOR, new ValueAccessor(field.getSqlIndex().intValue(), field, text));
+		text.setData(Constants.VALUE_ACCESSOR,
+				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.INSTANT));
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -100,7 +82,8 @@ public class WFCDetailFieldUtil {
 				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
 		FieldUtil.addDataToText(text, field, DataType.STRING);
 		// FieldUtil.addConsumer(text, field);
-		text.setData(Constants.VALUE_ACCESSOR, new ValueAccessor(field.getSqlIndex().intValue(), field, text));
+		text.setData(Constants.VALUE_ACCESSOR,
+				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.STRING));
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
