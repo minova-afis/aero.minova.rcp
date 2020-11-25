@@ -180,7 +180,12 @@ public class WFCDetailCASRequestsUtil {
 						try {
 							consumer.accept(table);
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
+					}
+					ValueAccessor valueAccessor = (ValueAccessor) c.getData(Constants.VALUE_ACCESSOR);
+					if (valueAccessor != null) {
+						valueAccessor.setValue(table.getRows().get(0));
 					}
 					if (c instanceof LookupControl) {
 						LookupControl lc = (LookupControl) c;
@@ -345,13 +350,14 @@ public class WFCDetailCASRequestsUtil {
 
 			formTable.addRow(r);
 
-			checkWorkingTime(getTextFromControl(Constants.FORM_BOOKINGDATE),
-					getTextFromControl(Constants.FORM_STARTDATE), //
-					getTextFromControl(Constants.FORM_ENDDATE), //
-					getTextFromControl(Constants.FORM_RENDEREDQUANTITY), //
-					getTextFromControl(Constants.FORM_CHARGEDQUANTITY), //
-					formTable, //
-					r);
+//			checkWorkingTime(getTextFromControl(Constants.FORM_BOOKINGDATE),
+//					getTextFromControl(Constants.FORM_STARTDATE), //
+//					getTextFromControl(Constants.FORM_ENDDATE), //
+//					getTextFromControl(Constants.FORM_RENDEREDQUANTITY), //
+//					getTextFromControl(Constants.FORM_CHARGEDQUANTITY), //
+//					formTable, //
+//					r);
+			sendSaveRequest(formTable, true);
 		}
 	}
 

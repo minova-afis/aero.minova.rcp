@@ -1,16 +1,13 @@
 package aero.minova.rcp.rcp.fields;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.NUMBER_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_TIME_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
-
-import java.text.MessageFormat;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -25,6 +22,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.ValueAccessor;
 
 public class WFCDetailFieldUtil {
 
@@ -72,7 +70,8 @@ public class WFCDetailFieldUtil {
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
-		FieldUtil.addConsumer(text, field);
+//		FieldUtil.addConsumer(text, field);
+		text.setData(Constants.VALUE_ACCESSOR, new ValueAccessor(field.getSqlIndex().intValue(), field, text));
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -100,7 +99,8 @@ public class WFCDetailFieldUtil {
 		Text text = formToolkit.createText(composite, "",
 				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
 		FieldUtil.addDataToText(text, field, DataType.STRING);
-		FieldUtil.addConsumer(text, field);
+		// FieldUtil.addConsumer(text, field);
+		text.setData(Constants.VALUE_ACCESSOR, new ValueAccessor(field.getSqlIndex().intValue(), field, text));
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 

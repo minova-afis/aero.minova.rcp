@@ -10,7 +10,11 @@ import org.eclipse.swt.widgets.Control;
 import org.osgi.service.component.annotations.Component;
 
 import aero.minova.rcp.dataservice.IHelper;
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.ValueAccessor;
 
 @Component
 public class WorkingTimeHelper implements IHelper {
@@ -45,16 +49,30 @@ public class WorkingTimeHelper implements IHelper {
 				calculateTime();
 			}
 		});
+		endDate.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				calculateTime();
+			}
+		});
 	}
 
 	protected void calculateTime() {
-		Value start = (Value) startDate.getData("value");
-		Value end = (Value) endDate.getData("value");
-		Instant iStart = start.getInstantValue();
-		Instant iEnd = end.getInstantValue();
-		long min = ChronoUnit.MINUTES.between(iStart, iEnd);
-		getFloatFromMinutes(min);
+		ValueAccessor start = (ValueAccessor) startDate.getData(Constants.VALUE_ACCESSOR);
+		ValueAccessor end = (ValueAccessor) endDate.getData(Constants.VALUE_ACCESSOR);
+		ValueAccessor reQty = (ValueAccessor) this.reQty.getData(Constants.VALUE_ACCESSOR);
+		ValueAccessor chQty = (ValueAccessor) this.chQty.getData(Constants.VALUE_ACCESSOR);
 
+		Instant iStart = start.getValue().getInstantValue();
+		Instant iEnd = end.getValue().getInstantValue();
+		long min = ChronoUnit.MINUTES.between(iStart, iEnd);
+		float renderedQty = getFloatFromMinutes(min);
+		float chargedQty = getChargedQuantity(renderedQty);
+		Value valueRe = new Value((double) renderedQty);
+		Value valueCh = new Value((double) chargedQty);
+		Row row = RowBuilder.newRow().withValue(valueRe).withValue(valueCh).create();
+		reQty.setValue(row);
+		chQty.setValue(row);
 	}
 
 	public float getFloatFromMinutes(long min) {
@@ -64,7 +82,7 @@ public class WorkingTimeHelper implements IHelper {
 		return f;
 	}
 
-	public Float getChagedQunatity(float f) {
+	public float getChargedQuantity(float f) {
 		float chargedQty = f;
 		// z.B. >= 0,75 -> 1
 		// z.B. >= 0,25 -> 0,5

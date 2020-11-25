@@ -48,4 +48,7 @@ public class Constants {
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 
+	// ValueAccessor
+	public static final String VALUE_ACCESSOR = "VALUEACCESSOR";
+
 }

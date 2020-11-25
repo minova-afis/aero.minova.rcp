@@ -8,6 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: aero.minova.rcp.dataservice,
  aero.minova.rcp.form.model.xsd,
  aero.minova.rcp.model,
+ aero.minova.rcp.rcp.util,
  javax.inject,
  org.eclipse.e4.core.di.annotations;version="1.6.0",
  org.eclipse.e4.ui.di,

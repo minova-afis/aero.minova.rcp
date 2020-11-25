@@ -47,6 +47,10 @@ public class FieldUtil {
 		control.setData(Constants.CONTROL_DATATYPE, datatype);
 	}
 
+	public static int getRowIndex(Table t, Field field) {
+		return t.getColumnIndex(field.getName());
+	}
+
 	protected static void addConsumer(Object o, Field field) {
 		if (o instanceof Text) {
 			Text text = (Text) o;

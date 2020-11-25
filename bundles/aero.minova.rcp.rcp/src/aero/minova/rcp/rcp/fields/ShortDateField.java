@@ -109,7 +109,8 @@ public class ShortDateField {
 		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of(timezone));
 		Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
 		// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
-		text.setMessage(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		text.setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		// text.setMessage(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 	}
 
 }
