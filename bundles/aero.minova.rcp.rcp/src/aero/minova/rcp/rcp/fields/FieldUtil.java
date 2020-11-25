@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.fields;
 
 import java.util.function.Consumer;
 
-import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
@@ -57,6 +56,7 @@ public class FieldUtil {
 				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
 				text.setText(ValueBuilder.value(value, f).getText());
 				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
+				text.setData(Constants.CONTROL_VALUE, value);
 			});
 		} else if (o instanceof Button) {
 			Button b = (Button) o;

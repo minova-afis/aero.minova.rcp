@@ -6,8 +6,10 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +21,7 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
@@ -39,6 +42,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.dataservice.IHelper;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -81,6 +85,10 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
+
+	@Inject
+	@Service
+	private List<IHelper> helperlist;
 
 	private FormToolkit formToolkit;
 
@@ -129,6 +137,15 @@ public class WFCDetailPart extends WFCFormPart {
 				layoutPage(parent, (Page) headOrPage);
 			}
 		}
+		// Helper-Klasse initialisieren
+		String helperClass = form.getHelperClass();
+		if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+			// TODO
+			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+		}
+		IHelper iHelper = helperlist.get(0);
+		iHelper.setControls(controls);
+
 	}
 
 	private void layoutHead(Composite parent, Head head) {
@@ -182,18 +199,23 @@ public class WFCDetailPart extends WFCFormPart {
 		Control control = null;
 		for (Object fieldOrGrid : head.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field))
+			 {
 				continue; // erst einmal nur Felder
+			}
 			Field field = (Field) fieldOrGrid;
 			if (!field.isVisible())
+			 {
 				continue; // nur sichtbare Felder
+			}
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null)
+			if (control != null) {
 				controls.put(field.getName(), control);
+			}
 			column += width;
 		}
 
@@ -207,18 +229,23 @@ public class WFCDetailPart extends WFCFormPart {
 		Control control;
 		for (Object fieldOrGrid : page.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field))
+			 {
 				continue; // erst einmal nur Felder
+			}
 			Field field = (Field) fieldOrGrid;
 			if (!field.isVisible())
+			 {
 				continue; // nur sichtbare Felder
+			}
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
 			control = createField(composite, field, row, column);
-			if (control != null)
+			if (control != null) {
 				controls.put(field.getName(), control);
+			}
 			column += width;
 			row += getExtraHeight(field);
 		}
@@ -274,8 +301,9 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private void translate(TranslationService translationService) {
 		this.translationService = translationService;
-		if (translationService != null && composite != null)
+		if (translationService != null && composite != null) {
 			translate(composite);
+		}
 	}
 
 	private void translate(Composite composite) {

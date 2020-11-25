@@ -225,7 +225,7 @@ public class WFCDetailCASRequestsUtil {
 						lookups.remove(field.getName());
 
 						CompletableFuture<?> tableFuture;
-						tableFuture = LookupCASRequestUtil.getRequestedTable(0, (String) lc.getText(), field, controls,
+						tableFuture = LookupCASRequestUtil.getRequestedTable(0, lc.getText(), field, controls,
 								dataService, sync, "List");
 						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 							if (ta instanceof SqlProcedureResult) {
@@ -385,7 +385,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param t
 	 * @param r
 	 */
-	private void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity,
+	public void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity,
 			String chargedQuantity, Table t, Row r) {
 		boolean contradiction = false;
 

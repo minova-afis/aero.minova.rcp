@@ -18,6 +18,7 @@ public class Constants {
 	public static final String CONTROL_KEYLONG = "keyLong";
 	public static final String CONTROL_DATATYPE = "dataType";
 	public static final String CONTROL_DECIMALS = "decimals";
+	public static final String CONTROL_VALUE = "value";
 
 	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
 	// textfieldVerifier zuzugreifen
