@@ -6,17 +6,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -85,6 +86,7 @@ import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -125,6 +127,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
+
+	@Inject
+	@Named(value = TranslationService.LOCALE)
+	Locale locale;
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -208,10 +214,8 @@ public class WFCIndexPart extends WFCFormPart {
 					Field field = fields.get(table.getColumnName(i));
 					if (field != null) {
 						if (field.getShortDate() != null) {
-							LocalDate localDate = LocalDate.ofInstant(r.getValue(i).getInstantValue(),
-									ZoneId.of(timezone));
-							String date = localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
-							r.setValue(new Value(date, DataType.STRING), i);
+							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale),
+									DataType.STRING), i);
 						} else if (field.getShortTime() != null) {
 							Instant instant = r.getValue(i).getInstantValue();
 							LocalDateTime localDatetime = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));

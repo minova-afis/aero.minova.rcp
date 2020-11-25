@@ -402,7 +402,7 @@ public class WFCDetailCASRequestsUtil {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		LocalDate localDate = LocalDate.parse(bookingDate, df);
 		LocalDateTime localDateTime = localDate.atTime(0, 0);
-		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of(timezone));
+		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of("UTC"));
 		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex(Constants.FORM_BOOKINGDATE));
 		LocalTime timeEndDate = LocalTime.parse(endDate);
 		LocalTime timeStartDate = LocalTime.parse(startDate);

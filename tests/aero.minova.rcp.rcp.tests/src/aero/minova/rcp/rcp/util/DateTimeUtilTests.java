@@ -213,7 +213,7 @@ public class DateTimeUtilTests {
 				.toInstant(ZoneOffset.UTC);
 		assertNull(DateTimeUtil.getDate(bithday, "7.1.1967", Locale.GERMANY));
 	}
-	
+
 	@Test
 	public void testGetDate07_01_20() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
@@ -221,10 +221,17 @@ public class DateTimeUtilTests {
 		Instant expected = LocalDate.of(20, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
 		assertEquals(expected, DateTimeUtil.getDate(bithday, "07.01.20", Locale.GERMANY));
 	}
-	
+
 	@Test
 	public void testGetDate0minus1() {
 		assertNull(DateTimeUtil.getDate("0-1", Locale.GERMANY));
+	}
+
+	@Test
+	public void testGetDateString01_01_2020() {
+		Instant instant = LocalDate.of(2020, JANUARY, 1).atStartOfDay().toInstant(ZoneOffset.UTC);
+
+		assertEquals("01.01.2020", DateTimeUtil.getDateString(instant, Locale.GERMANY));
 	}
 
 	@Test

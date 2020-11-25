@@ -16,7 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in Instant
+ * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in
+ * Instant
  * 
  * @author Wilfried Saak
  *
@@ -33,23 +34,30 @@ public class DateTimeUtil {
 	}
 
 	/**
-	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet
-	 * werden. Alle Kürzel müssen als Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
-	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol bestehen.
+	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es
+	 * dürfen keine doppelten Kürzel verwendet werden. Alle Kürzel müssen als
+	 * Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
+	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol
+	 * bestehen.
 	 * 
 	 * @param day   das Kürzel für Tag. Default (englisch) ist "d"
 	 * @param month das Kürzel für Monat. Default (englisch) ist "m"
 	 * @param year  das Kürzel für Jahr. Default (englisch) ist "y"
 	 * @param week  das Kürzel für Woche. Default (englisch) ist "w"
 	 * 
-	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
+	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen
+	 *                                     Bedingungen nicht erfüllt ist
 	 */
 	public static void setShortcuts(String day, String month, String year, String week) {
 		// Es muss immer genau ein Zeichen übergeben werden
-		if (day.length() != 1) throw new IllegalArgumentException("Shortcut for day must have length of 1!");
-		if (month.length() != 1) throw new IllegalArgumentException("Shortcut for month must have length of 1!");
-		if (year.length() != 1) throw new IllegalArgumentException("Shortcut for year must have length of 1!");
-		if (week.length() != 1) throw new IllegalArgumentException("Shortcut for week must have length of 1!");
+		if (day.length() != 1)
+			throw new IllegalArgumentException("Shortcut for day must have length of 1!");
+		if (month.length() != 1)
+			throw new IllegalArgumentException("Shortcut for month must have length of 1!");
+		if (year.length() != 1)
+			throw new IllegalArgumentException("Shortcut for year must have length of 1!");
+		if (week.length() != 1)
+			throw new IllegalArgumentException("Shortcut for week must have length of 1!");
 
 		// nur Kleinbuchstaben zulassen
 		day = day.toLowerCase();
@@ -58,12 +66,18 @@ public class DateTimeUtil {
 		week = week.toLowerCase();
 
 		// keine Symbol darf doppelt verwendet werden
-		if (day.equals(month)) throw new IllegalArgumentException("Shortcut for day and month must be different!");
-		if (day.equals(year)) throw new IllegalArgumentException("Shortcut for day and year must be different!");
-		if (day.equals(week)) throw new IllegalArgumentException("Shortcut for day and week must be different!");
-		if (month.equals(year)) throw new IllegalArgumentException("Shortcut for month and year must be different!");
-		if (month.equals(week)) throw new IllegalArgumentException("Shortcut for month and week must be different!");
-		if (year.equals(week)) throw new IllegalArgumentException("Shortcut for year and week must be different!");
+		if (day.equals(month))
+			throw new IllegalArgumentException("Shortcut for day and month must be different!");
+		if (day.equals(year))
+			throw new IllegalArgumentException("Shortcut for day and year must be different!");
+		if (day.equals(week))
+			throw new IllegalArgumentException("Shortcut for day and week must be different!");
+		if (month.equals(year))
+			throw new IllegalArgumentException("Shortcut for month and year must be different!");
+		if (month.equals(week))
+			throw new IllegalArgumentException("Shortcut for month and week must be different!");
+		if (year.equals(week))
+			throw new IllegalArgumentException("Shortcut for year and week must be different!");
 
 		// jetzt können wir uns die Werte merken
 		DateTimeUtil.day = day;
@@ -138,6 +152,11 @@ public class DateTimeUtil {
 
 	}
 
+	static public String getDateString(Instant instant, Locale locale) {
+		return LocalDate.ofInstant(instant, ZoneId.of("UTC"))
+				.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
+	}
+
 	static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
@@ -162,7 +181,8 @@ public class DateTimeUtil {
 		while (input.length() > 0) {
 			matcher = pattern.matcher(input);
 			boolean b = matcher.find();
-			if (!b) break;
+			if (!b)
+				break;
 			String result = matcher.group(0);
 			splits.add(checkMissingDay(result));
 			input = input.substring(result.length());
@@ -177,8 +197,10 @@ public class DateTimeUtil {
 	}
 
 	static String checkMissingDay(String result) {
-		if ((result.endsWith("+") || result.endsWith("-"))) return result + day;
-		else return result;
+		if ((result.endsWith("+") || result.endsWith("-")))
+			return result + day;
+		else
+			return result;
 	}
 
 	static Instant getNumericDate(Instant now, String input) {
