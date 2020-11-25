@@ -1,7 +1,9 @@
 package aero.minova.rcp.rcp.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -19,7 +21,7 @@ public class TimeUtil {
 		if (input.contains("-") || input.contains("+")) {
 			today = changeHours(today, input, timezone);
 		} else {
-			today = getTimeFromNumbers(input, timezone);
+			today = getTimeFromNumbers(today, input, timezone);
 		}
 		return today;
 	}
@@ -53,7 +55,7 @@ public class TimeUtil {
 		return instant;
 	}
 
-	private static Instant getTimeFromNumbers(String subString, String timezone) {
+	private static Instant getTimeFromNumbers(Instant givenInstant, String subString, String timezone) {
 
 		Integer hours = 0;
 		Integer minutes = 0;
@@ -76,8 +78,11 @@ public class TimeUtil {
 		if (minutes > 59) {
 			return null;
 		}
-
-		LocalDateTime localDateTime = LocalDateTime.now().withHour(hours).withMinute(minutes).withSecond(0);
+		LocalTime localTime = LocalTime.of(hours, minutes);
+		LocalDate localDate = LocalDate.ofInstant(givenInstant, ZoneId.of(timezone));
+		LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+		// LocalDateTime localDateTime =
+		// LocalDateTime.withHour(hours).withMinute(minutes).withSecond(0);
 		Instant instant = localDateTime.toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
 		return instant;
 	}
