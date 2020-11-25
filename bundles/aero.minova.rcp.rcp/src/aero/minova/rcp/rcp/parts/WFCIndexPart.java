@@ -5,11 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -88,6 +83,7 @@ import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.rcp.util.TimeUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -217,10 +213,10 @@ public class WFCIndexPart extends WFCFormPart {
 							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale),
 									DataType.STRING), i);
 						} else if (field.getShortTime() != null) {
-							Instant instant = r.getValue(i).getInstantValue();
-							LocalDateTime localDatetime = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
-							String date = localDatetime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
-							r.setValue(new Value(date, DataType.STRING), i);
+							r.setValue(
+									new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale, timezone),
+											DataType.STRING),
+									i);
 						}
 					}
 				}

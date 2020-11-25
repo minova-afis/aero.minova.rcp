@@ -3,6 +3,9 @@ package aero.minova.rcp.rcp.util;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public class TimeUtil {
 
@@ -19,6 +22,11 @@ public class TimeUtil {
 			today = getTimeFromNumbers(input, timezone);
 		}
 		return today;
+	}
+
+	static public String getTimeString(Instant instant, Locale locale, String timezone) {
+		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+		return localDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
 	}
 
 	private static Instant changeHours(Instant instant, String input, String timezone) {
