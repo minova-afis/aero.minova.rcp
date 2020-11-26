@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.eclipse.swt.widgets.Event;
 import org.junit.Test;
 
 public class NumberFieldVerifierTests {
@@ -57,6 +58,17 @@ public class NumberFieldVerifierTests {
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
 
 		assertEquals("get text", "999,95", nfv.getNewText(2, Locale.GERMANY, "99,95", 2, 2, 2, "9", dfs));
+	}
+
+	@Test
+	public void testFrom1_C00To1_1C0() {
+		Event e = new Event();
+		e.character = '\b';
+
+		NumberFieldVerifier nfv = new NumberFieldVerifier();
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
+
+		assertEquals("get caret", 3, nfv.getNewCaretPosition("1,00", "1", "1,10", dfs, 2, 1));
 	}
 
 	@Test
