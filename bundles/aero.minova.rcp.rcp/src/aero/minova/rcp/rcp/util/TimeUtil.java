@@ -120,30 +120,6 @@ public class TimeUtil {
 		return localDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
 	}
 
-	private static Instant changeHours(Instant instant, String input, String timezone) {
-
-		boolean correctInput = true;
-		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
-
-		for (int i = 0; i < input.length(); i++) {
-			if (correctInput = true) {
-				if (input.charAt(i) == '+') {
-					lt = lt.plusHours(1);
-				} else if (input.charAt(i) == '-') {
-					lt = lt.minusHours(1);
-				} else {
-					correctInput = false;
-				}
-			}
-		}
-		if (correctInput == true) {
-			instant = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
-		} else {
-			instant = null;
-		}
-		return instant;
-	}
-
 	private static Instant changeHours(Instant instant, String[] splits, String timezone) {
 
 		boolean correctInput = true;
@@ -161,7 +137,8 @@ public class TimeUtil {
 
 		for (int i = 0; i < splits.length; i++) {
 			if (correctInput == true) {
-				if ((i != 0 && skipFirst == false) || (skipFirst == true && i > 0)) {
+				if (i == 0 && skipFirst == true) {
+				} else {
 					lt = addRelativeDate(lt, splits[i]);
 					if (lt == null) {
 						correctInput = false;
