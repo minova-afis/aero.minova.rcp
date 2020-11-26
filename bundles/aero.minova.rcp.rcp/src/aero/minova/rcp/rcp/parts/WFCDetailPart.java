@@ -18,6 +18,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
@@ -77,6 +78,10 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	protected UISynchronize sync;
 
+	@Inject
+	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	String timezone;
+
 	private FormToolkit formToolkit;
 
 	private Composite composite;
@@ -111,7 +116,7 @@ public class WFCDetailPart extends WFCFormPart {
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
 		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setControls(controls, perspective);
+		casRequestsUtil.setControls(controls, perspective, localDatabaseService);
 	}
 
 	private void layoutForm(Composite parent) {
@@ -246,12 +251,12 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field.getDateTime() != null) {
 			return DateTimeField.create(composite, field, row, column, formToolkit);
 		} else if (field.getShortDate() != null) {
-			return ShortDateField.create(composite, field, row, column, formToolkit, locale);
+			return ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field.getShortTime() != null) {
 			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
 		} else if (field.getLookup() != null) {
 			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
-					controls, perspective);
+					controls, perspective, localDatabaseService);
 
 		} else if (field.getText() != null) {
 			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
@@ -323,7 +328,8 @@ public class WFCDetailPart extends WFCFormPart {
 				CompletableFuture<?> tableFuture;
 				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
 						"List");
-
+				LookupControl lc = (LookupControl) control;
+				lc.getTextControl().setText("...");
 				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
 					if (ta instanceof SqlProcedureResult) {
@@ -335,6 +341,7 @@ public class WFCDetailPart extends WFCFormPart {
 						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
 						lookupUtil.changeOptionsForLookupField(t, control, false);
 					}
+					lc.getTextControl().setText("");
 
 				}));
 			}

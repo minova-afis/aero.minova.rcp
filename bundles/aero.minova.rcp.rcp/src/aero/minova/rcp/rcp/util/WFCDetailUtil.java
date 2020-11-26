@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.fields.NumberFieldVerifier;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
@@ -130,14 +129,8 @@ public class WFCDetailUtil {
 						if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT
 								&& e.keyCode != SWT.ARROW_UP && e.keyCode != SWT.TAB && e.keyCode != SWT.CR
 								&& e.keyCode != SWT.SPACE && !lc.getText().startsWith("#")) {
-							if (lc.getData(Constants.CONTROL_OPTIONS) == null || lc.getText().equals("")) {
-								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
-								if (localTable != null) {
-									lookupUtil.changeOptionsForLookupField(localTable, c, false);
-								} else {
-									lookupUtil.requestOptionsFromCAS(lc);
-								}
+							if (lc.getData(Constants.CONTROL_OPTIONS) == null) {
+								lookupUtil.requestOptionsFromCAS(lc);
 							} else {
 								lookupUtil.changeSelectionBoxList(lc, false);
 							}
@@ -151,15 +144,9 @@ public class WFCDetailUtil {
 								lookupUtil.changeSelectionBoxList(c, false);
 							} else {
 								Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-								Table localTable = localDatabaseService.getResultsForLookupField(field.getName());
-								if (localTable != null) {
-									lookupUtil.changeOptionsForLookupField(localTable, c, false);
-								} else {
-									Map<MPerspective, String> brokerObject = new HashMap<>();
-									brokerObject.put(perspective, field.getName());
-									broker.post("WFCLoadAllLookUpValues", brokerObject);
-
-								}
+								Map<MPerspective, String> brokerObject = new HashMap<>();
+								brokerObject.put(perspective, field.getName());
+								broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
 							}
 						}
 					}
