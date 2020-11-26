@@ -104,12 +104,14 @@ public class ShortDateField {
 	}
 
 	public static void updateValue(TextAssist text, Instant date, String timezone) {
-		text.setData(FIELD_VALUE, date);
-		// Hier auch die Preferences beachten
-		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of(timezone));
-		Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
-		// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
-		text.setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		if (date != null) {
+			text.setData(FIELD_VALUE, date);
+			// Hier auch die Preferences beachten
+			LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of(timezone));
+			Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
+			// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
+			text.setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		}
 	}
 
 }
