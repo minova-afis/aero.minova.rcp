@@ -63,18 +63,16 @@ Wir haben für das Datum bestimmte Shortcuts definiert.
 
 |===
 | Eingabe | Wert
-| `0` | jetzt 
-| `1` | der 1:00 Uhr
-| `10` | der 1. Januar des Jahres im Dezember 2020 -> 01.01.2020
-| `123` | der 1. des Monats November im aktuellen Jahr -> 01.11.2020 
-| `1023` | der 1. Februar des aktuellen Jahres -> 01.02.2020
-| `+` | jetzt plus 1 Stunde
-| `++` | jetzt plus 2 Stunden 
+| `1` |  	1:00 Uhr
+| `10` | 	10:00 Uhr
+| `123` |	12:30 Uhr
+| `1023` | 	10:23 Uhr
+| `+` | 	jetzt plus 1 Stunde
+| `++` | 	jetzt plus 2 Stunden 
 | `+++` | ...
-| `-` | jetzt minus 1 Stunde
-| `--` | jetzt minus 2 Stunden
+| `-` | 	jetzt minus 1 Stunde
+| `--` | 	jetzt minus 2 Stunden
 | `---` | ...
-| `0+2h` | jetzt plus 2 Stunden
 | `1+1h-1m` | 1:00 Uhr plus 1 Stunde minus 1 Minute ->  1:59 Uhr
 |===
 

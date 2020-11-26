@@ -1,16 +1,13 @@
 package aero.minova.rcp.rcp.fields;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.NUMBER_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_TIME_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
-
-import java.text.MessageFormat;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -104,7 +101,7 @@ public class WFCDetailFieldUtil {
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
+		labelFormData.top = new FormAttachment(text, 0, SWT.TOP);
 		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
 		labelFormData.width = COLUMN_WIDTH;
 
