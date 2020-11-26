@@ -101,7 +101,6 @@ public class WFCDetailFieldUtil {
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
-		labelFormData.top = new FormAttachment(text, 0, SWT.TOP);
 		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
 		labelFormData.width = COLUMN_WIDTH;
 
@@ -112,9 +111,13 @@ public class WFCDetailFieldUtil {
 			textFormData.width = COLUMN_WIDTH * 3 + MARGIN_LEFT * 2 + MARGIN_BORDER;
 		} else {
 			textFormData.width = TEXT_WIDTH;
+
 		}
 		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
 			textFormData.height = COLUMN_HEIGHT * Integer.parseInt(field.getNumberRowsSpanned()) - MARGIN_TOP;
+			labelFormData.top = new FormAttachment(text, 0, SWT.TOP);
+		} else {
+			labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
 		}
 
 		label.setData(TRANSLATE_PROPERTY, labelText);
