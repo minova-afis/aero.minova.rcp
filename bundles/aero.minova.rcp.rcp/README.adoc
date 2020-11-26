@@ -63,6 +63,7 @@ Wir haben für das Datum bestimmte Shortcuts definiert.
 
 |===
 | Eingabe | Wert
+| `0` |  	jetzt
 | `1` |  	1:00 Uhr
 | `10` | 	10:00 Uhr
 | `123` |	12:30 Uhr
@@ -73,6 +74,7 @@ Wir haben für das Datum bestimmte Shortcuts definiert.
 | `-` | 	jetzt minus 1 Stunde
 | `--` | 	jetzt minus 2 Stunden
 | `---` | ...
+| `0+1h` 	| jetzt plus 1 Stunde
 | `1+1h-1m` | 1:00 Uhr plus 1 Stunde minus 1 Minute ->  1:59 Uhr
 |===
 

@@ -63,7 +63,10 @@ public class TimeUtil {
 		if (input.contains("-") || input.contains("+")) {
 			String[] split = splitInput(input);
 			today = changeHours(today, split, timezone);
+		} else if (input.equals("0")) {
+			return today;
 		} else {
+
 			today = getTimeFromNumbers(today, input, timezone);
 		}
 		return today;
@@ -130,8 +133,13 @@ public class TimeUtil {
 		Matcher matcher = pattern.matcher(splits[0]);
 
 		if (!matcher.find()) {
-			Instant givenInstant = getTimeFromNumbers(instant, splits[0], timezone);
-			lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
+			if (splits[0].equals("0")) {
+				Instant givenInstant = Instant.now();
+				lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
+			} else {
+				Instant givenInstant = getTimeFromNumbers(instant, splits[0], timezone);
+				lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
+			}
 			skipFirst = true;
 		}
 
