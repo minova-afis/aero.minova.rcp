@@ -133,7 +133,7 @@ public class DataService implements IDataService {
 				Pattern cutError = Pattern
 						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
 				errorMessage = cutError.matcher(errorMessage).replaceAll("");
-				errorMessage.replace("\"", "");
+				errorMessage = errorMessage.replace('"', ' ');
 				Table error = new Table();
 				Row r = new Row();
 				error.setName("Error");
