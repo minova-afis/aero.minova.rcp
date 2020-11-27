@@ -143,7 +143,7 @@ public class WFCDetailsLookupUtil {
 						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
 								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
 						sync.asyncExec(() -> DetailUtil.updateSelectedLookupEntry(filteredTable, c));
-						changeProposals(lc, t);
+						changeProposals(lc, filteredTable);
 						// Setzen der Proposals/Optionen
 					} else if (filteredTable.getRows().size() != 0) {
 						changeProposals((LookupControl) lc, filteredTable);
