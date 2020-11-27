@@ -27,9 +27,12 @@ public class NumberFieldVerifier implements VerifyListener {
 		String textBefore = field.getText();
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
-		String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
-		Double newValue = getNewValue(newText, dfs);
-		int newCaretPosition = getNewCaretPosition(textBefore, insertion, newText, dfs, caretPosition, keyCode);
+		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() && keyCode == 127) {
+			e.doit = false;
+		} else if (!textBefore.isEmpty() && textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()
+				&& keyCode == 8) {
+			e.doit = false;
+		}
 
 		verificationActive = true;
 		field.setText(newText);
