@@ -34,12 +34,18 @@ public class NumberFieldVerifier implements VerifyListener {
 			e.doit = false;
 		}
 
-		verificationActive = true;
-		field.setText(newText);
-		field.setSelection(newCaretPosition);
-		field.setData(FieldUtil.FIELD_VALUE, newValue);
-		verificationActive = false;
-		e.doit = false;
+		if (e.doit == true) {
+			String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
+			Double newValue = getNewValue(newText, dfs);
+			int newCaretPosition = getNewCaretPosition(textBefore, insertion, newText, dfs, caretPosition, keyCode);
+
+			verificationActive = true;
+			field.setText(newText);
+			field.setSelection(newCaretPosition);
+			field.setData(FieldUtil.FIELD_VALUE, newValue);
+			verificationActive = false;
+			e.doit = false;
+		}
 	}
 
 	protected Double getNewValue(String newText, DecimalFormatSymbols dfs) {
