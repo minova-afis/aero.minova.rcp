@@ -134,8 +134,7 @@ public class TimeUtil {
 
 		if (!matcher.find()) {
 			if (splits[0].equals("0")) {
-				Instant givenInstant = Instant.now();
-				lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
+				lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
 			} else {
 				Instant givenInstant = getTimeFromNumbers(instant, splits[0], timezone);
 				lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));

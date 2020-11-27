@@ -70,4 +70,17 @@ public class TimeUtilTests {
 				.toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(bithday, "7+8h-2m", "UTC"));
 	}
+
+	@Test
+	public void testGetTime0() {
+		Instant expected = Instant.now();
+		assertEquals(expected, TimeUtil.getTime(expected, "0", "UTC"));
+	}
+
+	@Test
+	public void testGetTime0Plus() {
+		Instant birthday = LocalDate.of(2020, DECEMBER, 24).atStartOfDay().toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDate.of(2020, DECEMBER, 24).atStartOfDay().plusHours(1).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(birthday, "0+", "UTC"));
+	}
 }
