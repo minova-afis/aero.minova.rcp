@@ -1,6 +1,5 @@
 package aero.minova.rcp.rcp.util;
 
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -168,36 +167,36 @@ public class WFCDetailUtil {
 	 * verändert
 	 */
 	public void updateQuantitys() {
-		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
-		Text startDate = (Text) controls.get(Constants.FORM_STARTDATE);
-		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
-			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
-			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
-			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
-					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
-			timeDifference = timeDifference / 60;
-			Text renderedField = (Text) controls.get(Constants.FORM_RENDEREDQUANTITY);
-			Text chargedField = (Text) controls.get(Constants.FORM_CHARGEDQUANTITY);
-			String renderedValue;
-			String chargedValue;
-			if (timeDifference >= 0) {
-				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
-				Double half = (double) Math.round(timeDifference * 2) / 2f;
-				String chargedFormat = "%1."
-						+ ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
-				String renderedFormat = "%1."
-						+ ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
-				chargedValue = String.format(chargedFormat, half);
-				chargedValue = chargedValue.replace(',', '.');
-				renderedValue = String.format(renderedFormat, quarter);
-				renderedValue = renderedValue.replace(',', '.');
-			} else {
-				renderedValue = "0.00";
-				chargedValue = "0.00";
-			}
-			chargedField.setText(chargedValue);
-			renderedField.setText(renderedValue);
-		}
+//		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
+//		Text startDate = (Text) controls.get(Constants.FORM_STARTDATE);
+//		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
+//			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
+//			LocalTime timeStartDate = LocalTime.parse(startDate.getText());
+//			float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
+//					- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+//			timeDifference = timeDifference / 60;
+//			Text renderedField = (Text) controls.get(Constants.FORM_RENDEREDQUANTITY);
+//			Text chargedField = (Text) controls.get(Constants.FORM_CHARGEDQUANTITY);
+//			String renderedValue;
+//			String chargedValue;
+//			if (timeDifference >= 0) {
+//				Double quarter = (double) Math.round(timeDifference * 4) / 4f;
+//				Double half = (double) Math.round(timeDifference * 2) / 2f;
+//				String chargedFormat = "%1."
+//						+ ((Field) chargedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+//				String renderedFormat = "%1."
+//						+ ((Field) renderedField.getData(Constants.CONTROL_FIELD)).getNumber().getDecimals() + "f";
+//				chargedValue = String.format(chargedFormat, half);
+//				chargedValue = chargedValue.replace(',', '.');
+//				renderedValue = String.format(renderedFormat, quarter);
+//				renderedValue = renderedValue.replace(',', '.');
+//			} else {
+//				renderedValue = "0.00";
+//				chargedValue = "0.00";
+//			}
+//			chargedField.setText(chargedValue);
+//			renderedField.setText(renderedValue);
+//		}
 	}
 
 	public String getTimeZone() {

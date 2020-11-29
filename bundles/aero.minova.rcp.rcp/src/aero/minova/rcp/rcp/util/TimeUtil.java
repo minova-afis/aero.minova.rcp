@@ -1,14 +1,17 @@
 package aero.minova.rcp.rcp.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 public class TimeUtil {
 
 	static public Instant getTime(String input, String timezone) {
 
-		return getTime(Instant.now(), input, timezone);
+		return getTime(Instant.now().truncatedTo(ChronoUnit.MINUTES), input, timezone);
 	}
 
 	static public Instant getTime(Instant today, String input, String timezone) {
@@ -69,8 +72,9 @@ public class TimeUtil {
 			return null;
 		}
 
+		LocalTime localTime = LocalTime.of(hours, minutes);
 		LocalDateTime localDateTime = LocalDateTime.now().withHour(hours).withMinute(minutes).withSecond(0);
-		Instant instant = localDateTime.toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
+		Instant instant = localTime.atDate(LocalDate.of(1900, 1, 1)).toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
 		return instant;
 	}
 

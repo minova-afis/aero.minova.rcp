@@ -2,6 +2,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="aero.minova.workingtime.helper.WorkingTimeHelper">
    <service>
       <provide interface="aero.minova.rcp.dataservice.IHelper"/>
+      <provide interface="aero.minova.rcp.rcp.util.ValueChangeListener"/>
    </service>
    <implementation class="aero.minova.workingtime.helper.WorkingTimeHelper"/>
 </scr:component>

@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
+import java.util.Vector;
+
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -17,6 +19,7 @@ public class ValueAccessor {
 	private Field field;
 	private DataType type;
 	private Value value;
+	private java.util.Vector<ValueChangeListener> listeners;
 
 	public ValueAccessor(int index, Field field, Control control, DataType type) {
 		this.index = index;
@@ -30,9 +33,23 @@ public class ValueAccessor {
 		return "ValueAccessor [value=" + value + "]";
 	}
 
-	public void setValue(Value value) {
+	/**
+	 * einen neuen Wert setzen
+	 * 
+	 * @param value
+	 *            der neue Wert
+	 * @param user
+	 *            true, wenn der neue Wert von einer Benutzereingabe herrührt. Wenn dieser Wert false ist, sollten keine Überprüfungen und Berechnungen
+	 *            durchgeführt werden.
+	 */
+	public void setValue(Value value, boolean user) {
+		if (this.value == value) return; // auch true, wenn beide null sind
+		if (value != null && value.equals(this.value)) return;
+
 		try {
+			Value oldValue = this.value;
 			this.value = value;
+			fire(new ValueChangeEvent(control, field, oldValue, value, user));
 			if (control instanceof Text) {
 				Text text = (Text) control;
 				text.setText(ValueBuilder.value(value, field).getText());
@@ -46,7 +63,7 @@ public class ValueAccessor {
 	}
 
 	public void setValue(Row row) {
-		setValue(row.getValue(index));
+		setValue(row.getValue(index), false);
 	}
 
 	public Value getValue() {
@@ -65,4 +82,34 @@ public class ValueAccessor {
 		// 5.7
 		return value;
 	}
+
+	/**
+	 * Mit dieser Methode kann man einen Listener für Wertänderungen anhängen.
+	 * 
+	 * @param listener
+	 */
+	public void addValueChangeListener(ValueChangeListener listener) {
+		if (listener == null) return;
+		if (listeners == null) listeners = new Vector<ValueChangeListener>();
+		if (!listeners.contains(listener)) listeners.add(listener);
+	}
+
+	/**
+	 * Mit dieser Methode kann man einen Listener für Wertänderungen entfernen.
+	 * 
+	 * @param listener
+	 */
+	public void removeValueChangeListener(ValueChangeListener listener) {
+		if (listener == null) return;
+		if (listeners == null) return;
+		if (listeners.contains(listener)) listeners.remove(listener);
+	}
+
+	private void fire(ValueChangeEvent event) {
+		if (listeners == null) return;
+		for (ValueChangeListener listener : listeners) {
+			listener.valueChange(event);
+		}
+	}
+
 }

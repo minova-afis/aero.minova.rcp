@@ -53,6 +53,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
+import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
@@ -311,7 +312,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field.getShortDate() != null) {
 			return ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field.getShortTime() != null) {
-			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
+			return ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field.getLookup() != null) {
 			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
 					controls, perspective, localDatabaseService);
