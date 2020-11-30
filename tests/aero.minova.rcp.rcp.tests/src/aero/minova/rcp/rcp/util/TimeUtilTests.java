@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.util;
 
 import static java.time.Month.JANUARY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -91,5 +92,12 @@ public class TimeUtilTests {
 		Instant expected = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).withYear(1900).withMonth(1).withDayOfMonth(1).truncatedTo(ChronoUnit.MINUTES)
 				.toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(now, "0", "UTC"));
+	}
+
+	@Test
+	public void testEmptyString() {
+		Instant today = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC);
+		Instant result = TimeUtil.getTime(today, "", "UTC");
+		assertNull(result);
 	}
 }

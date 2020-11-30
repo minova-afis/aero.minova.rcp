@@ -69,8 +69,9 @@ public class TimeUtil {
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 			today = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
 			return today;
+		} else if (input.equals("")) {
+			return null;
 		} else {
-
 			today = getTimeFromNumbers(today, input, timezone);
 		}
 		return today;
