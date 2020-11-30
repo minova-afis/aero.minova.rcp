@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -64,6 +66,9 @@ public class TimeUtil {
 			String[] split = splitInput(input);
 			today = changeHours(today, split, timezone);
 		} else if (input.equals("0")) {
+			LocalDateTime lt = LocalDateTime.ofInstant(today, ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES);
+			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
+			today = lt.toInstant(ZoneOffset.UTC);
 			return today;
 		} else {
 
@@ -141,7 +146,6 @@ public class TimeUtil {
 			}
 			skipFirst = true;
 		}
-
 		for (int i = 0; i < splits.length; i++) {
 			if (correctInput == true) {
 				if (i == 0 && skipFirst == true) {
@@ -153,7 +157,8 @@ public class TimeUtil {
 				}
 			}
 		}
-
+		lt = lt.truncatedTo(ChronoUnit.MINUTES);
+		lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 		if (correctInput == true) {
 			instant = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
 		} else {
@@ -220,6 +225,7 @@ public class TimeUtil {
 		}
 		LocalTime localTime = LocalTime.of(hours, minutes);
 		LocalDate localDate = LocalDate.ofInstant(givenInstant, ZoneId.of(timezone));
+		localDate = localDate.withYear(1900).withMonth(1).withDayOfMonth(1);
 		LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
 		Instant instant = localDateTime.toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
 		return instant;

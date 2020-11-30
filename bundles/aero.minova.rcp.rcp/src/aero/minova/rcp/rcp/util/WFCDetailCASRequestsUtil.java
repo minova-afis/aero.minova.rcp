@@ -94,8 +94,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setControls(Map<String, Control> controls, MPerspective perspective,
-			ILocalDatabaseService localDatabaseService) {
+	public void setControls(Map<String, Control> controls, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
 		this.controls = controls;
 		this.perspective = perspective;
 		this.localDatabaseService = localDatabaseService;
@@ -141,8 +140,7 @@ public class WFCDetailCASRequestsUtil {
 					Row r = builder.create();
 					rowIndexTable.addRow(r);
 
-					CompletableFuture<SqlProcedureResult> tableFuture = dataService
-							.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 					tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 						selectedTable = t.getOutputParameters();
 						updateSelectedEntry();
@@ -186,8 +184,7 @@ public class WFCDetailCASRequestsUtil {
 					if (c instanceof LookupControl) {
 						LookupControl lc = (LookupControl) c;
 						Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(),
-								table.getRows().get(0).getValue(i).getIntegerValue());
+						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(), table.getRows().get(0).getValue(i).getIntegerValue());
 						if (databaseMap != null) {
 							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.TABLE_KEYLONG));
 							lc.setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
@@ -226,19 +223,16 @@ public class WFCDetailCASRequestsUtil {
 						lookups.remove(field.getName());
 
 						CompletableFuture<?> tableFuture;
-						tableFuture = LookupCASRequestUtil.getRequestedTable(0, (String) lc.getText(), field, controls,
-								dataService, sync, "List");
+						tableFuture = LookupCASRequestUtil.getRequestedTable(0, (String) lc.getText(), field, controls, dataService, sync, "List");
 						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 							if (ta instanceof SqlProcedureResult) {
 								SqlProcedureResult sql = (SqlProcedureResult) ta;
 								localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
 								lc.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
 								for (Row row : sql.getResultSet().getRows()) {
-									if (row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYTEXT))
-											.getStringValue().equals(lc.getText())) {
+									if (row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().equals(lc.getText())) {
 										lookups.put(field.getName(),
-												row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYLONG))
-														.getIntegerValue());
+												row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
 									}
 								}
 							} else if (ta instanceof Table) {
@@ -246,10 +240,8 @@ public class WFCDetailCASRequestsUtil {
 								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
 								lc.setData(Constants.CONTROL_OPTIONS, ta);
 								for (Row row : t.getRows()) {
-									if (row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-											.equals(lc.getText())) {
-										lookups.put(field.getName(), row
-												.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+									if (row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().equals(lc.getText())) {
+										lookups.put(field.getName(), row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
 									}
 								}
 							}
@@ -354,8 +346,7 @@ public class WFCDetailCASRequestsUtil {
 
 			formTable.addRow(r);
 
-			checkWorkingTime(getTextFromControl(Constants.FORM_BOOKINGDATE),
-					getTextFromControl(Constants.FORM_STARTDATE), //
+			checkWorkingTime(getTextFromControl(Constants.FORM_BOOKINGDATE), getTextFromControl(Constants.FORM_STARTDATE), //
 					getTextFromControl(Constants.FORM_ENDDATE), //
 					getTextFromControl(Constants.FORM_RENDEREDQUANTITY), //
 					getTextFromControl(Constants.FORM_CHARGEDQUANTITY), //
@@ -394,8 +385,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param t
 	 * @param r
 	 */
-	private void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity,
-			String chargedQuantity, Table t, Row r) {
+	private void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity, String chargedQuantity, Table t, Row r) {
 		boolean contradiction = false;
 
 		// Prüfen, ob die bemessene Arbeitszeit der differenz der Stunden entspricht
@@ -407,17 +397,17 @@ public class WFCDetailCASRequestsUtil {
 		LocalTime timeEndDate = LocalTime.parse(endDate);
 		LocalTime timeStartDate = LocalTime.parse(startDate);
 
-		LocalDateTime localEndDate = localDate.atTime(timeEndDate);
+		LocalDate timeFieldDate = LocalDate.of(1900, 1, 1);
+		LocalDateTime localEndDate = timeFieldDate.atTime(timeEndDate);
 		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
 		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex(Constants.FORM_ENDDATE));
-		LocalDateTime localStartDate = localDate.atTime(timeStartDate);
+		LocalDateTime localStartDate = timeFieldDate.atTime(timeStartDate);
 		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
 		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex(Constants.FORM_STARTDATE));
 		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex(Constants.FORM_CHARGEDQUANTITY));
 		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex(Constants.FORM_RENDEREDQUANTITY));
 
-		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute())
-				- ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
+		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute()) - ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
 		timeDifference = timeDifference / 60;
 
 		float renderedQuantityFloat = Float.parseFloat(renderedQuantity);
@@ -446,8 +436,8 @@ public class WFCDetailCASRequestsUtil {
 				}));
 			}
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Entry not possible, check for wronginputs in your messured Time", shell);
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
+					shell);
 			notificationPopUp.open();
 		}
 	}
@@ -463,8 +453,7 @@ public class WFCDetailCASRequestsUtil {
 			// openNotificationPopup("Entry could not be updated:" +
 			// responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while updating Entry",
-					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while updating Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -482,8 +471,7 @@ public class WFCDetailCASRequestsUtil {
 		if (responce.getReturnCode() == -1) {
 			// openNotificationPopup("Entry could not be added:" + responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while adding Entry",
-					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while adding Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -504,8 +492,7 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			if (getKeys() != null) {
 				String tablename = form.getIndexView() != null ? "sp" : "op";
-				if ((!"sp".equals(form.getDetail().getProcedurePrefix())
-						&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
+				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
 					tablename = form.getDetail().getProcedurePrefix();
 				}
 				tablename += "Delete";
@@ -540,8 +527,7 @@ public class WFCDetailCASRequestsUtil {
 			// openNotificationPopup("Entry could not be deleted:" +
 			// responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while deleting Entry",
-					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while deleting Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -576,13 +562,11 @@ public class WFCDetailCASRequestsUtil {
 					Text t = (Text) c;
 					if (origin.equals(Constants.DELETE_REQUEST)) {
 						t.setText("");
-					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE)
-							.getData(Constants.CONTROL_FIELD)) {
+					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE).getData(Constants.CONTROL_FIELD)) {
 						SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 						Date date = new Date(System.currentTimeMillis());
 						t.setText(formatter.format(date));
-					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE)
-							.getData(Constants.CONTROL_FIELD)) {
+					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE).getData(Constants.CONTROL_FIELD)) {
 						Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
 						if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
 							lastEndDate = endDate.getText();
@@ -613,22 +597,18 @@ public class WFCDetailCASRequestsUtil {
 				LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
 				lc.setText(employee);
 				CompletableFuture<?> tableFuture;
-				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null,
-						(Field) lc.getData(Constants.CONTROL_FIELD), controls, dataService, sync, "List");
+				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD), controls, dataService, sync, "List");
 
 				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 					if (ta instanceof Table) {
 						Table t1 = (Table) ta;
 						for (Row r : t1.getRows()) {
-							if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-									.equals(employee.toLowerCase())) {
+							if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase().equals(employee.toLowerCase())) {
 								lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 								if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-									lc.getDescription().setText(r
-											.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+									lc.getDescription().setText(r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
 								}
-								lc.setData(Constants.CONTROL_KEYLONG,
-										r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
+								lc.setData(Constants.CONTROL_KEYLONG, r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
 							}
 						}
 						// changeOptionsForLookupField(t1, lc, true);
