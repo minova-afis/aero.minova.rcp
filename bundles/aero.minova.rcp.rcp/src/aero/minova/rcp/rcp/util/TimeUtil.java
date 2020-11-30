@@ -118,7 +118,7 @@ public class TimeUtil {
 			return result;
 	}
 
-	static public String getTimeString(Instant instant, Locale locale, String timezone) {
+	public static String getTimeString(Instant instant, Locale locale, String timezone) {
 		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
 		return localDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
 	}
