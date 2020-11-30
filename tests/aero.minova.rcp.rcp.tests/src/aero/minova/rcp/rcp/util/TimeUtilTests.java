@@ -100,4 +100,24 @@ public class TimeUtilTests {
 		Instant result = TimeUtil.getTime(today, "", "UTC");
 		assertNull(result);
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testShortcutDoubleHour() {
+		TimeUtil.setShortcuts("H", "h");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testShortcutDoubleMinute() {
+		TimeUtil.setShortcuts("M", "m");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testShortcut2HourChars() {
+		TimeUtil.setShortcuts("hh", "m");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testShortcut2MinuteChars() {
+		TimeUtil.setShortcuts("h", "mm");
+	}
 }

@@ -59,7 +59,13 @@ Wenn man Datumsinformationen an den CAS übergibt, muss der Zeitpunkt ausgerechn
 Bei der Anzeige könnte man sich überlegen, den Wert bei Verlassen auszurechnen. 
 Sobald der Anwender das Feld wieder anspringt (OnFocus) wird die Formel eingeblendet.
 
-Wir haben für das Datum bestimmte Shortcuts definiert.
+
+=== Zeitfelder
+
+Zeiteinträge werden stehts mit einem Datum von 01.01.1900 versehen. Auserdem werden sie auf ihre Minuten gerundet.
+
+
+Wir haben für die Datumsfelder ebenfalls bestimmte Shortcuts definiert.
 
 |===
 | Eingabe | Wert
