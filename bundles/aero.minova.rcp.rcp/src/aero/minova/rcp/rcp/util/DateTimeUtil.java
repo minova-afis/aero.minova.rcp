@@ -16,11 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in
- * Instant
+ * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in Instant
  * 
  * @author Wilfried Saak
- *
  */
 public class DateTimeUtil {
 	private static String day = "d";
