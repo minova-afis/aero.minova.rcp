@@ -11,6 +11,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
+import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.util.Constants;
 
 @SuppressWarnings("restriction")
@@ -42,7 +43,7 @@ public class FieldUtil {
 	private FieldUtil() {
 	}
 
-	protected static void addDataToText(Widget control, Field f, DataType datatype) {
+	protected static void addDataToText(Widget control, MField f, DataType datatype) {
 		control.setData(Constants.CONTROL_FIELD, f);
 		control.setData(Constants.CONTROL_DATATYPE, datatype);
 	}

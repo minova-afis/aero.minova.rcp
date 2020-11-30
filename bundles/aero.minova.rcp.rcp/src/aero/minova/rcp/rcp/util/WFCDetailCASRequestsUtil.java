@@ -45,6 +45,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
+import aero.minova.rcp.model.form.ValueAccessor;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class WFCDetailCASRequestsUtil {

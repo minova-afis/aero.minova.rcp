@@ -31,18 +31,19 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.ValueAccessor;
+import aero.minova.rcp.rcp.parts.ShortTimeValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.TimeUtil;
-import aero.minova.rcp.rcp.util.ValueAccessor;
 
 public class ShortTimeField {
 
-	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		TextAssist text = new TextAssist(composite, SWT.BORDER, new TextAssistContentProvider() {
@@ -72,7 +73,7 @@ public class ShortTimeField {
 		};
 		text.setContentProvider(contentProvider);
 		FieldUtil.addDataToText(text, field, DataType.INSTANT);
-		text.setData(Constants.VALUE_ACCESSOR, new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.INSTANT));
+		text.setData(Constants.VALUE_ACCESSOR, new ShortTimeValueAccessor(field, text));
 
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();

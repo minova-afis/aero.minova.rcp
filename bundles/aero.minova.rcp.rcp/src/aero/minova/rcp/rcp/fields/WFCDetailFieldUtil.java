@@ -5,7 +5,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_TIME_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
@@ -19,15 +18,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.parts.TextValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.ValueAccessor;
 
 public class WFCDetailFieldUtil {
 
-	public static Control createBooleanField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit) {
+	public static Control createBooleanField(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		FormData formData = new FormData();
 		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
@@ -40,50 +38,18 @@ public class WFCDetailFieldUtil {
 		button.setLayoutData(formData);
 		button.setData(Constants.CONTROL_FIELD, field);
 		button.setData(Constants.CONTROL_DATATYPE, DataType.BOOLEAN);
-		FieldUtil.addConsumer(button, field);
+//		FieldUtil.addConsumer(button, field);
 
 		return button;
 	}
 
-	public static Control createShortTimeField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit) {
+	public static Control createTextField(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "", SWT.BORDER);
-		FieldUtil.addDataToText(text, field, DataType.INSTANT);
-//		FieldUtil.addConsumer(text, field);
-		text.setData(Constants.VALUE_ACCESSOR,
-				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.INSTANT));
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
-
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		textFormData.width = SHORT_TIME_WIDTH;
-
-		label.setData(TRANSLATE_PROPERTY, labelText);
-		label.setLayoutData(labelFormData);
-
-		text.setMessage("23:59");
-		text.setLayoutData(textFormData);
-
-		return text;
-	}
-
-	public static Control createTextField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit) {
-		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "",
-				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
+		Text text = formToolkit.createText(composite, "", SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
 		FieldUtil.addDataToText(text, field, DataType.STRING);
 		// FieldUtil.addConsumer(text, field);
-		text.setData(Constants.VALUE_ACCESSOR,
-				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.STRING));
+		text.setData(Constants.VALUE_ACCESSOR, new TextValueAccessor(field, text));
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
@@ -93,14 +59,13 @@ public class WFCDetailFieldUtil {
 
 		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2
-				&& "toright".equals(field.getFill())) {
+		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2 && field.isFillToRight()) {
 			textFormData.width = COLUMN_WIDTH * 3 + MARGIN_LEFT * 2 + MARGIN_BORDER;
 		} else {
 			textFormData.width = TEXT_WIDTH;
 		}
-		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
-			textFormData.height = COLUMN_HEIGHT * Integer.parseInt(field.getNumberRowsSpanned()) - MARGIN_TOP;
+		if (field.getNumberRowsSpanned() > 1) {
+			textFormData.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
 		}
 
 		label.setData(TRANSLATE_PROPERTY, labelText);
@@ -111,10 +76,8 @@ public class WFCDetailFieldUtil {
 		return text;
 	}
 
-	private static int getExtraHeight(Field field) {
-		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
-			return Integer.parseInt(field.getNumberRowsSpanned()) - 1;
-		}
+	private static int getExtraHeight(MField field) {
+		if (field.getNumberRowsSpanned() > 1) return field.getNumberRowsSpanned() - 1;
 		return 0;
 	}
 

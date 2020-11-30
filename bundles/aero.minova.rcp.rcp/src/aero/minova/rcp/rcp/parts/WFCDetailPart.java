@@ -5,12 +5,10 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -48,20 +46,23 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.form.MBooleanField;
+import aero.minova.rcp.model.form.MDateTimeField;
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.form.MShortDateField;
+import aero.minova.rcp.model.form.MShortTimeField;
+import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
 import aero.minova.rcp.rcp.util.WFCDetailUtil;
-import aero.minova.rcp.rcp.util.WFCDetailsLookupUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
@@ -95,7 +96,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private Composite composite;
 
-	private Map<String, Control> controls = new HashMap<>();
+	private MDetail detail = new MDetail();
 
 	private WFCDetailUtil wfcDetailUtil = null;
 
@@ -124,8 +125,9 @@ public class WFCDetailPart extends WFCFormPart {
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
-		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setControls(controls, perspective, localDatabaseService);
+		// TODO SAW_ERC
+//		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
+//		casRequestsUtil.setControls(controls, perspective, localDatabaseService);
 	}
 
 	private static class HeadOrPageWrapper {
@@ -172,18 +174,17 @@ public class WFCDetailPart extends WFCFormPart {
 			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 		}
 		IHelper iHelper = helperlist.get(0);
-		iHelper.setControls(controls);
+		// TODO SAW_ERC
+//		iHelper.setControls(controls);
 	}
 
 	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
 		RowData headLayoutData = new RowData();
 		Section headSection;
 		if (head.isHead) {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
@@ -205,8 +206,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
 		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 
 		pageLayoutData.width = SECTION_WIDTH;
 
@@ -235,6 +235,9 @@ public class WFCDetailPart extends WFCFormPart {
 				continue; // erst einmal nur Felder
 			}
 			Field field = (Field) fieldOrGrid;
+			MField f = getMFieldOf(field);
+			detail.putField(f);
+
 			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
 			}
@@ -243,10 +246,7 @@ public class WFCDetailPart extends WFCFormPart {
 				column = 0;
 				row++;
 			}
-			control = createField(composite, field, row, column);
-			if (control != null) {
-				controls.put(field.getName(), control);
-			}
+			createField(composite, f, row, column);
 			column += width;
 			if (!headOrPage.isHead) {
 				row += getExtraHeight(field);
@@ -254,6 +254,32 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		addBottonMargin(composite, row + 1, column);
+	}
+
+	private MField getMFieldOf(Field field) {
+		MField f;
+		if (field.getBoolean() != null) f = new MBooleanField();
+		else if (field.getDateTime() != null) f = new MDateTimeField();
+		else if (field.getLookup() != null) f = new MLookupField();
+		else if (field.getNumber() != null) {
+			f = new MNumberField();
+			f.setDecimals(field.getNumber().getDecimals());
+			if (field.getNumber().getMaxValue() != null) f.setMaximumValue(field.getNumber().getMaxValue().doubleValue());
+			if (field.getNumber().getMinValue() != null) f.setMinimumValue(field.getNumber().getMinValue().doubleValue());
+		} else if (field.getShortDate() != null) f = new MShortDateField();
+		else if (field.getShortTime() != null) f = new MShortTimeField();
+		else if (field.getText() != null) {
+			f = new MTextField();
+			f.setFillToRight("toright".equals(field.getFill()));
+		} else return null;
+
+		f.setName(field.getName());
+		f.setLabel(field.getLabel());
+		f.setUnitText(field.getUnitText());
+		f.setSqlIndex(field.getSqlIndex().intValue());
+		if (field.getNumberColumnsSpanned() != null) f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
+		if (field.getNumberRowsSpanned() != null) f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
+		return f;
 	}
 
 	private void createFields(Composite composite, Page page) {
@@ -266,6 +292,9 @@ public class WFCDetailPart extends WFCFormPart {
 				continue; // erst einmal nur Felder
 			}
 			Field field = (Field) fieldOrGrid;
+			MField f = getMFieldOf(field);
+			detail.putField(f);
+
 			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
 			}
@@ -274,10 +303,7 @@ public class WFCDetailPart extends WFCFormPart {
 				column = 0;
 				row++;
 			}
-			control = createField(composite, field, row, column);
-			if (control != null) {
-				controls.put(field.getName(), control);
-			}
+			createField(composite, f, row, column);
 			column += width;
 			row += getExtraHeight(field);
 		}
@@ -302,25 +328,22 @@ public class WFCDetailPart extends WFCFormPart {
 		spacing.setLayoutData(spacingFormData);
 	}
 
-	private Control createField(Composite composite, Field field, int row, int column) {
-		if (field.getBoolean() != null) {
-			return WFCDetailFieldUtil.createBooleanField(composite, field, row, column, formToolkit);
-		} else if (field.getNumber() != null) {
-			return NumberField.create(composite, field, row, column, formToolkit, locale);
-		} else if (field.getDateTime() != null) {
-			return DateTimeField.create(composite, field, row, column, formToolkit);
-		} else if (field.getShortDate() != null) {
-			return ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
-		} else if (field.getShortTime() != null) {
-			return ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
-		} else if (field.getLookup() != null) {
-			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
-					controls, perspective, localDatabaseService);
-
-		} else if (field.getText() != null) {
-			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
+	private void createField(Composite composite, MField field, int row, int column) {
+		if (field instanceof MBooleanField) {
+			WFCDetailFieldUtil.createBooleanField(composite, field, row, column, formToolkit);
+		} else if (field instanceof MNumberField) {
+			NumberField.create(composite, field, row, column, formToolkit, locale);
+		} else if (field instanceof MDateTimeField) {
+			DateTimeField.create(composite, field, row, column, formToolkit);
+		} else if (field instanceof MShortDateField) {
+			ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
+		} else if (field instanceof MShortTimeField) {
+			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
+		} else if (field instanceof MLookupField) {
+//			WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker, controls, perspective, localDatabaseService);
+		} else if (field instanceof MTextField) {
+			WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
 		}
-		return null;
 	}
 
 	@Inject
@@ -370,41 +393,39 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
-	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
-	 * dem benutzer zur verfügung gestellt.
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird dem
+	 * benutzer zur verfügung gestellt.
 	 *
 	 * @param luc
 	 */
 	@Inject
 	@Optional
-	public void requestLookUpEntriesAll(
-			@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
+	public void requestLookUpEntriesAll(@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
 			String name = map.get(perspective);
-			Control control = controls.get(name);
-			if (control instanceof LookupControl) {
-				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
-				CompletableFuture<?> tableFuture;
-				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
-						"List");
-				LookupControl lc = (LookupControl) control;
-				lc.getTextControl().setText("...");
-				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
-					if (ta instanceof SqlProcedureResult) {
-						SqlProcedureResult sql = (SqlProcedureResult) ta;
-						localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
-						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, false);
-					} else if (ta instanceof Table) {
-						Table t = (Table) ta;
-						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
-						lookupUtil.changeOptionsForLookupField(t, control, false);
-					}
-					lc.getTextControl().setText("");
-
-				}));
-			}
+			// TODO SAW_ERC
+//			Control control = controls.get(name);
+//			if (control instanceof LookupControl) {
+//				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
+//				CompletableFuture<?> tableFuture;
+//				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync, "List");
+//				LookupControl lc = (LookupControl) control;
+//				lc.getTextControl().setText("...");
+//				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+//					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
+//					if (ta instanceof SqlProcedureResult) {
+//						SqlProcedureResult sql = (SqlProcedureResult) ta;
+//						localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
+//						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, false);
+//					} else if (ta instanceof Table) {
+//						Table t = (Table) ta;
+//						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
+//						lookupUtil.changeOptionsForLookupField(t, control, false);
+//					}
+//					lc.getTextControl().setText("");
+//
+//				}));
+//			}
 
 		}
 	}

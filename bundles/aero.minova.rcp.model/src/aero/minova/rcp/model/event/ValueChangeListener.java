@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.model.event;
 
 /**
  * A "ValueChange" event gets fired whenever a control (field) changes a "bound" value. You can register a ValueChangeListener with a source bean so as to be
