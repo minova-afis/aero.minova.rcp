@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
@@ -68,7 +67,7 @@ public class TimeUtil {
 		} else if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(today, ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
-			today = lt.toInstant(ZoneOffset.UTC);
+			today = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
 			return today;
 		} else {
 
