@@ -399,10 +399,10 @@ public class WFCDetailCASRequestsUtil {
 
 		LocalDate timeFieldDate = LocalDate.of(1900, 1, 1);
 		LocalDateTime localEndDate = timeFieldDate.atTime(timeEndDate);
-		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
+		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of("UTC"));
 		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex(Constants.FORM_ENDDATE));
 		LocalDateTime localStartDate = timeFieldDate.atTime(timeStartDate);
-		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
+		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of("UTC"));
 		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex(Constants.FORM_STARTDATE));
 		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex(Constants.FORM_CHARGEDQUANTITY));
 		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex(Constants.FORM_RENDEREDQUANTITY));
