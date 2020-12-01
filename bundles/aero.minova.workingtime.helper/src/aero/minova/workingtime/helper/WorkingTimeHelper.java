@@ -1,60 +1,62 @@
 package aero.minova.workingtime.helper;
 
-import java.util.Map;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
-import org.eclipse.swt.widgets.Control;
 import org.osgi.service.component.annotations.Component;
 
-import aero.minova.rcp.dataservice.IHelper;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.helper.IHelper;
 
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
-	Map<String, Control> controls;
+	private MDetail detail;
 	public static final String CONTROL_CONSUMER = "consumer";
 	public static final String CONTROL_FIELD = "field";
-	private Control startDate;
-	private Control endDate;
-	private Control renderedQuantity;
-	private Control chargedQuantity;
+	private MField startDate;
+	private MField endDate;
+	private MField renderedQuantity;
+	private MField chargedQuantity;
 
 	public WorkingTimeHelper() {
 		System.out.println("Ich bin da: WorkingTimeHelper");
 	}
 
 	@Override
-	public void setControls(Map<String, Control> controls) {
-		this.controls = controls;
+	public void setControls(MDetail detail) {
+		this.detail = detail;
 		initAccessor();
 	}
 
 	public void initAccessor() {
-//		startDate = controls.get("StartDate");
-//		endDate = controls.get("EndDate");
-//		renderedQuantity = controls.get("RenderedQuantity");
-//		chargedQuantity = controls.get("ChargedQuantity");
-//
-//		((ValueAccessor) startDate.getData(Constants.VALUE_ACCESSOR)).addValueChangeListener(this);
-//		((ValueAccessor) endDate.getData(Constants.VALUE_ACCESSOR)).addValueChangeListener(this);
+		startDate = detail.getField("StartDate");
+		endDate = detail.getField("EndDate");
+		renderedQuantity = detail.getField("RenderedQuantity");
+		chargedQuantity = detail.getField("ChargedQuantity");
+
+		// Auf diese werte reagieren wir
+		startDate.addValueChangeListener(this);
+		endDate.addValueChangeListener(this);
 	}
 
 	protected void calculateTime() {
-//		ValueAccessor start = (ValueAccessor) startDate.getData(Constants.VALUE_ACCESSOR);
-//		ValueAccessor end = (ValueAccessor) endDate.getData(Constants.VALUE_ACCESSOR);
-//		ValueAccessor reQty = (ValueAccessor) this.renderedQuantity.getData(Constants.VALUE_ACCESSOR);
-//		ValueAccessor chQty = (ValueAccessor) this.chargedQuantity.getData(Constants.VALUE_ACCESSOR);
-//
-//		Instant iStart = start.getValue().getInstantValue();
-//		Instant iEnd = end.getValue().getInstantValue();
-//		long min = ChronoUnit.MINUTES.between(iStart, iEnd);
-//		float renderedQty = getFloatFromMinutes(min);
-//		float chargedQty = getChargedQuantity(renderedQty);
-//		Value valueRe = new Value((double) renderedQty);
-//		Value valueCh = new Value((double) chargedQty);
-//		reQty.setValue(valueRe, false);
-//		chQty.setValue(valueCh, false);
+		if (startDate.getValue() == null) return;
+		if (endDate.getValue() == null) return;
+
+		Instant start = startDate.getValue().getInstantValue();
+		Instant end = endDate.getValue().getInstantValue();
+		long min = ChronoUnit.MINUTES.between(start, end);
+		float renderedQty = getFloatFromMinutes(min);
+		float chargedQty = getChargedQuantity(renderedQty);
+		Value valueRe = new Value((double) renderedQty);
+		Value valueCh = new Value((double) chargedQty);
+		renderedQuantity.setValue(valueRe, true);
+		chargedQuantity.setValue(valueCh, true);
 	}
 
 	public float getFloatFromMinutes(long min) {

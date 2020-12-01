@@ -1,7 +1,11 @@
 package aero.minova.rcp.model.form;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
@@ -14,18 +18,34 @@ import aero.minova.rcp.model.event.ValueChangeListener;
 public abstract class MField {
 
 	private ArrayList<ValueChangeListener> listeners;
-	private Value value;
+	private Value fieldValue;
+	private Value displayValue;
 	private ValueAccessor valueAccessor;
 	private String name;
 	private String label;
 	private String unitText;
-	private Integer decimals;
+	private final int decimals;
 	private Integer sqlIndex;
 	private Integer numberColumnsSpanned = 2;
 	private Integer numberRowsSpanned = 1;
 	private Double maximumValue;
 	private Double minimumValue;
 	private boolean fillToRight = false;
+	private String lookupTable;
+	private String lookupProcedurePrefix;
+	private List<String> lookupParameters;
+	private final DataType dataType;
+
+	protected MField(DataType dataType) {
+		this.dataType = dataType;
+		decimals = 0;
+	}
+
+	protected MField(int decimals) {
+		this.decimals = decimals;
+		if (decimals > 0) this.dataType = DataType.DOUBLE;
+		else this.dataType = DataType.INTEGER;
+	}
 
 	/**
 	 * Mit dieser Methode kann man einen Listener für Wertänderungen anhängen.
@@ -57,17 +77,17 @@ public abstract class MField {
 	}
 
 	public Value getValue() {
-		return value;
+		return fieldValue;
 	}
 
 	public void setValue(Value value, boolean user) {
-		if (this.value == value) return; // auch true, wenn beide null sind
-		if (value != null && value.equals(this.value)) return;
+		if (displayValue == value) return; // auch true, wenn beide null sind
+		if (value != null && value.equals(this.displayValue)) return;
 		checkDataType(value);
 
-		Value oldValue = this.value;
-		this.value = value;
-		if (valueAccessor != null) valueAccessor.setValue(value, user);
+		Value oldValue = this.fieldValue;
+		this.fieldValue = value;
+		if (getValueAccessor() != null) displayValue = getValueAccessor().setValue(value, user);
 		fire(new ValueChangeEvent(this, oldValue, value, user));
 	}
 
@@ -79,7 +99,11 @@ public abstract class MField {
 	 * @throws IllegalArgumentException
 	 *             Wenn der Typ ungültig für das Feld ist.
 	 */
-	protected abstract void checkDataType(Value value);
+	protected void checkDataType(Value value) {
+		if (value == null) return;
+		if (value.getType() != getDataType())
+			throw new IllegalArgumentException("Value of field " + getName() + " must be of type " + getDataType().toString() + "!");
+	}
 
 	public void setName(String name) {
 		this.name = name;
@@ -133,10 +157,6 @@ public abstract class MField {
 		return decimals;
 	}
 
-	public void setDecimals(int decimals) {
-		this.decimals = decimals;
-	}
-
 	public Double getMaximumValue() {
 		return maximumValue;
 	}
@@ -159,5 +179,54 @@ public abstract class MField {
 
 	public void setFillToRight(boolean fillToRight) {
 		this.fillToRight = fillToRight;
+	}
+
+	public String getLookupProcedurePrefix() {
+		return lookupProcedurePrefix;
+	}
+
+	public void setLookupProcedurePrefix(String lookupProcedurePrefix) {
+		this.lookupProcedurePrefix = lookupProcedurePrefix;
+	}
+
+	public String getLookupTable() {
+		return lookupTable;
+	}
+
+	public void setLookupTable(String lookupTable) {
+		this.lookupTable = lookupTable;
+	}
+
+	public List<String> getLookupParameters() {
+		return lookupParameters;
+	}
+
+	public void addLookupParameter(String fieldname) {
+		if (lookupParameters == null) lookupParameters = new ArrayList<>();
+		lookupParameters.add(fieldname);
+	}
+
+	public DataType getDataType() {
+		return dataType;
+	}
+
+	/**
+	 * Wenn das Feld anzeigen soll, dass wir auf Daten warten, muss dieses Methode aufgerufen werden. Dabei wird auch der Wert
+	 * {@link #setValue(Value, boolean)}} auf null gesetzt.
+	 */
+	public void indicateWaiting() {
+		setValue(null, false);
+	}
+
+	public Consumer<Table> getConsumer() {
+		return table -> setValue(table.getRows().get(0).getValue(sqlIndex), false);
+	}
+
+	public ValueAccessor getValueAccessor() {
+		return valueAccessor;
+	}
+
+	public void setValueAccessor(ValueAccessor valueAccessor) {
+		this.valueAccessor = valueAccessor;
 	}
 }

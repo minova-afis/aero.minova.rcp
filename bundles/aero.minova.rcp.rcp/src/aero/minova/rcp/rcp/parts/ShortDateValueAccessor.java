@@ -1,31 +1,37 @@
 package aero.minova.rcp.rcp.parts;
 
-import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 
-import aero.minova.rcp.model.Row;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
+
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.swt.widgets.Control;
+
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.model.form.ValueAccessor;
 
-public class ShortDateValueAccessor implements ValueAccessor {
+public class ShortDateValueAccessor extends AbstractValueAccessor {
 
-	MField field;
-	TextAssist text;
-
-	public ShortDateValueAccessor(MField field, TextAssist text) {
-		this.field = field;
-		this.text = text;
+	public ShortDateValueAccessor(MField field, TextAssist textAssist) {
+		super(field, textAssist);
 	}
 
 	@Override
-	public void setValue(Value value, boolean user) {
-		field.setValue(value, user);
-	}
-
-	@Override
-	public void setValue(Row row) {
-		Value value = row.getValue(field.getSqlIndex());
-		field.setValue(value, false);
+	protected void updateControlFromValue(Control control, Value value) {
+		if (value == null) {
+			((TextAssist) control).setText("");
+		} else {
+			Instant date = value.getInstantValue();
+			LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
+			Locale locale = (Locale) control.getData(TRANSLATE_LOCALE);
+			// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
+			((TextAssist) control).setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		}
 	}
 
 }

@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.rcp.fields;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,15 +20,18 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
-import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
-public class WFCDetailLookupFieldUtil {
+public class LookupField {
 
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	private static final int COLUMN_WIDTH = 140;
@@ -36,9 +39,8 @@ public class WFCDetailLookupFieldUtil {
 	private static final int MARGIN_TOP = 5; // Zwischenräume
 	private static final int COLUMN_HEIGHT = 28;
 
-	public static Control createLookupField(Composite composite, Field field, int row, int column,
-			FormToolkit formToolkit, IEventBroker broker, Map<String, Control> controls, MPerspective perspective,
-			ILocalDatabaseService localDatabaseService) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, IEventBroker broker, MPerspective perspective,
+			ILocalDatabaseService localDatabaseService, MDetail detail) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
@@ -82,8 +84,7 @@ public class WFCDetailLookupFieldUtil {
 
 			@Override
 			/*
-			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
-			 * LookUpFelder eingetragen wurden
+			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere LookUpFelder eingetragen wurden
 			 */
 			public void mouseDown(MouseEvent e) {
 				Map<MPerspective, String> brokerObject = new HashMap<>();
@@ -108,8 +109,7 @@ public class WFCDetailLookupFieldUtil {
 			lookupControl.setData(Constants.CONTROL_KEYLONG, keyLong);
 
 			CompletableFuture<?> tableFuture;
-			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, controls,
-					(IDataService) m.get("dataService"), (UISynchronize) m.get("sync"), "Resolve");
+			tableFuture = LookupCASRequestUtil.getRequestedTable(keyLong, null, field, detail, (IDataService) m.get("dataService"), "Resolve");
 			tableFuture.thenAccept(ta -> ((UISynchronize) m.get("sync")).asyncExec(() -> {
 				Table t = null;
 				if (ta instanceof SqlProcedureResult) {
@@ -128,8 +128,7 @@ public class WFCDetailLookupFieldUtil {
 	}
 
 	/**
-	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
-	 * Bindung zur Componente
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit Bindung zur Componente
 	 *
 	 * @param ta
 	 * @param c
@@ -142,8 +141,7 @@ public class WFCDetailLookupFieldUtil {
 		lc.setText((String) ValueBuilder.value(v).create());
 		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder
-						.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
 			} else {
 				lc.getDescription().setText("");
 			}

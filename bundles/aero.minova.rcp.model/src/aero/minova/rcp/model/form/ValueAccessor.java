@@ -5,7 +5,16 @@ import aero.minova.rcp.model.Value;
 
 public interface ValueAccessor {
 
-	public void setValue(Value value, boolean user);
+	public boolean isFocussed();
+
+	/**
+	 * @param value
+	 *            der anzuzeigende Wert
+	 * @param user
+	 *            true, wenn die Veränderung durch eine Benutzereingabe erfolgt
+	 * @return der Wert, der gerade im Control angezeigt wird
+	 */
+	public Value setValue(Value value, boolean user);
 
 	public void setValue(Row row);
 }

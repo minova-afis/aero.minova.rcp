@@ -1,12 +1,30 @@
 package aero.minova.rcp.model.form;
 
 import aero.minova.rcp.model.DataType;
-import aero.minova.rcp.model.Value;
 
 public class MLookupField extends MField {
-	@Override
-	protected void checkDataType(Value value) {
-		if (value == null) return;
-		if (value.getType() != DataType.INTEGER) throw new IllegalArgumentException("Value of field " + getName() + " must be of type INTEGER!");
+
+	public MLookupField() {
+		super(DataType.INTEGER);
 	}
+
+	private String keyText;
+	private String description;
+
+	public String getKeyText() {
+		return keyText;
+	}
+
+	public void setKeyText(String keyText) {
+		this.keyText = keyText;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 }

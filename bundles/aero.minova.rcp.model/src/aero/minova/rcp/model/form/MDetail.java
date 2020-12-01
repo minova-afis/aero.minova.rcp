@@ -1,5 +1,6 @@
 package aero.minova.rcp.model.form;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -40,6 +41,10 @@ public class MDetail {
 	 * @return Das Feld
 	 */
 	public MField getField(String name) {
-		return null;
+		return fields.get(name);
+	}
+
+	public Collection<MField> getFields() {
+		return fields.values();
 	}
 }
