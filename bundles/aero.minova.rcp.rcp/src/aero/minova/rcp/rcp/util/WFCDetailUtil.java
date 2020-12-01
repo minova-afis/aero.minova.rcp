@@ -12,6 +12,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -168,8 +169,8 @@ public class WFCDetailUtil {
 	 * verändert
 	 */
 	public void updateQuantitys() {
-		Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
-		Text startDate = (Text) controls.get(Constants.FORM_STARTDATE);
+		TextAssist endDate = (TextAssist) controls.get(Constants.FORM_ENDDATE);
+		TextAssist startDate = (TextAssist) controls.get(Constants.FORM_STARTDATE);
 		if (endDate.getText().matches("..:..") && startDate.getText().matches("..:..")) {
 			LocalTime timeEndDate = LocalTime.parse(endDate.getText());
 			LocalTime timeStartDate = LocalTime.parse(startDate.getText());

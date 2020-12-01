@@ -253,7 +253,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field.getShortDate() != null) {
 			return ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field.getShortTime() != null) {
-			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
+			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit, locale);
 		} else if (field.getLookup() != null) {
 			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
 					controls, perspective, localDatabaseService);
