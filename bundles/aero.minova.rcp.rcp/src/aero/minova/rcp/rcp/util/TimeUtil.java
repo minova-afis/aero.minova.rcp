@@ -217,6 +217,8 @@ public class TimeUtil {
 			if (timeList != null) {
 				hours = timeList[0];
 				minutes = timeList[1];
+			} else {
+				return null;
 			}
 		}
 		if (hours > 23) {
@@ -238,6 +240,7 @@ public class TimeUtil {
 		String hour = "";
 		String minutesString = "";
 		int[] time = null;
+		try {
 		switch (subString.length()) {
 		case 1:
 			time = new int[2];
@@ -265,6 +268,9 @@ public class TimeUtil {
 			time[1] = Integer.valueOf(minutesString);
 			return time;
 		}
+	} catch (Exception e) {
+		return null;
+	}
 
 		return null;
 	}

@@ -153,6 +153,8 @@ public class WFCDetailFieldUtil {
 			Locale locale = (Locale) text.getData(TRANSLATE_LOCALE);
 			// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
 			text.setText(localDate.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+		} else {
+			text.setText("");
 		}
 	}
 	public static Control createTextField(Composite composite, Field field, int row, int column,
