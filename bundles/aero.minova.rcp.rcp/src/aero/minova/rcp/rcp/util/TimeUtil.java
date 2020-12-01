@@ -60,7 +60,6 @@ public class TimeUtil {
 	}
 
 	static public Instant getTime(Instant today, String input, String timezone) {
-
 		if (input.contains("-") || input.contains("+")) {
 			String[] split = splitInput(input);
 			today = changeHours(today, split, timezone);
@@ -129,7 +128,7 @@ public class TimeUtil {
 	}
 
 	private static Instant changeHours(Instant instant, String[] splits, String timezone) {
-
+		if (splits.length != 0) {
 		boolean correctInput = true;
 		boolean skipFirst = false;
 		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
@@ -164,6 +163,9 @@ public class TimeUtil {
 		} else {
 			instant = null;
 		}
+	} else {
+		return null;
+	}
 		return instant;
 	}
 

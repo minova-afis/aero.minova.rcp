@@ -101,6 +101,13 @@ public class TimeUtilTests {
 		assertNull(result);
 	}
 
+	@Test
+	public void test2Plus2() {
+		Instant today = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC);
+		Instant result = TimeUtil.getTime(today, "2+2", "UTC");
+		assertNull(result);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void testShortcutDoubleHour() {
 		TimeUtil.setShortcuts("H", "h");
