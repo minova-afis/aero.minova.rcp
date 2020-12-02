@@ -31,26 +31,19 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.rcp.parts.ShortTimeValueAccessor;
+import aero.minova.rcp.rcp.accessor.ShortTimeValueAccessor;
 import aero.minova.rcp.rcp.util.TimeUtil;
 
 public class ShortTimeField {
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
+			Locale locale, String timezone) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		label.setData(TRANSLATE_PROPERTY, labelText);
 
-		TextAssist text = new TextAssist(composite, SWT.BORDER, new TextAssistContentProvider() {
-
-			@Override
-			public List<String> getContent(String entry) {
-				return null;
-			}
-		});
 		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
-
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
@@ -60,15 +53,17 @@ public class ShortTimeField {
 					field.setValue(null, true);
 				} else {
 					LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
-					result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+					result.add(
+							localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 					field.setValue(new Value(time), true);
 				}
 				return result;
 			}
 
 		};
-		text.setContentProvider(contentProvider);
-		text.setMessage(LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
+		text.setMessage(
+				LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {
