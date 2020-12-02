@@ -53,4 +53,5 @@ Import-Package: aero.minova.rcp.core.ui,aero.minova.rcp.perspectiveswitc
  on;version="1.0.0";resolution:=optional,javax.inject;version="1.0.0",or
  g.eclipse.e4.ui.css.swt.theme
 Automatic-Module-Name: aero.minova.rcp.rcp
+Bundle-ActivationPolicy: lazy
 

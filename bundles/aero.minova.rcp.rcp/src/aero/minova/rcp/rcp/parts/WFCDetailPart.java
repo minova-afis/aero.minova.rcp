@@ -7,7 +7,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
@@ -23,9 +22,7 @@ import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -63,7 +60,6 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
 @SuppressWarnings("restriction")
@@ -180,9 +176,11 @@ public class WFCDetailPart extends WFCFormPart {
 		RowData headLayoutData = new RowData();
 		Section headSection;
 		if (head.isHead) {
-			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = formToolkit.createSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			headSection = formToolkit.createSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
@@ -204,7 +202,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
 		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		Section pageSection = formToolkit.createSection(parent,
+				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 
 		pageLayoutData.width = SECTION_WIDTH;
 
@@ -327,7 +326,8 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MShortTimeField) {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService, detail);
+			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService,
+					detail);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}
@@ -379,41 +379,5 @@ public class WFCDetailPart extends WFCFormPart {
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
 
-	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird dem
-	 * benutzer zur verfügung gestellt.
-	 *
-	 * @param luc
-	 */
-	@Inject
-	@Optional
-	public void requestLookUpEntriesAll(@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
-		if (map.get(perspective) != null) {
-//			String name = map.get(perspective);
-			// TODO SAW_ERC
-//			Control control = controls.get(name);
-//			if (control instanceof LookupControl) {
-//				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
-//				CompletableFuture<?> tableFuture;
-//				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync, "List");
-//				LookupControl lc = (LookupControl) control;
-//				lc.getTextControl().setText("...");
-//				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-//					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
-//					if (ta instanceof SqlProcedureResult) {
-//						SqlProcedureResult sql = (SqlProcedureResult) ta;
-//						localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
-//						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, false);
-//					} else if (ta instanceof Table) {
-//						Table t = (Table) ta;
-//						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
-//						lookupUtil.changeOptionsForLookupField(t, control, false);
-//					}
-//					lc.getTextControl().setText("");
-//
-//				}));
-//			}
 
-		}
-	}
 }

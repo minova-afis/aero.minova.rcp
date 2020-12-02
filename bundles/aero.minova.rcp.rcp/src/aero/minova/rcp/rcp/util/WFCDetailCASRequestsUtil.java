@@ -154,6 +154,7 @@ public class WFCDetailCASRequestsUtil {
 							e.printStackTrace();
 						}
 					}
+
 					// TODO SAW_ERC Lookup
 //					ValueAccessor valueAccessor = (ValueAccessor) c.getData(Constants.VALUE_ACCESSOR);
 //					if (valueAccessor != null) {

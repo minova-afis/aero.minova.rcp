@@ -1,8 +1,13 @@
 package aero.minova.rcp.rcp.fields;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
+import javax.inject.Inject;
+
+import org.eclipse.core.runtime.ServiceCaller;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
@@ -12,14 +17,22 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class LookupField {
@@ -40,7 +53,10 @@ public class LookupField {
 		FormData labelFormData = new FormData();
 		FormData descriptionLabelFormData = new FormData();
 
-		field.setValueAccessor(new LookUpValueAccessor(field, detail, lookupControl));
+		IEclipseContext context = perspective.getContext();
+		LookUpValueAccessor lookUpValueAccessor = new LookUpValueAccessor(field, detail, lookupControl);
+		ContextInjectionFactory.inject(lookUpValueAccessor, context);
+		field.setValueAccessor(lookUpValueAccessor);
 
 		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		lookupFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
@@ -75,12 +91,47 @@ public class LookupField {
 			 * LookUpFelder eingetragen wurden
 			 */
 			public void mouseDown(MouseEvent e) {
-				Map<MPerspective, String> brokerObject = new HashMap<>();
-				brokerObject.put(perspective, field.getName());
-				broker.post(Constants.BROKER_WFCLOADALLLOOKUPVALUES, brokerObject);
+				requestLookUpEntriesAll(field, detail, lookupControl);
 			}
 		});
 		return lookupControl;
 	}
 
+	/**
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
+	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
+	 * dem benutzer zur verfügung gestellt.
+	 *
+	 * @param luc
+	 */
+	@Inject
+	@Optional
+	public static void requestLookUpEntriesAll(MField field, MDetail detail, LookupControl lookUpControl) {
+		String name = field.getName();
+		CompletableFuture<?> tableFuture;
+
+		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
+		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
+		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
+
+		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class,
+				ILocalDatabaseService.class);
+
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService,
+				"List");
+		lookUpControl.getTextControl().setText("...");
+		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
+			if (ta instanceof SqlProcedureResult) {
+				SqlProcedureResult sql = (SqlProcedureResult) ta;
+				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), sql.getResultSet());
+
+//					lookupUtil.changeOptionsForLookupField(sql.getResultSet(), lookUpControl, false);
+			} else if (ta instanceof Table) {
+				Table t = (Table) ta;
+				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
+//					lookupUtil.changeOptionsForLookupField(t, lookUpControl, false);
+			}
+			lookUpControl.getTextControl().setText("");
+		}));
+	}
 }

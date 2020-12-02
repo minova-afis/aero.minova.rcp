@@ -44,9 +44,9 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		if (value == null) {
 			((LookupControl) control).setText("");
 		} else {
-			((LookupControl) control).setData(Constants.CONTROL_KEYLONG, value.getIntegerValue());
-			((LookupControl) control).setData(Constants.CONTROL_DATATYPE, value.getType());
+			((LookupControl) control).getTextControl().setMessage("...");
 			getLookUpConsumer(control, value);
+
 		}
 	}
 
