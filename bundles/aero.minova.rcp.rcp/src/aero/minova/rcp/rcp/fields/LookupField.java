@@ -60,6 +60,7 @@ public class LookupField {
 		LookUpValueAccessor lookUpValueAccessor = new LookUpValueAccessor(field, detail, lookupControl);
 		ContextInjectionFactory.inject(lookUpValueAccessor, context);
 		field.setValueAccessor(lookUpValueAccessor);
+		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
 		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		lookupFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
@@ -82,7 +83,6 @@ public class LookupField {
 
 		lookupControl.setLayoutData(lookupFormData);
 		lookupControl.setDescription(descriptionLabel);
-		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
 
