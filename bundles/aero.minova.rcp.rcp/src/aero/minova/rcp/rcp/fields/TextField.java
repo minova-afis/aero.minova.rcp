@@ -34,7 +34,7 @@ public class TextField {
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
+				text.selectAll();
 			}
 		});
 
