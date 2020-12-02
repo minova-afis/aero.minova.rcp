@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
@@ -36,7 +37,7 @@ public class TextField {
 
 		int style = SWT.BORDER;
 		if (field.getNumberRowsSpanned() > 1) {
-			// Anwender hat mehrzeilige Eingabe definiert
+			// Maskenentwickler hat mehrzeilige Eingabe definiert
 			style |= SWT.MULTI;
 		}
 		Text text = formToolkit.createText(composite, "", style);
@@ -44,6 +45,17 @@ public class TextField {
 			@Override
 			public void focusGained(FocusEvent e) {
 				text.selectAll();
+			}
+		});
+		// Wenn der Anwender den Wert ändert, muss es weitergegeben werden
+		text.addModifyListener(e -> {
+			if (text.isFocusControl()) {
+				String newValue = text.getText();
+				if (newValue.length() < 1) {
+					field.setValue(null, true);
+				} else {
+					field.setValue(new Value(newValue), true);
+				}
 			}
 		});
 
