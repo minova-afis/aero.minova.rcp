@@ -26,7 +26,6 @@ import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
-import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -111,7 +110,6 @@ public class LookupField {
 	@Inject
 	@Optional
 	public static void requestLookUpEntriesAll(MField field, MDetail detail, LookupControl lookUpControl) {
-		String name = field.getName();
 		CompletableFuture<?> tableFuture;
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
@@ -129,11 +127,11 @@ public class LookupField {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), sql.getResultSet());
 
-//					lookupUtil.changeOptionsForLookupField(sql.getResultSet(), lookUpControl, false);
+				changeOptionsForLookupField(sql.getResultSet(), lookUpControl, false);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
-//					lookupUtil.changeOptionsForLookupField(t, lookUpControl, false);
+				changeOptionsForLookupField(t, lookUpControl, false);
 			}
 			lookUpControl.getTextControl().setText("");
 		}));
@@ -145,45 +143,46 @@ public class LookupField {
 	 * @param ta
 	 * @param c
 	 */
-	public void changeOptionsForLookupField(Table ta, Control c, boolean twisty) {
-		c.setData(Constants.CONTROL_OPTIONS, ta);
-		changeSelectionBoxList(c, twisty);
+	public static void changeOptionsForLookupField(Table ta, LookupControl lookupControl, boolean twisty) {
+		lookupControl.setData(Constants.CONTROL_OPTIONS, ta);
+		changeSelectionBoxList(lookupControl, twisty);
 	}
 
 	/**
-	 * Diese Mtethode setzt die den Ausgewählten Wert direkt in das Control oder lässt eine Liste aus möglichen Werten zur Auswahl erscheinen.
+	 * Diese Mtethode setzt die den Ausgewählten Wert direkt in das Control oder
+	 * lässt eine Liste aus möglichen Werten zur Auswahl erscheinen.
 	 *
-	 * @param c
+	 * @param lookUpControl
 	 */
-	public void changeSelectionBoxList(Control c, boolean twisty) {
-		if (c.getData(Constants.CONTROL_OPTIONS) != null) {
-			Table t = (Table) c.getData(Constants.CONTROL_OPTIONS);
-			LookupControl lc = (LookupControl) c;
-			Field field = (Field) c.getData(Constants.CONTROL_FIELD);
+	public static void changeSelectionBoxList(LookupControl lookUpControl, boolean twisty) {
+		if (lookUpControl.getData(Constants.CONTROL_OPTIONS) != null) {
+			Table t = (Table) lookUpControl.getData(Constants.CONTROL_OPTIONS);
 			// Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die
 			// Eingabe gleich dem gesuchten Wert ist.
 			// Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der Wert
 			// aus dem CAS als Option/Proposal aufgelistet
 			if (t.getRows().size() == 1) {
-				if (lc != null && lc.getText() != null && twisty == false) {
+				if (lookUpControl != null && lookUpControl.getText() != null && twisty == false) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-					if (value.getStringValue().equalsIgnoreCase(lc.getText().toString())) {
-						updateSelectedLookupEntry(t, c);
-						lc.setData(Constants.CONTROL_KEYLONG, t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
+					if (value.getStringValue().equalsIgnoreCase(lookUpControl.getText().toString())) {
+						updateSelectedLookupEntry(t, lookUpControl);
+						lookUpControl.setData(Constants.CONTROL_KEYLONG,
+								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
 					}
 					// Setzen der Proposals/Optionen
-					changeProposals((LookupControl) c, t);
+					changeProposals(lookUpControl, t);
 
 				} else {
-					updateSelectedLookupEntry(t, c);
+					updateSelectedLookupEntry(t, lookUpControl);
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					c.setData(Constants.CONTROL_KEYLONG, t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+					lookUpControl.setData(Constants.CONTROL_KEYLONG,
+							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
 					// Setzen der Proposals/Optionen
-					changeProposals((LookupControl) c, t);
+					changeProposals(lookUpControl, t);
 
 				}
 			} else {
-				if (lc != null && lc.getText() != null && twisty == false) {
+				if (lookUpControl != null && lookUpControl.getText() != null && twisty == false) {
 					// Aufbau einer gefilterten Tabelle, welche nur die Werte aus dem CAS enthält,
 					// die den Text im Field am Anfang stehen haben
 					Table filteredTable = new Table();
@@ -193,7 +192,8 @@ public class LookupField {
 					}
 					// Trifft der Text nicht überein, so wird auserdem die Description überprüft
 					for (Row r : t.getRows()) {
-						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase().startsWith(lc.getText().toLowerCase()))) {
+						if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.startsWith(lookUpControl.getText().toLowerCase()))) {
 							filteredTable.addRow(r);
 						} else if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 							if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
@@ -208,26 +208,27 @@ public class LookupField {
 					// Wert gesetzt
 					if (filteredTable.getRows().size() == 1
 							&& (filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-									.equals(lc.getText().toLowerCase()))
+									.equals(lookUpControl.getText().toLowerCase()))
 							|| (filteredTable.getRows().size() != 0
 									&& filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
 									&& filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue()
-											.toLowerCase().equals(lc.getText().toLowerCase()))) {
-						c.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
-						Display.getDefault().asyncExec(() -> updateSelectedLookupEntry(filteredTable, c));
-						changeProposals(lc, filteredTable);
+											.toLowerCase().equals(lookUpControl.getText().toLowerCase()))) {
+						lookUpControl.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
+								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+						Display.getDefault().asyncExec(() -> updateSelectedLookupEntry(filteredTable, lookUpControl));
+						changeProposals(lookUpControl, filteredTable);
 						// Setzen der Proposals/Optionen
 					} else if (filteredTable.getRows().size() != 0) {
-						changeProposals((LookupControl) lc, filteredTable);
-						lc.setData(Constants.CONTROL_KEYLONG, null);
+						changeProposals(lookUpControl, filteredTable);
+						lookUpControl.setData(Constants.CONTROL_KEYLONG, null);
 					} else {
-						changeProposals((LookupControl) lc, t);
-						lc.setData(Constants.CONTROL_KEYLONG, null);
+						changeProposals(lookUpControl, t);
+						lookUpControl.setData(Constants.CONTROL_KEYLONG, null);
 					}
 					// Setzen der Proposals/Optionen
 				} else {
-					changeProposals((LookupControl) lc, t);
-					lc.setData(Constants.CONTROL_KEYLONG, null);
+					changeProposals(lookUpControl, t);
+					lookUpControl.setData(Constants.CONTROL_KEYLONG, null);
 				}
 
 			}
@@ -240,12 +241,11 @@ public class LookupField {
 	 * @param c
 	 * @param t
 	 */
-	public void changeProposals(LookupControl lc, Table t) {
+	public static void changeProposals(LookupControl lc, Table t) {
 		lc.setProposals(t);
 	}
 
 	public static void updateSelectedLookupEntry(Table ta, Control c) {
-		System.out.println("Ich habe die Werte gesetzt");
 		Row r = ta.getRows().get(0);
 		LookupControl lc = (LookupControl) c;
 		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
