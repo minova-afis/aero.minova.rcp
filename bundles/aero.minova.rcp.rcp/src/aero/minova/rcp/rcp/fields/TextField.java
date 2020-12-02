@@ -9,6 +9,8 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -29,6 +31,13 @@ public class TextField {
 		Text text = formToolkit.createText(composite, "",
 				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
 		FieldUtil.addDataToText(text, field, DataType.STRING);
+
+		text.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				text.selectAll();
+			}
+		});
 
 		field.setValueAccessor(new TextValueAccessor(field, text));
 

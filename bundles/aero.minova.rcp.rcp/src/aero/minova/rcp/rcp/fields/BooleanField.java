@@ -16,14 +16,17 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.accessor.BooleanValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 
-public class WFCDetailFieldUtil {
+public class BooleanField {
 
-	public static Control createBooleanField(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		FormData formData = new FormData();
 		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
+
+		field.setValueAccessor(new BooleanValueAccessor(field, button));
 
 		formData.width = COLUMN_WIDTH;
 		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
@@ -33,7 +36,6 @@ public class WFCDetailFieldUtil {
 		button.setLayoutData(formData);
 		button.setData(Constants.CONTROL_FIELD, field);
 		button.setData(Constants.CONTROL_DATATYPE, DataType.BOOLEAN);
-//		FieldUtil.addConsumer(button, field);
 
 		return button;
 	}

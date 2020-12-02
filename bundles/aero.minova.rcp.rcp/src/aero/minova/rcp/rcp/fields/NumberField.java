@@ -14,6 +14,8 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import java.util.Locale;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -24,8 +26,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
-@SuppressWarnings("restriction")
 public class NumberField {
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
@@ -35,9 +37,17 @@ public class NumberField {
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
 		FieldUtil.addDataToText(text, field, DataType.DOUBLE);
-//		FieldUtil.addConsumer(text, field);
-//		text.setData(Constants.VALUE_ACCESSOR,
-//				new ValueAccessor(field.getSqlIndex().intValue(), field, text, DataType.DOUBLE));
+
+		text.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				text.selectAll();
+
+			}
+		});
+
+		field.setValueAccessor(new NumberValueAccessor(field, text));
+
 		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
