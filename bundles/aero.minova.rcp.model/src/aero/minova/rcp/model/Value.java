@@ -1,9 +1,11 @@
 package aero.minova.rcp.model;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
-public class Value {
+public class Value implements Serializable {
+	private static final long serialVersionUID = 202011291518L;
 
 	private final DataType type;
 	private final Object value;

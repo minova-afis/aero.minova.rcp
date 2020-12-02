@@ -14,6 +14,8 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import java.util.Locale;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -22,23 +24,28 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
-@SuppressWarnings("restriction")
 public class NumberField {
 
-	private NumberField() {
-	}
-
-	public static Control create(Composite composite, Field field, int row, int column, FormToolkit formToolkit,
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
 			Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
-		FieldUtil.addDataToText(text, field, DataType.DOUBLE);
-		FieldUtil.addConsumer(text, field);
+		// FieldUtil.addDataToText(text, field, DataType.DOUBLE);
+
+		text.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
+			}
+		});
+
+		field.setValueAccessor(new NumberValueAccessor(field, text));
+
 		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
@@ -59,19 +66,20 @@ public class NumberField {
 		label.setData(TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);
 
-		Integer decimals = field.getNumber().getDecimals();
+		Integer decimals = field.getDecimals();
 		decimals = decimals == null ? 0 : decimals;
-		Float maximum = field.getNumber().getMaxValue();
-		maximum = maximum == null ? Float.MAX_VALUE : maximum;
-		Float minimum = field.getNumber().getMinValue();
-		minimum = minimum == null ? Float.MIN_VALUE : maximum;
+		Double maximum = field.getMaximumValue();
+		maximum = maximum == null ? Double.MAX_VALUE : maximum;
+		Double minimum = field.getMinimumValue();
+		minimum = minimum == null ? Double.MIN_VALUE : maximum;
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.setData(FIELD_DECIMALS, decimals);
 		text.setData(FIELD_MAX_VALUE, maximum);
 		text.setData(FIELD_MIN_VALUE, minimum);
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
-		text.addVerifyListener(new NumberFieldVerifier(text));
+		// TODO SAW_ERC korrigieren NumberFieldVerifier
+		// text.addVerifyListener(new NumberFieldVerifier(text));
 
 		unit.setData(TRANSLATE_PROPERTY, unitText);
 		unit.setLayoutData(unitFormData);

@@ -23,7 +23,7 @@ public class NumberFieldUtil {
 	 */
 	public static void setMessage(Text text) {
 		int decimals = (int) text.getData(FieldUtil.FIELD_DECIMALS);
-		float maximum = (float) text.getData(FieldUtil.FIELD_MAX_VALUE);
+		double maximum = (double) text.getData(FieldUtil.FIELD_MAX_VALUE);
 		Locale locale = (Locale) text.getData(FieldUtil.TRANSLATE_LOCALE);
 
 		int integer = 0;

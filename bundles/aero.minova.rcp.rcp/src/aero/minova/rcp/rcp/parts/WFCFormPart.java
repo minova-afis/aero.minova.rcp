@@ -22,9 +22,6 @@ public abstract class WFCFormPart {
 	protected IDataService dataService;
 	protected Form form;
 
-	public WFCFormPart() {
-		super();
-	}
 
 	public Form getForm(Composite parent) {
 		form = perspective.getContext().get(Form.class);
