@@ -65,7 +65,12 @@ public class ShortTimeField {
 		text.setMessage(
 				LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 		text.setNumberOfLines(1);
+		// TODO SAW_ERC brauchen wird das hier?
+
 		text.setData(TRANSLATE_LOCALE, locale);
+
+		// TODO SAW_ERC funktioniert nicht sauber, wird von anderer Stelle zusätzlich
+		// getriggered
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {

@@ -12,7 +12,7 @@ import aero.minova.rcp.model.event.ValueChangeListener;
 
 /**
  * Modell eines Feldes im Detail oder auch im Index evtl. auch im SearchPart
- * 
+ *
  * @author saak
  */
 public abstract class MField {
@@ -43,34 +43,51 @@ public abstract class MField {
 
 	protected MField(int decimals) {
 		this.decimals = decimals;
-		if (decimals > 0) this.dataType = DataType.DOUBLE;
-		else this.dataType = DataType.INTEGER;
+		if (decimals > 0) {
+			this.dataType = DataType.DOUBLE;
+		} else {
+			this.dataType = DataType.INTEGER;
+		}
 	}
 
 	/**
 	 * Mit dieser Methode kann man einen Listener für Wertänderungen anhängen.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addValueChangeListener(ValueChangeListener listener) {
-		if (listener == null) return;
-		if (listeners == null) listeners = new ArrayList<>();
-		if (!listeners.contains(listener)) listeners.add(listener);
+		if (listener == null) {
+			return;
+		}
+		if (listeners == null) {
+			listeners = new ArrayList<>();
+		}
+		if (!listeners.contains(listener)) {
+			listeners.add(listener);
+		}
 	}
 
 	/**
 	 * Mit dieser Methode kann man einen Listener für Wertänderungen entfernen.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void removeValueChangeListener(ValueChangeListener listener) {
-		if (listener == null) return;
-		if (listeners == null) return;
-		if (listeners.contains(listener)) listeners.remove(listener);
+		if (listener == null) {
+			return;
+		}
+		if (listeners == null) {
+			return;
+		}
+		if (listeners.contains(listener)) {
+			listeners.remove(listener);
+		}
 	}
 
 	protected void fire(ValueChangeEvent event) {
-		if (listeners == null) return;
+		if (listeners == null) {
+			return;
+		}
 		for (ValueChangeListener listener : listeners) {
 			listener.valueChange(event);
 		}
@@ -81,28 +98,36 @@ public abstract class MField {
 	}
 
 	public void setValue(Value value, boolean user) {
-		if (displayValue == value) return; // auch true, wenn beide null sind
-		if (value != null && value.equals(this.displayValue)) return;
+		if (displayValue == value) {
+			return; // auch true, wenn beide null sind
+		}
+		if (value != null && value.equals(this.displayValue)) {
+			return;
+		}
 		checkDataType(value);
 
 		Value oldValue = this.fieldValue;
 		this.fieldValue = value;
-		if (getValueAccessor() != null) displayValue = getValueAccessor().setValue(value, user);
+		if (getValueAccessor() != null) {
+			displayValue = getValueAccessor().setValue(value, user);
+		}
 		fire(new ValueChangeEvent(this, oldValue, value, user));
 	}
 
 	/**
 	 * Der Datentyp muss geprüft werden, bevor er gesetzt werden darf.
-	 * 
-	 * @param value
-	 *            zu prüfender Datentyp
-	 * @throws IllegalArgumentException
-	 *             Wenn der Typ ungültig für das Feld ist.
+	 *
+	 * @param value zu prüfender Datentyp
+	 * @throws IllegalArgumentException Wenn der Typ ungültig für das Feld ist.
 	 */
 	protected void checkDataType(Value value) {
-		if (value == null) return;
-		if (value.getType() != getDataType())
-			throw new IllegalArgumentException("Value of field " + getName() + " must be of type " + getDataType().toString() + "!");
+		if (value == null) {
+			return;
+		}
+		if (value.getType() != getDataType()) {
+			throw new IllegalArgumentException(
+					"Value of field " + getName() + " must be of type " + getDataType().toString() + "!");
+		}
 	}
 
 	public void setName(String name) {
@@ -202,7 +227,9 @@ public abstract class MField {
 	}
 
 	public void addLookupParameter(String fieldname) {
-		if (lookupParameters == null) lookupParameters = new ArrayList<>();
+		if (lookupParameters == null) {
+			lookupParameters = new ArrayList<>();
+		}
 		lookupParameters.add(fieldname);
 	}
 
@@ -211,7 +238,8 @@ public abstract class MField {
 	}
 
 	/**
-	 * Wenn das Feld anzeigen soll, dass wir auf Daten warten, muss dieses Methode aufgerufen werden. Dabei wird auch der Wert
+	 * Wenn das Feld anzeigen soll, dass wir auf Daten warten, muss dieses Methode
+	 * aufgerufen werden. Dabei wird auch der Wert
 	 * {@link #setValue(Value, boolean)}} auf null gesetzt.
 	 */
 	public void indicateWaiting() {

@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
@@ -36,7 +35,7 @@ public class NumberField {
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
-		FieldUtil.addDataToText(text, field, DataType.DOUBLE);
+		// FieldUtil.addDataToText(text, field, DataType.DOUBLE);
 
 		text.addFocusListener(new FocusAdapter() {
 			@Override
