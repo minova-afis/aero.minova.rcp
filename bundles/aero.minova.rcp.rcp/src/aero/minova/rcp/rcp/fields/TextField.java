@@ -8,6 +8,8 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.util.Locale;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -25,7 +27,8 @@ import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
 public class TextField {
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
+			Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "",
@@ -35,7 +38,7 @@ public class TextField {
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.selectAll();
+				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
 			}
 		});
 
@@ -59,6 +62,7 @@ public class TextField {
 		if (field.getNumberRowsSpanned() > 1) {
 			textFormData.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
 		}
+
 
 		label.setData(TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);

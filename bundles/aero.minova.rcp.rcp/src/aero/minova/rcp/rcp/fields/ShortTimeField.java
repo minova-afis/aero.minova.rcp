@@ -69,7 +69,7 @@ public class ShortTimeField {
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.selectAll();
+				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
 			}
 		});
 
