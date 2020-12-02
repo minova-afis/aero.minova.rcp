@@ -19,4 +19,5 @@ Service-Component: OSGI-INF/aero.minova.workingtime.helper.WorkingTimeHelper.xml
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.swt;bundle-version="3.115.0",
  aero.minova.rcp.model,
- aero.minova.rcp.form.model
+ aero.minova.rcp.form.model,
+ org.eclipse.osgi.services;bundle-version="3.9.0";resolution:=optional
