@@ -50,7 +50,6 @@ import aero.minova.rcp.model.builder.RowBuilder;
 public class DataService implements IDataService {
 
 	private static final boolean LOG = true;
-	private HttpRequest request;
 	private HttpClient httpClient;
 	private Gson gson;
 
@@ -97,7 +96,7 @@ public class DataService implements IDataService {
 		String body = gson.toJson(seachTable);
 		logBody(body);
 
-		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
@@ -114,7 +113,7 @@ public class DataService implements IDataService {
 		init();
 		String body = gson.toJson(detailTable);
 		logBody(body);
-		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
@@ -155,7 +154,7 @@ public class DataService implements IDataService {
 		init();
 		String body = gson.toJson(detailTable);
 		logBody(body);
-		request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
@@ -235,7 +234,7 @@ public class DataService implements IDataService {
 	@Override
 	public File getFileSynch(String localPath, String filename) {
 		init();
-		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
 
@@ -257,7 +256,7 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<String> getFile(String filename) {
 		init();
-		request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
