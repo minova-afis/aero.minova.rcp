@@ -45,8 +45,12 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	}
 
 	protected void calculateTime() {
-		if (startDate.getValue() == null) return;
-		if (endDate.getValue() == null) return;
+		if (startDate.getValue() == null) {
+			return;
+		}
+		if (endDate.getValue() == null) {
+			return;
+		}
 
 		Instant start = startDate.getValue().getInstantValue();
 		Instant end = endDate.getValue().getInstantValue();
@@ -83,7 +87,9 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	@Override
 	public void valueChange(ValueChangeEvent event) {
-		if (!event.isUser()) return;
+		if (!event.isUser()) {
+			return;
+		}
 		System.out.println(event.getField().getName());
 		calculateTime();
 	}
