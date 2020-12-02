@@ -61,10 +61,10 @@ import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
+import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.util.WFCDetailUtil;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
@@ -100,8 +100,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private MDetail detail = new MDetail();
 
-	private WFCDetailUtil wfcDetailUtil = null;
-
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
 	private TranslationService translationService;
@@ -126,7 +124,6 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
 		// TODO SAW_ERC
 //		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
 		casRequestsUtil.setControls(detail, perspective, localDatabaseService);
@@ -258,9 +255,11 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private MField getMFieldOf(Field field) {
 		MField f;
-		if (field.getBoolean() != null) f = new MBooleanField();
-		else if (field.getDateTime() != null) f = new MDateTimeField();
-		else if (field.getLookup() != null) {
+		if (field.getBoolean() != null) {
+			f = new MBooleanField();
+		} else if (field.getDateTime() != null) {
+			f = new MDateTimeField();
+		} else if (field.getLookup() != null) {
 			f = new MLookupField();
 			f.setLookupTable(field.getLookup().getTable());
 			f.setLookupProcedurePrefix(field.getLookup().getProcedurePrefix());
@@ -269,21 +268,33 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 		} else if (field.getNumber() != null) {
 			f = new MNumberField(field.getNumber().getDecimals());
-			if (field.getNumber().getMaxValue() != null) f.setMaximumValue(field.getNumber().getMaxValue().doubleValue());
-			if (field.getNumber().getMinValue() != null) f.setMinimumValue(field.getNumber().getMinValue().doubleValue());
-		} else if (field.getShortDate() != null) f = new MShortDateField();
-		else if (field.getShortTime() != null) f = new MShortTimeField();
-		else if (field.getText() != null) {
+			if (field.getNumber().getMaxValue() != null) {
+				f.setMaximumValue(field.getNumber().getMaxValue().doubleValue());
+			}
+			if (field.getNumber().getMinValue() != null) {
+				f.setMinimumValue(field.getNumber().getMinValue().doubleValue());
+			}
+		} else if (field.getShortDate() != null) {
+			f = new MShortDateField();
+		} else if (field.getShortTime() != null) {
+			f = new MShortTimeField();
+		} else if (field.getText() != null) {
 			f = new MTextField();
 			f.setFillToRight("toright".equals(field.getFill()));
-		} else return null;
+		} else {
+			return null;
+		}
 
 		f.setName(field.getName());
 		f.setLabel(field.getLabel());
 		f.setUnitText(field.getUnitText());
 		f.setSqlIndex(field.getSqlIndex().intValue());
-		if (field.getNumberColumnsSpanned() != null) f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
-		if (field.getNumberRowsSpanned() != null) f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
+		if (field.getNumberColumnsSpanned() != null) {
+			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
+		}
+		if (field.getNumberRowsSpanned() != null) {
+			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
+		}
 		return f;
 	}
 
@@ -318,7 +329,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MLookupField) {
 			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService, detail);
 		} else if (field instanceof MTextField) {
-			WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
+			TextField.create(composite, field, row, column, formToolkit);
 		}
 	}
 
@@ -378,7 +389,7 @@ public class WFCDetailPart extends WFCFormPart {
 	@Optional
 	public void requestLookUpEntriesAll(@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
 		if (map.get(perspective) != null) {
-			String name = map.get(perspective);
+//			String name = map.get(perspective);
 			// TODO SAW_ERC
 //			Control control = controls.get(name);
 //			if (control instanceof LookupControl) {
