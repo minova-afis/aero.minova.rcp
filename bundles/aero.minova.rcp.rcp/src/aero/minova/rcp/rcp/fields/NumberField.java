@@ -80,7 +80,8 @@ public class NumberField {
 		text.setData(FIELD_MIN_VALUE, minimum);
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
-		text.addVerifyListener(new NumberFieldVerifier(text));
+		// TODO SAW_ERC korrigieren NumberFieldVerifier
+		// text.addVerifyListener(new NumberFieldVerifier(text));
 
 		unit.setData(TRANSLATE_PROPERTY, unitText);
 		unit.setLayoutData(unitFormData);
