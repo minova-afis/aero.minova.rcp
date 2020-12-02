@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.parts;
+package aero.minova.rcp.rcp.accessor;
 
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -42,25 +42,32 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		System.out.println("setValue.isFocussed = " + isFocussed() + "; value = " + value);
 
 		// Wenn der Focus auf dem Control liegt, setzen wir keinen Wert
-		if (isFocussed()) return getDisplayValue();
+		if (isFocussed()) {
+			return getDisplayValue();
+		}
+
 
 		updateControlFromValue(control, value);
 		setDisplayValue(value);
 		return value;
 	}
 
+	@Override
 	public void setValue(Row row) {
 		Value value = row.getValue(field.getSqlIndex());
 		field.setValue(value, false);
 	}
 
+	@Override
 	public boolean isFocussed() {
 		return focussed;
 	}
 
 	public void setFocussed(boolean focussed) {
 		this.focussed = focussed;
-		if (!focussed) setValue(field.getValue(), false);
+		if (!focussed) {
+			setValue(field.getValue(), false);
+		}
 	}
 
 	public Value getDisplayValue() {

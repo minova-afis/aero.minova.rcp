@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.parts;
+package aero.minova.rcp.rcp.accessor;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 
