@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.parts;
+package aero.minova.rcp.rcp.accessor;
 
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
