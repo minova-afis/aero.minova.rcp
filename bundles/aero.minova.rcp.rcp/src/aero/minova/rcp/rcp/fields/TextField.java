@@ -25,12 +25,17 @@ import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 public class TextField {
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
+
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "",
-				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
-		// FieldUtil.addDataToText(text, field, DataType.STRING);
+		label.setData(TRANSLATE_PROPERTY, labelText);
 
+		int style = SWT.BORDER;
+		if (field.getNumberRowsSpanned() > 1) {
+			// Anwender hat mehrzeilige Eingabe definiert
+			style |= SWT.MULTI;
+		}
+		Text text = formToolkit.createText(composite, "", style);
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -59,20 +64,10 @@ public class TextField {
 			textFormData.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
 		}
 
-		label.setData(TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);
 
 		text.setLayoutData(textFormData);
 
 		return text;
-
 	}
-
-	private static int getExtraHeight(MField field) {
-		if (field.getNumberRowsSpanned() > 1) {
-			return field.getNumberRowsSpanned() - 1;
-		}
-		return 0;
-	}
-
 }
