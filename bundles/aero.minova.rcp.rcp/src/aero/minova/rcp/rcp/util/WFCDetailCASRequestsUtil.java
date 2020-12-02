@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -243,88 +244,43 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
-//		if (perspective == this.perspective) {
-//			Table formTable = null;
-//			RowBuilder rb = RowBuilder.newRow();
-//
-//			if (getKeys() != null) {
-//				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
-//			} else {
-//				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
-//			}
-//			int valuePosition = 0;
-//			if (getKeys() != null) {
-//				for (ArrayList key : getKeys()) {
-//					rb.withValue(key.get(1));
-//					valuePosition++;
-//				}
-//			} else {
-//				List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
-//				for (Field f : keyList) {
-//					rb.withValue(null);
-//					valuePosition++;
-//				}
-//
-//			}
-//			while (valuePosition < formTable.getColumnCount()) {
-//				int i = 0;
-//				for (Control c : controls.values()) {
-//					String s = (String) controls.keySet().toArray()[i];
-//					if (s.equals(formTable.getColumnName(valuePosition))) {
-//						if (c instanceof Text) {
-//							if (!(((Text) c).getText().isBlank())) {
-//								rb.withValue(((Text) c).getText());
-//							} else {
-//								rb.withValue(null);
-//
-//							}
-//						}
-//						if (c instanceof LookupControl) {
-//							if (c.getData(Constants.CONTROL_KEYLONG) != null) {
-//								rb.withValue(c.getData(Constants.CONTROL_KEYLONG));
-//							} else {
-//								rb.withValue(null);
-//							}
-//						}
-//					}
-//					i++;
-//				}
-//				valuePosition++;
-//			}
-//
-//			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
-//			// Row-Wertes ermittelt und der Row angefügt
-//			Row r = rb.create();
-//			List<Field> formFields = dataFormService.getFieldsFromForm(form);
-//			if (controls.size() < formTable.getColumnCount()) {
-//				for (int i = r.size(); i < formTable.getColumnCount(); i++) {
-//					for (Field f : formFields) {
-//						if (f.getName().equals(formTable.getColumnName(i))) {
-//							if (ValueBuilder.value(f).getDataType() == DataType.BOOLEAN) {
-//								r.addValue(new Value(Boolean.valueOf(f.getDefault()), DataType.BOOLEAN));
-//							} else if (ValueBuilder.value(f).getDataType() == DataType.DOUBLE) {
-//								r.addValue(new Value(Double.valueOf(f.getDefault()), DataType.DOUBLE));
-//							} else if (ValueBuilder.value(f).getDataType() == DataType.INTEGER) {
-//								r.addValue(new Value(Integer.valueOf(f.getDefault()), DataType.INTEGER));
-//							} else {
-//								r.addValue(new Value(f.getDefault(), ValueBuilder.value(f).getDataType()));
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//			formTable.addRow(r);
-//
-////			checkWorkingTime(getTextFromControl(Constants.FORM_BOOKINGDATE),
-////					getTextFromControl(Constants.FORM_STARTDATE), //
-////					getTextFromControl(Constants.FORM_ENDDATE), //
-////					getTextFromControl(Constants.FORM_RENDEREDQUANTITY), //
-////					getTextFromControl(Constants.FORM_CHARGEDQUANTITY), //
-////					formTable, //
-////					r);
-//			sendSaveRequest(formTable, true);
-//		}
+		if (perspective == this.perspective) {
+			Table formTable = null;
+			RowBuilder rb = RowBuilder.newRow();
+
+			if (getKeys() != null) {
+				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
+			} else {
+				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
+			}
+			int valuePosition = 0;
+			if (getKeys() != null) {
+				for (ArrayList key : getKeys()) {
+					rb.withValue(key.get(1));
+					valuePosition++;
+				}
+			} else {
+				List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
+				for (Field f : keyList) {
+					rb.withValue(null);
+					valuePosition++;
+				}
+
+			}
+			while (valuePosition < formTable.getColumnCount()) {
+				MField field = detail.getField(formTable.getColumnName(valuePosition));
+				if (field != null) {
+					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
+				}
+				valuePosition++;
+			}
+
+			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
+			// Row-Wertes ermittelt und der Row angefügt
+			Row r = rb.create();
+			formTable.addRow(r);
+			sendSaveRequest(formTable);
+		}
 	}
 
 //	/**
@@ -392,57 +348,57 @@ public class WFCDetailCASRequestsUtil {
 //		sendSaveRequest(t, contradiction);
 //	}
 
-//	private void sendSaveRequest(Table t, boolean contradiction) {
-//		if (t.getRows() != null && contradiction != true) {
-//			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-//			if (Objects.isNull(getKeys())) {
-//				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-//					checkNewEntryInsert(tr);
-//				}));
-//			} else {
-//				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-//					checkEntryUpdate(tr);
-//				}));
-//			}
-//		} else {
-//			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
-//					shell);
-//			notificationPopUp.open();
-//		}
-//	}
+	private void sendSaveRequest(Table t) {
+		if (t.getRows() != null) {
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			if (Objects.isNull(getKeys())) {
+				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+					checkNewEntryInsert(tr);
+				}));
+			} else {
+				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+					checkEntryUpdate(tr);
+				}));
+			}
+		} else {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
+					shell);
+			notificationPopUp.open();
+		}
+	}
 
-//	/**
-//	 * Überprüft. ob das Update erfolgreich war
-//	 *
-//	 * @param responce
-//	 */
-//	private void checkEntryUpdate(SqlProcedureResult responce) {
-//		// Wenn es Hier negativ ist dann haben wir einen Fehler
-//		if (responce.getReturnCode() == -1) {
-//			openNotificationPopup("Entry could not be updated:" + responce.getResultSet());
-//		} else {
-//			openNotificationPopup("Sucessfully updated the entry");
-//			Map<MPerspective, String> map = new HashMap<>();
-//			map.put(perspective, Constants.UPDATE_REQUEST);
-//			clearFields(map);
-//		}
-//	}
+	/**
+	 * Überprüft. ob das Update erfolgreich war
+	 *
+	 * @param responce
+	 */
+	private void checkEntryUpdate(SqlProcedureResult responce) {
+		// Wenn es Hier negativ ist dann haben wir einen Fehler
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be updated:" + responce.getResultSet());
+		} else {
+			openNotificationPopup("Sucessfully updated the entry");
+			Map<MPerspective, String> map = new HashMap<>();
+			map.put(perspective, Constants.UPDATE_REQUEST);
+			clearFields(map);
+		}
+	}
 
-//	/**
-//	 * Überprüft, ob der neue Eintrag erstellt wurde
-//	 *
-//	 * @param responce
-//	 */
-//	private void checkNewEntryInsert(SqlProcedureResult responce) {
-//		if (responce.getReturnCode() == -1) {
-//			openNotificationPopup("Entry could not be added:" + responce.getResultSet());
-//		} else {
-//			openNotificationPopup("Sucessfully added the entry");
-//			Map<MPerspective, String> map = new HashMap<>();
-//			map.put(perspective, Constants.INSERT_REQUEST);
-//			clearFields(map);
-//		}
-//	}
+	/**
+	 * Überprüft, ob der neue Eintrag erstellt wurde
+	 *
+	 * @param responce
+	 */
+	private void checkNewEntryInsert(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be added:" + responce.getResultSet());
+		} else {
+			openNotificationPopup("Sucessfully added the entry");
+			Map<MPerspective, String> map = new HashMap<>();
+			map.put(perspective, Constants.INSERT_REQUEST);
+			clearFields(map);
+		}
+	}
 
 //	/**
 //	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
@@ -505,75 +461,18 @@ public class WFCDetailCASRequestsUtil {
 		notificationPopUp.open();
 	}
 
-//	/**
-//	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
-//	 *
-//	 * @param origin
-//	 */
-//	@Optional
-//	@Inject
-//	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
-//		if (map.get(perspective) != null) {
-//			String origin = map.get(perspective);
-//			for (Control c : controls.values()) {
-//				if (c instanceof Text) {
-//					Text t = (Text) c;
-//					if (origin.equals(Constants.DELETE_REQUEST)) {
-//						t.setText("");
-//					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_BOOKINGDATE).getData(Constants.CONTROL_FIELD)) {
-//						SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-//						Date date = new Date(System.currentTimeMillis());
-//						t.setText(formatter.format(date));
-//					} else if (c.getData(Constants.CONTROL_FIELD) == controls.get(Constants.FORM_STARTDATE).getData(Constants.CONTROL_FIELD)) {
-//						Text endDate = (Text) controls.get(Constants.FORM_ENDDATE);
-//						if (endDate.getText() != "" && !origin.equals(Constants.CLEAR_REQUEST)) {
-//							lastEndDate = endDate.getText();
-//						}
-//						t.setText(lastEndDate);
-//					} else {
-//						Field f = (Field) c.getData(Constants.CONTROL_FIELD);
-//						t.setText("");
-//
-//					}
-//				}
-//
-//				if (c instanceof LookupControl) {
-//					LookupControl lc = (LookupControl) c;
-//					lc.setText("");
-//					lc.setData(Constants.CONTROL_KEYLONG, null);
-//					lc.getDescription().setText("");
-//				}
-//				setKeys(null);
-//			}
-//			/*
-//			 * Nachdem alle felder bereinigt wurden wird der benutzer auf dem wert aus den preferences gesetzt. Hierfür wird eine frische Anfrage an den CAS
-//			 * versendet um zu gewährleisten, das wir diesen Eintrag auch derzeit in der Anwendung haben
-//			 */
-//			if (!origin.equals(Constants.DELETE_REQUEST)) {
-//				LookupControl lc = (LookupControl) controls.get(Constants.EMPLOYEEKEY);
-//				lc.setText(employee);
-//				CompletableFuture<?> tableFuture;
-//				// TODO SAW_ERC MDetail
-//				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, (Field) lc.getData(Constants.CONTROL_FIELD), MDetail, dataService, "List");
-//				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-//					if (ta instanceof Table) {
-//						Table t1 = (Table) ta;
-//						for (Row r : t1.getRows()) {
-//							if (r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase().equals(employee.toLowerCase())) {
-//								lc.setText(r.getValue(t1.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
-//								if (r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-//									lc.getDescription().setText(r.getValue(t1.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
-//								}
-//								lc.setData(Constants.CONTROL_KEYLONG, r.getValue(t1.getColumnIndex(Constants.TABLE_KEYLONG)));
-//							}
-//						}
-//						// changeOptionsForLookupField(t1, lc, true);
-//					}
-//
-//				}));
-//			}
-//		}
-//	}
+	/**
+	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
+	 *
+	 * @param origin
+	 */
+	@Optional
+	@Inject
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
+		for (MField f : detail.getFields()) {
+			f.setValue(null, false);
+		}
+	}
 
 //	/**
 //	 * Antworten des CAS für Ticketnummern werden hier ausgelesen, so das sie wie bei einem Aufruf in der Index-Tabelle ausgewertet werden können
