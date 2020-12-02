@@ -42,7 +42,6 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -52,6 +51,7 @@ import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
+import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
@@ -231,7 +231,7 @@ public class WFCDetailPart extends WFCFormPart {
 				continue; // erst einmal nur Felder
 			}
 			Field field = (Field) fieldOrGrid;
-			MField f = getMFieldOf(field);
+			MField f = ModelToViewModel.convert(field);
 			detail.putField(f);
 
 			if (!field.isVisible()) {
@@ -252,50 +252,6 @@ public class WFCDetailPart extends WFCFormPart {
 		addBottonMargin(composite, row + 1, column);
 	}
 
-	private MField getMFieldOf(Field field) {
-		MField f;
-		if (field.getBoolean() != null) {
-			f = new MBooleanField();
-		} else if (field.getDateTime() != null) {
-			f = new MDateTimeField();
-		} else if (field.getLookup() != null) {
-			f = new MLookupField();
-			f.setLookupTable(field.getLookup().getTable());
-			f.setLookupProcedurePrefix(field.getLookup().getProcedurePrefix());
-			for (TypeParam typeParam : field.getLookup().getParam()) {
-				f.addLookupParameter(typeParam.getFieldName());
-			}
-		} else if (field.getNumber() != null) {
-			f = new MNumberField(field.getNumber().getDecimals());
-			if (field.getNumber().getMaxValue() != null) {
-				f.setMaximumValue(field.getNumber().getMaxValue().doubleValue());
-			}
-			if (field.getNumber().getMinValue() != null) {
-				f.setMinimumValue(field.getNumber().getMinValue().doubleValue());
-			}
-		} else if (field.getShortDate() != null) {
-			f = new MShortDateField();
-		} else if (field.getShortTime() != null) {
-			f = new MShortTimeField();
-		} else if (field.getText() != null) {
-			f = new MTextField();
-			f.setFillToRight("toright".equals(field.getFill()));
-		} else {
-			return null;
-		}
-
-		f.setName(field.getName());
-		f.setLabel(field.getLabel());
-		f.setUnitText(field.getUnitText());
-		f.setSqlIndex(field.getSqlIndex().intValue());
-		if (field.getNumberColumnsSpanned() != null) {
-			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
-		}
-		if (field.getNumberRowsSpanned() != null) {
-			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
-		}
-		return f;
-	}
 
 	private int getExtraHeight(Field field) {
 		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
