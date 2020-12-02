@@ -78,7 +78,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setControls(MDetail detail, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
+	public void setDetail(MDetail detail, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
 		this.detail = detail;
 		this.perspective = perspective;
 		this.localDatabaseService = localDatabaseService;
