@@ -24,6 +24,10 @@ import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
 public class TextField {
 
+	private TextField() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
@@ -54,8 +58,7 @@ public class TextField {
 
 		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2
-				&& field.isFillToRight()) {
+		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2 && field.isFillToRight()) {
 			textFormData.width = COLUMN_WIDTH * 3 + MARGIN_LEFT * 2 + MARGIN_BORDER;
 		} else {
 			textFormData.width = TEXT_WIDTH;

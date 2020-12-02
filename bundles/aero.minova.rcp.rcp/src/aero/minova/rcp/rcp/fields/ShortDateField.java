@@ -36,6 +36,10 @@ import aero.minova.rcp.rcp.util.DateTimeUtil;
 
 public class ShortDateField {
 
+	private ShortDateField() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();

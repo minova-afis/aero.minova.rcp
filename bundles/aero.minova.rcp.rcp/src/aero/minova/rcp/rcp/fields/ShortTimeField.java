@@ -36,6 +36,10 @@ import aero.minova.rcp.rcp.util.TimeUtil;
 
 public class ShortTimeField {
 
+	private ShortTimeField() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
 			Locale locale, String timezone) {
 
