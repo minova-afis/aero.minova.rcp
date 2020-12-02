@@ -56,13 +56,13 @@ import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.helper.IHelper;
+import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
@@ -126,7 +126,7 @@ public class WFCDetailPart extends WFCFormPart {
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		// TODO SAW_ERC
 //		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setControls(detail, perspective, localDatabaseService);
+		casRequestsUtil.setDetail(detail, perspective, localDatabaseService);
 	}
 
 	private static class HeadOrPageWrapper {
@@ -317,7 +317,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void createField(Composite composite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
-			WFCDetailFieldUtil.createBooleanField(composite, field, row, column, formToolkit);
+			BooleanField.create(composite, field, row, column, formToolkit, locale);
 		} else if (field instanceof MNumberField) {
 			NumberField.create(composite, field, row, column, formToolkit, locale);
 		} else if (field instanceof MDateTimeField) {
