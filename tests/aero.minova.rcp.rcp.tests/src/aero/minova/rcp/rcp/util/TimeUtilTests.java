@@ -17,56 +17,55 @@ import org.junit.Test;
 public class TimeUtilTests {
 	@Test
 	public void testGetTimeString1_59() {
-		Instant instant = LocalDate.of(1900, JANUARY, 1).atTime(1, 59).toInstant(ZoneOffset.UTC);
-
+		Instant instant = LocalDateTime.of(1900, JANUARY, 1, 1, 59).toInstant(ZoneOffset.UTC);
 		assertEquals("01:59", TimeUtil.getTimeString(instant, Locale.GERMANY));
 	}
 
 	@Test
 	public void testGetTime1() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(1).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(bithday, "1"));
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 1, 0).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "1"));
 	}
 
 	@Test
 	public void testGetTime12() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(12).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(bithday, "12"));
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 12, 0).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "12"));
 	}
 
 	@Test
 	public void testGetTime123() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(12).plusMinutes(30).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(bithday, "123"));
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 12, 30).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "123"));
 	}
 
 	@Test
 	public void testGetTime1234() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(12).plusMinutes(34).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(bithday, "1234"));
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 12, 34).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "1234"));
 	}
 
 	@Test
 	public void testGetTimePlus() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(1).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(bithday, "+"));
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 1, 0).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "+"));
 	}
 
 	@Test
 	public void testGetTime7Plus1Hour() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
+		Instant bithday = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(8).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(bithday, "7+1h"));
 	}
 
 	@Test
 	public void testGetTime7Plus8HourMinus2Minutes() {
-		Instant bithday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
+		Instant bithday = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(15).minusMinutes(2).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(bithday, "7+8h-2m"));
 	}
@@ -81,30 +80,29 @@ public class TimeUtilTests {
 
 	@Test
 	public void testGetTime0Plus() {
-		Instant birthday = LocalDate.of(1900, JANUARY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(1).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(birthday, "0+"));
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 1, 0).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "0+"));
 	}
 
 	@Test
 	public void testGetDateWithoutSeconds() {
-		Instant now = Instant.now();
-		Instant expected = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).withYear(1900).withMonth(1).withDayOfMonth(1).truncatedTo(ChronoUnit.MINUTES)
-				.toInstant(ZoneOffset.UTC);
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 6, 7, 8, 9).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 6, 7).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(now, "0"));
 	}
 
 	@Test
 	public void testEmptyString() {
-		Instant today = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant result = TimeUtil.getTime(today, "");
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 6, 7, 8, 9).toInstant(ZoneOffset.UTC);
+		Instant result = TimeUtil.getTime(now, "");
 		assertNull(result);
 	}
 
 	@Test
 	public void test2Plus2() {
-		Instant today = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC);
-		Instant result = TimeUtil.getTime(today, "2+2");
+		Instant now = LocalDateTime.of(1900, JANUARY, 2, 6, 7, 8, 9).toInstant(ZoneOffset.UTC);
+		Instant result = TimeUtil.getTime(now, "2+2");
 		assertNull(result);
 	}
 
