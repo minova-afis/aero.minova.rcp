@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 public class TimeUtil {
 
+
 	private static String hour = "h";
 	private static String minute = "m";
 	private static String shortcuts = hour + minute;
@@ -67,10 +68,10 @@ public class TimeUtil {
 			return null;
 		} else {
 			today = getTimeFromNumbers(today, input, "UTC");
+
 		}
 		return today;
 	}
-
 	static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
@@ -131,6 +132,7 @@ public class TimeUtil {
 			if (!matcher.find()) {
 				if (splits[0].equals("0")) {
 					lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+
 				} else {
 					Instant givenInstant = getTimeFromNumbers(instant, splits[0], timezone);
 					lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
@@ -150,8 +152,9 @@ public class TimeUtil {
 		}
 		lt = lt.truncatedTo(ChronoUnit.MINUTES);
 		lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
-		if (correctInput == true) {
-			instant = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
+		if (correctInput) {
+			instant = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
+
 		} else {
 			instant = null;
 		}
@@ -160,7 +163,7 @@ public class TimeUtil {
 	}
 		return instant;
 	}
-
+  
 	static LocalDateTime addRelativeDate(LocalDateTime time, String input) {
 		String regex = "([+-]+)([0-9]*)([" + shortcuts + "])";
 		Pattern pattern = Pattern.compile(regex);
@@ -196,6 +199,7 @@ public class TimeUtil {
 
 	private static Instant getTimeFromNumbers(Instant givenInstant, String subString, String timezone) {
 
+
 		Integer hours = 0;
 		Integer minutes = 0;
 		String[] subStrings = subString.split(":");
@@ -219,11 +223,8 @@ public class TimeUtil {
 		if (minutes > 59) {
 			return null;
 		}
-		LocalTime localTime = LocalTime.of(hours, minutes);
-		LocalDate localDate = LocalDate.ofInstant(givenInstant, ZoneId.of(timezone));
-		localDate = localDate.withYear(1900).withMonth(1).withDayOfMonth(1);
-		LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-		Instant instant = localDateTime.toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
+		LocalDateTime localDateTime = LocalDateTime.now().withHour(hours).withMinute(minutes).withSecond(0);
+		Instant instant = localTime.atDate(LocalDate.of(1900, 1, 1)).toInstant(ZoneId.of("UTC").getRules().getOffset(localDateTime));
 		return instant;
 	}
 

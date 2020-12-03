@@ -36,6 +36,10 @@ import aero.minova.rcp.rcp.util.DateTimeUtil;
 
 public class ShortDateField {
 
+	private ShortDateField() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
@@ -66,7 +70,7 @@ public class ShortDateField {
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
+				text.selectAll();
 			}
 		});
 
