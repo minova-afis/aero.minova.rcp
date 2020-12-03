@@ -47,7 +47,7 @@ public class ShortTimeField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant time = TimeUtil.getTime(entry, timezone);
+				Instant time = TimeUtil.getTime(entry);
 				if (time == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 					field.setValue(null, true);
