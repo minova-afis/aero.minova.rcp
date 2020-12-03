@@ -207,7 +207,7 @@ public class WFCIndexPart extends WFCFormPart {
 						if (field.getShortDate() != null) {
 							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
 						} else if (field.getShortTime() != null) {
-							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale, "UTC"), DataType.STRING), i);
+							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
 						}
 					}
 				}

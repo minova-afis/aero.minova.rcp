@@ -19,7 +19,7 @@ public class TimeUtilTests {
 	public void testGetTimeString1_59() {
 		Instant instant = LocalDate.of(1900, JANUARY, 1).atTime(1, 59).toInstant(ZoneOffset.UTC);
 
-		assertEquals("01:59", TimeUtil.getTimeString(instant, Locale.GERMANY, "UTC"));
+		assertEquals("01:59", TimeUtil.getTimeString(instant, Locale.GERMANY));
 	}
 
 	@Test

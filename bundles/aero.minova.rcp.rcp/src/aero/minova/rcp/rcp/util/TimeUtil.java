@@ -59,7 +59,7 @@ public class TimeUtil {
 	public static Instant getTime(Instant today, String input) {
 		if (input.contains("-") || input.contains("+")) {
 			String[] split = splitInput(input);
-			today = changeHours(today, split, "UTC");
+			today = changeHours(today, split);
 		} else if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(today, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
@@ -68,7 +68,7 @@ public class TimeUtil {
 		} else if (input.equals("")) {
 			return null;
 		} else {
-			today = getTimeFromNumbers(today, input, "UTC");
+			today = getTimeFromNumbers(input);
 		}
 		return today;
 	}
@@ -116,26 +116,26 @@ public class TimeUtil {
 		else return result;
 	}
 
-	public static String getTimeString(Instant instant, Locale locale, String timezone) {
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+	public static String getTimeString(Instant instant, Locale locale) {
+		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
 		return localDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
 	}
 
-	private static Instant changeHours(Instant instant, String[] splits, String timezone) {
+	private static Instant changeHours(Instant instant, String[] splits) {
 		if (splits.length != 0) {
 			boolean correctInput = true;
 			boolean skipFirst = false;
-			LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+			LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
 			String regex = "([+-]+)([0-9]*)([" + shortcuts + "])";
 			Pattern pattern = Pattern.compile(regex);
 			Matcher matcher = pattern.matcher(splits[0]);
 
 			if (!matcher.find()) {
 				if (splits[0].equals("0")) {
-					lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+					lt = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
 				} else {
-					Instant givenInstant = getTimeFromNumbers(instant, splits[0], timezone);
-					lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
+					Instant givenInstant = getTimeFromNumbers(splits[0]);
+					lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of("UTC"));
 				}
 				skipFirst = true;
 			}
@@ -196,10 +196,10 @@ public class TimeUtil {
 		}
 	}
 
-	private static Instant getTimeFromNumbers(Instant givenInstant, String subString, String timezone) {
+	private static Instant getTimeFromNumbers(String input) {
 		Integer hours = 0;
 		Integer minutes = 0;
-		String[] subStrings = subString.split(":");
+		String[] subStrings = input.split(":");
 
 		if (subStrings.length == 2) {
 			hours = Integer.valueOf(subStrings[0]);
@@ -207,7 +207,7 @@ public class TimeUtil {
 		}
 
 		if (subStrings.length < 2) {
-			int[] timeList = checkNumbersForTime(subString);
+			int[] timeList = checkNumbersForTime(input);
 			if (timeList != null) {
 				hours = timeList[0];
 				minutes = timeList[1];
@@ -225,36 +225,36 @@ public class TimeUtil {
 		return localDateTime.toInstant(ZoneOffset.UTC);
 	}
 
-	private static int[] checkNumbersForTime(String subString) {
+	private static int[] checkNumbersForTime(String input) {
 		String hour = "";
 		String minutesString = "";
 		int[] time = null;
 
 		try {
-			switch (subString.length()) {
+			switch (input.length()) {
 			case 1:
 				time = new int[2];
-				time[0] = Integer.valueOf(subString);
+				time[0] = Integer.valueOf(input);
 				time[1] = 0;
 				return time;
 			case 2:
 				time = new int[2];
-				String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+				String hoursString = String.valueOf(input.charAt(0)) + String.valueOf(input.charAt(1));
 				time[0] = Integer.valueOf(hoursString);
 				time[1] = 0;
 				return time;
 			case 3:
 				time = new int[2];
-				hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+				hour = String.valueOf(input.charAt(0)) + String.valueOf(input.charAt(1));
 				time[0] = Integer.valueOf(hour);
-				minutesString = String.valueOf(subString.charAt(2)) + "0";
+				minutesString = String.valueOf(input.charAt(2)) + "0";
 				time[1] = Integer.valueOf(minutesString);
 				return time;
 			case 4:
 				time = new int[2];
-				hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+				hour = String.valueOf(input.charAt(0)) + String.valueOf(input.charAt(1));
 				time[0] = Integer.valueOf(hour);
-				minutesString = String.valueOf(subString.charAt(2)) + String.valueOf(subString.charAt(3));
+				minutesString = String.valueOf(input.charAt(2)) + String.valueOf(input.charAt(3));
 				time[1] = Integer.valueOf(minutesString);
 				return time;
 			}
