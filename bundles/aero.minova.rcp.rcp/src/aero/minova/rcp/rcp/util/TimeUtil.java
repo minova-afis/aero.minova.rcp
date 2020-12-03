@@ -56,21 +56,21 @@ public class TimeUtil {
 		return getTime(Instant.now(), input);
 	}
 
-	public static Instant getTime(Instant today, String input) {
+	public static Instant getTime(Instant now, String input) {
 		if (input.contains("-") || input.contains("+")) {
 			String[] split = splitInput(input);
-			today = changeHours(today, split);
+			now = changeHours(now, split);
 		} else if (input.equals("0")) {
-			LocalDateTime lt = LocalDateTime.ofInstant(today, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
+			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
-			today = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
-			return today;
+			now = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
+			return now;
 		} else if (input.equals("")) {
 			return null;
 		} else {
-			today = getTimeFromNumbers(input);
+			now = getTimeFromNumbers(input);
 		}
-		return today;
+		return now;
 	}
 
 	private static String[] splitInput(String input) {
