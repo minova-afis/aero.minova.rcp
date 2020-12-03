@@ -18,6 +18,10 @@ public class TimeUtil {
 	private static String minute = "m";
 	private static String shortcuts = hour + minute;
 
+	private TimeUtil() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	/**
 	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet werden. Alle Kürzel müssen als
 	 * Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol
@@ -48,11 +52,11 @@ public class TimeUtil {
 		TimeUtil.shortcuts = hour + minute;
 	}
 
-	static public Instant getTime(String input) {
+	public static Instant getTime(String input) {
 		return getTime(Instant.now(), input);
 	}
 
-	static public Instant getTime(Instant today, String input) {
+	public static Instant getTime(Instant today, String input) {
 		if (input.contains("-") || input.contains("+")) {
 			String[] split = splitInput(input);
 			today = changeHours(today, split, "UTC");
@@ -69,7 +73,7 @@ public class TimeUtil {
 		return today;
 	}
 
-	static String[] splitInput(String input) {
+	private static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
 		Pattern pattern;
@@ -107,7 +111,7 @@ public class TimeUtil {
 		return splits.toArray(new String[0]);
 	}
 
-	static String checkMissingHour(String result) {
+	private static String checkMissingHour(String result) {
 		if ((result.endsWith("+") || result.endsWith("-"))) return result + hour;
 		else return result;
 	}
@@ -158,7 +162,7 @@ public class TimeUtil {
 		return instant;
 	}
 
-	static LocalDateTime addRelativeDate(LocalDateTime time, String input) {
+	private static LocalDateTime addRelativeDate(LocalDateTime time, String input) {
 		String regex = "([+-]+)([0-9]*)([" + shortcuts + "])";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(input);
