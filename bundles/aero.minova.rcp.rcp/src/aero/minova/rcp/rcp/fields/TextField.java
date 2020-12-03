@@ -64,7 +64,6 @@ public class TextField {
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
 		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
 		labelFormData.width = COLUMN_WIDTH;
 
@@ -77,6 +76,9 @@ public class TextField {
 		}
 		if (field.getNumberRowsSpanned() > 1) {
 			textFormData.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
+			labelFormData.top = new FormAttachment(text, 0, SWT.TOP);
+		} else {
+			labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
 		}
 
 		label.setLayoutData(labelFormData);

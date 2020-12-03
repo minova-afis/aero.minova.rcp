@@ -7,10 +7,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -68,7 +70,10 @@ import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Column;
+import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -76,7 +81,9 @@ import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.rcp.util.TimeUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -106,8 +113,14 @@ public class WFCIndexPart extends WFCFormPart {
 	private BodyLayerStack<Row> bodyLayerStack;
 	private IEclipseContext context;
 
+	private Map<String, Field> fields = new HashMap();
+
 	@Inject
 	TranslationService translationService;
+
+	@Inject
+	@Named(value = TranslationService.LOCALE)
+	Locale locale;
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -130,6 +143,19 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		parent.setLayout(new GridLayout());
+
+		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
+			if (headOrPage instanceof Page) {
+				Page page = (Page) headOrPage;
+				for (Object fieldOrGrid : page.getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						Field field = (Field) fieldOrGrid;
+						fields.put(field.getName(), field);
+					}
+				}
+
+			}
+		}
 
 		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
 
@@ -173,6 +199,20 @@ public class WFCIndexPart extends WFCFormPart {
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
+
+			for (Row r : table.getRows()) {
+				for (int i = 0; i < r.size(); i++) {
+					Field field = fields.get(table.getColumnName(i));
+					if (field != null) {
+						if (field.getShortDate() != null) {
+							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
+						} else if (field.getShortTime() != null) {
+							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
+						}
+					}
+				}
+			}
+
 			updateData(table.getRows());
 
 			try {
