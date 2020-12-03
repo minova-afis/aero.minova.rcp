@@ -138,6 +138,10 @@ public class DateTimeUtil {
 
 	}
 
+	static public String getDateString(Instant instant, Locale locale) {
+		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
+	}
+
 	static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
