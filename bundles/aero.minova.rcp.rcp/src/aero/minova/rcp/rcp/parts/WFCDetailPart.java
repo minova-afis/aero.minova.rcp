@@ -5,10 +5,9 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -19,12 +18,11 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -44,19 +42,25 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.form.MBooleanField;
+import aero.minova.rcp.model.form.MDateTimeField;
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.form.MShortDateField;
+import aero.minova.rcp.model.form.MShortTimeField;
+import aero.minova.rcp.model.form.MTextField;
+import aero.minova.rcp.model.form.ModelToViewModel;
+import aero.minova.rcp.model.helper.IHelper;
+import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
+import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
-import aero.minova.rcp.rcp.fields.WFCDetailFieldUtil;
-import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
+import aero.minova.rcp.rcp.fields.ShortTimeField;
+import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.util.WFCDetailLookupFieldUtil;
-import aero.minova.rcp.rcp.util.WFCDetailUtil;
-import aero.minova.rcp.rcp.util.WFCDetailsLookupUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
@@ -82,13 +86,15 @@ public class WFCDetailPart extends WFCFormPart {
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
 
+	@Inject
+	@Service
+	private List<IHelper> helperlist;
+
 	private FormToolkit formToolkit;
 
 	private Composite composite;
 
-	private Map<String, Control> controls = new HashMap<>();
-
-	private WFCDetailUtil wfcDetailUtil = null;
+	private MDetail detail = new MDetail();
 
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
@@ -114,32 +120,73 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		wfcDetailUtil = ContextInjectionFactory.make(WFCDetailUtil.class, localContext);
-		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setControls(controls, perspective, localDatabaseService);
+		// TODO SAW_ERC
+//		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
+		casRequestsUtil.setDetail(detail, perspective, localDatabaseService);
+	}
+
+	private static class HeadOrPageWrapper {
+		private Object headOrPage;
+		public boolean isHead = false;
+
+		public HeadOrPageWrapper(Object headOrPage) {
+			this.headOrPage = headOrPage;
+			if (headOrPage instanceof Head) {
+				isHead = true;
+			}
+		}
+
+		public String getTranslationText() {
+			if (isHead) {
+				return "@Head";
+			}
+			return ((Page) headOrPage).getText();
+		}
+
+		public List<Object> getFieldOrGrid() {
+			if (isHead) {
+				return ((Head) headOrPage).getFieldOrGrid();
+			}
+			return ((Page) headOrPage).getFieldOrGrid();
+		}
+
 	}
 
 	private void layoutForm(Composite parent) {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
-
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
+			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			if (headOrPage instanceof Head) {
-				layoutHead(parent, (Head) headOrPage);
+				layoutHead(parent, wrapper);
 			} else if (headOrPage instanceof Page) {
-				layoutPage(parent, (Page) headOrPage);
+				layoutPage(parent, wrapper);
 			}
 		}
+		// Helper-Klasse initialisieren
+		String helperClass = form.getHelperClass();
+		if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+			// TODO
+			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+		}
+		IHelper iHelper = helperlist.get(0);
+		iHelper.setControls(detail);
 	}
 
-	private void layoutHead(Composite parent, Head head) {
+	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
 		RowData headLayoutData = new RowData();
-		Section headSection = formToolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		Section headSection;
+		if (head.isHead) {
+			headSection = formToolkit.createSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		} else {
+			headSection = formToolkit.createSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		}
 
 		headLayoutData.width = SECTION_WIDTH;
 
 		headSection.setLayoutData(headLayoutData);
-		headSection.setText("@Head");
+		headSection.setText(head.getTranslationText());
 		headSection.setData(TRANSLATE_PROPERTY, "@Head");
 
 		// Client Area
@@ -153,7 +200,7 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, head);
 	}
 
-	private void layoutPage(Composite parent, Page page) {
+	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
 		RowData pageLayoutData = new RowData();
 		Section pageSection = formToolkit.createSection(parent,
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
@@ -161,8 +208,8 @@ public class WFCDetailPart extends WFCFormPart {
 		pageLayoutData.width = SECTION_WIDTH;
 
 		pageSection.setLayoutData(pageLayoutData);
-		pageSection.setText(page.getText());
-		pageSection.setData(TRANSLATE_PROPERTY, page.getText());
+		pageSection.setText(page.getTranslationText());
+		pageSection.setData(TRANSLATE_PROPERTY, page.getTranslationText());
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(pageSection);
@@ -175,56 +222,36 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, page);
 	}
 
-	private void createFields(Composite composite, Head head) {
-		int row = 0;
-		int column = 0;
-		int width = 2;
-		Control control = null;
-		for (Object fieldOrGrid : head.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field))
-				continue; // erst einmal nur Felder
-			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible())
-				continue; // nur sichtbare Felder
-			width = getWidth(field);
-			if (column + width > 4) {
-				column = 0;
-				row++;
-			}
-			control = createField(composite, field, row, column);
-			if (control != null)
-				controls.put(field.getName(), control);
-			column += width;
-		}
-
-		addBottonMargin(composite, row + 1, column);
-	}
-
-	private void createFields(Composite composite, Page page) {
+	private void createFields(Composite composite, HeadOrPageWrapper headOrPage) {
 		int row = 0;
 		int column = 0;
 		int width;
-		Control control;
-		for (Object fieldOrGrid : page.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field))
+		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
+			if (!(fieldOrGrid instanceof Field)) {
 				continue; // erst einmal nur Felder
+			}
 			Field field = (Field) fieldOrGrid;
-			if (!field.isVisible())
+			MField f = ModelToViewModel.convert(field);
+			detail.putField(f);
+
+			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
+			}
 			width = getWidth(field);
 			if (column + width > 4) {
 				column = 0;
 				row++;
 			}
-			control = createField(composite, field, row, column);
-			if (control != null)
-				controls.put(field.getName(), control);
+			createField(composite, f, row, column);
 			column += width;
-			row += getExtraHeight(field);
+			if (!headOrPage.isHead) {
+				row += getExtraHeight(field);
+			}
 		}
 
 		addBottonMargin(composite, row + 1, column);
 	}
+
 
 	private int getExtraHeight(Field field) {
 		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
@@ -243,25 +270,23 @@ public class WFCDetailPart extends WFCFormPart {
 		spacing.setLayoutData(spacingFormData);
 	}
 
-	private Control createField(Composite composite, Field field, int row, int column) {
-		if (field.getBoolean() != null) {
-			return WFCDetailFieldUtil.createBooleanField(composite, field, row, column, formToolkit);
-		} else if (field.getNumber() != null) {
-			return NumberField.create(composite, field, row, column, formToolkit, locale);
-		} else if (field.getDateTime() != null) {
-			return DateTimeField.create(composite, field, row, column, formToolkit);
-		} else if (field.getShortDate() != null) {
-			return ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
-		} else if (field.getShortTime() != null) {
-			return WFCDetailFieldUtil.createShortTimeField(composite, field, row, column, formToolkit);
-		} else if (field.getLookup() != null) {
-			return WFCDetailLookupFieldUtil.createLookupField(composite, field, row, column, formToolkit, broker,
-					controls, perspective, localDatabaseService);
-
-		} else if (field.getText() != null) {
-			return WFCDetailFieldUtil.createTextField(composite, field, row, column, formToolkit);
+	private void createField(Composite composite, MField field, int row, int column) {
+		if (field instanceof MBooleanField) {
+			BooleanField.create(composite, field, row, column, formToolkit, locale);
+		} else if (field instanceof MNumberField) {
+			NumberField.create(composite, field, row, column, formToolkit, locale);
+		} else if (field instanceof MDateTimeField) {
+			DateTimeField.create(composite, field, row, column, formToolkit);
+		} else if (field instanceof MShortDateField) {
+			ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
+		} else if (field instanceof MShortTimeField) {
+			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
+		} else if (field instanceof MLookupField) {
+			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService,
+					detail);
+		} else if (field instanceof MTextField) {
+			TextField.create(composite, field, row, column, formToolkit);
 		}
-		return null;
 	}
 
 	@Inject
@@ -274,8 +299,9 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private void translate(TranslationService translationService) {
 		this.translationService = translationService;
-		if (translationService != null && composite != null)
+		if (translationService != null && composite != null) {
 			translate(composite);
+		}
 	}
 
 	private void translate(Composite composite) {
@@ -309,43 +335,5 @@ public class WFCDetailPart extends WFCFormPart {
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
 
-	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
-	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
-	 * dem benutzer zur verfügung gestellt.
-	 *
-	 * @param luc
-	 */
-	@Inject
-	@Optional
-	public void requestLookUpEntriesAll(
-			@UIEventTopic(Constants.BROKER_WFCLOADALLLOOKUPVALUES) Map<MPerspective, String> map) {
-		if (map.get(perspective) != null) {
-			String name = map.get(perspective);
-			Control control = controls.get(name);
-			if (control instanceof LookupControl) {
-				Field field = (Field) control.getData(Constants.CONTROL_FIELD);
-				CompletableFuture<?> tableFuture;
-				tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, controls, dataService, sync,
-						"List");
-				LookupControl lc = (LookupControl) control;
-				lc.getTextControl().setText("...");
-				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-					WFCDetailsLookupUtil lookupUtil = wfcDetailUtil.getLookupUtil();
-					if (ta instanceof SqlProcedureResult) {
-						SqlProcedureResult sql = (SqlProcedureResult) ta;
-						localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
-						lookupUtil.changeOptionsForLookupField(sql.getResultSet(), control, false);
-					} else if (ta instanceof Table) {
-						Table t = (Table) ta;
-						localDatabaseService.replaceResultsForLookupField(field.getName(), t);
-						lookupUtil.changeOptionsForLookupField(t, control, false);
-					}
-					lc.getTextControl().setText("");
 
-				}));
-			}
-
-		}
-	}
 }

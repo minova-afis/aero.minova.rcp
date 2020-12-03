@@ -26,9 +26,6 @@ public abstract class WFCFormPart {
 	@Inject
 	Logger logger;
 
-	public WFCFormPart() {
-		super();
-	}
 
 	public Form getForm(Composite parent) {
 		form = perspective.getContext().get(Form.class);

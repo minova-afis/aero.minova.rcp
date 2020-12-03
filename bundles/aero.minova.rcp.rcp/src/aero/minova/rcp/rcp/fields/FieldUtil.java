@@ -2,13 +2,10 @@ package aero.minova.rcp.rcp.fields;
 
 import java.util.function.Consumer;
 
-import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
@@ -43,9 +40,13 @@ public class FieldUtil {
 	private FieldUtil() {
 	}
 
-	protected static void addDataToText(Widget control, Field f, DataType datatype) {
-		control.setData(Constants.CONTROL_FIELD, f);
-		control.setData(Constants.CONTROL_DATATYPE, datatype);
+//	protected static void addDataToText(Widget control, MField f, DataType datatype) {
+//		control.setData(Constants.CONTROL_FIELD, f);
+//		control.setData(Constants.CONTROL_DATATYPE, datatype);
+//	}
+
+	public static int getRowIndex(Table t, Field field) {
+		return t.getColumnIndex(field.getName());
 	}
 
 	protected static void addConsumer(Object o, Field field) {
@@ -57,6 +58,7 @@ public class FieldUtil {
 				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
 				text.setText(ValueBuilder.value(value, f).getText());
 				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
+				text.setData(Constants.CONTROL_VALUE, value);
 			});
 		} else if (o instanceof Button) {
 			Button b = (Button) o;

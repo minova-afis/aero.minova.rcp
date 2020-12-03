@@ -1,33 +1,33 @@
 package aero.minova.rcp.rcp.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 public class TimeUtil {
 
-	static public Instant getTime(String input, String timezone) {
-
-		return getTime(Instant.now(), input, timezone);
+	public static Instant getTime(String input) {
+		return getTime(Instant.now().truncatedTo(ChronoUnit.MINUTES), input);
 	}
 
-	static public Instant getTime(Instant today, String input, String timezone) {
-
+	public static Instant getTime(Instant today, String input) {
 		if (input.contains("-") || input.contains("+")) {
-			today = changeHours(today, input, timezone);
+			today = changeHours(today, input);
 		} else {
-			today = getTimeFromNumbers(input, timezone);
+			today = getTimeFromNumbers(input);
 		}
 		return today;
 	}
 
-	private static Instant changeHours(Instant instant, String input, String timezone) {
-
+	private static Instant changeHours(Instant instant, String input) {
 		boolean correctInput = true;
-		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
 
 		for (int i = 0; i < input.length(); i++) {
-			if (correctInput = true) {
+			if (correctInput) {
 				if (input.charAt(i) == '+') {
 					lt = lt.plusHours(1);
 				} else if (input.charAt(i) == '-') {
@@ -37,16 +37,15 @@ public class TimeUtil {
 				}
 			}
 		}
-		if (correctInput == true) {
-			instant = lt.toInstant(ZoneId.of(timezone).getRules().getOffset(lt));
+		if (correctInput) {
+			instant = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
 		} else {
 			instant = null;
 		}
 		return instant;
 	}
 
-	private static Instant getTimeFromNumbers(String subString, String timezone) {
-
+	private static Instant getTimeFromNumbers(String subString) {
 		Integer hours = 0;
 		Integer minutes = 0;
 		String[] subStrings = subString.split(":");
@@ -69,8 +68,9 @@ public class TimeUtil {
 			return null;
 		}
 
+		LocalTime localTime = LocalTime.of(hours, minutes);
 		LocalDateTime localDateTime = LocalDateTime.now().withHour(hours).withMinute(minutes).withSecond(0);
-		Instant instant = localDateTime.toInstant(ZoneId.of(timezone).getRules().getOffset(localDateTime));
+		Instant instant = localTime.atDate(LocalDate.of(1900, 1, 1)).toInstant(ZoneId.of("UTC").getRules().getOffset(localDateTime));
 		return instant;
 	}
 

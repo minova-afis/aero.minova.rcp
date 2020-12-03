@@ -18,6 +18,7 @@ public class Constants {
 	public static final String CONTROL_KEYLONG = "keyLong";
 	public static final String CONTROL_DATATYPE = "dataType";
 	public static final String CONTROL_DECIMALS = "decimals";
+	public static final String CONTROL_VALUE = "value";
 
 	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
 	// textfieldVerifier zuzugreifen
@@ -46,5 +47,8 @@ public class Constants {
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
+
+	// ValueAccessor
+	public static final String VALUE_ACCESSOR = "VALUEACCESSOR";
 
 }
