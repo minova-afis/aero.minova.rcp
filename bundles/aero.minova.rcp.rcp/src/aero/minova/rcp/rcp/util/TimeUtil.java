@@ -49,7 +49,6 @@ public class TimeUtil {
 	}
 
 	static public Instant getTime(String input) {
-
 		return getTime(Instant.now(), input);
 	}
 
@@ -66,7 +65,6 @@ public class TimeUtil {
 			return null;
 		} else {
 			today = getTimeFromNumbers(today, input, "UTC");
-
 		}
 		return today;
 	}
@@ -131,7 +129,6 @@ public class TimeUtil {
 			if (!matcher.find()) {
 				if (splits[0].equals("0")) {
 					lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
-
 				} else {
 					Instant givenInstant = getTimeFromNumbers(instant, splits[0], timezone);
 					lt = LocalDateTime.ofInstant(givenInstant, ZoneId.of(timezone));
@@ -152,7 +149,6 @@ public class TimeUtil {
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 			if (correctInput) {
 				instant = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
-
 			} else {
 				instant = null;
 			}
@@ -166,6 +162,7 @@ public class TimeUtil {
 		String regex = "([+-]+)([0-9]*)([" + shortcuts + "])";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(input);
+
 		if (matcher.find()) {
 			String sign = matcher.group(1);
 			String number = matcher.group(2);
@@ -196,10 +193,10 @@ public class TimeUtil {
 	}
 
 	private static Instant getTimeFromNumbers(Instant givenInstant, String subString, String timezone) {
-
 		Integer hours = 0;
 		Integer minutes = 0;
 		String[] subStrings = subString.split(":");
+
 		if (subStrings.length == 2) {
 			hours = Integer.valueOf(subStrings[0]);
 			minutes = Integer.valueOf(subStrings[1]);
@@ -225,10 +222,10 @@ public class TimeUtil {
 	}
 
 	private static int[] checkNumbersForTime(String subString) {
-
 		String hour = "";
 		String minutesString = "";
 		int[] time = null;
+
 		try {
 			switch (subString.length()) {
 			case 1:
