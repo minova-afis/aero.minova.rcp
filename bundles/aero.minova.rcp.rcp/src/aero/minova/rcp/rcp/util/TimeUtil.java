@@ -1,10 +1,9 @@
 package aero.minova.rcp.rcp.util;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
@@ -14,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TimeUtil {
-
 
 	private static String hour = "h";
 	private static String minute = "m";
@@ -72,6 +70,7 @@ public class TimeUtil {
 		}
 		return today;
 	}
+
 	static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
@@ -122,9 +121,9 @@ public class TimeUtil {
 
 	private static Instant changeHours(Instant instant, String[] splits, String timezone) {
 		if (splits.length != 0) {
-		boolean correctInput = true;
+			boolean correctInput = true;
 			boolean skipFirst = false;
-		LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
+			LocalDateTime lt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));
 			String regex = "([+-]+)([0-9]*)([" + shortcuts + "])";
 			Pattern pattern = Pattern.compile(regex);
 			Matcher matcher = pattern.matcher(splits[0]);
@@ -141,29 +140,28 @@ public class TimeUtil {
 			}
 			for (int i = 0; i < splits.length; i++) {
 				if (correctInput == true) {
-					if (i == 0 && skipFirst == true) {
-				} else {
+					if (i == 0 && skipFirst == true) {} else {
 						lt = addRelativeDate(lt, splits[i]);
 						if (lt == null) {
 							correctInput = false;
 						}
+					}
 				}
 			}
-		}
-		lt = lt.truncatedTo(ChronoUnit.MINUTES);
-		lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
-		if (correctInput) {
-			instant = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
+			lt = lt.truncatedTo(ChronoUnit.MINUTES);
+			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
+			if (correctInput) {
+				instant = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
 
+			} else {
+				instant = null;
+			}
 		} else {
-			instant = null;
+			return null;
 		}
-	} else {
-		return null;
-	}
 		return instant;
 	}
-  
+
 	static LocalDateTime addRelativeDate(LocalDateTime time, String input) {
 		String regex = "([+-]+)([0-9]*)([" + shortcuts + "])";
 		Pattern pattern = Pattern.compile(regex);
@@ -199,7 +197,6 @@ public class TimeUtil {
 
 	private static Instant getTimeFromNumbers(Instant givenInstant, String subString, String timezone) {
 
-
 		Integer hours = 0;
 		Integer minutes = 0;
 		String[] subStrings = subString.split(":");
@@ -223,9 +220,8 @@ public class TimeUtil {
 		if (minutes > 59) {
 			return null;
 		}
-		LocalDateTime localDateTime = LocalDateTime.now().withHour(hours).withMinute(minutes).withSecond(0);
-		Instant instant = localTime.atDate(LocalDate.of(1900, 1, 1)).toInstant(ZoneId.of("UTC").getRules().getOffset(localDateTime));
-		return instant;
+		LocalDateTime localDateTime = LocalDateTime.of(1900, 1, 1, hours, minutes);
+		return localDateTime.toInstant(ZoneOffset.UTC);
 	}
 
 	private static int[] checkNumbersForTime(String subString) {
@@ -234,36 +230,36 @@ public class TimeUtil {
 		String minutesString = "";
 		int[] time = null;
 		try {
-		switch (subString.length()) {
-		case 1:
-			time = new int[2];
-			time[0] = Integer.valueOf(subString);
-			time[1] = 0;
-			return time;
-		case 2:
-			time = new int[2];
-			String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
-			time[0] = Integer.valueOf(hoursString);
-			time[1] = 0;
-			return time;
-		case 3:
-			time = new int[2];
-			hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
-			time[0] = Integer.valueOf(hour);
-			minutesString = String.valueOf(subString.charAt(2)) + "0";
-			time[1] = Integer.valueOf(minutesString);
-			return time;
-		case 4:
-			time = new int[2];
-			hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
-			time[0] = Integer.valueOf(hour);
-			minutesString = String.valueOf(subString.charAt(2)) + String.valueOf(subString.charAt(3));
-			time[1] = Integer.valueOf(minutesString);
-			return time;
+			switch (subString.length()) {
+			case 1:
+				time = new int[2];
+				time[0] = Integer.valueOf(subString);
+				time[1] = 0;
+				return time;
+			case 2:
+				time = new int[2];
+				String hoursString = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+				time[0] = Integer.valueOf(hoursString);
+				time[1] = 0;
+				return time;
+			case 3:
+				time = new int[2];
+				hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+				time[0] = Integer.valueOf(hour);
+				minutesString = String.valueOf(subString.charAt(2)) + "0";
+				time[1] = Integer.valueOf(minutesString);
+				return time;
+			case 4:
+				time = new int[2];
+				hour = String.valueOf(subString.charAt(0)) + String.valueOf(subString.charAt(1));
+				time[0] = Integer.valueOf(hour);
+				minutesString = String.valueOf(subString.charAt(2)) + String.valueOf(subString.charAt(3));
+				time[1] = Integer.valueOf(minutesString);
+				return time;
+			}
+		} catch (Exception e) {
+			return null;
 		}
-	} catch (Exception e) {
-		return null;
-	}
 
 		return null;
 	}
