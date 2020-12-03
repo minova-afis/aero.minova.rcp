@@ -36,6 +36,10 @@ import aero.minova.rcp.rcp.util.TimeUtil;
 
 public class ShortTimeField {
 
+	private ShortTimeField() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
 			Locale locale, String timezone) {
 
@@ -47,7 +51,7 @@ public class ShortTimeField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant time = TimeUtil.getTime(entry, timezone);
+				Instant time = TimeUtil.getTime(entry);
 				if (time == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 					field.setValue(null, true);
@@ -65,16 +69,11 @@ public class ShortTimeField {
 		text.setMessage(
 				LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 		text.setNumberOfLines(1);
-		// TODO SAW_ERC brauchen wird das hier?
-
 		text.setData(TRANSLATE_LOCALE, locale);
-
-		// TODO SAW_ERC funktioniert nicht sauber, wird von anderer Stelle zusätzlich
-		// getriggered
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
+				text.selectAll();
 			}
 		});
 

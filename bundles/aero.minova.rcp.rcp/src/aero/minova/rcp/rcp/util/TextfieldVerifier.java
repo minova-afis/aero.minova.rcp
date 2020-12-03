@@ -41,7 +41,7 @@ public class TextfieldVerifier implements FocusListener {
 	public static String verifyTime(String newString, String timezone) {
 		String time = "";
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.of(timezone));
-		Instant instant = TimeUtil.getTime(newString, timezone);
+		Instant instant = TimeUtil.getTime(newString);
 		if (instant != null) {
 			time = df.format(instant);
 		}

@@ -19,22 +19,43 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
 public class TextField {
 
+	private TextField() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
+
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "",
-				SWT.BORDER | (getExtraHeight(field) > 0 ? SWT.MULTI : SWT.NONE));
-		// FieldUtil.addDataToText(text, field, DataType.STRING);
+		label.setData(TRANSLATE_PROPERTY, labelText);
 
+		int style = SWT.BORDER;
+		if (field.getNumberRowsSpanned() > 1) {
+			// Maskenentwickler hat mehrzeilige Eingabe definiert
+			style |= SWT.MULTI;
+		}
+		Text text = formToolkit.createText(composite, "", style);
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
+				text.selectAll();
+			}
+		});
+		// Wenn der Anwender den Wert ändert, muss es weitergegeben werden
+		text.addModifyListener(e -> {
+			if (text.isFocusControl()) {
+				String newValue = text.getText();
+				if (newValue.length() < 1) {
+					field.setValue(null, true);
+				} else {
+					field.setValue(new Value(newValue), true);
+				}
 			}
 		});
 
@@ -49,8 +70,7 @@ public class TextField {
 
 		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2
-				&& field.isFillToRight()) {
+		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2 && field.isFillToRight()) {
 			textFormData.width = COLUMN_WIDTH * 3 + MARGIN_LEFT * 2 + MARGIN_BORDER;
 		} else {
 			textFormData.width = TEXT_WIDTH;
@@ -59,20 +79,10 @@ public class TextField {
 			textFormData.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
 		}
 
-		label.setData(TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);
 
 		text.setLayoutData(textFormData);
 
 		return text;
-
 	}
-
-	private static int getExtraHeight(MField field) {
-		if (field.getNumberRowsSpanned() > 1) {
-			return field.getNumberRowsSpanned() - 1;
-		}
-		return 0;
-	}
-
 }

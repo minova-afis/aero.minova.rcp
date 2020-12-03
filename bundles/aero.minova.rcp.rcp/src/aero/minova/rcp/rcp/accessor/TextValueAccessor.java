@@ -15,11 +15,11 @@ public class TextValueAccessor extends AbstractValueAccessor {
 
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
-		if (value == null) {
-			((Text) control).setText("");
-		} else {
-			((Text) control).setText(value.getStringValue());
-		}
+		String newText = value == null ? "" : value.getStringValue();
+		String currentText = ((Text) control).getText();
+		
+		if (newText.equals(currentText)) return; // ist ja schon gesetzt
+		else ((Text) control).setText(newText);
 	}
 
 }
