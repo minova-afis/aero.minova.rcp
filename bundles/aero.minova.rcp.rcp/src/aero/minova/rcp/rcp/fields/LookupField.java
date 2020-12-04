@@ -35,6 +35,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
@@ -118,20 +119,21 @@ public class LookupField {
 				if (e.keyCode == SWT.CONTROL) {
 					controlPressed = false;
 				} else
+
 					// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 					if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
 							&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE && !lookupControl.getText().startsWith("#")) {
-								if (lookupControl.getData(Constants.CONTROL_OPTIONS) == null) {
+								if (((MLookupField) field).getOptions() == null) {
 									requestLookUpEntriesAll(field, detail, lookupControl);
 								} else {
-									changeSelectionBoxList(lookupControl, false);
+									changeSelectionBoxList(lookupControl, (MLookupField) field, false);
 								}
 							} else
 						if (e.keyCode == SWT.SPACE && controlPressed == true) {
 							requestLookUpEntriesAll(field, detail, lookupControl);
 						} else if (e.keyCode == SWT.ARROW_DOWN && lookupControl.isProposalPopupOpen() == false) {
-							if (lookupControl.getData(Constants.CONTROL_OPTIONS) != null) {
-								changeSelectionBoxList(lookupControl, false);
+							if (((MLookupField) field).getOptions() != null) {
+								changeSelectionBoxList(lookupControl, (MLookupField) field, false);
 							} else {
 								requestLookUpEntriesAll(field, detail, lookupControl);
 							}
@@ -186,8 +188,9 @@ public class LookupField {
 	 * @param c
 	 */
 	public static void changeOptionsForLookupField(Table ta, LookupControl lookupControl, boolean twisty) {
-		lookupControl.setData(Constants.CONTROL_OPTIONS, ta);
-		changeSelectionBoxList(lookupControl, twisty);
+		MLookupField field = (MLookupField) lookupControl.getData(Constants.CONTROL_FIELD);
+		field.setOptions(ta);
+		changeSelectionBoxList(lookupControl, field, twisty);
 	}
 
 	/**
@@ -196,9 +199,9 @@ public class LookupField {
 	 *
 	 * @param lookUpControl
 	 */
-	public static void changeSelectionBoxList(LookupControl lookUpControl, boolean twisty) {
-		if (lookUpControl.getData(Constants.CONTROL_OPTIONS) != null) {
-			Table t = (Table) lookUpControl.getData(Constants.CONTROL_OPTIONS);
+	public static void changeSelectionBoxList(LookupControl lookUpControl, MLookupField field, boolean twisty) {
+		if (field.getOptions() != null) {
+			Table t = (Table) field.getOptions();
 			// Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die
 			// Eingabe gleich dem gesuchten Wert ist.
 			// Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der Wert
@@ -208,8 +211,7 @@ public class LookupField {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 					if (value.getStringValue().equalsIgnoreCase(lookUpControl.getText().toString())) {
 						updateSelectedLookupEntry(t, lookUpControl);
-						lookUpControl.setData(Constants.CONTROL_KEYLONG,
-								t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
+						field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
 					}
 					// Setzen der Proposals/Optionen
 					changeProposals(lookUpControl, t);
@@ -217,8 +219,7 @@ public class LookupField {
 				} else {
 					updateSelectedLookupEntry(t, lookUpControl);
 					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					lookUpControl.setData(Constants.CONTROL_KEYLONG,
-							t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
+					field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
 					// Setzen der Proposals/Optionen
 					changeProposals(lookUpControl, t);
 
@@ -255,22 +256,18 @@ public class LookupField {
 									&& filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
 									&& filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue()
 											.toLowerCase().equals(lookUpControl.getText().toLowerCase()))) {
-						lookUpControl.setData(Constants.CONTROL_KEYLONG, filteredTable.getRows().get(0)
-								.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getValue());
-						Display.getDefault().asyncExec(() -> updateSelectedLookupEntry(filteredTable, lookUpControl));
+
+						field.setValue(filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
 						changeProposals(lookUpControl, filteredTable);
 						// Setzen der Proposals/Optionen
 					} else if (filteredTable.getRows().size() != 0) {
 						changeProposals(lookUpControl, filteredTable);
-						lookUpControl.setData(Constants.CONTROL_KEYLONG, null);
 					} else {
 						changeProposals(lookUpControl, t);
-						lookUpControl.setData(Constants.CONTROL_KEYLONG, null);
 					}
 					// Setzen der Proposals/Optionen
 				} else {
 					changeProposals(lookUpControl, t);
-					lookUpControl.setData(Constants.CONTROL_KEYLONG, null);
 				}
 
 			}
