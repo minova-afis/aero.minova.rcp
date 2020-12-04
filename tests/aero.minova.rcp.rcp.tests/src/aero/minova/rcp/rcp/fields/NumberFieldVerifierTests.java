@@ -60,16 +60,16 @@ public class NumberFieldVerifierTests {
 		assertEquals("get text", "999,95", nfv.getNewText(2, Locale.GERMANY, "99,95", 2, 2, 2, "9", dfs));
 	}
 
-	@Test
-	public void testFrom1_C00To1_1C0() {
-		Event e = new Event();
-		e.character = '\b';
-
-		NumberFieldVerifier nfv = new NumberFieldVerifier();
-		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
-
-		assertEquals("get caret", 3, nfv.getNewCaretPosition("1,00", "1", "1,10", dfs, 2, 1));
-	}
+//	@Test
+//	public void testFrom1_C00To1_1C0() {
+//		Event e = new Event();
+//		e.character = '\b';
+//
+//		NumberFieldVerifier nfv = new NumberFieldVerifier();
+//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
+//
+//		assertEquals("get caret", 3, nfv.getNewCaretPosition("1,00", "1", "1,10", dfs, 2, 1));
+//	}
 
 	@Test
 	public void testInsertComma() {
