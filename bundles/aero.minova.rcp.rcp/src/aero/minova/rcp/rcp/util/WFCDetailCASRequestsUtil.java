@@ -16,6 +16,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -375,7 +376,10 @@ public class WFCDetailCASRequestsUtil {
 	private void checkEntryUpdate(SqlProcedureResult responce) {
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
 		if (responce.getReturnCode() == -1) {
-			openNotificationPopup("Entry could not be updated:" + responce.getResultSet());
+			// openNotificationPopup("Entry could not be updated:" +
+			// responce.getResultSet());
+			Row r = responce.getResultSet().getRows().get(0);
+			MessageDialog.openError(shell, "Error while updating Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -391,7 +395,9 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private void checkNewEntryInsert(SqlProcedureResult responce) {
 		if (responce.getReturnCode() == -1) {
-			openNotificationPopup("Entry could not be added:" + responce.getResultSet());
+			// openNotificationPopup("Entry could not be added:" + responce.getResultSet());
+			Row r = responce.getResultSet().getRows().get(0);
+			MessageDialog.openError(shell, "Error while adding Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -442,7 +448,11 @@ public class WFCDetailCASRequestsUtil {
 //	 */
 //	public void deleteEntry(SqlProcedureResult responce) {
 //		if (responce.getReturnCode() == -1) {
-//			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
+// openNotificationPopup("Entry could not be deleted:" +
+// responce.getResultSet());
+//		Row r = responce.getResultSet().getRows().get(0);
+//		MessageDialog.openError(shell, "Error while deleting Entry",
+//				r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 //		} else {
 //			openNotificationPopup("Sucessfully deleted the entry");
 //			Map<MPerspective, String> map = new HashMap<>();
