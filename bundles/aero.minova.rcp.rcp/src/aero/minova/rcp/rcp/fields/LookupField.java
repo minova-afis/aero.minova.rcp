@@ -11,6 +11,8 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -97,6 +99,46 @@ public class LookupField {
 				requestLookUpEntriesAll(field, detail, lookupControl);
 			}
 		});
+
+		// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
+		// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
+		lookupControl.addKeyListener(new KeyListener() {
+			boolean controlPressed = false;
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.keyCode == SWT.CONTROL) {
+					controlPressed = true;
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.keyCode == SWT.CONTROL) {
+					controlPressed = false;
+				} else
+					// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
+					if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
+							&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE && !lookupControl.getText().startsWith("#")) {
+								if (lookupControl.getData(Constants.CONTROL_OPTIONS) == null) {
+									requestLookUpEntriesAll(field, detail, lookupControl);
+								} else {
+									changeSelectionBoxList(lookupControl, false);
+								}
+							} else
+						if (e.keyCode == SWT.SPACE && controlPressed == true) {
+							requestLookUpEntriesAll(field, detail, lookupControl);
+						} else if (e.keyCode == SWT.ARROW_DOWN && lookupControl.isProposalPopupOpen() == false) {
+							if (lookupControl.getData(Constants.CONTROL_OPTIONS) != null) {
+								changeSelectionBoxList(lookupControl, false);
+							} else {
+								requestLookUpEntriesAll(field, detail, lookupControl);
+							}
+						}
+			}
+
+		});
 		return lookupControl;
 	}
 
@@ -127,11 +169,11 @@ public class LookupField {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), sql.getResultSet());
 
-				changeOptionsForLookupField(sql.getResultSet(), lookUpControl, false);
+				changeOptionsForLookupField(sql.getResultSet(), lookUpControl, true);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
-				changeOptionsForLookupField(t, lookUpControl, false);
+				changeOptionsForLookupField(t, lookUpControl, true);
 			}
 			lookUpControl.getTextControl().setMessage("");
 		}));

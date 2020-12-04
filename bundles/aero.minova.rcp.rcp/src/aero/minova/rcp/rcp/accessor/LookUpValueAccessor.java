@@ -41,9 +41,8 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
-		if (value == null) {
-			((LookupControl) control).setText("");
-		} else {
+		((LookupControl) control).setText("");
+		if (value != null) {
 			((LookupControl) control).getTextControl().setMessage("...");
 			getLookUpConsumer(control, value);
 
