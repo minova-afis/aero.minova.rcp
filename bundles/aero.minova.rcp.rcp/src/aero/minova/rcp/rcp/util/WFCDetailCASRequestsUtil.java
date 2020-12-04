@@ -26,12 +26,10 @@ import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
-import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
@@ -408,58 +406,60 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
-	/**
-	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
-	 *
-	 * @param obj
-	 */
-	@Inject
-	@Optional
-	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
-		if (perspective == this.perspective) {
-			if (getKeys() != null) {
-				String tablename = form.getIndexView() != null ? "sp" : "op";
-				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-					tablename = form.getDetail().getProcedurePrefix();
-				}
-				tablename += "Delete";
-				tablename += form.getDetail().getProcedureSuffix();
-				TableBuilder tb = TableBuilder.newTable(tablename);
-				RowBuilder rb = RowBuilder.newRow();
-				for (ArrayList key : getKeys()) {
-					tb.withColumn((String) key.get(0), (DataType) key.get(2));
-					rb.withValue(key.get(1));
-				}
-				Table t = tb.create();
-				Row r = rb.create();
-				t.addRow(r);
-				if (t.getRows() != null) {
-					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-						deleteEntry(ta);
-					}));
-				}
-			}
-		}
-	}
+//	/**
+//	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
+//	 *
+//	 * @param obj
+//	 */
+//	@Inject
+//	@Optional
+//	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
+//		if (perspective == this.perspective) {
+//			if (getKeys() != null) {
+//				String tablename = form.getIndexView() != null ? "sp" : "op";
+//				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+//					tablename = form.getDetail().getProcedurePrefix();
+//				}
+//				tablename += "Delete";
+//				tablename += form.getDetail().getProcedureSuffix();
+//				TableBuilder tb = TableBuilder.newTable(tablename);
+//				RowBuilder rb = RowBuilder.newRow();
+//				for (ArrayList key : getKeys()) {
+//					tb.withColumn((String) key.get(0), (DataType) key.get(2));
+//					rb.withValue(key.get(1));
+//				}
+//				Table t = tb.create();
+//				Row r = rb.create();
+//				t.addRow(r);
+//				if (t.getRows() != null) {
+//					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+//					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+//						deleteEntry(ta);
+//					}));
+//				}
+//			}
+//		}
+//	}
 
-	/**
-	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
-	 *
-	 * @param responce
-	 */
-	public void deleteEntry(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == -1) {
-			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
-			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while deleting Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
-		} else {
-			openNotificationPopup("Sucessfully deleted the entry");
-			Map<MPerspective, String> map = new HashMap<>();
-			map.put(perspective, Constants.DELETE_REQUEST);
-			clearFields(map);
-		}
-	}
+//	/**
+//	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
+//	 *
+//	 * @param responce
+//	 */
+//	public void deleteEntry(SqlProcedureResult responce) {
+//		if (responce.getReturnCode() == -1) {
+// openNotificationPopup("Entry could not be deleted:" +
+// responce.getResultSet());
+//		Row r = responce.getResultSet().getRows().get(0);
+//		MessageDialog.openError(shell, "Error while deleting Entry",
+//				r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+//		} else {
+//			openNotificationPopup("Sucessfully deleted the entry");
+//			Map<MPerspective, String> map = new HashMap<>();
+//			map.put(perspective, Constants.DELETE_REQUEST);
+//			clearFields(map);
+//		}
+//	}
 
 	/**
 	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner Anfrage informiert
