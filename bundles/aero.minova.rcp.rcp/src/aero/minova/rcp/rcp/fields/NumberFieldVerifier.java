@@ -10,56 +10,97 @@ import org.eclipse.swt.widgets.Text;
 
 public class NumberFieldVerifier implements VerifyListener {
 
-	private Text field;
-	private int decimals;
 	private boolean verificationActive = false;
-
-	public NumberFieldVerifier(Text text) {
-		field = text;
-		decimals = (int) field.getData(FieldUtil.FIELD_DECIMALS);
-	}
 
 	@Override
 	public void verifyText(VerifyEvent e) {
 		if (verificationActive) return; // Wir setzen gerade den Wert
-		if (e.widget != field) return; // ist nicht unser Feld
 
+		Text field = (Text) e.getSource();
+		int decimals = (int) field.getData(FieldUtil.FIELD_DECIMALS);
 		Locale locale = (Locale) field.getData(FieldUtil.TRANSLATE_LOCALE);
-		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-		numberFormat.setMaximumFractionDigits(decimals);
-		numberFormat.setMinimumFractionDigits(decimals);
-		numberFormat.setGroupingUsed(true);
 		String insertion = e.text;
-		String text = field.getText();
-		if (e.text.equals("" + dfs.getDecimalSeparator()) && text.indexOf(dfs.getDecimalSeparator()) >= 0) {
-			field.setSelection(text.indexOf(dfs.getDecimalSeparator()) + 1);
+		int caretPosition = field.getCaretPosition();
+		int start = e.start;
+		int end = e.end;
+		int keyCode = e.keyCode;
+		String textBefore = field.getText();
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+
+		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() && keyCode == 127) {
 			e.doit = false;
-			return;
+		} else if (!textBefore.isEmpty() && textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()
+				&& keyCode == 8) {
+			e.doit = false;
 		}
 
-		int caretPosition = field.getCaretPosition();
-		String newText;
-		if ("".equals(e.text)) {
-			newText = text.substring(0, e.start) + text.substring(e.end);
-		} else {
-			newText = text.substring(0, caretPosition) + insertion + text.substring(caretPosition);
+		if (e.doit == true) {
+			String newText = getNewText(decimals, locale, textBefore, caretPosition, start, end, insertion, dfs);
+			Double newValue = getNewValue(newText, dfs);
+			int newCaretPosition = getNewCaretPosition(textBefore, insertion, newText, dfs, caretPosition, keyCode);
+
+			verificationActive = true;
+			field.setText(newText);
+			field.setSelection(newCaretPosition);
+			field.setData(FieldUtil.FIELD_VALUE, newValue);
+			verificationActive = false;
+			e.doit = false;
 		}
-		newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
-		newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
+	}
+
+	protected Double getNewValue(String newText, DecimalFormatSymbols dfs) {
 		Double newValue;
 		if (newText.isEmpty()) {
 			newValue = null;
 		} else {
+			newText = newText.replaceAll("[" + dfs.getGroupingSeparator() + "]", "");
+			newText = newText.replaceAll("[" + dfs.getDecimalSeparator() + "]", ".");
 			newValue = Double.parseDouble(newText);
-			newText = numberFormat.format(newValue);
-			verificationActive = true;
-			field.setText(newText);
-			field.setSelection(caretPosition + insertion.length());
-			verificationActive = false;
 		}
-		field.setData(FieldUtil.FIELD_VALUE, newValue);
-		e.doit = false;
+		return newValue;
+	}
+
+	protected int getNewCaretPosition(String textBefore, String insertion, String newText, DecimalFormatSymbols dfs, int caretPosition, int keyCode) {
+		int newCaretPosition;
+		if (keyCode == 8) {
+			if (newText.length() <= 1) {
+				newCaretPosition = caretPosition;
+			} else {
+				newCaretPosition = newText.length() - 3;
+			}
+		} else if (keyCode == 127) {
+			newCaretPosition = caretPosition;
+		} else if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
+			newCaretPosition = newText.length() - 3 + 1;
+		} else if (textBefore.equals("0" + dfs.getDecimalSeparator() + "00")) {
+			newCaretPosition = insertion.length();
+		} else if (insertion.equals("")) {
+			newCaretPosition = caretPosition;
+		} else {
+			newCaretPosition = newText.length() - 3;
+		}
+
+		return newCaretPosition;
+	}
+
+	protected String getNewText(int decimals, Locale locale, String textBefore, int caretPosition, int start, int end, String insertion,
+			DecimalFormatSymbols dfs) {
+		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+		numberFormat.setMaximumFractionDigits(decimals);
+		numberFormat.setMinimumFractionDigits(decimals);
+		numberFormat.setGroupingUsed(true);
+		String newText;
+
+		if ("".equals(insertion)) {
+			newText = textBefore.substring(0, start) + textBefore.substring(end);
+		} else if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
+			newText = textBefore.substring(0, start) + textBefore.substring(end);
+		} else {
+			newText = textBefore.substring(0, caretPosition) + insertion + textBefore.substring(caretPosition);
+		}
+		if (!newText.isEmpty()) newText = numberFormat.format(getNewValue(newText, dfs));
+
+		return newText;
 	}
 
 }

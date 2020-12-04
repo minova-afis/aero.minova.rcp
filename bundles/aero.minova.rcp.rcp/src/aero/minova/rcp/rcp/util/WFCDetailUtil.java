@@ -22,8 +22,6 @@ public class WFCDetailUtil {
 	@Inject
 	private IEventBroker broker;
 
-	private ILocalDatabaseService localDatabaseService;
-
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;

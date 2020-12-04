@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.parts;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
@@ -21,6 +22,9 @@ public abstract class WFCFormPart {
 	@Inject
 	protected IDataService dataService;
 	protected Form form;
+	
+	@Inject
+	Logger logger;
 
 
 	public Form getForm(Composite parent) {
@@ -31,6 +35,7 @@ public abstract class WFCFormPart {
 			form = dataFormService.getForm(formName);
 			if (form == null) {
 				LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
+				logger.error("Server konnte " + formName + " nicht laden!");
 				return null;
 			}
 		}

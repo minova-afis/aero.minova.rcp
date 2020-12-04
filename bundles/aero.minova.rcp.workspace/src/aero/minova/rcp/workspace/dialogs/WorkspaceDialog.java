@@ -17,7 +17,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -28,8 +27,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.WorkspaceException;
-import aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 @SuppressWarnings("restriction")
@@ -68,8 +67,7 @@ public class WorkspaceDialog extends Dialog {
 		profile = new Combo(container, SWT.NONE);
 		profile.setLayoutData(new GridData(SWT.FILL, SWT.END, true, false, 3, 1));
 		fillProfiles();
-		profile.addSelectionListener(new SelectionListener() {
-
+		profile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				int i = profile.getSelectionIndex();
@@ -80,10 +78,6 @@ public class WorkspaceDialog extends Dialog {
 				connectionString.setText("");
 				applicationArea.setText("");
 				loadProfileData();
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
 		profile.addFocusListener(new FocusAdapter() {
@@ -119,14 +113,12 @@ public class WorkspaceDialog extends Dialog {
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				// if (!profile.getText().isEmpty()) {
 				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
 				profile.clearSelection();
 				profile.removeAll();
 				loadedProfile = false;
 				fillProfiles();
 				deleteDialogEntries();
-				//
 			}
 		});
 

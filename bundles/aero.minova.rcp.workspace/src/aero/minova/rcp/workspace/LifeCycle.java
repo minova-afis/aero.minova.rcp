@@ -12,9 +12,9 @@ import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
-import aero.minova.rcp.workspace.handler.WorkspaceAccessPreferences;
 
 @SuppressWarnings("restriction")
 public class LifeCycle {
@@ -35,8 +35,7 @@ public class LifeCycle {
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
-		// TODO hier wird aktuell noch dran gearbeitet. HOM & ERC 18.11.2020 17:30Uhr
-		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty() && false) {
+		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
 
 			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 			try {

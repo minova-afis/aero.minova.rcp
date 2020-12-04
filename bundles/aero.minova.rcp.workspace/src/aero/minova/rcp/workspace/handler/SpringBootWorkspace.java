@@ -28,6 +28,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
+import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.WorkspaceException;
 
 @SuppressWarnings("restriction")

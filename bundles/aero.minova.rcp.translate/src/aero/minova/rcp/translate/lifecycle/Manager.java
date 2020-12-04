@@ -49,7 +49,7 @@ public class Manager {
 		preferences.put("language", language);
 		String country = preferences.get("country", Locale.getDefault().getDisplayCountry(Locale.getDefault()));
 		preferences.put("country", country);
-		String timezone = preferences.get("timezone", ZoneId.systemDefault().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+		String timezone = preferences.get("timezone", ZoneId.systemDefault().getId());
 		preferences.put("timezone", timezone);
 		String font = preferences.get("font", "M");
 		preferences.put("font", font);
