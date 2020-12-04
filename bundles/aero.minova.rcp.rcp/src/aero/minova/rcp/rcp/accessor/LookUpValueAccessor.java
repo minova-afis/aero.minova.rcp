@@ -86,6 +86,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		int index = table.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
 		lc.setText((String) ValueBuilder.value(v).create());
+		lc.getTextControl().setMessage("");
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder

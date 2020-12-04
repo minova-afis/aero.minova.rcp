@@ -121,7 +121,7 @@ public class LookupField {
 
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService,
 				"List");
-		lookUpControl.getTextControl().setText("...");
+		lookUpControl.getTextControl().setMessage("...");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
@@ -133,7 +133,7 @@ public class LookupField {
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, lookUpControl, false);
 			}
-			lookUpControl.getTextControl().setText("");
+			lookUpControl.getTextControl().setMessage("");
 		}));
 	}
 
