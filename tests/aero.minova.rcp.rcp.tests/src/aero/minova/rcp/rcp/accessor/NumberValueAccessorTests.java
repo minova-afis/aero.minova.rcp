@@ -71,6 +71,7 @@ public class NumberValueAccessorTests {
 				decimalFormatSymbols//
 		);
 		assertEquals("Text", "9.999,95", result.text);
+		assertEquals("CaretPosition", 5, result.caretPosition);
 	}
 
 //	@Test
