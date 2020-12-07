@@ -20,6 +20,9 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		super();
 		this.field = field;
 		this.control = control;
+
+		if (control == null) return;
+
 		control.addFocusListener(new FocusListener() {
 
 			@Override

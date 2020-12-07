@@ -24,27 +24,28 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
 public class NumberField {
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
+	public static Control create(Composite composite, MNumberField field, int row, int column, FormToolkit formToolkit,
 			Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
-		// FieldUtil.addDataToText(text, field, DataType.DOUBLE);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, text);
 
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				text.getDisplay().asyncExec(() -> text.setSelection(0, text.getText().length() - 1));
+				text.selectAll();
 			}
 		});
+		text.addVerifyListener(numberValueAccessor);
 
-		field.setValueAccessor(new NumberValueAccessor(field, text));
+		field.setValueAccessor(numberValueAccessor);
 
 		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
 		FormData labelFormData = new FormData();

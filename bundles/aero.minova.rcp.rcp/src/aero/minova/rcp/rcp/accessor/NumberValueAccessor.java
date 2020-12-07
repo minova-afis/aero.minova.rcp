@@ -1,15 +1,31 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.rcp.fields.FieldUtil;
 
-public class NumberValueAccessor extends AbstractValueAccessor {
+public class NumberValueAccessor extends AbstractValueAccessor implements VerifyListener {
 
-	public NumberValueAccessor(MField field, Control control) {
+	public class Result {
+		String text;
+		int caretPosition;
+		Value value;
+	}
+
+	private boolean verificationActive = false;
+
+	public NumberValueAccessor(MNumberField field, Control control) {
 		super(field, control);
 	}
 
@@ -18,12 +34,156 @@ public class NumberValueAccessor extends AbstractValueAccessor {
 		if (value == null) {
 			((Text) control).setText("");
 		} else {
+			int decimals = (int) field.getDecimals();
+			Locale locale = (Locale) control.getData(FieldUtil.TRANSLATE_LOCALE);
+
+			NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+			numberFormat.setMaximumFractionDigits(decimals); // wir wollen genau so viele Nachkommastellen
+			numberFormat.setMinimumFractionDigits(decimals); // dito
+
 			if (value.getType().equals(DataType.DOUBLE)) {
-				((Text) control).setText(value.getDoubleValue().toString());
+				((Text) control).setText(numberFormat.format(value.getDoubleValue()));
 			} else {
-				((Text) control).setText(value.getIntegerValue().toString());
+				((Text) control).setText(numberFormat.format(value.getIntegerValue()));
 			}
 		}
 	}
 
+	@Override
+	public void verifyText(VerifyEvent e) {
+		if (!isFocussed()) return; // Wir sind aktiv, wenn der Control den Focus hat
+		if (verificationActive) return; // diese Methode setzt einen neuen Wert
+		if (!e.doit) return; // anscheinend hat schon jemand reagiert
+
+		// Werte vom Event
+		String insertion = e.text;
+		int start = e.start;
+		int end = e.end;
+		int keyCode = e.keyCode;
+
+		// Werte aus dem Model
+		int decimals = field.getDecimals();
+
+		// Werte vom Text-Widget
+		Text control = (Text) e.getSource();
+		Locale locale = (Locale) control.getData(FieldUtil.TRANSLATE_LOCALE);
+		int caretPosition = control.getCaretPosition();
+		String textBefore = control.getText();
+
+		// allegmeine Variablen
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+
+		// Berechnung
+		String newText;
+		Value newValue;
+		int newCaretPosition;
+
+		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs);
+
+		verificationActive = true;
+		field.setValue(r.value, true);
+		control.setText(r.text);
+		control.setSelection(r.caretPosition);
+		e.doit = false;
+		verificationActive = false;
+	}
+
+	/**
+	 * <p>
+	 * Diese Methode ermittelt den neu darzustellenden Text.
+	 * </p>
+	 * <p>
+	 * Dabei ermitteln wir die CaretPosition im Verhältnis zum Komma. Wenn das Komma nicht vorhanden ist, gilt der rechte Rand. Nach dem Einfügen des neuen
+	 * Textes setzen wir uns wieder an die Position.
+	 * </p>
+	 * 
+	 * @param insertion
+	 *            die Benutzereingabe als Zeichenkette (darstellbare Zeichen) ({@link VerifyEvent#text})
+	 * @param start
+	 *            die 1. Position der selektierten Zeichenkette im {@code textBefore} ({@link VerifyEvent#start})
+	 * @param end
+	 *            die letzte Position der selektierten Zeichenkette im {@code textBefore} ({@link VerifyEvent#end})
+	 * @param keyCode
+	 *            der keyCode der Eingabe. Dies kann ein darstellbares Zeichen sein. Es kann aber auch ein nicht darstellbares Zeichen sein. Wenn die #insertion
+	 *            mehr als ein Zeichen enthält, ist dieser Wert 0 ({@link Event#keyCode})
+	 * @param decimals
+	 *            die Anzahl der Nachkommastellen, die der Entwickler für das Feld definiert hat.
+	 * @param locale
+	 *            die aktuellen Spracheinstellungen
+	 * @param caretPosition
+	 *            die Position, an der sich der Cursor befindet ({@link Text#getCaretPosition()})
+	 * @param textBefore
+	 *            der Text, der aktuell (vor Verarbeitung dieses Events) im Feld steht ({@link Text#getText()})
+	 * @param decimalFormatSymbols
+	 *            {@link DecimalFormatSymbols} des aktuellen locale
+	 * @return
+	 */
+	public Result processInput(String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore,
+			DecimalFormatSymbols decimalFormatSymbols) {
+		Result result = new Result();
+		String text;
+		int rightCaretPosition;
+		int rightDecimalPosition = 0;
+		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+		numberFormat.setMaximumFractionDigits(decimals);
+		numberFormat.setMinimumFractionDigits(decimals);
+		numberFormat.setGroupingUsed(true);
+		StringBuilder sb = new StringBuilder();
+
+		// textBefore von überflüssigen Zeichen befreien
+		int position = 0;
+		for (char c : textBefore.toCharArray()) {
+			if (c >= '0' && c <= '9') sb.append(c);
+			else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+			else {
+				// wir entfernen das Zeichen
+				if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+				if (start >= position) start--;
+				if (end >= position) end--;
+				position--; // wird am Ende der Schleife wieder hochgezählt
+			}
+			position++;
+		}
+		textBefore = sb.toString();
+		rightCaretPosition = textBefore.length() - caretPosition;
+		for (char c : textBefore.toCharArray()) {
+			if (c == decimalFormatSymbols.getDecimalSeparator()) {
+				rightDecimalPosition = textBefore.length() - rightDecimalPosition;
+				break;
+			}
+			rightDecimalPosition++;
+		}
+
+		// insertion von überflüssigen Zeichen befreien
+		position = 0;
+		sb = new StringBuilder();
+		for (char c : insertion.toCharArray()) {
+			if (c >= '0' && c <= '9') sb.append(c);
+			else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+			else position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
+			position++;
+		}
+		insertion = sb.toString();
+
+		if (start != end) {
+			// wir müssen etwas herausschneiden
+			text = textBefore.substring(0, start) + textBefore.substring(end);
+		} else text = textBefore;
+
+		if (insertion.length() > 0) {
+			// wir müssen etwas einfügen
+			text = text.substring(0, start) + insertion + text.substring(start);
+		}
+
+		try {
+			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+			result.text = numberFormat.format(result.value.getDoubleValue());
+			result.caretPosition = caretPosition + result.text.length() - textBefore.length();
+		} catch (NumberFormatException e) {
+			result.value = null;
+			result.caretPosition = caretPosition + insertion.length();
+		}
+
+		return result;
+	}
 }
