@@ -274,7 +274,7 @@ public class WFCDetailPart extends WFCFormPart {
 		if (field instanceof MBooleanField) {
 			BooleanField.create(composite, field, row, column, formToolkit, locale);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, field, row, column, formToolkit, locale);
+			NumberField.create(composite, (MNumberField) field, row, column, formToolkit, locale);
 		} else if (field instanceof MDateTimeField) {
 			DateTimeField.create(composite, field, row, column, formToolkit);
 		} else if (field instanceof MShortDateField) {
