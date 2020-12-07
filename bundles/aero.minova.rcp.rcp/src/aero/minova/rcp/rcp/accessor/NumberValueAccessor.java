@@ -145,14 +145,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			position++;
 		}
 		textBefore = sb.toString();
-		rightCaretPosition = textBefore.length() - caretPosition;
-		for (char c : textBefore.toCharArray()) {
-			if (c == decimalFormatSymbols.getDecimalSeparator()) {
-				rightDecimalPosition = textBefore.length() - rightDecimalPosition;
-				break;
-			}
-			rightDecimalPosition++;
-		}
 
 		// insertion von überflüssigen Zeichen befreien
 		position = 0;
@@ -178,12 +170,62 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		try {
 			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
 			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = caretPosition + result.text.length() - textBefore.length();
+			result.caretPosition = getRightCaretPosition(result.text, textBefore, insertion, keyCode, caretPosition, decimalFormatSymbols);
 		} catch (NumberFormatException e) {
 			result.value = null;
-			result.caretPosition = caretPosition + insertion.length();
+			result.caretPosition = getRightCaretPosition(result.text, textBefore, insertion, keyCode, caretPosition, decimalFormatSymbols);
 		}
 
 		return result;
+	}
+
+	/**
+	 * <p>
+	 * Diese Methode ermittelt die neue Caret Position.
+	 * </p>
+	 * <p>
+	 * Die neue Caret Position wird ermittelt anhand des neuen formatierten Textes, des vorherigen Textes, der Eingabe und der vorherigen Caret Position. Wenn
+	 * die Eingabe ein dezimal Trennzeichen ist wird die Caret Position hinter das Trennzeichen gesetzt. Bei Löschen oder Entfernen bleibt die Caret Position
+	 * gleich.
+	 * </p>
+	 * 
+	 * @param text
+	 *            der Text, der sich aus insertion und textBefore zusammen setzt und formatiert wurde ({@link Text#getText()})
+	 * @param textBefore
+	 *            der Text, der aktuell (vor Verarbeitung dieses Events) im Feld steht ({@link Text#getText()})
+	 * @param insertion
+	 *            die Benutzereingabe als Zeichenkette (darstellbare Zeichen) ({@link VerifyEvent#text})
+	 * @param keyCode
+	 *            der keyCode der Eingabe. Dies kann ein darstellbares Zeichen sein. Es kann aber auch ein nicht darstellbares Zeichen sein. Wenn die #insertion
+	 *            mehr als ein Zeichen enthält, ist dieser Wert 0 ({@link Event#keyCode})
+	 * @param caretPosition
+	 *            die Position, an der sich der Cursor befindet ({@link Text#getCaretPosition()})
+	 * @param decimalFormatSymbols
+	 *            {@link DecimalFormatSymbols} des aktuellen locale
+	 * @return
+	 */
+	public int getRightCaretPosition(String text, String textBefore, String insertion, int keyCode, int caretPosition,
+			DecimalFormatSymbols decimalFormatSymbols) {
+		int rightCaretPosition;
+
+		if (keyCode == 8) { // Fall, dass etwas gelöscht wird
+			if (text.length() <= 1) {
+				rightCaretPosition = caretPosition;
+			} else {
+				rightCaretPosition = text.length() - 3;
+			}
+		} else if (keyCode == 127) { // Fall, dass etwas entfernt wird
+			rightCaretPosition = caretPosition;
+		} else if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die Engabe ein dezimal Trennzeich ist
+			rightCaretPosition = text.length() - 2;
+		} else if (textBefore.equals("0" + decimalFormatSymbols.getDecimalSeparator() + "00")) {
+			rightCaretPosition = insertion.length();
+		} else if (insertion.equals("")) {
+			rightCaretPosition = caretPosition;
+		} else {
+			rightCaretPosition = text.length() - 3;
+		}
+
+		return rightCaretPosition;
 	}
 }
