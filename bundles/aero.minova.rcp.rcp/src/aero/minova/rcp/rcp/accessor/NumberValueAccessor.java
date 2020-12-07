@@ -92,10 +92,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * <p>
 	 * Diese Methode ermittelt den neu darzustellenden Text.
 	 * </p>
-	 * <p>
-	 * Dabei ermitteln wir die CaretPosition im Verhältnis zum Komma. Wenn das Komma nicht vorhanden ist, gilt der rechte Rand. Nach dem Einfügen des neuen
-	 * Textes setzen wir uns wieder an die Position.
-	 * </p>
 	 * 
 	 * @param insertion
 	 *            die Benutzereingabe als Zeichenkette (darstellbare Zeichen) ({@link VerifyEvent#text})
