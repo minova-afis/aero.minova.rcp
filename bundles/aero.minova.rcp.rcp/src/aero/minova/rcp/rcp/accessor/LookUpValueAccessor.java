@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -64,7 +65,22 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		((LookupControl) control).setText("");
 		if (value != null) {
 			// TODO: berücksichtigung des Localdatabaseservice
-			getLookUpConsumer(control, value);
+			Map databaseMap;
+			if (field.getLookupTable() != null) {
+				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
+			} else {
+				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupProcedurePrefix(), value.getIntegerValue());
+			}
+			if (databaseMap == null) {
+				getLookUpConsumer(control, value);
+			} else {
+				((LookupControl) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
+				if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
+					((LookupControl) control).getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
+				} else {
+					((LookupControl) control).getDescription().setText("");
+				}
+			}
 
 		}
 	}
@@ -91,7 +107,11 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			} else if (ta instanceof Table) {
 				t = (Table) ta;
 			}
-			localDatabaseService.addResultsForLookupField(field.getName(), t);
+			if (field.getLookupTable() != null) {
+				localDatabaseService.addResultsForLookupField(field.getLookupTable(), t);
+			} else {
+				localDatabaseService.addResultsForLookupField(field.getLookupProcedurePrefix(), t);
+			}
 			updateSelectedLookupEntry(t, control);
 		}));
 	}

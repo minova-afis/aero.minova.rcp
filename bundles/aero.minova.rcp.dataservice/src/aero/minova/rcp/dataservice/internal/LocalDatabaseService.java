@@ -44,7 +44,10 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	private Connection conn;
 
 	/**
-	 * Öffnen der Datenbankverbindung beim Öffnen der Klasse
+	 * Öffnen der Datenbankverbindung beim Öffnen der Klasse und erstellt, wenn nicht vorhanden, zwei Tabellen Lookupvalues: enthält sämtliche Optionen, welche
+	 * derzeit von der Anwendung verwendet werden. Der Inhalt wird ständig ausgetauscht AllLookupvalues: enthält sämtliche Optionen. Diese Tabelle wird nur
+	 * erweitert, um ein schnelles Laden zu ermöglichen Lookup: enthält die procedureprefix, um einzräge eindeutig zuordnen zu können KeyLong, KeyText,
+	 * Description: die Informationen aus dem CAS
 	 */
 	@Activate
 	@SuppressWarnings("unchecked")
@@ -59,10 +62,10 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 			conn.setAutoCommit(false);
 			createTableIfNotExisting = conn.prepareStatement(
-					"CREATE TABLE IF NOT EXISTS Lookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
+					"CREATE TABLE IF NOT EXISTS Lookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR)");
 			createTableIfNotExisting.execute();
 			createTableIfNotExisting = conn.prepareStatement(
-					"CREATE TABLE IF NOT EXISTS AllLookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
+					"CREATE TABLE IF NOT EXISTS AllLookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR)");
 			createTableIfNotExisting.execute();
 		} catch (SQLException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -186,7 +189,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			if (table != null || name != null) {
 				try {
 					insertEntryOfLookup = conn.prepareStatement(
-							"INSERT INTO Lookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
+							"INSERT INTO Lookupvalues(Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
 					deleteAllEntriesOfLookup = conn
 							.prepareStatement("DELETE FROM Lookupvalues WHERE Lookup='" + name + "'");
 					deleteAllEntriesOfLookup.execute();
@@ -236,7 +239,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					Map found = getResultsForKeyLong(name, keyLong);
 					if (found == null) {
 						insertEntryOfLookup = conn.prepareStatement(
-								"INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
+								"INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
 						int i = 0;
 						while (i < table.getRows().size()) {
 							Row r = table.getRows().get(i);
