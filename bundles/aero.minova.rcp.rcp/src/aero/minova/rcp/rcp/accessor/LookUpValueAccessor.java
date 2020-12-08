@@ -16,6 +16,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
@@ -40,26 +41,33 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	}
 
 	@Override
+	/**
+	 * Die Methode verändert den MessageWert und setzt den Textinhalt auf "". Sie überprüft die locale Datenbase, ob der value bereits bekannt ist. Andernfalls
+	 * wird eine Abfrage an den CAS versendet
+	 */
 	protected void updateControlFromValue(Control control, Value value) {
-		if (value == null) {
-			((LookupControl) control).setText("");
-		} else {
-			((LookupControl) control).getTextControl().setMessage("...");
+		((LookupControl) control).setText("");
+		if (value != null) {
+			// TODO: berücksichtigung des Localdatabaseservice
 			getLookUpConsumer(control, value);
 
 		}
 	}
 
+	/**
+	 * @param control
+	 * @param value
+	 */
 	private void getLookUpConsumer(Control control, Value value) {
 		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
 		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
 		// gestartet, um die Werte des zugehörigen Keys zu erhalten
 
 		CompletableFuture<?> tableFuture;
-		tableFuture = LookupCASRequestUtil.getRequestedTable(value.getIntegerValue(), null, field, detail, dataService,
-				"Resolve");
+		tableFuture = LookupCASRequestUtil.getRequestedTable(value.getIntegerValue(), null, field, detail, dataService, "Resolve");
 		// Diese Methode lauft auserhalb des Hauptthreads. Desshalb brauchen wir nochmal
 		// den MainThread, damit die UI-Componenten aktualisiert werden können
+		((LookupControl) control).getTextControl().setMessage("...");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			Table t = null;
 			if (ta instanceof SqlProcedureResult) {
@@ -74,25 +82,60 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	}
 
 	/**
-	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
-	 * Bindung zur Componente
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit Bindung zur Componente
 	 *
 	 * @param table
 	 * @param control
 	 */
-	public static void updateSelectedLookupEntry(Table table, Control control) {
+	public void updateSelectedLookupEntry(Table table, Control control) {
 		Row r = table.getRows().get(0);
 		LookupControl lc = (LookupControl) control;
 		int index = table.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
 		lc.setText((String) ValueBuilder.value(v).create());
+		lc.getTextControl().setMessage("");
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder
-						.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
 			} else {
 				lc.getDescription().setText("");
 			}
+		}
+	}
+
+	@Override
+	/**
+	 * Wenn das Feld dein Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
+	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
+	 */
+	public void setFocussed(boolean focussed) {
+		if (!focussed) {
+			((LookupControl) control).getTextControl().setMessage("");
+			String displayText = ((LookupControl) control).getText();
+			if (displayText != null && !displayText.equals("")) {
+
+				Table optionTable = ((MLookupField) field).getOptions();
+				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
+				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
+
+				for (Row r : optionTable.getRows()) {
+					if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
+						Value rowValue = r.getValue(indexKeyLong);
+						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
+						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
+							((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+							return;
+						}
+						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
+						else {
+							field.setValue(rowValue, false);
+							return;
+						}
+					}
+				}
+			}
+			field.setValue(null, false);
+			((LookupControl) control).getDescription().setText("");
 		}
 	}
 }

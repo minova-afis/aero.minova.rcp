@@ -1,6 +1,7 @@
 package aero.minova.rcp.model.form;
 
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Table;
 
 public class MLookupField extends MField {
 
@@ -10,6 +11,7 @@ public class MLookupField extends MField {
 
 	private String keyText;
 	private String description;
+	private Table options;
 
 	public String getKeyText() {
 		return keyText;
@@ -25,6 +27,14 @@ public class MLookupField extends MField {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Table getOptions() {
+		return options;
+	}
+
+	public void setOptions(Table options) {
+		this.options = options;
 	}
 
 }
