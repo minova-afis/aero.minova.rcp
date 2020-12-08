@@ -74,7 +74,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 5, result.caretPosition);
 	}
 
-//	@Test
+	@Test
 	public void testFrom0_00To1_00() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
@@ -93,10 +93,10 @@ public class NumberValueAccessorTests {
 		);
 		assertEquals("Text", "1,000", result.text);
 		assertEquals("CaretPosition", 1, result.caretPosition);
-		assertEquals("Value", new Value(1.0d), result.value);
+		assertEquals("Value", new Value(1.0), result.value);
 	}
 
-//	@Test
+	@Test
 	public void testFrom1_00To12_00() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
@@ -115,7 +115,7 @@ public class NumberValueAccessorTests {
 		);
 		assertEquals("Text", "12,000", result.text);
 		assertEquals("CaretPosition", 2, result.caretPosition);
-		assertEquals("Value", new Value(12.0d), result.value);
+		assertEquals("Value", new Value(12.0), result.value);
 	}
 
 	@Test
@@ -190,8 +190,8 @@ public class NumberValueAccessorTests {
 
 		Result result = numberValueAccessor.processInput(//
 				"0", // insertion
-				1, // start
-				1, // end
+				3, // start
+				3, // end
 				0, // keyCode
 				2, // decimals
 				Locale.US, // locale
@@ -203,7 +203,7 @@ public class NumberValueAccessorTests {
 		assertEquals("9,000.00", result.text);
 	}
 
-//	@Test
+	@Test
 	public void testGetNewValue() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
@@ -211,8 +211,8 @@ public class NumberValueAccessorTests {
 
 		Result result = numberValueAccessor.processInput(//
 				"0", // insertion
-				1, // start
-				1, // end
+				3, // start
+				3, // end
 				0, // keyCode
 				3, // decimals
 				Locale.US, // locale
@@ -231,8 +231,8 @@ public class NumberValueAccessorTests {
 
 		Result result = numberValueAccessor.processInput(//
 				"0", // insertion
-				1, // start
-				1, // end
+				3, // start
+				3, // end
 				0, // keyCode
 				3, // decimals
 				Locale.US, // locale
@@ -251,8 +251,8 @@ public class NumberValueAccessorTests {
 
 		Result result = numberValueAccessor.processInput(//
 				"0", // insertion
-				1, // start
-				1, // end
+				3, // start
+				3, // end
 				0, // keyCode
 				3, // decimals
 				Locale.GERMANY, // locale
@@ -264,7 +264,7 @@ public class NumberValueAccessorTests {
 		assertEquals(5, result.caretPosition);
 	}
 
-//	@Test
+	@Test
 	public void testGetNewCaretPositionInsertPointUS() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
@@ -277,7 +277,7 @@ public class NumberValueAccessorTests {
 				0, // keyCode
 				3, // decimals
 				Locale.US, // locale
-				3, // caretPosition
+				1, // caretPosition
 				"0.00", // textBefore
 				decimalFormatSymbols//
 		);
@@ -285,7 +285,7 @@ public class NumberValueAccessorTests {
 		assertEquals(2, result.caretPosition);
 	}
 
-//	@Test
+	@Test
 	public void testGetNewCaretPositionInsertCommaGER() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
