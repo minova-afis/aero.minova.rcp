@@ -104,40 +104,35 @@ public class LookupField {
 		// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
 		// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 		lookupControl.addKeyListener(new KeyListener() {
-			boolean controlPressed = false;
+
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				if (e.keyCode == SWT.CONTROL) {
-					controlPressed = true;
-				}
+
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (e.keyCode == SWT.CONTROL) {
-					controlPressed = false;
-				} else
+
 
 					// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
-					if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
-							&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE && !lookupControl.getText().startsWith("#")) {
-								if (((MLookupField) field).getOptions() == null) {
-									requestLookUpEntriesAll(field, detail, lookupControl);
-								} else {
-									changeSelectionBoxList(lookupControl, (MLookupField) field, false);
-								}
-							} else
-						if (e.keyCode == SWT.SPACE && controlPressed == true) {
-							requestLookUpEntriesAll(field, detail, lookupControl);
-						} else if (e.keyCode == SWT.ARROW_DOWN && lookupControl.isProposalPopupOpen() == false) {
-							if (((MLookupField) field).getOptions() != null) {
-								changeSelectionBoxList(lookupControl, (MLookupField) field, false);
-							} else {
-								requestLookUpEntriesAll(field, detail, lookupControl);
-							}
-						}
+				if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
+						&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE && !lookupControl.getText().startsWith("#")) {
+					if (((MLookupField) field).getOptions() == null) {
+						requestLookUpEntriesAll(field, detail, lookupControl);
+					} else {
+						changeSelectionBoxList(lookupControl, (MLookupField) field, false);
+					}
+				} else if (e.keyCode == SWT.SPACE && ((e.stateMask & SWT.CONTROL) != 0)) {
+					requestLookUpEntriesAll(field, detail, lookupControl);
+				} else if (e.keyCode == SWT.ARROW_DOWN && lookupControl.isProposalPopupOpen() == false) {
+					if (((MLookupField) field).getOptions() != null) {
+						changeSelectionBoxList(lookupControl, (MLookupField) field, false);
+					} else {
+						requestLookUpEntriesAll(field, detail, lookupControl);
+					}
+				}
 			}
 
 		});
