@@ -200,7 +200,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public int getRightCaretPosition(String text, String textBefore, String insertion, int keyCode, int caretPosition,
+	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
 			DecimalFormatSymbols decimalFormatSymbols) {
 		int rightCaretPosition;
 
@@ -208,18 +208,18 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if (text.length() <= 1) {
 				rightCaretPosition = caretPosition;
 			} else {
-				rightCaretPosition = text.length() - 3;
+				rightCaretPosition = text.length() - (decimals + 1);
 			}
 		} else if (keyCode == 127) { // Fall, dass etwas entfernt wird
 			rightCaretPosition = caretPosition;
-		} else if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die Engabe ein dezimal Trennzeich ist
-			rightCaretPosition = text.length() - 2;
-		} else if (textBefore.equals("0" + decimalFormatSymbols.getDecimalSeparator() + "00")) {
+		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
+			rightCaretPosition = text.length() - decimals;
+		} else if (textBefore.equals("0" + decimalFormatSymbols.getDecimalSeparator() + (0 * decimals))) {
 			rightCaretPosition = insertion.length();
 		} else if (insertion.equals("")) {
 			rightCaretPosition = caretPosition;
 		} else {
-			rightCaretPosition = text.length() - 3;
+			rightCaretPosition = text.length() - (decimals + 1);
 		}
 
 		return rightCaretPosition;
