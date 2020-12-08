@@ -73,11 +73,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
-		// Berechnung
-		String newText;
-		Value newValue;
-		int newCaretPosition;
-
 		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs);
 
 		verificationActive = true;
@@ -119,7 +114,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		Result result = new Result();
 		String text;
 		Boolean doit;
-		int rightDecimalPosition = 0;
+//		int rightDecimalPosition = 0;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
@@ -178,14 +173,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				text = text.substring(0, start) + insertion + text.substring(start);
 			}
 
-			try {
-				result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
-				result.text = numberFormat.format(result.value.getDoubleValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
-			} catch (NumberFormatException e) {
-				result.value = null;
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
-			}
 		} else {
 			try {
 				result.value = new Value(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
@@ -244,9 +231,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else if (insertion.equals("")) {
 			rightCaretPosition = caretPosition;
 		} else {
-			rightCaretPosition = text.length() - (decimals + 1);
+			newCaretPosition = text.length() - (decimals + 1);
 		}
 
-		return rightCaretPosition;
+		return newCaretPosition;
 	}
 }
