@@ -213,23 +213,24 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * @return
 	 */
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
-			DecimalFormatSymbols decimalFormatSymbols) {
-		int rightCaretPosition;
+			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
+		int newCaretPosition;
+		String null_point = numberFormat.format(0);
 
-		if (keyCode == 8) { // Fall, dass etwas gelöscht wird
+		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			if (text.length() <= 1) {
-				rightCaretPosition = caretPosition;
+				newCaretPosition = caretPosition;
 			} else {
-				rightCaretPosition = text.length() - (decimals + 1);
+				newCaretPosition = text.length() - (decimals + 1);
 			}
-		} else if (keyCode == 127) { // Fall, dass etwas entfernt wird
-			rightCaretPosition = caretPosition;
+		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF56 entfernt wird
+			newCaretPosition = text.length() - (decimals + 1);
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
-			rightCaretPosition = text.length() - decimals;
-		} else if (textBefore.equals("0" + decimalFormatSymbols.getDecimalSeparator() + (0 * decimals))) {
-			rightCaretPosition = insertion.length();
-		} else if (insertion.equals("")) {
-			rightCaretPosition = caretPosition;
+			newCaretPosition = text.length() - decimals;
+		} else if (null_point.equals(textBefore)) {
+			newCaretPosition = insertion.length();
+		} else if ("".equals(insertion)) {
+			newCaretPosition = caretPosition;
 		} else {
 			newCaretPosition = text.length() - (decimals + 1);
 		}
