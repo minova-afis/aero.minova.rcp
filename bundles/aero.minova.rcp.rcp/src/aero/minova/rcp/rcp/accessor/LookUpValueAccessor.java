@@ -126,7 +126,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		if (!focussed) {
 
 			String displayText = ((LookupControl) control).getText();
-			if (displayText == null || displayText.equals("")) return;
+			if (displayText != null && !displayText.equals("")) {
 
 			Table optionTable = ((MLookupField) field).getOptions();
 			int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
@@ -147,6 +147,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 			}
+		}
 			field.setValue(null, false);
 			((LookupControl) control).getDescription().setText("");
 
