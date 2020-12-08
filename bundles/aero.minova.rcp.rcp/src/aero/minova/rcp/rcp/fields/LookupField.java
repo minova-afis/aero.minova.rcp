@@ -177,7 +177,6 @@ public class LookupField {
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, lookUpControl, true);
 			}
-			lookUpControl.getTextControl().setMessage("");
 		}));
 	}
 

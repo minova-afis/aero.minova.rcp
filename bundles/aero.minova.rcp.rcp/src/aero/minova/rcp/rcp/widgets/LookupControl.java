@@ -92,28 +92,14 @@ public class LookupControl extends Composite {
 	protected void addTextControl(int style) {
 		textControl = new Text(this, style);
 		contentProposalProvider = new MinovaProposalProvider();
-//		TextContentAdapter tca = new TextContentAdapter() {
-//			/**
-//			 * Wird bei auswahl eines Wertes in den Proposals aufgerufen. Der ausgewählte
-//			 * Wert wird in das Feld geschrieben und der Keylong abespeichert
-//			 */
-//			@Override
-//			public void insertControlContents(Control control, String text, int cursorPosition) {
-//				Point selection = ((Text) control).getSelection();
-//				selectOption(control, text);
-//				if (cursorPosition < text.length()) {
-//					((Text) control).setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
-//				}
-//			}
-//		};
 		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, new TextContentAdapter(),
 				contentProposalProvider,
 				null, null);
 		contentProposalAdapter.addContentProposalListener(proposal -> {
 			MinovaContentProposal p = (MinovaContentProposal) proposal;
 			MField data = (MField) LookupControl.this.getData(Constants.CONTROL_FIELD);
-			LookupControl lc = LookupControl.this;
-			lc.setText(p.keyText);
+			setText(p.keyText);
+			getTextControl().setMessage("");
 			data.setValue(new Value(p.keyLong), false);
 		});
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
