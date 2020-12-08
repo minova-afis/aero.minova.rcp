@@ -174,14 +174,33 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 
 		} else {
-			try {
-				result.value = new Value(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
-				result.text = numberFormat.format(result.value.getDoubleValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
-			} catch (NumberFormatException e) {
-				result.value = null;
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
+			int position = 0;
+			for (char c : textBefore.toCharArray()) {
+				if (c >= '0' && c <= '9') sb.append(c);
+				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+				else {
+					// wir entfernen das Zeichen
+					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+					if (start >= position) start--;
+					if (end >= position) end--;
+					position--; // wird am Ende der Schleife wieder hochgezählt
+				}
+				position++;
 			}
+			textBefore = sb.toString();
+
+			text = textBefore;
+		}
+
+		try {
+			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+			result.text = numberFormat.format(result.value.getDoubleValue());
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
+					numberFormat);
+		} catch (NumberFormatException e) {
+			result.value = null;
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
+					numberFormat);
 		}
 
 		return result;
