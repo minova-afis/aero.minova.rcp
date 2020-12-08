@@ -206,7 +206,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * </p>
 	 * <p>
 	 * Die neue Caret Position wird ermittelt anhand des neuen formatierten Textes, des vorherigen Textes, der Eingabe und der vorherigen Caret Position. Wenn
-	 * die Eingabe ein dezimal Trennzeichen ist wird die Caret Position hinter das Trennzeichen gesetzt. Bei Löschen oder Entfernen bleibt die Caret Position
+	 * die Eingabe ein dezimal Trennzeichen ist wird die Caret Position hinter das Trennzeichen gesetzt. Beim Löschen oder Entfernen bleibt die Caret Position
 	 * gleich.
 	 * </p>
 	 * 
