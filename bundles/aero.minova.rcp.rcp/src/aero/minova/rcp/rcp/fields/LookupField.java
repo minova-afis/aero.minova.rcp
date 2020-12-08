@@ -207,25 +207,12 @@ public class LookupField {
 			// Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der Wert
 			// aus dem CAS als Option/Proposal aufgelistet
 			if (t.getRows().size() == 1) {
-				if (lookUpControl != null && lookUpControl.getText() != null && twisty == false) {
-					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-					if (value.getStringValue().equalsIgnoreCase(lookUpControl.getText().toString())) {
-						updateSelectedLookupEntry(t, lookUpControl);
-						field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
-					}
-					// Setzen der Proposals/Optionen
-					changeProposals(lookUpControl, t);
-
-				} else {
+				if (lookUpControl != null && lookUpControl.getText() != null && !twisty) {
 					updateSelectedLookupEntry(t, lookUpControl);
-					System.out.println(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)));
-					field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
-					// Setzen der Proposals/Optionen
-					changeProposals(lookUpControl, t);
-
 				}
+				changeProposals(lookUpControl, t);
 			} else {
-				if (lookUpControl != null && lookUpControl.getText() != null && twisty == false) {
+				if (lookUpControl != null && lookUpControl.getText() != null && !twisty) {
 					// Aufbau einer gefilterten Tabelle, welche nur die Werte aus dem CAS enthält,
 					// die den Text im Field am Anfang stehen haben
 					Table filteredTable = new Table();
@@ -246,21 +233,7 @@ public class LookupField {
 						}
 
 					}
-					// Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100%
-					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
-					// Wert gesetzt
-					if (filteredTable.getRows().size() == 1
-							&& (filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-									.equals(lookUpControl.getText().toLowerCase()))
-							|| (filteredTable.getRows().size() != 0
-									&& filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
-									&& filteredTable.getRows().get(0).getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue()
-											.toLowerCase().equals(lookUpControl.getText().toLowerCase()))) {
-
-						field.setValue(filteredTable.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
-						changeProposals(lookUpControl, filteredTable);
-						// Setzen der Proposals/Optionen
-					} else if (filteredTable.getRows().size() != 0) {
+					if (filteredTable.getRows().size() != 0) {
 						changeProposals(lookUpControl, filteredTable);
 					} else {
 						changeProposals(lookUpControl, t);
