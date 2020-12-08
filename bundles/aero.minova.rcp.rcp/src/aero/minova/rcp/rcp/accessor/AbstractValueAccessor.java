@@ -13,14 +13,15 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	protected final MField field;
 	protected final Control control;
-	private boolean focussed = false;
+	protected FocusListener focusListener;
+	protected boolean focussed = false;
 	private Value displayValue;
 
 	public AbstractValueAccessor(MField field, Control control) {
 		super();
 		this.field = field;
 		this.control = control;
-		control.addFocusListener(new FocusListener() {
+		FocusListener abstractFocusListener = new FocusListener() {
 
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -32,7 +33,9 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 			public void focusGained(FocusEvent e) {
 				setFocussed(true);
 			}
-		});
+		};
+		this.focusListener = abstractFocusListener;
+		control.addFocusListener(abstractFocusListener);
 	}
 
 	protected abstract void updateControlFromValue(Control control, Value value);
