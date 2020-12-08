@@ -95,6 +95,7 @@ public class LookupControl extends Composite {
 		contentProposalAdapter = new ContentProposalAdapterExtension(textControl, new TextContentAdapter(),
 				contentProposalProvider,
 				null, null);
+		// Wird eine Option ausgewählt, so setzen wir diese nun in das Feld
 		contentProposalAdapter.addContentProposalListener(proposal -> {
 			MinovaContentProposal p = (MinovaContentProposal) proposal;
 			MField data = (MField) LookupControl.this.getData(Constants.CONTROL_FIELD);
