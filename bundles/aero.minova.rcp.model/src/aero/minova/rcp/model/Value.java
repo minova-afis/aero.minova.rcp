@@ -105,6 +105,7 @@ public class Value implements Serializable {
 	public boolean equals(Object obj) {
 		Value v = null;
 		if (obj instanceof Value) v = (Value) obj;
+		if (v == null) return false; // wir sind gesetzt und vergleichen mit null -> false
 		return (this.type == v.type && this.value.equals(v.value));
 	}
 }
