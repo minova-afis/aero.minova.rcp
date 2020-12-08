@@ -73,11 +73,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
-		// Berechnung
-		String newText;
-		Value newValue;
-		int newCaretPosition;
-
 		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs);
 
 		verificationActive = true;
@@ -91,10 +86,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	/**
 	 * <p>
 	 * Diese Methode ermittelt den neu darzustellenden Text.
-	 * </p>
-	 * <p>
-	 * Dabei ermitteln wir die CaretPosition im Verhältnis zum Komma. Wenn das Komma nicht vorhanden ist, gilt der rechte Rand. Nach dem Einfügen des neuen
-	 * Textes setzen wir uns wieder an die Position.
 	 * </p>
 	 * 
 	 * @param insertion
@@ -122,68 +113,147 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			DecimalFormatSymbols decimalFormatSymbols) {
 		Result result = new Result();
 		String text;
-		int rightCaretPosition;
-		int rightDecimalPosition = 0;
+		Boolean doit;
+//		int rightDecimalPosition = 0;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
-		// textBefore von überflüssigen Zeichen befreien
-		int position = 0;
-		for (char c : textBefore.toCharArray()) {
-			if (c >= '0' && c <= '9') sb.append(c);
-			else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
-			else {
-				// wir entfernen das Zeichen
-				if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
-				if (start >= position) start--;
-				if (end >= position) end--;
-				position--; // wird am Ende der Schleife wieder hochgezählt
+		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 127) {
+			doit = false;
+		} else if (!textBefore.isEmpty() && textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 8) {
+			doit = false;
+		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
+			if (!textBefore.isEmpty() && decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+				doit = false;
+			} else {
+				doit = true;
 			}
-			position++;
+		} else {
+			doit = true;
 		}
-		textBefore = sb.toString();
-		rightCaretPosition = textBefore.length() - caretPosition;
-		for (char c : textBefore.toCharArray()) {
-			if (c == decimalFormatSymbols.getDecimalSeparator()) {
-				rightDecimalPosition = textBefore.length() - rightDecimalPosition;
-				break;
+
+		if (doit == true) {
+			// textBefore von überflüssigen Zeichen befreien
+			int position = 0;
+			for (char c : textBefore.toCharArray()) {
+				if (c >= '0' && c <= '9') sb.append(c);
+				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+				else {
+					// wir entfernen das Zeichen
+					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+					if (start >= position) start--;
+					if (end >= position) end--;
+					position--; // wird am Ende der Schleife wieder hochgezählt
+				}
+				position++;
 			}
-			rightDecimalPosition++;
-		}
+			textBefore = sb.toString();
 
-		// insertion von überflüssigen Zeichen befreien
-		position = 0;
-		sb = new StringBuilder();
-		for (char c : insertion.toCharArray()) {
-			if (c >= '0' && c <= '9') sb.append(c);
-			else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
-			else position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
-			position++;
-		}
-		insertion = sb.toString();
+			// insertion von überflüssigen Zeichen befreien
+			position = 0;
+			sb = new StringBuilder();
+			for (char c : insertion.toCharArray()) {
+				if (c >= '0' && c <= '9') sb.append(c);
+				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+				else position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
+				position++;
+			}
+			insertion = sb.toString();
 
-		if (start != end) {
-			// wir müssen etwas herausschneiden
-			text = textBefore.substring(0, start) + textBefore.substring(end);
-		} else text = textBefore;
+			if (start != end) {
+				// wir müssen etwas herausschneiden
+				text = textBefore.substring(0, start) + textBefore.substring(end);
+			} else text = textBefore;
 
-		if (insertion.length() > 0) {
-			// wir müssen etwas einfügen
-			text = text.substring(0, start) + insertion + text.substring(start);
+			if (insertion.length() > 0) {
+				// wir müssen etwas einfügen
+				text = text.substring(0, start) + insertion + text.substring(start);
+			}
+
+		} else {
+			int position = 0;
+			for (char c : textBefore.toCharArray()) {
+				if (c >= '0' && c <= '9') sb.append(c);
+				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+				else {
+					// wir entfernen das Zeichen
+					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+					if (start >= position) start--;
+					if (end >= position) end--;
+					position--; // wird am Ende der Schleife wieder hochgezählt
+				}
+				position++;
+			}
+			textBefore = sb.toString();
+
+			text = textBefore;
 		}
 
 		try {
 			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
 			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = caretPosition + result.text.length() - textBefore.length();
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
+					numberFormat);
 		} catch (NumberFormatException e) {
 			result.value = null;
-			result.caretPosition = caretPosition + insertion.length();
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
+					numberFormat);
 		}
 
 		return result;
+	}
+
+	/**
+	 * <p>
+	 * Diese Methode ermittelt die neue Caret Position.
+	 * </p>
+	 * <p>
+	 * Die neue Caret Position wird ermittelt anhand des neuen formatierten Textes, des vorherigen Textes, der Eingabe und der vorherigen Caret Position. Wenn
+	 * die Eingabe ein dezimal Trennzeichen ist wird die Caret Position hinter das Trennzeichen gesetzt. Beim Löschen oder Entfernen bleibt die Caret Position
+	 * gleich.
+	 * </p>
+	 * 
+	 * @param text
+	 *            der Text, der sich aus insertion und textBefore zusammen setzt und formatiert wurde ({@link Text#getText()})
+	 * @param textBefore
+	 *            der Text, der aktuell (vor Verarbeitung dieses Events) im Feld steht ({@link Text#getText()})
+	 * @param insertion
+	 *            die Benutzereingabe als Zeichenkette (darstellbare Zeichen) ({@link VerifyEvent#text})
+	 * @param keyCode
+	 *            der keyCode der Eingabe. Dies kann ein darstellbares Zeichen sein. Es kann aber auch ein nicht darstellbares Zeichen sein. Wenn die #insertion
+	 *            mehr als ein Zeichen enthält, ist dieser Wert 0 ({@link Event#keyCode})
+	 * @param caretPosition
+	 *            die Position, an der sich der Cursor befindet ({@link Text#getCaretPosition()})
+	 * @param decimalFormatSymbols
+	 *            {@link DecimalFormatSymbols} des aktuellen locale
+	 * @return
+	 */
+	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
+			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
+		int newCaretPosition;
+		String null_point = numberFormat.format(0);
+
+		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
+			if (text.length() <= 1) {
+				newCaretPosition = caretPosition;
+			} else {
+				newCaretPosition = text.length() - (decimals + 1);
+			}
+		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF56 entfernt wird
+			newCaretPosition = text.length() - (decimals + 1);
+		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
+			newCaretPosition = text.length() - decimals;
+		} else if (null_point.equals(textBefore)) {
+			newCaretPosition = insertion.length();
+		} else if ("".equals(insertion)) {
+			newCaretPosition = caretPosition;
+		} else {
+			newCaretPosition = text.length() - (decimals + 1);
+		}
+
+		return newCaretPosition;
 	}
 }

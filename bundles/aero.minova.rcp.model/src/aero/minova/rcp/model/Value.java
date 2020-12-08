@@ -101,4 +101,10 @@ public class Value implements Serializable {
 		return "Value [type=" + type + ", value=" + value + "]";
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		Value v = null;
+		if (obj instanceof Value) v = (Value) obj;
+		return (this.type == v.type && this.value.equals(v.value));
+	}
 }
