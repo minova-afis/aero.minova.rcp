@@ -118,113 +118,277 @@ public class NumberValueAccessorTests {
 		assertEquals("Value", new Value(12.0d), result.value);
 	}
 
+	@Test
+	public void testFrom99_95To999_95() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"9", // insertion
+				2, // start
+				2, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"99,95", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("get text", "999,95", result.text);
+	}
+
 //	@Test
-//	public void testFrom99_95To999_95() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
-//
-//		assertEquals("get text", "999,95", nfv.getNewText(2, Locale.GERMANY, "99,95", 2, 2, 2, "9", dfs));
-//	}
-//
-////	@Test
-////	public void testFrom1_C00To1_1C0() {
-////		Event e = new Event();
-////		e.character = '\b';
-////
-////		NumberFieldVerifier nfv = new NumberFieldVerifier();
-////		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
-////
-////		assertEquals("get caret", 3, nfv.getNewCaretPosition("1,00", "1", "1,10", dfs, 2, 1));
-////	}
-//
+	public void testFrom1_C00To1_1C0() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"1", // insertion
+				2, // start
+				2, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"1,00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("get caret", 3, result.caretPosition);
+	}
+
+	@Test
+	public void testInsertComma() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				",", // insertion
+				3, // start
+				3, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"999,95", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("get Text", "999,95", result.text);
+		assertEquals("get Caret", 4, result.caretPosition);
+	}
+
+	@Test
+	public void testDecimalSeparatorEnglish() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+
+		Result result = numberValueAccessor.processInput(//
+				"0", // insertion
+				1, // start
+				1, // end
+				0, // keyCode
+				2, // decimals
+				Locale.US, // locale
+				3, // caretPosition
+				"900.00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("9,000.00", result.text);
+	}
+
 //	@Test
-//	public void testInsertComma() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMAN);
-//
-//		assertEquals("999,95", nfv.getNewText(2, Locale.GERMANY, "999,95", 0, 0, 0, ",", dfs));
-//	}
-//
+	public void testGetNewValue() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+
+		Result result = numberValueAccessor.processInput(//
+				"0", // insertion
+				1, // start
+				1, // end
+				0, // keyCode
+				3, // decimals
+				Locale.US, // locale
+				3, // caretPosition
+				"900.00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals(new Value(9000.00), result.value);
+	}
+
+	@Test
+	public void testGetNewCaretPositionForLocaleUS() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+
+		Result result = numberValueAccessor.processInput(//
+				"0", // insertion
+				1, // start
+				1, // end
+				0, // keyCode
+				3, // decimals
+				Locale.US, // locale
+				3, // caretPosition
+				"900.00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals(5, result.caretPosition);
+	}
+
+	@Test
+	public void testGetNewCaretPositionForLocaleGERMANY() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMANY);
+
+		Result result = numberValueAccessor.processInput(//
+				"0", // insertion
+				1, // start
+				1, // end
+				0, // keyCode
+				3, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"900,00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals(5, result.caretPosition);
+	}
+
 //	@Test
-//	public void testDecimalSeparatorEnglish() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-//
-//		assertEquals("9,000.00", nfv.getNewText(2, Locale.US, "", 0, 0, 0, "9000", dfs));
-//	}
-//
+	public void testGetNewCaretPositionInsertPointUS() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+
+		Result result = numberValueAccessor.processInput(//
+				".", // insertion
+				1, // start
+				1, // end
+				0, // keyCode
+				3, // decimals
+				Locale.US, // locale
+				3, // caretPosition
+				"0.00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals(2, result.caretPosition);
+	}
+
 //	@Test
-//	public void testGetNewValue() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-//
-//		assertEquals(Double.valueOf(9000.0), nfv.getNewValue("9000,0", dfs));
-//	}
-//
-//	@Test
-//	public void testGetNewCaretPositionForLocaleUS() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-//
-//		assertEquals(4, nfv.getNewCaretPosition("0.00", "9000", "9,000.00", dfs, 1, 1));
-//	}
-//
-//	@Test
-//	public void testGetNewCaretPositionForLocaleGERMANY() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-//
-//		assertEquals(4, nfv.getNewCaretPosition("0,00", "9000", "9.000,00", dfs, 1, 1));
-//	}
-//
-//	@Test
-//	public void testGetNewCaretPositionInsertPointUS() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-//
-//		assertEquals(2, nfv.getNewCaretPosition("0.00", ".", "0.00", dfs, 1, 1));
-//	}
-//
-//	@Test
-//	public void testGetNewCaretPositionInsertCommaGER() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-//
-//		assertEquals(2, nfv.getNewCaretPosition("0,00", ",", "0,00", dfs, 1, 1));
-//	}
-//
-//	@Test
-//	public void testFrom100_00To1_002_00GER() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-//
-//		assertEquals("get text", "1.002,00", nfv.getNewText(2, Locale.GERMANY, "100,00", 3, 3, 3, "2", dfs));
-//		assertEquals("get caret Position", 5, nfv.getNewCaretPosition("100,00", "2", "1.002,00", dfs, 3, 1));
-//	}
-//
-//	@Test
-//	public void testFrom100_00To1_002_00US() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
-//
-//		assertEquals("get text", "1,002.00", nfv.getNewText(2, Locale.US, "100.00", 3, 3, 3, "2", dfs));
-//		assertEquals("get caret Position", 5, nfv.getNewCaretPosition("100.00", "2", "1,002.00", dfs, 3, 1));
-//	}
-//
-//	@Test
-//	public void testKeyCode8() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-//
-//		assertEquals("get caret Position", 3, nfv.getNewCaretPosition("1.002,00", "", "100,00", dfs, 4, 8));
-//	}
-//	
-//	@Test
-//	public void testKeyCode127() {
-//		NumberFieldVerifier nfv = new NumberFieldVerifier();
-//		DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.GERMANY);
-//
-//		assertEquals("get caret Position", 3, nfv.getNewCaretPosition("1.002,00", "", "100,00", dfs, 3, 127));
-//	}
+	public void testGetNewCaretPositionInsertCommaGER() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMANY);
+
+		Result result = numberValueAccessor.processInput(//
+				",", // insertion
+				1, // start
+				1, // end
+				0, // keyCode
+				3, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"0,00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals(2, result.caretPosition);
+	}
+
+	@Test
+	public void testFrom100_00To1002_00GER() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMANY);
+
+		Result result = numberValueAccessor.processInput(//
+				"2", // insertion
+				3, // start
+				3, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"100,00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("get text", "1.002,00", result.text);
+		assertEquals("get caret Position", 5, result.caretPosition);
+	}
+
+	@Test
+	public void testFrom100_00To1_002_00US() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+
+		Result result = numberValueAccessor.processInput(//
+				"2", // insertion
+				3, // start
+				3, // end
+				0, // keyCode
+				2, // decimals
+				Locale.US, // locale
+				3, // caretPosition
+				"100.00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("get text", "1,002.00", result.text);
+		assertEquals("get caret Position", 5, result.caretPosition);
+	}
+
+	@Test
+	public void testKeyCode8() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				3, // start
+				3, // end
+				8, // keyCode
+				2, // decimals
+				Locale.GERMAN, // locale
+				3, // caretPosition
+				"100,00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals(3, result.caretPosition);
+	}
+	
+	@Test
+	public void testKeyCode127() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				3, // start
+				3, // end
+				8, // keyCode
+				2, // decimals
+				Locale.GERMAN, // locale
+				3, // caretPosition
+				"100,00", // textBefore
+				decimalFormatSymbols//
+		);
+
+		assertEquals("get caret Position", 3, result.caretPosition);
+	}
 
 }
