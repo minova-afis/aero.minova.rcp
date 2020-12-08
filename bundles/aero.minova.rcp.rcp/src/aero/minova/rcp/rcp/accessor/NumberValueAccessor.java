@@ -118,7 +118,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			DecimalFormatSymbols decimalFormatSymbols) {
 		Result result = new Result();
 		String text;
-		int rightCaretPosition;
+		Boolean doit;
 		int rightDecimalPosition = 0;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
@@ -126,50 +126,75 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
-		// textBefore von überflüssigen Zeichen befreien
-		int position = 0;
-		for (char c : textBefore.toCharArray()) {
-			if (c >= '0' && c <= '9') sb.append(c);
-			else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
-			else {
-				// wir entfernen das Zeichen
-				if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
-				if (start >= position) start--;
-				if (end >= position) end--;
-				position--; // wird am Ende der Schleife wieder hochgezählt
+		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 127) {
+			doit = false;
+		} else if (!textBefore.isEmpty() && textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 8) {
+			doit = false;
+		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
+			if (!textBefore.isEmpty() && decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+				doit = false;
+			} else {
+				doit = true;
 			}
-			position++;
-		}
-		textBefore = sb.toString();
-
-		// insertion von überflüssigen Zeichen befreien
-		position = 0;
-		sb = new StringBuilder();
-		for (char c : insertion.toCharArray()) {
-			if (c >= '0' && c <= '9') sb.append(c);
-			else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
-			else position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
-			position++;
-		}
-		insertion = sb.toString();
-
-		if (start != end) {
-			// wir müssen etwas herausschneiden
-			text = textBefore.substring(0, start) + textBefore.substring(end);
-		} else text = textBefore;
-
-		if (insertion.length() > 0) {
-			// wir müssen etwas einfügen
-			text = text.substring(0, start) + insertion + text.substring(start);
+		} else {
+			doit = true;
 		}
 
-		try {
-			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
-			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = getRightCaretPosition(result.text, textBefore, insertion, keyCode, caretPosition, decimalFormatSymbols);
-		} catch (NumberFormatException e) {
-			result.value = null;
-			result.caretPosition = getRightCaretPosition(result.text, textBefore, insertion, keyCode, caretPosition, decimalFormatSymbols);
+		if (doit == true) {
+			// textBefore von überflüssigen Zeichen befreien
+			int position = 0;
+			for (char c : textBefore.toCharArray()) {
+				if (c >= '0' && c <= '9') sb.append(c);
+				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+				else {
+					// wir entfernen das Zeichen
+					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+					if (start >= position) start--;
+					if (end >= position) end--;
+					position--; // wird am Ende der Schleife wieder hochgezählt
+				}
+				position++;
+			}
+			textBefore = sb.toString();
+
+			// insertion von überflüssigen Zeichen befreien
+			position = 0;
+			sb = new StringBuilder();
+			for (char c : insertion.toCharArray()) {
+				if (c >= '0' && c <= '9') sb.append(c);
+				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
+				else position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
+				position++;
+			}
+			insertion = sb.toString();
+
+			if (start != end) {
+				// wir müssen etwas herausschneiden
+				text = textBefore.substring(0, start) + textBefore.substring(end);
+			} else text = textBefore;
+
+			if (insertion.length() > 0) {
+				// wir müssen etwas einfügen
+				text = text.substring(0, start) + insertion + text.substring(start);
+			}
+
+			try {
+				result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+				result.text = numberFormat.format(result.value.getDoubleValue());
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
+			} catch (NumberFormatException e) {
+				result.value = null;
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
+			}
+		} else {
+			try {
+				result.value = new Value(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+				result.text = numberFormat.format(result.value.getDoubleValue());
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
+			} catch (NumberFormatException e) {
+				result.value = null;
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols);
+			}
 		}
 
 		return result;
