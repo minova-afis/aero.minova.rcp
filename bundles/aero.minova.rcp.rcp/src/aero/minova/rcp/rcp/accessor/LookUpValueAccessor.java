@@ -110,7 +110,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
-
+			((LookupControl) control).getTextControl().setMessage("");
 			String displayText = ((LookupControl) control).getText();
 			if (displayText != null && !displayText.equals("")) {
 
@@ -136,8 +136,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			}
 			field.setValue(null, false);
 			((LookupControl) control).getDescription().setText("");
-			((LookupControl) control).getTextControl().setMessage("");
-
 		}
 	}
 }
