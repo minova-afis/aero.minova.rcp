@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Preferences
+Bundle-SymbolicName: aero.minova.rcp.preferences
+Bundle-Version: 1.2.0.qualifier
+Automatic-Module-Name: aero.minova.rcp.preferences
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.eclipse.equinox.security
+Import-Package: org.eclipse.e4.core.services.log
+Export-Package: aero.minova.rcp.preferences

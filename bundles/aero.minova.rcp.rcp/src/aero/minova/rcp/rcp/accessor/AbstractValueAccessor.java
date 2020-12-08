@@ -35,6 +35,7 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 			}
 		};
 		this.focusListener = abstractFocusListener;
+		if (control == null) return;
 		control.addFocusListener(abstractFocusListener);
 	}
 

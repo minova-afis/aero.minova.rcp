@@ -36,6 +36,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.preferencewindow.control.CustomPWCheckBox;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -104,20 +105,22 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						if (pref.getDisplayType() != DisplayType.ZONEID)
+						if (pref.getDisplayType() != DisplayType.ZONEID
+								&& pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
 							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
 									window.getValueFor(pref.getKey()), s);
+						}
 					}
 				}
 
 			}
 			try {
 				preferences.flush();
-			} catch (BackingStoreException e) {
+				// eventuell muss es synchronisiert ausgeführt werden.
+				lcs.changeApplicationLocale(CustomLocale.getLocale());
+			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
-
-			lcs.changeApplicationLocale(CustomLocale.getLocale());
 		}
 	}
 
@@ -131,8 +134,10 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceDescriptor pref : section.getPreferences()) {
 					String key = pref.getKey();
 					Object defaultValue = pref.getDefaultValue();
-					data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(),
-							defaultValue, s));
+					if (pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
+						data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(),
+								pref.getDisplayType(), defaultValue, s));
+					}
 
 				}
 			}
@@ -184,6 +189,9 @@ public class ApplicationPreferenceWindow {
 			break;
 		case LOCALE:
 			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
+			break;
+		case CUSTOMCHECK:
+			widget = new CustomPWCheckBox(pref.getLabel(), key).setWidth(200).setIndent(25);
 			break;
 		default:
 			break;

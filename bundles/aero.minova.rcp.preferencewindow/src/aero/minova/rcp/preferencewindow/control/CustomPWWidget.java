@@ -4,6 +4,13 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+/**
+ * Diese Klasse gewährt Zugang zu den Methoden aus PWWidget, die package gebunden sind.
+ * Ansonsten fungiert sie genau wie PWWidget.
+ * 
+ * @author bauer
+ *
+ */
 public abstract class CustomPWWidget extends PWWidget {
 	private final String propertyKey;
 

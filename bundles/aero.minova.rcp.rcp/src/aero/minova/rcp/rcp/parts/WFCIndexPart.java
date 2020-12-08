@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -208,6 +209,21 @@ public class WFCIndexPart extends WFCFormPart {
 							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
 						} else if (field.getShortTime() != null) {
 							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
+						} else if (field.getNumber() != null) {
+							int decimals = field.getNumber().getDecimals();
+
+							NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+							numberFormat.setMaximumFractionDigits(decimals); // wir wollen genau so viele Nachkommastellen
+							numberFormat.setMinimumFractionDigits(decimals); // dito
+
+							Value value = r.getValue(i);
+							Value displayValue;
+							if (value.getType().equals(DataType.DOUBLE)) {
+								displayValue = new Value(numberFormat.format(value.getDoubleValue()));
+							} else {
+								displayValue = new Value(numberFormat.format(value.getIntegerValue()));
+							}
+							r.setValue(displayValue, i);
 						}
 					}
 				}
