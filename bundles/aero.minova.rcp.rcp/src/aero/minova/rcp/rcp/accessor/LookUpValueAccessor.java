@@ -137,6 +137,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					Value rowValue = r.getValue(indexKeyLong);
 					// es gibt einen Wert der wie der DisplyText startet!
 					if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
+						((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
 						return;
 					}
 					// Ist der Wert noch nicht gestzt, so wird dies nun getan
@@ -146,7 +147,9 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 			}
-			// field.setValue(null, false);
+			field.setValue(null, false);
+			((LookupControl) control).getDescription().setText("");
+
 		}
 	}
 }

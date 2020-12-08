@@ -112,7 +112,9 @@ public class LookupControl extends Composite {
 		contentProposalAdapter.addContentProposalListener(proposal -> {
 			MinovaContentProposal p = (MinovaContentProposal) proposal;
 			MField data = (MField) LookupControl.this.getData(Constants.CONTROL_FIELD);
-				data.setValue(new Value(p.keyLong), false);
+			LookupControl lc = LookupControl.this;
+			lc.setText(p.keyText);
+			data.setValue(new Value(p.keyLong), false);
 		});
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
 	}
