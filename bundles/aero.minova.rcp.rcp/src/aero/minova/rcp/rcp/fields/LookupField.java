@@ -118,7 +118,7 @@ public class LookupField {
 
 					// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 				if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
-						&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE && !lookupControl.getText().startsWith("#")) {
+						&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE) {
 					if (((MLookupField) field).getOptions() == null) {
 						requestLookUpEntriesAll(field, detail, lookupControl);
 					} else {
