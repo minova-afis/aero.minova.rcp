@@ -112,7 +112,7 @@ public class LookupControl extends Composite {
 		contentProposalAdapter.addContentProposalListener(proposal -> {
 			MinovaContentProposal p = (MinovaContentProposal) proposal;
 			MField data = (MField) LookupControl.this.getData(Constants.CONTROL_FIELD);
-			data.setValue(new Value(p.keyLong), true);
+				data.setValue(new Value(p.keyLong), false);
 		});
 		setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "LookupField");
 	}
@@ -120,8 +120,8 @@ public class LookupControl extends Composite {
 
 	public void setProposals(Table table) {
 		contentProposalProvider.setProposals(table);
-		contentProposalAdapter.openProposalPopup();
 		contentProposalAdapter.refresh();
+		contentProposalAdapter.openProposalPopup();
 	}
 
 	public void addTwistieMouseListener(MouseListener ml) {
