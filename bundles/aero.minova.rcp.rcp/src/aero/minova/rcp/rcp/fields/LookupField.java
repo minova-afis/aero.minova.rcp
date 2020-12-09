@@ -32,7 +32,6 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
@@ -198,11 +197,14 @@ public class LookupField {
 			Table t = (Table) field.getOptions();
 			// Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die
 			// Eingabe gleich dem gesuchten Wert ist.
-			// Ist dies der Fall, so wird dieser Wert ausgewählt. Ansonsten wird der Wert
-			// aus dem CAS als Option/Proposal aufgelistet
+			// Ist dies der Fall, so wird dieser Wert ausgewählt.
+			// Der Wert wird auserdem immer als Option aufgelistet
 			if (t.getRows().size() == 1) {
 				if (lookUpControl != null && lookUpControl.getText() != null && !twisty) {
-					updateSelectedLookupEntry(t, lookUpControl);
+					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
+					if (value.getStringValue().toLowerCase().startsWith((lookUpControl.getText().toString().toLowerCase()))) {
+						field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
+ 					}
 				}
 				changeProposals(lookUpControl, t);
 			} else {
@@ -227,7 +229,21 @@ public class LookupField {
 						}
 
 					}
-					if (filteredTable.getRows().size() != 0) {
+					// Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100%
+ 					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
+ 					// Wert gesetzt
+ 					if (filteredTable.getRows().size() == 1) {
+						Row row = filteredTable.getRows().get(0);
+						if ((row.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.equals(lookUpControl.getText().toLowerCase()))
+								|| (row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
+										&& row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue()
+ 											.toLowerCase().equals(lookUpControl.getText().toLowerCase()))) {
+							field.setValue(row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
+ 						}
+						changeProposals(lookUpControl, filteredTable);
+ 						// Setzen der Proposals/Optionen
+ 					} else if (filteredTable.getRows().size() != 0) {
 						changeProposals(lookUpControl, filteredTable);
 					} else {
 						changeProposals(lookUpControl, t);
@@ -249,23 +265,5 @@ public class LookupField {
 	 */
 	public static void changeProposals(LookupControl lc, Table t) {
 		lc.setProposals(t);
-	}
-
-	public static void updateSelectedLookupEntry(Table ta, Control c) {
-		Row r = ta.getRows().get(0);
-		LookupControl lc = (LookupControl) c;
-		int index = ta.getColumnIndex(Constants.TABLE_KEYTEXT);
-		Value v = r.getValue(index);
-
-		lc.setText((String) ValueBuilder.value(v).create());
-		lc.getTextControl().setMessage("");
-		if (lc.getDescription() != null && ta.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
-			if (r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(ta.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			} else {
-				lc.getDescription().setText("");
-			}
-		}
-
 	}
 }

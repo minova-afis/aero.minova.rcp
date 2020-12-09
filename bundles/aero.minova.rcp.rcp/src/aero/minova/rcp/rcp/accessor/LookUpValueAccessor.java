@@ -46,6 +46,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
+		((LookupControl) control).getDescription().setText("");
 		((LookupControl) control).setText("");
 		if (value != null) {
 			// TODO: berücksichtigung des Localdatabaseservice
@@ -110,7 +111,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
-			if (((MLookupField) field).getOptions() != null) {
+			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
 				((LookupControl) control).getTextControl().setMessage("");
 				String displayText = ((LookupControl) control).getText();
 				if (displayText != null && !displayText.equals("")) {
@@ -136,6 +137,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 				field.setValue(null, false);
+				((LookupControl) control).setText("");
 				((LookupControl) control).getDescription().setText("");
 			}
 		}
