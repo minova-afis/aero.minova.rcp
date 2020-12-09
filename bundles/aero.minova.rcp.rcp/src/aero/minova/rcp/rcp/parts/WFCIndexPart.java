@@ -407,8 +407,8 @@ public class WFCIndexPart extends WFCFormPart {
 			// Apply a ColumnLabelAccumulator to address the columns in the
 			// EditConfiguration class
 			// first colum starts at 0, etc
-			ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(bodyDataProvider);
-			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
+//			ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(bodyDataProvider);
+//			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
 
 			// layer for event handling of GlazedLists and PropertyChanges
 			GlazedListsEventLayer<T> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
