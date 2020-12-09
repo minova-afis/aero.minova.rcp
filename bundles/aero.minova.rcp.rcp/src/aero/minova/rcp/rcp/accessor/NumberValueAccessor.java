@@ -242,19 +242,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		int lengthDifference = ((text.length() - decimals) - ((textBefore.length() - decimals) + insertion.length()));
 
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
-			if (text.length() <= 1) {
-				newCaretPosition = caretPosition;
-			} else {
-				newCaretPosition = text.length() - (decimals + 1);
-			}
-		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF56 entfernt wird
-			newCaretPosition = text.length() - (decimals + 1);
+			newCaretPosition = caretPosition;
+		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
+			newCaretPosition = caretPosition - 1;
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = text.length() - decimals;
-		} else if (null_point.equals(textBefore)) {
-			newCaretPosition = insertion.length();
-		} else if ("".equals(insertion)) {
+		} else if (formatted0.equals(textBefore)) {
 			newCaretPosition = caretPosition;
+		} else if ("".equals(textBefore)) {
+			newCaretPosition = insertion.length();
 		} else {
 			newCaretPosition = text.length() - (decimals + 1);
 		}
