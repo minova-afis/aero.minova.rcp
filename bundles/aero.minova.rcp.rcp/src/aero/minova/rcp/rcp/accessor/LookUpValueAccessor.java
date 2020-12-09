@@ -6,8 +6,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.dataservice.IDataService;
@@ -40,19 +38,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	public LookUpValueAccessor(MField field, MDetail detail, Control control) {
 		super(field, control);
 		this.detail = detail;
-		control.removeFocusListener(focusListener);
-		control.addFocusListener(new FocusListener() {
-
-			@Override
-			public void focusLost(FocusEvent e) {
-				setFocussed(false);
-			}
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				setFocussed(true);
-			}
-		});
 
 	}
 
@@ -145,7 +130,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
-
+			((LookupControl) control).getTextControl().setMessage("");
 			String displayText = ((LookupControl) control).getText();
 			if (displayText != null && !displayText.equals("")) {
 
@@ -171,7 +156,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			}
 			field.setValue(null, false);
 			((LookupControl) control).getDescription().setText("");
-
 		}
 	}
 }
