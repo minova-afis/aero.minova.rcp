@@ -70,7 +70,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IMinovaJsonService;
-import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Page;
@@ -122,6 +121,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Named(value = TranslationService.LOCALE)
 	Locale locale;
+
+	private MinovaColumnPropertyAccessor columnPropertyAccessor;
+
+	private ColumnHeaderLayer columnHeaderLayer;
 
 	@PostConstruct
 	public void createComposite(Composite parent, MPart part, EModelService modelService) {
@@ -206,14 +209,17 @@ public class WFCIndexPart extends WFCFormPart {
 					Field field = fields.get(table.getColumnName(i));
 					if (field != null) {
 						if (field.getShortDate() != null) {
-							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
+							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale),
+									DataType.STRING), i);
 						} else if (field.getShortTime() != null) {
-							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale), DataType.STRING), i);
+							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale),
+									DataType.STRING), i);
 						} else if (field.getNumber() != null) {
 							int decimals = field.getNumber().getDecimals();
 
 							NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-							numberFormat.setMaximumFractionDigits(decimals); // wir wollen genau so viele Nachkommastellen
+							numberFormat.setMaximumFractionDigits(decimals); // wir wollen genau so viele
+																				// Nachkommastellen
 							numberFormat.setMinimumFractionDigits(decimals); // dito
 
 							Value value = r.getValue(i);
@@ -241,31 +247,44 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		this.locale = s;
+		translate(translationService);
+	}
+
+	private void translate(TranslationService translationService2) {
+		// TODO wir hlören auf das LocaleChangeEvent dann entfällt der Check!
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i,
+						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
+
+	}
+
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService,
 			IEclipseContext context) {
 
 		this.context = context;
-		Map<String, String> tableHeadersMap = new HashMap<>();
-		List<Column> columns = form.getIndexView().getColumn();
-		String[] propertyNames = new String[columns.size()];
-		int i = 0;
-		for (Column column : columns) {
-			String translate = translationService.translate(column.getLabel(), null);
-			tableHeadersMap.put(column.getName(), translate);
-			propertyNames[i++] = column.getName();
-		}
 
 		// Datenmodel für die Eingaben
 		ConfigRegistry configRegistry = new ConfigRegistry();
-		IColumnPropertyAccessor<Row> columnPropertyAccessor = new MinovaColumnPropertyAccessor(table);
+		columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, form);
+		columnPropertyAccessor.initPropertyNames(translationService);
 
 		// create the body stack
 		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
+				columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
+		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
 				bodyLayerStack.getSelectionLayer());
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer, new GlazedListsSortModel<>(
@@ -435,26 +454,26 @@ public class WFCIndexPart extends WFCFormPart {
 			 * Collection<ILayer> underlyingLayersByColumnPosition =
 			 * table.getUnderlyingLayersByColumnPosition(0); int[] selectedColumnPositions =
 			 * null; for (ILayer iLayer : underlyingLayersByColumnPosition) {
-			 * 
+			 *
 			 * if (iLayer instanceof ViewportLayer)
-			 * 
+			 *
 			 * { int minColumnPosition = ((ViewportLayer)
 			 * iLayer).getMinimumOriginColumnPosition();
-			 * 
+			 *
 			 * int columnCount = ((ViewportLayer) iLayer).getColumnCount();
-			 * 
+			 *
 			 * int maxColumnPosition = minColumnPosition + columnCount - 1;
-			 * 
+			 *
 			 * selectedColumnPositions = new int[columnCount];
-			 * 
+			 *
 			 * for (int i = minColumnPosition; i <= maxColumnPosition; i++) {
-			 * 
+			 *
 			 * int idx = i - minColumnPosition;
-			 * 
+			 *
 			 * selectedColumnPositions[idx] = i;
-			 * 
+			 *
 			 * }
-			 * 
+			 *
 			 * }
 			 */
 

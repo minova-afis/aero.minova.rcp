@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -19,7 +18,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
-import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
@@ -52,7 +50,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import aero.minova.rcp.dataservice.IMinovaJsonService;
-import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -142,14 +139,6 @@ public class WFCSearchPart extends WFCFormPart {
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
 
 		Map<String, String> tableHeadersMap = new HashMap<>();
-		List<Column> columns = form.getIndexView().getColumn();
-		String[] propertyNames = new String[columns.size()];
-		int i = 0;
-		for (Column column : columns) {
-			String translate = translationService.translate(column.getLabel(), null);
-			tableHeadersMap.put(column.getName(), translate);
-			propertyNames[i++] = column.getName();
-		}
 
 		// Datenmodel für die Eingaben
 		ConfigRegistry configRegistry = new ConfigRegistry();
@@ -157,9 +146,10 @@ public class WFCSearchPart extends WFCFormPart {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
 		SortedList<Row> sortedList = new SortedList<>(eventList, null);
-		IColumnPropertyAccessor<Row> accessor = new MinovaColumnPropertyAccessor(table);
+		MinovaColumnPropertyAccessor accessor = new MinovaColumnPropertyAccessor(table, form);
+		accessor.initPropertyNames(translationService);
 
-		IDataProvider bodyDataProvider = new ListDataProvider<Row>(sortedList, accessor);
+		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 
@@ -177,7 +167,8 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(propertyNames, tableHeadersMap);
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(accessor.getPropertyNames(),
+				accessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
