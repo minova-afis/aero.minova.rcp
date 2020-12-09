@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.widgets;
 
+import java.util.Collections;
+
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -108,9 +110,17 @@ public class LookupControl extends Composite {
 
 
 	public void setProposals(Table table) {
+		sortTableAlphabetical(table);
 		contentProposalProvider.setProposals(table);
 		contentProposalAdapter.refresh();
 		contentProposalAdapter.openProposalPopup();
+	}
+
+	public void sortTableAlphabetical(Table table) {
+		Collections.sort(table.getRows(), (row1, row2) -> {
+			return row1.getValue(table.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+					.compareTo(row2.getValue(table.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+		});
 	}
 
 	public void addTwistieMouseListener(MouseListener ml) {
