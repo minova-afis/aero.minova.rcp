@@ -238,7 +238,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
 			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
 		int newCaretPosition;
-		String null_point = numberFormat.format(0);
+		String formatted0 = numberFormat.format(0);
+		int lengthDifference = ((text.length() - decimals) - ((textBefore.length() - decimals) + insertion.length()));
 
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			if (text.length() <= 1) {
