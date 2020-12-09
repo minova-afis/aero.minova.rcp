@@ -110,32 +110,34 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
-			((LookupControl) control).getTextControl().setMessage("");
-			String displayText = ((LookupControl) control).getText();
-			if (displayText != null && !displayText.equals("")) {
+			if (((MLookupField) field).getOptions() != null) {
+				((LookupControl) control).getTextControl().setMessage("");
+				String displayText = ((LookupControl) control).getText();
+				if (displayText != null && !displayText.equals("")) {
 
-				Table optionTable = ((MLookupField) field).getOptions();
-				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
-				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
+					Table optionTable = ((MLookupField) field).getOptions();
+					int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
+					int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
 
-				for (Row r : optionTable.getRows()) {
-					if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
-						Value rowValue = r.getValue(indexKeyLong);
-						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
-						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-							((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
-							return;
-						}
-						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
-						else {
-							field.setValue(rowValue, false);
-							return;
+					for (Row r : optionTable.getRows()) {
+						if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
+							Value rowValue = r.getValue(indexKeyLong);
+							// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
+							if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
+								((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+								return;
+							}
+							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
+							else {
+								field.setValue(rowValue, false);
+								return;
+							}
 						}
 					}
 				}
+				field.setValue(null, false);
+				((LookupControl) control).getDescription().setText("");
 			}
-			field.setValue(null, false);
-			((LookupControl) control).getDescription().setText("");
 		}
 	}
 }
