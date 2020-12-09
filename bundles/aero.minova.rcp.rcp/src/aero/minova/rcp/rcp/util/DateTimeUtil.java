@@ -4,6 +4,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -115,10 +116,6 @@ public class DateTimeUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static String getDateTimeString(Instant date, Locale locale, ZoneId zoneID) {
-		return "TODO KUJ";
-	}
-
 	public static Instant getDate(Instant today, String input, Locale locale) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
@@ -162,8 +159,13 @@ public class DateTimeUtil {
 
 	}
 
-	static public String getDateString(Instant instant, Locale locale) {
+	public static String getDateString(Instant instant, Locale locale) {
 		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
+	}
+
+	public static String getDateTimeString(Instant instant, Locale locale, ZoneId zoneId) {
+		return LocalDate.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)) + " "
+				+ LocalTime.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
 	}
 
 	static String[] splitInput(String input) {
