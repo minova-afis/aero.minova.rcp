@@ -285,6 +285,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// create the body stack
 		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
+<<<<<<< Upstream, based on branch 'master' of https://github.com/minova-afis/aero.minova.rcp.git
+=======
+
+>>>>>>> 2552d20 Column Accessor korrekt registriert
 		bodyLayerStack.getBodyDataLayer().setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		// build the column header layer
@@ -293,8 +297,6 @@ public class WFCIndexPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
 				bodyLayerStack.getSelectionLayer());
-
-		columnHeaderDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer, new GlazedListsSortModel<>(
 				bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
