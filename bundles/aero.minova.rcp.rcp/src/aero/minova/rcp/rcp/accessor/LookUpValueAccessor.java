@@ -111,6 +111,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
+			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
 			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
 				((LookupControl) control).getTextControl().setMessage("");
 				String displayText = ((LookupControl) control).getText();
