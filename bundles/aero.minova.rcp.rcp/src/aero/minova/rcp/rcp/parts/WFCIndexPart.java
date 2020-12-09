@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -73,7 +72,6 @@ import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Page;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -82,9 +80,7 @@ import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
-import aero.minova.rcp.rcp.util.TimeUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -204,44 +200,10 @@ public class WFCIndexPart extends WFCFormPart {
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
-
-			for (Row r : table.getRows()) {
-				for (int i = 0; i < r.size(); i++) {
-					Field field = fields.get(table.getColumnName(i));
-					if (field != null) {
-						if (field.getShortDate() != null) {
-							r.setValue(new Value(DateTimeUtil.getDateString(r.getValue(i).getInstantValue(), locale),
-									DataType.STRING), i);
-						} else if (field.getShortTime() != null) {
-							r.setValue(new Value(TimeUtil.getTimeString(r.getValue(i).getInstantValue(), locale),
-									DataType.STRING), i);
-						} else if (field.getNumber() != null) {
-							int decimals = field.getNumber().getDecimals();
-
-							NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-							numberFormat.setMaximumFractionDigits(decimals); // wir wollen genau so viele
-																				// Nachkommastellen
-							numberFormat.setMinimumFractionDigits(decimals); // dito
-
-							Value value = r.getValue(i);
-							Value displayValue;
-							if (value.getType().equals(DataType.DOUBLE)) {
-								displayValue = new Value(numberFormat.format(value.getDoubleValue()));
-							} else {
-								displayValue = new Value(numberFormat.format(value.getIntegerValue()));
-							}
-							r.setValue(displayValue, i);
-						}
-					}
-				}
-			}
-
 			updateData(table.getRows());
-
 			try {
 				Path file = Path.of(dataService.getStoragePath().toString(), "cache" + "jsonTableIndex");
 				Files.write(file, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
-				System.out.println("Table saved");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -384,7 +346,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor);
 
-
 			// we register a custom UpdateDataCommandHandler so that we could add a new
 			// value if desired
 			// alternative we could add a new line during line selection
@@ -403,7 +364,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 			// get the IDataProvider that was created by the GroupByDataLayer
 			this.bodyDataProvider = bodyDataLayer.getDataProvider();
-
 
 			// Apply a ColumnLabelAccumulator to address the columns in the
 			// EditConfiguration class

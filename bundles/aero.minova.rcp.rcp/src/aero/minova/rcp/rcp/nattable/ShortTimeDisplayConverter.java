@@ -5,20 +5,20 @@ import java.util.Locale;
 
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
-import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.TimeUtil;
 
-public class ShortDateDisplayConverter extends DisplayConverter {
+public class ShortTimeDisplayConverter extends DisplayConverter {
 
 	private Locale locale;
 
-	public ShortDateDisplayConverter(Locale locale) {
+	public ShortTimeDisplayConverter(Locale locale) {
 		this.locale = locale;
 	}
 
 	@Override
 	public Object canonicalToDisplayValue(Object canonicalValue) {
 		if (canonicalValue instanceof Instant) {
-			return DateTimeUtil.getDateString((Instant) canonicalValue, locale);
+			return TimeUtil.getTimeString((Instant) canonicalValue, locale);
 		}
 		return null;
 	}
