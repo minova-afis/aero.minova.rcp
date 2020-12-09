@@ -123,10 +123,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 127) {
 			doit = false;
-		} else if (!textBefore.isEmpty() && textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 8) {
-			doit = false;
+		} else if (!textBefore.isEmpty() && keyCode == 8) {
+			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
+				doit = false;
+			} else {
+				doit = true;
+			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (!textBefore.isEmpty() && decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
 				doit = false;
 			} else {
 				doit = true;
