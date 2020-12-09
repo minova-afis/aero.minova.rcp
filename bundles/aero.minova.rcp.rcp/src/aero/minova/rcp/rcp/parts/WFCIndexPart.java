@@ -286,9 +286,7 @@ public class WFCIndexPart extends WFCFormPart {
 		// create the body stack
 		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
 
-		// Adressierung der Zellen
-		ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(
-				bodyLayerStack.getBodyDataProvider());
+		bodyLayerStack.getBodyDataLayer().setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
@@ -296,8 +294,6 @@ public class WFCIndexPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
 				bodyLayerStack.getSelectionLayer());
-
-		columnHeaderDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer, new GlazedListsSortModel<>(
 				bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
@@ -385,6 +381,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor);
 
+
 			// we register a custom UpdateDataCommandHandler so that we could add a new
 			// value if desired
 			// alternative we could add a new line during line selection
@@ -403,6 +400,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 			// get the IDataProvider that was created by the GroupByDataLayer
 			this.bodyDataProvider = bodyDataLayer.getDataProvider();
+
 
 			// Apply a ColumnLabelAccumulator to address the columns in the
 			// EditConfiguration class
