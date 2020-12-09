@@ -153,6 +153,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 
+		
+		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
+
+		
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
@@ -172,8 +176,7 @@ public class WFCSearchPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
-		columnHeaderDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
-
+		
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
 
