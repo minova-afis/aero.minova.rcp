@@ -80,6 +80,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -254,6 +255,11 @@ public class WFCIndexPart extends WFCFormPart {
 		translate(translationService);
 	}
 
+	/**
+	 * Übersetz die Headerzeile in der NatTable
+	 *
+	 * @param translationService2
+	 */
 	private void translate(TranslationService translationService2) {
 		// TODO wir hlören auf das LocaleChangeEvent dann entfällt der Check!
 		if (columnPropertyAccessor != null) {
@@ -280,12 +286,18 @@ public class WFCIndexPart extends WFCFormPart {
 		// create the body stack
 		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
 
+		// Adressierung der Zellen
+		ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(
+				bodyLayerStack.getBodyDataProvider());
+
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
 				columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
 				bodyLayerStack.getSelectionLayer());
+
+		columnHeaderDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer, new GlazedListsSortModel<>(
 				bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
@@ -313,13 +325,13 @@ public class WFCIndexPart extends WFCFormPart {
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		natTable = new NatTable(parent, compositeGridLayer, false);
-
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
 		// manually
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 		natTable.addConfiguration(new SingleClickSortConfiguration());
+		natTable.addConfiguration(new MinovaDisplayConfiguration(table.getColumns(), translationService, form));
 
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
 //
@@ -331,6 +343,9 @@ public class WFCIndexPart extends WFCFormPart {
 				bodyLayerStack.getSelectionLayer()));
 
 		natTable.configure();
+		// Hier können wir das Theme setzen
+//		ThemeConfiguration darkThemeConfig = new DarkNatTableThemeConfiguration();
+//		natTable.setTheme(darkThemeConfig);
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		return natTable;
