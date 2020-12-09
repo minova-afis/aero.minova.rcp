@@ -21,7 +21,7 @@ public class Table {
 	}
 
 	public String getColumnName(int index) {
-		return columns.get(index).name;
+		return columns.get(index).getName();
 	}
 
 	public int getColumnCount() {
@@ -37,7 +37,7 @@ public class Table {
 
 	public int getColumnIndex(String columnName) {
 		for (int i = 0; i < columns.size(); i++) {
-			if (columns.get(i).name.equals(columnName)) {
+			if (columns.get(i).getName().equals(columnName)) {
 				return i;
 			}
 		}
