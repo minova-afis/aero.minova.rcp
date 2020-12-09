@@ -252,7 +252,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else if ("".equals(textBefore)) {
 			newCaretPosition = insertion.length();
 		} else {
-			newCaretPosition = text.length() - (decimals + 1);
+			if (text.length() == textBefore.length() + insertion.length()) {
+				newCaretPosition = caretPosition + insertion.length();
+			} else {
+				if (caretPosition >= 1) {
+					newCaretPosition = caretPosition + insertion.length() + lengthDifference;
+				} else {
+					newCaretPosition = caretPosition + insertion.length() + lengthDifference - 1;
+				}
+			}
 		}
 
 		return newCaretPosition;
