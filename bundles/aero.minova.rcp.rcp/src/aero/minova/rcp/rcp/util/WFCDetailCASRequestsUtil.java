@@ -512,6 +512,10 @@ public class WFCDetailCASRequestsUtil {
 	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		for (MField f : detail.getFields()) {
 			f.setValue(null, false);
+			if (f instanceof MLookupField) {
+				((MLookupField) f).setOptions(null);
+				((MLookupField) f).setPreviousValue(-1);
+			}
 		}
 	}
 
