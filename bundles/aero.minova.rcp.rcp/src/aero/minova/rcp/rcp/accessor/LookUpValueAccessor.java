@@ -149,6 +149,16 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
 							else {
 								field.setValue(rowValue, false);
+								//Ändern der Optionen der drunterliegenden Felder
+								if (!field.equals(detail.getField(Constants.EMPLOYEEKEY))) {
+									for (MField f : detail.getFields()) {
+										if (f instanceof MLookupField) {
+											if (f.getSqlIndex() > field.getSqlIndex()) {
+												((LookUpValueAccessor) f.getValueAccessor()).changeOptions();
+											}
+										}
+									}
+								}
 								return;
 							}
 						}
