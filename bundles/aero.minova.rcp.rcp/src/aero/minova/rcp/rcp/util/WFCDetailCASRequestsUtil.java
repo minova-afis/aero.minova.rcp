@@ -151,7 +151,7 @@ public class WFCDetailCASRequestsUtil {
 				}
 				field.indicateWaiting();
 			}
-
+			int changedPosition = -1;
 			for (int i = 0; i < selectedTable.getColumnCount(); i++) {
 				String name = selectedTable.getColumnName(i);
 				MField c = detail.getField(name);
@@ -165,8 +165,12 @@ public class WFCDetailCASRequestsUtil {
 					}
 					if (c instanceof MLookupField) {
 						MLookupField lookupField = (MLookupField) c;
-						if (lookupField.getOptions() == null || lookupField.getValue().getIntegerValue() != lookupField.getPreviousValue()) {
+						if (lookupField.getOptions() == null || lookupField.getValue().getIntegerValue() != lookupField.getPreviousValue()
+								|| (changedPosition < lookupField.getSqlIndex() && changedPosition != -1)) {
 							((LookUpValueAccessor) lookupField.getValueAccessor()).changeOptions();
+							if (!lookupField.equals(detail.getField(Constants.EMPLOYEEKEY))) {
+								changedPosition = lookupField.getSqlIndex();
+							}
 						}
 					}
 
