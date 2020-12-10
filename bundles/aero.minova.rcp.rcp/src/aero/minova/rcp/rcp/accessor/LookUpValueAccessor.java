@@ -1,6 +1,5 @@
 package aero.minova.rcp.rcp.accessor;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -47,25 +46,11 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
+		((LookupControl) control).getDescription().setText("");
 		((LookupControl) control).setText("");
 		if (value != null) {
 			// TODO: berücksichtigung des Localdatabaseservice
-			Map databaseMap;
-			if (field.getLookupTable() != null) {
-				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
-			} else {
-				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupProcedurePrefix(), value.getIntegerValue());
-			}
-			if (databaseMap == null) {
-				getLookUpConsumer(control, value);
-			} else {
-				((LookupControl) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
-				if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
-					((LookupControl) control).getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
-				} else {
-					((LookupControl) control).getDescription().setText("");
-				}
-			}
+			getLookUpConsumer(control, value);
 
 		}
 	}
@@ -92,11 +77,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			} else if (ta instanceof Table) {
 				t = (Table) ta;
 			}
-			if (field.getLookupTable() != null) {
-				localDatabaseService.addResultsForLookupField(field.getLookupTable(), t);
-			} else {
-				localDatabaseService.addResultsForLookupField(field.getLookupProcedurePrefix(), t);
-			}
+			localDatabaseService.addResultsForLookupField(field.getName(), t);
 			updateSelectedLookupEntry(t, control);
 		}));
 	}
@@ -130,32 +111,61 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
-			((LookupControl) control).getTextControl().setMessage("");
-			String displayText = ((LookupControl) control).getText();
-			if (displayText != null && !displayText.equals("")) {
+			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
+			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+				((LookupControl) control).getTextControl().setMessage("");
+				String displayText = ((LookupControl) control).getText();
+				if (displayText != null && !displayText.equals("")) {
 
-				Table optionTable = ((MLookupField) field).getOptions();
-				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
-				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
+					Table optionTable = ((MLookupField) field).getOptions();
+					int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
+					int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
 
-				for (Row r : optionTable.getRows()) {
-					if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
-						Value rowValue = r.getValue(indexKeyLong);
-						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
-						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-							((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
-							return;
-						}
-						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
-						else {
-							field.setValue(rowValue, false);
-							return;
+					for (Row r : optionTable.getRows()) {
+						if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
+							Value rowValue = r.getValue(indexKeyLong);
+							// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
+							if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
+								((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+								return;
+							}
+							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
+							else {
+								field.setValue(rowValue, false);
+								return;
+							}
 						}
 					}
 				}
+				field.setValue(null, false);
+				((LookupControl) control).setText("");
+				((LookupControl) control).getDescription().setText("");
 			}
-			field.setValue(null, false);
-			((LookupControl) control).getDescription().setText("");
 		}
+	}
+
+	public void changeOptions() {
+		CompletableFuture<?> tableFuture;
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) control).getText(), field, detail, dataService, "List");
+		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+			if (ta instanceof SqlProcedureResult) {
+				SqlProcedureResult sql = (SqlProcedureResult) ta;
+				if (field.getLookupTable() != null) {
+					localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), sql.getResultSet());
+				} else {
+					localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), sql.getResultSet());
+				}
+				((MLookupField) field).setOptions(sql.getResultSet());
+			} else if (ta instanceof Table) {
+				Table t = (Table) ta;
+				if (field.getLookupTable() != null) {
+					localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
+				} else {
+					localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), t);
+				}
+				((MLookupField) field).setOptions(t);
+			}
+
+		}));
 	}
 }

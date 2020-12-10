@@ -12,6 +12,7 @@ public class MLookupField extends MField {
 	private String keyText;
 	private String description;
 	private Table options;
+	private int previousValue;
 
 	public String getKeyText() {
 		return keyText;
@@ -35,6 +36,14 @@ public class MLookupField extends MField {
 
 	public void setOptions(Table options) {
 		this.options = options;
+	}
+
+	public int getPreviousValue() {
+		return previousValue;
+	}
+
+	public void setPreviousValue(int previousValue) {
+		this.previousValue = previousValue;
 	}
 
 }

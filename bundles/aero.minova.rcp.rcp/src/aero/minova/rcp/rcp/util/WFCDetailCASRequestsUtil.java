@@ -33,6 +33,8 @@ import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -142,6 +144,11 @@ public class WFCDetailCASRequestsUtil {
 	public void updateSelectedEntry() {
 		if (selectedTable != null) {
 			for (MField field : detail.getFields()) {
+				if (field instanceof MLookupField) {
+					if (((MLookupField) field).getValue() != null) {
+						((MLookupField) field).setPreviousValue(field.getValue().getIntegerValue());
+					}
+				}
 				field.indicateWaiting();
 			}
 
@@ -154,6 +161,12 @@ public class WFCDetailCASRequestsUtil {
 							c.getConsumer().accept(selectedTable);
 						} catch (Exception e) {
 							e.printStackTrace();
+						}
+					}
+					if (c instanceof MLookupField) {
+						MLookupField lookupField = (MLookupField) c;
+						if (lookupField.getOptions() == null || lookupField.getValue().getIntegerValue() != lookupField.getPreviousValue()) {
+							((LookUpValueAccessor) lookupField.getValueAccessor()).changeOptions();
 						}
 					}
 
