@@ -98,7 +98,7 @@ public abstract class MField {
 	}
 
 	public void setValue(Value value, boolean user) {
-		if (displayValue != null && value != null && displayValue.getType().equals(value.getType()) && displayValue.getValue().equals(value.getValue())) {
+		if (displayValue != null && displayValue.equals(value)) {
 			return; // auch true, wenn beide null sind
 		}
 		checkDataType(value);
