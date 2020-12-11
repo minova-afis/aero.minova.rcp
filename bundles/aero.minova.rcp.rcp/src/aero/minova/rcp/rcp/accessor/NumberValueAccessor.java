@@ -238,6 +238,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 */
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
 			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
+
+		if (!"".equals(textBefore) && null != textBefore)
+			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+
 		int newCaretPosition;
 		String formatted0 = numberFormat.format(0);
 		int lengthDifference = ((text.length() - decimals) - ((textBefore.length() - decimals) + insertion.length()));
