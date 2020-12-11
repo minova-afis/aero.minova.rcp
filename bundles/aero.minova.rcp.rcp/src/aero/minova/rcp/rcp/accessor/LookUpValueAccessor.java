@@ -52,6 +52,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	}
 
 	private void replaceKeyValues(Control control, Value value) {
+		((LookupControl) control).getTextControl().setMessage("...");
 		((LookupControl) control).getDescription().setText("");
 		((LookupControl) control).setText("");
 		if (value != null) {
@@ -74,7 +75,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		tableFuture = LookupCASRequestUtil.getRequestedTable(value.getIntegerValue(), null, field, detail, dataService, "Resolve");
 		// Diese Methode lauft auserhalb des Hauptthreads. Desshalb brauchen wir nochmal
 		// den MainThread, damit die UI-Componenten aktualisiert werden können
-		((LookupControl) control).getTextControl().setMessage("...");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			Table t = null;
 			if (ta instanceof SqlProcedureResult) {
@@ -116,7 +116,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
 			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
-			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+			if (((MLookupField) field).getOptions() != null && !((LookupControl) control).getTextControl().getMessage().equals("...")) {
 				((LookupControl) control).getTextControl().setMessage("");
 				String displayText = ((LookupControl) control).getText();
 				if (displayText != null && !displayText.equals("")) {
