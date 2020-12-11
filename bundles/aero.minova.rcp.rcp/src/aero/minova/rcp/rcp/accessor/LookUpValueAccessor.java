@@ -98,8 +98,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			} else {
-				lc.getDescription().setText("");
 			}
 		}
 	}
