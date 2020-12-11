@@ -21,16 +21,16 @@ jobs:
     - name: Build with Maven
       run: mvn clean verify --file pom.xml -T4
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: minova-wfc-linux
-        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*linux*.zip
-    - uses: actions/upload-artifact@v2
-      with:
-        name: minova-wfc-mac
-        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*mac*.zip
-    - uses: actions/upload-artifact@v2
-      with:
-        name: minova-wfc-win
-        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*win*.zip
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: minova-wfc-linux
+#        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*linux*.zip
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: minova-wfc-mac
+#        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*mac*.zip
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: minova-wfc-win
+#        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*win*.zip
     
