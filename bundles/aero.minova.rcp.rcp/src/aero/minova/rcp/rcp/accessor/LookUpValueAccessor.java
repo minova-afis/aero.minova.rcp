@@ -138,8 +138,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 				field.setValue(null, false);
-				((LookupControl) control).setText("");
-				((LookupControl) control).getDescription().setText("");
 			}
 		}
 	}
