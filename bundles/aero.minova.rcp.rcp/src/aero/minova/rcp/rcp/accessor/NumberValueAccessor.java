@@ -120,13 +120,13 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
-		if (!textBefore.isEmpty() && keyCode == 127) {
+		if (!textBefore.isEmpty() && keyCode == 127 && caretPosition > 0) {
 			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
 				doit = false;
 			} else {
 				doit = true;
 			}
-		} else if (!textBefore.isEmpty() && keyCode == 8 ) {
+		} else if (!textBefore.isEmpty() && keyCode == 8 && caretPosition > 0) {
 			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
 				doit = false;
 			} else {
@@ -202,7 +202,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
 					numberFormat);
 		} catch (NumberFormatException e) {
-			result.value = null;
+			result.value = new Value(0.0);
+			result.text = numberFormat.format(result.value.getDoubleValue());
 			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
 					numberFormat);
 		}
