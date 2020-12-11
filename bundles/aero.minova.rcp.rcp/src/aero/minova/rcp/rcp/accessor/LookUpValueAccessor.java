@@ -177,19 +177,11 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				if (field.getLookupTable() != null) {
-					localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), sql.getResultSet());
-				} else {
-					localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), sql.getResultSet());
-				}
+				localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), sql.getResultSet());
 				((MLookupField) field).setOptions(sql.getResultSet());
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				if (field.getLookupTable() != null) {
-					localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
-				} else {
-					localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), t);
-				}
+				localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
 				((MLookupField) field).setOptions(t);
 			}
 
