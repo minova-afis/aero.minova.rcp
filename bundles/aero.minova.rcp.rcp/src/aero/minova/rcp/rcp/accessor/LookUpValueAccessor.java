@@ -46,13 +46,15 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
-		sync.asyncExec(() -> {
-			replaceKeyValues(control, value);
-		});
+		if (value != null) {
+			((LookupControl) control).getTextControl().setMessage("...");
+			sync.asyncExec(() -> {
+				replaceKeyValues(control, value);
+			});
+		}
 	}
 
 	private void replaceKeyValues(Control control, Value value) {
-		((LookupControl) control).getTextControl().setMessage("...");
 		((LookupControl) control).getDescription().setText("");
 		((LookupControl) control).setText("");
 		if (value != null) {
@@ -116,7 +118,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
 			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
-			if (((MLookupField) field).getOptions() != null && !((LookupControl) control).getTextControl().getMessage().equals("...")) {
+			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
 				((LookupControl) control).getTextControl().setMessage("");
 				String displayText = ((LookupControl) control).getText();
 				if (displayText != null && !displayText.equals("")) {
@@ -142,6 +144,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 				field.setValue(null, false);
+				((LookupControl) control).getTextControl().setMessage("");
 			}
 		}
 	}
