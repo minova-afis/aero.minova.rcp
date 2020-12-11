@@ -204,8 +204,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} catch (NumberFormatException e) {
 			result.value = new Value(0.0);
 			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
-					numberFormat);
+			result.caretPosition = 1;
 		}
 
 		return result;
