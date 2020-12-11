@@ -247,9 +247,17 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		int lengthDifference = (text.length() - (textBefore.length() + insertion.length()));
 
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
-			newCaretPosition = caretPosition + lengthDifference;
+			if (decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition - 1;
+			} else {
+				newCaretPosition = caretPosition + lengthDifference;
+			}
 		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
-			newCaretPosition = caretPosition;
+			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition + 1;
+			} else {
+				newCaretPosition = caretPosition + lengthDifference;
+			}
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = decimalCaretPostion;
 		} else if (formatted0.equals(textBefore)) {
