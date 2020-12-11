@@ -248,15 +248,18 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		int lengthDifference = (text.length() - (textBefore.length() + insertion.length()));
 
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
-			newCaretPosition = caretPosition;
+			newCaretPosition = caretPosition + lengthDifference;
 		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
-			newCaretPosition = caretPosition - 1;
+			newCaretPosition = caretPosition;
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
-			newCaretPosition = text.length() - decimals;
+			newCaretPosition = decimalCaretPostion;
 		} else if (formatted0.equals(textBefore)) {
 			newCaretPosition = caretPosition;
 		} else if ("".equals(textBefore)) {
 			newCaretPosition = insertion.length();
+		} else if (decimalCaretPostion <= caretPosition) {
+			newCaretPosition = caretPosition + insertion.length();
+			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 		} else {
 			if (text.length() == textBefore.length() + insertion.length()) {
 				newCaretPosition = caretPosition + insertion.length();
