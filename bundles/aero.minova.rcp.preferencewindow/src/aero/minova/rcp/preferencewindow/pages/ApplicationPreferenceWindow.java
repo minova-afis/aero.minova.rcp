@@ -25,6 +25,7 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -116,6 +117,13 @@ public class ApplicationPreferenceWindow {
 			}
 			try {
 				preferences.flush();
+				Display display = Display.getDefault();
+				if (display == null) {
+					System.out.println("Display = null");
+				}
+				if (display.getThread() != Thread.currentThread()) {
+					System.out.println("Invalid Access");
+				}
 				// eventuell muss es synchronisiert ausgeführt werden.
 				lcs.changeApplicationLocale(CustomLocale.getLocale());
 			} catch (BackingStoreException | NullPointerException e) {
