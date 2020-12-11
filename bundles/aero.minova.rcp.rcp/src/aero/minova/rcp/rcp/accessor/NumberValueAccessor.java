@@ -187,7 +187,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
 				else {
 					// wir entfernen das Zeichen
-					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
 					position--; // wird am Ende der Schleife wieder hochgezählt
 				}
 				position++;
