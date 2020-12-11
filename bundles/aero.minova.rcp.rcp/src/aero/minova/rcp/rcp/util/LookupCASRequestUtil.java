@@ -67,7 +67,11 @@ public class LookupCASRequestUtil {
 				for (String param : parameters) {
 					MField parameterControl = detail.getField(param);
 					tableBuilder.withColumn(param, parameterControl.getDataType());
+					if (parameterControl.getValue() != null) {
 					rowBuilder.withValue(parameterControl.getValue().getValue());
+					} else {
+						rowBuilder.withValue(null);
+					}
 				}
 			}
 		}

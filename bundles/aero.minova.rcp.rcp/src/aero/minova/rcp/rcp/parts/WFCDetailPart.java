@@ -291,7 +291,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	@Optional
-	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
 		this.locale = s;
 		translate(translationService);
 	}
