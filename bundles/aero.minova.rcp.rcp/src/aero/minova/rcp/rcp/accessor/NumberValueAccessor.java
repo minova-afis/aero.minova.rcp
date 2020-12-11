@@ -120,9 +120,13 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
-		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 127) {
-			doit = false;
-		} else if (!textBefore.isEmpty() && keyCode == 8) {
+		if (!textBefore.isEmpty() && keyCode == 127) {
+			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
+				doit = false;
+			} else {
+				doit = true;
+			}
+		} else if (!textBefore.isEmpty() && keyCode == 8 ) {
 			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
 				doit = false;
 			} else {
@@ -146,7 +150,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
 				else {
 					// wir entfernen das Zeichen
-					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+//					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
 					if (start >= position) start--;
 					if (end >= position) end--;
 					position--; // wird am Ende der Schleife wieder hochgezählt
