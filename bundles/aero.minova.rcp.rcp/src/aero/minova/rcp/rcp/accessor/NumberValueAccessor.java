@@ -114,7 +114,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		Result result = new Result();
 		String text;
 		Boolean doit;
-//		int rightDecimalPosition = 0;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
@@ -185,8 +184,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				else {
 					// wir entfernen das Zeichen
 					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
-					if (start >= position) start--;
-					if (end >= position) end--;
 					position--; // wird am Ende der Schleife wieder hochgezählt
 				}
 				position++;
