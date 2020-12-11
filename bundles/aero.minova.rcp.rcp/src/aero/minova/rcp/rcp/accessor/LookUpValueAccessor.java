@@ -46,8 +46,22 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
-		((LookupControl) control).setText("");
 		if (value != null) {
+			sync.asyncExec(() -> {
+				replaceKeyValues(control, value);
+			});
+		} else {
+			((LookupControl) control).getDescription().setText("");
+			((LookupControl) control).setText("");
+		}
+
+	}
+
+	private void replaceKeyValues(Control control, Value value) {
+		if (value != null) {
+			((LookupControl) control).getTextControl().setMessage("...");
+			((LookupControl) control).getDescription().setText("");
+			((LookupControl) control).setText("");
 			// TODO: berücksichtigung des Localdatabaseservice
 			getLookUpConsumer(control, value);
 
@@ -67,7 +81,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		tableFuture = LookupCASRequestUtil.getRequestedTable(value.getIntegerValue(), null, field, detail, dataService, "Resolve");
 		// Diese Methode lauft auserhalb des Hauptthreads. Desshalb brauchen wir nochmal
 		// den MainThread, damit die UI-Componenten aktualisiert werden können
-		((LookupControl) control).getTextControl().setMessage("...");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			Table t = null;
 			if (ta instanceof SqlProcedureResult) {
@@ -97,8 +110,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			} else {
-				lc.getDescription().setText("");
 			}
 		}
 	}
@@ -110,32 +121,35 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed) {
-			((LookupControl) control).getTextControl().setMessage("");
-			String displayText = ((LookupControl) control).getText();
-			if (displayText != null && !displayText.equals("")) {
+			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
+			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+				((LookupControl) control).getTextControl().setMessage("");
+				String displayText = ((LookupControl) control).getText();
+				if (displayText != null && !displayText.equals("")) {
 
-				Table optionTable = ((MLookupField) field).getOptions();
-				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
-				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
+					Table optionTable = ((MLookupField) field).getOptions();
+					int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
+					int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
 
-				for (Row r : optionTable.getRows()) {
-					if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
-						Value rowValue = r.getValue(indexKeyLong);
-						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
-						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-							((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
-							return;
-						}
-						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
-						else {
-							field.setValue(rowValue, false);
-							return;
+					for (Row r : optionTable.getRows()) {
+						if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
+							Value rowValue = r.getValue(indexKeyLong);
+							// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
+							if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
+								((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+								return;
+							}
+							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
+							else {
+								field.setValue(rowValue, false);
+								return;
+							}
 						}
 					}
 				}
+				field.setValue(null, false);
+				((LookupControl) control).getTextControl().setMessage("");
 			}
-			field.setValue(null, false);
-			((LookupControl) control).getDescription().setText("");
 		}
 	}
 }
