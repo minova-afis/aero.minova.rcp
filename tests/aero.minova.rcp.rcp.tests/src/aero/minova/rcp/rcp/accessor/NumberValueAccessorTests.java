@@ -683,4 +683,44 @@ public class NumberValueAccessorTests {
 		assertEquals("Value", new Value(1111111234.0), result.value);
 	}
 	
+	@Test
+	public void test1_5c0To1_c00() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				3, // start
+				3, // end
+				8, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"1,50", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("CaretPosition", 2, result.caretPosition);
+	}
+	
+	@Test
+	public void test1_52cTo1_50c() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				3, // start
+				3, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"1,52", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("CaretPosition", 4, result.caretPosition);
+	}
+	
 }
