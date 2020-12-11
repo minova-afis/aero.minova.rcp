@@ -243,8 +243,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
 
 		int newCaretPosition;
-		String formatted0 = numberFormat.format(0);
-		int lengthDifference = ((text.length() - decimals) - ((textBefore.length() - decimals) + insertion.length()));
+		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
+		int decimalCaretPostion = textBefore.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int lengthDifference = (text.length() - (textBefore.length() + insertion.length()));
 
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			newCaretPosition = caretPosition;
