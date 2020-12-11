@@ -723,4 +723,6 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 4, result.caretPosition);
 	}
 	
+	//Test
+	
 }
