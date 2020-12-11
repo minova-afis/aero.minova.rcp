@@ -47,17 +47,21 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
 		if (value != null) {
-			((LookupControl) control).getTextControl().setMessage("...");
 			sync.asyncExec(() -> {
 				replaceKeyValues(control, value);
 			});
+		} else {
+			((LookupControl) control).getDescription().setText("");
+			((LookupControl) control).setText("");
 		}
+
 	}
 
 	private void replaceKeyValues(Control control, Value value) {
-		((LookupControl) control).getDescription().setText("");
-		((LookupControl) control).setText("");
 		if (value != null) {
+			((LookupControl) control).getTextControl().setMessage("...");
+			((LookupControl) control).getDescription().setText("");
+			((LookupControl) control).setText("");
 			// TODO: berücksichtigung des Localdatabaseservice
 			getLookUpConsumer(control, value);
 
