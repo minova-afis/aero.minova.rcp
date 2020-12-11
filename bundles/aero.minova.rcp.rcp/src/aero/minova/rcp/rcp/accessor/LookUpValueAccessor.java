@@ -46,6 +46,12 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
+		sync.asyncExec(() -> {
+			replaceKeyValues(control, value);
+		});
+	}
+
+	private void replaceKeyValues(Control control, Value value) {
 		((LookupControl) control).getDescription().setText("");
 		((LookupControl) control).setText("");
 		if (value != null) {
