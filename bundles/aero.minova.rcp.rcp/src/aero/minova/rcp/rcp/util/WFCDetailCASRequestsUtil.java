@@ -63,7 +63,7 @@ public class WFCDetailCASRequestsUtil {
 
 	private MPerspective perspective = null;
 
-	private Map<String, Integer> lookups = new HashMap();
+	private Map<String, Integer> lookups = new HashMap<String, Integer>();
 
 	private List<ArrayList> keys = null;
 
@@ -100,7 +100,7 @@ public class WFCDetailCASRequestsUtil {
 					// Hauptmaske
 
 					List<Column> indexColumns = form.getIndexView().getColumn();
-					setKeys(new ArrayList<ArrayList>());
+					ArrayList<ArrayList> newKeys = new ArrayList<>();
 					for (Field f : allFields) {
 						boolean found = false;
 						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
@@ -108,11 +108,11 @@ public class WFCDetailCASRequestsUtil {
 								found = true;
 								if ("primary".equals(f.getKeyType())) {
 									builder.withValue(row.getValue(i).getValue());
-									ArrayList al = new ArrayList();
+									ArrayList<Object> al = new ArrayList<Object>();
 									al.add(indexColumns.get(i).getName());
 									al.add(row.getValue(i).getValue());
 									al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-									keys.add(al);
+									newKeys.add(al);
 								} else {
 									builder.withValue(null);
 								}
@@ -123,6 +123,10 @@ public class WFCDetailCASRequestsUtil {
 						}
 
 					}
+
+					if (newKeys.equals(keys)) return;
+					else setKeys(newKeys);
+
 					Row r = builder.create();
 					rowIndexTable.addRow(r);
 
