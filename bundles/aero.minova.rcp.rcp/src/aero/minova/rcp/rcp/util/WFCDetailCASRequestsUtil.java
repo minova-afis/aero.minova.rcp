@@ -63,7 +63,7 @@ public class WFCDetailCASRequestsUtil {
 
 	private MPerspective perspective = null;
 
-	private Map<String, Integer> lookups = new HashMap();
+	private Map<String, Integer> lookups = new HashMap<String, Integer>();
 
 	private List<ArrayList> keys = null;
 
@@ -88,51 +88,52 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(Constants.BROKER_ACTIVEROWS) List<Row> rows) {
-		if (rows != null) {
-			if (rows.size() != 0) {
-				Row row = rows.get(0);
-				if (row.getValue(0).getValue() != null) {
-					Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
+		if (rows == null || rows.isEmpty()) return;
+		Row row = rows.get(0);
+		if (row.getValue(0).getValue() != null) {
+			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
 
-					RowBuilder builder = RowBuilder.newRow();
-					List<Field> allFields = dataFormService.getFieldsFromForm(form);
+			RowBuilder builder = RowBuilder.newRow();
+			List<Field> allFields = dataFormService.getFieldsFromForm(form);
 
-					// Hauptmaske
+			// Hauptmaske
 
-					List<Column> indexColumns = form.getIndexView().getColumn();
-					setKeys(new ArrayList<ArrayList>());
-					for (Field f : allFields) {
-						boolean found = false;
-						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-							if (indexColumns.get(i).getName().equals(f.getName())) {
-								found = true;
-								if ("primary".equals(f.getKeyType())) {
-									builder.withValue(row.getValue(i).getValue());
-									ArrayList al = new ArrayList();
-									al.add(indexColumns.get(i).getName());
-									al.add(row.getValue(i).getValue());
-									al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-									keys.add(al);
-								} else {
-									builder.withValue(null);
-								}
-							}
-						}
-						if (!found) {
+			List<Column> indexColumns = form.getIndexView().getColumn();
+			ArrayList<ArrayList> newKeys = new ArrayList<>();
+			for (Field f : allFields) {
+				boolean found = false;
+				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+					if (indexColumns.get(i).getName().equals(f.getName())) {
+						found = true;
+						if ("primary".equals(f.getKeyType())) {
+							builder.withValue(row.getValue(i).getValue());
+							ArrayList<Object> al = new ArrayList<Object>();
+							al.add(indexColumns.get(i).getName());
+							al.add(row.getValue(i).getValue());
+							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
+							newKeys.add(al);
+						} else {
 							builder.withValue(null);
 						}
-
 					}
-					Row r = builder.create();
-					rowIndexTable.addRow(r);
-
-					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
-					tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-						selectedTable = t.getOutputParameters();
-						updateSelectedEntry();
-					}));
 				}
+				if (!found) {
+					builder.withValue(null);
+				}
+
 			}
+
+			if (newKeys.equals(keys)) return;
+			else setKeys(newKeys);
+
+			Row r = builder.create();
+			rowIndexTable.addRow(r);
+
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+				selectedTable = t.getOutputParameters();
+				updateSelectedEntry();
+			}));
 		}
 	}
 
