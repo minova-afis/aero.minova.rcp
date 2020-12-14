@@ -59,10 +59,24 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	}
 
 	private void replaceKeyValues(Control control, Value value) {
-		if (value != null) {
-			((LookupControl) control).getTextControl().setMessage("...");
-			((LookupControl) control).getDescription().setText("");
-			((LookupControl) control).setText("");
+		((LookupControl) control).getTextControl().setMessage("...");
+		((LookupControl) control).getDescription().setText("");
+		((LookupControl) control).setText("");
+
+		Table options = ((MLookupField) field).getOptions();
+		if (options != null) {
+			for (Row r : options.getRows()) {
+				if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
+					((LookupControl) control).getTextControl().setMessage("");
+					((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+					if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+						((LookupControl) control).getDescription().setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+					}
+				}
+			}
+		}
+
+		if (((LookupControl) control).getTextControl().getMessage().equals("...")) {
 			// TODO: berücksichtigung des Localdatabaseservice
 			Map databaseMap = null;
 			if (field.getLookupTable() != null) {
@@ -81,7 +95,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				}
 
 			}
-
 		}
 	}
 
