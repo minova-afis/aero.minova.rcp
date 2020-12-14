@@ -121,13 +121,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 
 		if (!textBefore.isEmpty() && keyCode == 127 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
+			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()
+					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
 				doit = false;
 			} else {
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && keyCode == 8 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
+			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()
+					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
 				doit = false;
 			} else {
 				doit = true;
@@ -249,11 +251,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			if (decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition - 1;
+			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
+				newCaretPosition = caretPosition - 1;
 			} else {
 				newCaretPosition = caretPosition + lengthDifference;
 			}
 		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
 			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition + 1;
+			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
 				newCaretPosition = caretPosition + 1;
 			} else {
 				newCaretPosition = caretPosition + lengthDifference;
