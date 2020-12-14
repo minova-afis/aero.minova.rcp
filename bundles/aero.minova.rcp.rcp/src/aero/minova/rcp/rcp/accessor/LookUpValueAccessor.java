@@ -47,9 +47,22 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
-		((LookupControl) control).getDescription().setText("");
-		((LookupControl) control).setText("");
 		if (value != null) {
+			sync.asyncExec(() -> {
+				replaceKeyValues(control, value);
+			});
+		} else {
+			((LookupControl) control).getDescription().setText("");
+			((LookupControl) control).setText("");
+		}
+
+	}
+
+	private void replaceKeyValues(Control control, Value value) {
+		if (value != null) {
+			((LookupControl) control).getTextControl().setMessage("...");
+			((LookupControl) control).getDescription().setText("");
+			((LookupControl) control).setText("");
 			// TODO: berücksichtigung des Localdatabaseservice
 			Map databaseMap = null;
 			if (field.getLookupTable() != null) {
@@ -85,7 +98,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		tableFuture = LookupCASRequestUtil.getRequestedTable(value.getIntegerValue(), null, field, detail, dataService, "Resolve");
 		// Diese Methode lauft auserhalb des Hauptthreads. Desshalb brauchen wir nochmal
 		// den MainThread, damit die UI-Componenten aktualisiert werden können
-		((LookupControl) control).getTextControl().setMessage("...");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			Table t = null;
 			if (ta instanceof SqlProcedureResult) {
@@ -115,8 +127,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			} else {
-				lc.getDescription().setText("");
 			}
 		}
 	}
@@ -165,8 +175,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 				field.setValue(null, false);
-				((LookupControl) control).setText("");
-				((LookupControl) control).getDescription().setText("");
+				((LookupControl) control).getTextControl().setMessage("");
 			}
 		}
 	}

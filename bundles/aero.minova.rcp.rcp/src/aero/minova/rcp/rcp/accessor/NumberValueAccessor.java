@@ -114,19 +114,26 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		Result result = new Result();
 		String text;
 		Boolean doit;
-//		int rightDecimalPosition = 0;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
-		if (!textBefore.isEmpty() && textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 127) {
-			doit = false;
-		} else if (!textBefore.isEmpty() && textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator() && keyCode == 8) {
-			doit = false;
+		if (!textBefore.isEmpty() && keyCode == 127 && caretPosition > 0) {
+			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
+				doit = false;
+			} else {
+				doit = true;
+			}
+		} else if (!textBefore.isEmpty() && keyCode == 8 && caretPosition > 0) {
+			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
+				doit = false;
+			} else {
+				doit = true;
+			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (!textBefore.isEmpty() && decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
 				doit = false;
 			} else {
 				doit = true;
@@ -143,9 +150,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
 				else {
 					// wir entfernen das Zeichen
-					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
-					if (start >= position) start--;
-					if (end >= position) end--;
+//					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
+					if (start > position) start--;
+					if (end > position) end--;
 					position--; // wird am Ende der Schleife wieder hochgezählt
 				}
 				position++;
@@ -180,9 +187,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				else if (c == decimalFormatSymbols.getDecimalSeparator()) sb.append(c);
 				else {
 					// wir entfernen das Zeichen
-					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
-					if (start >= position) start--;
-					if (end >= position) end--;
 					position--; // wird am Ende der Schleife wieder hochgezählt
 				}
 				position++;
@@ -198,9 +202,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
 					numberFormat);
 		} catch (NumberFormatException e) {
-			result.value = null;
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
-					numberFormat);
+			result.value = new Value(0.0);
+			result.text = numberFormat.format(result.value.getDoubleValue());
+			result.caretPosition = 1;
 		}
 
 		return result;
@@ -233,25 +237,46 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 */
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
 			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
+
+		if (!"".equals(textBefore) && null != textBefore)
+			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+
 		int newCaretPosition;
-		String null_point = numberFormat.format(0);
+		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
+		int decimalCaretPostion = textBefore.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int lengthDifference = (text.length() - (textBefore.length() + insertion.length()));
 
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
-			if (text.length() <= 1) {
-				newCaretPosition = caretPosition;
+			if (decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition - 1;
 			} else {
-				newCaretPosition = text.length() - (decimals + 1);
+				newCaretPosition = caretPosition + lengthDifference;
 			}
-		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF56 entfernt wird
-			newCaretPosition = text.length() - (decimals + 1);
+		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
+			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition + 1;
+			} else {
+				newCaretPosition = caretPosition + lengthDifference;
+			}
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
-			newCaretPosition = text.length() - decimals;
-		} else if (null_point.equals(textBefore)) {
-			newCaretPosition = insertion.length();
-		} else if ("".equals(insertion)) {
+			newCaretPosition = decimalCaretPostion;
+		} else if (formatted0.equals(textBefore)) {
 			newCaretPosition = caretPosition;
+		} else if ("".equals(textBefore)) {
+			newCaretPosition = insertion.length();
+		} else if (decimalCaretPostion <= caretPosition) {
+			newCaretPosition = caretPosition + insertion.length();
+			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 		} else {
-			newCaretPosition = text.length() - (decimals + 1);
+			if (text.length() == textBefore.length() + insertion.length()) {
+				newCaretPosition = caretPosition + insertion.length();
+			} else {
+				if (caretPosition >= 1) {
+					newCaretPosition = caretPosition + insertion.length() + lengthDifference;
+				} else {
+					newCaretPosition = caretPosition + insertion.length() + lengthDifference - 1;
+				}
+			}
 		}
 
 		return newCaretPosition;

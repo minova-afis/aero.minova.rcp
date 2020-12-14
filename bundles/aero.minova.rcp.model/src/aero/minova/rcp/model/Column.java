@@ -18,11 +18,15 @@ public class Column {
 
 	@Override
 	public String toString() {
-		return "Column [name=" + name + ", type=" + getType() + ", outputType=" + outputType + "]";
+		return "Column [name=" + getName() + ", type=" + getType() + ", outputType=" + outputType + "]";
 	}
 
 	public DataType getType() {
 		return type;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }

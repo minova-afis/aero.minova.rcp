@@ -5,7 +5,7 @@
 
 Label#SplashLabel {
 	/* beim Laden von CSS Splash nicht verändern! */
-	font-size: 10px;
+	/* font-size: 10px; *//* TODO SAW - CSS Fontsize */
 }
 
 Text#Console {

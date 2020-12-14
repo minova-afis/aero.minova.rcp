@@ -4,11 +4,11 @@
 @import url("platform:/plugin/aero.minova.rcp.css/css/nattable.css");
 
 Label, LookupTwistie {
-	font-size: 14px;
+	/* font-size: 14px; *//* TODO SAW - CSS Fontsize */
 }
 
 Widget, CTabItem, LookupControl, Text, ToolBar, ToolTip, Button, MinovaSection, LookupText {
-	font-size: 14px;
+	/* font-size: 14px; *//* TODO SAW - CSS Fontsize */
 }
 
 MinovaSection {
@@ -30,7 +30,7 @@ MinovaSection {
 }
 
 NatTable {
-	font-size: 10;
+	/* font-size: 10; *//* TODO SAW - CSS Fontsize */
 	padding: 3;
 	/*row-height: 24;*/
 }
@@ -40,7 +40,7 @@ NatTable > .BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	.TREE_EXPANDED, .TREE_EXPANDED:select,
 	.TREE_COLLAPSED, .TREE_COLLAPSED:select,
 	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {
-	font-size: 10;
+	/* font-size: 10; *//* TODO SAW - CSS Fontsize */
 	padding: 3;
 	/*row-height: 24;*/
 }
