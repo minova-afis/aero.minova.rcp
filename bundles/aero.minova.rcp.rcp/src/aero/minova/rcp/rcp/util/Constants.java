@@ -42,13 +42,11 @@ public class Constants {
 // Liste an Broker-Konstanten
 	public static final String BROKER_SAVEENTRY = "aero/minova/rcp/SaveEntry";
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
-	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/clearFields";
+	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
+	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
-
-	// ValueAccessor
-	public static final String VALUE_ACCESSOR = "VALUEACCESSOR";
 
 }
