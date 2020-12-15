@@ -145,7 +145,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		}
 
 		if (doit == true) {
-				
+
 			// textBefore von überflüssigen Zeichen befreien
 			int position = 0;
 			for (char c : textBefore.toCharArray()) {
@@ -183,9 +183,13 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				text = text.substring(0, start) + insertion + text.substring(start);
 			}
 
-			String decimalLength = text.substring(text.lastIndexOf(decimalFormatSymbols.getDecimalSeparator()) + 1); //Ermittelt den dezimal Bereich
-
-			if (!textBefore.isEmpty() && end == textBefore.length() && decimals < decimalLength.length()) text = text.substring(0, end); //schneidet den dezimal Bereich auf die angebene dezimal Länge
+			for (char c : text.toCharArray()) {
+				if (c == decimalFormatSymbols.getDecimalSeparator()) {
+					String decimalLength = text.substring(text.lastIndexOf(decimalFormatSymbols.getDecimalSeparator()) + 1); // Ermittelt den dezimal Bereich
+					// schneidet den dezimal Bereich auf die angebene dezimal Länge
+					if (!textBefore.isEmpty() && end == textBefore.length() && decimals < decimalLength.length()) text = text.substring(0, end);
+				}
+			}
 
 		} else {
 			int position = 0;
