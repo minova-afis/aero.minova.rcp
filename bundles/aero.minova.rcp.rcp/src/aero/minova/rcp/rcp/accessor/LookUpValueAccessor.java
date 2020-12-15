@@ -94,6 +94,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				} else {
 					((LookupControl) control).getDescription().setText("");
 				}
+				((LookupControl) control).getTextControl().setMessage("");
 
 			}
 		}
