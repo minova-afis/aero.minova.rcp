@@ -183,6 +183,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				text = text.substring(0, start) + insertion + text.substring(start);
 			}
 
+			String decimalLength = text.substring(text.lastIndexOf(decimalFormatSymbols.getDecimalSeparator()) + 1); //Ermittelt den dezimal Bereich
+
+			if (!textBefore.isEmpty() && end == textBefore.length() && decimals < decimalLength.length()) text = text.substring(0, end); //schneidet den dezimal Bereich auf die angebene dezimal Länge
+
 		} else {
 			int position = 0;
 			for (char c : textBefore.toCharArray()) {
