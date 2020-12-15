@@ -776,7 +776,7 @@ public class NumberValueAccessorTests {
 		Result result = numberValueAccessor.processInput(//
 				"100", // insertion
 				0, // start
-				3, // end
+				4, // end
 				0, // keyCode
 				2, // decimals
 				Locale.GERMANY, // locale
