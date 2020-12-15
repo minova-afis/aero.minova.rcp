@@ -272,7 +272,11 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = decimalCaretPostion;
 		} else if (formatted0.equals(textBefore)) {
-			newCaretPosition = caretPosition;
+			if (caretPosition >= 1) {
+				newCaretPosition = caretPosition + insertion.length() - 1;
+			} else {
+				newCaretPosition = caretPosition + insertion.length();
+			}
 		} else if ("".equals(textBefore)) {
 			newCaretPosition = insertion.length();
 		} else if (decimalCaretPostion <= caretPosition) {
