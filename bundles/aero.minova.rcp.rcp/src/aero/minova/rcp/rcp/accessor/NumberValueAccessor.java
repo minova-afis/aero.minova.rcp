@@ -135,7 +135,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die eingabe ein dezimal Trennzeichen ist.
 				doit = false;
 			} else {
 				doit = true;
@@ -145,6 +145,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		}
 
 		if (doit == true) {
+				
 			// textBefore von überflüssigen Zeichen befreien
 			int position = 0;
 			for (char c : textBefore.toCharArray()) {
