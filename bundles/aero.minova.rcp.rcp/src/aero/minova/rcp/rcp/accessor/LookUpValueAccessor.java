@@ -62,7 +62,23 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			((LookupControl) control).getTextControl().setMessage("...");
 			((LookupControl) control).getDescription().setText("");
 			((LookupControl) control).setText("");
-			getLookUpConsumer(control, value);
+
+			Table options = ((MLookupField) field).getOptions();
+			if (options != null) {
+				for (Row r : options.getRows()) {
+					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
+						((LookupControl) control).getTextControl().setMessage("");
+						((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							((LookupControl) control).getDescription()
+									.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						}
+					}
+				}
+			}
+			if (((LookupControl) control).getTextControl().getMessage().equals("...")) {
+				getLookUpConsumer(control, value);
+			}
 
 		}
 	}
