@@ -63,7 +63,7 @@ public class WFCDetailCASRequestsUtil {
 
 	private MPerspective perspective = null;
 
-	private Map<String, Integer> lookups = new HashMap<String, Integer>();
+	private Map<String, Integer> lookups = new HashMap<>();
 
 	private List<ArrayList> keys = null;
 
@@ -88,7 +88,10 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(Constants.BROKER_ACTIVEROWS) List<Row> rows) {
-		if (rows == null || rows.isEmpty()) return;
+		if (rows == null || rows.isEmpty()) {
+			return;
+		}
+
 		Row row = rows.get(0);
 		if (row.getValue(0).getValue() != null) {
 			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
@@ -107,7 +110,7 @@ public class WFCDetailCASRequestsUtil {
 						found = true;
 						if ("primary".equals(f.getKeyType())) {
 							builder.withValue(row.getValue(i).getValue());
-							ArrayList<Object> al = new ArrayList<Object>();
+							ArrayList<Object> al = new ArrayList<>();
 							al.add(indexColumns.get(i).getName());
 							al.add(row.getValue(i).getValue());
 							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
@@ -123,8 +126,11 @@ public class WFCDetailCASRequestsUtil {
 
 			}
 
-			if (newKeys.equals(keys)) return;
-			else setKeys(newKeys);
+			if (newKeys.equals(keys)) {
+				return;
+			} else {
+				setKeys(newKeys);
+			}
 
 			Row r = builder.create();
 			rowIndexTable.addRow(r);
