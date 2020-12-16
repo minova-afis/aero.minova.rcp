@@ -10,8 +10,10 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -58,6 +60,8 @@ import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaEditConfiguration;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -136,6 +140,21 @@ public class WFCSearchPart extends WFCFormPart {
 
 	}
 
+	/**
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
+	 *
+	 * @param mPart
+	 */
+	@Inject
+	@Optional
+	public void resize(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+		if (!mPart.equals(this.mPart)) {
+			return;
+		}
+		NatTableUtil.resize(natTable);
+	}
+
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
 
 		Map<String, String> tableHeadersMap = new HashMap<>();
@@ -153,10 +172,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 
-		
+
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
-		
+
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
@@ -176,7 +195,7 @@ public class WFCSearchPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
-		
+
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
 

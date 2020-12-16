@@ -482,6 +482,7 @@ public class WFCDetailCASRequestsUtil {
 	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		for (MField f : detail.getFields()) {
 			f.setValue(null, false);
+			setKeys(null);
 		}
 	}
 
@@ -533,6 +534,19 @@ public class WFCDetailCASRequestsUtil {
 //
 //		updateSelectedEntry();
 //	}
+
+	/**
+	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten Eintrags zurück
+	 *
+	 * @param obj
+	 */
+	@Inject
+	@Optional
+	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
+		if (perspective == this.perspective) {
+			updateSelectedEntry();
+		}
+	}
 
 	public List<ArrayList> getKeys() {
 		return keys;

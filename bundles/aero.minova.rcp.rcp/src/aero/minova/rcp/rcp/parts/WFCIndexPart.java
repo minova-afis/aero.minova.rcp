@@ -53,7 +53,6 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
-import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
@@ -80,6 +79,7 @@ import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -123,9 +123,11 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private ColumnHeaderLayer columnHeaderLayer;
 
-	@PostConstruct
-	public void createComposite(Composite parent, MPart part, EModelService modelService) {
+	@Inject
+	MPart mpart;
 
+	@PostConstruct
+	public void createComposite(Composite parent, EModelService modelService) {
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
@@ -189,6 +191,21 @@ public class WFCIndexPart extends WFCFormPart {
 	@PersistTableSelection
 	public void savePrefs() {
 		// TODO INDEX Part reihenfolge + Gruppierung speichern
+	}
+
+	/**
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
+	 *
+	 * @param mPart
+	 */
+	@Inject
+	@Optional
+	public void load(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+		if (!mPart.equals(this.mpart)) {
+			return;
+		}
+		NatTableUtil.resize(natTable);
 	}
 
 	/**
@@ -416,52 +433,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public EventList<T> getList() {
 			return eventList;
-		}
-	}
-
-	public static void resizeTable(NatTable table) {
-		if (!table.isDisposed()) {
-
-			/*
-			 * Collection<ILayer> underlyingLayersByColumnPosition =
-			 * table.getUnderlyingLayersByColumnPosition(0); int[] selectedColumnPositions =
-			 * null; for (ILayer iLayer : underlyingLayersByColumnPosition) {
-			 *
-			 * if (iLayer instanceof ViewportLayer)
-			 *
-			 * { int minColumnPosition = ((ViewportLayer)
-			 * iLayer).getMinimumOriginColumnPosition();
-			 *
-			 * int columnCount = ((ViewportLayer) iLayer).getColumnCount();
-			 *
-			 * int maxColumnPosition = minColumnPosition + columnCount - 1;
-			 *
-			 * selectedColumnPositions = new int[columnCount];
-			 *
-			 * for (int i = minColumnPosition; i <= maxColumnPosition; i++) {
-			 *
-			 * int idx = i - minColumnPosition;
-			 *
-			 * selectedColumnPositions[idx] = i;
-			 *
-			 * }
-			 *
-			 * }
-			 */
-
-			int[] selectedColumnPositions = new int[table.getColumnCount()];
-
-			for (int i = table.getColumnCount() - 1; i > -1; i--) {
-
-				selectedColumnPositions[i] = i;
-
-			}
-
-			// }
-			AutoResizeColumnsCommand columnCommand = new AutoResizeColumnsCommand(table, false,
-					selectedColumnPositions);
-
-			table.doCommand(columnCommand);
 		}
 	}
 
