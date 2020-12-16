@@ -208,7 +208,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		try {
 			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
 			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, decimalFormatSymbols,
 					numberFormat);
 		} catch (NumberFormatException e) {
 			result.value = new Value(0.0);
@@ -244,7 +244,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
+	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int decimals, int caretPosition,
 			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
 
 		if (!"".equals(textBefore) && null != textBefore)
@@ -288,7 +288,18 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if (text.length() == textBefore.length() + insertion.length()) {
 				newCaretPosition = caretPosition + insertion.length();
 			} else {
-				if (caretPosition >= 1) {
+				if (start != end) {
+					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+					if (0 != start) {
+						newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
+					} else {
+						if (insertion.contains("" + decimalFormatSymbols.getDecimalSeparator())) {
+							newCaretPosition = start + formatInsertion.length();
+						} else {
+							newCaretPosition = start + formatInsertion.length() - decimals - 1;
+						}
+					}
+				} else if (caretPosition >= 1) {
 					newCaretPosition = caretPosition + insertion.length() + lengthDifference;
 				} else {
 					newCaretPosition = caretPosition + insertion.length() + lengthDifference - 1;
