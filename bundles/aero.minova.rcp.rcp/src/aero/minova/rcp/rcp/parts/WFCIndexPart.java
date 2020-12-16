@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -55,6 +56,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
+import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
@@ -298,6 +300,22 @@ public class WFCIndexPart extends WFCFormPart {
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
+		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
+//		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
+//		selectionLayer
+//				.setSelectionModel(new RowSelectionModel<>(selectionLayer, bodyDataProvider, new IRowIdAccessor<>() {
+//					@Override
+//					public Serializable getRowId(Object rowObject) {
+//						if (rowObject instanceof Row) {
+//							return ((Row) rowObject).hashCode();
+//						} else if (rowObject instanceof GroupByObject) {
+//							return ((GroupByObject) rowObject).hashCode();
+//						}
+//						return rowObject.toString();
+//					}
+//				}));
+
+		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 		natTable = new NatTable(parent, compositeGridLayer, false);
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
@@ -394,9 +412,12 @@ public class WFCIndexPart extends WFCFormPart {
 
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
-					Object c = SelectionUtils.getSelectedRowObjects(selectionLayer,
+					List c = SelectionUtils.getSelectedRowObjects(selectionLayer,
 							(IRowDataProvider<T>) bodyDataProvider, false);
-					context.set(Constants.BROKER_ACTIVEROWS, c);
+					List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+					if (!collection.isEmpty()) {
+						context.set(Constants.BROKER_ACTIVEROWS, collection);
+					}
 				}
 			});
 

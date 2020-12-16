@@ -1,8 +1,5 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -22,6 +19,8 @@ import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -157,8 +156,6 @@ public class WFCSearchPart extends WFCFormPart {
 
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
 
-		Map<String, String> tableHeadersMap = new HashMap<>();
-
 		// Datenmodel für die Eingaben
 		ConfigRegistry configRegistry = new ConfigRegistry();
 
@@ -171,6 +168,22 @@ public class WFCSearchPart extends WFCFormPart {
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
+		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
+			@SuppressWarnings("unchecked")
+			@Override
+			protected boolean doCommand(UpdateDataCommand command) {
+				if (super.doCommand(command)) {
+					System.out.println("Custom update handler called");
+
+					Table dummy = data;
+					dummy.addRow();
+					sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+					return true;
+				}
+				return false;
+			}
+		});
 
 
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
