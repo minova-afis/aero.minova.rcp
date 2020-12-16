@@ -86,7 +86,6 @@ public class WFCSearchPart extends WFCFormPart {
 
 	private Gson gson;
 
-
 	@Inject
 	MPart mPart;
 
@@ -119,24 +118,6 @@ public class WFCSearchPart extends WFCFormPart {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
-
-//		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
-//		try {
-//			File jsonFile = new File(path.toString());
-//			jsonFile.createNewFile();
-//			String content = Files.readString(path, StandardCharsets.UTF_8);
-//			if (!content.equals("")) {
-//				Table searchTable = gson.fromJson(content, Table.class);
-//				if (searchTable.getRows() != null) {
-//					natTable.updateData(searchTable.getRows());
-//					mPart.getContext().set("NatTableDataSearchArea", natTable);
-//				}
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 	}
 
 	/**
@@ -170,16 +151,14 @@ public class WFCSearchPart extends WFCFormPart {
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
-			@SuppressWarnings("unchecked")
 			@Override
 			protected boolean doCommand(UpdateDataCommand command) {
 				if (super.doCommand(command)) {
-					if (data.getRows().size() - 1 == command.getRowPosition()) {
+					Object newValue = command.getNewValue();
+					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
 						Table dummy = data;
 						dummy.addRow();
-
 						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
-
 					}
 					return true;
 				}
@@ -187,9 +166,7 @@ public class WFCSearchPart extends WFCFormPart {
 			}
 		});
 
-
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
-
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
@@ -209,7 +186,6 @@ public class WFCSearchPart extends WFCFormPart {
 				accessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
-
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
