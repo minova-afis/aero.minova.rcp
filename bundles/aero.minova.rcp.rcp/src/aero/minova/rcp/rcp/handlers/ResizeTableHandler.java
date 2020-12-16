@@ -9,7 +9,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 
 import aero.minova.rcp.rcp.util.Constants;
 
-public class ResizeIndexHandler {
+public class ResizeTableHandler {
 
 	@Inject
 	IEventBroker broker;
@@ -20,7 +20,7 @@ public class ResizeIndexHandler {
 			// TODO Info an den Benutzer, Ist die Perspektive jemals Null?
 			return;
 		}
-		broker.post(Constants.BROKER_RESIZEINDEXTABLE, mpart);
+		broker.post(Constants.BROKER_RESIZETABLE, mpart);
 	}
 
 }
