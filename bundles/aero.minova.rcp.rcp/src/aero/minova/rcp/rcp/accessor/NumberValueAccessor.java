@@ -280,7 +280,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				newCaretPosition = caretPosition + insertion.length();
 			}
 		} else if ("".equals(textBefore)) {
-			newCaretPosition = insertion.length();
+			newCaretPosition = insertion.length() + lengthDifference - decimals - 1;
 		} else if (decimalCaretPostion <= caretPosition) {
 			newCaretPosition = caretPosition + insertion.length();
 			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
