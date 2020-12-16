@@ -62,7 +62,23 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			((LookupControl) control).getTextControl().setMessage("...");
 			((LookupControl) control).getDescription().setText("");
 			((LookupControl) control).setText("");
-			getLookUpConsumer(control, value);
+
+			Table options = ((MLookupField) field).getOptions();
+			if (options != null) {
+				for (Row r : options.getRows()) {
+					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
+						((LookupControl) control).getTextControl().setMessage("");
+						((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							((LookupControl) control).getDescription()
+									.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						}
+					}
+				}
+			}
+			if (((LookupControl) control).getTextControl().getMessage().equals("...")) {
+				getLookUpConsumer(control, value);
+			}
 
 		}
 	}
@@ -106,8 +122,11 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		Value v = r.getValue(index);
 		lc.setText((String) ValueBuilder.value(v).create());
 		lc.getTextControl().setMessage("");
-		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
-			lc.getDescription().setText((String) ValueBuilder.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
+		int indexDescription = table.getColumnIndex(Constants.TABLE_DESCRIPTION);
+		if (lc.getDescription() != null && indexDescription > -1) {
+			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
+ 			if (v1 == null) lc.getDescription().setText("");
+ 			else lc.getDescription().setText((String) ValueBuilder.value(v1).create());
 		}
 	}
 
