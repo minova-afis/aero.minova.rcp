@@ -482,6 +482,7 @@ public class WFCDetailCASRequestsUtil {
 	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		for (MField f : detail.getFields()) {
 			f.setValue(null, false);
+			setKeys(null);
 		}
 	}
 
