@@ -1,8 +1,5 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -22,6 +19,8 @@ import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -87,7 +86,6 @@ public class WFCSearchPart extends WFCFormPart {
 
 	private Gson gson;
 
-
 	@Inject
 	MPart mPart;
 
@@ -120,24 +118,6 @@ public class WFCSearchPart extends WFCFormPart {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
-
-//		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
-//		try {
-//			File jsonFile = new File(path.toString());
-//			jsonFile.createNewFile();
-//			String content = Files.readString(path, StandardCharsets.UTF_8);
-//			if (!content.equals("")) {
-//				Table searchTable = gson.fromJson(content, Table.class);
-//				if (searchTable.getRows() != null) {
-//					natTable.updateData(searchTable.getRows());
-//					mPart.getContext().set("NatTableDataSearchArea", natTable);
-//				}
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 	}
 
 	/**
@@ -157,8 +137,6 @@ public class WFCSearchPart extends WFCFormPart {
 
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
 
-		Map<String, String> tableHeadersMap = new HashMap<>();
-
 		// Datenmodel für die Eingaben
 		ConfigRegistry configRegistry = new ConfigRegistry();
 
@@ -171,10 +149,24 @@ public class WFCSearchPart extends WFCFormPart {
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-
+		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
+		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
+			@Override
+			protected boolean doCommand(UpdateDataCommand command) {
+				if (super.doCommand(command)) {
+					Object newValue = command.getNewValue();
+					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
+						Table dummy = data;
+						dummy.addRow();
+						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+					}
+					return true;
+				}
+				return false;
+			}
+		});
 
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
-
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
@@ -194,7 +186,6 @@ public class WFCSearchPart extends WFCFormPart {
 				accessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
-
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
@@ -224,7 +215,7 @@ public class WFCSearchPart extends WFCFormPart {
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
 //
 
-		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns()));
+		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns(), translationService, form));
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
