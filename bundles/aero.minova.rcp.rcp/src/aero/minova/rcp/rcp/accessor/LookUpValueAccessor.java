@@ -122,11 +122,10 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		Value v = r.getValue(index);
 		lc.setText((String) ValueBuilder.value(v).create());
 		lc.getTextControl().setMessage("");
-		int indexDescription = table.getColumnIndex(Constants.TABLE_DESCRIPTION);
-		if (lc.getDescription() != null && indexDescription > -1) {
+		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
- 			if (v1 == null) lc.getDescription().setText("");
- 			else lc.getDescription().setText((String) ValueBuilder.value(v1).create());
+			if (v1 == null) lc.getDescription().setText("");
+			else lc.getDescription().setText((String) ValueBuilder.value(v1).create());
 		}
 	}
 
