@@ -174,11 +174,13 @@ public class WFCSearchPart extends WFCFormPart {
 			@Override
 			protected boolean doCommand(UpdateDataCommand command) {
 				if (super.doCommand(command)) {
-					System.out.println("Custom update handler called");
+					if (data.getRows().size() - 1 == command.getRowPosition()) {
+						Table dummy = data;
+						dummy.addRow();
 
-					Table dummy = data;
-					dummy.addRow();
-					sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+
+					}
 					return true;
 				}
 				return false;
