@@ -54,12 +54,15 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
+import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
+import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
+import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -189,6 +192,28 @@ public class WFCIndexPart extends WFCFormPart {
 	@PersistTableSelection
 	public void savePrefs() {
 		// TODO INDEX Part reihenfolge + Gruppierung speichern
+	}
+
+	/**
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
+	 *
+	 * @param mPart
+	 */
+	@Inject
+	@Optional
+	public void load(@UIEventTopic(Constants.BROKER_RESIZEINDEXTABLE) MPart mPart) {
+		for (int i = 0; i < natTable.getColumnCount(); i++) {
+			InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(natTable, i,
+					natTable.getConfigRegistry(), new GCFactory(natTable));
+			natTable.doCommand(columnCommand);
+		}
+
+		for (int i = 0; i < natTable.getColumnCount(); i++) {
+			InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable, i,
+					natTable.getConfigRegistry(), new GCFactory(natTable));
+			natTable.doCommand(rowCommand);
+		}
 	}
 
 	/**

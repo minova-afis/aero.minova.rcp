@@ -1,29 +1,26 @@
 package aero.minova.rcp.rcp.handlers;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
-import aero.minova.rcp.core.ui.PartsID;
+import aero.minova.rcp.rcp.util.Constants;
 
 public class ResizeIndexHandler {
 
 	@Inject
-	private EModelService model;
+	IEventBroker broker;
 
 	@Execute
 	public void execute(MPart mpart, MPerspective mPerspective) {
-
-		List<MPart> findElements = model.findElements(mPerspective, PartsID.INDEX_PART, MPart.class);
-//		NatTable table = indexPart.getNatTable();
-//		NatTableUtil.resizeTable(table);
-
-		// TODO update table
+		if (mPerspective == null) {
+			// TODO Info an den Benutzer, Ist die Perspektive jemals Null?
+			return;
+		}
+		broker.post(Constants.BROKER_RESIZEINDEXTABLE, mpart);
 	}
 
 }
