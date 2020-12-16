@@ -25,6 +25,7 @@ public class SaveDetailHandler {
 	@Execute
 	public void execute(@Optional MPerspective perspective) {
 		if (perspective == null) {
+			// TODO Info an den Benutzer
 			return;
 		}
 		broker.post(Constants.BROKER_SAVEENTRY, perspective);
