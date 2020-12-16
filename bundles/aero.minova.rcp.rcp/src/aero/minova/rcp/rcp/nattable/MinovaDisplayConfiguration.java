@@ -110,7 +110,6 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex) {
-		// TODO Auto-generated method stub
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
@@ -206,14 +205,6 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 				DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 	}
 
-//	private void registerGenderEditor(IConfigRegistry configRegistry, int columnIndex) {
-//		ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(Arrays.asList("Done", "Not Done"));
-//		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT,
-//				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-//
-//		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new ComboBoxPainter(),
-//				DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-//	}
 
 	private void registerBooleanEditor(IConfigRegistry configRegistry, int columnIndex) {
 
@@ -224,7 +215,6 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		// columnIndex);
 
 		// The CheckBoxCellEditor can also be visualized like a check button
-
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(),
 				DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
@@ -235,15 +225,5 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 	}
 
-//	private void registerDateEditor(IConfigRegistry configRegistry, int columnIndex) {
-//		DateCellEditor dateCellEditor = new DateCellEditor();
-//		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, dateCellEditor, DisplayMode.EDIT,
-//				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-//
-//		// using a DateCellEditor also needs a Date conversion to work correctly
-//		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER,
-//				new DefaultLocalDateDisplayConverter(), DisplayMode.NORMAL,
-//				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-//	}
 
 }

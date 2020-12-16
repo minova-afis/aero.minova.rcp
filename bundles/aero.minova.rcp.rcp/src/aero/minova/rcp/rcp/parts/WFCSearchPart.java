@@ -237,7 +237,7 @@ public class WFCSearchPart extends WFCFormPart {
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
 //
 
-		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns()));
+		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns(), translationService, form));
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
