@@ -1,8 +1,5 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -10,8 +7,10 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -20,6 +19,8 @@ import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -58,6 +59,8 @@ import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaEditConfiguration;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -82,7 +85,6 @@ public class WFCSearchPart extends WFCFormPart {
 	private NatTable natTable;
 
 	private Gson gson;
-
 
 	@Inject
 	MPart mPart;
@@ -116,29 +118,24 @@ public class WFCSearchPart extends WFCFormPart {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
+	}
 
-//		Path path = Path.of(Platform.getInstanceLocation().getURL().getPath().toString() + "/cache/jsonTableSearch");
-//		try {
-//			File jsonFile = new File(path.toString());
-//			jsonFile.createNewFile();
-//			String content = Files.readString(path, StandardCharsets.UTF_8);
-//			if (!content.equals("")) {
-//				Table searchTable = gson.fromJson(content, Table.class);
-//				if (searchTable.getRows() != null) {
-//					natTable.updateData(searchTable.getRows());
-//					mPart.getContext().set("NatTableDataSearchArea", natTable);
-//				}
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
+	/**
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
+	 *
+	 * @param mPart
+	 */
+	@Inject
+	@Optional
+	public void resize(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+		if (!mPart.equals(this.mPart)) {
+			return;
+		}
+		NatTableUtil.resize(natTable);
 	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
-
-		Map<String, String> tableHeadersMap = new HashMap<>();
 
 		// Datenmodel für die Eingaben
 		ConfigRegistry configRegistry = new ConfigRegistry();
@@ -152,11 +149,25 @@ public class WFCSearchPart extends WFCFormPart {
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
+		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
+			@Override
+			protected boolean doCommand(UpdateDataCommand command) {
+				if (super.doCommand(command)) {
+					Object newValue = command.getNewValue();
+					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
+						Table dummy = data;
+						dummy.addRow();
+						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+					}
+					return true;
+				}
+				return false;
+			}
+		});
 
-		
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
-		
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
@@ -176,7 +187,6 @@ public class WFCSearchPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
-		
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
 
@@ -205,7 +215,7 @@ public class WFCSearchPart extends WFCFormPart {
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
 //
 
-		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns()));
+		natTable.addConfiguration(new MinovaEditConfiguration(table.getColumns(), translationService, form));
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 

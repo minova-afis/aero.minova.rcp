@@ -121,19 +121,21 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 
 		if (!textBefore.isEmpty() && keyCode == 127 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
+			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()
+					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
 				doit = false;
 			} else {
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && keyCode == 8 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
+			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()
+					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
 				doit = false;
 			} else {
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die eingabe ein dezimal Trennzeichen ist.
 				doit = false;
 			} else {
 				doit = true;
@@ -143,6 +145,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		}
 
 		if (doit == true) {
+
 			// textBefore von überflüssigen Zeichen befreien
 			int position = 0;
 			for (char c : textBefore.toCharArray()) {
@@ -180,6 +183,12 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				text = text.substring(0, start) + insertion + text.substring(start);
 			}
 
+			if (text.contains("" + decimalFormatSymbols.getDecimalSeparator())) {
+				int decimalOverLength = text.substring(text.lastIndexOf(decimalFormatSymbols.getDecimalSeparator()) + 1).length() - decimals;
+				// schneidet den dezimal Bereich auf die angebene dezimal Länge
+				if (!textBefore.isEmpty() && 0 < decimalOverLength) text = text.substring(0, text.length() - decimalOverLength);
+			}
+
 		} else {
 			int position = 0;
 			for (char c : textBefore.toCharArray()) {
@@ -199,7 +208,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		try {
 			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
 			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, decimals, caretPosition, decimalFormatSymbols,
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, decimalFormatSymbols,
 					numberFormat);
 		} catch (NumberFormatException e) {
 			result.value = new Value(0.0);
@@ -235,7 +244,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int decimals, int caretPosition,
+	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int decimals, int caretPosition,
 			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
 
 		if (!"".equals(textBefore) && null != textBefore)
@@ -249,11 +258,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			if (decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition - 1;
+			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
+				newCaretPosition = caretPosition - 1;
 			} else {
 				newCaretPosition = caretPosition + lengthDifference;
 			}
 		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
 			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition + 1;
+			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
 				newCaretPosition = caretPosition + 1;
 			} else {
 				newCaretPosition = caretPosition + lengthDifference;
@@ -261,9 +274,13 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = decimalCaretPostion;
 		} else if (formatted0.equals(textBefore)) {
-			newCaretPosition = caretPosition;
+			if (caretPosition >= 1) {
+				newCaretPosition = caretPosition + insertion.length() - 1;
+			} else {
+				newCaretPosition = caretPosition + insertion.length();
+			}
 		} else if ("".equals(textBefore)) {
-			newCaretPosition = insertion.length();
+			newCaretPosition = insertion.length() + lengthDifference - decimals - 1;
 		} else if (decimalCaretPostion <= caretPosition) {
 			newCaretPosition = caretPosition + insertion.length();
 			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
@@ -271,7 +288,18 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if (text.length() == textBefore.length() + insertion.length()) {
 				newCaretPosition = caretPosition + insertion.length();
 			} else {
-				if (caretPosition >= 1) {
+				if (start != end) {
+					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+					if (0 != start) {
+						newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
+					} else {
+						if (insertion.contains("" + decimalFormatSymbols.getDecimalSeparator())) {
+							newCaretPosition = start + formatInsertion.length();
+						} else {
+							newCaretPosition = start + formatInsertion.length() - decimals - 1;
+						}
+					}
+				} else if (caretPosition >= 1) {
 					newCaretPosition = caretPosition + insertion.length() + lengthDifference;
 				} else {
 					newCaretPosition = caretPosition + insertion.length() + lengthDifference - 1;

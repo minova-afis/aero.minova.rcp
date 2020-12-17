@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -53,9 +54,9 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
-import org.eclipse.nebula.widgets.nattable.resize.command.AutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
+import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
@@ -80,6 +81,7 @@ import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -123,9 +125,11 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private ColumnHeaderLayer columnHeaderLayer;
 
-	@PostConstruct
-	public void createComposite(Composite parent, MPart part, EModelService modelService) {
+	@Inject
+	MPart mpart;
 
+	@PostConstruct
+	public void createComposite(Composite parent, EModelService modelService) {
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
@@ -189,6 +193,21 @@ public class WFCIndexPart extends WFCFormPart {
 	@PersistTableSelection
 	public void savePrefs() {
 		// TODO INDEX Part reihenfolge + Gruppierung speichern
+	}
+
+	/**
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
+	 *
+	 * @param mPart
+	 */
+	@Inject
+	@Optional
+	public void load(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+		if (!mPart.equals(this.mpart)) {
+			return;
+		}
+		NatTableUtil.resize(natTable);
 	}
 
 	/**
@@ -281,6 +300,22 @@ public class WFCIndexPart extends WFCFormPart {
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
+		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
+//		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
+//		selectionLayer
+//				.setSelectionModel(new RowSelectionModel<>(selectionLayer, bodyDataProvider, new IRowIdAccessor<>() {
+//					@Override
+//					public Serializable getRowId(Object rowObject) {
+//						if (rowObject instanceof Row) {
+//							return ((Row) rowObject).hashCode();
+//						} else if (rowObject instanceof GroupByObject) {
+//							return ((GroupByObject) rowObject).hashCode();
+//						}
+//						return rowObject.toString();
+//					}
+//				}));
+
+		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 		natTable = new NatTable(parent, compositeGridLayer, false);
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
@@ -377,9 +412,12 @@ public class WFCIndexPart extends WFCFormPart {
 
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
-					Object c = SelectionUtils.getSelectedRowObjects(selectionLayer,
+					List c = SelectionUtils.getSelectedRowObjects(selectionLayer,
 							(IRowDataProvider<T>) bodyDataProvider, false);
-					context.set(Constants.BROKER_ACTIVEROWS, c);
+					List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+					if (!collection.isEmpty()) {
+						context.set(Constants.BROKER_ACTIVEROWS, collection);
+					}
 				}
 			});
 
@@ -416,52 +454,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public EventList<T> getList() {
 			return eventList;
-		}
-	}
-
-	public static void resizeTable(NatTable table) {
-		if (!table.isDisposed()) {
-
-			/*
-			 * Collection<ILayer> underlyingLayersByColumnPosition =
-			 * table.getUnderlyingLayersByColumnPosition(0); int[] selectedColumnPositions =
-			 * null; for (ILayer iLayer : underlyingLayersByColumnPosition) {
-			 *
-			 * if (iLayer instanceof ViewportLayer)
-			 *
-			 * { int minColumnPosition = ((ViewportLayer)
-			 * iLayer).getMinimumOriginColumnPosition();
-			 *
-			 * int columnCount = ((ViewportLayer) iLayer).getColumnCount();
-			 *
-			 * int maxColumnPosition = minColumnPosition + columnCount - 1;
-			 *
-			 * selectedColumnPositions = new int[columnCount];
-			 *
-			 * for (int i = minColumnPosition; i <= maxColumnPosition; i++) {
-			 *
-			 * int idx = i - minColumnPosition;
-			 *
-			 * selectedColumnPositions[idx] = i;
-			 *
-			 * }
-			 *
-			 * }
-			 */
-
-			int[] selectedColumnPositions = new int[table.getColumnCount()];
-
-			for (int i = table.getColumnCount() - 1; i > -1; i--) {
-
-				selectedColumnPositions[i] = i;
-
-			}
-
-			// }
-			AutoResizeColumnsCommand columnCommand = new AutoResizeColumnsCommand(table, false,
-					selectedColumnPositions);
-
-			table.doCommand(columnCommand);
 		}
 	}
 

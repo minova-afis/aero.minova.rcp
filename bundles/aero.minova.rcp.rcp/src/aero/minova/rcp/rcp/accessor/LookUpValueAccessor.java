@@ -95,7 +95,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					((LookupControl) control).getDescription().setText("");
 				}
 				((LookupControl) control).getTextControl().setMessage("");
-
 			}
 		}
 	}
@@ -140,9 +139,9 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		lc.setText((String) ValueBuilder.value(v).create());
 		lc.getTextControl().setMessage("");
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
-			if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-				lc.getDescription().setText((String) ValueBuilder.value(r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION))).create());
-			}
+			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
+			if (v1 == null) lc.getDescription().setText("");
+			else lc.getDescription().setText((String) ValueBuilder.value(v1).create());
 		}
 	}
 
@@ -190,10 +189,10 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 					}
 				}
 				field.setValue(null, false);
-				((LookupControl) control).getTextControl().setMessage("");
 			}
 		} else {
 			((LookupControl) control).getTextControl().selectAll();
+			((LookupControl) control).getTextControl().setMessage("");
 		}
 	}
 
