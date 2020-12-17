@@ -854,6 +854,28 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 2, result.caretPosition);
 		assertEquals("Value", new Value(12345.0), result.value);
 	}
+	
+	@Test
+	public void test_12pcse345k00_BS_12pcse45k00() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				2, // start
+				2, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"12.345,00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "12.345,00", result.text);
+		assertEquals("CaretPosition", 3, result.caretPosition);
+		assertEquals("Value", new Value(12345.0), result.value);
+	}
 
 	@Test
 	public void test_1k234cse_8_1k234cse() {
