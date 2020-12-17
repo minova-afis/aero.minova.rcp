@@ -856,7 +856,7 @@ public class NumberValueAccessorTests {
 	}
 	
 	@Test
-	public void test_12pcse345k00_BS_12pcse45k00() {
+	public void test_12pcse345k00_DEL_12pcse45k00() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
@@ -874,6 +874,28 @@ public class NumberValueAccessorTests {
 		);
 		assertEquals("Text", "12.345,00", result.text);
 		assertEquals("CaretPosition", 3, result.caretPosition);
+		assertEquals("Value", new Value(12345.0), result.value);
+	}
+
+//	@Test
+	public void test_12p345csek00_DEL_12p345kcse00() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				6, // start
+				6, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				6, // caretPosition
+				"12.345,00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "12.345,00", result.text);
+		assertEquals("CaretPosition", 7, result.caretPosition);
 		assertEquals("Value", new Value(12345.0), result.value);
 	}
 
