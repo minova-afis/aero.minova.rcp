@@ -137,6 +137,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
 			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die eingabe ein dezimal Trennzeichen ist.
 				doit = false;
+			} else if (decimalFormatSymbols.getGroupingSeparator() == insertion.charAt(0)) {
+				doit = false;
 			} else {
 				doit = true;
 			}
