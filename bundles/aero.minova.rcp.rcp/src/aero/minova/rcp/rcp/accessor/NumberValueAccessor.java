@@ -135,9 +135,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die eingabe ein dezimal Trennzeichen ist.
-				doit = false;
-			} else if (decimalFormatSymbols.getGroupingSeparator() == insertion.charAt(0)) {
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0) || decimalFormatSymbols.getGroupingSeparator() == insertion.charAt(0)
+					|| !Character.isDigit(insertion.charAt(0))) { // Fall, dass die Eingabe ein dezimal Trennzeichen, ein Gruppierungs Trennzeichen oder keine Zahl ist.
 				doit = false;
 			} else {
 				doit = true;
@@ -285,7 +284,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 		} else if ("".equals(textBefore)) {
 			newCaretPosition = insertion.length() + lengthDifference - decimals - 1;
-		} else if (decimalCaretPostion <= caretPosition) {
+		} else if (decimalCaretPostion <= caretPosition && Character.isDigit(insertion.charAt(0))) {
 			newCaretPosition = caretPosition + insertion.length();
 			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 		} else {
