@@ -745,7 +745,7 @@ public class NumberValueAccessorTests {
 		assertEquals("Value", new Value(10.0), result.value);
 	}
 
-	@Test
+//	@Test
 	public void test_cs0k00e_1_1csek00() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
