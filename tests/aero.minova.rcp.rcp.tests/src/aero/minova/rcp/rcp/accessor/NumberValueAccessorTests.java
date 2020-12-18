@@ -856,8 +856,8 @@ public class NumberValueAccessorTests {
 		assertEquals("Value", new Value(12345.0), result.value);
 	}
 
-//	@Test
-	public void test_12p345csek00_DEL_12p345kcse00() {
+	@Test
+	public void test_12p345csek00_ENTF_12p345kcse00() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
