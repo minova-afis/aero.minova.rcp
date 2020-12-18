@@ -177,7 +177,7 @@ public class WFCDetailCASRequestsUtil {
 						if (lookupField.getOptions() == null || lookupField.getValue().getIntegerValue() != lookupField.getPreviousValue()
 								|| (changedPosition < lookupField.getSqlIndex() && changedPosition != -1)) {
 							((LookUpValueAccessor) lookupField.getValueAccessor()).changeOptions();
-							if (!lookupField.equals(detail.getField(Constants.EMPLOYEEKEY))) {
+							if (lookupField.getLookupTable() == null) {
 								changedPosition = lookupField.getSqlIndex();
 							}
 						}

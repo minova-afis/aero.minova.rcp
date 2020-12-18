@@ -47,7 +47,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
-
 		if (value != null) {
 			sync.asyncExec(() -> {
 				replaceKeyValues(control, value);
@@ -174,12 +173,10 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 							else {
 								field.setValue(rowValue, false);
 								//Ändern der Optionen der drunterliegenden Felder
-								if (!field.equals(detail.getField(Constants.EMPLOYEEKEY))) {
+								if (field.getLookupTable() == null) {
 									for (MField f : detail.getFields()) {
-										if (f instanceof MLookupField) {
-											if (f.getSqlIndex() > field.getSqlIndex()) {
-												((LookUpValueAccessor) f.getValueAccessor()).changeOptions();
-											}
+										if (f instanceof MLookupField && f.getSqlIndex() > field.getSqlIndex()) {
+											((LookUpValueAccessor) f.getValueAccessor()).changeOptions();
 										}
 									}
 								}
