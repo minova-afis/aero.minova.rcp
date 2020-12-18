@@ -37,13 +37,4 @@ public class MLookupField extends MField {
 	public void setOptions(Table options) {
 		this.options = options;
 	}
-
-	public int getPreviousValue() {
-		return previousValue;
-	}
-
-	public void setPreviousValue(int previousValue) {
-		this.previousValue = previousValue;
-	}
-
 }

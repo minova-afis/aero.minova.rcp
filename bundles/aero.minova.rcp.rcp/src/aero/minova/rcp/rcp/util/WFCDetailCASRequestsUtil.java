@@ -36,7 +36,6 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -153,34 +152,16 @@ public class WFCDetailCASRequestsUtil {
 	public void updateSelectedEntry() {
 		if (selectedTable != null) {
 			for (MField field : detail.getFields()) {
-				if (field instanceof MLookupField) {
-					if (((MLookupField) field).getValue() != null) {
-						((MLookupField) field).setPreviousValue(field.getValue().getIntegerValue());
-					}
-				}
 				field.indicateWaiting();
 			}
-			int changedPosition = -1;
 			for (int i = 0; i < selectedTable.getColumnCount(); i++) {
 				String name = selectedTable.getColumnName(i);
 				MField c = detail.getField(name);
-				if (c != null) {
-					if (c.getConsumer() != null) {
-						try {
-							c.getConsumer().accept(selectedTable);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					if (c instanceof MLookupField) {
-						MLookupField lookupField = (MLookupField) c;
-						if (lookupField.getOptions() == null || lookupField.getValue().getIntegerValue() != lookupField.getPreviousValue()
-								|| (changedPosition < lookupField.getSqlIndex() && changedPosition != -1)) {
-							((LookUpValueAccessor) lookupField.getValueAccessor()).changeOptions();
-							if (lookupField.getLookupTable() == null) {
-								changedPosition = lookupField.getSqlIndex();
-							}
-						}
+				if (c != null && c.getConsumer() != null) {
+					try {
+						c.getConsumer().accept(selectedTable);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
 			}
@@ -369,7 +350,6 @@ public class WFCDetailCASRequestsUtil {
 			f.setValue(null, false);
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);
-				((MLookupField) f).setPreviousValue(-1);
 			}
 
 		}
