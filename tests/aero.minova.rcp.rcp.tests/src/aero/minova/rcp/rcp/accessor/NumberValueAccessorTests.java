@@ -1075,4 +1075,70 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(1565.00), result.value);
 	}
+	
+	@Test
+	public void testInsertNotDigit() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"[", // insertion
+				3, // start
+				3, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"1.565,00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "1.565,00", result.text);
+		assertEquals("CaretPosition", 3, result.caretPosition);
+		assertEquals("Value", new Value(1565.00), result.value);
+	}
+	
+	@Test
+	public void testInsertLetter() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"A6565", // insertion
+				3, // start
+				3, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"1.565,00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "1.565,00", result.text);
+		assertEquals("CaretPosition", 3, result.caretPosition);
+		assertEquals("Value", new Value(1565.00), result.value);
+	}
+	
+	@Test
+	public void testInsertLetterAfterDecimalSeperator() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"A6565", // insertion
+				7, // start
+				7, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				7, // caretPosition
+				"1.565,00", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "1.565,00", result.text);
+		assertEquals("CaretPosition", 7, result.caretPosition);
+		assertEquals("Value", new Value(1565.00), result.value);
+	}
 }
