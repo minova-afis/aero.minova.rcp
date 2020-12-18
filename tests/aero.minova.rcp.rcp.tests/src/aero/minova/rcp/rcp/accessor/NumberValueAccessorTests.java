@@ -370,27 +370,6 @@ public class NumberValueAccessorTests {
 		assertEquals(3, result.caretPosition);
 	}
 
-	@Test
-	public void testKeyCode127() {
-		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
-		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
-
-		Result result = numberValueAccessor.processInput(//
-				"", // insertion
-				3, // start
-				3, // end
-				127, // keyCode
-				2, // decimals
-				Locale.GERMAN, // locale
-				3, // caretPosition
-				"100,00", // textBefore
-				decimalFormatSymbols//
-		);
-
-		assertEquals("get caret Position", 3, result.caretPosition);
-	}
-
 	//
 	//
 	// Weitere Tests
