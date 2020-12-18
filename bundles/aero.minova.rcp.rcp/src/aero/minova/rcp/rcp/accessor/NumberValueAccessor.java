@@ -258,19 +258,21 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			if (decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition - 1;
-			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
-				newCaretPosition = caretPosition - 1;
-			} else {
-				newCaretPosition = caretPosition + lengthDifference;
-			}
+			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()
+					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
+						newCaretPosition = caretPosition - 1;
+					} else {
+						newCaretPosition = caretPosition + lengthDifference;
+					}
 		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
 			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition + 1;
-			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
-				newCaretPosition = caretPosition + 1;
-			} else {
-				newCaretPosition = caretPosition + lengthDifference;
-			}
+			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()
+					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
+						newCaretPosition = caretPosition + 1;
+					} else {
+						newCaretPosition = caretPosition + lengthDifference;
+					}
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = decimalCaretPostion;
 		} else if (formatted0.equals(textBefore)) {
