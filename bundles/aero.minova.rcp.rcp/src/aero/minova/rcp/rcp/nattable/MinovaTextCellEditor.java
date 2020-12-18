@@ -38,6 +38,8 @@ import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -50,6 +52,8 @@ import org.eclipse.swt.widgets.Text;
  * didn't configure something else.
  */
 public class MinovaTextCellEditor extends AbstractCellEditor {
+
+	private boolean initText = false;
 
 	/**
 	 * The Text control which is the editor wrapped by this TextCellEditor.
@@ -171,6 +175,8 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 */
 	protected char[] autoActivationCharacters;
 
+	private boolean verifyText;
+
 	/**
 	 * Creates the default TextCellEditor that does not commit on pressing the
 	 * up/down arrow keys and will not move the selection on committing a value by
@@ -282,6 +288,44 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		}
 
 		this.text.forceFocus();
+
+		// System.out.println("OS-Name:" + System.getProperty("os.name"));
+		if (System.getProperty("os.name").startsWith("Mac")) {
+			initText = true;
+			this.text.addVerifyListener(new VerifyListener() {
+
+				@Override
+				public void verifyText(VerifyEvent e) {
+					Text text1 = (Text) e.getSource();
+					if (initText && !verifyText) {
+						System.out.println("Verify:" + e.text + "," + "text Verify:" + ((Text) e.getSource()).getText()
+								+ ", bool=" + initText);
+						// Text schreiben + erstes zeichen
+						verifyText = true;
+						e.doit = false;
+						text1.setText(text1.getText() + e.text);
+						text1.setSelection(text1.getText().length());
+						initText = false;
+						verifyText = false;
+					}
+				}
+			});
+
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						if (!text.isDisposed() && initText) {
+							text.setSelection(text.getText().length());
+							initText = false;
+							System.out.println("Asynch Selection ändern:" + text.getText());
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
 
 		return this.text;
 	}
@@ -771,4 +815,3 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		this.commitWithCtrlKey = commitWithCtrlKey;
 	}
 }
-

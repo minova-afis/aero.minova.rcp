@@ -184,6 +184,11 @@ public class MinovaEditConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex) {
+		MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+		attributeValue.setSelectionMode(EditorSelectionEnum.START);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
+				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
