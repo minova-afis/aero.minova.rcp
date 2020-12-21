@@ -277,8 +277,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					} else {
 						newCaretPosition = caretPosition + lengthDifference + 1;
 					}
-		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
-			newCaretPosition = decimalCaretPostion;
+		} else if (!insertion.isEmpty() && insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich
+			newCaretPosition = decimalCaretPostion; // ist
 		} else if (formatted0.equals(textBefore)) {
 			if (caretPosition >= 1) {
 				newCaretPosition = caretPosition + insertion.length() - 1;
