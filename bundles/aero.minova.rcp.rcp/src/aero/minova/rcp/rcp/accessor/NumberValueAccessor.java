@@ -120,22 +120,25 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
+		// Prüft ob die Eingabe statt findet oder nicht
 		if (!textBefore.isEmpty() && keyCode == 127 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()
-					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
+			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
+					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) { // entfernt werden soll
 				doit = false;
 			} else {
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && keyCode == 8 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()
-					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
+			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()// prüft ob ein dezimal oder Gruppierungs trennzeichen
+					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {// gelöscht werden soll
 				doit = false;
 			} else {
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { // Fall, dass die eingabe ein dezimal Trennzeichen ist.
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0) || decimalFormatSymbols.getGroupingSeparator() == insertion.charAt(0)
+					|| !Character.isDigit(insertion.charAt(0))) { // Fall, dass die Eingabe ein dezimal Trennzeichen, ein Gruppierungs Trennzeichen oder keine
+																	// Zahl ist.
 				doit = false;
 			} else {
 				doit = true;
@@ -183,6 +186,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				text = text.substring(0, start) + insertion + text.substring(start);
 			}
 
+			// text auf dezimal Trennzeichen prüfen
 			if (text.contains("" + decimalFormatSymbols.getDecimalSeparator())) {
 				int decimalOverLength = text.substring(text.lastIndexOf(decimalFormatSymbols.getDecimalSeparator()) + 1).length() - decimals;
 				// schneidet den dezimal Bereich auf die angebene dezimal Länge
@@ -258,19 +262,21 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
 			if (decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition - 1;
-			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {
-				newCaretPosition = caretPosition - 1;
-			} else {
-				newCaretPosition = caretPosition + lengthDifference;
-			}
+			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()
+					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
+						newCaretPosition = caretPosition - 1;
+					} else {
+						newCaretPosition = caretPosition + lengthDifference;
+					}
 		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
 			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition + 1;
-			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) {
-				newCaretPosition = caretPosition + 1;
-			} else {
-				newCaretPosition = caretPosition + lengthDifference;
-			}
+			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()
+					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
+						newCaretPosition = caretPosition + 1;
+					} else {
+						newCaretPosition = caretPosition + lengthDifference;
+					}
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = decimalCaretPostion;
 		} else if (formatted0.equals(textBefore)) {
@@ -281,7 +287,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 		} else if ("".equals(textBefore)) {
 			newCaretPosition = insertion.length() + lengthDifference - decimals - 1;
-		} else if (decimalCaretPostion <= caretPosition) {
+		} else if (decimalCaretPostion <= caretPosition && Character.isDigit(insertion.charAt(0))) {// Prüft ob man sich hinter dem dezimal Trennzeichen
+																									// befindet und die Eingabe ein Zahl ist
 			newCaretPosition = caretPosition + insertion.length();
 			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 		} else {
