@@ -275,7 +275,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
 						newCaretPosition = caretPosition + 1;
 					} else {
-						newCaretPosition = caretPosition + lengthDifference;
+						newCaretPosition = caretPosition + lengthDifference + 1;
 					}
 		} else if (insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich ist
 			newCaretPosition = decimalCaretPostion;
