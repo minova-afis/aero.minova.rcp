@@ -507,7 +507,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 4, result.caretPosition);
 		assertEquals("Value", new Value(1.45), result.value);
 	}
-	
+
 	@Test
 	public void testc234_00To11c_234_00() {
 		MNumberField field = new MNumberField(2);
@@ -529,7 +529,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 2, result.caretPosition);
 		assertEquals("Value", new Value(11234.0), result.value);
 	}
-	
+
 	@Test
 	public void testc234_00To111c_234_00() {
 		MNumberField field = new MNumberField(2);
@@ -551,7 +551,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(111234.0), result.value);
 	}
-	
+
 	@Test
 	public void testc234_00To1_111c_234_00() {
 		MNumberField field = new MNumberField(2);
@@ -573,7 +573,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 5, result.caretPosition);
 		assertEquals("Value", new Value(1111234.0), result.value);
 	}
-	
+
 	@Test
 	public void testc234_00To1_111_111c_234_00() {
 		MNumberField field = new MNumberField(2);
@@ -595,7 +595,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 9, result.caretPosition);
 		assertEquals("Value", new Value(1111111234.0), result.value);
 	}
-	
+
 	@Test
 	public void testc234_00To2_341_111c_00() {
 		MNumberField field = new MNumberField(2);
@@ -617,7 +617,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 9, result.caretPosition);
 		assertEquals("Value", new Value(2341111.0), result.value);
 	}
-	
+
 	@Test
 	public void testcTo5c_00() {
 		MNumberField field = new MNumberField(2);
@@ -639,7 +639,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 1, result.caretPosition);
 		assertEquals("Value", new Value(5.0), result.value);
 	}
-	
+
 	@Test
 	public void testInsert1_111_111() {
 		MNumberField field = new MNumberField(2);
@@ -661,7 +661,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 9, result.caretPosition);
 		assertEquals("Value", new Value(1111111234.0), result.value);
 	}
-	
+
 	@Test
 	public void test1_5c0To1_c00() {
 		MNumberField field = new MNumberField(2);
@@ -681,7 +681,7 @@ public class NumberValueAccessorTests {
 		);
 		assertEquals("CaretPosition", 2, result.caretPosition);
 	}
-	
+
 	@Test
 	public void test1_52cTo1_50c() {
 		MNumberField field = new MNumberField(2);
@@ -701,7 +701,7 @@ public class NumberValueAccessorTests {
 		);
 		assertEquals("CaretPosition", 4, result.caretPosition);
 	}
-	
+
 	@Test
 	public void test_cse0k00_1_1csek00() {
 		MNumberField field = new MNumberField(2);
@@ -745,7 +745,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 1, result.caretPosition);
 		assertEquals("Value", new Value(1.0), result.value);
 	}
-	
+
 	@Test
 	public void test_cs0k00e_1_100csek00() {
 		MNumberField field = new MNumberField(2);
@@ -767,7 +767,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(100.0), result.value);
 	}
-	
+
 	@Test
 	public void test_0csk00e_1_100csek00() {
 		MNumberField field = new MNumberField(2);
@@ -833,7 +833,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 2, result.caretPosition);
 		assertEquals("Value", new Value(12345.0), result.value);
 	}
-	
+
 	@Test
 	public void test_12pcse345k00_DEL_12pcse45k00() {
 		MNumberField field = new MNumberField(2);
@@ -899,7 +899,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 5, result.caretPosition);
 		assertEquals("Value", new Value(1.234), result.value);
 	}
-	
+
 	@Test
 	public void test_1k23cse4_8_1k23cse8() {
 		MNumberField field = new MNumberField(2);
@@ -921,7 +921,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 5, result.caretPosition);
 		assertEquals("Value", new Value(1.238), result.value);
 	}
-	
+
 	@Test
 	public void test1_565csek00_1000_1_000csek00() {
 		MNumberField field = new MNumberField(2);
@@ -943,7 +943,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 5, result.caretPosition);
 		assertEquals("Value", new Value(1000.00), result.value);
 	}
-	
+
 	@Test
 	public void test1_565csek00_100_100csek00() {
 		MNumberField field = new MNumberField(2);
@@ -965,7 +965,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(100.00), result.value);
 	}
-	
+
 	@Test
 	public void testcs1_565k00e_1000000_1_000_000csek00() {
 		MNumberField field = new MNumberField(2);
@@ -987,7 +987,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 9, result.caretPosition);
 		assertEquals("Value", new Value(1000000.00), result.value);
 	}
-	
+
 	@Test
 	public void testcs1_565k00e_1000k65_1_000csek65() {
 		MNumberField field = new MNumberField(2);
@@ -1009,7 +1009,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 8, result.caretPosition);
 		assertEquals("Value", new Value(1000.65), result.value);
 	}
-	
+
 	@Test
 	public void test1_cs565ek00_100_100csek00() {
 		MNumberField field = new MNumberField(2);
@@ -1031,7 +1031,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 5, result.caretPosition);
 		assertEquals("Value", new Value(1100.00), result.value);
 	}
-	
+
 	@Test
 	public void test1_5cs65ek00_100_15_100csek00() {
 		MNumberField field = new MNumberField(2);
@@ -1053,7 +1053,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 6, result.caretPosition);
 		assertEquals("Value", new Value(15100.00), result.value);
 	}
-	
+
 	@Test
 	public void testInsertGroupingSeperator() {
 		MNumberField field = new MNumberField(2);
@@ -1075,7 +1075,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(1565.00), result.value);
 	}
-	
+
 	@Test
 	public void testInsertNotDigit() {
 		MNumberField field = new MNumberField(2);
@@ -1097,7 +1097,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(1565.00), result.value);
 	}
-	
+
 	@Test
 	public void testInsertLetter() {
 		MNumberField field = new MNumberField(2);
@@ -1119,7 +1119,7 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 3, result.caretPosition);
 		assertEquals("Value", new Value(1565.00), result.value);
 	}
-	
+
 	@Test
 	public void testInsertLetterAfterDecimalSeperator() {
 		MNumberField field = new MNumberField(2);
@@ -1141,4 +1141,93 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 7, result.caretPosition);
 		assertEquals("Value", new Value(1565.00), result.value);
 	}
+
+	@Test
+	public void testInsertKeyCode127() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				4, // start
+				5, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				4, // caretPosition
+				"123.456,78", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "12.356,78", result.text);
+		assertEquals("CaretPosition", 4, result.caretPosition);
+		assertEquals("Value", new Value(12356.78), result.value);
+	}
+
+	@Test
+	public void test12_3cse56k78_to_1_23cse6k78() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				4, // start
+				5, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				4, // caretPosition
+				"12.356,78", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "1.236,78", result.text);
+		assertEquals("CaretPosition", 4, result.caretPosition);
+		assertEquals("Value", new Value(1236.78), result.value);
+	}
+	
+	@Test
+	public void test1_23cse56k78_to_12csek78() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				3, // start
+				5, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"12.356,78", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "12,78", result.text);
+		assertEquals("CaretPosition", 2, result.caretPosition);
+		assertEquals("Value", new Value(12.78), result.value);
+	}
+	
+	@Test
+	public void testInsert1ABC() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"1ABC", // insertion
+				6, // start
+				6, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				6, // caretPosition
+				"12.356,78", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "123.561,78", result.text);
+		assertEquals("CaretPosition", 7, result.caretPosition);
+		assertEquals("Value", new Value(123561.78), result.value);
+	}
+
 }
