@@ -1187,7 +1187,7 @@ public class NumberValueAccessorTests {
 	}
 	
 	@Test
-	public void test1_23cse56k78_to_12csek78() {
+	public void test12_3cse56k78_to_12csek78() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
@@ -1195,7 +1195,7 @@ public class NumberValueAccessorTests {
 		Result result = numberValueAccessor.processInput(//
 				"", // insertion
 				3, // start
-				5, // end
+				6, // end
 				127, // keyCode
 				2, // decimals
 				Locale.GERMANY, // locale
@@ -1206,6 +1206,28 @@ public class NumberValueAccessorTests {
 		assertEquals("Text", "12,78", result.text);
 		assertEquals("CaretPosition", 2, result.caretPosition);
 		assertEquals("Value", new Value(12.78), result.value);
+	}
+	
+	@Test
+	public void test1_234_56cse7k89_to_123_456csek89() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				8, // start
+				9, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				8, // caretPosition
+				"1.234.567,89", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "123.456,89", result.text);
+		assertEquals("CaretPosition", 7, result.caretPosition);
+		assertEquals("Value", new Value(123456.89), result.value);
 	}
 	
 	@Test
