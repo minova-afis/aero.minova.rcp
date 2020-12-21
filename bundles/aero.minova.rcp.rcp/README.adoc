@@ -58,3 +58,16 @@ Wenn man Datumsinformationen an den CAS übergibt, muss der Zeitpunkt ausgerechn
 
 Bei der Anzeige könnte man sich überlegen, den Wert bei Verlassen auszurechnen. 
 Sobald der Anwender das Feld wieder anspringt (OnFocus) wird die Formel eingeblendet.
+
+==== Zahlenformatierung
+
+Wir haben für die Formatierung von Zahlen folgende Regeln definiert:
+
+- Die Zahlen werden nach dem in den Preferences festgelegten Locale formatiert. Regeln für dezimal Trennzeichen und Gruppierung.
+- Die Eingabe im dezimalen Bereich wird auf die vorher festgelegte Länge begrenzt und jede Eingabe, die die Länge überschreitet wird ignoriert.
+- Wenn man ein dezimales Trennzeichen oder ein Gruppen Trennzeichen versucht zu Löschen(Backspace) oder zu entfernen(DEL/ ENTF), springt die Caret Position auf die gegenüberliegende Seite des Trennzeichens.
+- Wenn eine Zahl im dezimalen Bereich gelöscht wird und sie nicht an der letzten Stelle stand, rückt die nachfolgende Zahl auf.
+- Alles außer Zahlen wird bei der Eingabe ignoriert und rausgefiltert.
+- Wenn man ein dezimales Trennzeichen eingibt, wird man sofort an die Caret Position hinter dem dezimalen Trennzeichen gesetzt.
+- Die Eingabe eines Gruppen Trennzeichens wird ignoriert.
+- Wenn die Ausgangszahl 0 ist, wird die 0 durch die erste eingegebene Zahl ersetzt.
