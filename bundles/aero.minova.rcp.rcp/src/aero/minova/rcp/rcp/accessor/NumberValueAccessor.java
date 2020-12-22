@@ -136,9 +136,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				doit = true;
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0) || decimalFormatSymbols.getGroupingSeparator() == insertion.charAt(0)
-					|| !Character.isDigit(insertion.charAt(0))) { // Fall, dass die Eingabe ein dezimal Trennzeichen, ein Gruppierungs Trennzeichen oder keine
-																	// Zahl ist.
+			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { 
 				doit = false;
 			} else {
 				doit = true;
