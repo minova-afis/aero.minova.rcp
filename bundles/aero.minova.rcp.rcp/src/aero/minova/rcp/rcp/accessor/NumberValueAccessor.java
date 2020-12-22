@@ -192,6 +192,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 
 		} else {
+
 			int position = 0;
 			for (char c : textBefore.toCharArray()) {
 				if (c >= '0' && c <= '9') sb.append(c);
@@ -255,28 +256,31 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		int newCaretPosition;
 		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
 		int decimalCaretPostion = textBefore.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
-		int lengthDifference = (text.length() - (textBefore.length() + insertion.length()));
+		int countGroupingSeperator = 0;
 
-		if (keyCode == 8) { // Fall, dass etwas mit backspace gelöscht wird
-			if (decimalCaretPostion <= caretPosition) {
-				newCaretPosition = caretPosition - 1;
-			} else if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()
+		for (Character gs : text.toCharArray()) {
+			if (decimalFormatSymbols.getGroupingSeparator() == gs) countGroupingSeperator++;
+		}
+		for (Character gs : textBefore.toCharArray()) {
+			if (decimalFormatSymbols.getGroupingSeparator() == gs) countGroupingSeperator--;
+		}
+
+		if (8 == keyCode) {
+			if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()
 					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
-						newCaretPosition = caretPosition - 1;
-					} else {
-						newCaretPosition = caretPosition + lengthDifference;
-					}
-		} else if (keyCode == 127) { // Fall, dass etwas mit ENTF entfernt wird
-			if (formatted0.equals(text) || decimalCaretPostion <= caretPosition) {
-				newCaretPosition = caretPosition + 1;
-			} else if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()
+				newCaretPosition = caretPosition - 1;
+			} else {
+				newCaretPosition = caretPosition - 1 + countGroupingSeperator;
+			}
+		} else if (127 == keyCode) {
+			if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()
 					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
-						newCaretPosition = caretPosition + 1;
-					} else {
-						newCaretPosition = caretPosition + lengthDifference + 1;
-					}
-		} else if (!insertion.isEmpty() && insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Engabe ein dezimal Trennzeich
-			newCaretPosition = decimalCaretPostion; // ist
+				newCaretPosition = caretPosition + 1;
+			} else {
+				newCaretPosition = caretPosition + countGroupingSeperator;
+			}
+		} else if (!insertion.isEmpty() && insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Eingabe ein dezimales
+			newCaretPosition = decimalCaretPostion; // Trennzeichen ist
 		} else if (formatted0.equals(textBefore)) {
 			if (caretPosition >= 1) {
 				newCaretPosition = caretPosition + insertion.length() - 1;
@@ -284,9 +288,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				newCaretPosition = caretPosition + insertion.length();
 			}
 		} else if ("".equals(textBefore)) {
-			newCaretPosition = insertion.length() + lengthDifference - decimals - 1;
+			newCaretPosition = insertion.length() + countGroupingSeperator;
 		} else if (decimalCaretPostion <= caretPosition && Character.isDigit(insertion.charAt(0))) {// Prüft ob man sich hinter dem dezimal Trennzeichen
-																									// befindet und die Eingabe ein Zahl ist
+																									// befindet und die Eingabe eine Zahl ist
 			newCaretPosition = caretPosition + insertion.length();
 			if (newCaretPosition >= text.length()) newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 		} else {
@@ -305,9 +309,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 						}
 					}
 				} else if (caretPosition >= 1) {
-					newCaretPosition = caretPosition + insertion.length() + lengthDifference;
+					newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator;
 				} else {
-					newCaretPosition = caretPosition + insertion.length() + lengthDifference - 1;
+					newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator - 1;
 				}
 			}
 		}
