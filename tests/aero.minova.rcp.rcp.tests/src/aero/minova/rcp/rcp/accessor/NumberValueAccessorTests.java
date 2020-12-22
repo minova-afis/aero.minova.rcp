@@ -367,7 +367,7 @@ public class NumberValueAccessorTests {
 				"100,00", // textBefore
 				decimalFormatSymbols//
 		);
-		assertEquals(3, result.caretPosition);
+		assertEquals(2, result.caretPosition);
 	}
 
 	//
@@ -857,7 +857,7 @@ public class NumberValueAccessorTests {
 	}
 
 	@Test
-	public void test_12p345csek00_ENTF_12p345kcse00() {
+	public void test_12p345csek00_DEL_12p345kcse00() {
 		MNumberField field = new MNumberField(2);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
@@ -1105,7 +1105,7 @@ public class NumberValueAccessorTests {
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
 		Result result = numberValueAccessor.processInput(//
-				"A6565", // insertion
+				"A1234", // insertion
 				3, // start
 				3, // end
 				0, // keyCode
@@ -1115,9 +1115,9 @@ public class NumberValueAccessorTests {
 				"1.565,00", // textBefore
 				decimalFormatSymbols//
 		);
-		assertEquals("Text", "1.565,00", result.text);
-		assertEquals("CaretPosition", 3, result.caretPosition);
-		assertEquals("Value", new Value(1565.00), result.value);
+		assertEquals("Text", "15.123.465,00", result.text);
+		assertEquals("CaretPosition", 8, result.caretPosition);
+		assertEquals("Value", new Value(15123465.00), result.value);
 	}
 
 	@Test
@@ -1137,9 +1137,9 @@ public class NumberValueAccessorTests {
 				"1.565,00", // textBefore
 				decimalFormatSymbols//
 		);
-		assertEquals("Text", "1.565,00", result.text);
-		assertEquals("CaretPosition", 7, result.caretPosition);
-		assertEquals("Value", new Value(1565.00), result.value);
+		assertEquals("Text", "1.565,06", result.text);
+		assertEquals("CaretPosition", 8, result.caretPosition);
+		assertEquals("Value", new Value(1565.06), result.value);
 	}
 
 	@Test
@@ -1251,5 +1251,28 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 7, result.caretPosition);
 		assertEquals("Value", new Value(123561.78), result.value);
 	}
+	
+	@Test
+	public void testDELGroupingSeperator() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				5, // start
+				5, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				5, // caretPosition
+				"1.234.567,89", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "1.234.567,89", result.text);
+		assertEquals("CaretPosition", 6, result.caretPosition);
+		assertEquals("Value", new Value(1234567.89), result.value);
+	}
+	
 
 }
