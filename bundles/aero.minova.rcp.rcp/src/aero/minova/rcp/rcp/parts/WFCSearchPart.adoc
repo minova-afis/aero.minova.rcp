@@ -83,7 +83,9 @@ Jede `column` bildet eine Spalte aus der Tabelle ab. Ihr Datentyp wir durch die 
 |===
 
 Bei der Suchanfrage wird das Tabellenobjekt mit allen Spalten erstellt. Danach werden leere Zeilen eingefügt. Die Anzahl der leeren Zeilen entspricht der Anzahl an Zeilen aus den Suchkriterien. Die letzte leere Zeile wird dabei ignoriert.
-Die zu interpretiernden Werte aus den Feldern werden in die zugehörigen leeren Zeilen geschrieben. Nachdem die Tabelle vollständig erstellt wurde, wird dieses Objekt als Anfrage mit einem HttpRequest an den CAS versendet. Die asynchrone Antwort enthält ebenfalls ein Table-Objekt. Dieses wird von dem Indexbereich eingelesen und dargestellt.
+Die zu interpretiernden Werte aus den Feldern werden in die zugehörigen leeren Zeilen geschrieben.
+Die Operatoren vor den Werten werden ebenfalls mit in die Zelle eingetragen. Sie werden vom CAS verarbeitet.
+Nachdem die Tabelle vollständig erstellt wurde, wird dieses Objekt als Anfrage mit einem HttpRequest an den CAS versendet. Die asynchrone Antwort enthält ebenfalls ein Table-Objekt. Dieses wird von dem Indexbereich eingelesen und dargestellt.
 
 == Interpreter
 Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinhalt einen Wert interpretiert. 
