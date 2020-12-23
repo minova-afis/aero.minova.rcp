@@ -126,3 +126,6 @@ Es werden alle Datensätze gesucht, deren Wert nicht gleich dem angegebene ist.
 
 ==== '=' Gleich
 Es werden alle Datensätze gesucht, deren Wert genau dem angegebenen entspricht.
+
+==== 'null' Nichts (kein Wert)
+Es werden alle Datensätze gesucht, bei denen in diesem Feld kein Wert eingetragen wurde
