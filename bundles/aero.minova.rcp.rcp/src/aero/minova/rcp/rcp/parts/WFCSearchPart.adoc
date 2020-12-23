@@ -1,7 +1,7 @@
 === SearchPart
 Der SearchPart dient der Filterung und der Suche von Datensätzen. Dieser Bereich zeigt die gleichen Felder an wie der Indexbereich. Verschiedenen Kriterien können miteinander kombiniert werden. Dafür ist das erste Feld vorgesehen.
 
-image::../../../../../images/searchpart-01.png[300,300]  
+image::../../../../../../images/searchpart-01.png[300,300]  
 
 == Interpreter
 Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinhalt einen Wert interpretiert. Dieser interpretierte Wert wird beim Verlassen des Feldes dargestellt. Er ersetzt visuell den eingetragenen Wert.
@@ -20,6 +20,14 @@ Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `
 ==== Textfelder
 Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `%`, `?`, `=`, `<>`, `null`.
  * `%` der Weildcard-Operator steht für einen beliebigen Text.
- 	| Eingabe| Interpretation | Darstellung beim Verlassen
-	| `%burg` | `%` + burg | *burg
-	In diesem Beispiel werden alle Einträge gefunden, die mit dem Text: `burg` enden. 
+ 
+ 	[options="header",cols="1,1,1"]
+	|===
+	|Eingabe   |Interpretation   |Darstellung beim Verlassen   
+	//----------------------
+	|`%burg`   |`%` + burg   |`*burg`   
+	|`%varo%`   |`%` + varo + `%`|`*varo*`   
+	|===
+
+	In diesem Beispiel werden alle Einträge gefunden, die mit dem Text: `burg` enden.
+	Zusätzlich werden alle Datensätze gesucht, die `varo` enthalten. 
