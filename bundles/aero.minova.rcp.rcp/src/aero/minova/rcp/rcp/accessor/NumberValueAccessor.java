@@ -269,6 +269,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()
 					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
 				newCaretPosition = caretPosition - 1;
+			} else if (text.startsWith("0") && text.length() == formatted0.length()) {
+				newCaretPosition = 1;
 			} else {
 				newCaretPosition = caretPosition - 1 + countGroupingSeperator;
 			}
@@ -276,6 +278,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()
 					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
 				newCaretPosition = caretPosition + 1;
+			} else if (text.startsWith("0") && text.length() == formatted0.length()) {
+				newCaretPosition = 1;
 			} else {
 				newCaretPosition = caretPosition + countGroupingSeperator;
 			}
