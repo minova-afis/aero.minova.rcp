@@ -6,7 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
@@ -35,8 +37,11 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 
 	private MDetail detail;
 
-	public LookUpValueAccessor(MField field, MDetail detail, Control control) {
+	private Label description;
+
+	public LookUpValueAccessor(MField field, MDetail detail, TextAssist control, Label description) {
 		super(field, control);
+		this.description = description;
 		this.detail = detail;
 
 	}
@@ -52,32 +57,31 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				replaceKeyValues(control, value);
 			});
 		} else {
-			((LookupControl) control).getDescription().setText("");
-			((LookupControl) control).setText("");
+			description.setText("");
+			((TextAssist) control).setText("");
 		}
 
 	}
 
 	private void replaceKeyValues(Control control, Value value) {
-		((LookupControl) control).getTextControl().setMessage("...");
-		((LookupControl) control).getDescription().setText("");
-		((LookupControl) control).setText("");
+		description.setText("");
+		((TextAssist) control).setMessage("...");
+		((TextAssist) control).setText("");
 
 		Table options = ((MLookupField) field).getOptions();
 		if (options != null) {
 			for (Row r : options.getRows()) {
 				if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
-					((LookupControl) control).getTextControl().setMessage("");
-					((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+					((TextAssist) control).setMessage("...");
+					((TextAssist) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 					if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-						((LookupControl) control).getDescription().setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
+						description.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
 					}
 				}
 			}
 		}
 
-		if (((LookupControl) control).getTextControl().getMessage().equals("...")) {
-			// TODO: berücksichtigung des Localdatabaseservice
+		if (((TextAssist) control).getMessage().equals("...")) {
 			Map databaseMap = null;
 			if (field.getLookupTable() != null) {
 				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
@@ -87,13 +91,13 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			if (databaseMap == null) {
 				getLookUpConsumer(control, value);
 			} else {
-				((LookupControl) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
+				((TextAssist) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
 				if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
-					((LookupControl) control).getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
+					description.setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
 				} else {
-					((LookupControl) control).getDescription().setText("");
+					description.setText("");
 				}
-				((LookupControl) control).getTextControl().setMessage("");
+				((TextAssist) control).setMessage("");
 			}
 			changeOptions();
 			// Ändern der Optionen der drunterliegenden Felder
@@ -162,8 +166,8 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		if (!focussed) {
 			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
 			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
-				((LookupControl) control).getTextControl().setMessage("");
-				String displayText = ((LookupControl) control).getText();
+				((TextAssist) control).setMessage("");
+				String displayText = ((TextAssist) control).getText();
 				if (displayText != null && !displayText.equals("")) {
 
 					Table optionTable = ((MLookupField) field).getOptions();
@@ -175,7 +179,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 							Value rowValue = r.getValue(indexKeyLong);
 							// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
 							if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-								((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+								((TextAssist) control).setText(r.getValue(indexKeyText).getStringValue());
 								return;
 							}
 							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
@@ -189,14 +193,14 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				field.setValue(null, false);
 			}
 		} else {
-			((LookupControl) control).getTextControl().selectAll();
-			((LookupControl) control).getTextControl().setMessage("");
+			((TextAssist) control).selectAll();
+			((TextAssist) control).setMessage("");
 		}
 	}
 
 	public void changeOptions() {
 		CompletableFuture<?> tableFuture;
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) control).getText(), field, detail, dataService, "List");
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((TextAssist) control).getText(), field, detail, dataService, "List");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;

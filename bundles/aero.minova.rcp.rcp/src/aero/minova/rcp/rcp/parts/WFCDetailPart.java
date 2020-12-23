@@ -283,7 +283,7 @@ public class WFCDetailPart extends WFCFormPart {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
 			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService,
-					detail);
+					detail, locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}
