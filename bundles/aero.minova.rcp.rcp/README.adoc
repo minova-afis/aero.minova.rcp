@@ -71,3 +71,5 @@ Wir haben für die Formatierung von Zahlen folgende Regeln definiert:
 - Wenn man ein dezimales Trennzeichen eingibt, wird man sofort an die Caret Position hinter dem dezimalen Trennzeichen gesetzt.
 - Die Eingabe eines Gruppen Trennzeichens wird ignoriert.
 - Wenn die Ausgangszahl 0 ist, wird die 0 durch die erste eingegebene Zahl ersetzt.
+- Wenn die letzte Zahl vor dem dezimalen Trennzeichen gelöscht/ entfernt wird springt die Caret Position auf die 1.
+
