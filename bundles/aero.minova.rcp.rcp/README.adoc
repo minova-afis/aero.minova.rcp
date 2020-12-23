@@ -2,7 +2,7 @@ Beschreibung dieses Plugins
 
 == Parts
 
-* link:src/aero/minova/rcp/rcp/parts/WFCSerachPart.adoc[Search Part]
+* link:src/aero/minova/rcp/rcp/parts/WFCSearchPart.adoc[Search Part]
 
 == Felder
 
