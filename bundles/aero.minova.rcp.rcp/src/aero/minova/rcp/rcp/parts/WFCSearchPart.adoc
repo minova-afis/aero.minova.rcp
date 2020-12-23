@@ -5,7 +5,7 @@ image::../../../../../../images/searchpart-01.png[650,650]
 
 == Konzept
 
-Ein Interpreter wird für jede Zelle des Suchbereichs registriert. Er ersetzt visuell den eingetragenen Wert. Bei der Darstellung werden die Felder, welche sich nicht gerade editiertwerden mit den Werten dargestellt. Das Feld welches gerade editiert wird, trägt noch den Inhalt der Eingabe.
+Ein Interpreter wird für jede Zelle des Suchbereichs registriert. Er ersetzt visuell den eingetragenen Wert. Bei der Darstellung werden die Felder, welche nicht gerade editiert werden, mit den Werten dargestellt. Das Feld welches gerade editiert wird, trägt noch den Inhalt der Eingabe.
 
 image::../../../../../../images/searchpart-02.png[650,650]  
 
