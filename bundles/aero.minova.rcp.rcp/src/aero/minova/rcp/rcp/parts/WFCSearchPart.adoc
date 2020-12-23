@@ -1,5 +1,6 @@
 = SearchPart
-Der SearchPart dient der Filterung und der Suche von Datensätzen. Dieser Bereich zeigt die gleichen Felder an wie der Indexbereich. Verschiedenen Kriterien können miteinander kombiniert werden. Dafür ist das erste Feld vorgesehen. Nach dem Laden der Suchkriterien werden wird das Ergebnis im Indexbereich dargestellt.
+
+Der SearchPart dient der Filterung und der Suche von Datensätzen. Dieser Bereich zeigt die gleichen Felder an wie der Indexbereich. Verschiedenen Kriterien können miteinander kombiniert werden. Dafür ist das erste Feld vorgesehen. Nach dem Laden der Suchkriterien wird das Ergebnis im Indexbereich dargestellt.
 
 image::../../../../../../images/searchpart-01.png[650,650]  
 
