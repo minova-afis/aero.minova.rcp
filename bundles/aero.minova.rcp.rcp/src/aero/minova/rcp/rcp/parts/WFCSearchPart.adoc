@@ -1,2 +1,14 @@
-== SearchPart
+=== SearchPart
+Der SearchPart dient der Filterung und der Suche von Datensätzen. Dieser Bereich zeigt die gleichen Felder an wie der Indexbereich. Verschiedenen Kriterien können miteinander kombiniert werden. Dafür ist das erste Feld vorgesehen.
 
+== Funktionsweise: 
+
+== Interpreter
+ * Zahlenfelder
+ * String (gleich Operator, % (Wildcard), Fragezeichen ersetzt ein Zeichen
+ * Datumsfelder
+ * Zeitfelder
+ * DateTime-Felder
+ * Boolean (3 Zustände: ja, nein, nichts)
+
+== Verbindung zwischen Datenfeldern und Interpreter
