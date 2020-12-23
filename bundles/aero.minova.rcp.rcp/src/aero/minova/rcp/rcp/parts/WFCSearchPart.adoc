@@ -111,8 +111,9 @@ Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `%`, `?`, `
 |===
 |Eingabe   |Interpretation   |Darstellung beim Verlassen   
 //----------------------
-|`%burg`   |`%` + burg   |`*burg`   
-|`%varo%`   |`%` + varo + `%`|`*varo*`   
+|`%burg`   |`%` + burg   |`%burg`   
+|`%varo%`   |`%` + varo + `%`|`%varo%`
+|`% burg`   |`%` + ' ' + burg   |`% burg`
 |===
 
 In diesem Beispiel werden alle Einträge gefunden, die mit dem Text: `burg` enden.
