@@ -1,5 +1,9 @@
 Beschreibung dieses Plugins
 
+== Parts
+
+* link:src/aero/minova/rcp/rcp/parts/WFCSerachPart.adoc[Search Part]
+
 == Felder
 
 Die verschiedenen Feldinhalte werden entsprechend interprtiert.
