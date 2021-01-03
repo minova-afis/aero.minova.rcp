@@ -52,22 +52,24 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
+		description.setText("");
+		((TextAssist) control).setText("");
 		if (value != null) {
-			sync.asyncExec(() -> {
-				replaceKeyValues(control, value);
-			});
+			((TextAssist) control).setMessage("...");
+			sync.asyncExec(() -> replaceKeyValues(value));
 		} else {
-			description.setText("");
-			((TextAssist) control).setText("");
+			((TextAssist) control).setMessage("");
 		}
 
 	}
 
-	private void replaceKeyValues(Control control, Value value) {
-		description.setText("");
-		((TextAssist) control).setMessage("...");
-		((TextAssist) control).setText("");
-
+	/**
+	 * versuchen wir mal herauszufinden, was hier passieren soll
+	 * 
+	 * @param control
+	 * @param value
+	 */
+	private void replaceKeyValues(Value value) {
 		Table options = ((MLookupField) field).getOptions();
 		if (options != null) {
 			for (Row r : options.getRows()) {
@@ -82,7 +84,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 		}
 
 		if (((TextAssist) control).getMessage().equals("...")) {
-			Map databaseMap = null;
+			Map<?, ?> databaseMap = null;
 			if (field.getLookupTable() != null) {
 				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
 			} else {
@@ -159,7 +161,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 
 	@Override
 	/**
-	 * Wenn das Feld dein Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
+	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
 	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
 	 */
 	public void setFocussed(boolean focussed) {
@@ -211,7 +213,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
 				((MLookupField) field).setOptions(t);
 			}
-
 		}));
 	}
 }
