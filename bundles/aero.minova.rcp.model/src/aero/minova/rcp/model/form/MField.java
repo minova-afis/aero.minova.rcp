@@ -254,4 +254,9 @@ public abstract class MField {
 	public void setValueAccessor(ValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
 	}
+
+	@Override
+	public String toString() {
+		return "MField(" + getName() + ")";
+	}
 }
