@@ -165,38 +165,35 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
 	 */
 	public void setFocussed(boolean focussed) {
-		if (!focussed) {
-			// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
-			if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
-				((TextAssist) control).setMessage("");
-				String displayText = ((TextAssist) control).getText();
-				if (displayText != null && !displayText.equals("")) {
+		if (focussed) return; // wenn wir den Focus erhalten, machen wir nichts
 
-					Table optionTable = ((MLookupField) field).getOptions();
-					int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
-					int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
+		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
+		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+			((TextAssist) control).setMessage("");
+			String displayText = ((TextAssist) control).getText();
+			if (displayText != null && !displayText.equals("")) {
 
-					for (Row r : optionTable.getRows()) {
-						if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
-							Value rowValue = r.getValue(indexKeyLong);
-							// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
-							if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-								((TextAssist) control).setText(r.getValue(indexKeyText).getStringValue());
-								return;
-							}
-							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
-							else {
-								field.setValue(rowValue, false);
-								return;
-							}
+				Table optionTable = ((MLookupField) field).getOptions();
+				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
+				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
+
+				for (Row r : optionTable.getRows()) {
+					if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
+						Value rowValue = r.getValue(indexKeyLong);
+						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
+						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
+							((TextAssist) control).setText(r.getValue(indexKeyText).getStringValue());
+							return;
+						}
+						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
+						else {
+							field.setValue(rowValue, false);
+							return;
 						}
 					}
 				}
-				field.setValue(null, false);
 			}
-		} else {
-			((TextAssist) control).selectAll();
-			((TextAssist) control).setMessage("");
+			field.setValue(null, false);
 		}
 	}
 
