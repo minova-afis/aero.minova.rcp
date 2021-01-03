@@ -1,0 +1,159 @@
+= SearchPart
+
+Der SearchPart dient der Filterung und der Suche von Datensätzen. Dieser Bereich zeigt die gleichen Felder an wie der Indexbereich. Verschiedenen Kriterien können miteinander kombiniert werden. Dafür ist das erste Feld vorgesehen. Nach dem Laden der Suchkriterien wird das Ergebnis im Indexbereich dargestellt.
+
+image::../../../../../../images/searchpart-01.png[650,650]  
+
+== Konzept
+
+Ein Interpreter wird für jede Zelle des Suchbereichs registriert. Er ersetzt visuell den eingetragenen Wert. Bei der Darstellung werden die Felder, welche nicht gerade editiert werden, mit den Werten dargestellt. Das Feld welches gerade editiert wird, trägt noch den Inhalt der Eingabe.
+
+image::../../../../../../images/searchpart-02.png[650,650]  
+
+In diesem Beispiel wird sichtbar, dass kein Datum als eingabe erfolgte sondern entsprechende Kürzel order Formeln.
+
+=== Suchanfrage
+
+Nach der Eingabe der Suchkriterien erfolgt mit `F5` oder dem `Laden` Button die erstellung einer Suchanfrage. Diese Anfrage setzt sich aus den Suchkriterien und der Spalten des Suchbereis zusammen. Als Basis für die Spalten des Suchbereis dient die *.XML Datei. Sie beschreibt in dem Tag `index-view` den darzustellenden Such- und Indexbereich.
+[source,xml]
+----
+<index-view source="vWorkingTimeIndex2" index-report="auto">
+		<column name="KeyLong" key="true" text="@WorkingTime.KeyLong" aggregate="COUNT">
+			<number/>
+		</column>
+		<column name="EmployeeText" text="@WorkingTime.EmployeeText">
+			<text/>
+		</column>
+		<column name="CustomerText" text="@WorkingTime.CustomerText">
+			<text/>
+		</column>
+		<column name="ProjectText" text="@WorkingTime.ProjectText">
+			<text/>
+		</column>
+		<column name="ServiceText" text="@WorkingTime.ServiceText">
+			<text/>
+		</column>
+		<column name="BookingDate" text="@WorkingTime.BookingDate">
+			<short-date/>
+		</column>
+		<column name="StartDate" text="@WorkingTime.StartDate">
+			<short-time/>
+		</column>
+		<column name="EndDate" text="@WorkingTime.EndDate">
+			<short-time/>
+		</column>
+		<column name="RenderedQuantity" text="@WorkingTime.RenderedQuantity" total="true">
+			<number decimals="2"/>
+		</column>
+		<column name="ChargedQuantity" text="@WorkingTime.ChargedQuantity" total="true">
+			<number decimals="2"/>
+		</column>
+		<column name="Description" text="@WorkingTime.Description">
+			<text/>
+		</column>
+		<column name="ServiceContractText" text="@WorkingTime.ServiceContractText">
+			<text/>
+		</column>
+		<column name="Assigned" text="@WorkingTime.Assigned">
+			<boolean/>
+		</column>
+		<column name="LastDate" text="@WorkingTime.LastDate">
+			<date-time/>
+		</column>
+		<column name="InvoiceText" text="@WorkingTime.InvoiceText">
+			<text/>
+		</column>
+	</index-view>
+----
+
+Dieser XMl-Tag wird in ein Table-Objekt umgewandelt. Dieses Objekt dient als Basis und Datenschicht der NatTable. 
+Jede `column` bildet eine Spalte aus der Tabelle ab. Ihr Datentyp wir durch die Eigenschaft definiert.
+
+|===
+|XMl-Eigenschaft   |Datentyp Java   
+//-------------
+|text   |String   
+|short-date   |Instant   
+|short-time   |Instant   
+|long-time   |Instant   
+|datetime   |Instant   
+|number   |Integer  
+|number + decimals > 0 |Double   
+|boolean   |Boolean   
+|===
+
+Bei der Suchanfrage wird das Tabellenobjekt mit allen Spalten erstellt. Danach werden leere Zeilen eingefügt. Die Anzahl der leeren Zeilen entspricht der Anzahl an Zeilen aus den Suchkriterien. Die letzte leere Zeile wird dabei ignoriert.
+Die zu interpretiernden Werte aus den Feldern werden in die zugehörigen leeren Zeilen geschrieben.
+Die Operatoren vor den Werten werden ebenfalls mit in die Zelle eingetragen. Sie werden vom CAS verarbeitet.
+Nachdem die Tabelle vollständig erstellt wurde, wird dieses Objekt als Anfrage mit einem HttpRequest an den CAS versendet. Die asynchrone Antwort enthält ebenfalls ein Table-Objekt. Dieses wird von dem Indexbereich eingelesen und dargestellt.
+
+== Interpreter
+Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinhalt einen Wert interpretiert. 
+
+|===
+|Eingabe   |Interpretation   |Darstellung beim Verlassen   
+//----------------------
+|`>1`   |`>` + der 1. des aktuellen Monats   | > 01.12.2020    
+|===
+
+Für die folgenden Felder kann ein Interpreter eingesetzt werden: 
+
+==== Zahlenfelder
+Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `<>`, `null`, `!null`.
+
+==== Datums-, Zeit-, DateTimeFelder
+Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `<>`, `null`, `!null`.
+
+==== Textfelder
+Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `%`, `?`, `=`, `<>`, `null`, `!null`.
+ * `%` der Weildcard-Operator steht für einen beliebigen Text.
+ 
+|===
+|Eingabe   |Interpretation   |Darstellung beim Verlassen   
+//----------------------
+|`%burg`   |`%` + burg   |`%burg`   
+|`%varo%`   |`%` + varo + `%`|`%varo%`
+|`% burg`   |`%` + ' ' + burg   |`% burg`
+|===
+
+In diesem Beispiel werden alle Einträge gefunden, die mit dem Text: `burg` enden.
+Zusätzlich werden alle Datensätze gesucht, die `varo` enthalten. 
+
+==== '>' Größer
+Es werden alle Datensätze gesucht, deren Wert größer als der angegebene ist.
+
+==== '<' Kleiner
+Es werden alle Datensätze gesucht, deren Wert kleiner als der angegebene ist.
+
+==== '<>' Ungleich
+Es werden alle Datensätze gesucht, deren Wert nicht gleich dem angegebene ist.
+
+==== '=' Gleich
+Es werden alle Datensätze gesucht, deren Wert genau dem angegebenen entspricht.
+
+==== 'null' Nichts (kein Wert)
+Es werden alle Datensätze gesucht, bei denen in diesem Feld kein Wert eingetragen wurde
+
+==== '!null' nicht Nichts (einen Wert)
+Es werden alle Datensätze gesucht, bei denen in diesem Feld ein Wert eingetragen wurde
+
+==== '~' Like Operator (Ählichkeitssuche)
+Es werden alle Datensätze gesucht, bei denen der Wert des Feldes mit dem Muster übereinstimmt.
+Das Muster kann die Wildcards `%` und `?` enthalten.
+
+==== '!~' Not Like Operator
+Es werden alle Datensätze gesucht, bei denen der Wert des Feldes nicht mit dem Muster übereinstimmt.
+Das Muster kann die Wildcards `%` und `?` enthalten.
+
+== Aufruf des CAS
+
+An das CAS muss immer der Operator gesendet werden. 
+Dies ist auch erforderlich, wenn im UI keine Operator eingetragen wurde.
+
+Der Operator wird immer mit einem Leerzeichen von den Daten getrennt.
+
+Bei Datums und Zeitangaben wir immer der String als SQL-Instant übertragen.
+`{ts '2020-12-31 12:30:00'}` ist die entsprechende Konstante. 
+Bei Feldern mit Zeit, wird als Datum immer der 01.01.1900 angegeben.
+Als Zeitzone ist UTC einzustellen.
+Die Zeitzone der Anwendung kann davon abweichen.
