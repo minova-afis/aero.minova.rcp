@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Activate;
@@ -29,8 +28,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 	private String protocol = "jdbc:h2:file:";
 
-	private String database = "derbyDB";
-
 	private PreparedStatement deleteAllEntriesOfLookup;
 
 	private PreparedStatement insertEntryOfLookup;
@@ -40,8 +37,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	private PreparedStatement insertLookupResolveValue;
 	private PreparedStatement selectLookupResolveValue;
 	private PreparedStatement updateLookupResolveValue;
-
-	private Properties properties = new Properties();
 
 	private Statement s;
 
@@ -56,7 +51,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	 * Description: die Informationen aus dem CAS
 	 */
 	@Activate
-	@SuppressWarnings("unchecked")
 	protected void activateComponent() {
 		if (conn != null) {
 			return;
@@ -77,11 +71,8 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					"CREATE TABLE IF NOT EXISTS LookupResolveValues ( Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR, PRIMARY KEY (Lookup, KeyLong))");
 			createTableIfNotExisting.execute();
 		} catch (SQLException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		;
-
 	}
 
 	/**
