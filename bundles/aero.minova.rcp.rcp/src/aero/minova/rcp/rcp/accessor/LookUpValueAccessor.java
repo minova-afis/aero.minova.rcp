@@ -22,7 +22,6 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
 
 public class LookUpValueAccessor extends AbstractValueAccessor {
 
@@ -147,15 +146,14 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void updateSelectedLookupEntry(Table table, Control control) {
 		Row r = table.getRows().get(0);
-		LookupControl lc = (LookupControl) control;
 		int index = table.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
-		lc.setText((String) ValueBuilder.value(v).create());
-		lc.getTextControl().setMessage("");
-		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
+		((TextAssist) control).setText((String) ValueBuilder.value(v).create());
+		((TextAssist) control).setMessage("");
+		if (description != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
-			if (v1 == null) lc.getDescription().setText("");
-			else lc.getDescription().setText((String) ValueBuilder.value(v1).create());
+			if (v1 == null) description.setText("");
+			else description.setText((String) ValueBuilder.value(v1).create());
 		}
 	}
 
@@ -172,7 +170,6 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 			((TextAssist) control).setMessage("");
 			String displayText = ((TextAssist) control).getText();
 			if (displayText != null && !displayText.equals("")) {
-
 				Table optionTable = ((MLookupField) field).getOptions();
 				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
 				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
