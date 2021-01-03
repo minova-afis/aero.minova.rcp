@@ -202,4 +202,12 @@ public class LookupControl extends Composite {
 	public boolean isProposalPopupOpen() {
 		return contentProposalAdapter.isProposalPopupOpen();
 	}
+
+	public void setMessage(String message) {
+		textControl.setMessage(message);
+	}
+
+	public String getMessage() {
+		return textControl.getMessage();
+	}
 }

@@ -1,6 +1,10 @@
 
 package aero.minova.rcp.rcp.parts;
 
+import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
+import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
@@ -65,13 +69,9 @@ import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
-	private static final int COLUMN_WIDTH = 140;
-	private static final int MARGIN_LEFT = 5;
-	private static final int MARGIN_TOP = 5;
 	private static final int MARGIN_SECTION = 8;
 	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION; // 4 Spalten = 5
 																										// Zwischenräume
-	private static final int COLUMN_HEIGHT = 28;
 
 	@Inject
 	private IEventBroker broker;
@@ -283,7 +283,7 @@ public class WFCDetailPart extends WFCFormPart {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
 			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService,
-					detail);
+					detail, locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}

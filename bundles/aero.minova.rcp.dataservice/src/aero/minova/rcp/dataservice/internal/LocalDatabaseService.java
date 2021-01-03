@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -18,6 +19,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.LookupEntry;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -35,6 +37,10 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 	private PreparedStatement createTableIfNotExisting;
 
+	private PreparedStatement insertLookupResolveValue;
+	private PreparedStatement selectLookupResolveValue;
+	private PreparedStatement updateLookupResolveValue;
+
 	private Properties properties = new Properties();
 
 	private Statement s;
@@ -44,7 +50,10 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	private Connection conn;
 
 	/**
-	 * Öffnen der Datenbankverbindung beim Öffnen der Klasse
+	 * Öffnen der Datenbankverbindung beim Öffnen der Klasse und erstellt, wenn nicht vorhanden, zwei Tabellen Lookupvalues: enthält sämtliche Optionen, welche
+	 * derzeit von der Anwendung verwendet werden. Der Inhalt wird ständig ausgetauscht AllLookupvalues: enthält sämtliche Optionen. Diese Tabelle wird nur
+	 * erweitert, um ein schnelles Laden zu ermöglichen Lookup: enthält die procedureprefix, um einzräge eindeutig zuordnen zu können KeyLong, KeyText,
+	 * Description: die Informationen aus dem CAS
 	 */
 	@Activate
 	@SuppressWarnings("unchecked")
@@ -59,10 +68,13 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 			conn.setAutoCommit(false);
 			createTableIfNotExisting = conn.prepareStatement(
-					"CREATE TABLE IF NOT EXISTS Lookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
+					"CREATE TABLE IF NOT EXISTS Lookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR)");
 			createTableIfNotExisting.execute();
 			createTableIfNotExisting = conn.prepareStatement(
-					"CREATE TABLE IF NOT EXISTS AllLookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, DescriptionText VARCHAR)");
+					"CREATE TABLE IF NOT EXISTS AllLookupvalues ( Lookupvalue_id IDENTITY NOT NULL PRIMARY KEY, Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR)");
+			createTableIfNotExisting.execute();
+			createTableIfNotExisting = conn.prepareStatement(
+					"CREATE TABLE IF NOT EXISTS LookupResolveValues ( Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR, PRIMARY KEY (Lookup, KeyLong))");
 			createTableIfNotExisting.execute();
 		} catch (SQLException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -81,9 +93,9 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	}
 
 	/**
-	 * @param name Name des Lookupfields, für welches wir die die Optionen Anfragen
-	 * @return ein TableObject, welches alle wichtigen informationen enthält, um es
-	 *         zu verwenden wie eine Anfrage an den CAS
+	 * @param name
+	 *            Name des Lookupfields, für welches wir die die Optionen Anfragen
+	 * @return ein TableObject, welches alle wichtigen informationen enthält, um es zu verwenden wie eine Anfrage an den CAS
 	 */
 	@Override
 	public Table getResultsForLookupField(String name) {
@@ -139,8 +151,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			if (name != null && keyLong != null) {
 				try {
 					s = conn.createStatement();
-					rs = s.executeQuery(
-							"SELECT * FROM AllLookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
+					rs = s.executeQuery("SELECT * FROM AllLookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
 					while (rs.next()) {
 						map.put("KeyLong", rs.getInt(3));
 						map.put("KeyText", rs.getString(4));
@@ -173,22 +184,20 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	}
 
 	/**
-	 * Wir löschen sämtlichen Optionen, welche wir für ein bestimmtes Lookupfield
-	 * gespeichert haben und hinterlegen die neuen Ergebnisse des CAS
+	 * Wir löschen sämtlichen Optionen, welche wir für ein bestimmtes Lookupfield gespeichert haben und hinterlegen die neuen Ergebnisse des CAS
 	 * 
-	 * @param name  Name des Lookupfields, für welches wir die die Optionen Anfragen
-	 * @param Table Das Ergebniss der CAS-Anfrage, welches wir in die Datenbank
-	 *              schreiben möchten
+	 * @param name
+	 *            Name des Lookupfields, für welches wir die die Optionen Anfragen
+	 * @param Table
+	 *            Das Ergebniss der CAS-Anfrage, welches wir in die Datenbank schreiben möchten
 	 */
 	@Override
 	public void replaceResultsForLookupField(String name, Table table) {
 		if (conn != null) {
 			if (table != null || name != null) {
 				try {
-					insertEntryOfLookup = conn.prepareStatement(
-							"INSERT INTO Lookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
-					deleteAllEntriesOfLookup = conn
-							.prepareStatement("DELETE FROM Lookupvalues WHERE Lookup='" + name + "'");
+					insertEntryOfLookup = conn.prepareStatement("INSERT INTO Lookupvalues(Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
+					deleteAllEntriesOfLookup = conn.prepareStatement("DELETE FROM Lookupvalues WHERE Lookup='" + name + "'");
 					deleteAllEntriesOfLookup.execute();
 
 					int i = 0;
@@ -198,8 +207,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 						insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
 						insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
 						if (r.getValue(table.getColumnIndex("Description")) != null) {
-							insertEntryOfLookup.setString(4,
-									r.getValue(table.getColumnIndex("Description")).getStringValue());
+							insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex("Description")).getStringValue());
 						} else {
 							insertEntryOfLookup.setString(4, "");
 						}
@@ -219,11 +227,12 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	}
 
 	/**
-	 * Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die
-	 * Latenz zwischen Index und Detail zu vermindern
+	 * Nur für den Fall verwenden, das sämtliche Optionen gespeichert werden, um die Latenz zwischen Index und Detail zu vermindern
 	 * 
-	 * @param name  Name des Lookupfields, für welches wir die die Optionen Anfragen
-	 * @param Table Der Eintrag, welchen wir in die Datenbank schreiben möchten
+	 * @param name
+	 *            Name des Lookupfields, für welches wir die die Optionen Anfragen
+	 * @param Table
+	 *            Der Eintrag, welchen wir in die Datenbank schreiben möchten
 	 * @return void
 	 */
 	@Override
@@ -235,19 +244,15 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 					int keyLong = row.getValue(table.getColumnIndex("KeyLong")).getIntegerValue();
 					Map found = getResultsForKeyLong(name, keyLong);
 					if (found == null) {
-						insertEntryOfLookup = conn.prepareStatement(
-								"INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, DescriptionText) VALUES (?, ?, ?, ?)");
+						insertEntryOfLookup = conn.prepareStatement("INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
 						int i = 0;
 						while (i < table.getRows().size()) {
 							Row r = table.getRows().get(i);
 							insertEntryOfLookup.setString(1, name);
-							insertEntryOfLookup.setInt(2,
-									r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
-							insertEntryOfLookup.setString(3,
-									r.getValue(table.getColumnIndex("KeyText")).getStringValue());
+							insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
+							insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
 							if (r.getValue(table.getColumnIndex("Description")) != null) {
-								insertEntryOfLookup.setString(4,
-										r.getValue(table.getColumnIndex("Description")).getStringValue());
+								insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex("Description")).getStringValue());
 							} else {
 								insertEntryOfLookup.setString(4, "");
 							}
@@ -275,6 +280,65 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 			System.out.println("Schließen der Datenbankverbindung schlug fehl.");
 			e.printStackTrace();
 		}
+	}
+
+	// "CREATE TABLE IF NOT EXISTS LookupResolveValues ( Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR, PRIMARY
+	// KEY (Lookup, KeyLong)");
+	@Override
+	public void updateResolveValue(String lookupName, Value keyLong, Value keyText, Value description) {
+		int rowCount = 0;
+
+		if (conn == null) return; // da können wir nichts tun
+
+		try {
+			if (updateLookupResolveValue == null) {
+				updateLookupResolveValue = conn
+						.prepareStatement("UPDATE LookupResolveValues SET KeyText = ?, Description = ? WHERE Lookup = ? AND KeyLong = ?");
+			}
+			if (insertLookupResolveValue == null) {
+				insertLookupResolveValue = conn.prepareStatement("INSERT INTO LookupResolveValues (Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
+			}
+
+			updateLookupResolveValue.setString(1, keyText.getStringValue());
+			if (description == null) updateLookupResolveValue.setNull(2, Types.VARCHAR);
+			else updateLookupResolveValue.setString(2, description.getStringValue());
+			updateLookupResolveValue.setString(3, lookupName);
+			updateLookupResolveValue.setInt(4, keyLong.getIntegerValue());
+			rowCount = updateLookupResolveValue.executeUpdate();
+			if (rowCount > 0) return;
+
+			insertLookupResolveValue.setString(1, lookupName);
+			insertLookupResolveValue.setInt(2, keyLong.getIntegerValue());
+			insertLookupResolveValue.setString(3, keyText.getStringValue());
+			if (description == null) insertLookupResolveValue.setNull(4, Types.VARCHAR);
+			else insertLookupResolveValue.setString(4, description.getStringValue());
+			insertLookupResolveValue.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public LookupEntry resolveValue(String lookupName, Value keyLong) {
+		if (conn == null) return null;
+		if (keyLong == null) return new LookupEntry(0, "", null);
+
+		try {
+			if (selectLookupResolveValue == null)
+				selectLookupResolveValue = conn.prepareStatement("SELECT KeyText, Description FROM LookupResolveValues WHERE Lookup = ? AND KeyLong = ?");
+			
+			selectLookupResolveValue.setString(1, lookupName);
+			selectLookupResolveValue.setInt(2, keyLong.getIntegerValue());
+			
+			ResultSet resultSet = selectLookupResolveValue.executeQuery();
+			if (resultSet.first()) {
+				return new LookupEntry(keyLong.getIntegerValue(), resultSet.getString(1), (String) resultSet.getObject(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 }
