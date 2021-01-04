@@ -1,6 +1,5 @@
 package aero.minova.rcp.rcp.accessor;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -52,20 +51,14 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value keyLong) {
-		description.setText("");
-		((LookupControl) control).setText("");
-
-		String lookupName = (field.getLookupTable() != null) ? field.getLookupTable() : field.getLookupProcedurePrefix();
-		LookupEntry lookupEntry = localDatabaseService.resolveValue(lookupName, keyLong);
-
-		if (lookupEntry != null) {
-			((LookupControl) control).setText(lookupEntry.keyText);
-			description.setText((lookupEntry.description != null) ? lookupEntry.description : "");
-		} else if (keyLong != null) {
-			((LookupControl) control).setMessage("...");
-			replaceKeyValues(keyLong);
+		if (keyLong != null) {
+			sync.asyncExec(() -> {
+				((LookupControl) control).setMessage("...");
+				replaceKeyValues(keyLong);
+			});
 		} else {
-			((LookupControl) control).setMessage("");
+			description.setText("");
+			((LookupControl) control).setText("");
 		}
 
 	}
@@ -80,7 +73,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		if (options != null) {
 			for (Row r : options.getRows()) {
 				if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
-					((LookupControl) control).setMessage("...");
+					((LookupControl) control).setMessage("");
 					((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 					if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 						description.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
@@ -88,25 +81,19 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 				}
 			}
 		}
-
 		if (((LookupControl) control).getMessage().equals("...")) {
-			Map<?, ?> databaseMap = null;
-			if (field.getLookupTable() != null) {
-				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
+
+			String lookupName = (field.getLookupTable() != null) ? field.getLookupTable() : field.getLookupProcedurePrefix();
+			LookupEntry lookupEntry = localDatabaseService.resolveValue(lookupName, value);
+
+			if (lookupEntry != null) {
+				((LookupControl) control).setText(lookupEntry.keyText);
+				description.setText((lookupEntry.description != null) ? lookupEntry.description : "");
 			} else {
-				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupProcedurePrefix(), value.getIntegerValue());
-			}
-			if (databaseMap == null) {
 				getLookupConsumer(control, value);
-			} else {
-				((LookupControl) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
-				if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
-					description.setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
-				} else {
-					description.setText("");
-				}
-				((LookupControl) control).setMessage("");
 			}
+
+
 //			changeOptions(); // das benötigen wir hier nicht, weil wir nur aufgerufen werden, wenn ein Wert durch das System gesetzt wird.
 //			// Ändern der Optionen der drunterliegenden Felder
 //			if (field.getLookupTable() == null) {
