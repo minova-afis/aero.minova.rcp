@@ -73,7 +73,6 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	/**
 	 * versuchen wir mal herauszufinden, was hier passieren soll
 	 * 
-	 * @param control
 	 * @param value
 	 */
 	private void replaceKeyValues(Value value) {

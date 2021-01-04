@@ -136,8 +136,8 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	}
 
 	@Override
-	public Map getResultsForKeyLong(String name, Integer keyLong) {
-		Map map = new HashMap();
+	public Map<String, Object> getResultsForKeyLong(String name, Integer keyLong) {
+		Map<String, Object> map = new HashMap<>();
 		if (conn != null) {
 			if (name != null && keyLong != null) {
 				try {
@@ -233,7 +233,7 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 				try {
 					Row row = table.getRows().get(0);
 					int keyLong = row.getValue(table.getColumnIndex("KeyLong")).getIntegerValue();
-					Map found = getResultsForKeyLong(name, keyLong);
+					Map<String, Object> found = getResultsForKeyLong(name, keyLong);
 					if (found == null) {
 						insertEntryOfLookup = conn.prepareStatement("INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
 						int i = 0;
