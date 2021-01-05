@@ -4,7 +4,6 @@ import java.util.Collections;
 
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
@@ -34,7 +33,7 @@ import aero.minova.rcp.rcp.util.Constants;
  * @since 11.0.0
  */
 public class LookupControl extends Composite {
-	private final class ContentProposalAdapterExtension extends ContentProposalAdapter {
+	private final class ContentProposalAdapterExtension extends MinovaCustomContentProposalAdapter {
 		private ContentProposalAdapterExtension(Control control, IControlContentAdapter controlContentAdapter,
 				IContentProposalProvider proposalProvider, KeyStroke keyStroke, char[] autoActivationCharacters) {
 			super(control, controlContentAdapter, proposalProvider, keyStroke, autoActivationCharacters);
