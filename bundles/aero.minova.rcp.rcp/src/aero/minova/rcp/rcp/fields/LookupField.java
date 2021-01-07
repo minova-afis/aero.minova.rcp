@@ -153,8 +153,14 @@ public class LookupField {
 			public void keyReleased(KeyEvent e) {
 
 				// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
-				if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
-						&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE) {
+				if (e.keyCode != SWT.ARROW_DOWN && //
+				e.keyCode != SWT.ARROW_LEFT && //
+				e.keyCode != SWT.ARROW_RIGHT && //
+				e.keyCode != SWT.ARROW_UP && //
+				e.keyCode != SWT.TAB && //
+				e.keyCode != SWT.CR && //
+				e.keyCode != SWT.SPACE && //
+				e.keyCode != SWT.SHIFT) {
 					if (((MLookupField) field).getOptions() == null) {
 						requestLookUpEntriesAll(field, detail, lookupControl);
 					} else {
