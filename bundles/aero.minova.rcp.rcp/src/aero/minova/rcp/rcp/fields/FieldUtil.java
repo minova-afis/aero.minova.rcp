@@ -11,7 +11,6 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.rcp.util.Constants;
 
-@SuppressWarnings("restriction")
 public class FieldUtil {
 
 	public static final String TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";

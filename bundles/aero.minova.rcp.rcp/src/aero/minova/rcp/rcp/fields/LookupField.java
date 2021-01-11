@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.fields;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -35,7 +36,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
+import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.LookupControl;
@@ -49,7 +50,46 @@ public class LookupField {
 	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail) {
+			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail, Locale locale) {
+//		String labelText = field.getLabel() == null ? "" : field.getLabel();
+//		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
+//		label.setData(TRANSLATE_PROPERTY, labelText);
+//
+//		LookupControl text = new LookupControl(composite, SWT.NONE);
+//		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
+//
+//		IEclipseContext context = perspective.getContext();
+//		LookupValueAccessor lva = new LookupValueAccessor(field, detail, text, descriptionLabel);
+//		ContextInjectionFactory.inject(lva, context);
+//		field.setValueAccessor(lva);
+//
+//
+//		FormData labelFormData = new FormData();
+//		FormData textFormData = new FormData();
+//		FormData descriptionLabelFormData = new FormData();
+//
+//		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
+//		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
+//		labelFormData.width = COLUMN_WIDTH;
+//
+//		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
+//		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
+//		textFormData.width = SHORT_DATE_WIDTH;
+//
+//		descriptionLabelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
+//		descriptionLabelFormData.left = new FormAttachment(text, 0, SWT.RIGHT);
+//		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
+//			descriptionLabelFormData.width = MARGIN_LEFT * 2 + COLUMN_WIDTH * 2;
+//		} else {
+//			descriptionLabelFormData.width = 0;
+//		}
+//
+//		label.setLayoutData(labelFormData);
+//		text.setLayoutData(textFormData);
+//		descriptionLabel.setLayoutData(descriptionLabelFormData);
+//
+//		return text;
+
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
@@ -59,9 +99,9 @@ public class LookupField {
 		FormData descriptionLabelFormData = new FormData();
 
 		IEclipseContext context = perspective.getContext();
-		LookUpValueAccessor lookUpValueAccessor = new LookUpValueAccessor(field, detail, lookupControl);
-		ContextInjectionFactory.inject(lookUpValueAccessor, context);
-		field.setValueAccessor(lookUpValueAccessor);
+		LookupValueAccessor lookupValueAccessor = new LookupValueAccessor(field, detail, lookupControl, descriptionLabel);
+		ContextInjectionFactory.inject(lookupValueAccessor, context);
+		field.setValueAccessor(lookupValueAccessor);
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
 		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
@@ -92,8 +132,7 @@ public class LookupField {
 
 			@Override
 			/*
-			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
-			 * LookUpFelder eingetragen wurden
+			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere LookUpFelder eingetragen wurden
 			 */
 			public void mouseDown(MouseEvent e) {
 				requestLookUpEntriesAll(field, detail, lookupControl);
@@ -104,7 +143,6 @@ public class LookupField {
 		// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 		lookupControl.addKeyListener(new KeyListener() {
 
-
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
@@ -114,8 +152,7 @@ public class LookupField {
 			@Override
 			public void keyReleased(KeyEvent e) {
 
-
-					// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
+				// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 				if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
 						&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE) {
 					if (((MLookupField) field).getOptions() == null) {

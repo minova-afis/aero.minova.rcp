@@ -36,5 +36,4 @@ public class MLookupField extends MField {
 	public void setOptions(Table options) {
 		this.options = options;
 	}
-
 }
