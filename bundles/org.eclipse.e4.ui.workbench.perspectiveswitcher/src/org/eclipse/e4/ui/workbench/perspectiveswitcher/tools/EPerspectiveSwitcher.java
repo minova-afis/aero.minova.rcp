@@ -52,10 +52,6 @@ public class EPerspectiveSwitcher {
 			MPerspective perspective = (MPerspective) changedElement;
 			if (!perspective.isToBeRendered())
 				return;
-			
-			MWindow perspectiveWindow = perspective.getContext().get(MWindow.class); 
-			if (window != perspectiveWindow)
-				return;
 						
 			String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
 			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
