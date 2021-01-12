@@ -1,7 +1,9 @@
 package aero.minova.rcp.model.form;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Das Modell für den Detailbereich
@@ -11,6 +13,8 @@ import java.util.HashMap;
 public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
+
+	private List<MField> fieldList = new ArrayList<MField>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -27,6 +31,13 @@ public class MDetail {
 	public void putField(MField field) {
 		if (field == null) return;
 		fields.put(field.getName(), field);
+	}
+
+	public void addField(MField field) {
+		if (field == null) return;
+		if (!fieldList.contains(field)) {
+			fieldList.add(field);
+		}
 	}
 
 	/**
@@ -46,5 +57,9 @@ public class MDetail {
 
 	public Collection<MField> getFields() {
 		return fields.values();
+	}
+
+	public List<MField> getFieldList() {
+		return fieldList;
 	}
 }

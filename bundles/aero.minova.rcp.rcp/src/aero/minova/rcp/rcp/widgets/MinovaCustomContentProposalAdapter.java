@@ -367,6 +367,9 @@ public class MinovaCustomContentProposalAdapter {
 					} else {
 						close();
 					}
+
+					Shell shell = getShell();
+					System.out.println();
 					break;
 //					e.doit = false;
 //					getShell().setFocus();
@@ -460,6 +463,7 @@ public class MinovaCustomContentProposalAdapter {
 					@Override
 					public void focusGained(FocusEvent event) {
 						ContentProposalPopup.this.close();
+						popupWasOpen = true;
 					}
 				});
 				return text;
@@ -889,6 +893,8 @@ public class MinovaCustomContentProposalAdapter {
 			}
 			boolean ret = super.close();
 			notifyPopupClosed();
+
+			popupWasOpen = true;
 			return ret;
 		}
 
@@ -1219,6 +1225,8 @@ public class MinovaCustomContentProposalAdapter {
 	 * A flag that indicates that we are watching modify events
 	 */
 	private boolean watchModify = false;
+
+	public boolean popupWasOpen = false;
 
 	/**
 	 * Construct a content proposal adapter that can assist the user with
@@ -1554,6 +1562,7 @@ public class MinovaCustomContentProposalAdapter {
 		if (isEnabled && !enabled) {
 			if (popup != null) {
 				popup.close();
+
 			}
 		}
 		isEnabled = enabled;

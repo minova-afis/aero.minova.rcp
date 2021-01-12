@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -118,8 +119,13 @@ public class LookupField {
 			descriptionLabelFormData.width = MARGIN_LEFT * 2 + COLUMN_WIDTH * 2;
 		} else {
 			descriptionLabelFormData.width = 0;
+
 		}
 
+		//TODO TabIndex bearbeiten
+		field.getTabIndex();
+		
+		
 		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
 		label.setLayoutData(labelFormData);
 
@@ -143,6 +149,8 @@ public class LookupField {
 		// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
 		lookupControl.addKeyListener(new KeyListener() {
 
+			private Control[] tabList;
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
@@ -151,7 +159,6 @@ public class LookupField {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-
 				// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
 				if (e.keyCode != SWT.ARROW_DOWN && //
 				e.keyCode != SWT.ARROW_LEFT && //
@@ -174,6 +181,30 @@ public class LookupField {
 					} else {
 						requestLookUpEntriesAll(field, detail, lookupControl);
 					}
+				} else if (e.keyCode == SWT.TAB) {
+					if (lookupControl.wasProposalPopupOpen()) {
+						// nur wenn die Optionen aufgeblendet wurtden, sonst brauchen wir hier nichts tun
+						int focussed_elenent_id = 0;
+						int i = 0;
+						Control[] tablist = lookupControl.getParent().getTabList();
+						for (Control control : lookupControl.getParent().getTabList()) {
+
+							if (i > 0) {
+								if (control instanceof LookupControl || control instanceof Text) {
+									control.setFocus();
+									lookupControl.setWasProposalPopupOpenFalse();
+									return;
+								}
+							}
+							if (lookupControl.hashCode() == control.hashCode()) {
+								// wir haben es gefunden un nehmen das nächste elment
+								i = focussed_elenent_id;
+							}
+							focussed_elenent_id++;
+						}
+
+					}
+					lookupControl.setWasProposalPopupOpenFalse();
 				}
 			}
 

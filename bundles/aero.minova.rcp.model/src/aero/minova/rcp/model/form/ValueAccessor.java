@@ -1,5 +1,7 @@
 package aero.minova.rcp.model.form;
 
+import org.eclipse.swt.widgets.Control;
+
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 
@@ -17,4 +19,6 @@ public interface ValueAccessor {
 	public Value setValue(Value value, boolean user);
 
 	public void setValue(Row row);
+
+	public Control getControl();
 }

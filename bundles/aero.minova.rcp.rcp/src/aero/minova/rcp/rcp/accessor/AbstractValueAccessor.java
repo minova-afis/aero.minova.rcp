@@ -79,4 +79,9 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		this.displayValue = displayValue;
 	}
 
+	@Override
+	public Control getControl() {
+		return this.control;
+	}
+
 }

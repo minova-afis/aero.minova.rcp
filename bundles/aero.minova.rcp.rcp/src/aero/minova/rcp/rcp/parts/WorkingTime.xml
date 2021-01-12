@@ -51,7 +51,7 @@
 			<field name="KeyLong" visible="false" key-type="primary" sql-index="0">
 				<number decimals="0"/>
 			</field>
-			<field name="EmployeeKey" key-type="user" text="@WorkingTime.EmployeeText" sql-index="1" number-columns-spanned="4" required="true">
+			<field name="EmployeeKey" key-type="user" text="@WorkingTime.EmployeeText" sql-index="1" number-columns-spanned="4" required="true" tab-index="5">
 				<lookup table="tEmployee"/>
 			</field>
 			<field name="OrderReceiverKey" text="@WorkingTime.CustomerText" sql-index="3" number-columns-spanned="4" required="true">

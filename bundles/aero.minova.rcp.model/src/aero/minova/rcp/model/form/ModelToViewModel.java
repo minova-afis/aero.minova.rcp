@@ -41,6 +41,10 @@ public class ModelToViewModel {
 			f.setLabel(field.getLabel());
 			f.setUnitText(field.getUnitText());
 			f.setSqlIndex(field.getSqlIndex().intValue());
+			f.setReadOnly(field.isReadOnly());
+			if (field.getTabIndex() != null) {
+				f.setTabIndex(field.getTabIndex().intValue());
+			}
 			if (field.getNumberColumnsSpanned() != null) {
 				f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 			}

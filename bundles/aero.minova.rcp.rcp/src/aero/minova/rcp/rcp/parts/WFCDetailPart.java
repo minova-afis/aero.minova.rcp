@@ -9,6 +9,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -95,6 +96,8 @@ public class WFCDetailPart extends WFCFormPart {
 	private Composite composite;
 
 	private MDetail detail = new MDetail();
+
+	private List<Composite> CompositeList;
 
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
@@ -222,6 +225,56 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, page);
 	}
 
+	private void changeTabList(Composite composite) {
+		// TODO: durch sämltiche Felder durchgehen, und die tabliste anhand der gesetzten tabwerte erstellen. Nur diese Felder sollen durch Tab auswählbar sein
+		// Keien felder mit Readßonlz eigenschaft = true kommen in die Liste, keine visible = false Felder,
+		// löschen und neu anlegen
+		// TODO: die xml-Datei kann aus mehreren Abschnitten bestehen. Dementsprechend muss die tabliste erweitert und nicht mit jeden abschnitt neu
+		// überschrieben werden
+		// composite.getTabList()
+
+		List<Control> tabList = new ArrayList<Control>();
+		// 1x Mal alle vorhandenen yuw
+		// Liste[] = 0,1,2,3,4,5,6,7, , , ,
+		int i = 0;
+		for (MField field : detail.getFieldList()) {
+			if (field.getValueAccessor() != null && field.getTabIndex() != null) {
+				Control control = field.getValueAccessor().getControl();
+				if (control.getParent().hashCode() == composite.hashCode()) {
+					tabList.add(i, control);
+					// newTab[field.getTabIndex()] = control;
+					i++;
+				}
+			}
+
+		}
+
+		// 2tes Mal nur noch ohne Positionen yuwe
+		// Liste[] = 0,1,2,3,4,5,6,7,null0, , ,
+		// Liste[] = 0,1,2,3,4,5,6,7,null0,null1,null2
+		// Liste[] = 0,1,2,3,4,5,6,7,null0, , ,
+		// Liste[] = 0,1,2,3,4,5,6,7,null0, , ,
+		for (MField field : detail.getFieldList()) {
+			if (field.getValueAccessor() != null && field.getTabIndex() == null) {
+				Control control = field.getValueAccessor().getControl();
+				if (control.getParent().hashCode() == composite.hashCode()) {
+					tabList.add(i, control);
+					// newTab[i] = control;
+					i++;
+				}
+			}
+		}
+		// Um zu vermeiden, das leere Felder übrigbleiben, speichern wir unsere Controls zunächst in eine ArrayList und übertragen deren werte anschließend in
+		// das ControlArray
+		// so haben wir stehts ein Array, welches die Anzahl der Werte wiederspiegelt
+		Control[] newTab = new Control[i];
+		for (int j = 0; j < i; j++) {
+			newTab[j] = tabList.get(j);
+		}
+		composite.setTabList(newTab);
+
+	}
+
 	private void createFields(Composite composite, HeadOrPageWrapper headOrPage) {
 		int row = 0;
 		int column = 0;
@@ -247,8 +300,13 @@ public class WFCDetailPart extends WFCFormPart {
 			if (!headOrPage.isHead) {
 				row += getExtraHeight(field);
 			}
+			if (f.getValueAccessor().getControl().isEnabled() || !f.isReadOnly()) {
+				detail.addField(f);
+			}
 		}
 
+
+		changeTabList(composite);
 		addBottonMargin(composite, row + 1, column);
 	}
 

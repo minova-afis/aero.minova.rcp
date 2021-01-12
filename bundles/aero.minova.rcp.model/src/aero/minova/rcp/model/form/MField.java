@@ -26,6 +26,8 @@ public abstract class MField {
 	private String unitText;
 	private final int decimals;
 	private Integer sqlIndex;
+	private Integer tabIndex;
+	private boolean readOnly;
 	private Integer numberColumnsSpanned = 2;
 	private Integer numberRowsSpanned = 1;
 	private Double maximumValue;
@@ -258,5 +260,21 @@ public abstract class MField {
 	@Override
 	public String toString() {
 		return "MField(" + getName() + ")";
+	}
+
+	public Integer getTabIndex() {
+		return tabIndex;
+	}
+
+	public void setTabIndex(Integer tabIndex) {
+		this.tabIndex = tabIndex;
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
 	}
 }
