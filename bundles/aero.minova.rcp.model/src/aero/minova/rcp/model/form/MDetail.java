@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Composite;
+
 /**
  * Das Modell für den Detailbereich
  * 
@@ -15,6 +17,8 @@ public class MDetail {
 	private HashMap<String, MField> fields = new HashMap<>();
 
 	private List<MField> fieldList = new ArrayList<MField>();
+
+	private List<Composite> compositeSectionList = new ArrayList<Composite>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -61,5 +65,13 @@ public class MDetail {
 
 	public List<MField> getFieldList() {
 		return fieldList;
+	}
+
+	public List<Composite> getCompositeSectionList() {
+		return compositeSectionList;
+	}
+
+	public void setCompositeSectionList(List<Composite> compositeSectionList) {
+		this.compositeSectionList = compositeSectionList;
 	}
 }

@@ -199,6 +199,27 @@ public class LookupField {
 							if (lookupControl.hashCode() == control.hashCode()) {
 								// wir haben es gefunden un nehmen das nächste elment
 								i = focussed_elenent_id;
+
+								if (tablist.length == i + 1) {
+									// Wir haben das letzte Element gefunden
+									int indexOf = detail.getCompositeSectionList().indexOf(lookupControl.getParent());
+									try {
+										if (indexOf >= 0) {
+											Composite c = null;
+											if (indexOf == detail.getCompositeSectionList().size()) {
+												// Letztes Composite -> erstes benötigt
+												c = detail.getCompositeSectionList().get(0);
+											} else {
+												c = detail.getCompositeSectionList().get(indexOf + 1);
+											}
+											c.getTabList()[0].setFocus();
+											lookupControl.setWasProposalPopupOpenFalse();
+											return;
+										}
+									} catch (Exception ea) {
+										System.out.println("Fehler beim Auslesen der CompositeListe");
+									}
+								}
 							}
 							focussed_elenent_id++;
 						}

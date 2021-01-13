@@ -97,7 +97,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private MDetail detail = new MDetail();
 
-	private List<Composite> CompositeList;
+	private List<Composite> compositeSectionList = new ArrayList<Composite>();
 
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
@@ -112,6 +112,7 @@ public class WFCDetailPart extends WFCFormPart {
 			return;
 		}
 		layoutForm(parent);
+		detail.setCompositeSectionList(compositeSectionList);
 		translate(translationService);
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
 		// steuert
@@ -201,6 +202,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Fields
 		createFields(composite, head);
+		
+		compositeSectionList.add(composite);
 	}
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
@@ -223,6 +226,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Fields
 		createFields(composite, page);
+
+		compositeSectionList.add(composite);
 	}
 
 	private void changeTabList(Composite composite) {
