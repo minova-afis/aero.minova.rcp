@@ -51,6 +51,13 @@ public class PreferenceWindowModel {
 				DisplayType.INTEGER, 0));
 		psd.add(new PreferenceDescriptor("defaultworkspace", translationService.translate("@Default.Workspace", null),
 				0.2, DisplayType.CUSTOMCHECK, false));
+		
+		psd = new PreferenceSectionDescriptor("keyboardNavigation", translationService.translate("@Keyboard.Navigation", null), 0.2);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor("enterSelectFirstRequired", translationService.translate("@Enter.Select.First.Required", null), 0.1, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("lookupEnterSelectNextRequired", translationService.translate("@Lookup.Enter.Select.Next.Required", null), 0.2, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("selectPageWithTab", translationService.translate("@Select.Page.With.Tab", null), 0.3, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor("selectAllControls", translationService.translate("@Select.All.Controls", null), 0.4, DisplayType.CHECK, true));
 		return ptd;
 	}
 
