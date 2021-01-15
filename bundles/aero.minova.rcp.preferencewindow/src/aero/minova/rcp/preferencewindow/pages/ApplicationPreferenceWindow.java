@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceDescriptor;
@@ -47,8 +48,7 @@ import aero.minova.rcp.preferencewindow.control.PWLocale;
 public class ApplicationPreferenceWindow {
 
 	// Konstante für den Pfad der .prefs erstellen
-	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
-	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
+	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	// Widget Builder Impelentierung
 	private PreferenceWindowModel pwm;
@@ -95,10 +95,10 @@ public class ApplicationPreferenceWindow {
 
 		window.setSelectedTab(0);
 		if (window.open()) {
-			InstancePreferenceAccessor.putValue(preferences, "timezone", DisplayType.ZONEID,
-					window.getValueFor("timezone"), s);
-			InstancePreferenceAccessor.putValue(preferences, "language", DisplayType.LOCALE,
-					window.getValueFor("language"), s);
+			InstancePreferenceAccessor.putValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.ZONEID,
+					window.getValueFor(ApplicationPreferences.TIMEZONE), s);
+			InstancePreferenceAccessor.putValue(preferences, "LocalLanguage", DisplayType.LOCALE,
+					window.getValueFor("LocalLanguage"), s);
 			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE,
 					window.getValueFor("country"), s);
 			for (PreferenceTabDescriptor tab : preferenceTabs) {

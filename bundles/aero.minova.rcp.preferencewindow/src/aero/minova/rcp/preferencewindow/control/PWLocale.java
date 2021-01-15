@@ -62,7 +62,7 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	public List<String> getCountries() {
 		List<String> countries = new ArrayList<>();
-		String language = PreferenceWindow.getInstance().getValueFor("language").toString();
+		String language = PreferenceWindow.getInstance().getValueFor("LocalLanguage").toString();
 		Locale[] locales = CustomLocale.getLocales();
 		for (Locale l : locales) {
 			if (language.equals(l.getDisplayLanguage(l))) {
@@ -99,7 +99,7 @@ public class PWLocale extends CustomPWWidget {
 		for (int i = 0; i < dataL.size(); i++) {
 			final Object language = dataL.get(i);
 			comboLanguage.add(language.toString());
-			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "language", DisplayType.LOCALE,
+			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "LocalLanguage", DisplayType.LOCALE,
 					Locale.getDefault().getDisplayLanguage(Locale.getDefault()), context.get(Locale.class)))) {
 				comboLanguage.select(i);
 			}
@@ -107,7 +107,7 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboLanguage.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue("language",
+			PreferenceWindow.getInstance().setValue("LocalLanguage",
 					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
 			// erneuert Liste mit Ländern
 			comboCountries.removeAll();
