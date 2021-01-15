@@ -25,7 +25,7 @@ public class ApplicationPreferences {
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
-	public static final String Allow_Multiple_Forms = "AllowMultipleForms";
+	public static final String ALLOW_MULTIPLE_FORMS = "AllowMultipleForms";
 
 	/**
 	 * Index beim Öffnen automatisch laden.
@@ -134,7 +134,7 @@ public class ApplicationPreferences {
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
-	public static final String IINDEX_FONT = "IndexFont";
+	public static final String INDEX_FONT = "IndexFont";
 
 	/**
 	 * Bestimmt die Wochen vor einer Linzenz Warnung.
@@ -254,7 +254,7 @@ public class ApplicationPreferences {
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
-	public static final String TABLE_SELECT_BUFFER_MS = "TableSelectionBufferMs";
+	public static final String TABLE_SELECTION_BUFFER_MS = "TableSelectionBufferMs";
 	
 	/**
 	 * Masken Puffer benutzen.
