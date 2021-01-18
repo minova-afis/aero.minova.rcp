@@ -57,6 +57,7 @@ import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -83,7 +84,7 @@ public class WFCDetailPart extends WFCFormPart {
 	protected UISynchronize sync;
 
 	@Inject
-	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
 
 	@Inject

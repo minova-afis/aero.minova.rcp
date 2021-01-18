@@ -1,7 +1,6 @@
 package aero.minova.rcp.translate.lifecycle;
 
 import java.time.ZoneId;
-import java.time.format.TextStyle;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -12,13 +11,13 @@ import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.swt.graphics.FontData;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.translate.service.WFCTranslationService;
 
 public class Manager {
 
-	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
-	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
+	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	@PostContextCreate
 	public void postContextCreate(IEclipseContext context) {
@@ -45,76 +44,76 @@ public class Manager {
 	}
 
 	private void initPrefs() {
-		String language = preferences.get("language", Locale.getDefault().getDisplayLanguage(Locale.getDefault()));
-		preferences.put("language", language);
-		String country = preferences.get("country", Locale.getDefault().getDisplayCountry(Locale.getDefault()));
-		preferences.put("country", country);
-		String timezone = preferences.get("timezone", ZoneId.systemDefault().getId());
-		preferences.put("timezone", timezone);
-		String font = preferences.get("font", "M");
-		preferences.put("font", font);
-		String symbolMenu = preferences.get("symbolMenu", "24x24");
-		preferences.put("symbolMenu", symbolMenu);
-		String symbolToolbar = preferences.get("symbolToolbar", "32x32");
-		preferences.put("symbolToolbar", symbolToolbar);
-		boolean masks = preferences.getBoolean("masks", false);
-		preferences.putBoolean("masks", masks);
-		boolean dragdrop = preferences.getBoolean("dragdrop", false);
-		preferences.putBoolean("dragdrop", dragdrop);
-		boolean icons = preferences.getBoolean("icons", false);
-		preferences.putBoolean("icons", icons);
-		boolean indexautoload = preferences.getBoolean("indexautoload", false);
-		preferences.putBoolean("indexautoload", indexautoload);
-		boolean indexautoupdate = preferences.getBoolean("indexautoupdate", false);
-		preferences.putBoolean("indexautoupdate", indexautoupdate);
-		boolean reportwindow = preferences.getBoolean("reportwindow", true);
-		preferences.putBoolean("reportwindow", reportwindow);
-		boolean descriptionButton = preferences.getBoolean("descriptionButton", true);
-		preferences.putBoolean("descriptionButton", descriptionButton);
-		boolean maskbuffer = preferences.getBoolean("maskbuffer", true);
-		preferences.putBoolean("maskbuffer", maskbuffer);
-		int displaybuffer = preferences.getInt("displaybuffer", 20);
-		preferences.putInt("displaybuffer", displaybuffer);
-		int maxbuffer = preferences.getInt("maxbuffer", 90);
-		preferences.putInt("maxbuffer", maxbuffer);
-		int selectiondelay = preferences.getInt("selectiondelay", 150);
-		preferences.putInt("selectiondelay", selectiondelay);
-		boolean sizeautoadjust = preferences.getBoolean("sizeautoadjust", false);
-		preferences.putBoolean("sizeautoadjust", sizeautoadjust);
-		boolean fadeinbuttontext = preferences.getBoolean("fadeinbuttontext", false);
-		preferences.putBoolean("fadeinbuttontext", fadeinbuttontext);
-		boolean buttondetailarea = preferences.getBoolean("buttondetailarea", true);
-		preferences.putBoolean("buttondetailarea", buttondetailarea);
-		boolean showlookups = preferences.getBoolean("showlookups", true);
-		preferences.putBoolean("showlookups", showlookups);
-		boolean fadeingroups = preferences.getBoolean("fadeingroups", true);
-		preferences.putBoolean("fadeingroups", fadeingroups);
-		boolean showchangedrow = preferences.getBoolean("showchangedrow", true);
-		preferences.putBoolean("showchangedrow", showchangedrow);
-		boolean xmlxsdcreate = preferences.getBoolean("xmlxsdcreate", false);
-		preferences.putBoolean("xmlxsdcreate", xmlxsdcreate);
-		boolean optimizewidth = preferences.getBoolean("optimizewidth", true);
-		preferences.putBoolean("optimizewidth", optimizewidth);
-		boolean hideemptycolumn = preferences.getBoolean("hideemptycolumn", true);
-		preferences.putBoolean("hideemptycolumn", hideemptycolumn);
-		boolean hidegoupcolumns = preferences.getBoolean("hidegoupcolumns", true);
-		preferences.putBoolean("hidegoupcolumns", hidegoupcolumns);
-		boolean hidesearchdetails = preferences.getBoolean("hidesearchdetails", true);
-		preferences.putBoolean("hidesearchdetails", hidesearchdetails);
-		boolean deactivateinternpreview = preferences.getBoolean("deactivateinternpreview", false);
-		preferences.putBoolean("deactivateinternpreview", deactivateinternpreview);
-		int maxCharacter = preferences.getInt("maxCharacter", 24000);
-		preferences.putInt("maxCharacter", maxCharacter);
-		String user = preferences.get("user", System.getProperty("user.name"));
-		preferences.put("user", user);
-		String fd = preferences.get("fontChooser", null);
+		String language = preferences.get(ApplicationPreferences.LOCALE_LANGUAGE, Locale.getDefault().getDisplayLanguage(Locale.getDefault()));
+		preferences.put(ApplicationPreferences.LOCALE_LANGUAGE, language);
+		String country = preferences.get(ApplicationPreferences.COUNTRY, Locale.getDefault().getDisplayCountry(Locale.getDefault()));
+		preferences.put(ApplicationPreferences.COUNTRY, country);
+		String timezone = preferences.get(ApplicationPreferences.TIMEZONE, ZoneId.systemDefault().getId());
+		preferences.put(ApplicationPreferences.TIMEZONE, timezone);
+		String font = preferences.get(ApplicationPreferences.FONT_SIZE, "M");
+		preferences.put(ApplicationPreferences.FONT_SIZE, font);
+		String symbolMenu = preferences.get(ApplicationPreferences.ICON_SIZE, "24x24");
+		preferences.put(ApplicationPreferences.ICON_SIZE, symbolMenu);
+		String symbolToolbar = preferences.get(ApplicationPreferences.ICON_SIZE_BIG, "32x32");
+		preferences.put(ApplicationPreferences.ICON_SIZE_BIG, symbolToolbar);
+		boolean masks = preferences.getBoolean(ApplicationPreferences.ALLOW_MULTIPLE_FORMS, false);
+		preferences.putBoolean(ApplicationPreferences.ALLOW_MULTIPLE_FORMS, masks);
+		boolean dragdrop = preferences.getBoolean(ApplicationPreferences.DISALLOW_DRAG_AND_DROP, false);
+		preferences.putBoolean(ApplicationPreferences.DISALLOW_DRAG_AND_DROP, dragdrop);
+		boolean icons = preferences.getBoolean(ApplicationPreferences.SHOW_ALL_ACTION_IN_TOOLBAR, false);
+		preferences.putBoolean(ApplicationPreferences.SHOW_ALL_ACTION_IN_TOOLBAR, icons);
+		boolean indexautoload = preferences.getBoolean(ApplicationPreferences.AUTO_LOAD_INDEX, false);
+		preferences.putBoolean(ApplicationPreferences.AUTO_LOAD_INDEX, indexautoload);
+		boolean indexautoupdate = preferences.getBoolean(ApplicationPreferences.AUTO_RELOAD_INDEX, false);
+		preferences.putBoolean(ApplicationPreferences.AUTO_RELOAD_INDEX, indexautoupdate);
+		boolean reportwindow = preferences.getBoolean(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES, true);
+		preferences.putBoolean(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES, reportwindow);
+		boolean descriptionButton = preferences.getBoolean(ApplicationPreferences.SHOW_DETAIL_BUTTON_TEXT, true);
+		preferences.putBoolean(ApplicationPreferences.SHOW_DETAIL_BUTTON_TEXT, descriptionButton);
+		boolean maskbuffer = preferences.getBoolean(ApplicationPreferences.USE_FORM_BUFFER, true);
+		preferences.putBoolean(ApplicationPreferences.USE_FORM_BUFFER, maskbuffer);
+		int displaybuffer = preferences.getInt(ApplicationPreferences.DISPLAY_BUFFER_MS, 20);
+		preferences.putInt(ApplicationPreferences.DISPLAY_BUFFER_MS, displaybuffer);
+		int maxbuffer = preferences.getInt(ApplicationPreferences.MAX_BUFFER_MS, 90);
+		preferences.putInt(ApplicationPreferences.MAX_BUFFER_MS, maxbuffer);
+		int selectiondelay = preferences.getInt(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS, 150);
+		preferences.putInt(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS, selectiondelay);
+		boolean sizeautoadjust = preferences.getBoolean(ApplicationPreferences.AUTO_RESIZE, false);
+		preferences.putBoolean(ApplicationPreferences.AUTO_RESIZE, sizeautoadjust);
+		boolean fadeinbuttontext = preferences.getBoolean(ApplicationPreferences.SHOW_BUTTON_TEXT, false);
+		preferences.putBoolean(ApplicationPreferences.SHOW_BUTTON_TEXT, fadeinbuttontext);
+		boolean buttondetailarea = preferences.getBoolean(ApplicationPreferences.SHOW_BUTTON_IN_SECTION, true);
+		preferences.putBoolean(ApplicationPreferences.SHOW_BUTTON_IN_SECTION, buttondetailarea);
+		boolean showlookups = preferences.getBoolean(ApplicationPreferences.SHOW_LOOKUPS, true);
+		preferences.putBoolean(ApplicationPreferences.SHOW_LOOKUPS, showlookups);
+		boolean fadeingroups = preferences.getBoolean(ApplicationPreferences.SHOW_GROUPS, true);
+		preferences.putBoolean(ApplicationPreferences.SHOW_GROUPS, fadeingroups);
+		boolean showchangedrow = preferences.getBoolean(ApplicationPreferences.SHOW_CHANGED_ROWS, true);
+		preferences.putBoolean(ApplicationPreferences.SHOW_CHANGED_ROWS, showchangedrow);
+		boolean xmlxsdcreate = preferences.getBoolean(ApplicationPreferences.CREATE_XML_XS, false);
+		preferences.putBoolean(ApplicationPreferences.CREATE_XML_XS, xmlxsdcreate);
+		boolean optimizewidth = preferences.getBoolean(ApplicationPreferences.OPTIMIZED_WIDTHS, true);
+		preferences.putBoolean(ApplicationPreferences.OPTIMIZED_WIDTHS, optimizewidth);
+		boolean hideemptycolumn = preferences.getBoolean(ApplicationPreferences.HIDE_EMPTY_COLS, true);
+		preferences.putBoolean(ApplicationPreferences.HIDE_EMPTY_COLS, hideemptycolumn);
+		boolean hidegoupcolumns = preferences.getBoolean(ApplicationPreferences.HIDE_GROUP_COLS, true);
+		preferences.putBoolean(ApplicationPreferences.HIDE_GROUP_COLS, hidegoupcolumns);
+		boolean hidesearchdetails = preferences.getBoolean(ApplicationPreferences.HIDE_SEARCH_CRITERIAS, true);
+		preferences.putBoolean(ApplicationPreferences.HIDE_SEARCH_CRITERIAS, hidesearchdetails);
+		boolean deactivateinternpreview = preferences.getBoolean(ApplicationPreferences.DISABLE_PREVIEW, false);
+		preferences.putBoolean(ApplicationPreferences.DISABLE_PREVIEW, deactivateinternpreview);
+		int maxCharacter = preferences.getInt(ApplicationPreferences.MAX_CHARS, 24000);
+		preferences.putInt(ApplicationPreferences.MAX_CHARS, maxCharacter);
+		String user = preferences.get(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, System.getProperty("user.name"));
+		preferences.put(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, user);
+		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
 		if ("".equals(fd))
 			fd = null;
 		FontData fdC = (fd == null ? null : new FontData(fd));
 		if (fd != null) {
-			preferences.put("fontChooser", (fdC.toString()));
+			preferences.put(ApplicationPreferences.INDEX_FONT, (fdC.toString()));
 		} else {
-			preferences.put("fontChooser", "");
+			preferences.put(ApplicationPreferences.INDEX_FONT, "");
 		}
 	}
 
