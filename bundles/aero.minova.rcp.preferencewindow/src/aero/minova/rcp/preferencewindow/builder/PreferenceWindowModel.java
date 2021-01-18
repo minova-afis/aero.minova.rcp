@@ -86,7 +86,7 @@ public class PreferenceWindowModel {
 		PreferenceSectionDescriptor psd;
 		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Extended.png", "expandedTab",
 				translationService.translate("@Preferences.Advanced", null), 0.3);
-		psd = new PreferenceSectionDescriptor("GeneralExpanded", "@Preferences.General", 0.1);
+		psd = new PreferenceSectionDescriptor("GeneralExpanded", translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ALLOW_MULTIPLE_FORMS, translationService.translate("@Preferences.AllowMultipleForms", null), 0.1, DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DISALLOW_DRAG_AND_DROP, translationService.translate("@Preferences.General.DisallowDragAndDrop", null), 0.2, DisplayType.CHECK,
