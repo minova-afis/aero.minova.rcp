@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
@@ -34,7 +35,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 * @param propertyKey associated key
 	 */
 	public CustomPWCheckBox(final String label, final String propertyKey) {
-		super(label, propertyKey, 1, true);
+		super(label, propertyKey, 3, true);
 	}
 
 	/**
@@ -42,11 +43,21 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		buildLabel(parent, GridData.CENTER);
+		final Label label = new Label(parent, SWT.NONE);
+
+		if (getLabel() == null) {
+			throw new UnsupportedOperationException("Test");
+		} else {
+			label.setText(getLabel());
+		}
+		addControl(label);
+		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
+		labelGridData.horizontalIndent = getIndent();
+		label.setLayoutData(labelGridData);
+		
 		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
 		addControl(text);
-		final GridData textGridData = new GridData(GridData.FILL, GridData.BEGINNING, true, false);
-		textGridData.horizontalIndent = getIndent();
+		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(textGridData);
 
 		// Auslesen des PrimaryWorksapces
@@ -63,8 +74,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		}
 
 		final Button button = new Button(parent, SWT.PUSH);
-		final GridData buttonGridData = new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false);
-		buttonGridData.widthHint = 75;
+		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		button.setText("Reset");
 		button.setLayoutData(buttonGridData);
 
@@ -85,7 +95,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 			}
 		});
 
-		return text;
+		return button;
 	}
 
 	/**

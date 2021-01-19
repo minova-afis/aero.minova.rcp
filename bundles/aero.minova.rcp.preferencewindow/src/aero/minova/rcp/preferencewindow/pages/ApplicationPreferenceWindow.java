@@ -160,10 +160,10 @@ public class ApplicationPreferenceWindow {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
-			widget = new CustomPWStringText(pref.getLabel(), key).setIndent(25);
+			widget = new CustomPWStringText(pref.getLabel(), key);
 			break;
 		case INTEGER:
-			widget = new CustomPWIntegerText(pref.getLabel(), key).setIndent(25);
+			widget = new CustomPWIntegerText(pref.getLabel(), key);
 			break;
 		case FLOAT:
 			widget = new CustomPWFloatText(pref.getLabel(), key);
