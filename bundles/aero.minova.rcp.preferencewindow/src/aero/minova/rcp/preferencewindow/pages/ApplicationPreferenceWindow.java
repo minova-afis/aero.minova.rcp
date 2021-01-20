@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
@@ -88,7 +89,7 @@ public class ApplicationPreferenceWindow {
 					// Preference hinzufügen
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
-					createWidgets(newTab, pref, key, values);
+					createWidgets(newTab, pref, key, translationService, values);
 				}
 			}
 		}
@@ -156,7 +157,7 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, Object... values) {
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, Object... values) {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
@@ -193,13 +194,13 @@ public class ApplicationPreferenceWindow {
 			widget = new PWTextarea(pref.getLabel(), key);
 			break;
 		case FONT:
-			widget = new CustomPWFontChooser(pref.getLabel(), key);
+			widget = new CustomPWFontChooser(pref.getLabel(), key, translationService);
 			break;
 		case LOCALE:
 			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
 			break;
 		case CUSTOMCHECK:
-			widget = new CustomPWCheckBox(pref.getLabel(), key).setWidth(200).setIndent(25);
+			widget = new CustomPWCheckBox(pref.getLabel(), key, translationService).setWidth(200).setIndent(25);
 			break;
 		default:
 			break;

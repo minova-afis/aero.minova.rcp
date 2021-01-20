@@ -1,7 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import javax.inject.Inject;
-
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -13,14 +12,19 @@ import org.eclipse.swt.widgets.Text;
 
 public abstract class CustomPWChooser extends CustomPWWidget {
 
+	TranslationService translationService;
+
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
-	public CustomPWChooser(final String label, final String propertyKey) {
+	public CustomPWChooser(final String label, final String propertyKey, @Optional TranslationService translationService) {
 		super(label, propertyKey, 3, false);
+		this.translationService = translationService;
 		setGrabExcessSpace(false);
 	}
 
@@ -49,7 +53,7 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 		final Button button = new Button(parent, SWT.PUSH);
 		addControl(button);
 		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		button.setText("@Chooser.choose" + "...");
+		button.setText(translationService.translate("@Chooser.choose", null) + "...");
 		button.setLayoutData(buttonGridData);
 
 		setButtonAction(text, button);
@@ -61,8 +65,10 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	/**
 	 * Code executed when the user presses the button
 	 *
-	 * @param text text box
-	 * @param button associated button
+	 * @param text
+	 *            text box
+	 * @param button
+	 *            associated button
 	 */
 	protected abstract void setButtonAction(Text text, Button button);
 

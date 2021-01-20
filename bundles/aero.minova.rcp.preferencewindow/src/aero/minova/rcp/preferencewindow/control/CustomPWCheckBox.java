@@ -25,19 +25,22 @@ public class CustomPWCheckBox extends CustomPWWidget {
 
 	@Inject
 	Logger logger;
-
-	@Inject
+	
 	TranslationService translationService;
+
 	/**
 	 * Constructor
 	 *
-	 * @param label       associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
-	public CustomPWCheckBox(final String label, final String propertyKey) {
+	public CustomPWCheckBox(final String label, final String propertyKey, final TranslationService translationService) {
 		super(label, propertyKey, 3, true);
+		this.translationService = translationService;
 	}
-
+	
 	/**
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#build(org.eclipse.swt.widgets.Composite)
 	 */
@@ -54,7 +57,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
-		
+
 		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -75,7 +78,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 
 		final Button button = new Button(parent, SWT.PUSH);
 		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		button.setText("Reset");
+		button.setText(translationService.translate("@Action.Reset", null));
 		button.setLayoutData(buttonGridData);
 
 		button.addSelectionListener(new SelectionAdapter() {
@@ -83,8 +86,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 			public void widgetSelected(SelectionEvent e) {
 				text.setText("Nicht gesetzt!");
 				if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-					ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger)
-							.get();
+					ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 					try {
 						prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
 						prefs.flush();
@@ -108,8 +110,8 @@ public class CustomPWCheckBox extends CustomPWWidget {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
 		} else {
 			if (!(value instanceof Boolean)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey()
-						+ "' has to be a Boolean because it is associated to a checkbox");
+				throw new UnsupportedOperationException(
+						"The property '" + getCustomPropertyKey() + "' has to be a Boolean because it is associated to a checkbox");
 			}
 		}
 	}
