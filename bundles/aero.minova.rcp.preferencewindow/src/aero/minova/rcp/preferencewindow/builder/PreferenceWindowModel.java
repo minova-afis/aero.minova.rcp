@@ -45,14 +45,14 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.LICENCE_WARNING_BEFORE_WEEKS,
 				translationService.translate("@Preferences.General.LicenceWarningBeforeWeeks", null), 0.1, DisplayType.INTEGER, 0));
-		psd.add(new PreferenceDescriptor("DefaultWorkspace", translationService.translate("@Default.Workspace", null), 0.2, DisplayType.CUSTOMCHECK, false));
-		psd = new PreferenceSectionDescriptor("KeyboardNavigation", translationService.translate("@Keyboard.Navigation", null), 0.2);
+		psd.add(new PreferenceDescriptor("DefaultWorkspace", translationService.translate("@Preferences.DefaultWorkspace", null), 0.2, DisplayType.CUSTOMCHECK, false));
+		psd = new PreferenceSectionDescriptor("KeyboardNavigation", translationService.translate("@Preferences.KeyboardNavigation", null), 0.2);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
-				translationService.translate("@Enter.Selects.First.Required", null), 0.1, DisplayType.CHECK, true));
+				translationService.translate("@Preferences.EnterSelectFirstRequired", null), 0.1, DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED,
-				translationService.translate("@Lookup.Enter.Selects.Next.Required", null), 0.2, DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SELECT_ALL_CONTROLS, translationService.translate("@Select.All.Controls", null), 0.3,
+				translationService.translate("@Preferences.LookupEnterSelectNextRequired", null), 0.2, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SELECT_ALL_CONTROLS, translationService.translate("@Preferences.SelectAllControls", null), 0.3,
 				DisplayType.CHECK, true));
 		return ptd;
 	}

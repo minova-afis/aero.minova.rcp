@@ -73,7 +73,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 				e1.printStackTrace();
 			}
 		} else {
-			text.setText("Nicht gesetzt!");
+			text.setText(translationService.translate("msg.NotSet", null));
 		}
 
 		final Button button = new Button(parent, SWT.PUSH);
