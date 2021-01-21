@@ -6,31 +6,61 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class CustomPWIntegerText extends CustomPWText {
 
-	
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
 	public CustomPWIntegerText(final String label, final String propertyKey) {
 		super(label, propertyKey);
 	}
-	
+
 	@Override
 	public Control build(final Composite parent) {
-		buildLabel(parent, GridData.CENTER);
-		text = new Text(parent, SWT.BORDER | SWT.RIGHT |getStyle());
-		addControl(text);
-		addVerifyListeners();
-		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		text.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
-		});
+		String translatedLabel = getLabel();
+
+		if (translatedLabel.contains("[")) {
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(translatedLabel.substring(0, translatedLabel.lastIndexOf("[") - 1));
+			final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
+			labelGridData.horizontalIndent = 25;
+			label.setLayoutData(labelGridData);
+			addControl(label);
+
+			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
+			addControl(text);
+			addVerifyListeners();
+			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+			text.addListener(SWT.Modify, event -> {
+				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
+			});
+
+			final Label unit = new Label(parent, SWT.NONE);
+			unit.setText(translatedLabel.substring(translatedLabel.lastIndexOf("[") + 1));
+			unit.setText(unit.getText().replace("]", ""));
+			final GridData unitGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+			unit.setLayoutData(unitGridData);
+			addControl(unit);
+			
+		} else {
+			buildLabel(parent, GridData.CENTER);
+			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
+			addControl(text);
+			addVerifyListeners();
+			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+			text.addListener(SWT.Modify, event -> {
+				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
+			});
+		}
+
 		return text;
 	}
 
@@ -62,7 +92,8 @@ public class CustomPWIntegerText extends CustomPWText {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Integer.valueOf(0));
 		} else {
 			if (!(value instanceof Integer)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be an Integer because it is associated to a integer text widget");
+				throw new UnsupportedOperationException(
+						"The property '" + getCustomPropertyKey() + "' has to be an Integer because it is associated to a integer text widget");
 			}
 		}
 	}
@@ -72,7 +103,7 @@ public class CustomPWIntegerText extends CustomPWText {
 	 */
 	@Override
 	public Object convertValue() {
-		if(text.getText().equals("")) {
+		if (text.getText().equals("")) {
 			return 0;
 		}
 		return Integer.parseInt(text.getText());
