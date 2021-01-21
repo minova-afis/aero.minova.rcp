@@ -73,7 +73,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 				e1.printStackTrace();
 			}
 		} else {
-			text.setText(translationService.translate("msg.NotSet", null));
+			text.setText(translationService.translate("@msg.NotSet", null));
 		}
 
 		final Button button = new Button(parent, SWT.PUSH);
@@ -84,7 +84,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				text.setText("Nicht gesetzt!");
+				text.setText(translationService.translate("@msg.NotSet", null));
 				if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
 					ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 					try {
