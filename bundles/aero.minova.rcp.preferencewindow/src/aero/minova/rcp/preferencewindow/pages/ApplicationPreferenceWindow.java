@@ -98,10 +98,10 @@ public class ApplicationPreferenceWindow {
 		if (window.open()) {
 			InstancePreferenceAccessor.putValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.ZONEID,
 					window.getValueFor(ApplicationPreferences.TIMEZONE), s);
-			InstancePreferenceAccessor.putValue(preferences, "LocalLanguage", DisplayType.LOCALE,
-					window.getValueFor("LocalLanguage"), s);
-			InstancePreferenceAccessor.putValue(preferences, "country", DisplayType.LOCALE,
-					window.getValueFor("country"), s);
+			InstancePreferenceAccessor.putValue(preferences, ApplicationPreferences.LOCALE_LANGUAGE, DisplayType.LOCALE,
+					window.getValueFor(ApplicationPreferences.LOCALE_LANGUAGE), s);
+			InstancePreferenceAccessor.putValue(preferences, ApplicationPreferences.COUNTRY, DisplayType.LOCALE,
+					window.getValueFor(ApplicationPreferences.COUNTRY), s);
 			for (PreferenceTabDescriptor tab : preferenceTabs) {
 
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
@@ -151,7 +151,7 @@ public class ApplicationPreferenceWindow {
 				}
 			}
 		}
-		data.put("country", InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
+		data.put("country", InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.COUNTRY, DisplayType.LOCALE,
 				Locale.getDefault().getDisplayCountry(Locale.getDefault()), s));
 
 		return data;

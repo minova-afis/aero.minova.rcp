@@ -120,7 +120,7 @@ public class PWLocale extends CustomPWWidget {
 
 		// Label für Landauswahl erstellen
 		final Label countryLabel = new Label(parent, SWT.NONE);
-		countryLabel.setText(translationService.translate("@CountryCode", null));
+		countryLabel.setText(translationService.translate("@tContact.Country", null));
 		final GridData labelCGridData = new GridData(GridData.END, getAlignment(), false, false);
 		labelCGridData.horizontalIndent = getIndent();
 		countryLabel.setLayoutData(labelCGridData);

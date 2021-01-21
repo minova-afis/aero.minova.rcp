@@ -145,7 +145,7 @@ public class PreferenceWindowModel {
 				translationService.translate("@Action.Print", null), 0.4);
 		psd = new PreferenceSectionDescriptor("print", translationService.translate("@Action.Print", null), 0.1);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.CREATE_XML_XS, translationService.translate("@CreateXMLXS", null), 0.1, DisplayType.CHECK,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.CREATE_XML_XS, translationService.translate("@CreateXMLXSL", null), 0.1, DisplayType.CHECK,
 				false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_FONT, translationService.translate("@IndexFont", null), 0.2, DisplayType.FONT, null));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.OPTIMIZED_WIDTHS, translationService.translate("@OptimizeWidths", null), 0.3, DisplayType.CHECK,
