@@ -400,7 +400,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		final MenuItem menuItem = new MenuItem(menu, SWT.CHECK);
 		final List<String> keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
 
-		menuItem.setText(translationService.translate("Action.KeepIt", null));
+		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
 			@Override
