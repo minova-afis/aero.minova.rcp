@@ -17,8 +17,8 @@ public abstract class CustomPWText extends CustomPWWidget {
 	 * @param propertyKey associated property key
 	 */
 	public CustomPWText(final String label, final String propertyKey) {
-		super(label, propertyKey, label == null ? 1 : 3, false);
-		setGrabExcessSpace(false);
+		super(label, propertyKey, label == null ? 1 : 2, false);
+		setGrabExcessSpace(true);
 	}
 
 	/**
