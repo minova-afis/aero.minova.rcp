@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 
-public class CustomPWCheckBox extends CustomPWWidget {
+public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 
 	@Inject
 	Logger logger;
@@ -37,7 +37,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWCheckBox(final String label, final String propertyKey, final TranslationService translationService) {
+	public TextButtonForDefaultWorkspace(final String label, final String propertyKey, final TranslationService translationService) {
 		super(label, propertyKey, 2, false);
 		this.translationService = translationService;
 	}
