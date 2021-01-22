@@ -4,6 +4,7 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWIntegerText;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -34,19 +35,27 @@ public class CustomPWIntegerText extends CustomPWText {
 			labelGridData.horizontalIndent = 25;
 			label.setLayoutData(labelGridData);
 			addControl(label);
+			
+			Composite cmp = new Composite(parent, SWT.NONE);
+			cmp.setLayout(new GridLayout(2, false));
+			addControl(cmp);
 
-			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
+			text = new Text(cmp, SWT.BORDER | SWT.RIGHT | getStyle());
+			final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+			textGridData.widthHint = 150;
+			text.setLayoutData(textGridData);
 			addControl(text);
+			
 			addVerifyListeners();
 			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
 			text.addListener(SWT.Modify, event -> {
 				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
 			});
 
-			final Label unit = new Label(parent, SWT.NONE);
+			final Label unit = new Label(cmp, SWT.NONE);
 			unit.setText(translatedLabel.substring(translatedLabel.lastIndexOf("[") + 1));
 			unit.setText(unit.getText().replace("]", ""));
-			final GridData unitGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+			final GridData unitGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			unit.setLayoutData(unitGridData);
 			addControl(unit);
 			

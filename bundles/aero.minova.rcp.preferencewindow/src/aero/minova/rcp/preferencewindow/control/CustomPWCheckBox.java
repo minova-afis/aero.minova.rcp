@@ -13,6 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -37,7 +38,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 *            associated key
 	 */
 	public CustomPWCheckBox(final String label, final String propertyKey, final TranslationService translationService) {
-		super(label, propertyKey, 3, true);
+		super(label, propertyKey, 2, false);
 		this.translationService = translationService;
 	}
 	
@@ -57,10 +58,15 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
+		
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(2, false));
+		addControl(cmp);
 
-		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
+		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
 		addControl(text);
-		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
+		textGridData.widthHint = 150;
 		text.setLayoutData(textGridData);
 
 		// Auslesen des PrimaryWorksapces
@@ -76,7 +82,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 			text.setText(translationService.translate("@msg.NotSet", null));
 		}
 
-		final Button button = new Button(parent, SWT.PUSH);
+		final Button button = new Button(cmp, SWT.PUSH);
 		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		button.setText(translationService.translate("@Action.Reset", null));
 		button.setLayoutData(buttonGridData);

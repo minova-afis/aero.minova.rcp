@@ -200,7 +200,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWLocale(pref.getLabel(), "language", context, translationService).setAlignment(GridData.FILL);
 			break;
 		case CUSTOMCHECK:
-			widget = new CustomPWCheckBox(pref.getLabel(), key, translationService).setWidth(200).setIndent(25);
+			widget = new CustomPWCheckBox(pref.getLabel(), key, translationService).setIndent(25);
 			break;
 		default:
 			break;
