@@ -1,5 +1,7 @@
 package aero.minova.rcp.workspace.handler;
 
+import static java.nio.file.Files.isRegularFile;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.text.MessageFormat;
@@ -157,15 +160,20 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	public static SSLContext disabledSslVerificationContext() {
 		try {
-			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			trustStore.load(new FileInputStream(Paths.get(System.getProperty("user.home")).resolve(".minwfc").resolve("keystore.p12").toString()), "minova123".toCharArray());
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-			tmf.init(trustStore);
-			TrustManager[] trustManagers = tmf.getTrustManagers();
+			final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(".minwfc").resolve("keystore.p12");
+			if (isRegularFile(trustStorePath)) {
+				trustStore.load(new FileInputStream(trustStorePath.toString()), "minova123".toCharArray());
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				tmf.init(trustStore);
+				TrustManager[] trustManagers = tmf.getTrustManagers();
 
-			SSLContext sslContext = SSLContext.getInstance("SSL");
-			sslContext.init(null, trustManagers, null);
-			return sslContext;
+				SSLContext sslContext = SSLContext.getInstance("SSL");
+				sslContext.init(null, trustManagers, null);
+				return sslContext;
+			} else {
+				return SSLContext.getInstance("SSL");
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
