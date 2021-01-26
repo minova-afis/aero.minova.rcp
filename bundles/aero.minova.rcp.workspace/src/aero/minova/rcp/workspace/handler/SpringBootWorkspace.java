@@ -1,6 +1,7 @@
 package aero.minova.rcp.workspace.handler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.ConnectException;
@@ -13,15 +14,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.text.MessageFormat;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
@@ -156,31 +156,19 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	}
 
 	public static SSLContext disabledSslVerificationContext() {
-		SSLContext sslContext = null;
-
-		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-
-			@Override
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-
-			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
-
-			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
-		} };
-
 		try {
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustAllCerts, new SecureRandom());
-		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			trustStore.load(new FileInputStream(Paths.get(System.getProperty("user.home")).resolve(".minwfc").resolve("keystore.p12").toString()), "minova123".toCharArray());
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			tmf.init(trustStore);
+			TrustManager[] trustManagers = tmf.getTrustManagers();
+
+			SSLContext sslContext = SSLContext.getInstance("SSL");
+			sslContext.init(null, trustManagers, null);
+			return sslContext;
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return sslContext;
 	}
 
 	/**
