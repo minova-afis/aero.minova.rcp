@@ -77,3 +77,11 @@ Wir haben für die Formatierung von Zahlen folgende Regeln definiert:
 - Wenn die Ausgangszahl 0 ist, wird die 0 durch die erste eingegebene Zahl ersetzt.
 - Wenn die letzte Zahl vor dem dezimalen Trennzeichen gelöscht/ entfernt wird springt die Caret Position auf die 1.
 
+==== Lookups
+Die Lookup Felder werden mit Hilfe der TextAssist - Klasse dargestellt. Diese Klasse bietet sowohl die Möglichkeit einer anzeige von möglichgen Treffern (Liste) als auch die Eigenschaften eines Textfeldes. Bei der Eingabe eines Zeichens werden die Ergibnisse gefiltert, so dass eine Liste mit möglichen Treffern aufpopped.
+In die Liste kann mittels den Pfeiltasten (⬇︎ & ⬆︎) navigiert werden. Enter oder Tab kann das ausgewähltge Element bestätigen und schließt automatisch die Liste der vorgeschlagenen Werte. Zusätzlich springt man in das nächste Feld / Pflichtfeld.
+- Die Anzahl der maximal angezeigten Werte sollte Einstellbar sein, allerdings wird ein Wert von 10 Elementen im Standard-Fall eingetragen
+- Ein LookUp wird mit Hilfe eines Text-Zeichen am Ende des Labels erkannt. Zum Beispiel: "Mandant ▼" [____________] Description.
+- Das Textzeichen hinter dem Label des Lookups sollte ebenfalls in den Einstellungen geändert werden können.  
+
+
