@@ -1,0 +1,7 @@
+== Anwendungs Preferences
+
+xref: "doc/adoc/application.adoc"[Application Preferences]
+
+== Workspace Preferences
+
+xref: "doc/adoc/workspace.adoc"[Workspace Preferences]
