@@ -1,7 +1,7 @@
 == Anwendungs Preferences
 
-xref: "doc/adoc/application.adoc"[Application Preferences]
+link: doc/adoc/application.adoc[Application Preferences]
 
 == Workspace Preferences
 
-xref: "doc/adoc/workspace.adoc"[Workspace Preferences]
+link: doc/adoc/workspace.adoc[Workspace Preferences]
