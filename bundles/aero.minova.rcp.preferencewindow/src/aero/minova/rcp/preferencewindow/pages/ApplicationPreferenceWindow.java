@@ -25,6 +25,7 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWSeparator;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWTextarea;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWURLText;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -39,6 +40,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.preferencewindow.control.CustomPWCheckBox;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
@@ -89,7 +91,7 @@ public class ApplicationPreferenceWindow {
 					// Preference hinzufügen
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
-					createWidgets(newTab, pref, key, translationService, values);
+					createWidgets(newTab, pref, key, translationService, window, values);
 				}
 			}
 		}
@@ -157,7 +159,7 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, Object... values) {
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, PreferenceWindow pwindow, Object... values) {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
@@ -182,7 +184,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
-			widget = new PWCheckbox(pref.getLabel(), key).setAlignment(GridData.FILL).setIndent(25);
+			widget = new CustomPWCheckBox(pref.getLabel(), key, pwindow).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		case URL:
 			widget = new PWURLText(pref.getLabel(), key);
