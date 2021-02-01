@@ -39,6 +39,9 @@ import aero.minova.rcp.workspace.WorkspaceException;
 @SuppressWarnings("restriction")
 public class SpringBootWorkspace extends WorkspaceHandler {
 
+	private static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
+	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
+
 	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
 		super(logger);
 		workspaceData.setConnection(connection);
@@ -101,7 +104,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				if (!getApplicationArea().isEmpty()) {
 					instanceLocationUrl = new URL(getApplicationArea());
 				} else {
-					String path = defaultPath + "/.minwfc/" + workspaceData.getWorkspaceHashHex() + "/";
+					String path = defaultPath + "/" + DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
 					instanceLocationUrl = new URL("file", null, path);
 				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
@@ -162,7 +165,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	public static SSLContext disabledSslVerificationContext() {
 		try {
 			final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(".minwfc").resolve("keystore.p12");
+			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(DEFAULT_CONFIG_FOLDER).resolve(KEYSTORE_FILE_NAME);
 			if (isRegularFile(trustStorePath)) {
 				trustStore.load(new FileInputStream(trustStorePath.toString()), "minova123".toCharArray());
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
