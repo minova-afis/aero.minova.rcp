@@ -28,35 +28,35 @@ public class ApplicationPreferences {
 	public static final String ALLOW_MULTIPLE_FORMS = "AllowMultipleForms";
 
 	/**
-	 * Index beim Öffnen automatisch laden.
+	 * Die Daten im Index werden beim Öffnen der Maske automatisch geladen.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String AUTO_LOAD_INDEX = "AutoLoadIndex";
 
 	/**
-	 * Index automatisch nach dem Speichern aktualisieren.
+	 * Der Index wird nach dem Speichern automatisch aktualisiert.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String AUTO_RELOAD_INDEX = "AutoReloadIndex";
 
 	/**
-	 * Meldungsfenster an Menüleiste.
+	 * Passt die Größe der Tabellen automatisch an.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String AUTO_RESIZE = "AutoResize";
 
 	/**
-	 * Erstellt XMLXS.
+	 * Erstellt beim Drucken neben einem PDF auch eine eine XML und XSL Datei im gleichen Ordner.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String CREATE_XML_XS = "CreateXMLXS";
 
 	/**
-	 * Interne Vorschau deaktivieren.
+	 * Deaktiviert die interne Druckvorschau.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
@@ -70,7 +70,7 @@ public class ApplicationPreferences {
 	public static final String DISALLOW_DRAG_AND_DROP = "DisallowDragAndDrop";
 
 	/**
-	 * Anzeige Puffer[ms].
+	 * Bestimmt die Zeit, die die Anwendung wartet bevor sie den Detail Bereich aktualisiert .
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
@@ -88,56 +88,56 @@ public class ApplicationPreferences {
 	public static final String ENTER_SELECTS_FIRST_REQUIRED = "EnterSelectsFirstRequired";
 
 	/**
-	 * Bestimmt die Schriftgröße an.
+	 * Bestimmt die Schriftgröße der Anwendung.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String FONT_SIZE = "FontSize";
 
 	/**
-	 * Leere Spalten verbergen.
+	 * Verbirgt beim Drucken die leeren Spalten.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String HIDE_EMPTY_COLS = "HideEmptyCols";
 
 	/**
-	 * Gruppenspalten verbergen.
+	 * Verbirgt beim Drucken die Spalten, die die Gruppen bilden.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String HIDE_GROUP_COLS = "HideGroupCols";
 
 	/**
-	 * Suchkriterien verbergen.
+	 * Verbirgt beim Drucken die Suchkriterien.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String HIDE_SEARCH_CRITERIAS = "HideSearchCriterias";
 
 	/**
-	 * Bestimmt die Größe der Symbole (Menü, Detail).
+	 * Bestimmt die Größe der Symbole für Menü, Detail, usw.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String ICON_SIZE = "IconSize";
 
 	/**
-	 * Bestimmt die Größe der Symbole (Toolbar).
+	 * Bestimmt die Größe der Symbole in den ToolBars.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String ICON_SIZE_BIG = "IconSizeBig";
 
 	/**
-	 * Bestimmt die Schriftart des Inhaltsverzeichnisses im Druck.
+	 * Bestimmt die Schriftart des Inhaltsverzeichnisses beim Drucken.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String INDEX_FONT = "IndexFont";
 
 	/**
-	 * Bestimmt die Wochen vor einer Linzenz Warnung.
+	 * Bestimmt den Zeitraum vor einer Linzenz Warnung in Wochen.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
@@ -162,21 +162,21 @@ public class ApplicationPreferences {
 	public static final String LOOKUP_ENTER_SELECTS_NEXT_REQUIRED = "LookupEnterSelectsNextRequired";
 
 	/**
-	 * Bestimmt den Max. Puffer [ms].
+	 * Bestimmt den Puffer in dem die Anwendung Zwischenänderungen sichtbar macht, während der Anzeige-Puffer noch nicht abgelaufen ist.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String MAX_BUFFER_MS = "MaxBufferMs";
 
 	/**
-	 * Bestimmt die maximal Anzahl an Zeichen.
+	 * Bestimmt die maximal Anzahl an Zeichen in der Konsole. Die ältesten Einträge werden abgeschnitten.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String MAX_CHARS = "MaxChars";
 
 	/**
-	 * Breiten Optimieren.
+	 * Optimiert die Breiten der Spalten beim Drucken.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
@@ -194,82 +194,83 @@ public class ApplicationPreferences {
 	public static final String SELECT_ALL_CONTROLS = "SelectAllControls";
 
 	/**
-	 * Meldungsfenster an Menüleiste.
+	 * Das Meldungsfenster für Fehler wird an die Menüleiste angebunden.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHEET_STYLES_MESSAGE_BOXES = "SheetStylesMessageBoxes";
 
 	/**
-	 * Alle Icons in Symbolleiste einblenden.
+	 * Blendet die Icons aller Masken in die Symbolleiste ein.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_ALL_ACTION_IN_TOOLBAR = "ShowAllActioninToolbar";
 
 	/**
-	 * Schaltflächentext einblenden.
+	 * Blendet den Text neben den Schaltflächen in den Toolbars der Sections ein.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_BUTTON_TEXT = "ShowButtonText";
 
 	/**
-	 * Schaltflächentext im Detailbereich. *
+	 * Blendet die Schaltflächen in den Sections ein.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_BUTTON_IN_SECTION = "ShowButtonsInSection";
 
 	/**
-	 * Zeige geänderte Zeilen.
+	 * Makiert geänderte, gelöschte und neue Zeilen.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_CHANGED_ROWS = "ShowChangedRows";
-	
+
 	/**
-	 * Beschreibung für Schaltfläche einblenden.
+	 * Blendet den Text von Schaltflächen in den Toolbars ein.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_DETAIL_BUTTON_TEXT = "ShowDetailButtonText";
-	
+
 	/**
-	 * Gruppen einblenden.
+	 * Erlaubt Gruppen in Teiltabellen.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_GROUPS = "ShowGroups";
-	
+
 	/**
-	 * Zeige Nachschläge.
+	 * Aktiviert Lookups in Teiltabellen.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_LOOKUPS = "ShowLookups";
-	
+
 	/**
-	 * Bestimmt die Auswahlverzögerung [ms] in den Tabellen.
+	 * Bestimmt die Dauer, die bei einer Auswahl gewartet wird, bevor das Event gesendet wird. Zum Beispiel, wenn man mit den Pfeiltasten durch die Tabelle geht,
+	 * wird nicht bei jeder Auswahl das Event gesendet, sondern nur, wenn in dem angegebenen Zeitraum die Auswahl nicht geändert wurde.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String TABLE_SELECTION_BUFFER_MS = "TableSelectionBufferMs";
-	
+
 	/**
-	 * Masken Puffer benutzen.
+	 * Masken Puffer benutzen. ENTFERNEN?!
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String USE_FORM_BUFFER = "UseFormBuffer";
-	
+
 	/**
-	 * Vorbelegung des Benutzernamens.
+	 * Bestimmt welcher Benutzer in den Detail Bereich eingetragen wird. ENTFERNEN? Über den Login regeln?
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String USER_PRESELECT_DESCRIPTOR = "UserPreselectDescription";
-	
+
 	/**
 	 * Bestimmt das Land, das für das Locale genutzt wird.
 	 * 

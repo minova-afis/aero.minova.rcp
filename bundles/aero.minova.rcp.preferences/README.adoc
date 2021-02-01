@@ -1,0 +1,7 @@
+== Anwendungs Preferences
+
+link: doc/adoc/application.adoc[Application Preferences]
+
+== Workspace Preferences
+
+link: doc/adoc/workspace.adoc[Workspace Preferences]

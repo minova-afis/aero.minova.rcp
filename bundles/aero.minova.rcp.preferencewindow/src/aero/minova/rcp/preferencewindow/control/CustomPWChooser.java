@@ -1,6 +1,7 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import org.eclipse.nebula.widgets.opal.commons.ResourceManager;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -11,14 +12,19 @@ import org.eclipse.swt.widgets.Text;
 
 public abstract class CustomPWChooser extends CustomPWWidget {
 
+	TranslationService translationService;
+
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
-	public CustomPWChooser(final String label, final String propertyKey) {
+	public CustomPWChooser(final String label, final String propertyKey, @Optional TranslationService translationService) {
 		super(label, propertyKey, 3, false);
+		this.translationService = translationService;
 		setGrabExcessSpace(false);
 	}
 
@@ -35,20 +41,19 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 			label.setText(getLabel());
 		}
 		addControl(label);
-		final GridData labelGridData = new GridData(GridData.END, GridData.BEGINNING, false, false);
-		labelGridData.horizontalIndent = getIndent();
+		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
+		labelGridData.horizontalIndent = 25;
 		label.setLayoutData(labelGridData);
 
 		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
 		addControl(text);
-		final GridData textGridData = new GridData(GridData.FILL, GridData.BEGINNING, true, false);
+		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(textGridData);
 
 		final Button button = new Button(parent, SWT.PUSH);
 		addControl(button);
-		final GridData buttonGridData = new GridData(GridData.FILL, GridData.BEGINNING, false, false);
-		buttonGridData.widthHint = 150;
-		button.setText(ResourceManager.getLabel(ResourceManager.CHOOSE) + "...");
+		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		button.setText(translationService.translate("@Chooser.choose", null) + "...");
 		button.setLayoutData(buttonGridData);
 
 		setButtonAction(text, button);
@@ -60,8 +65,10 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	/**
 	 * Code executed when the user presses the button
 	 *
-	 * @param text text box
-	 * @param button associated button
+	 * @param text
+	 *            text box
+	 * @param button
+	 *            associated button
 	 */
 	protected abstract void setButtonAction(Text text, Button button);
 
