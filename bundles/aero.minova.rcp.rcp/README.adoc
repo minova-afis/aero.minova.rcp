@@ -83,7 +83,7 @@ Wir haben für die Zeit bestimmte Shortcuts definiert.
 | `00` | 00:00 Uhr 
 | `1` | die Stunde am Tag und 0 Minuten -> 0**1**:00 Uhr
 | `12` | dies liefert die Stunde am Tag. 
-Werte > 23 liefern ein üngoltiges Datum. -> **12**:00 Uhr
+Werte > 23 liefern ein ungültiges Datum. -> **12**:00 Uhr
 | `123` | Die 1. Stelle liefert die Stunde; die Stellen 2 und 3 die Minuten. -> 0**1**:**23** Uhr  
 | `1234` | Die 1. und 2. Stelle liefern die Stunde; die Stellen 3 und 4 die Minuten. -> **12**:**34** Uhr 
 | `+` | jetzt plus eine Stunde
