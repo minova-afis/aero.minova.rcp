@@ -19,7 +19,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 public class LookUpValueAccessor extends AbstractValueAccessor {
 
@@ -51,32 +51,33 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				replaceKeyValues(control, value);
 			});
 		} else {
-			((LookupControl) control).getDescription().setText("");
-			((LookupControl) control).setText("");
+			((Lookup) control).getDescription().setText("");
+			((Lookup) control).setText("");
 		}
 
 	}
 
 	private void replaceKeyValues(Control control, Value value) {
 		if (value != null) {
-			((LookupControl) control).getTextControl().setMessage("...");
-			((LookupControl) control).getDescription().setText("");
-			((LookupControl) control).setText("");
+			((Lookup) control).setMessage("...");
+			((Lookup) control).getDescription().setText("");
+			((Lookup) control).setText("");
 
 			Table options = ((MLookupField) field).getOptions();
 			if (options != null) {
 				for (Row r : options.getRows()) {
 					if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
-						((LookupControl) control).getTextControl().setMessage("");
-						((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+						((Lookup) control).setMessage("");
+						((Lookup) control)
+								.setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 						if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
-							((LookupControl) control).getDescription()
+							((Lookup) control).getDescription()
 									.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
 						}
 					}
 				}
 			}
-			if (((LookupControl) control).getTextControl().getMessage().equals("...")) {
+			if (((Lookup) control).getMessage().equals("...")) {
 				getLookUpConsumer(control, value);
 			}
 
@@ -117,15 +118,18 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void updateSelectedLookupEntry(Table table, Control control) {
 		Row r = table.getRows().get(0);
-		LookupControl lc = (LookupControl) control;
+		Lookup lc = (Lookup) control;
 		int index = table.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
 		lc.setText((String) ValueBuilder.value(v).create());
-		lc.getTextControl().setMessage("");
+		lc.setMessage("");
 		if (lc.getDescription() != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
-			if (v1 == null) lc.getDescription().setText("");
-			else lc.getDescription().setText((String) ValueBuilder.value(v1).create());
+			if (v1 == null) {
+				lc.getDescription().setText("");
+			} else {
+				lc.getDescription().setText((String) ValueBuilder.value(v1).create());
+			}
 		}
 	}
 
@@ -136,8 +140,8 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (!focussed && ((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
-			((LookupControl) control).getTextControl().setMessage("");
-			String displayText = ((LookupControl) control).getText();
+			((Lookup) control).setMessage("");
+			String displayText = ((Lookup) control).getText();
 			if (displayText != null && !displayText.equals("")) {
 
 				Table optionTable = ((MLookupField) field).getOptions();
@@ -149,7 +153,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 						Value rowValue = r.getValue(indexKeyLong);
 						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
 						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-							((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+							((Lookup) control).setText(r.getValue(indexKeyText).getStringValue());
 							return;
 						}
 						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
@@ -161,7 +165,7 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 				}
 			}
 			field.setValue(null, false);
-			((LookupControl) control).getTextControl().setMessage("");
+			((Lookup) control).setMessage("");
 		}
 	}
 }

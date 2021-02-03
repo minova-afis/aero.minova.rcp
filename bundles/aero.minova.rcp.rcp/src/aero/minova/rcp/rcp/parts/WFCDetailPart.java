@@ -314,6 +314,12 @@ public class WFCDetailPart extends WFCFormPart {
 					expandableComposite.setText(value);
 					translate((Composite) expandableComposite.getClient());
 				} else if (control instanceof Label) {
+					Label l = ((Label) control);
+					Object data = l.getData(LookupField.AERO_MINOVA_RCP_LOOKUP);
+					if (data != null) {
+						// TODO aus den Preferences Laden
+						value = value + " ▼";
+					}
 					((Label) control).setText(value);
 				} else if (control instanceof Button) {
 					((Button) control).setText(value);

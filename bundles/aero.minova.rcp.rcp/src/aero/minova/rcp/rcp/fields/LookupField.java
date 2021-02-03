@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.fields;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -11,16 +13,17 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -38,11 +41,13 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
+import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.rcp.widgets.LookupContentProvider;
 
 public class LookupField {
 
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
+	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 	private static final int COLUMN_WIDTH = 140;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5; // Zwischenräume
@@ -52,7 +57,38 @@ public class LookupField {
 			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		LookupControl lookupControl = new LookupControl(composite, SWT.LEFT);
+		LookupContentProvider lookUpContentProvider = new LookupContentProvider() {
+
+			@Override
+			public List<String> getContent(String entry) {
+				final List<String> returnedList = new ArrayList<>();
+
+				if (getTable() == null) {
+					return null;
+				}
+				for (final Row r : getTable().getRows()) {
+					if (r.getValue(1).getStringValue().toLowerCase().startsWith(entry.toLowerCase())) {
+						returnedList.add(r.getValue(1).getStringValue());
+					}
+				}
+				// f%h
+				// f.*h.*
+				// TODO umwandlung in RegEx
+
+				if (entry.equals("%")) {
+					for (final Row r : getTable().getRows()) {
+						returnedList.add(r.getValue(1).getStringValue());
+					}
+				}
+				return returnedList;
+			}
+
+		};
+		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT, lookUpContentProvider);
+		// TODO übersetzen
+		lookupControl.setMessage("Werte ...");
+		lookupControl.setNumberOfLines(50);
+
 		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
 		FormData lookupFormData = new FormData();
 		FormData labelFormData = new FormData();
@@ -81,6 +117,7 @@ public class LookupField {
 		}
 
 		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
+		label.setData(AERO_MINOVA_RCP_LOOKUP, lookupControl);
 		label.setLayoutData(labelFormData);
 
 		lookupControl.setLayoutData(lookupFormData);
@@ -88,53 +125,58 @@ public class LookupField {
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
 
-		lookupControl.addTwistieMouseListener(new MouseAdapter() {
-
+		// Alle Daten anzeigen funktioniert nicht mehr mit der Maus
+		label.addMouseListener(new MouseAdapter() {
 			@Override
-			/*
-			 * Aufruf der Prozedur mit um den Datensatz zu laden. prüfen ob noch andere
-			 * LookUpFelder eingetragen wurden
-			 */
 			public void mouseDown(MouseEvent e) {
+				// TODO
+				Label widget = (Label) e.widget;
+				Lookup l = (Lookup) widget.getData(AERO_MINOVA_RCP_LOOKUP);
+				l.setFocus();
 				requestLookUpEntriesAll(field, detail, lookupControl);
 			}
 		});
 
-		// Hinzufügen von Keylistenern, sodass die Felder bei Eingaben
-		// ihre Optionen auflisten können und ihren Wert bei einem Treffer übernehmen
-		lookupControl.addKeyListener(new KeyListener() {
-
+		lookupControl.addTraverseListener(new TraverseListener() {
 
 			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
+			public void keyTraversed(TraverseEvent e) {
+				Text text = ((Text) e.getSource());
+				Lookup t = (Lookup) text.getParent();
+				System.out.println("Pressed key: " + e.keyCode);
+				switch (e.detail) {
+				case SWT.TRAVERSE_TAB_PREVIOUS:
+					t.fillSelectedValue();
+					e.doit = true;
+					// entfernen des Details, damit niemand mehr dieses TRAVERSE_RETURN Event
+					// verwenden kann.
+					break;
+				case SWT.TRAVERSE_TAB_NEXT:
+				case SWT.TRAVERSE_RETURN:
+					// Hier übernehmen wir den ersten Treffer der Liste, falls es einen Eintrag gibt
+					// edit same column previous row
+					t.fillSelectedValue();
+					e.doit = true;
+					// entfernen des Details, damit niemand mehr dieses TRAVERSE_RETURN Event
+					// verwenden kann.
+					e.detail = SWT.TRAVERSE_TAB_NEXT;
+					break;
 
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-
-
-					// PFeiltastenangaben, Enter und TAB sollen nicht den Suchprozess auslösen
-				if (e.keyCode != SWT.ARROW_DOWN && e.keyCode != SWT.ARROW_LEFT && e.keyCode != SWT.ARROW_RIGHT && e.keyCode != SWT.ARROW_UP
-						&& e.keyCode != SWT.TAB && e.keyCode != SWT.CR && e.keyCode != SWT.SPACE) {
-					if (((MLookupField) field).getOptions() == null) {
-						requestLookUpEntriesAll(field, detail, lookupControl);
+				case SWT.TRAVERSE_ARROW_NEXT:
+					Lookup l = (Lookup) ((Text) e.widget).getParent();
+					if (!l.getContentProvider().tableIsEmpty()) {
+						if (!l.popupIsOpen()) {
+							l.showAllElements("%");
+						}
 					} else {
-						changeSelectionBoxList(lookupControl, (MLookupField) field, false);
-					}
-				} else if (e.keyCode == SWT.SPACE && ((e.stateMask & SWT.CONTROL) != 0)) {
-					requestLookUpEntriesAll(field, detail, lookupControl);
-				} else if (e.keyCode == SWT.ARROW_DOWN && lookupControl.isProposalPopupOpen() == false) {
-					if (((MLookupField) field).getOptions() != null) {
-						changeSelectionBoxList(lookupControl, (MLookupField) field, false);
-					} else {
+						e.doit = false;
 						requestLookUpEntriesAll(field, detail, lookupControl);
 					}
+					break;
 				}
 			}
-
 		});
+
 		return lookupControl;
 	}
 
@@ -147,7 +189,7 @@ public class LookupField {
 	 */
 	@Inject
 	@Optional
-	public static void requestLookUpEntriesAll(MField field, MDetail detail, LookupControl lookUpControl) {
+	public static void requestLookUpEntriesAll(MField field, MDetail detail, Lookup lookUpControl) {
 		CompletableFuture<?> tableFuture;
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
@@ -157,9 +199,8 @@ public class LookupField {
 		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class,
 				ILocalDatabaseService.class);
 
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService,
-				"List");
-		lookUpControl.getTextControl().setMessage("...");
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
+		lookUpControl.setMessage("...");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
@@ -170,6 +211,7 @@ public class LookupField {
 				Table t = (Table) ta;
 				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, lookUpControl, true);
+				lookUpControl.showAllElements("%");
 			}
 		}));
 	}
@@ -180,7 +222,7 @@ public class LookupField {
 	 * @param ta
 	 * @param c
 	 */
-	public static void changeOptionsForLookupField(Table ta, LookupControl lookupControl, boolean twisty) {
+	public static void changeOptionsForLookupField(Table ta, Lookup lookupControl, boolean twisty) {
 		MLookupField field = (MLookupField) lookupControl.getData(Constants.CONTROL_FIELD);
 		field.setOptions(ta);
 		changeSelectionBoxList(lookupControl, field, twisty);
@@ -192,9 +234,9 @@ public class LookupField {
 	 *
 	 * @param lookUpControl
 	 */
-	public static void changeSelectionBoxList(LookupControl lookUpControl, MLookupField field, boolean twisty) {
+	public static void changeSelectionBoxList(Lookup lookUpControl, MLookupField field, boolean twisty) {
 		if (field.getOptions() != null) {
-			Table t = (Table) field.getOptions();
+			Table t = field.getOptions();
 			// Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die
 			// Eingabe gleich dem gesuchten Wert ist.
 			// Ist dies der Fall, so wird dieser Wert ausgewählt.
@@ -202,9 +244,10 @@ public class LookupField {
 			if (t.getRows().size() == 1) {
 				if (lookUpControl != null && lookUpControl.getText() != null && !twisty) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-					if (value.getStringValue().toLowerCase().startsWith((lookUpControl.getText().toString().toLowerCase()))) {
+					if (value.getStringValue().toLowerCase()
+							.startsWith((lookUpControl.getText().toString().toLowerCase()))) {
 						field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
- 					}
+					}
 				}
 				changeProposals(lookUpControl, t);
 			} else {
@@ -223,27 +266,29 @@ public class LookupField {
 							filteredTable.addRow(r);
 						} else if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 							if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-									.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue().toLowerCase()))) {
+									.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))
+											.getStringValue().toLowerCase()))) {
 								filteredTable.addRow(r);
 							}
 						}
 
 					}
 					// Existiert genau 1 Treffer, so wird geschaut ob dieser bereits 100%
- 					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
- 					// Wert gesetzt
- 					if (filteredTable.getRows().size() == 1) {
+					// übereinstimmt. Tut er dies, so wird statt dem setzen des Proposals direkt der
+					// Wert gesetzt
+					if (filteredTable.getRows().size() == 1) {
 						Row row = filteredTable.getRows().get(0);
-						if ((row.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-								.equals(lookUpControl.getText().toLowerCase()))
+						if ((row.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
+								.toLowerCase().equals(lookUpControl.getText().toLowerCase()))
 								|| (row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
-										&& row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue()
- 											.toLowerCase().equals(lookUpControl.getText().toLowerCase()))) {
+										&& row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
+												.getStringValue().toLowerCase()
+												.equals(lookUpControl.getText().toLowerCase()))) {
 							field.setValue(row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
- 						}
+						}
 						changeProposals(lookUpControl, filteredTable);
- 						// Setzen der Proposals/Optionen
- 					} else if (filteredTable.getRows().size() != 0) {
+						// Setzen der Proposals/Optionen
+					} else if (filteredTable.getRows().size() != 0) {
 						changeProposals(lookUpControl, filteredTable);
 					} else {
 						changeProposals(lookUpControl, t);
@@ -263,7 +308,8 @@ public class LookupField {
 	 * @param c
 	 * @param t
 	 */
-	public static void changeProposals(LookupControl lc, Table t) {
-		lc.setProposals(t);
+	public static void changeProposals(Lookup lc, Table t) {
+		LookupContentProvider contentProvider = lc.getContentProvider();
+		contentProvider.setTable(t);
 	}
 }
