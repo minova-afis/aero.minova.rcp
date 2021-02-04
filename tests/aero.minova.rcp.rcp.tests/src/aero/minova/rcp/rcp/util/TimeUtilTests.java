@@ -38,7 +38,7 @@ public class TimeUtilTests {
 	@Test
 	public void testGetTime123() {
 		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 12, 30).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 1, 23).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(now, "123"));
 	}
 

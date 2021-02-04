@@ -245,9 +245,9 @@ public class TimeUtil {
 				return time;
 			case 3:
 				time = new int[2];
-				hour = String.valueOf(input.charAt(0)) + String.valueOf(input.charAt(1));
+				hour = String.valueOf(input.charAt(0));
 				time[0] = Integer.valueOf(hour);
-				minutesString = String.valueOf(input.charAt(2)) + "0";
+				minutesString = String.valueOf(input.charAt(1)) + String.valueOf(input.charAt(2));
 				time[1] = Integer.valueOf(minutesString);
 				return time;
 			case 4:
