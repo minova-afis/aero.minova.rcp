@@ -239,22 +239,21 @@ public class TimeUtil {
 				return time;
 			case 2:
 				time = new int[2];
-				String hoursString = String.valueOf(input.charAt(0)) + String.valueOf(input.charAt(1));
-				time[0] = Integer.valueOf(hoursString);
+				time[0] = Integer.valueOf(input);
 				time[1] = 0;
 				return time;
 			case 3:
 				time = new int[2];
 				hour = String.valueOf(input.charAt(0));
 				time[0] = Integer.valueOf(hour);
-				minutesString = String.valueOf(input.charAt(1)) + String.valueOf(input.charAt(2));
+				minutesString = input.substring(1);
 				time[1] = Integer.valueOf(minutesString);
 				return time;
 			case 4:
 				time = new int[2];
-				hour = String.valueOf(input.charAt(0)) + String.valueOf(input.charAt(1));
+				hour = input.substring(0,2);
 				time[0] = Integer.valueOf(hour);
-				minutesString = String.valueOf(input.charAt(2)) + String.valueOf(input.charAt(3));
+				minutesString = input.substring(2);
 				time[1] = Integer.valueOf(minutesString);
 				return time;
 			}
