@@ -86,7 +86,7 @@ public class Lookup extends Composite {
 	public Lookup(final Composite parent, final int style, final LookupContentProvider contentProvider) {
 		super(parent, SWT.NONE);
 		this.contentProvider = contentProvider;
-		this.contentProvider.setTextAssist(this);
+		this.contentProvider.setLookup(this);
 
 		setLayout(new FillLayout());
 		numberOfLines = 10;

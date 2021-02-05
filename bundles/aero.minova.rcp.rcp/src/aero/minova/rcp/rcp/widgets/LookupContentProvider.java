@@ -8,7 +8,7 @@ import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 
 public class LookupContentProvider {
-	private Lookup textAssist;
+	private Lookup lookup;
 	protected List<LookupValue> values = new ArrayList<>();
 
 	/**
@@ -29,17 +29,17 @@ public class LookupContentProvider {
 	}
 
 	/**
-	 * @param textAssist the textAssist to set
+	 * @param lookup the textAssist to set
 	 */
-	protected void setTextAssist(final Lookup textAssist) {
-		this.textAssist = textAssist;
+	protected void setLookup(final Lookup lookup) {
+		this.lookup = lookup;
 	}
 
 	/**
 	 * @return the max number of propositions.
 	 */
 	protected int getMaxNumberOfLines() {
-		return this.textAssist.getNumberOfLines();
+		return this.lookup.getNumberOfLines();
 	}
 
 	public void setTable(Table table) {
