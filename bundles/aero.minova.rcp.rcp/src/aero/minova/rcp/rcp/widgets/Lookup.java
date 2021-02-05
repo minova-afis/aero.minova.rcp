@@ -199,8 +199,9 @@ public class Lookup extends Composite {
 			tableItem.setText(1, values.get(i).description);
 		}
 		table.getColumn(0).pack();
+		table.getColumn(0).setWidth(table.getColumn(0).getWidth() + 5);
 		table.getColumn(1).pack();
-		table.getColumn(1).setWidth(table.getColumn(1).getWidth() + 10);
+		table.getColumn(1).setWidth(table.getColumn(1).getWidth() + 5);
 
 		final Point point = text.toDisplay(text.getLocation().x, text.getSize().y + text.getBorderWidth() - 3);
 		int x = point.x;
