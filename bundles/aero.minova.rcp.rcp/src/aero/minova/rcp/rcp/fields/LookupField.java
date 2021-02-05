@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.fields;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -31,7 +29,6 @@ import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
-import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -58,35 +55,7 @@ public class LookupField {
 			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		LookupContentProvider lookUpContentProvider = new LookupContentProvider() {
-
-			@Override
-			public List<LookupValue> getContent(String entry) {
-				final List<LookupValue> returnedList = new ArrayList<>();
-
-				if (getTable() == null) {
-					return null;
-				}
-				for (final Row r : getTable().getRows()) {
-					if (r.getValue(1).getStringValue().toLowerCase().startsWith(entry.toLowerCase())) {
-						LookupValue lv = new LookupValue(r.getValue(0).getIntegerValue(), r.getValue(1).getStringValue(), r.getValue(2).getStringValue());
-						returnedList.add(lv);
-					}
-				}
-				// f%h
-				// f.*h.*
-				// TODO umwandlung in RegEx
-
-				if (entry.equals("%")) {
-					for (final Row r : getTable().getRows()) {
-						LookupValue lv = new LookupValue(r.getValue(0).getIntegerValue(), r.getValue(1).getStringValue(), r.getValue(2).getStringValue());
-						returnedList.add(lv);
-					}
-				}
-				return returnedList;
-			}
-
-		};
+		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
 		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT, lookUpContentProvider);
 		// TODO übersetzen
 		lookupControl.setMessage("Werte ...");
@@ -167,7 +136,7 @@ public class LookupField {
 
 				case SWT.TRAVERSE_ARROW_NEXT:
 					Lookup l = (Lookup) ((Text) e.widget).getParent();
-					if (!l.getContentProvider().tableIsEmpty()) {
+					if (!l.getContentProvider().isEmpty()) {
 						if (!l.popupIsOpen()) {
 							l.showAllElements("%");
 						}

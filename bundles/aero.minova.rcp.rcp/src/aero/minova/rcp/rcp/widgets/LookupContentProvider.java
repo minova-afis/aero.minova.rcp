@@ -1,13 +1,15 @@
 package aero.minova.rcp.rcp.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 
-public abstract class LookupContentProvider {
+public class LookupContentProvider {
 	private Lookup textAssist;
-	protected Table table;
+	protected List<LookupValue> values = new ArrayList<>();
 
 	/**
 	 * Provides the content
@@ -16,7 +18,15 @@ public abstract class LookupContentProvider {
 	 * @return an array list of String that contains propositions for the entry
 	 *         typed by the user
 	 */
-	public abstract List<LookupValue> getContent(final String entry);
+	public List<LookupValue> getContent(final String entry) {
+		if ("%".equals(entry)) {
+			return values;
+		} else {
+			return values.stream()
+					.filter(lv -> lv.keyText.toUpperCase().startsWith(entry.toUpperCase()) || lv.description.toUpperCase().startsWith(entry.toUpperCase()))
+					.collect(Collectors.toList());
+		}
+	}
 
 	/**
 	 * @param textAssist the textAssist to set
@@ -33,18 +43,17 @@ public abstract class LookupContentProvider {
 	}
 
 	public void setTable(Table table) {
-		this.table = table;
+		values.clear();
+		values.addAll(table.getRows().stream().map(r -> {
+			int keyLong = r.getValue(0).getIntegerValue();
+			String keyText = r.getValue(1) == null ? "" : r.getValue(1).getStringValue();
+			String description = r.getValue(2) == null ? "" : r.getValue(2).getStringValue();
+			return new LookupValue(keyLong, keyText, description);
+		}).collect(Collectors.toList()));
 	}
 
-	public Table getTable() {
-		return table;
-	}
-
-	public boolean tableIsEmpty() {
-		if (table == null || table.getRows().isEmpty()) {
-			return true;
-		}
-		return false;
+	public boolean isEmpty() {
+		return values.isEmpty();
 	}
 
 }
