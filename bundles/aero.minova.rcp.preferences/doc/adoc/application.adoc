@@ -1,0 +1,208 @@
+= Anwendungs Preferences
+
+Dokumentation der standard Preferences für die Anwendung, die nicht spezifisch zu einer der Anwendungen(SIS, DISPO, TTA, AFIS) gehören. Die Werte der Preferences werden im Instance Scope des Workspaces gespeichert. 
+
+
+==== Anwendungs Tab
+
+====== Lizenz Warnung
+
+	Bestimmt den Zeitraum vor einer Linzenz Warnung in Wochen.
+
+[%hardbreaks]
+
+====== Standard Workspace
+
+	Zeigt das eingestellte Standard Workspace an und ermöglicht dieses Zurückzusetzen		
+	
+	Das Workspace "test" wurde als Standard Workspace gesetzt:
+	
+	image::default_workspace_set.png
+	
+
+[%hardbreaks]
+
+====== Nach dem Betätigen von ENTER wird das erste erforderliche Feld selektiert
+
+	Fall True (Default):
+	Der eingetragene oder ausgewählte Wert wird festgesetzt und der Benutzer springt ins erste Pflichtfeld der Maske.
+	 
+	Fall False:
+	Der eingetragene oder ausgewählte Wert wird festgesetzt und der Benutzer springt ins nächste Pflichtfeld.
+	 
+
+[%hardbreaks]
+
+====== Das Betätigen von Enter in einer Auswahlbox bewirkt die Übernahme des ausgewählten Wertes. Nach der Übernahme wird das nächste erforderliche Feld selektiert
+
+	Fall True (Default):
+	Der in der LookupComboBox ausgewählte Wert wird festgesetzt und der Benutzer springt ins nächste Pflichtfeld.
+	 
+	Fall False:
+	Der in der LookupComboBox ausgewählte Wert wird festgesetzt und der Benutzer bleibt im Feld.
+
+[%hardbreaks]
+
+====== Aktiviert die Selektion aller möglichen Felder inkl. Registerkarte und Schaltflächen
+
+	Fall True (Default):
+	Der Benutzer kann mit TAB in die Controls(Speichern, Neu, ...) navigieren.
+	
+	Fall False:
+	Der Benutzer kann mit TAB nicht in die Controls(Speichern, Neu, ...) navigieren.
+	 
+
+[%hardbreaks]
+
+
+==== Darstellungs Tab
+
+====== Landessprache
+
+	Bestimmt die Sprache der Anwendung.
+
+[%hardbreaks]
+
+====== Land
+
+	Bestimmt das Land, das für das Locale genutzt wird.
+
+[%hardbreaks]
+
+====== Zeitzone
+
+	Bestimmt die Zeitzone des Anwenders. Der Server arbeitet immer in der Zeitzone UTC.
+
+[%hardbreaks]
+
+====== Schriftgröße
+
+	Bestimmt die Schriftgröße der Anwendung.
+
+[%hardbreaks]
+
+====== Symbole [Menü, Detail]
+
+	Bestimmt die Größe der Symbole für Menü, Detail, usw.
+
+[%hardbreaks]
+
+====== Symbole [Toolbar]
+
+	Bestimmt die Größe der Symbole in den ToolBars.
+
+[%hardbreaks]
+
+==== Erweitert Tab
+
+====== Index beim Öffnen der Maske automatisch laden
+
+	Die Daten im Index werden beim Öffnen der Maske automatisch geladen.
+
+[%hardbreaks]
+
+====== Index automatisch nach dem Speichern aktualisieren
+	
+	Der Index wird nach dem Speichern automatisch aktualisiert.
+
+[%hardbreaks]
+
+====== Meldungsfenster an Menüleiste
+
+	Das Meldungsfenster für Fehler wird an die Menüleiste angebunden.
+
+[%hardbreaks]
+
+====== Beschreibung für Schaltflächen einblenden
+
+	Blendet den Text neben den Schaltflächen in den Toolbars der Sections ein.
+
+[%hardbreaks]
+
+====== Anzeige Puffer [ms]
+
+	Bestimmt die Zeit, die die Anwendung wartet bevor sie den Detail Bereich aktualisiert .
+
+[%hardbreaks]
+
+====== Max . Puffer [ms]
+
+	Bestimmt den Puffer in dem die Anwendung Zwischenänderungen sichtbar macht, während der Anzeige-Puffer noch nicht abgelaufen ist.
+
+[%hardbreaks]
+
+====== Auswahlverzögerung [ms]
+
+	Bestimmt die Dauer, die bei einer Auswahl gewartet wird, bevor das Event gesendet wird. Zum Beispiel, wenn man mit den Pfeiltasten 
+	durch die Tabelle geht, wird nicht bei jeder Auswahl das Event gesendet, sondern nur, wenn in dem angegebenen Zeitraum die Auswahl 
+	nicht geändert wurde.
+
+[%hardbreaks]
+
+====== Schaltflächentext einblenden
+
+	Blendet den Text neben den Schaltflächen in den Toolbars der Sections ein.
+
+[%hardbreaks]
+
+====== Gruppen einblenden
+
+	Erlaubt Gruppen in Teiltabellen.
+
+[%hardbreaks]
+
+====== Zeige geänderte Zeilen
+
+	Makiert geänderte, gelöschte und neue Zeilen.
+
+[%hardbreaks]
+
+==== Drucken Tab
+
+====== XML + XSL erstellen
+
+	Erstellt beim Drucken neben einem PDF auch eine eine XML und XSL Datei im gleichen Ordner.
+
+[%hardbreaks]
+
+====== Schriftart Inhaltsverzeichnis
+
+	Bestimmt die Schriftart des Inhaltsverzeichnisses beim Drucken.
+
+[%hardbreaks]
+
+====== Breiten optimieren
+
+	Optimiert die Breiten der Spalten beim Drucken.
+
+[%hardbreaks]
+
+====== Leere Spalten verbergen
+
+	Verbirgt beim Drucken die leeren Spalten.
+
+[%hardbreaks]
+
+====== Gruppenspalten verbergen
+
+	Verbirgt beim Drucken die Spalten, die die Gruppen bilden.
+
+[%hardbreaks]
+
+====== Suchkriterien verbergen
+
+	Verbirgt beim Drucken die Suchkriterien.
+
+[%hardbreaks]
+
+====== Interne Vorschau verbergen
+
+	Deaktiviert die interne Druckvorschau.
+
+[%hardbreaks]
+
+==== Konsole
+
+====== Max . Zeichen
+
+	Bestimmt die maximal Anzahl an Zeichen in der Konsole. Die ältesten Einträge werden abgeschnitten.
