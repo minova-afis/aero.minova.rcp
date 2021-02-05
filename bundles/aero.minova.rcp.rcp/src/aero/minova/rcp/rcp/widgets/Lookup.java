@@ -200,6 +200,7 @@ public class Lookup extends Composite {
 		}
 		table.getColumn(0).pack();
 		table.getColumn(1).pack();
+		table.getColumn(1).setWidth(table.getColumn(1).getWidth() + 10);
 
 		final Point point = text.toDisplay(text.getLocation().x, text.getSize().y + text.getBorderWidth() - 3);
 		int x = point.x;
