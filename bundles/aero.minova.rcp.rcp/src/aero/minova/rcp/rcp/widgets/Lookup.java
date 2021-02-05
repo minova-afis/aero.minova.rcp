@@ -19,9 +19,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+
+import aero.minova.rcp.model.LookupValue;
 
 public class Lookup extends Composite {
 
@@ -32,7 +35,7 @@ public class Lookup extends Composite {
 	private LookupContentProvider contentProvider;
 	private int numberOfLines;
 	private boolean useSingleClick = false;
-	private String firstValue;
+	private LookupValue firstValue;
 	private Label description;
 
 	/**
@@ -91,6 +94,9 @@ public class Lookup extends Composite {
 		popup = new Shell(getDisplay(), SWT.ON_TOP);
 		popup.setLayout(new FillLayout());
 		table = new Table(popup, SWT.SINGLE);
+		table.setLinesVisible(true);
+		new TableColumn(table, SWT.NONE); // KeyText
+		new TableColumn(table, SWT.NONE); // Description
 
 		addTextListener();
 		addTableListener();
@@ -174,7 +180,7 @@ public class Lookup extends Composite {
 	}
 
 	public void showAllElements(String value) {
-		List<String> values = contentProvider.getContent(value);
+		List<LookupValue> values = contentProvider.getContent(value);
 		if (values == null || values.isEmpty()) {
 			popup.setVisible(false);
 			firstValue = null;
@@ -189,8 +195,11 @@ public class Lookup extends Composite {
 		final int numberOfRows = Math.min(values.size(), numberOfLines);
 		for (int i = 0; i < numberOfRows; i++) {
 			final TableItem tableItem = new TableItem(table, SWT.NONE);
-			tableItem.setText(values.get(i));
+			tableItem.setText(0, values.get(i).keyText);
+			tableItem.setText(1, values.get(i).description);
 		}
+		table.getColumn(0).pack();
+		table.getColumn(1).pack();
 
 		final Point point = text.toDisplay(text.getLocation().x, text.getSize().y + text.getBorderWidth() - 3);
 		int x = point.x;
@@ -827,7 +836,7 @@ public class Lookup extends Composite {
 		if (popup.isVisible() && table.getSelectionIndex() != -1) {
 			text.setText(table.getSelection()[0].getText());
 		} else if (popup.isVisible() && firstValue != null) {
-			text.setText(firstValue);
+			text.setText(firstValue.keyText);
 		}
 	}
 

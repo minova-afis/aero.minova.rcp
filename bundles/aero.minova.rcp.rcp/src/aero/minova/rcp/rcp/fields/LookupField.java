@@ -31,6 +31,7 @@ import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -60,15 +61,16 @@ public class LookupField {
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider() {
 
 			@Override
-			public List<String> getContent(String entry) {
-				final List<String> returnedList = new ArrayList<>();
+			public List<LookupValue> getContent(String entry) {
+				final List<LookupValue> returnedList = new ArrayList<>();
 
 				if (getTable() == null) {
 					return null;
 				}
 				for (final Row r : getTable().getRows()) {
 					if (r.getValue(1).getStringValue().toLowerCase().startsWith(entry.toLowerCase())) {
-						returnedList.add(r.getValue(1).getStringValue());
+						LookupValue lv = new LookupValue(r.getValue(0).getIntegerValue(), r.getValue(1).getStringValue(), r.getValue(2).getStringValue());
+						returnedList.add(lv);
 					}
 				}
 				// f%h
@@ -77,7 +79,8 @@ public class LookupField {
 
 				if (entry.equals("%")) {
 					for (final Row r : getTable().getRows()) {
-						returnedList.add(r.getValue(1).getStringValue());
+						LookupValue lv = new LookupValue(r.getValue(0).getIntegerValue(), r.getValue(1).getStringValue(), r.getValue(2).getStringValue());
+						returnedList.add(lv);
 					}
 				}
 				return returnedList;

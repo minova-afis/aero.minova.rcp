@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.widgets;
 
 import java.util.List;
 
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 
 public abstract class LookupContentProvider {
@@ -15,7 +16,7 @@ public abstract class LookupContentProvider {
 	 * @return an array list of String that contains propositions for the entry
 	 *         typed by the user
 	 */
-	public abstract List<String> getContent(final String entry);
+	public abstract List<LookupValue> getContent(final String entry);
 
 	/**
 	 * @param textAssist the textAssist to set
