@@ -11,8 +11,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
@@ -60,6 +58,7 @@ public class LookupField {
 		// TODO übersetzen
 		lookupControl.setMessage("Werte ...");
 		lookupControl.setNumberOfLines(50);
+		lookupControl.setLabel(label);
 
 		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
 		FormData lookupFormData = new FormData();
@@ -96,18 +95,6 @@ public class LookupField {
 		lookupControl.setDescription(descriptionLabel);
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
-
-		// Alle Daten anzeigen funktioniert nicht mehr mit der Maus
-		label.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseDown(MouseEvent e) {
-				// TODO
-				Label widget = (Label) e.widget;
-				Lookup l = (Lookup) widget.getData(AERO_MINOVA_RCP_LOOKUP);
-				l.setFocus();
-				requestLookUpEntriesAll(field, detail, lookupControl);
-			}
-		});
 
 		lookupControl.addTraverseListener(new TraverseListener() {
 

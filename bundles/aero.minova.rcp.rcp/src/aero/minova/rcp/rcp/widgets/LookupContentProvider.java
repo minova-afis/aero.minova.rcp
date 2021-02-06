@@ -50,6 +50,7 @@ public class LookupContentProvider {
 			String description = r.getValue(2) == null ? "" : r.getValue(2).getStringValue();
 			return new LookupValue(keyLong, keyText, description);
 		}).sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
+		lookup.valuesUpdated();
 	}
 
 	public boolean isEmpty() {

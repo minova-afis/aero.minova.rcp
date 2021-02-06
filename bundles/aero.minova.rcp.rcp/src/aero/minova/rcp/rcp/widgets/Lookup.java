@@ -1,10 +1,14 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.core.runtime.ServiceCaller;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -14,6 +18,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -23,8 +28,19 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
+import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.LookupValue;
+import aero.minova.rcp.model.SqlProcedureResult;
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.fields.LookupField;
+import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 
 public class Lookup extends Composite {
 
@@ -36,7 +52,14 @@ public class Lookup extends Composite {
 	private int numberOfLines;
 	private boolean useSingleClick = false;
 	private LookupValue firstValue;
+	/**
+	 * Das Label, das den Wert beschreibt. Die Description aus der Datenbank.
+	 */
 	private Label description;
+	/**
+	 * Das Label, das das Feld beschreibt
+	 */
+	private Label label;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value
@@ -852,5 +875,57 @@ public class Lookup extends Composite {
 
 	public boolean popupIsOpen() {
 		return popup.getVisible();
+	}
+
+	public void setLabel(Label label) {
+//		if (this.label != null) this.label.removeMouseListener(null);
+
+		this.label = label;
+
+		if (label == null) return;
+		label.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				Lookup.this.setFocus();
+				requestAllLookupEntries();
+			}
+		});
+
+	}
+
+	protected void requestAllLookupEntries() {
+		CompletableFuture<?> tableFuture;
+		MField field = (MField) getData(Constants.CONTROL_FIELD);
+		MDetail detail = field.getDetail();
+
+		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
+		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
+		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
+
+		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class, ILocalDatabaseService.class);
+
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
+		setMessage("...");
+		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
+			aero.minova.rcp.model.Table t = null;
+			if (ta instanceof SqlProcedureResult) {
+				t = ((SqlProcedureResult) ta).getResultSet();
+			} else if (ta instanceof aero.minova.rcp.model.Table) {
+				t = (aero.minova.rcp.model.Table) ta;
+			}
+			localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
+			contentProvider.setTable(t);
+		}));
+
+	}
+
+	/**
+	 * Diese Methode wird aufgerufen, sobald der {@link LookupContentProvider} neue Werte von der Datenbank erhalten hat.
+	 */
+	public void valuesUpdated() {
+		if (!text.isFocusControl()) return;
+
+		if (text.getText().length() > 0) showAllElements(text.getText());
+		else showAllElements("%");
 	}
 }
