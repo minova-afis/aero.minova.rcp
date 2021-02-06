@@ -1,6 +1,9 @@
 package aero.minova.rcp.workspace.handler;
 
+import static java.nio.file.Files.isRegularFile;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.ConnectException;
@@ -13,14 +16,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
@@ -34,6 +39,9 @@ import aero.minova.rcp.workspace.WorkspaceException;
 @SuppressWarnings("restriction")
 public class SpringBootWorkspace extends WorkspaceHandler {
 
+	private static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
+	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
+
 	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
 		super(logger);
 		workspaceData.setConnection(connection);
@@ -41,8 +49,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	}
 
 	@Override
-	public boolean checkConnection(String username, String password, String applicationArea, Boolean saveAsDefault)
-			throws WorkspaceException {
+	public boolean checkConnection(String username, String password, String applicationArea, Boolean saveAsDefault) throws WorkspaceException {
 		String profile = getProfile();
 		List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger);
 		ISecurePreferences store = null;
@@ -75,8 +82,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		workspaceData.setApplicationArea(applicationArea);
 
 		// Profil speichern
-		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(),
-				getPassword(), getProfile(), applicationArea, saveAsDefault);
+		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(), getPassword(), getProfile(), applicationArea,
+				saveAsDefault);
 
 		return true;
 	}
@@ -97,7 +104,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				if (!getApplicationArea().isEmpty()) {
 					instanceLocationUrl = new URL(getApplicationArea());
 				} else {
-					String path = defaultPath + "/.minwfc/" + workspaceData.getWorkspaceHashHex() + "/";
+					String path = defaultPath + "/" + DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
 					instanceLocationUrl = new URL("file", null, path);
 				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
@@ -156,39 +163,48 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	}
 
 	public static SSLContext disabledSslVerificationContext() {
-		SSLContext sslContext = null;
-
-		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-
-			@Override
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-
-			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
-
-			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
-		} };
-
 		try {
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustAllCerts, new SecureRandom());
-		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(DEFAULT_CONFIG_FOLDER).resolve(KEYSTORE_FILE_NAME);
+			if (isRegularFile(trustStorePath)) {
+				trustStore.load(new FileInputStream(trustStorePath.toString()), "minova123".toCharArray());
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				tmf.init(trustStore);
+				TrustManager[] trustManagers = tmf.getTrustManagers();
+
+				SSLContext sslContext = SSLContext.getInstance("SSL");
+				sslContext.init(null, trustManagers, null);
+				return sslContext;
+			} else {
+				/*
+				 * Falls kein Keystore vorhanden ist, vertrauen wird erstmal allem, damit es für die lokale Entwicklung einfacher ist.
+				 */
+				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+					@Override
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					@Override
+					public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+
+					@Override
+					public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+				} };
+				SSLContext sslContext = SSLContext.getInstance("TLS");
+				sslContext.init(null, trustAllCerts, new SecureRandom());
+				return sslContext;
+			}
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return sslContext;
 	}
 
 	/**
-	 * Diese Methode überprüft die angegebenen Einträge und versucht eine verbindung
-	 * zum Server herzustellen
+	 * Diese Methode überprüft die angegebenen Einträge und versucht eine verbindung zum Server herzustellen
 	 *
 	 * @throws WorkspaceException
-	 *
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
@@ -201,13 +217,12 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			}
 		};
 
-		String body = "{\n" + "  \"name\": \"tEmployee\",\n" + "  \"columns\": [\n" + "    {\n"
-				+ "      \"name\": \"KeyLong\",\n" + "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n"
-				+ "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
-				+ "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
-				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n"
-				+ "  \"rows\": [\n" + "    {\n" + "      \"values\": [\n" + "        null,\n" + "        null,\n"
-				+ "        null,\n" + "        \"s-\\u003e0\"\n" + "      ]\n" + "    }\n" + "  ]\n" + "}";
+		String body = "{\n" + "  \"name\": \"tEmployee\",\n" + "  \"columns\": [\n" + "    {\n" + "      \"name\": \"KeyLong\",\n"
+				+ "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n" + "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n"
+				+ "    {\n" + "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
+				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n" + "  \"rows\": [\n" + "    {\n"
+				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        \"s-\\u003e0\"\n" + "      ]\n" + "    }\n"
+				+ "  ]\n" + "}";
 		try {
 			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //
 					.header("Content-Type", "application/json") //

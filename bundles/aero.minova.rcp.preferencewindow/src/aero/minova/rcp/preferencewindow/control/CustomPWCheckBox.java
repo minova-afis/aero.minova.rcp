@@ -1,40 +1,28 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
-
-import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
-
-import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 
 public class CustomPWCheckBox extends CustomPWWidget {
 
-	@Inject
-	Logger logger;
+	PreferenceWindow pwindow;
 
-	@Inject
-	TranslationService translationService;
 	/**
 	 * Constructor
 	 *
-	 * @param label       associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
-	public CustomPWCheckBox(final String label, final String propertyKey) {
+	public CustomPWCheckBox(final String label, final String propertyKey, PreferenceWindow pwindow) {
 		super(label, propertyKey, 1, true);
+		this.pwindow = pwindow;
 	}
 
 	/**
@@ -42,50 +30,24 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		buildLabel(parent, GridData.CENTER);
-		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
-		addControl(text);
-		final GridData textGridData = new GridData(GridData.FILL, GridData.BEGINNING, true, false);
-		textGridData.horizontalIndent = getIndent();
-		text.setLayoutData(textGridData);
-
-		// Auslesen des PrimaryWorksapces
-		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-			ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-			try {
-				String profil = prefs.get(WorkspaceAccessPreferences.PROFILE, null);
-				text.setText(profil);
-			} catch (StorageException e1) {
-				e1.printStackTrace();
-			}
-		} else {
-			text.setText("Nicht gesetzt!");
+		Point widthWindow = pwindow.getShell().getSize();
+		
+		if (getLabel() == null) {
+			throw new UnsupportedOperationException("Please specify a label for a checkbox");
 		}
+		final Button button = new Button(parent, SWT.CHECK);
+		addControl(button);
+//		GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+//		buttonGridData.widthHint = widthWindow.x - 50;
+//		button.setLayoutData(buttonGridData);
+		button.setText(getLabel());
+		final boolean originalSelection = (Boolean) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
+		button.setSelection(originalSelection);
 
-		final Button button = new Button(parent, SWT.PUSH);
-		final GridData buttonGridData = new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false);
-		buttonGridData.widthHint = 75;
-		button.setText("Reset");
-		button.setLayoutData(buttonGridData);
-
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				text.setText("Nicht gesetzt!");
-				if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-					ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger)
-							.get();
-					try {
-						prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
-						prefs.flush();
-					} catch (StorageException | IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
+		button.addListener(SWT.Selection, e -> {
+			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), button.getSelection());
 		});
-
-		return text;
+		return button;
 	}
 
 	/**
@@ -98,10 +60,9 @@ public class CustomPWCheckBox extends CustomPWWidget {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
 		} else {
 			if (!(value instanceof Boolean)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey()
-						+ "' has to be a Boolean because it is associated to a checkbox");
+				throw new UnsupportedOperationException(
+						"The property '" + getCustomPropertyKey() + "' has to be a Boolean because it is associated to a checkbox");
 			}
 		}
 	}
-
 }

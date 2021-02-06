@@ -93,7 +93,7 @@ Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinha
 |===
 |Eingabe   |Interpretation   |Darstellung beim Verlassen   
 //----------------------
-|`>1`   |`>` + der 1. des Monats im Dezember   | > 01.12.2020    
+|`>1`   |`>` + der 1. des aktuellen Monats   | > 01.12.2020    
 |===
 
 Für die folgenden Felder kann ein Interpreter eingesetzt werden: 
@@ -136,3 +136,24 @@ Es werden alle Datensätze gesucht, bei denen in diesem Feld kein Wert eingetrag
 
 ==== '!null' nicht Nichts (einen Wert)
 Es werden alle Datensätze gesucht, bei denen in diesem Feld ein Wert eingetragen wurde
+
+==== '~' Like Operator (Ählichkeitssuche)
+Es werden alle Datensätze gesucht, bei denen der Wert des Feldes mit dem Muster übereinstimmt.
+Das Muster kann die Wildcards `%` und `?` enthalten.
+
+==== '!~' Not Like Operator
+Es werden alle Datensätze gesucht, bei denen der Wert des Feldes nicht mit dem Muster übereinstimmt.
+Das Muster kann die Wildcards `%` und `?` enthalten.
+
+== Aufruf des CAS
+
+An das CAS muss immer der Operator gesendet werden. 
+Dies ist auch erforderlich, wenn im UI keine Operator eingetragen wurde.
+
+Der Operator wird immer mit einem Leerzeichen von den Daten getrennt.
+
+Bei Datums und Zeitangaben wir immer der String als SQL-Instant übertragen.
+`{ts '2020-12-31 12:30:00'}` ist die entsprechende Konstante. 
+Bei Feldern mit Zeit, wird als Datum immer der 01.01.1900 angegeben.
+Als Zeitzone ist UTC einzustellen.
+Die Zeitzone der Anwendung kann davon abweichen.

@@ -26,13 +26,16 @@ import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -151,94 +154,17 @@ public class WFCDetailCASRequestsUtil {
 			for (MField field : detail.getFields()) {
 				field.indicateWaiting();
 			}
-
 			for (int i = 0; i < selectedTable.getColumnCount(); i++) {
 				String name = selectedTable.getColumnName(i);
 				MField c = detail.getField(name);
-				if (c != null) {
-					if (c.getConsumer() != null) {
-						try {
-							c.getConsumer().accept(selectedTable);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+				if (c != null && c.getConsumer() != null) {
+					try {
+						c.getConsumer().accept(selectedTable);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-
-					// TODO SAW_ERC Lookup
-//					ValueAccessor valueAccessor = (ValueAccessor) c.getData(Constants.VALUE_ACCESSOR);
-//					if (valueAccessor != null) {
-//						valueAccessor.setValue(selectedTable.getRows().get(0));
-//					}
-//					if (c instanceof LookupControl) {
-//						LookupControl lc = (LookupControl) c;
-//						Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-//						Map databaseMap = localDatabaseService.getResultsForKeyLong(field.getName(),
-//								selectedTable.getRows().get(0).getValue(i).getIntegerValue());
-//						if (databaseMap != null) {
-//							lc.setData(Constants.CONTROL_KEYLONG, databaseMap.get(Constants.TABLE_KEYLONG));
-//							lc.setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
-//							lc.getTextControl().setMessage("");
-//							if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
-//								lc.getDescription().setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
-//							}
-//						} else {
-//							Map hash = new HashMap<>();
-//							hash.put("value", selectedTable.getRows().get(0).getValue(i));
-//							hash.put("sync", sync);
-//							hash.put("dataService", dataService);
-//							hash.put("control", c);
-//
-//							Consumer<Map> lookupConsumer = (Consumer<Map>) c.getData(Constants.CONTROL_LOOKUPCONSUMER);
-//							if (lookupConsumer != null) {
-//								try {
-//									lookupConsumer.accept(hash);
-//
-//								} catch (Exception e) {}
-//							}
-//						}
-//					}
-
 				}
 			}
-//			// Dieser Ansatz kommt in Frage, falls wir stehts die Optionen austauschen
-//			// möchten und die Latenz gesamt kleinhalten möchten
-//			for (Control co : controls.values()) {
-//				if (co instanceof LookupControl) {
-//					LookupControl lc = (LookupControl) co;
-//					Field field = (Field) lc.getData(Constants.CONTROL_FIELD);
-//					if (lookups.get(field.getName()) == null || lc.getData(Constants.CONTROL_KEYLONG) == null
-//							|| (int) lc.getData(Constants.CONTROL_KEYLONG) != lookups.get(field.getName())) {
-//						lookups.remove(field.getName());
-//
-//						CompletableFuture<?> tableFuture;
-//						tableFuture = LookupCASRequestUtil.getRequestedTable(0, lc.getText(), field, lc, dataService, sync, "List");
-//						tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-//							if (ta instanceof SqlProcedureResult) {
-//								SqlProcedureResult sql = (SqlProcedureResult) ta;
-//								localDatabaseService.replaceResultsForLookupField(field.getName(), sql.getResultSet());
-//								lc.setData(Constants.CONTROL_OPTIONS, sql.getResultSet());
-//								for (Row row : sql.getResultSet().getRows()) {
-//									if (row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().equals(lc.getText())) {
-//										lookups.put(field.getName(),
-//												row.getValue(sql.getResultSet().getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
-//									}
-//								}
-//							} else if (ta instanceof Table) {
-//								Table t = (Table) ta;
-//								localDatabaseService.replaceResultsForLookupField(field.getName(), t);
-//								lc.setData(Constants.CONTROL_OPTIONS, ta);
-//								for (Row row : t.getRows()) {
-//									if (row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().equals(lc.getText())) {
-//										lookups.put(field.getName(), row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
-//									}
-//								}
-//							}
-//
-//						}));
-//					}
-//
-//				}
-//			}
 
 		}
 
@@ -290,71 +216,6 @@ public class WFCDetailCASRequestsUtil {
 			sendSaveRequest(formTable);
 		}
 	}
-
-//	/**
-//	 * Diese Methode ließt die Daten aus den Feldern / Controls und gibt einen String zurück. Der String kann auch null sein.
-//	 *
-//	 * @param constant
-//	 * @return
-//	 */
-//	String getTextFromControl(String constant) {
-//		Control control = controls.get(constant);
-//		String text = null;
-//		if (control instanceof Text) {
-//			text = ((Text) controls.get(constant)).getText();
-//		} else if (control instanceof TextAssist) {
-//			text = ((TextAssist) controls.get(constant)).getMessage();
-//		}
-//		return text;
-//	}
-
-//	/**
-//	 * Eine Methode, welche eine Anfrage an den CAS versendet um zu überprüfen, ob eine Überschneidung in den Arbeitszeiten vorliegt
-//	 *
-//	 * @param bookingDate
-//	 * @param startDate
-//	 * @param endDate
-//	 * @param renderedQuantity
-//	 * @param chargedQuantity
-//	 * @param t
-//	 * @param r
-//	 */
-//	public void checkWorkingTime(String bookingDate, String startDate, String endDate, String renderedQuantity, String chargedQuantity, Table t, Row r) {
-//		boolean contradiction = false;
-//
-//		// Prüfen, ob die bemessene Arbeitszeit der differenz der Stunden entspricht
-//		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-//		LocalDate localDate = LocalDate.parse(bookingDate, df);
-//		LocalDateTime localDateTime = localDate.atTime(0, 0);
-//		ZonedDateTime zdtBooking = localDateTime.atZone(ZoneId.of(timezone));
-//		r.setValue(new Value(zdtBooking.toInstant()), t.getColumnIndex(Constants.FORM_BOOKINGDATE));
-//		LocalTime timeEndDate = LocalTime.parse(endDate);
-//		LocalTime timeStartDate = LocalTime.parse(startDate);
-//
-//		LocalDateTime localEndDate = localDate.atTime(timeEndDate);
-//		ZonedDateTime zdtEnd = localEndDate.atZone(ZoneId.of(timezone));
-//		r.setValue(new Value(zdtEnd.toInstant()), t.getColumnIndex(Constants.FORM_ENDDATE));
-//		LocalDateTime localStartDate = localDate.atTime(timeStartDate);
-//		ZonedDateTime zdtStart = localStartDate.atZone(ZoneId.of(timezone));
-//		r.setValue(new Value(zdtStart.toInstant()), t.getColumnIndex(Constants.FORM_STARTDATE));
-//		r.setValue(new Value(Double.valueOf(chargedQuantity)), t.getColumnIndex(Constants.FORM_CHARGEDQUANTITY));
-//		r.setValue(new Value(Double.valueOf(renderedQuantity)), t.getColumnIndex(Constants.FORM_RENDEREDQUANTITY));
-//
-//		float timeDifference = ((timeEndDate.getHour() * 60) + timeEndDate.getMinute()) - ((timeStartDate.getHour() * 60) + timeStartDate.getMinute());
-//		timeDifference = timeDifference / 60;
-//
-//		float renderedQuantityFloat = Float.parseFloat(renderedQuantity);
-//		float chargedQuantityFloat = Float.parseFloat(chargedQuantity);
-//		if (timeDifference != renderedQuantityFloat) {
-//			contradiction = true;
-//		}
-//		if ((renderedQuantityFloat + 0.25 < chargedQuantityFloat)) {
-//			contradiction = true;
-//		}
-//		// Anfrage an den CAS um zu überprüfen, ob für den Mitarbeiter im angegebenen
-//		// Zeitrahmen bereits einträge existieren
-//		sendSaveRequest(t, contradiction);
-//	}
 
 	private void sendSaveRequest(Table t) {
 		if (t.getRows() != null) {
@@ -413,60 +274,58 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
-//	/**
-//	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
-//	 *
-//	 * @param obj
-//	 */
-//	@Inject
-//	@Optional
-//	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
-//		if (perspective == this.perspective) {
-//			if (getKeys() != null) {
-//				String tablename = form.getIndexView() != null ? "sp" : "op";
-//				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-//					tablename = form.getDetail().getProcedurePrefix();
-//				}
-//				tablename += "Delete";
-//				tablename += form.getDetail().getProcedureSuffix();
-//				TableBuilder tb = TableBuilder.newTable(tablename);
-//				RowBuilder rb = RowBuilder.newRow();
-//				for (ArrayList key : getKeys()) {
-//					tb.withColumn((String) key.get(0), (DataType) key.get(2));
-//					rb.withValue(key.get(1));
-//				}
-//				Table t = tb.create();
-//				Row r = rb.create();
-//				t.addRow(r);
-//				if (t.getRows() != null) {
-//					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-//					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-//						deleteEntry(ta);
-//					}));
-//				}
-//			}
-//		}
-//	}
+	/**
+	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
+	 *
+	 * @param obj
+	 */
+	@Inject
+	@Optional
+	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
+		if (perspective == this.perspective) {
+			if (getKeys() != null) {
+				String tablename = form.getIndexView() != null ? "sp" : "op";
+				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+					tablename = form.getDetail().getProcedurePrefix();
+				}
+				tablename += "Delete";
+				tablename += form.getDetail().getProcedureSuffix();
+				TableBuilder tb = TableBuilder.newTable(tablename);
+				RowBuilder rb = RowBuilder.newRow();
+				for (ArrayList key : getKeys()) {
+					tb.withColumn((String) key.get(0), (DataType) key.get(2));
+					rb.withValue(key.get(1));
+				}
+				Table t = tb.create();
+				Row r = rb.create();
+				t.addRow(r);
+				if (t.getRows() != null) {
+					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+						deleteEntry(ta);
+					}));
+				}
+			}
+		}
+	}
 
-//	/**
-//	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
-//	 *
-//	 * @param responce
-//	 */
-//	public void deleteEntry(SqlProcedureResult responce) {
-//		if (responce.getReturnCode() == -1) {
-// openNotificationPopup("Entry could not be deleted:" +
-// responce.getResultSet());
-//		Row r = responce.getResultSet().getRows().get(0);
-//		MessageDialog.openError(shell, "Error while deleting Entry",
-//				r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
-//		} else {
-//			openNotificationPopup("Sucessfully deleted the entry");
-//			Map<MPerspective, String> map = new HashMap<>();
-//			map.put(perspective, Constants.DELETE_REQUEST);
-//			clearFields(map);
-//		}
-//	}
+	/**
+	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
+	 *
+	 * @param responce
+	 */
+	public void deleteEntry(SqlProcedureResult responce) {
+		if (responce.getReturnCode() == -1) {
+			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
+			Row r = responce.getResultSet().getRows().get(0);
+			MessageDialog.openError(shell, "Error while deleting Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+		} else {
+			openNotificationPopup("Sucessfully deleted the entry");
+			Map<MPerspective, String> map = new HashMap<>();
+			map.put(perspective, Constants.DELETE_REQUEST);
+			clearFields(map);
+		}
+	}
 
 	/**
 	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner Anfrage informiert
@@ -487,8 +346,12 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		for (MField f : detail.getFields()) {
-			f.setValue(null, false);
 			setKeys(null);
+			f.setValue(null, false);
+			if (f instanceof MLookupField) {
+				((MLookupField) f).setOptions(null);
+			}
+
 		}
 	}
 

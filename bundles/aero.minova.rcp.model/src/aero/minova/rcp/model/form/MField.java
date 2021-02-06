@@ -263,4 +263,9 @@ public abstract class MField {
 	void setDetail(MDetail detail) {
 		this.detail = detail;
 	}
+
+	@Override
+	public String toString() {
+		return "MField(" + getName() + ")";
+	}
 }

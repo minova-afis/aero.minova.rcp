@@ -62,6 +62,11 @@ public class DataService implements IDataService {
 	// Ticket-Anfragen zu versenden
 	// private String server = "https://mintest.minova.com:8084";
 
+	/**
+	 * Anzahl der Aufrufe des Servers
+	 */
+	private int callCount = 0;
+
 	@Override
 	public void setCredentials(String username, String password, String server) {
 		this.username = username;
@@ -94,13 +99,13 @@ public class DataService implements IDataService {
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
 		init();
 		String body = gson.toJson(seachTable);
-		logBody(body);
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<Table> future
+		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			System.out.println(t);
 			return gson.fromJson(t.body(), Table.class);
@@ -112,12 +117,12 @@ public class DataService implements IDataService {
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
-		logBody(body);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<SqlProcedureResult> future
+		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
@@ -153,12 +158,12 @@ public class DataService implements IDataService {
 	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
 		init();
 		String body = gson.toJson(detailTable);
-		logBody(body);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<Integer> future
+		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString())
 				.thenApply(t -> gson.fromJson(t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
 
@@ -201,6 +206,10 @@ public class DataService implements IDataService {
 
 	}
 
+	private void logBody(String body, int i) {
+		logBody("Call: " + i + "\n" + body);
+	}
+
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
@@ -239,6 +248,7 @@ public class DataService implements IDataService {
 				.build();
 
 		try {
+			logBody("getFileSynch(" + filename + ")", ++callCount);
 			String body = httpClient.send(request, BodyHandlers.ofString()).body();
 			URI uri = new URI(localPath + filename);
 			Files.writeString(Path.of(uri), body, StandardOpenOption.CREATE);
@@ -259,6 +269,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
+		logBody("getFile(" + filename + ")", ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
 
 	}

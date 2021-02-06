@@ -13,8 +13,8 @@ public class Table {
 	// spReadDriver
 	// opReadContact
 	//
-	List<Column> columns = new ArrayList();
-	List<Row> rows = new ArrayList();
+	List<Column> columns = new ArrayList<>();
+	List<Row> rows = new ArrayList<>();
 
 	public void setName(String name) {
 		this.name = name;

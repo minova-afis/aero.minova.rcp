@@ -110,7 +110,6 @@ public class SwitchPerspectiveHandler {
 				.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
-//		MUIElement element = modelService.cloneSnippet(window, E4WorkbenchCommandConstants.SNIPPET_PERSPECTIVE, window);
 		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
 
 		if (element == null) {
@@ -118,9 +117,7 @@ public class SwitchPerspectiveHandler {
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-//			perspective.setContext(context);
 			perspective.getPersistedState().put(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
-//			perspective.getContext().set(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
 			perspective.setLabel(item.getLabel());
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);

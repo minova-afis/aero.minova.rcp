@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.fields;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -34,7 +35,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.rcp.accessor.LookUpValueAccessor;
+import aero.minova.rcp.rcp.accessor.LookupValueAccessorss;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
@@ -50,7 +51,7 @@ public class LookupField {
 	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail) {
+			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail, Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
@@ -66,9 +67,9 @@ public class LookupField {
 		FormData descriptionLabelFormData = new FormData();
 
 		IEclipseContext context = perspective.getContext();
-		LookUpValueAccessor lookUpValueAccessor = new LookUpValueAccessor(field, detail, lookupControl);
-		ContextInjectionFactory.inject(lookUpValueAccessor, context);
-		field.setValueAccessor(lookUpValueAccessor);
+		LookupValueAccessorss lookupValueAccessor = new LookupValueAccessorss(field, detail, lookupControl, descriptionLabel);
+		ContextInjectionFactory.inject(lookupValueAccessor, context);
+		field.setValueAccessor(lookupValueAccessor);
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
 		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
