@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Label;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
-import aero.minova.rcp.model.LookupEntry;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -51,31 +51,29 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 * Die Methode verändert den MessageWert und setzt den Textinhalt auf "". Sie überprüft die locale Datenbase, ob der value bereits bekannt ist. Andernfalls
 	 * wird eine Abfrage an den CAS versendet
 	 */
-	protected void updateControlFromValue(Control control, Value keyLong) {
-		description.setText("");
-		((Lookup) control).setText("");
-
-		String lookupName = (field.getLookupTable() != null) ? field.getLookupTable() : field.getLookupProcedurePrefix();
-		LookupEntry lookupEntry = localDatabaseService.resolveValue(lookupName, keyLong);
-
-		if (lookupEntry != null) {
-			((Lookup) control).setText(lookupEntry.keyText);
-			description.setText((lookupEntry.description != null) ? lookupEntry.description : "");
-		} else if (keyLong != null) {
-			((Lookup) control).setMessage("...");
-			replaceKeyValues(keyLong);
-		} else {
-			((Lookup) control).setMessage("");
+	protected void updateControlFromValue(Control control, Value value) {
+		if (value == null) {
+			((Lookup) control).getDescription().setText("");
+			((Lookup) control).setText("");
+			return;
 		}
 
+		if (value instanceof LookupValue) {
+			LookupValue lv = (LookupValue) value;
+			((Lookup) control).getDescription().setText(lv.description);
+			((Lookup) control).setText(lv.keyText);
+		} else {
+			sync.asyncExec(() -> resolveKeyLong(control, value));
+		}
 	}
 
 	/**
-	 * versuchen wir mal herauszufinden, was hier passieren soll
-	 * 
+	 * @param control
+	 *            Feld, das aktualisiert werden muss
 	 * @param value
+	 *            keyLong ohne weitere Informationen. KEIN {@link LookupValue}
 	 */
-	private void replaceKeyValues(Value value) {
+	private void resolveKeyLong(Control control, Value value) {
 		Table options = ((MLookupField) field).getOptions();
 		if (options != null) {
 			for (Row r : options.getRows()) {

@@ -39,6 +39,7 @@ import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
@@ -147,7 +148,10 @@ public class Lookup extends Composite {
 			if (!useSingleClick) {
 				return;
 			}
-			text.setText(table.getSelection()[0].getText());
+//			text.setText(table.getSelection()[0].getText());
+			MField field = (MField) getData(Constants.CONTROL_FIELD);
+			LookupValue lv = popupValues.get(table.getSelectionIndex());
+			field.setValue(lv, true);
 			popup.setVisible(false);
 		});
 
@@ -155,7 +159,10 @@ public class Lookup extends Composite {
 			if (useSingleClick) {
 				return;
 			}
-			text.setText(table.getSelection()[0].getText());
+//			text.setText(table.getSelection()[0].getText());
+			MField field = (MField) getData(Constants.CONTROL_FIELD);
+			LookupValue lv = popupValues.get(table.getSelectionIndex());
+			field.setValue(lv, true);
 			popup.setVisible(false);
 		});
 		table.addListener(SWT.KeyDown, event -> {
@@ -904,18 +911,22 @@ public class Lookup extends Composite {
 	}
 
 	protected void requestAllLookupEntries() {
+		setMessage("...");
+
 		CompletableFuture<?> tableFuture;
-		MField field = (MField) getData(Constants.CONTROL_FIELD);
+		MLookupField field = (MLookupField) getData(Constants.CONTROL_FIELD);
 		MDetail detail = field.getDetail();
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
+//		tableFuture = dataService.listLookupAsync("%", field, false);
+//		tableFuture.thenAccept(v -> contentProvider.setValues(v));
+
 		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class, ILocalDatabaseService.class);
 
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
-		setMessage("...");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			aero.minova.rcp.model.Table t = null;
 			if (ta instanceof SqlProcedureResult) {

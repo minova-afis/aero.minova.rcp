@@ -2,12 +2,15 @@ package aero.minova.rcp.dataservice;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.e4.ui.di.UISynchronize;
 
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.form.MLookupField;
 
 public interface IDataService {
 
@@ -18,6 +21,10 @@ public interface IDataService {
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
 
 	CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable);
+
+	CompletableFuture<List<LookupValue>> resolveLookupAsync(Integer keyLong, String keyText, MLookupField field, boolean useCache);
+
+	CompletableFuture<List<LookupValue>> listLookupAsync(String filterText, MLookupField field, boolean useCache);
 
 	CompletableFuture<String> getFile(String path);
 

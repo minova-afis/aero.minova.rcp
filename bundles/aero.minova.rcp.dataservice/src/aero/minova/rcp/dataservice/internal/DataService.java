@@ -19,6 +19,7 @@ import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +39,7 @@ import com.google.gson.GsonBuilder;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -45,6 +47,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.form.MLookupField;
 
 @Component
 public class DataService implements IDataService {
@@ -328,5 +331,17 @@ public class DataService implements IDataService {
 			throw new RuntimeException(e);
 		}
 		return p;
+	}
+
+	@Override
+	public CompletableFuture<List<LookupValue>> resolveLookupAsync(Integer keyLong, String keyText, MLookupField field, boolean useCache) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<List<LookupValue>> listLookupAsync(String filterText, MLookupField field, boolean useCache) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
