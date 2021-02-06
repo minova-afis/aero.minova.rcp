@@ -60,7 +60,7 @@ public class Lookup extends Composite {
 	 * Das Label, das das Feld beschreibt
 	 */
 	private Label label;
-	private List<LookupValue> values;
+	private List<LookupValue> popupValues;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value
@@ -208,23 +208,23 @@ public class Lookup extends Composite {
 	}
 
 	public void showAllElements(String value) {
-		values = contentProvider.getContent(value);
-		if (values == null || values.isEmpty()) {
+		popupValues = contentProvider.getContent(value);
+		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
 			firstValue = null;
 			return;
 		}
-		firstValue = values.get(0);
-		if (values.size() > numberOfLines) {
-			values = values.subList(0, numberOfLines);
+		firstValue = popupValues.get(0);
+		if (popupValues.size() > numberOfLines) {
+			popupValues = popupValues.subList(0, numberOfLines);
 		}
 
 		table.removeAll();
-		final int numberOfRows = Math.min(values.size(), numberOfLines);
+		final int numberOfRows = Math.min(popupValues.size(), numberOfLines);
 		for (int i = 0; i < numberOfRows; i++) {
 			final TableItem tableItem = new TableItem(table, SWT.NONE);
-			tableItem.setText(0, values.get(i).keyText);
-			tableItem.setText(1, values.get(i).description);
+			tableItem.setText(0, popupValues.get(i).keyText);
+			tableItem.setText(1, popupValues.get(i).description);
 		}
 		table.getColumn(0).pack();
 		table.getColumn(0).setWidth(table.getColumn(0).getWidth() + 5);
@@ -865,7 +865,7 @@ public class Lookup extends Composite {
 	public void fillSelectedValue() {
 		MField field = (MField) getData(Constants.CONTROL_FIELD);
 		if (popup.isVisible() && table.getSelectionIndex() != -1) {
-			LookupValue lv = values.get(table.getSelectionIndex());
+			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			text.setText(lv.keyText);
 			field.setValue(lv, true);
 		} else if (popup.isVisible() && firstValue != null) {
