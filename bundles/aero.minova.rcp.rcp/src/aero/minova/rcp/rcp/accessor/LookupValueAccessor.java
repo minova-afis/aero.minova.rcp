@@ -24,7 +24,7 @@ import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
-public class LookupValueAccessorss extends AbstractValueAccessor {
+public class LookupValueAccessor extends AbstractValueAccessor {
 
 	@Inject
 	IDataService dataService;
@@ -39,7 +39,7 @@ public class LookupValueAccessorss extends AbstractValueAccessor {
 
 	private Label description;
 
-	public LookupValueAccessorss(MField field, MDetail detail, Lookup control, Label description) {
+	public LookupValueAccessor(MField field, MDetail detail, Lookup control, Label description) {
 		super(field, control);
 		this.description = description;
 		this.detail = detail;

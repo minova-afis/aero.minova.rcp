@@ -35,7 +35,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.rcp.accessor.LookupValueAccessorss;
+import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
@@ -67,7 +67,7 @@ public class LookupField {
 		FormData descriptionLabelFormData = new FormData();
 
 		IEclipseContext context = perspective.getContext();
-		LookupValueAccessorss lookupValueAccessor = new LookupValueAccessorss(field, detail, lookupControl, descriptionLabel);
+		LookupValueAccessor lookupValueAccessor = new LookupValueAccessor(field, detail, lookupControl, descriptionLabel);
 		ContextInjectionFactory.inject(lookupValueAccessor, context);
 		field.setValueAccessor(lookupValueAccessor);
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
