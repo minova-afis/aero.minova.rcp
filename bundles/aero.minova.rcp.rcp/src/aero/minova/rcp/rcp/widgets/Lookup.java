@@ -197,6 +197,10 @@ public class Lookup extends Composite {
 						popup.setVisible(false);
 						break;
 					}
+				} else {
+					if (event.keyCode == SWT.ARROW_DOWN) {
+						requestAllLookupEntries();
+					}
 				}
 			}
 		};

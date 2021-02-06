@@ -120,18 +120,6 @@ public class LookupField {
 					// verwenden kann.
 					e.detail = SWT.TRAVERSE_TAB_NEXT;
 					break;
-
-				case SWT.TRAVERSE_ARROW_NEXT:
-					Lookup l = (Lookup) ((Text) e.widget).getParent();
-					if (!l.getContentProvider().isEmpty()) {
-						if (!l.popupIsOpen()) {
-							l.showAllElements("%");
-						}
-					} else {
-						e.doit = false;
-						requestLookUpEntriesAll(field, detail, lookupControl);
-					}
-					break;
 				}
 			}
 		});
