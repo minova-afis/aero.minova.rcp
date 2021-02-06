@@ -27,6 +27,7 @@ public class MDetail {
 	public void putField(MField field) {
 		if (field == null) return;
 		fields.put(field.getName(), field);
+		field.setDetail(this);
 	}
 
 	/**

@@ -35,6 +35,7 @@ public abstract class MField {
 	private String lookupProcedurePrefix;
 	private List<String> lookupParameters;
 	private final DataType dataType;
+	private MDetail detail;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -253,5 +254,13 @@ public abstract class MField {
 
 	public void setValueAccessor(ValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
+	}
+
+	public MDetail getDetail() {
+		return detail;
+	}
+
+	void setDetail(MDetail detail) {
+		this.detail = detail;
 	}
 }
