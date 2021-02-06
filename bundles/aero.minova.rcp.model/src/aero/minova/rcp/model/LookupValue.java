@@ -10,5 +10,10 @@ public class LookupValue {
 		this.keyText = keyText == null ? "" : keyText;
 		this.description = description == null ? "" : description;
 	}
+
+	public int compareTo(LookupValue lv2) {
+		if (keyText.compareTo(lv2.keyText) == 0) return description.compareTo(lv2.description);
+		return keyText.compareTo(lv2.keyText);
+	}
 }
 

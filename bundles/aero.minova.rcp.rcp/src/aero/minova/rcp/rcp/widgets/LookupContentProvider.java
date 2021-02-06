@@ -49,7 +49,7 @@ public class LookupContentProvider {
 			String keyText = r.getValue(1) == null ? "" : r.getValue(1).getStringValue();
 			String description = r.getValue(2) == null ? "" : r.getValue(2).getStringValue();
 			return new LookupValue(keyLong, keyText, description);
-		}).collect(Collectors.toList()));
+		}).sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
 	}
 
 	public boolean isEmpty() {
