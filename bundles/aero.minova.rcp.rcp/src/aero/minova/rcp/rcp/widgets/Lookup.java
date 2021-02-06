@@ -60,6 +60,7 @@ public class Lookup extends Composite {
 	 * Das Label, das das Feld beschreibt
 	 */
 	private Label label;
+	private List<LookupValue> values;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value
@@ -207,7 +208,7 @@ public class Lookup extends Composite {
 	}
 
 	public void showAllElements(String value) {
-		List<LookupValue> values = contentProvider.getContent(value);
+		values = contentProvider.getContent(value);
 		if (values == null || values.isEmpty()) {
 			popup.setVisible(false);
 			firstValue = null;
@@ -862,10 +863,14 @@ public class Lookup extends Composite {
 	}
 
 	public void fillSelectedValue() {
+		MField field = (MField) getData(Constants.CONTROL_FIELD);
 		if (popup.isVisible() && table.getSelectionIndex() != -1) {
-			text.setText(table.getSelection()[0].getText());
+			LookupValue lv = values.get(table.getSelectionIndex());
+			text.setText(lv.keyText);
+			field.setValue(lv, true);
 		} else if (popup.isVisible() && firstValue != null) {
 			text.setText(firstValue.keyText);
+			field.setValue(firstValue, true);
 		}
 	}
 

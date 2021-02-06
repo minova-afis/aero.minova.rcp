@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ILocalDatabaseService;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -46,18 +47,27 @@ public class LookUpValueAccessor extends AbstractValueAccessor {
 	 * wird eine Abfrage an den CAS versendet
 	 */
 	protected void updateControlFromValue(Control control, Value value) {
-		if (value != null) {
-			sync.asyncExec(() -> {
-				replaceKeyValues(control, value);
-			});
-		} else {
+		if (value == null) {
 			((Lookup) control).getDescription().setText("");
 			((Lookup) control).setText("");
 		}
 
+		if (value instanceof LookupValue) {
+			LookupValue lv = (LookupValue) value;
+			((Lookup) control).getDescription().setText(lv.description);
+			((Lookup) control).setText(lv.keyText);
+		} else {
+			sync.asyncExec(() -> resolveKeyLong(control, value));
+		}
 	}
 
-	private void replaceKeyValues(Control control, Value value) {
+	/**
+	 * @param control
+	 *            Feld, das aktualisiert werden muss
+	 * @param value
+	 *            keyLong ohne weitere Informationen. KEIN {@link LookupValue}
+	 */
+	private void resolveKeyLong(Control control, Value value) {
 		if (value != null) {
 			((Lookup) control).setMessage("...");
 			((Lookup) control).getDescription().setText("");
