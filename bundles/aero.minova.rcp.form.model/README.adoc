@@ -1,0 +1,50 @@
+== XMLForm.xsd
+
+In diesem Schema wird die Maske beschrieben.
+Diese Dokumentation wird Stück für Stück ergänzt.
+Dadurch kann das Wissen immer wieder nachgetragen werden.
+
+=== <form>
+
+Jede Maske wird durch ein Tag `<form>` beschrieben.
+Neben den unten beschriebenen Attributen kann es noch folgende Elemente besitzen.
+
+* link:#index-view[<index-view>]
+* link:#detail[<detail>]
+* link:#events[<events>]
+
+==== icon
+
+==== title
+
+==== helper-class
+
+=== <index-view>
+
+=== <detail>
+
+=== <events> 
+
+=== <column>
+
+=== <field>
+
+Im `<Head>` und in der `<Page>` werden die einzelnen Felder definiert.
+Als Element ist genau ein Kind möglich, dass den Datentyp beschreibt.
+
+* link:#lookup[<lookup>]
+
+
+=== Datentypen
+
+==== <lookup>
+
+Eine Lookup-Spalte speichert als Wert immer einen Integer.
+Dies ist der `KeyLong` der referenzierten Tabelle.
+Angezeigt wird jedoch in der Regel der `KeyText` der referenzierten Tabelle - dies ist ja auch der Benutzerschlüssel.
+
+Zusätzlich kann noch rechts neben dem Feld die Beschreibung angezeigt werden.
+Dies ist ist der Regel der Wert aus der Spalte `Description` in der referenzierten Tabelle.
+Wenn eine View verwendet wird, oder eine gespeicherte Prozedur, dann kann es auch einen anderen Wert - z.B. eine Berechnung - anzeigen.
+
+
