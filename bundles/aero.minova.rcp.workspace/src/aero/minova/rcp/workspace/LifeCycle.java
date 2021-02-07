@@ -1,9 +1,11 @@
 package aero.minova.rcp.workspace;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -32,22 +34,25 @@ public class LifeCycle {
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
 		WorkspaceDialog workspaceDialog;
 		int returnCode;
+
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
 		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-
 			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 			try {
+				if (!Platform.getInstanceLocation().isSet()) {
+					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+				}
 				dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null),
 						sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
 						sPrefs.get(WorkspaceAccessPreferences.URL, null));
 			} catch (StorageException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		} else {
 			if ((returnCode = workspaceDialog.open()) != 0) {
-				logger.info("RecurtnCode: " + returnCode);
+				logger.info("ReturnCode: " + returnCode);
 				System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
 											// ausgesucht
 			}

@@ -16,7 +16,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.rcp.widgets.LookupControl;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 public class LookupFieldFocusListener implements FocusListener {
 
@@ -35,7 +35,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	/**
 	 * Wenn der Keylong nicht gesetzt wurde, so wird das Feld bereinigt
 	 */
-	private void clearColumn(LookupControl lc) {
+	private void clearColumn(Lookup lc) {
 		if (lc.getData(Constants.CONTROL_KEYLONG) == null) {
 			lc.setText("");
 		} else {
@@ -58,7 +58,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	 * 
 	 * @param lc
 	 */
-	private void getTicketFromCAS(LookupControl lc) {
+	private void getTicketFromCAS(Lookup lc) {
 		Table ticketTable = new Table();
 		String ticketNumber = lc.getText().replace("#", "");
 		ticketTable.setName("Ticket");
@@ -88,7 +88,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	@Override
 	public void focusLost(FocusEvent e) {
 		Text t = (Text) e.getSource();
-		LookupControl lc = (LookupControl) t.getParent();
+		Lookup lc = (Lookup) t.getParent();
 		if (lc.getText().startsWith("#")) {
 			getTicketFromCAS(lc);
 		} else {

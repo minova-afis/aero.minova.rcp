@@ -22,7 +22,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
-import aero.minova.rcp.rcp.widgets.LookupControl;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 public class LookupValueAccessor extends AbstractValueAccessor {
 
@@ -39,7 +39,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 	private Label description;
 
-	public LookupValueAccessor(MField field, MDetail detail, LookupControl control, Label description) {
+	public LookupValueAccessor(MField field, MDetail detail, Lookup control, Label description) {
 		super(field, control);
 		this.description = description;
 		this.detail = detail;
@@ -53,19 +53,19 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	protected void updateControlFromValue(Control control, Value keyLong) {
 		description.setText("");
-		((LookupControl) control).setText("");
+		((Lookup) control).setText("");
 
 		String lookupName = (field.getLookupTable() != null) ? field.getLookupTable() : field.getLookupProcedurePrefix();
 		LookupEntry lookupEntry = localDatabaseService.resolveValue(lookupName, keyLong);
 
 		if (lookupEntry != null) {
-			((LookupControl) control).setText(lookupEntry.keyText);
+			((Lookup) control).setText(lookupEntry.keyText);
 			description.setText((lookupEntry.description != null) ? lookupEntry.description : "");
 		} else if (keyLong != null) {
-			((LookupControl) control).setMessage("...");
+			((Lookup) control).setMessage("...");
 			replaceKeyValues(keyLong);
 		} else {
-			((LookupControl) control).setMessage("");
+			((Lookup) control).setMessage("");
 		}
 
 	}
@@ -80,8 +80,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		if (options != null) {
 			for (Row r : options.getRows()) {
 				if (r.getValue(options.getColumnIndex(Constants.TABLE_KEYLONG)).equals(value)) {
-					((LookupControl) control).setMessage("...");
-					((LookupControl) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+					((Lookup) control).setMessage("...");
+					((Lookup) control).setText(r.getValue(options.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 					if (r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 						description.setText(r.getValue(options.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
 					}
@@ -89,7 +89,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			}
 		}
 
-		if (((LookupControl) control).getMessage().equals("...")) {
+		if (((Lookup) control).getMessage().equals("...")) {
 			Map<?, ?> databaseMap = null;
 			if (field.getLookupTable() != null) {
 				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
@@ -99,13 +99,13 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			if (databaseMap == null) {
 				getLookupConsumer(control, value);
 			} else {
-				((LookupControl) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
+				((Lookup) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
 				if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
 					description.setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
 				} else {
 					description.setText("");
 				}
-				((LookupControl) control).setMessage("");
+				((Lookup) control).setMessage("");
 			}
 //			changeOptions(); // das benötigen wir hier nicht, weil wir nur aufgerufen werden, wenn ein Wert durch das System gesetzt wird.
 //			// Ändern der Optionen der drunterliegenden Felder
@@ -165,8 +165,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		Row r = table.getRows().get(0);
 		int index = table.getColumnIndex(Constants.TABLE_KEYTEXT);
 		Value v = r.getValue(index);
-		((LookupControl) control).setText((String) ValueBuilder.value(v).create());
-		((LookupControl) control).setMessage("");
+		((Lookup) control).setText((String) ValueBuilder.value(v).create());
+		((Lookup) control).setMessage("");
 		if (description != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
 			if (v1 == null) description.setText("");
@@ -184,8 +184,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
 		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
-			((LookupControl) control).setMessage("");
-			String displayText = ((LookupControl) control).getText();
+			((Lookup) control).setMessage("");
+			String displayText = ((Lookup) control).getText();
 			if (displayText != null && !displayText.equals("")) {
 				Table optionTable = ((MLookupField) field).getOptions();
 				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
@@ -196,7 +196,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 						Value rowValue = r.getValue(indexKeyLong);
 						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
 						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-							((LookupControl) control).setText(r.getValue(indexKeyText).getStringValue());
+							((Lookup) control).setText(r.getValue(indexKeyText).getStringValue());
 							return;
 						}
 						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
@@ -216,7 +216,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		System.out.println("LookupValueAccessor[" + field.getName() + "].changeOptions()");
 
 		CompletableFuture<?> tableFuture;
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((LookupControl) control).getText(), field, detail, dataService, "List");
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((Lookup) control).getText(), field, detail, dataService, "List");
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
