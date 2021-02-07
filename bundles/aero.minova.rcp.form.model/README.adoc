@@ -81,20 +81,20 @@ Die Ausgabe ist neben dem Parameter `@Count` ein Resultset mit den folgenden Spa
 `KeyLong`::
 Diese Spalte enthält den internen Schlüssel des referenzierten Wertes.
 Als Datentyp wird Integer angenommen.
-Der Spaltenname könnte zwar durch das Attribut link:key-long-name[key-long-name] einen anderen Namen haben.
+Der Spaltenname könnte zwar durch das Attribut link:#key-long-name[key-long-name] einen anderen Namen haben.
 Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 `KeyText`::
 Diese Spalte enthält den Benutzerschlüssel des referenzierten Wertes.
 Als Datentyp wird String angenommen.
-Der Spaltenname könnte zwar durch das Attribut link:key-text-name[key-text-name] einen anderen Namen haben.
+Der Spaltenname könnte zwar durch das Attribut link:#key-text-name[key-text-name] einen anderen Namen haben.
 Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 `Description`::
 Diese Spalte enthält eine Beschreibung des referenzierten Wertes.
 Als Datentyp wird String angenommen.
 In der Regel ist dies der Wert der Spalte `Description` in der referenzierten Tabelle.
-Der Spaltenname könnte zwar durch das Attribut link:description-name[description-name] einen anderen Namen haben.
+Der Spaltenname könnte zwar durch das Attribut link:#description-name[description-name] einen anderen Namen haben.
 Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 `LastAction`::
@@ -133,20 +133,20 @@ Die Ausgabe ist ein Resultset mit den folgenden Spalten.
 `KeyLong`::
 Diese Spalte enthält den internen Schlüssel des referenzierten Wertes.
 Als Datentyp wird Integer angenommen.
-Der Spaltenname könnte zwar durch das Attribut link:key-long-name[key-long-name] einen anderen Namen haben.
+Der Spaltenname könnte zwar durch das Attribut link:#key-long-name[key-long-name] einen anderen Namen haben.
 Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 `KeyText`::
 Diese Spalte enthält den Benutzerschlüssel des referenzierten Wertes.
 Als Datentyp wird String angenommen.
-Der Spaltenname könnte zwar durch das Attribut link:key-text-name[key-text-name] einen anderen Namen haben.
+Der Spaltenname könnte zwar durch das Attribut link:#key-text-name[key-text-name] einen anderen Namen haben.
 Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 `Description`::
 Diese Spalte enthält eine Beschreibung des referenzierten Wertes.
 Als Datentyp wird String angenommen.
 In der Regel ist dies der Wert der Spalte `Description` in der referenzierten Tabelle.
-Der Spaltenname könnte zwar durch das Attribut link:description-name[description-name] einen anderen Namen haben.
+Der Spaltenname könnte zwar durch das Attribut link:#description-name[description-name] einen anderen Namen haben.
 Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 ===== table
