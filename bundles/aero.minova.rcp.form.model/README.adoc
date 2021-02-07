@@ -61,22 +61,93 @@ Diese Prozedur liefert die möglichen Werte.
 Als Aufrufparameter werden folgende Parameter übergeben.
 
 [horizontal]
-Count int output:: 
+@Count int output:: 
 Dieser Wert wird von der Prozedur zurückgegeben.
 Er enthält die Anzehl der gefundenen Werte.
 
-FilterLastAction bit:: 
+@FilterLastAction bit:: 
 Mit diesem Wert kann unter Umständen (wenn es die Prozedur berücksichtigt) das Löschkennzeichen berücksichtigt werden.
 Wird eine 1 (`true`) übergeben, sollen die gelöschten Werte (`LastAction < 0`) nicht zurückgegeben werden.
 Wird eine 0 (`false`) übergeben, sollen alle Werte zurückgegeben werden.
 
-`param`::
+param[1]->field-name::
 Jetzt werden in der definierten Reihenfolge die Werte der Parameter übergeben.
 Dabei muss auch der Wert `null` möglich sein.
 Der Datentyp orientiert sich an dem Datentyp der entsprechenden Spalte. 
 
+Die Ausgabe ist neben dem Parameter `@Count` ein Resultset mit den folgenden Spalten.
+
+[horizontal]
+`KeyLong`::
+Diese Spalte enthält den internen Schlüssel des referenzierten Wertes.
+Als Datentyp wird Integer angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:key-long-name[key-long-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`KeyText`::
+Diese Spalte enthält den Benutzerschlüssel des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:key-text-name[key-text-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`Description`::
+Diese Spalte enthält eine Beschreibung des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+In der Regel ist dies der Wert der Spalte `Description` in der referenzierten Tabelle.
+Der Spaltenname könnte zwar durch das Attribut link:description-name[description-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`LastAction`::
+Diese Spalte soll die LastAction enthalten.
+Als Datentyp wird Integer angenommen.
+Zeilen mit einem Wert < 0 gelten als gelöschte Spalten und werden nicht angezeigt.
+Allerdings sollten keine gelöschten Spalten zurückgeliefert werden.
+Es kann ja auch mit dem Parameter link:#filter-last-action[filter-last-action] gearbeitet werden.
+
 ====== Resolve
 
+Diese Prozedur liefert die Werte für eine Schlüssel.
+In der Regel wird der interne Schlüssel (`KeyLong`) für die Suche übergeben.
+Es kann aber auch der Benutzerschlüssel (`KeyText`) für die Suche übergeben werden.
+Eine Wildcard-Suche ist nicht vorgesehen. 
+Aus diesem Grund sollte das Ergebnis auch immer maximal eine Zeile liefern. 
+Als Aufrufparameter werden folgende Parameter übergeben.
+
+[horizontal]
+@KeyLong int::
+Der interne Schlüssel, dessen Werte aufgelöst werden sollen.
+Wenn dieser Wert nicht übergeben wird (`null`), dann sollte der Benutzerschlüssel (`KeyText`) übergeben werden.
+
+@KeyText string::
+Der Benutzerschlüssel, dessen Werte aufgelöst werden sollen.
+Wenn dieser Wert nicht übergeben wird (`null`), dann sollte der interne Schlüssel (`KeyLong`) übergeben werden.
+
+@FilterLastAction bit:: 
+Mit diesem Wert kann unter Umständen (wenn es die Prozedur berücksichtigt) das Löschkennzeichen berücksichtigt werden.
+Wird eine 1 (`true`) übergeben, sollen die gelöschten Werte (`LastAction < 0`) nicht zurückgegeben werden.
+Wird eine 0 (`false`) übergeben, sollen alle Werte zurückgegeben werden.
+
+Die Ausgabe ist ein Resultset mit den folgenden Spalten.
+
+[horizontal]
+`KeyLong`::
+Diese Spalte enthält den internen Schlüssel des referenzierten Wertes.
+Als Datentyp wird Integer angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:key-long-name[key-long-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`KeyText`::
+Diese Spalte enthält den Benutzerschlüssel des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:key-text-name[key-text-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`Description`::
+Diese Spalte enthält eine Beschreibung des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+In der Regel ist dies der Wert der Spalte `Description` in der referenzierten Tabelle.
+Der Spaltenname könnte zwar durch das Attribut link:description-name[description-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
 
 ===== table
 
