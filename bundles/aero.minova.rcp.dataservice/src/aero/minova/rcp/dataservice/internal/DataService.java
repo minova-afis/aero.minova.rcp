@@ -75,6 +75,7 @@ public class DataService implements IDataService {
 		this.username = username;
 		this.password = password;
 		this.server = server;
+		init();
 	}
 
 	private void init() {
@@ -90,7 +91,6 @@ public class DataService implements IDataService {
 				.sslContext(disabledSslVerificationContext())//
 				.authenticator(authentication).build();
 
-		gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
@@ -100,7 +100,6 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
-		init();
 		String body = gson.toJson(seachTable);
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
@@ -118,7 +117,6 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
-		init();
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
@@ -245,7 +243,6 @@ public class DataService implements IDataService {
 	 */
 	@Override
 	public File getFileSynch(String localPath, String filename) {
-		init();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
@@ -268,7 +265,6 @@ public class DataService implements IDataService {
 	 */
 	@Override
 	public CompletableFuture<String> getFile(String filename) {
-		init();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
