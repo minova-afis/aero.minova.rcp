@@ -1,25 +1,26 @@
 package aero.minova.rcp.xml.tests;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import aero.minova.workingtime.helper.WorkingTimeHelper;
 
-public class CalculateDateTest {
+class CalculateDateTest {
 
 	private WorkingTimeHelper w;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		w = new WorkingTimeHelper();
 	}
 	@Test
-	public void testCalculateDuration2Hours() {
+	void testCalculateDuration2Hours() {
 		Instant now = Instant.now();
 		Instant nowPlus2Hours = now.plusSeconds(7200);
 		long min = ChronoUnit.MINUTES.between(now, nowPlus2Hours);
@@ -28,7 +29,7 @@ public class CalculateDateTest {
 	}
 
 	@Test
-	public void testCalculateDuration1_15Hours() {
+	void testCalculateDuration1_15Hours() {
 		Instant now = Instant.now();
 		Instant nowPlus2Hours = now.plusSeconds(4500);
 		long min = ChronoUnit.MINUTES.between(now, nowPlus2Hours);
@@ -38,7 +39,7 @@ public class CalculateDateTest {
 	}
 
 	@Test
-	public void testCalculateDuration1_14Hours() {
+	void testCalculateDuration1_14Hours() {
 		Instant now = Instant.now();
 		Instant nowPlus2Hours = now.plusSeconds(4440);
 		long min = ChronoUnit.MINUTES.between(now, nowPlus2Hours);
@@ -48,7 +49,7 @@ public class CalculateDateTest {
 	}
 
 	@Test
-	public void testCalculateDuration1_44Hours() {
+	void testCalculateDuration1_44Hours() {
 		Instant now = Instant.now();
 		Instant nowPlus2Hours = now.plusSeconds(6240);
 		long min = ChronoUnit.MINUTES.between(now, nowPlus2Hours);
@@ -58,7 +59,7 @@ public class CalculateDateTest {
 	}
 
 	@Test
-	public void testCalculateDuration1_45Hours() {
+	void testCalculateDuration1_45Hours() {
 		Instant now = Instant.now();
 		Instant nowPlus2Hours = now.plusSeconds(6300);
 		long min = ChronoUnit.MINUTES.between(now, nowPlus2Hours);
