@@ -171,6 +171,8 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 		IHelper iHelper = helperlist.get(0);
 		iHelper.setControls(detail);
+		detail.setHelper(iHelper);
+
 	}
 
 	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
