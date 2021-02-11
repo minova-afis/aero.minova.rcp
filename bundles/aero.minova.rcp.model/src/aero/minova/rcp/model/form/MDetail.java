@@ -3,14 +3,18 @@ package aero.minova.rcp.model.form;
 import java.util.Collection;
 import java.util.HashMap;
 
+import aero.minova.rcp.model.helper.IHelper;
+
 /**
  * Das Modell für den Detailbereich
- * 
+ *
  * @author saak
  */
 public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
+
+	private IHelper helper;
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -18,7 +22,7 @@ public class MDetail {
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
 	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param name
 	 *            Name / ID des Feldes
 	 * @param field
@@ -36,7 +40,7 @@ public class MDetail {
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
 	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param name
 	 *            Name des Feldes
 	 * @return Das Feld
@@ -47,5 +51,13 @@ public class MDetail {
 
 	public Collection<MField> getFields() {
 		return fields.values();
+	}
+
+	public IHelper getHelper() {
+		return helper;
+	}
+
+	public void setHelper(IHelper helper) {
+		this.helper = helper;
 	}
 }
