@@ -13,6 +13,7 @@ import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 
@@ -64,13 +65,8 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			employeeValue = new Value(user);
 		}
 		employee.setValue(employeeValue, false);
-
-		if (endDateValue != null) {
-			startDate.setValue(endDateValue, false);
-		}
-		if (bookingDateValue != null) {
-			bookingDate.setValue(bookingDateValue, false);
-		}
+		bookingDateValue = new Value(Instant.now());
+		bookingDate.setValue(bookingDateValue, false);
 	}
 
 	protected void calculateTime() {
@@ -125,4 +121,36 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		calculateTime();
 	}
 
+	@Override
+	public void handleDetailAction(ActionCode code) {
+		switch (code) {
+		case DEL:
+			employeeValue = new Value(user);
+			employee.setValue(employeeValue, false);
+			bookingDateValue = new Value(Instant.now());
+			bookingDate.setValue(bookingDateValue, false);
+			endDateValue = null;
+			break;
+		case SAVE:
+			employee.setValue(employeeValue, false);
+			if (endDateValue != null) {
+				startDate.setValue(endDateValue, false);
+			}
+			if (bookingDateValue != null) {
+				bookingDate.setValue(bookingDateValue, false);
+			}
+		case NEW:
+			employee.setValue(employeeValue, false);
+			if (bookingDateValue == null) {
+				bookingDateValue = new Value(Instant.now());
+			}
+			bookingDate.setValue(bookingDateValue, false);
+			if (endDateValue != null) {
+				startDate.setValue(endDateValue, false);
+			}
+		default:
+			break;
+		}
+
+	}
 }

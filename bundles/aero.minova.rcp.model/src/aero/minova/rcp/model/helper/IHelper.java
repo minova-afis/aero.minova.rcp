@@ -6,4 +6,6 @@ public interface IHelper {
 
 	void setControls(MDetail detail);
 
+	void handleDetailAction(ActionCode code);
+
 }
