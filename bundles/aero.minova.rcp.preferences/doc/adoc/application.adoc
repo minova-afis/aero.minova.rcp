@@ -1,7 +1,8 @@
+:imagesdir: **/images
+
 = Anwendungs Preferences
 
 Dokumentation der standard Preferences für die Anwendung, die nicht spezifisch zu einer der Anwendungen(SIS, DISPO, TTA, AFIS) gehören. Die Werte der Preferences werden im Instance Scope des Workspaces gespeichert. 
-
 
 ==== Anwendungs Tab
 
@@ -13,12 +14,9 @@ Dokumentation der standard Preferences für die Anwendung, die nicht spezifisch 
 
 ====== Standard Workspace
 
-	Zeigt das eingestellte Standard Workspace an und ermöglicht dieses Zurückzusetzen		
+	Zeigt das eingestellte Standard Workspace an und ermöglicht dieses zurückzusetzen
 	
-	Das Workspace "test" wurde als Standard Workspace gesetzt:
-	
-	image::default_workspace_set.png
-	
+image::default_workspace_set.png[Das Workspace "test" ist als standard Workspace gesetzt.]
 
 [%hardbreaks]
 
