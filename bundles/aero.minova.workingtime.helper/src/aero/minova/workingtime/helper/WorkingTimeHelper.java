@@ -23,10 +23,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	private MField renderedQuantity;
 	private MField chargedQuantity;
 
-	public WorkingTimeHelper() {
-		System.out.println("Ich bin da: WorkingTimeHelper");
-	}
-
 	@Override
 	public void setControls(MDetail detail) {
 		this.detail = detail;
