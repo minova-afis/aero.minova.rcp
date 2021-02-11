@@ -87,7 +87,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			}
 		}
 
-		if (((Lookup) control).getMessage().equals("...")) {
+		if (((Lookup) control).getMessage().isBlank() || ((Lookup) control).getMessage().contains("...")) {
 			Map<?, ?> databaseMap = null;
 			if (field.getLookupTable() != null) {
 				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
@@ -167,8 +167,11 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		((Lookup) control).setMessage("");
 		if (description != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
-			if (v1 == null) description.setText("");
-			else description.setText((String) ValueBuilder.value(v1).create());
+			if (v1 == null) {
+				description.setText("");
+			} else {
+				description.setText((String) ValueBuilder.value(v1).create());
+			}
 		}
 	}
 
@@ -178,7 +181,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
 	 */
 	public void setFocussed(boolean focussed) {
-		if (focussed) return; // wenn wir den Focus erhalten, machen wir nichts
+		if (focussed)
+		 {
+			return; // wenn wir den Focus erhalten, machen wir nichts
+		}
 
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
 		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
