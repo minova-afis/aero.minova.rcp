@@ -37,9 +37,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
-	public WorkingTimeHelper() {
-	}
-
 	@Override
 	public void setControls(MDetail detail) {
 		this.detail = detail;
