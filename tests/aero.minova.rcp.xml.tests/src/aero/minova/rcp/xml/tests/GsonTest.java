@@ -12,8 +12,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,11 +27,11 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 
-public class GsonTest {
+class GsonTest {
 
 	private Table t;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		t = new Table();
 		t.setName("OrderReceiver");
@@ -77,7 +77,7 @@ public class GsonTest {
 
 	@Test
 	public void ensureTableIsInitialized() {
-		assertTrue(t!=null);
+		assertNotNull(t);
 	}
 
 //	@Test
@@ -108,7 +108,7 @@ public class GsonTest {
 				.create();
 
 		SqlProcedureResult sql = gson.fromJson(s, SqlProcedureResult.class);
-		assertTrue(sql.getOutputParameters().getRows() != null);
+		assertNotNull(sql.getOutputParameters().getRows());
 	}
 
 	@Test
