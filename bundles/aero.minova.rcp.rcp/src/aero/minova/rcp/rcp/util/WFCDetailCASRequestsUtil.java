@@ -351,7 +351,10 @@ public class WFCDetailCASRequestsUtil {
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);
 			}
-
+		}
+		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können. 
+		if (detail.getHelper() != null) {
+			detail.getHelper().setControls(detail);
 		}
 	}
 
