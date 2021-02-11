@@ -211,8 +211,8 @@ public class WFCIndexPart extends WFCFormPart {
 	}
 
 	/**
-	 * Diese Methode ließt die Index-Apalten aus und erstellet daraus eine Tabel,
-	 * diese wir dann an den CAS als Anfrage übergeben.
+	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table,
+	 * diese wird dann an den CAS als Anfrage übergeben.
 	 */
 	@Inject
 	@Optional
