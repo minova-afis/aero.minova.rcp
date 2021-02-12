@@ -1,8 +1,9 @@
 package aero.minova.rcp.xml.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -76,12 +77,12 @@ class GsonTest {
 	}
 
 	@Test
-	public void ensureTableIsInitialized() {
+	void ensureTableIsInitialized() {
 		assertNotNull(t);
 	}
 
 //	@Test
-	public void blabla() {
+	void blabla() {
 		Instant now = Instant.parse("2020-08-04T22:00:00Z");
 		System.out.println(now);
 
@@ -112,7 +113,7 @@ class GsonTest {
 	}
 
 	@Test
-	public void tableCanBeConvertedToGsonAndBackDate() {
+	void tableCanBeConvertedToGsonAndBackDate() {
 		Gson gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
@@ -128,7 +129,7 @@ class GsonTest {
 	}
 
 	@Test
-	public void tableCanBeConvertedToGsonAndBack() {
+	void tableCanBeConvertedToGsonAndBack() {
 		Gson gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
