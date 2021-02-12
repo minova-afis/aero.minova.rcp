@@ -57,14 +57,19 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			((Lookup) control).setText("");
 			return;
 		}
-
 		if (value instanceof LookupValue) {
 			LookupValue lv = (LookupValue) value;
 			((Lookup) control).getDescription().setText(lv.description);
 			((Lookup) control).setText(lv.keyText);
+		} else if (value.getStringValue() != null) {
+			sync.asyncExec(() -> resolveKeyText(control, value));
 		} else {
 			sync.asyncExec(() -> resolveKeyLong(control, value));
 		}
+	}
+
+	private void resolveKeyText(Control control, Value value) {
+		getLookupConsumer(control, value.getStringValue());
 	}
 
 	/**
@@ -87,7 +92,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			}
 		}
 
-		if (((Lookup) control).getMessage().equals("...")) {
+		if (((Lookup) control).getMessage().isBlank() || ((Lookup) control).getMessage().contains("...")) {
 			Map<?, ?> databaseMap = null;
 			if (field.getLookupTable() != null) {
 				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
@@ -154,7 +159,46 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	}
 
 	/**
-	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit Bindung zur Componente
+	 *
+	 * @param control
+	 * @param keyText
+	 */
+	public void getLookupConsumer(Control control, String keyTextValue) {
+		// hinterlegen einer Methode in die component, um stehts die Daten des richtigen
+		// Indexes in der Detailview aufzulisten. Hierfür wird eine Anfrage an den CAS
+		// gestartet, um die Werte des zugehörigen Keys zu erhalten
+
+		CompletableFuture<?> tableFuture;
+		tableFuture = LookupCASRequestUtil.getRequestedTable(0, keyTextValue, field, detail, dataService, "Resolve");
+		// Diese Methode lauft auserhalb des Hauptthreads. Desshalb brauchen wir nochmal
+		// den MainThread, damit die UI-Componenten aktualisiert werden können
+		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+			Table t = null;
+			if (ta instanceof SqlProcedureResult) {
+				SqlProcedureResult sql = (SqlProcedureResult) ta;
+				t = sql.getResultSet();
+			} else if (ta instanceof Table) {
+				t = (Table) ta;
+			}
+			localDatabaseService.addResultsForLookupField(field.getName(), t);
+
+			updateSelectedLookupEntry(t, control);
+
+			if (t.getRows().size() > 0) {
+				Row row = t.getRows().get(0);
+				String lookupName = (field.getLookupTable() != null) ? field.getLookupTable()
+						: field.getLookupProcedurePrefix();
+				Value keyLong = row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG));
+				Value keyText = row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
+				Value description = row.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION));
+				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
+			}
+		}));
+	}
+
+	/**
+	 * Abfangen der Table der in der Consume-Methode versendeten CAS-Abfrage mit
+	 * Bindung zur Componente
 	 *
 	 * @param table
 	 * @param control
@@ -167,8 +211,11 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		((Lookup) control).setMessage("");
 		if (description != null && table.getColumnIndex(Constants.TABLE_DESCRIPTION) > -1) {
 			Value v1 = r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION));
-			if (v1 == null) description.setText("");
-			else description.setText((String) ValueBuilder.value(v1).create());
+			if (v1 == null) {
+				description.setText("");
+			} else {
+				description.setText((String) ValueBuilder.value(v1).create());
+			}
 		}
 	}
 
@@ -178,7 +225,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
 	 */
 	public void setFocussed(boolean focussed) {
-		if (focussed) return; // wenn wir den Focus erhalten, machen wir nichts
+		if (focussed)
+		 {
+			return; // wenn wir den Focus erhalten, machen wir nichts
+		}
 
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
 		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {

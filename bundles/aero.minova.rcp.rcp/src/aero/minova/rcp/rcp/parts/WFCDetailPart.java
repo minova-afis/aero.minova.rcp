@@ -166,11 +166,13 @@ public class WFCDetailPart extends WFCFormPart {
 		// Helper-Klasse initialisieren
 		String helperClass = form.getHelperClass();
 		if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
-			// TODO
+			// TODO Übersetzung!
 			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 		}
 		IHelper iHelper = helperlist.get(0);
 		iHelper.setControls(detail);
+		detail.setHelper(iHelper);
+
 	}
 
 	private void layoutHead(Composite parent, HeadOrPageWrapper head) {

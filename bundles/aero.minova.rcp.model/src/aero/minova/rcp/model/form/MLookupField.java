@@ -2,6 +2,7 @@ package aero.minova.rcp.model.form;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 
 public class MLookupField extends MField {
 
@@ -35,5 +36,12 @@ public class MLookupField extends MField {
 
 	public void setOptions(Table options) {
 		this.options = options;
+	}
+
+	@Override
+	protected void checkDataType(Value value) {
+		if (value == null || (value.getIntegerValue() == null && value.getStringValue() == null)) {
+			super.checkDataType(value);
+		}
 	}
 }

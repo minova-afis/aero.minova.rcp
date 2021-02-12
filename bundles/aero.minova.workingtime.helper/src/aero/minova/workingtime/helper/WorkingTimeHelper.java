@@ -3,14 +3,19 @@ package aero.minova.workingtime.helper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
@@ -22,6 +27,15 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	private MField endDate;
 	private MField renderedQuantity;
 	private MField chargedQuantity;
+	private MField bookingDate;
+	private MLookupField employee;
+	private String user;
+
+	private Value endDateValue;
+	private Value bookingDateValue;
+	private Value employeeValue;
+
+	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	@Override
 	public void setControls(MDetail detail) {
@@ -32,12 +46,24 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	public void initAccessor() {
 		startDate = detail.getField("StartDate");
 		endDate = detail.getField("EndDate");
+		bookingDate = detail.getField("BookingDate");
 		renderedQuantity = detail.getField("RenderedQuantity");
 		chargedQuantity = detail.getField("ChargedQuantity");
+		employee = (MLookupField) detail.getField("EmployeeKey");
 
 		// Auf diese werte reagieren wir
 		startDate.addValueChangeListener(this);
 		endDate.addValueChangeListener(this);
+
+		// Mitarbeiter Setzen
+		user = preferences.get(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, System.getProperty("user.name"));
+		if (employeeValue == null) {
+			// Hier müssen wir den Keytext auflösen!
+			employeeValue = new Value(user);
+		}
+		employee.setValue(employeeValue, false);
+		bookingDateValue = new Value(Instant.now());
+		bookingDate.setValue(bookingDateValue, false);
 	}
 
 	protected void calculateTime() {
@@ -57,6 +83,9 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		Value valueCh = new Value((double) chargedQty);
 		renderedQuantity.setValue(valueRe, true);
 		chargedQuantity.setValue(valueCh, true);
+		endDateValue = endDate.getValue();
+		bookingDateValue = bookingDate.getValue();
+		employeeValue = employee.getValue();
 	}
 
 	public float getFloatFromMinutes(long min) {
@@ -86,8 +115,39 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		if (!event.isUser()) {
 			return;
 		}
-		System.out.println(event.getField().getName());
 		calculateTime();
 	}
 
+	@Override
+	public void handleDetailAction(ActionCode code) {
+		switch (code) {
+		case DEL:
+			employeeValue = new Value(user);
+			employee.setValue(employeeValue, false);
+			bookingDateValue = new Value(Instant.now());
+			bookingDate.setValue(bookingDateValue, false);
+			endDateValue = null;
+			break;
+		case SAVE:
+			employee.setValue(employeeValue, false);
+			if (endDateValue != null) {
+				startDate.setValue(endDateValue, false);
+			}
+			if (bookingDateValue != null) {
+				bookingDate.setValue(bookingDateValue, false);
+			}
+		case NEW:
+			employee.setValue(employeeValue, false);
+			if (bookingDateValue == null) {
+				bookingDateValue = new Value(Instant.now());
+			}
+			bookingDate.setValue(bookingDateValue, false);
+			if (endDateValue != null) {
+				startDate.setValue(endDateValue, false);
+			}
+		default:
+			break;
+		}
+
+	}
 }

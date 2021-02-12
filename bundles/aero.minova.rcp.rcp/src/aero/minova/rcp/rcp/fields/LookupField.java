@@ -57,7 +57,7 @@ public class LookupField {
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
 		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT, lookUpContentProvider);
 		// TODO übersetzen
-		lookupControl.setMessage("Werte ...");
+		lookupControl.setMessage("...");
 		lookupControl.setNumberOfLines(50);
 		lookupControl.setLabel(label);
 

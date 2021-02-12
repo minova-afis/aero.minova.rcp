@@ -259,6 +259,7 @@ public class Lookup extends Composite {
 
 		popup.setLocation(x, y);
 		popup.setVisible(true);
+		table.setFocus();
 	}
 
 	/**
@@ -299,7 +300,7 @@ public class Lookup extends Composite {
 						return;
 					}
 					final Control control = Lookup.this.getDisplay().getFocusControl();
-					if (control == null || control != text && control != table) {
+					if (control == null || (control != text && control != table && control != popup)) {
 						popup.setVisible(false);
 					}
 				});
@@ -896,10 +897,14 @@ public class Lookup extends Composite {
 	}
 
 	public void setLabel(Label label) {
-		if (this.label != null && mouseListener != null) label.removeMouseListener(mouseListener);
+		if (this.label != null && mouseListener != null) {
+			label.removeMouseListener(mouseListener);
+		}
 
 		this.label = label;
-		if (label == null) return;
+		if (label == null) {
+			return;
+		}
 
 		label.addMouseListener(mouseListener = new MouseAdapter() {
 			@Override
@@ -944,9 +949,14 @@ public class Lookup extends Composite {
 	 * Diese Methode wird aufgerufen, sobald der {@link LookupContentProvider} neue Werte von der Datenbank erhalten hat.
 	 */
 	public void valuesUpdated() {
-		if (!text.isFocusControl()) return;
+		if (!text.isFocusControl()) {
+			return;
+		}
 
-		if (text.getText().length() > 0) showAllElements(text.getText());
-		else showAllElements("%");
+		if (text.getText().length() > 0) {
+			showAllElements(text.getText());
+		} else {
+			showAllElements("%");
+		}
 	}
 }
