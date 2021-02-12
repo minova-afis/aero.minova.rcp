@@ -259,6 +259,7 @@ public class Lookup extends Composite {
 
 		popup.setLocation(x, y);
 		popup.setVisible(true);
+		table.setFocus();
 	}
 
 	/**
