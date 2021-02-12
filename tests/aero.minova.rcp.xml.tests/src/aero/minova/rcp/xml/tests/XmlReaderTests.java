@@ -1,50 +1,57 @@
 package aero.minova.rcp.xml.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.dataservice.internal.DataFormService;
-import aero.minova.rcp.dataservice.internal.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.DataType;
 
-public class XmlReaderTests {
+class XmlReaderTests {
 	private DataFormService dfs;
+	private Path path;
 
-	@org.junit.Test
-	public void testName() {
-		assertTrue(true);
-	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		dfs = new DataFormService();
+		path = Path.of("resources", "work", "WorkingTime.xml");
 	}
 
 	@Test
-	public void dataServiceConvertColumnToDataType() throws Exception {
-		String userDir = System.getProperty("user.home");
+	@DisplayName("Ensure that the WorkingTime.xml file for the test is present")
+	void ensureThatLocalWorkingTimeFileIsPresent() throws IOException {
+		assertTrue(path.toFile().exists(), "WorkingTime.xml should be prent for the tests");
+	}
+
+	@Test
+	@DisplayName("Ensure DataFormService can convert WorkingTime.xml to the correct data type")
+	void dataServiceConvertColumnToDataType() throws Exception {
 
 		Form form = null;
+		String content = Files.readString(path);
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
-			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
-
-		} catch (JAXBException | SAXException | IOException e) {
+			XmlProcessor xmlProcessor = new XmlProcessor();
+			form = xmlProcessor.get(content, Form.class);
+		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
+
+		assertNotNull(form);
 		List<Column> column = form.getIndexView().getColumn();
 		assertEquals(15, column.size());
 		assertEquals(DataType.INTEGER, dfs.getDataType(column.get(0)));
