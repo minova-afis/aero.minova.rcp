@@ -276,7 +276,7 @@ public class WFCDetailCASRequestsUtil {
 			map.put(perspective, Constants.INSERT_REQUEST);
 			clearFields(map);
 			if (detail.getHelper() != null) {
-				detail.getHelper().handleDetailAction(ActionCode.DEL);
+				detail.getHelper().handleDetailAction(ActionCode.SAVE);
 			}
 		}
 	}
