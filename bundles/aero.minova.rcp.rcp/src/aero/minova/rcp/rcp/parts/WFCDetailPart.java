@@ -41,7 +41,6 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
@@ -76,9 +75,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	private IEventBroker broker;
-
-	@Inject
-	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	protected UISynchronize sync;
@@ -121,9 +117,7 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		// TODO SAW_ERC
-//		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setDetail(detail, perspective, localDatabaseService);
+		casRequestsUtil.setDetail(detail, perspective);
 	}
 
 	private static class HeadOrPageWrapper {
@@ -285,8 +279,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MShortTimeField) {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService,
-					detail, locale);
+			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, detail, locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}

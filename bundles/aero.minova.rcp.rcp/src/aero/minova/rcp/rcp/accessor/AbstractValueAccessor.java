@@ -40,7 +40,7 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	@Override
 	public Value setValue(Value value, boolean user) {
-		System.out.println("setValue.isFocussed = " + isFocussed() + "; value = " + value);
+		System.out.println("setValue.isFocussed = " + isFocussed() + "; value = " + value + "; user = " + user);
 
 		// Wenn der Focus auf dem Control liegt, setzen wir keinen Wert
 		if (isFocussed()) {

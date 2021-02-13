@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.widgets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.core.runtime.ServiceCaller;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyListener;
@@ -34,15 +33,11 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.LookupValue;
-import aero.minova.rcp.model.SqlProcedureResult;
-import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 
 public class Lookup extends Composite {
 
@@ -259,7 +254,7 @@ public class Lookup extends Composite {
 
 		popup.setLocation(x, y);
 		popup.setVisible(true);
-		table.setFocus();
+//		table.setFocus();
 	}
 
 	/**
@@ -300,7 +295,7 @@ public class Lookup extends Composite {
 						return;
 					}
 					final Control control = Lookup.this.getDisplay().getFocusControl();
-					if (control == null || (control != text && control != table && control != popup)) {
+					if (control == null || (control != text && control != table)) {
 						popup.setVisible(false);
 					}
 				});
@@ -918,31 +913,13 @@ public class Lookup extends Composite {
 	protected void requestAllLookupEntries() {
 		setMessage("...");
 
-		CompletableFuture<?> tableFuture;
 		MLookupField field = (MLookupField) getData(Constants.CONTROL_FIELD);
-		MDetail detail = field.getDetail();
-
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
-//		tableFuture = dataService.listLookupAsync("%", field, false);
-//		tableFuture.thenAccept(v -> contentProvider.setValues(v));
-
-		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class, ILocalDatabaseService.class);
-
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
-		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
-			aero.minova.rcp.model.Table t = null;
-			if (ta instanceof SqlProcedureResult) {
-				t = ((SqlProcedureResult) ta).getResultSet();
-			} else if (ta instanceof aero.minova.rcp.model.Table) {
-				t = (aero.minova.rcp.model.Table) ta;
-			}
-			localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
-			contentProvider.setTable(t);
-		}));
-
+		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false, "%");
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> contentProvider.setValues(l)));
 	}
 
 	/**

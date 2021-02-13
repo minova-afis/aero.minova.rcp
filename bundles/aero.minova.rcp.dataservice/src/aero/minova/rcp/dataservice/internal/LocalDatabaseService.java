@@ -12,10 +12,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupEntry;
@@ -23,8 +21,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 
-@Component
-public class LocalDatabaseService implements ILocalDatabaseService {
+public class LocalDatabaseService {
 
 	private String protocol = "jdbc:h2:file:";
 
@@ -88,7 +85,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	 *            Name des Lookupfields, für welches wir die die Optionen Anfragen
 	 * @return ein TableObject, welches alle wichtigen informationen enthält, um es zu verwenden wie eine Anfrage an den CAS
 	 */
-	@Override
 	public Table getResultsForLookupField(String name) {
 		if (conn != null) {
 			if (name != null) {
@@ -135,7 +131,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 		}
 	}
 
-	@Override
 	public Map<String, Object> getResultsForKeyLong(String name, Integer keyLong) {
 		Map<String, Object> map = new HashMap<>();
 		if (conn != null) {
@@ -182,7 +177,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	 * @param Table
 	 *            Das Ergebniss der CAS-Anfrage, welches wir in die Datenbank schreiben möchten
 	 */
-	@Override
 	public void replaceResultsForLookupField(String name, Table table) {
 		if (conn != null) {
 			if (table != null || name != null) {
@@ -226,7 +220,6 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 	 *            Der Eintrag, welchen wir in die Datenbank schreiben möchten
 	 * @return void
 	 */
-	@Override
 	public void addResultsForLookupField(String name, Table table) {
 		if (conn != null) {
 			if (table != null || name != null) {
@@ -275,7 +268,18 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 
 	// "CREATE TABLE IF NOT EXISTS LookupResolveValues ( Lookup VARCHAR NOT NULL, KeyLong int NOT NULL, KeyText VARCHAR NOT NULL, Description VARCHAR, PRIMARY
 	// KEY (Lookup, KeyLong)");
-	@Override
+	/**
+	 * Aktualisiert die Werte für eine Lookup und einen KeyLong
+	 * 
+	 * @param lookupName
+	 *            Name der Tabelle oder Name der Prozedur ohne 'List' / 'Resolve'). Dieser Wert darf nicht leer sein.
+	 * @param keyLong
+	 *            Wert des KeyLongs für die Lookup-Zeile. Dieser Wert darf nicht leer sein.
+	 * @param keyText
+	 *            Wert für den Benutzerschlüssel. Dieser Wert darf nicht leer sein. Dieser Wert darf sich normalerweise in der Datenbank nicht ändern.
+	 * @param description
+	 *            Optionale Beschreibung für den Schlüssel (keyText)
+	 */
 	public void updateResolveValue(String lookupName, Value keyLong, Value keyText, Value description) {
 		int rowCount = 0;
 
@@ -309,7 +313,15 @@ public class LocalDatabaseService implements ILocalDatabaseService {
 		}
 	}
 
-	@Override
+	/**
+	 * Diese Methode sucht in der lokalen Datenbank einen Wert für den KeyLong und den LookupName
+	 * 
+	 * @param lookupName
+	 *            Name der Tabelle oder der gespeicherten Prozedur (ohne 'list' / 'Resolve'), über die die Werte ermittelt werden können.
+	 * @param keyLong
+	 *            KeyLong des Wertes. Dieser wird auch in der Datenbank als Referenz gespeichert.
+	 * @return null, wenn der Wert nicht lokal gespeichert ist
+	 */
 	public LookupEntry resolveValue(String lookupName, Value keyLong) {
 		if (conn == null) return null;
 		if (keyLong == null) return new LookupEntry(0, "", null);
