@@ -1,8 +1,9 @@
 package aero.minova.rcp.xml.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,8 +13,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,11 +28,11 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 
-public class GsonTest {
+class GsonTest {
 
 	private Table t;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		t = new Table();
 		t.setName("OrderReceiver");
@@ -76,12 +77,12 @@ public class GsonTest {
 	}
 
 	@Test
-	public void ensureTableIsInitialized() {
-		assertTrue(t!=null);
+	void ensureTableIsInitialized() {
+		assertNotNull(t);
 	}
 
 //	@Test
-	public void blabla() {
+	void blabla() {
 		Instant now = Instant.parse("2020-08-04T22:00:00Z");
 		System.out.println(now);
 
@@ -108,11 +109,11 @@ public class GsonTest {
 				.create();
 
 		SqlProcedureResult sql = gson.fromJson(s, SqlProcedureResult.class);
-		assertTrue(sql.getOutputParameters().getRows() != null);
+		assertNotNull(sql.getOutputParameters().getRows());
 	}
 
 	@Test
-	public void tableCanBeConvertedToGsonAndBackDate() {
+	void tableCanBeConvertedToGsonAndBackDate() {
 		Gson gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
@@ -128,7 +129,7 @@ public class GsonTest {
 	}
 
 	@Test
-	public void tableCanBeConvertedToGsonAndBack() {
+	void tableCanBeConvertedToGsonAndBack() {
 		Gson gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //

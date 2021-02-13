@@ -26,6 +26,7 @@ import aero.minova.rcp.dataservice.IDataService;
 public class WFCTranslationService extends TranslationService {
 
 	private TranslationService parent;
+	@Inject
 	private IDataService dataService;
 
 	Logger logger;
@@ -34,8 +35,6 @@ public class WFCTranslationService extends TranslationService {
 	private String applicationId = "WFC";
 	private Properties resources = new Properties();
 
-	public WFCTranslationService() {
-	}
 
 	@Inject
 	@Optional
@@ -104,37 +103,11 @@ public class WFCTranslationService extends TranslationService {
 		this.customerId = id;
 	}
 
-	@Inject
-	@Optional
-	void setLocale(Locale locale) {
-		if (logger != null) {
-			logger.info("Locale changed to: " + locale.getDisplayName(Locale.ENGLISH));
-			logger.info(Platform.getInstallLocation().toString());
-		}
-	}
-
-	@Inject
-	@Optional
-	void setDataService(IDataService dataService) {
-		if (logger != null) {
-			logger.info("DataService changed to: " + dataService);
-			logger.info(Platform.getInstallLocation().toString());
-		}
-		this.dataService = dataService;
-		loadResources();
-	}
-
 	public void setTranslationService(TranslationService o) {
 		this.parent = o;
 
 		if (logger != null) {
 			logger.info("Locale changed to: " + locale.getDisplayName(Locale.ENGLISH));
-			try {
-				logger.info(Platform.getInstanceLocation().getURL().toURI().toString());
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 
 		loadResources();
@@ -144,11 +117,13 @@ public class WFCTranslationService extends TranslationService {
 	 * Resource Bundle Search and Loading Strategy
 	 *
 	 * <p>
-	 * getBundle uses the base name, the specified locale, and the default locale (obtained from Locale.getDefault) to
-	 * generate a sequence of candidate bundle names. If the specified locale's language, script, country, and variant
-	 * are all empty strings, then the base name is the only candidate bundle name. Otherwise, a list of candidate
-	 * locales is generated from the attribute values of the specified locale (language, script, country and variant)
-	 * and appended to the base name. Typically, this will look like the following:
+	 * getBundle uses the base name, the specified locale, and the default locale
+	 * (obtained from Locale.getDefault) to generate a sequence of candidate bundle
+	 * names. If the specified locale's language, script, country, and variant are
+	 * all empty strings, then the base name is the only candidate bundle name.
+	 * Otherwise, a list of candidate locales is generated from the attribute values
+	 * of the specified locale (language, script, country and variant) and appended
+	 * to the base name. Typically, this will look like the following:
 	 * </p>
 	 *
 	 * baseName + "_" + language + "_" + script + "_" + country + "_" + variant <br>
@@ -164,23 +139,32 @@ public class WFCTranslationService extends TranslationService {
 	private void loadResources() {
 		String basePath, i18nPath;
 		String filename;
-		if (dataService == null) return;
-		
-		try {
-			basePath = Platform.getInstanceLocation().getURL().toURI().toString();
-			i18nPath = basePath + "i18n";
-			File i18nDir = new File(new URI(i18nPath));
-			if (!i18nDir.exists()) {
-				i18nDir.mkdirs();
-			}
-			filename = "i18n/messages";
-			resources = new Properties();
+		if (dataService == null)
+			return;
+
+		i18nPath = "i18n";
+		filename = i18nPath + "/messages";
+		resources = new Properties();
+
+		// construct file name to load
+		loadResources(filename + ".properties");
+		if (locale == null) {
+			return;
+		}
+		if (!isEmpty(locale.getLanguage())) {
+			filename += "_" + locale.getLanguage();
 			loadResources(filename + ".properties");
-			if (locale == null) {
-				return;
+			if (!isEmpty(locale.getCountry())) {
+				filename += "_" + locale.getCountry();
+				loadResources(filename + ".properties");
+				if (!isEmpty(locale.getVariant())) {
+					filename += "_" + locale.getVariant();
+					loadResources(filename + ".properties");
+				}
 			}
-			if (!isEmpty(locale.getLanguage())) {
-				filename += "_" + locale.getLanguage();
+			filename = "i18n/messages" + "+" + locale.getDisplayLanguage();
+			if (!isEmpty(locale.getScript())) {
+				filename += "_" + locale.getScript();
 				loadResources(filename + ".properties");
 				if (!isEmpty(locale.getCountry())) {
 					filename += "_" + locale.getCountry();
@@ -190,22 +174,7 @@ public class WFCTranslationService extends TranslationService {
 						loadResources(filename + ".properties");
 					}
 				}
-				filename = "i18n/messages" + "+" + locale.getDisplayLanguage();
-				if (!isEmpty(locale.getScript())) {
-					filename += "_" + locale.getScript();
-					loadResources(filename + ".properties");
-					if (!isEmpty(locale.getCountry())) {
-						filename += "_" + locale.getCountry();
-						loadResources(filename + ".properties");
-						if (!isEmpty(locale.getVariant())) {
-							filename += "_" + locale.getVariant();
-							loadResources(filename + ".properties");
-						}
-					}
-				}
 			}
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -216,10 +185,9 @@ public class WFCTranslationService extends TranslationService {
 			localpath = Platform.getInstanceLocation().getURL().toURI().toString();
 			File propertiesFile = new File(new URI(localpath + filename));
 			if (!propertiesFile.exists())
-				dataService.getFileSynch(localpath, filename);
+				dataService.getFileSynch(filename);
 			if (propertiesFile.exists()) {
 				is = new FileInputStream(propertiesFile);
-				resources.load(is);
 			}
 		} catch (FileNotFoundException | URISyntaxException e) {
 			e.printStackTrace();
