@@ -139,6 +139,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			if (bookingDateValue != null) {
 				bookingDate.setValue(bookingDateValue, false);
 			}
+			break;
 		case NEW:
 			employee.setValue(employeeValue, false);
 			if (bookingDateValue == null) {
@@ -148,6 +149,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			if (endDateValue != null) {
 				startDate.setValue(endDateValue, false);
 			}
+			break;
 		default:
 			break;
 		}
