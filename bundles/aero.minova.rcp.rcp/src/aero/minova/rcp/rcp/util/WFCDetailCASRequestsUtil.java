@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -48,8 +47,6 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private IDataService dataService;
-
-	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -84,10 +81,9 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setDetail(MDetail detail, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
+	public void setDetail(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
-		this.localDatabaseService = localDatabaseService;
 	}
 
 	@Inject

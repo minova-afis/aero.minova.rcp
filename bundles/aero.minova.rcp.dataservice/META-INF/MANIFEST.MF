@@ -22,6 +22,5 @@ Import-Package: aero.minova.rcp.form.model.xsd,
 Service-Component: OSGI-INF/aero.minova.rcp.dataservice.internal.DataFormService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml,
- OSGI-INF/aero.minova.rcp.dataservice.internal.LocalDatabaseService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.XmlProcessor.xml
 Bundle-ActivationPolicy: lazy

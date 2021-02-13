@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.runtime.ServiceCaller;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -27,7 +26,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -51,7 +49,7 @@ public class LookupField {
 	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			IEventBroker broker, MPerspective perspective, ILocalDatabaseService localDatabaseService, MDetail detail, Locale locale) {
+			IEventBroker broker, MPerspective perspective, MDetail detail, Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
@@ -144,20 +142,19 @@ public class LookupField {
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
-		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class,
-				ILocalDatabaseService.class);
-
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
 		lookUpControl.setMessage("...");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), sql.getResultSet());
+				// TODO SAW1202
+//				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), sql.getResultSet());
 
 				changeOptionsForLookupField(sql.getResultSet(), lookUpControl, true);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
+				// TODO SAW1202
+//				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, lookUpControl, true);
 				lookUpControl.showAllElements("%");
 			}

@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -31,9 +30,6 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 	@Inject
 	UISynchronize sync;
-
-	@Inject
-	ILocalDatabaseService localDatabaseService;
 
 	private MDetail detail;
 
@@ -94,11 +90,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 		if (((Lookup) control).getMessage().isBlank() || ((Lookup) control).getMessage().contains("...")) {
 			Map<?, ?> databaseMap = null;
-			if (field.getLookupTable() != null) {
-				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
-			} else {
-				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupProcedurePrefix(), value.getIntegerValue());
-			}
+			// TODO SAW1202
+//			if (field.getLookupTable() != null) {
+//				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
+//			} else {
+//				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupProcedurePrefix(), value.getIntegerValue());
+//			}
 			if (databaseMap == null) {
 				getLookupConsumer(control, value);
 			} else {
@@ -143,7 +140,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			} else if (ta instanceof Table) {
 				t = (Table) ta;
 			}
-			localDatabaseService.addResultsForLookupField(field.getName(), t);
+			// TODO SAW1202
+//			localDatabaseService.addResultsForLookupField(field.getName(), t);
 
 			updateSelectedLookupEntry(t, control);
 
@@ -153,7 +151,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 				Value keyLong = row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG));
 				Value keyText = row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 				Value description = row.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION));
-				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
+				// TODO SAW1202
+//				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
 			}
 		}));
 	}
@@ -180,7 +179,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			} else if (ta instanceof Table) {
 				t = (Table) ta;
 			}
-			localDatabaseService.addResultsForLookupField(field.getName(), t);
+			// TODO SAW1202
+//			localDatabaseService.addResultsForLookupField(field.getName(), t);
 
 			updateSelectedLookupEntry(t, control);
 
@@ -191,7 +191,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 				Value keyLong = row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG));
 				Value keyText = row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
 				Value description = row.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION));
-				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
+				// TODO SAW1202
+//				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
 			}
 		}));
 	}
@@ -268,11 +269,13 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), sql.getResultSet());
+				// TODO SAW1202
+//				localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), sql.getResultSet());
 				((MLookupField) field).setOptions(sql.getResultSet());
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
+				// TODO SAW1202
+//				localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
 				((MLookupField) field).setOptions(t);
 			}
 		}));

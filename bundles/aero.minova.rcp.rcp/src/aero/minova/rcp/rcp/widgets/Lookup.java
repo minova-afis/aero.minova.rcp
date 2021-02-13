@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.widgets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.core.runtime.ServiceCaller;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyListener;
@@ -34,7 +33,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.form.MDetail;
@@ -929,8 +927,6 @@ public class Lookup extends Composite {
 //		tableFuture = dataService.listLookupAsync("%", field, false);
 //		tableFuture.thenAccept(v -> contentProvider.setValues(v));
 
-		ServiceCaller<ILocalDatabaseService> localDatabaseService = new ServiceCaller<>(LookupField.class, ILocalDatabaseService.class);
-
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			aero.minova.rcp.model.Table t = null;
@@ -939,7 +935,8 @@ public class Lookup extends Composite {
 			} else if (ta instanceof aero.minova.rcp.model.Table) {
 				t = (aero.minova.rcp.model.Table) ta;
 			}
-			localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
+			// TODO SAW1202
+//			localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 			contentProvider.setTable(t);
 		}));
 
