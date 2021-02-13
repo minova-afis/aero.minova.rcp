@@ -330,13 +330,13 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<List<LookupValue>> resolveLookupAsync(Integer keyLong, String keyText, MLookupField field, boolean useCache) {
+	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<List<LookupValue>> listLookupAsync(String filterText, MLookupField field, boolean useCache) {
+	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText) {
 		// TODO Auto-generated method stub
 		return null;
 	}

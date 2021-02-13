@@ -142,19 +142,15 @@ public class LookupField {
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
+		// TODO SAW1202 - laden wir nochmal neu vom Server
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
 		lookUpControl.setMessage("...");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			if (ta instanceof SqlProcedureResult) {
 				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				// TODO SAW1202
-//				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), sql.getResultSet());
-
 				changeOptionsForLookupField(sql.getResultSet(), lookUpControl, true);
 			} else if (ta instanceof Table) {
 				Table t = (Table) ta;
-				// TODO SAW1202
-//				localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 				changeOptionsForLookupField(t, lookUpControl, true);
 				lookUpControl.showAllElements("%");
 			}

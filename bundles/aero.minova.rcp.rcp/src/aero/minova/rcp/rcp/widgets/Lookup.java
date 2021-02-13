@@ -927,6 +927,7 @@ public class Lookup extends Composite {
 //		tableFuture = dataService.listLookupAsync("%", field, false);
 //		tableFuture.thenAccept(v -> contentProvider.setValues(v));
 
+		// TODO SAW1202 - laden wir nochmal neu vom Server
 		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
 		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
 			aero.minova.rcp.model.Table t = null;
@@ -935,8 +936,6 @@ public class Lookup extends Composite {
 			} else if (ta instanceof aero.minova.rcp.model.Table) {
 				t = (aero.minova.rcp.model.Table) ta;
 			}
-			// TODO SAW1202
-//			localDatabaseService.current().get().replaceResultsForLookupField(field.getName(), t);
 			contentProvider.setTable(t);
 		}));
 

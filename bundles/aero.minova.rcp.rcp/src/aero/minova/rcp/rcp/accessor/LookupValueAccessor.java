@@ -1,6 +1,5 @@
 package aero.minova.rcp.rcp.accessor;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -89,33 +88,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 
 		if (((Lookup) control).getMessage().isBlank() || ((Lookup) control).getMessage().contains("...")) {
-			Map<?, ?> databaseMap = null;
-			// TODO SAW1202
-//			if (field.getLookupTable() != null) {
-//				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupTable(), value.getIntegerValue());
-//			} else {
-//				databaseMap = localDatabaseService.getResultsForKeyLong(field.getLookupProcedurePrefix(), value.getIntegerValue());
-//			}
-			if (databaseMap == null) {
-				getLookupConsumer(control, value);
-			} else {
-				((Lookup) control).setText((String) databaseMap.get(Constants.TABLE_KEYTEXT));
-				if (databaseMap.get(Constants.TABLE_DESCRIPTION) != null) {
-					description.setText((String) databaseMap.get(Constants.TABLE_DESCRIPTION));
-				} else {
-					description.setText("");
-				}
-				((Lookup) control).setMessage("");
-			}
-//			changeOptions(); // das benötigen wir hier nicht, weil wir nur aufgerufen werden, wenn ein Wert durch das System gesetzt wird.
-//			// Ändern der Optionen der drunterliegenden Felder
-//			if (field.getLookupTable() == null) {
-//				for (MField f : detail.getFields()) {
-//					if (f instanceof MLookupField && f.getSqlIndex() > field.getSqlIndex()) {
-//						((LookupValueAccessor) f.getValueAccessor()).changeOptions();
-//					}
-//				}
-//			}
+			getLookupConsumer(control, value);
 		}
 	}
 
@@ -140,20 +113,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			} else if (ta instanceof Table) {
 				t = (Table) ta;
 			}
-			// TODO SAW1202
-//			localDatabaseService.addResultsForLookupField(field.getName(), t);
 
 			updateSelectedLookupEntry(t, control);
-
-			if (t.getRows().size() > 0) {
-				Row row = t.getRows().get(0);
-				String lookupName = (field.getLookupTable() != null) ? field.getLookupTable() : field.getLookupProcedurePrefix();
-				Value keyLong = row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG));
-				Value keyText = row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-				Value description = row.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION));
-				// TODO SAW1202
-//				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
-			}
 		}));
 	}
 
@@ -179,21 +140,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			} else if (ta instanceof Table) {
 				t = (Table) ta;
 			}
-			// TODO SAW1202
-//			localDatabaseService.addResultsForLookupField(field.getName(), t);
 
 			updateSelectedLookupEntry(t, control);
-
-			if (t.getRows().size() > 0) {
-				Row row = t.getRows().get(0);
-				String lookupName = (field.getLookupTable() != null) ? field.getLookupTable()
-						: field.getLookupProcedurePrefix();
-				Value keyLong = row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG));
-				Value keyText = row.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-				Value description = row.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION));
-				// TODO SAW1202
-//				localDatabaseService.updateResolveValue(lookupName, keyLong, keyText, description);
-			}
 		}));
 	}
 
@@ -247,9 +195,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
 							((Lookup) control).setText(r.getValue(indexKeyText).getStringValue());
 							return;
-						}
-						// Ist der Wert noch nicht gesetzt, so wird dies nun getan
-						else {
+						} else {
+							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
 							field.setValue(rowValue, false);
 							return;
 						}
@@ -258,26 +205,5 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			}
 			field.setValue(null, false);
 		}
-	}
-
-	public void changeOptions() {
-
-		System.out.println("LookupValueAccessor[" + field.getName() + "].changeOptions()");
-
-		CompletableFuture<?> tableFuture;
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, ((Lookup) control).getText(), field, detail, dataService, "List");
-		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-			if (ta instanceof SqlProcedureResult) {
-				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				// TODO SAW1202
-//				localDatabaseService.replaceResultsForLookupField(field.getLookupProcedurePrefix(), sql.getResultSet());
-				((MLookupField) field).setOptions(sql.getResultSet());
-			} else if (ta instanceof Table) {
-				Table t = (Table) ta;
-				// TODO SAW1202
-//				localDatabaseService.replaceResultsForLookupField(field.getLookupTable(), t);
-				((MLookupField) field).setOptions(t);
-			}
-		}));
 	}
 }
