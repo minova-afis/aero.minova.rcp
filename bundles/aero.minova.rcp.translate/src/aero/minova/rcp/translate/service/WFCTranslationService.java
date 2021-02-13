@@ -188,6 +188,7 @@ public class WFCTranslationService extends TranslationService {
 				dataService.getFileSynch(filename);
 			if (propertiesFile.exists()) {
 				is = new FileInputStream(propertiesFile);
+				resources.load(is);
 			}
 		} catch (FileNotFoundException | URISyntaxException e) {
 			e.printStackTrace();
