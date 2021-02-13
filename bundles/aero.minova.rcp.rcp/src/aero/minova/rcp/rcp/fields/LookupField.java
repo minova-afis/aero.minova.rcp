@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.fields;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,8 +27,8 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
-import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MDetail;
@@ -35,7 +36,6 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.LookupCASRequestUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 import aero.minova.rcp.rcp.widgets.LookupContentProvider;
 
@@ -135,26 +135,15 @@ public class LookupField {
 	 */
 	@Inject
 	@Optional
-	public static void requestLookUpEntriesAll(MField field, MDetail detail, Lookup lookUpControl) {
+	public static void requestLookUpEntriesAll(MField field, MDetail detail, Lookup lookup) {
 		CompletableFuture<?> tableFuture;
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
-		// TODO SAW1202 - laden wir nochmal neu vom Server
-		tableFuture = LookupCASRequestUtil.getRequestedTable(0, null, field, detail, dataService, "List");
-		lookUpControl.setMessage("...");
-		tableFuture.thenAccept(ta -> Display.getDefault().asyncExec(() -> {
-			if (ta instanceof SqlProcedureResult) {
-				SqlProcedureResult sql = (SqlProcedureResult) ta;
-				changeOptionsForLookupField(sql.getResultSet(), lookUpControl, true);
-			} else if (ta instanceof Table) {
-				Table t = (Table) ta;
-				changeOptionsForLookupField(t, lookUpControl, true);
-				lookUpControl.showAllElements("%");
-			}
-		}));
+		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, false, "%");
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> lookup.getContentProvider().setValues(l)));
 	}
 
 	/**

@@ -43,6 +43,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
+		try {
+		System.out.println("updateControlFromValue " + value.toString());
+		} catch (NullPointerException npe) {
+			System.out.println("updateControlFromValue null");
+		}
+
 		if (value == null) {
 			((Lookup) control).getDescription().setText("");
 			((Lookup) control).setText("");
@@ -73,21 +79,21 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 	}
 
-//	@Override
-//	/**
-//	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
-//	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
-//	 */
-//	public void setFocussed(boolean focussed) {
-//		if (focussed) {
-//			return; // wenn wir den Focus erhalten, machen wir nichts
-//		}
-//
-//		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
-//		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
-//			((Lookup) control).setMessage("");
-//			String displayText = ((Lookup) control).getText();
-//			if (displayText != null && !displayText.equals("")) {
+	@Override
+	/**
+	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
+	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
+	 */
+	public void setFocussed(boolean focussed) {
+		if (focussed) {
+			return; // wenn wir den Focus erhalten, machen wir nichts
+		}
+
+		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
+		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+			((Lookup) control).setMessage("");
+			String displayText = ((Lookup) control).getText();
+			if (displayText != null && !displayText.equals("")) {
 //				Table optionTable = ((MLookupField) field).getOptions();
 //				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
 //				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
@@ -106,8 +112,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 //						}
 //					}
 //				}
-//			}
-//			field.setValue(null, false);
-//		}
-//	}
+				return;
+			}
+			field.setValue(null, false);
+		}
+	}
 }

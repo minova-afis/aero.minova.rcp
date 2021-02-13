@@ -430,7 +430,96 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText) {
-		return new CompletableFuture<>();
+		ArrayList<LookupValue> list = new ArrayList<>();
+		if (field.getLookupTable() != null) {
+			String tableName = field.getLookupTable();
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
+// cache			
+//			if (map.get(keyLong) != null) {
+//				list.add(map.get(keyLong));
+//				return CompletableFuture.supplyAsync(() -> list);
+//			}
+			Table t = TableBuilder.newTable(tableName) //
+					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
+					.create();
+			Row row = RowBuilder.newRow() //
+					.withValue(null) //
+					.withValue(filterText) //
+					.withValue(null) //
+					.withValue(">0") //
+					.create();
+			t.addRow(row);
+			row = RowBuilder.newRow() //
+					.withValue(null) //
+					.withValue(null) //
+					.withValue(filterText) //
+					.withValue(">0") //
+					.create();
+			t.addRow(row);
+			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
+			Table ta = null;
+			try {
+				ta = tableFuture.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+					map.put(lv.keyLong, lv);
+					list.add(lv);
+				}
+			}
+			return CompletableFuture.supplyAsync(() -> list);
+		} else {
+			// LookupProcedurePrefix
+			String procedureName = field.getLookupProcedurePrefix() + "List";
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
+// cache
+//			if (map.get(keyLong) != null) {
+//				list.add(map.get(keyLong));
+//				return CompletableFuture.supplyAsync(() -> list);
+//			}
+			Table t = TableBuilder.newTable(procedureName) //
+					.withColumn(TABLE_COUNT, DataType.INTEGER) //
+					.withColumn(TABLE_FILTERLASTACTION, DataType.BOOLEAN) //
+					.create();
+			Row row = RowBuilder.newRow() //
+					.withValue(null) //
+					.withValue(false) //
+					.create();
+			for (String paramName : field.getLookupParameters()) {
+				MField paramField = field.getDetail().getField(paramName);
+				t.addColumn(new Column(paramName, paramField.getDataType()));
+				row.addValue(paramField.getValue());
+			}
+			t.addRow(row);
+
+			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t);
+			Table ta = null;
+			try {
+				ta = tableFuture.get().getResultSet();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+					map.put(lv.keyLong, lv);
+					list.add(lv);
+				}
+			}
+			return CompletableFuture.supplyAsync(() -> list);
+		}
 	}
 
 	private CompletableFuture<?> getRequestedTable(int keyLong, String keyText, MField field, String purpose) {
