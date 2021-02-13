@@ -57,6 +57,7 @@ Dabei gibt es 2 Prozeduren.
 
 ====== List
 
+Der Name der Prozedur setzt sich aus dem Wert von `procedure-prefix` und `List` zusammen.
 Diese Prozedur liefert die möglichen Werte.
 Als Aufrufparameter werden folgende Parameter übergeben.
 
@@ -106,6 +107,7 @@ Es kann ja auch mit dem Parameter link:#filter-last-action[filter-last-action] g
 
 ====== Resolve
 
+Der Name der Prozedur setzt sich aus dem Wert von `procedure-prefix` und `List` zusammen.
 Diese Prozedur liefert die Werte für eine Schlüssel.
 In der Regel wird der interne Schlüssel (`KeyLong`) für die Suche übergeben.
 Es kann aber auch der Benutzerschlüssel (`KeyText`) für die Suche übergeben werden.
