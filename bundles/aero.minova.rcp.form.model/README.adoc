@@ -1,0 +1,185 @@
+== XMLForm.xsd
+
+In diesem Schema wird die Maske beschrieben.
+Diese Dokumentation wird Stück für Stück ergänzt.
+Dadurch kann das Wissen immer wieder nachgetragen werden.
+
+=== <form>
+
+Jede Maske wird durch ein Tag `<form>` beschrieben.
+Neben den unten beschriebenen Attributen kann es noch folgende Elemente besitzen.
+
+* link:#index-view[<index-view>]
+* link:#detail[<detail>]
+* link:#events[<events>]
+
+==== icon
+
+==== title
+
+==== helper-class
+
+=== <index-view>
+
+=== <detail>
+
+=== <events> 
+
+=== <column>
+
+=== <field>
+
+Im link:#head[`<Head>`] und in der link:#page[`<Page>`] werden die einzelnen Felder definiert.
+Als Element ist genau ein Kind möglich, dass den Datentyp beschreibt.
+
+* link:#lookup[<lookup>]
+
+=== <head>
+
+=== <page>
+
+=== Datentypen
+
+==== <lookup>
+
+Eine Lookup-Spalte speichert als Wert immer einen Integer.
+Dies ist der `KeyLong` der referenzierten Tabelle.
+Angezeigt wird jedoch in der Regel der `KeyText` der referenzierten Tabelle - dies ist ja auch der Benutzerschlüssel.
+
+Zusätzlich kann noch rechts neben dem Feld die Beschreibung angezeigt werden.
+Dies ist ist der Regel der Wert aus der Spalte `Description` in der referenzierten Tabelle.
+Wenn eine View verwendet wird, oder eine gespeicherte Prozedur, dann kann es auch einen anderen Wert - z.B. eine Berechnung - anzeigen.
+
+===== procedure-prefix
+
+Wenn dieses Attribut gesetzt ist, werden die Daten der referenzierten Tabelle mittels gespeicherter Prozeduren ermittelt.
+Dabei gibt es 2 Prozeduren.
+
+====== List
+
+Der Name der Prozedur setzt sich aus dem Wert von `procedure-prefix` und `List` zusammen.
+Diese Prozedur liefert die möglichen Werte.
+Als Aufrufparameter werden folgende Parameter übergeben.
+
+[horizontal]
+@Count int output:: 
+Dieser Wert wird von der Prozedur zurückgegeben.
+Er enthält die Anzehl der gefundenen Werte.
+
+@FilterLastAction bit:: 
+Mit diesem Wert kann unter Umständen (wenn es die Prozedur berücksichtigt) das Löschkennzeichen berücksichtigt werden.
+Wird eine 1 (`true`) übergeben, sollen die gelöschten Werte (`LastAction < 0`) nicht zurückgegeben werden.
+Wird eine 0 (`false`) übergeben, sollen alle Werte zurückgegeben werden.
+
+param[1]->field-name::
+Jetzt werden in der definierten Reihenfolge die Werte der Parameter übergeben.
+Dabei muss auch der Wert `null` möglich sein.
+Der Datentyp orientiert sich an dem Datentyp der entsprechenden Spalte. 
+
+Die Ausgabe ist neben dem Parameter `@Count` ein Resultset mit den folgenden Spalten.
+
+[horizontal]
+`KeyLong`::
+Diese Spalte enthält den internen Schlüssel des referenzierten Wertes.
+Als Datentyp wird Integer angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:#key-long-name[key-long-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`KeyText`::
+Diese Spalte enthält den Benutzerschlüssel des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:#key-text-name[key-text-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`Description`::
+Diese Spalte enthält eine Beschreibung des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+In der Regel ist dies der Wert der Spalte `Description` in der referenzierten Tabelle.
+Der Spaltenname könnte zwar durch das Attribut link:#description-name[description-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`LastAction`::
+Diese Spalte soll die LastAction enthalten.
+Als Datentyp wird Integer angenommen.
+Zeilen mit einem Wert < 0 gelten als gelöschte Spalten und werden nicht angezeigt.
+Allerdings sollten keine gelöschten Spalten zurückgeliefert werden.
+Es kann ja auch mit dem Parameter link:#filter-last-action[filter-last-action] gearbeitet werden.
+
+====== Resolve
+
+Der Name der Prozedur setzt sich aus dem Wert von `procedure-prefix` und `List` zusammen.
+Diese Prozedur liefert die Werte für eine Schlüssel.
+In der Regel wird der interne Schlüssel (`KeyLong`) für die Suche übergeben.
+Es kann aber auch der Benutzerschlüssel (`KeyText`) für die Suche übergeben werden.
+Eine Wildcard-Suche ist nicht vorgesehen. 
+Aus diesem Grund sollte das Ergebnis auch immer maximal eine Zeile liefern. 
+Als Aufrufparameter werden folgende Parameter übergeben.
+
+[horizontal]
+@KeyLong int::
+Der interne Schlüssel, dessen Werte aufgelöst werden sollen.
+Wenn dieser Wert nicht übergeben wird (`null`), dann sollte der Benutzerschlüssel (`KeyText`) übergeben werden.
+
+@KeyText string::
+Der Benutzerschlüssel, dessen Werte aufgelöst werden sollen.
+Wenn dieser Wert nicht übergeben wird (`null`), dann sollte der interne Schlüssel (`KeyLong`) übergeben werden.
+
+@FilterLastAction bit:: 
+Mit diesem Wert kann unter Umständen (wenn es die Prozedur berücksichtigt) das Löschkennzeichen berücksichtigt werden.
+Wird eine 1 (`true`) übergeben, sollen die gelöschten Werte (`LastAction < 0`) nicht zurückgegeben werden.
+Wird eine 0 (`false`) übergeben, sollen alle Werte zurückgegeben werden.
+
+Die Ausgabe ist ein Resultset mit den folgenden Spalten.
+
+[horizontal]
+`KeyLong`::
+Diese Spalte enthält den internen Schlüssel des referenzierten Wertes.
+Als Datentyp wird Integer angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:#key-long-name[key-long-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`KeyText`::
+Diese Spalte enthält den Benutzerschlüssel des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+Der Spaltenname könnte zwar durch das Attribut link:#key-text-name[key-text-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+`Description`::
+Diese Spalte enthält eine Beschreibung des referenzierten Wertes.
+Als Datentyp wird String angenommen.
+In der Regel ist dies der Wert der Spalte `Description` in der referenzierten Tabelle.
+Der Spaltenname könnte zwar durch das Attribut link:#description-name[description-name] einen anderen Namen haben.
+Von dieser Vorgehensweise wird jedoch dringend abgeraten, da bei einer Prozedur die Ergebnisspalten direkt benannt werden können.
+
+===== table
+
+===== key-long-name
+
+Default ist `KeyLong`
+
+===== key-text-name
+
+Default ist `KeyText`
+
+===== description-name
+
+Default ist `Description`
+
+===== filter-blocked
+
+Default ist `false`
+
+===== filter-last-action
+
+Default ist `true`
+
+===== form
+
+Dieses Attribut diente mal dazu, dass man eine Maske öffnen kann, in der man Daten suchen oder auch neu anlegen kann.
+Dieses Attribut wird aktuell nicht ausgewertet.
+
+===== use-resolve-params
+
+Dieses Attribut wird aktuell nicht ausgewertet.
+Es dient in Verbindung mit link:#procedure-prefix[procedure-prefix] dazu, dass beim Auflösen von interne Schlüssel (`KeyLong`) in Benutzerschlüssel (`KeyText`) alle Parameter mit übergeben werden.
+

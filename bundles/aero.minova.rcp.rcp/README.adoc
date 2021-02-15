@@ -63,7 +63,49 @@ Wenn man Datumsinformationen an den CAS übergibt, muss der Zeitpunkt ausgerechn
 Bei der Anzeige könnte man sich überlegen, den Wert bei Verlassen auszurechnen. 
 Sobald der Anwender das Feld wieder anspringt (OnFocus) wird die Formel eingeblendet.
 
-==== Zahlenformatierung
+=== Zeitfelder
+
+Alle Zeitangabe werden auf dem Server in UTC gespeichert.
+Bei Feldern, die Datum und Zeit enthalten, wird der Zeitpunkt an den Server als link:https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html[Instant] gesendet.
+Hierbei muss die lokale Zeitzone, die in den Einstellungen konfiguriert werden kann, berücksichtigt werden.
+
+Bei Feldern, die nur die Zeit enthalten, wird als Datum immer der 31.12.1899 verwendet.
+Die Uhrzeit ist immer im UTC-Format zu setzen.
+Somit wird keine Zeitzone berücksichtigt,
+
+==== Shortcuts
+
+Wir haben für die Zeit bestimmte Shortcuts definiert.
+
+|===
+| Eingabe | Wert
+| `0` | jetzt 
+| `00` | 00:00 Uhr 
+| `1` | die Stunde am Tag und 0 Minuten -> 0**1**:00 Uhr
+| `12` | dies liefert die Stunde am Tag. 
+Werte > 23 liefern ein ungültiges Datum. -> **12**:00 Uhr
+| `123` | Die 1. Stelle liefert die Stunde; die Stellen 2 und 3 die Minuten. -> 0**1**:**23** Uhr  
+| `1234` | Die 1. und 2. Stelle liefern die Stunde; die Stellen 3 und 4 die Minuten. -> **12**:**34** Uhr 
+| `+` | jetzt plus eine Stunde
+| `++` | jetzt plus 2 Stunden 
+| `+++` | ...
+| `-` | jetzt minus einer Stunde (vor einer Stunde)
+| `--` | jetzt minus 2 Stunden
+| `---` | ...
+| `0+3h` | jetzt + 3 Stunden
+| `1+2h-3m` | 01:00 Uhr + 2 Stunden - 3 Minuten -> 02:57 Uhr 
+|===
+
+Es gibt 2 Kürzel, die sowohl klein- als auch großgeschrieben werden können.
+Die Kürzel können global für die Benutzersprache gesetzt werden.
+
+|===
+| Kürzel (deutsch) | Bedeutung
+| `H` `h` | Stunde
+| `M` `m` | Minute
+|===
+
+=== Zahlenformatierung
 
 Wir haben für die Formatierung von Zahlen folgende Regeln definiert:
 
@@ -77,7 +119,7 @@ Wir haben für die Formatierung von Zahlen folgende Regeln definiert:
 - Wenn die Ausgangszahl 0 ist, wird die 0 durch die erste eingegebene Zahl ersetzt.
 - Wenn die letzte Zahl vor dem dezimalen Trennzeichen gelöscht/ entfernt wird springt die Caret Position auf die 1.
 
-==== Lookups
+=== Lookups
 Die Lookup Felder werden mit Hilfe der TextAssist - Klasse dargestellt. Diese Klasse bietet sowohl die Möglichkeit einer anzeige von möglichgen Treffern (Liste) als auch die Eigenschaften eines Textfeldes. Bei der Eingabe eines Zeichens werden die Ergibnisse gefiltert, so dass eine Liste mit möglichen Treffern aufpopped.
 In die Liste kann mittels den Pfeiltasten (⬇︎ & ⬆︎) navigiert werden. Enter oder Tab kann das ausgewähltge Element bestätigen und schließt automatisch die Liste der vorgeschlagenen Werte. Zusätzlich springt man in das nächste Feld / Pflichtfeld.
 

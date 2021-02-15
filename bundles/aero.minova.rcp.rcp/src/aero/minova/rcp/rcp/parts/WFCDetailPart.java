@@ -41,7 +41,6 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
@@ -76,9 +75,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	private IEventBroker broker;
-
-	@Inject
-	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	protected UISynchronize sync;
@@ -121,9 +117,7 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		// TODO SAW_ERC
-//		wfcDetailUtil.bindValues(controls, perspective, localDatabaseService);
-		casRequestsUtil.setDetail(detail, perspective, localDatabaseService);
+		casRequestsUtil.setDetail(detail, perspective);
 	}
 
 	private static class HeadOrPageWrapper {
@@ -166,11 +160,13 @@ public class WFCDetailPart extends WFCFormPart {
 		// Helper-Klasse initialisieren
 		String helperClass = form.getHelperClass();
 		if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
-			// TODO
+			// TODO Übersetzung!
 			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 		}
 		IHelper iHelper = helperlist.get(0);
 		iHelper.setControls(detail);
+		detail.setHelper(iHelper);
+
 	}
 
 	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
@@ -283,8 +279,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MShortTimeField) {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, localDatabaseService,
-					detail, locale);
+			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, detail, locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}
@@ -315,6 +310,12 @@ public class WFCDetailPart extends WFCFormPart {
 					expandableComposite.setText(value);
 					translate((Composite) expandableComposite.getClient());
 				} else if (control instanceof Label) {
+					Label l = ((Label) control);
+					Object data = l.getData(LookupField.AERO_MINOVA_RCP_LOOKUP);
+					if (data != null) {
+						// TODO aus den Preferences Laden
+						value = value + " ▼";
+					}
 					((Label) control).setText(value);
 				} else if (control instanceof Button) {
 					((Button) control).setText(value);

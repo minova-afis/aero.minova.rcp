@@ -19,7 +19,11 @@ import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +42,7 @@ import com.google.gson.GsonBuilder;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -45,9 +50,20 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 
 @Component
 public class DataService implements IDataService {
+
+	public static final String TABLE_KEYTEXT = "KeyText";
+	public static final String TABLE_KEYLONG = "KeyLong";
+	public static final String TABLE_DESCRIPTION = "Description";
+	public static final String TABLE_LASTACTION = "LastAction";
+	public static final String TABLE_COUNT = "Count";
+	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
 	private static final boolean LOG = true;
 	private HttpClient httpClient;
@@ -72,6 +88,7 @@ public class DataService implements IDataService {
 		this.username = username;
 		this.password = password;
 		this.server = server;
+		init();
 	}
 
 	private void init() {
@@ -87,7 +104,6 @@ public class DataService implements IDataService {
 				.sslContext(disabledSslVerificationContext())//
 				.authenticator(authentication).build();
 
-		gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
@@ -97,7 +113,6 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
-		init();
 		String body = gson.toJson(seachTable);
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
@@ -115,7 +130,6 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
-		init();
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
@@ -242,7 +256,6 @@ public class DataService implements IDataService {
 	 */
 	@Override
 	public File getFileSynch(String localPath, String filename) {
-		init();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
@@ -265,7 +278,6 @@ public class DataService implements IDataService {
 	 */
 	@Override
 	public CompletableFuture<String> getFile(String filename) {
-		init();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
 				.header("Content-Type", "application/octet-stream") //
 				.build();
@@ -329,4 +341,259 @@ public class DataService implements IDataService {
 		}
 		return p;
 	}
+
+	/**
+	 * Je Prozedur bzw. Tabellenneame gibt es einen Cache je KeyLong mit dem LookupValue
+	 */
+	private HashMap<String, HashMap<Integer, LookupValue>> cache = new HashMap<>();
+
+	@Override
+ 	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
+		ArrayList<LookupValue> list = new ArrayList<>();
+		if (field.getLookupTable() != null) {
+			String tableName = field.getLookupTable();
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
+			if (map.get(keyLong) != null) {
+				list.add(map.get(keyLong));
+				return CompletableFuture.supplyAsync(() -> list);
+			}
+			Table t = TableBuilder.newTable(tableName) //
+					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
+					.create();
+			Row row = RowBuilder.newRow() //
+					.withValue(keyLong) //
+					.withValue(keyText) //
+					.withValue(null) //
+					.withValue(">0") //
+					.create();
+			t.addRow(row);
+			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
+			Table ta = null;
+			try {
+				ta = tableFuture.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			if (ta != null && !ta.getRows().isEmpty()) {
+				Row r = ta.getRows().get(0);
+				LookupValue lv = new LookupValue(//
+						r.getValue(0).getIntegerValue(), //
+						r.getValue(1).getStringValue(), //
+						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+				map.put(keyLong, lv);
+				list.add(lv);
+			}
+			return CompletableFuture.supplyAsync(() -> list);
+		} else {
+			// LookupProcedurePrefix
+			String procedureName = field.getLookupProcedurePrefix() + "Resolve";
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
+			if (map.get(keyLong) != null) {
+				list.add(map.get(keyLong));
+				return CompletableFuture.supplyAsync(() -> list);
+			}
+			Table t = TableBuilder.newTable(procedureName) //
+					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+					.withColumn(TABLE_FILTERLASTACTION, DataType.BOOLEAN) //
+					.create();
+			Row row = RowBuilder.newRow() //
+					.withValue(keyLong) //
+					.withValue(keyText) //
+					.withValue(false) //
+					.create();
+			t.addRow(row);
+
+			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t);
+			Table ta = null;
+			try {
+				ta = tableFuture.get().getResultSet();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			if (ta != null && !ta.getRows().isEmpty()) {
+				Row r = ta.getRows().get(0);
+				LookupValue lv = new LookupValue(//
+						r.getValue(0).getIntegerValue(), //
+						r.getValue(1).getStringValue(), //
+						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+				map.put(keyLong, lv);
+				list.add(lv);
+			}
+			return CompletableFuture.supplyAsync(() -> list);
+		}
+	}
+
+
+	@Override
+	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText) {
+		ArrayList<LookupValue> list = new ArrayList<>();
+		if (field.getLookupTable() != null) {
+			String tableName = field.getLookupTable();
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
+// cache			
+//			if (map.get(keyLong) != null) {
+//				list.add(map.get(keyLong));
+//				return CompletableFuture.supplyAsync(() -> list);
+//			}
+			Table t = TableBuilder.newTable(tableName) //
+					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
+					.create();
+			Row row = RowBuilder.newRow() //
+					.withValue(null) //
+					.withValue(filterText) //
+					.withValue(null) //
+					.withValue(">0") //
+					.create();
+			t.addRow(row);
+			row = RowBuilder.newRow() //
+					.withValue(null) //
+					.withValue(null) //
+					.withValue(filterText) //
+					.withValue(">0") //
+					.create();
+			t.addRow(row);
+			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
+			Table ta = null;
+			try {
+				ta = tableFuture.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+					map.put(lv.keyLong, lv);
+					list.add(lv);
+				}
+			}
+			return CompletableFuture.supplyAsync(() -> list);
+		} else {
+			// LookupProcedurePrefix
+			String procedureName = field.getLookupProcedurePrefix() + "List";
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
+// cache
+//			if (map.get(keyLong) != null) {
+//				list.add(map.get(keyLong));
+//				return CompletableFuture.supplyAsync(() -> list);
+//			}
+			Table t = TableBuilder.newTable(procedureName) //
+					.withColumn(TABLE_COUNT, DataType.INTEGER) //
+					.withColumn(TABLE_FILTERLASTACTION, DataType.BOOLEAN) //
+					.create();
+			Row row = RowBuilder.newRow() //
+					.withValue(null) //
+					.withValue(false) //
+					.create();
+			for (String paramName : field.getLookupParameters()) {
+				MField paramField = field.getDetail().getField(paramName);
+				t.addColumn(new Column(paramName, paramField.getDataType()));
+				row.addValue(paramField.getValue());
+			}
+			t.addRow(row);
+
+			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t);
+			Table ta = null;
+			try {
+				ta = tableFuture.get().getResultSet();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+					map.put(lv.keyLong, lv);
+					list.add(lv);
+				}
+			}
+			return CompletableFuture.supplyAsync(() -> list);
+		}
+	}
+
+	private CompletableFuture<?> getRequestedTable(int keyLong, String keyText, MField field, String purpose) {
+		MDetail detail = field.getDetail();
+		String tableName;
+		boolean isTable = false;
+		if (field.getLookupTable() != null) {
+			tableName = field.getLookupTable();
+			isTable = true;
+		} else {
+			tableName = field.getLookupProcedurePrefix() + purpose;
+		}
+		TableBuilder tableBuilder = TableBuilder.newTable(tableName);
+		RowBuilder rowBuilder = RowBuilder.newRow();
+		if (isTable) {
+			tableBuilder = tableBuilder.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(TABLE_LASTACTION, DataType.INTEGER);//
+			if (keyLong == 0) {
+				rowBuilder = rowBuilder.withValue(null);
+			} else {
+				rowBuilder = rowBuilder.withValue(keyLong);
+			}
+			rowBuilder = rowBuilder.withValue(keyText);
+			rowBuilder = rowBuilder.withValue(null);
+			rowBuilder = rowBuilder.withValue(">0");
+		} else {
+			// Reihenfolge der Werte einhalten!
+			if (!purpose.equals("List")) {
+				tableBuilder = tableBuilder//
+						.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+						.withColumn(TABLE_KEYTEXT, DataType.STRING);
+				if (keyLong == 0) {
+					rowBuilder = rowBuilder.withValue(null).withValue(keyText);
+				} else {
+					rowBuilder = rowBuilder.withValue(keyLong).withValue(null);
+				}
+			} else if (purpose.equals("List")) {
+				tableBuilder = tableBuilder.withColumn(TABLE_COUNT, DataType.INTEGER);
+				rowBuilder = rowBuilder.withValue(null);
+			}
+			tableBuilder = tableBuilder.withColumn(TABLE_FILTERLASTACTION, DataType.BOOLEAN);
+			rowBuilder = rowBuilder.withValue(false);
+
+			// Einschränken der angegebenen Optionen anhand bereits ausgewählter
+			// Optionen (Kontrakt nur für Kunde x,...)
+			// Für nicht-lookups(bookingdate)->Text übernehmen wenn nicht null
+			// bei leeren feldern ein nullfeld anhängen, alle parameter müssen für die
+			// anfrage gesetzt sein
+			if (purpose.equals("List")) {
+				List<String> parameters = field.getLookupParameters();
+				for (String param : parameters) {
+					MField parameterControl = detail.getField(param);
+					tableBuilder.withColumn(param, parameterControl.getDataType());
+					if (parameterControl.getValue() != null) {
+						rowBuilder.withValue(parameterControl.getValue().getValue());
+					} else {
+						rowBuilder.withValue(null);
+					}
+				}
+			}
+		}
+		Table t = tableBuilder.create();
+		Row row = rowBuilder.create();
+		t.addRow(row);
+		CompletableFuture<?> tableFuture;
+		if (field.getLookupTable() != null) {
+			tableFuture = getIndexDataAsync(t.getName(), t);
+		} else {
+			tableFuture = getDetailDataAsync(t.getName(), t);
+		}
+
+		return tableFuture;
+	}
+
 }

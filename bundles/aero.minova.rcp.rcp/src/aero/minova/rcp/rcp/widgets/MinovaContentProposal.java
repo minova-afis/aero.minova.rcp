@@ -31,7 +31,7 @@ public class MinovaContentProposal implements IContentProposal {
 
 	@Override
 	public String getDescription() {
-		return null;
+		return desription;
 	}
 
 	@Override

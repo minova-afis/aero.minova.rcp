@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -36,6 +35,7 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.helper.ActionCode;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -47,8 +47,6 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private IDataService dataService;
-
-	private ILocalDatabaseService localDatabaseService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -83,10 +81,9 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setDetail(MDetail detail, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
+	public void setDetail(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
-		this.localDatabaseService = localDatabaseService;
 	}
 
 	@Inject
@@ -253,6 +250,9 @@ public class WFCDetailCASRequestsUtil {
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.UPDATE_REQUEST);
 			clearFields(map);
+			if (detail.getHelper() != null) {
+				detail.getHelper().handleDetailAction(ActionCode.SAVE);
+			}
 		}
 	}
 
@@ -271,6 +271,9 @@ public class WFCDetailCASRequestsUtil {
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.INSERT_REQUEST);
 			clearFields(map);
+			if (detail.getHelper() != null) {
+				detail.getHelper().handleDetailAction(ActionCode.SAVE);
+			}
 		}
 	}
 
@@ -324,6 +327,10 @@ public class WFCDetailCASRequestsUtil {
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
+			// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
+			if (detail.getHelper() != null) {
+				detail.getHelper().handleDetailAction(ActionCode.DEL);
+			}
 		}
 	}
 
@@ -335,6 +342,22 @@ public class WFCDetailCASRequestsUtil {
 	public void openNotificationPopup(String message) {
 		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, shell);
 		notificationPopUp.open();
+	}
+
+	/**
+	 * Diese Methode reagiert wird ausgeführt, wenn der Anwender einen neuen
+	 * Datensatz eintragen möchte.
+	 *
+	 * @param origin
+	 */
+	@Optional
+	@Inject
+	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
+		clearFields(map);
+		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
+		if (detail.getHelper() != null) {
+			detail.getHelper().handleDetailAction(ActionCode.NEW);
+		}
 	}
 
 	/**
@@ -351,7 +374,6 @@ public class WFCDetailCASRequestsUtil {
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);
 			}
-
 		}
 	}
 

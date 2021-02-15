@@ -11,7 +11,6 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.ILocalDatabaseService;
 import aero.minova.rcp.model.form.MDetail;
 
 public class WFCDetailUtil {
@@ -38,7 +37,7 @@ public class WFCDetailUtil {
 	@Inject
 	public WFCDetailUtil() {}
 
-	public void bindValues(MDetail detail, MPerspective perspective, ILocalDatabaseService localDatabaseService) {
+	public void bindValues(MDetail detail, MPerspective perspective) {
 //		this.detail = detail;
 //		this.localDatabaseService = localDatabaseService;
 //

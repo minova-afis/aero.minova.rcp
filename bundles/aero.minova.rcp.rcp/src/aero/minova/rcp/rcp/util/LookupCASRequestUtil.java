@@ -15,7 +15,8 @@ import aero.minova.rcp.model.form.MField;
 public class LookupCASRequestUtil {
 	private LookupCASRequestUtil() {}
 
-	public static CompletableFuture<?> getRequestedTable(int keyLong, String keyText, MField field, MDetail detail, IDataService dataService, String purpose) {
+	public static CompletableFuture<?> getRequestedTablexx(int keyLong, String keyText, MField field, MDetail detail, IDataService dataService,
+			String purpose) {
 		String tableName;
 		boolean isTable = false;
 		if (field.getLookupTable() != null) {
