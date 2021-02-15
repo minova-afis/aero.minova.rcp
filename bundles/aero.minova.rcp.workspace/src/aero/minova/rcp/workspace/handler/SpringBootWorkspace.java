@@ -167,7 +167,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(DEFAULT_CONFIG_FOLDER).resolve(KEYSTORE_FILE_NAME);
 			if (isRegularFile(trustStorePath)) {
-				trustStore.load(new FileInputStream(trustStorePath.toString()), "minova123".toCharArray());
+				trustStore.load(new FileInputStream(trustStorePath.toString()), "geheim".toCharArray());
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 				tmf.init(trustStore);
 				TrustManager[] trustManagers = tmf.getTrustManagers();
