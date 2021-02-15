@@ -1,0 +1,8 @@
+= Workspace Preferences
+
+Die Workspace Preferences sind Einstellungen, welche Zugangsdaten für den Workspace abspeichern und zur Verfügung stellen:
+
+* Die URL des Servers mit dem gearbeitet wird.
+* Den Nutzername und das Passwort, welche als Zugriffsdaten für den Server verwendet werden.
+* Das lokale Verzeichnis (application area) des Workspace.
+  Hier werden Daten abgelegt.
