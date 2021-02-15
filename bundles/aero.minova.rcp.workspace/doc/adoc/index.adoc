@@ -1,0 +1,45 @@
+== Workspace Manager
+
+Dieses Plug-in sorgt für die Auswahl des Workspaces.
+
+* xref:./folder.adoc#[Ordnerstruktur]
+
+=== Workspace
+
+Im Workspace werden die Einstellungen der Anwendung gespeichert.
+Jeder Workspace ist mit einer Server-Anwendung verknüpft.
+So ist es möglich, die gleiche Anwendung für mehrere Serververbindungen zu verwenden.
+
+Durch die geplante Synchronisation soll auch die Möglichkeit geschaffen werden, dass gewissen Informationen offline gespeichert werden.
+Dazu gehören unter anderem die folgenden Blöcke.
+
+==== Plug-ins
+
+Es soll möglich sein, dass der Server weitere anwendungsspezifische Plug-ins liefert.
+Die Synchronisation und das Starten der Plug-Ins soll Teil dieses Plgug-ins sein.
+
+Über entsprechende Plug-ins können dann später auch die Icons und die Übersetzungen geliefert werden.
+
+==== Menu
+
+Das Menu soll im ersten Schritt als XML-Datei gesendet werden.
+So kann die bisherige Anwendungsstruktur weiter verwendet werden.
+
+==== Masken
+
+Die Masken und OptionPages sollen auch in ihrer bisherigen Struktur übertragen werden.
+So kann die bisherige Anwendungsstruktur weiter verwendet werden.
+
+==== Konfiguration
+
+Wir haben heute noch eine XBS-Datei.
+In dieser speichern wir die Konfiguration der Anwendung.
+Sie soll auch weiterhin existieren.
+
+In der Zukunft soll die Konfiguration besser in die RCP-Logik integriert werden.
+Dabei müssen aber mehrere Stufen beachtet werden.
+
+* lokal (nur auf diesem Rechner / in diesem Workspace)
+* user (überall, wo der Benutzer sich anmeldet)
+* global (für alle Benutzer)
+* system (Für alle Benutzer, jedoch nicht durch einen Benutzer änderbar)
