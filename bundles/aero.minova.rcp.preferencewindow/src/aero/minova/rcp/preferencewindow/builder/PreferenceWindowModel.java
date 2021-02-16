@@ -88,12 +88,6 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.Advanced", null), 0.3);
 		psd = new PreferenceSectionDescriptor("GeneralExpanded", translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.ALLOW_MULTIPLE_FORMS, translationService.translate("@Preferences.AllowMultipleForms", null),
-				0.1, DisplayType.CHECK, false));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.DISALLOW_DRAG_AND_DROP,
-				translationService.translate("@Preferences.General.DisallowDragAndDrop", null), 0.2, DisplayType.CHECK, false));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_ALL_ACTION_IN_TOOLBAR,
-				translationService.translate("@Preferences.General.ShowAllActioninToolbar", null), 0.3, DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_LOAD_INDEX, translationService.translate("@Preferences.General.AutoLoadIndex", null), 0.4,
 				DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_RELOAD_INDEX, translationService.translate("@Preferences.General.AutoReloadIndex", null),
@@ -117,19 +111,12 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS,
 				translationService.translate("@Preferences.Table.TableSelectionBufferMs", null), 0.1, DisplayType.INTEGER, 150));
 
-		psd = new PreferenceSectionDescriptor("Lookup", translationService.translate("@Preferences.Lookup", null), 0.5);
-		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_RESIZE, translationService.translate("@Preferences.Table.AutoResize", null), 0.1,
-				DisplayType.CHECK, false));
-
-		psd = new PreferenceSectionDescriptor("Grid", translationService.translate("@Preferences.Grid", null), 0.6);
+		psd = new PreferenceSectionDescriptor("Grid", translationService.translate("@Preferences.Grid", null) + "(Deprecated)", 0.6);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_BUTTON_TEXT, translationService.translate("@Preferences.Grid.ShowButtonText", null), 0.1,
 				DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_BUTTON_IN_SECTION,
 				translationService.translate("@Preferences.Grid.ShowButtonsInSection", null), 0.2, DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_LOOKUPS, translationService.translate("@Preferences.Grid.ShowLookups", null), 0.3,
-				DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_GROUPS, translationService.translate("@Preferences.Grid.ShowGroups", null), 0.4,
 				DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_CHANGED_ROWS, translationService.translate("@Preferences.CHANGED.ShowChangedRows", null),
