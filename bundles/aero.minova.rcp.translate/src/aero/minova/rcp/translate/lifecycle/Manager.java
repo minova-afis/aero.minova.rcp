@@ -56,12 +56,6 @@ public class Manager {
 		preferences.put(ApplicationPreferences.ICON_SIZE, symbolMenu);
 		String symbolToolbar = preferences.get(ApplicationPreferences.ICON_SIZE_BIG, "32x32");
 		preferences.put(ApplicationPreferences.ICON_SIZE_BIG, symbolToolbar);
-		boolean masks = preferences.getBoolean(ApplicationPreferences.ALLOW_MULTIPLE_FORMS, false);
-		preferences.putBoolean(ApplicationPreferences.ALLOW_MULTIPLE_FORMS, masks);
-		boolean dragdrop = preferences.getBoolean(ApplicationPreferences.DISALLOW_DRAG_AND_DROP, false);
-		preferences.putBoolean(ApplicationPreferences.DISALLOW_DRAG_AND_DROP, dragdrop);
-		boolean icons = preferences.getBoolean(ApplicationPreferences.SHOW_ALL_ACTION_IN_TOOLBAR, false);
-		preferences.putBoolean(ApplicationPreferences.SHOW_ALL_ACTION_IN_TOOLBAR, icons);
 		boolean indexautoload = preferences.getBoolean(ApplicationPreferences.AUTO_LOAD_INDEX, false);
 		preferences.putBoolean(ApplicationPreferences.AUTO_LOAD_INDEX, indexautoload);
 		boolean indexautoupdate = preferences.getBoolean(ApplicationPreferences.AUTO_RELOAD_INDEX, false);
@@ -78,14 +72,10 @@ public class Manager {
 		preferences.putInt(ApplicationPreferences.MAX_BUFFER_MS, maxbuffer);
 		int selectiondelay = preferences.getInt(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS, 150);
 		preferences.putInt(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS, selectiondelay);
-		boolean sizeautoadjust = preferences.getBoolean(ApplicationPreferences.AUTO_RESIZE, false);
-		preferences.putBoolean(ApplicationPreferences.AUTO_RESIZE, sizeautoadjust);
 		boolean fadeinbuttontext = preferences.getBoolean(ApplicationPreferences.SHOW_BUTTON_TEXT, false);
 		preferences.putBoolean(ApplicationPreferences.SHOW_BUTTON_TEXT, fadeinbuttontext);
 		boolean buttondetailarea = preferences.getBoolean(ApplicationPreferences.SHOW_BUTTON_IN_SECTION, true);
 		preferences.putBoolean(ApplicationPreferences.SHOW_BUTTON_IN_SECTION, buttondetailarea);
-		boolean showlookups = preferences.getBoolean(ApplicationPreferences.SHOW_LOOKUPS, true);
-		preferences.putBoolean(ApplicationPreferences.SHOW_LOOKUPS, showlookups);
 		boolean fadeingroups = preferences.getBoolean(ApplicationPreferences.SHOW_GROUPS, true);
 		preferences.putBoolean(ApplicationPreferences.SHOW_GROUPS, fadeingroups);
 		boolean showchangedrow = preferences.getBoolean(ApplicationPreferences.SHOW_CHANGED_ROWS, true);
