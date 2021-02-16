@@ -17,7 +17,7 @@ Bestimmt den Zeitraum vor einer Linzenz Warnung in Wochen.
 Zeigt das eingestellte Standard Workspace an und ermöglicht dieses zurückzusetzen
 	
 Das Workspace "test" wurde als standard Workspace eingestellt:
-image::images/default_workspace_set.png[Das ist die Bildbeschreibung,500,400]
+image::images/default_workspace_set.png[Das ist die Bildbeschreibung,650,400]
 
 [%hardbreaks]
 
@@ -27,10 +27,10 @@ Fall True (Default):
 Der eingetragene oder ausgewählte Wert wird festgesetzt und der Benutzer springt ins erste Pflichtfeld der Maske.
 
 Position vor dem Betätigen von ENTER:
-image::images/enter_selects_first_required_start.png[Position vor drücken von ENTER,500,400]
+image::images/enter_selects_first_required_start.png[Position vor drücken von ENTER,650,400]
 
 Position nach dem Betätigen von ENTER mit EnterSelectsFirstRequired = true:
-image::images/enter_selects_first_required_true.png[Position nach drücken von ENTER bei der Option true,500,400]
+image::images/enter_selects_first_required_true.png[Position nach drücken von ENTER bei der Option true,650,400]
 
 [%hardbreaks]
 	 
@@ -38,10 +38,10 @@ Fall False:
 Der eingetragene oder ausgewählte Wert wird festgesetzt und der Benutzer springt ins nächste Pflichtfeld.
 
 Position vor dem Betätigen von ENTER:
-image::images/enter_selects_first_required_start.png[Position vor drücken von ENTER,500,400]
+image::images/enter_selects_first_required_start.png[Position vor drücken von ENTER,650,400]
 
 Position nach dem Betätigen von ENTER mit EnterSelectsFirstRequired = false:
-image::images/enter_selects_first_required_false.png[Position nach drücken von ENTER mit der Option false,500,400]
+image::images/enter_selects_first_required_false.png[Position nach drücken von ENTER mit der Option false,650,400]
 
 
 [%hardbreaks]
@@ -52,19 +52,19 @@ Fall True (Default):
 Der in der LookupComboBox ausgewählte Wert wird festgesetzt und der Benutzer springt ins nächste Pflichtfeld.
 
 Position vor dem Betätigen von ENTER im LookupControl:
-image::images/lookup_enter_selects_next_required_start.png[Start,500,400]
+image::images/lookup_enter_selects_next_required_start.png[Start,650,400]
 
 Position nach dem Betätigen von ENTER im LookupControl mit LookupEnterSelectsNextRequired = true:
-image::images/lookup_enter_selects_next_required_true.png[True,500,400]
+image::images/lookup_enter_selects_next_required_true.png[True,650,400]
 
 Fall False:
 Der in der LookupComboBox ausgewählte Wert wird festgesetzt und der Benutzer bleibt im Feld.
 
 Position vor dem Betätigen von ENTER im LookupControl:
-image::images/lookup_enter_selects_next_required_start.png[Start,500,400]
+image::images/lookup_enter_selects_next_required_start.png[Start,650,400]
 
 Position nach dem Betätigen von ENTER im LookupControl mit LookupEnterSelectsNextRequired = false:
-image::images/lookup_enter_selects_next_required_false.png[False,500,400]
+image::images/lookup_enter_selects_next_required_false.png[False,650,400]
 
 [%hardbreaks]
 
@@ -74,19 +74,19 @@ Fall True (Default):
 Der Benutzer kann mit TAB in die Controls(Speichern, Neu, ...) navigieren.
 
 Position vor dem Betätigen von TAB:
-image::images/select_all_controls_start.png[Start,500,400]
+image::images/select_all_controls_start.png[Start,650,400]
 
 Position nach dem Betätigen von TAB mit SelectAllControls = true:
-image::images/select_all_controls_true.png[Start,500,400]
+image::images/select_all_controls_true.png[True,650,400]
 	
 Fall False:
 Der Benutzer kann mit TAB nicht in die Controls(Speichern, Neu, ...) navigieren.
 	 
 Position vor dem Betätigen von TAB:
-image::images/select_all_controls_start.png[Start,500,400]
+image::images/select_all_controls_start.png[Start,650,400]
 
 Position nach dem Betätigen von TAB mit SelectAllControls = false:
-image::images/select_all_controls_false.png[Start,500,400]
+image::images/select_all_controls_false.png[False,650,400]
 
 [%hardbreaks]
 
@@ -115,17 +115,36 @@ Bestimmt die Zeitzone des Anwenders. Der Server arbeitet immer in der Zeitzone U
 
 Bestimmt die Schriftgröße der Anwendung.
 
+Schriftgröße ist auf M gesetzt:
+image::images/fontsize_M.png[M,650,400]
+
+Schriftgröße ist auf L gesetzt:
+image::images/fontsize_L.png[L,650,400]
+
+
 [%hardbreaks]
 
 ===== Symbole [Menü, Detail]
 
 Bestimmt die Größe der Symbole für Menü, Detail, usw.
 
+Die Größe der Symbole ist auf 24x24 gesetzt:
+image::images/symbol_size_small_24x24.png[24x24,650,400]
+
+Die Größe der Symbole ist auf 32x32 gesetzt:
+image::images/symbol_size_small_32x32.png[32x32,650,400]
+
 [%hardbreaks]
 
 ===== Symbole [Toolbar]
 
 Bestimmt die Größe der Symbole in den ToolBars.
+
+Die Größe der Symbole ist auf 32x32 gesetzt:
+image::images/symbol_size_big_32x32.png[32x32,650,400]
+
+Die Größe der Symbole ist auf 48x48 gesetzt:
+image::images/symbol_size_big_48x48.png[48x48,650,400]
 
 [%hardbreaks]
 
@@ -151,7 +170,13 @@ Das Meldungsfenster für Fehler wird an die Menüleiste angebunden.
 
 ===== Beschreibung für Schaltflächen einblenden
 
-Blendet den Text neben den Schaltflächen in den Toolbars der Sections ein.
+Blendet den Text von Schaltflächen in den Toolbars ein.
+
+Schaltflächen in den Toolbars mit ShowButtonText = false:
+image::images/show_button_text_false.png[false,650,400]
+
+Schaltflächen in den Toolbars mit ShowButtonText = true:
+image::images/show_button_text_true.png[true,650,400]
 
 [%hardbreaks]
 
@@ -179,15 +204,27 @@ nicht geändert wurde.
 
 Blendet den Text neben den Schaltflächen in den Toolbars der Sections ein.
 
+Schaltflächen in den Toolbars in der Section mit ShowDetailButtonText = false:
+image::images/show_detail_button_text_false.png[false,650,400]
+
+Schaltflächen in den Toolbars in der Section mit ShowDetailButtonText = true:
+image::images/show_detail_button_text_true.png[true,650,400]
+
 [%hardbreaks]
 
-===== Gruppen einblenden
+===== Gruppen einblenden (Nicht implementiert)
 
 Erlaubt Gruppen in Teiltabellen.
 
+Teiltabelle mit Gruppierung auf Produktcode:
+image::images/show_groups_true.png[True,650,400]
+
+Teiltabelle mit ShowGroups = false:
+image::images/show_groups_false.png[False,650,400]
+
 [%hardbreaks]
 
-===== Zeige geänderte Zeilen
+===== Zeige geänderte Zeilen (Nicht implementiert)
 
 Makiert geänderte, gelöschte und neue Zeilen.
 
@@ -211,11 +248,23 @@ Bestimmt die Schriftart des Inhaltsverzeichnisses beim Drucken.
 
 Optimiert die Breiten der Spalten beim Drucken.
 
+Druckvorschau im Index mit OptimizeWidth = true:
+image::images/optimize_width_true.png[True,650,200]
+
+Druckvorschau im Index mit OptimizeWidth = false:
+image::images/optimize_width_false.png[False,650,200]
+
 [%hardbreaks]
 
 ===== Leere Spalten verbergen
 
-Verbirgt beim Drucken die leeren Spalten.
+Verbirgt beim Drucken die leeren Spalten. 
+
+Druckvorschau im Index mit HideEmptyCols = true:
+image::images/hide_empty_cols_true.png[True,750,200]
+
+Druckvorschau im Index mit HideEmptyCols = false:
+image::images/hide_empty_cols_false.png[False,750,200]
 
 [%hardbreaks]
 
@@ -223,11 +272,23 @@ Verbirgt beim Drucken die leeren Spalten.
 
 Verbirgt beim Drucken die Spalten, die die Gruppen bilden.
 
+Druckvorschau im Index mit HideGroupCols = true:
+image::images/hide_group_cols_true.png[True,750,200]
+
+Druckvorschau im Index mit HideGroupCols = false:
+image::images/hide_group_cols_false.png[False,750,200]
+
 [%hardbreaks]
 
 ===== Suchkriterien verbergen
 
 Verbirgt beim Drucken die Suchkriterien.
+
+Druckvorschau im Index mit HideSearchCriterias = true:
+image::images/hide_search_criterias_true.png[True,750,200]
+
+Druckvorschau im Index mit HideSearchCriterias = false:
+image::images/hide_search_criterias_false.png[False,750,200]
 
 [%hardbreaks]
 
