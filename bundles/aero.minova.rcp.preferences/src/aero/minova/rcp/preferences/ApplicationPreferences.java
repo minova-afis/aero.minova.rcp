@@ -20,12 +20,6 @@ public class ApplicationPreferences {
 	 */
 	public static final String TIMEZONE = "Timezone";
 
-	/**
-	 * Erlaubt Masken merfach zu öffnen.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String ALLOW_MULTIPLE_FORMS = "AllowMultipleForms";
 
 	/**
 	 * Die Daten im Index werden beim Öffnen der Maske automatisch geladen.
@@ -42,13 +36,6 @@ public class ApplicationPreferences {
 	public static final String AUTO_RELOAD_INDEX = "AutoReloadIndex";
 
 	/**
-	 * Passt die Größe der Tabellen automatisch an.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String AUTO_RESIZE = "AutoResize";
-
-	/**
 	 * Erstellt beim Drucken neben einem PDF auch eine eine XML und XSL Datei im gleichen Ordner.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
@@ -61,13 +48,6 @@ public class ApplicationPreferences {
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String DISABLE_PREVIEW = "DisablePreview";
-
-	/**
-	 * DragDrop deaktivieren.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String DISALLOW_DRAG_AND_DROP = "DisallowDragAndDrop";
 
 	/**
 	 * Bestimmt die Zeit, die die Anwendung wartet bevor sie den Detail Bereich aktualisiert .
@@ -201,13 +181,6 @@ public class ApplicationPreferences {
 	public static final String SHEET_STYLES_MESSAGE_BOXES = "SheetStylesMessageBoxes";
 
 	/**
-	 * Blendet die Icons aller Masken in die Symbolleiste ein.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String SHOW_ALL_ACTION_IN_TOOLBAR = "ShowAllActioninToolbar";
-
-	/**
 	 * Blendet den Text neben den Schaltflächen in den Toolbars der Sections ein.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
@@ -241,13 +214,6 @@ public class ApplicationPreferences {
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String SHOW_GROUPS = "ShowGroups";
-
-	/**
-	 * Aktiviert Lookups in Teiltabellen.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String SHOW_LOOKUPS = "ShowLookups";
 
 	/**
 	 * Bestimmt die Dauer, die bei einer Auswahl gewartet wird, bevor das Event gesendet wird. Zum Beispiel, wenn man mit den Pfeiltasten durch die Tabelle geht,
