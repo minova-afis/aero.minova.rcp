@@ -2,18 +2,21 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.xml.sax.SAXException;
 
 import aero.minova.rcp.dataservice.IDataFormService;
+import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -25,6 +28,9 @@ import aero.minova.rcp.model.Table;
 
 @Component
 public class DataFormService implements IDataFormService {
+
+	@Reference
+	IDataService dataService;
 
 	@Override
 	public Table getTableFromFormIndex(Form form) {
@@ -157,9 +163,10 @@ public class DataFormService implements IDataFormService {
 
 		Form form = null;
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
+			XmlProcessor xmlProcessor = new XmlProcessor();
 			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
+					Form.class);
 
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
@@ -274,17 +281,24 @@ public class DataFormService implements IDataFormService {
 
 	@Override
 	public Form getForm(String name) {
+
 		Form form = null;
+		CompletableFuture<String> hashedFile = dataService.getHashedFile(name); // Datei ggf. vom Server holen
+		// form wird synchron geladen, das sollte später auch asynchron werden
+		String formContent = hashedFile.join();
+		
+		XmlProcessor xmlProcessor = new XmlProcessor();
 		try {
-			File formFile = new File(new URI(Platform.getInstanceLocation().getURL().toURI().toString() + name));
+			String localpath = Platform.getInstanceLocation().getURL().toURI().toString();
+			File formFile = new File(localpath + name);
 			if (!formFile.exists()) {
 				// Datei vom Server holen
 			}
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
-			form = (Form) xmlProcessor.load(formFile);
-		} catch (URISyntaxException | JAXBException | SAXException | IOException e) {
-			e.printStackTrace();
+			form = xmlProcessor.get(formContent, Form.class);
+		} catch (URISyntaxException | JAXBException ex) {
+			throw new RuntimeException(ex);
 		}
+
 		return form;
 	}
 

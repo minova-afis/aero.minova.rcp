@@ -1,6 +1,7 @@
 package aero.minova.rcp.dataservice;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -12,7 +13,7 @@ import aero.minova.rcp.model.form.MLookupField;
 
 public interface IDataService {
 
-	void setCredentials(String username, String password, String server, String workspacePath);
+	void setCredentials(String username, String password, String server, URI uri);
 
 	/**
 	 * Anfrage an den Server ein Table object zu bekommen, mit den Suchkriterium
@@ -63,31 +64,11 @@ public interface IDataService {
 	 */
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText);
 
-	CompletableFuture<String> getFile(String path);
-	CompletableFuture<Path> getPath(String path);
-
-	/**
-	 * Eine Datei vom CAS laden. Die Datei wird in den Workspace geladen. Dabei wird
-	 * die gleiche Struktur, wie auf dem Server verwendet.
-	 * </p>
-	 * </p>
-	 * Die Datei wird nur geladen, wenn sie noch nicht im Workspace ist.
-	 * 
-	 * @param filename Name inklusive Verzeichnis auf dem CAS.
-	 */
-
-	<T> T convert(File f, Class<T> clazz);
-
-
-	String getFileContent(String path);
-	/**
-	 * synchrones laden einer Datei vom Cache.
-	 *
-	 * @param filename relativer Pfad und Dateiname auf dem Server
-	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
-	 */
 	File getFileSynch(String filename);
 
+
 	Path getStoragePath();
+
+	CompletableFuture<String> getHashedFile(String filename);
 
 }

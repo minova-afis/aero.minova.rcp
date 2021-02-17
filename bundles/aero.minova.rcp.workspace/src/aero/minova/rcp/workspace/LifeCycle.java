@@ -1,6 +1,7 @@
 package aero.minova.rcp.workspace;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
@@ -56,9 +57,9 @@ public class LifeCycle {
 											// ausgesucht
 			}
 		}
-		String workspaceLocation = null;
+		URI workspaceLocation = null;
 		try {
-			workspaceLocation = Platform.getInstanceLocation().getURL().toURI().toString();
+			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

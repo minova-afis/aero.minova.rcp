@@ -25,14 +25,29 @@ public class MenuProcessor {
 
 	public static String mdiFileName = "application.mdi";
 	public static String xbsFileName = "application.xbs";
+	private MMenu menu;
+	private EModelService modelService;
+	private MApplication mApplication;
 
 	@Inject
 	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService,
-			IDataService dataService, MApplication mApplication) throws JAXBException {
+			IDataService dataService, MApplication mApplication) {
 
-		String fileContent = dataService.getFileContent(mdiFileName);
+		this.menu = menu;
+		this.modelService = modelService;
+		this.mApplication = mApplication;
+		dataService.getHashedFile(mdiFileName).thenAccept(fileContent -> processXML(fileContent));
+		
+	}
+
+	private void processXML(String fileContent) {
 		XmlProcessor xmlProcessor = new XmlProcessor();
-		Main mainMDI = xmlProcessor.get(fileContent, Main.class);
+		Main mainMDI = null;
+		try {
+			mainMDI = xmlProcessor.get(fileContent, Main.class);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 
 		if (mainMDI != null) {
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
@@ -53,7 +68,6 @@ public class MenuProcessor {
 			}
 		}
 	}
-
 
 	/**
 	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der Einträge
