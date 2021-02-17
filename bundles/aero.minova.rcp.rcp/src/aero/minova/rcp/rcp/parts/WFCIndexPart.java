@@ -1,10 +1,5 @@
 package aero.minova.rcp.rcp.parts;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -15,10 +10,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -66,18 +59,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.ValueDeserializer;
-import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.Constants;
@@ -91,28 +77,15 @@ import ca.odell.glazedlists.TransformedList;
 public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
-	@Preference
-	private IEclipsePreferences prefs;
-
-	@Inject
-	private IMinovaJsonService mjs;
-
-	@Inject
 	private ESelectionService selectionService;
 
 	private Table data;
-
-	private FormToolkit formToolkit;
-
-	private Composite composite;
-
-	private Gson gson;
 
 	private NatTable natTable;
 	private BodyLayerStack<Row> bodyLayerStack;
 	private IEclipseContext context;
 
-	private Map<String, Field> fields = new HashMap();
+	private Map<String, Field> fields = new HashMap<>();
 
 	@Inject
 	TranslationService translationService;
@@ -130,22 +103,14 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
-		composite = parent;
-		formToolkit = new FormToolkit(parent.getDisplay());
+		new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
 			return;
 		}
 
 		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 
-		String tableName = form.getIndexView().getSource();
-
-		String string = prefs.get(tableName, null);
 		data = dataFormService.getTableFromFormIndex(form);
-		data.addRow();
-		if (string != null) {
-			data = mjs.json2Table(string);
-		}
 
 		parent.setLayout(new GridLayout());
 
@@ -163,31 +128,6 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
-
-		gson = new Gson();
-		gson = new GsonBuilder() //
-				.registerTypeAdapter(Value.class, new ValueSerializer()) //
-				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
-				.setPrettyPrinting() //
-				.create();
-
-		try {
-			Path path = Path.of(dataService.getStoragePath().toString(), "cache", "jsonTableIndex");
-			File jsonFile = new File(path.toString());
-			jsonFile.createNewFile();
-
-			String content = Files.readString(path, StandardCharsets.UTF_8);
-			if (!content.equals("")) {
-				Table indexTable = gson.fromJson(content, Table.class);
-				if (indexTable.getRows() != null) {
-					updateData(indexTable.getRows());
-				}
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@PersistTableSelection
@@ -220,12 +160,6 @@ public class WFCIndexPart extends WFCFormPart {
 		if (map.get(perspective) != null) {
 			Table table = map.get(perspective);
 			updateData(table.getRows());
-			try {
-				Path file = Path.of(dataService.getStoragePath().toString(), "cache" + "jsonTableIndex");
-				Files.write(file, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
