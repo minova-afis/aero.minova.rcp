@@ -14,6 +14,14 @@ public interface IDataService {
 
 	void setCredentials(String username, String password, String server, String workspacePath);
 
+	/**
+	 * Anfrage an den Server ein Table object zu bekommen, mit den Suchkriterium
+	 * definiert über den searchTab
+	 * 
+	 * @param tableName
+	 * @param seachTable
+	 * @return
+	 */
 	CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable);
 
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
