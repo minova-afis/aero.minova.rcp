@@ -1,7 +1,9 @@
 package aero.minova.rcp.workspace;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -44,9 +46,6 @@ public class LifeCycle {
 				if (!Platform.getInstanceLocation().isSet()) {
 					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
 				}
-				dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null),
-						sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
-						sPrefs.get(WorkspaceAccessPreferences.URL, null));
 			} catch (StorageException e) {
 				logger.error(e);
 			}
@@ -56,9 +55,17 @@ public class LifeCycle {
 				System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
 											// ausgesucht
 			}
-			dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
-					workspaceDialog.getConnection());
 		}
+		String workspaceLocation = null;
+		try {
+			workspaceLocation = Platform.getInstanceLocation().getURL().toURI().toString();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		Objects.requireNonNull(workspaceLocation);
+		dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
+				workspaceDialog.getConnection(), workspaceLocation);
+
 		Manager manager = new Manager();
 		manager.postContextCreate(workbenchContext);
 
