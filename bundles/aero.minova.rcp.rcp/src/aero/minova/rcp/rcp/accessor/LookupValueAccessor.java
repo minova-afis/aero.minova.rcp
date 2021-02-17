@@ -37,14 +37,29 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 	}
 
+	public LookupValue getValueFromSync(Integer keyLong, String keyText) {
+		CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true,
+				keyLong, keyText);
+		List<LookupValue> llv = resolveLookup.join();
+		if (!llv.isEmpty()) {
+			return llv.get(0);
+		}
+		return null;
+	}
+
+	public CompletableFuture<List<LookupValue>> getValueFromAsync(Integer keyLong, String keyText) {
+		return dataService.resolveLookup((MLookupField) field, true, keyLong, keyText);
+	}
+
 	/*
-	 * Wenn wir einen Wert anfragen sollten wir immer nur einen erhalten. Die Ausnahme funktiniert nur bei einer Anfrage über KeyText. Dann wird der 1.
+	 * Wenn wir einen Wert anfragen sollten wir immer nur einen erhalten. Die
+	 * Ausnahme funktioniert nur bei einer Anfrage über KeyText. Dann wird der 1.
 	 * genommen.
 	 */
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
 		try {
-		System.out.println("updateControlFromValue " + value.toString());
+			System.out.println("updateControlFromValue " + value.toString());
 		} catch (NullPointerException npe) {
 			System.out.println("updateControlFromValue null");
 		}
@@ -63,10 +78,14 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		} else {
 			Integer keyLong = null;
 			String keyText = null;
-			if (value.getType() == DataType.INTEGER) keyLong = value.getIntegerValue();
-			else keyText = value.getStringValue();
+			if (value.getType() == DataType.INTEGER) {
+				keyLong = value.getIntegerValue();
+			} else {
+				keyText = value.getStringValue();
+			}
 
-			CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true, keyLong, keyText);
+			CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true,
+					keyLong, keyText);
 			resolveLookup.thenAccept(llv -> sync.asyncExec(() -> {
 				if (llv.isEmpty()) {
 					((Lookup) control).getDescription().setText("");
@@ -81,15 +100,18 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 	@Override
 	/**
-	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
-	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
+	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der
+	 * Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und
+	 * die Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er
+	 * bereits gesetzt wurde oder ob dies getan Werden muss
 	 */
 	public void setFocussed(boolean focussed) {
 		if (focussed) {
 			return; // wenn wir den Focus erhalten, machen wir nichts
 		}
 
-		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine Optionen vorlagen oder der DisplayValue neu gesetzt wird
+		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine
+		// Optionen vorlagen oder der DisplayValue neu gesetzt wird
 		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
 			((Lookup) control).setMessage("");
 			String displayText = ((Lookup) control).getText();
