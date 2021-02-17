@@ -103,7 +103,12 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		chargedQuantity.setValue(valueCh, true);
 		endDateValue = endDate.getValue();
 		bookingDateValue = bookingDate.getValue();
-		employeeValue = (LookupValue) employee.getValue();
+		if (employee.getValue() instanceof LookupValue) {
+			employeeValue = (LookupValue) employee.getValue();
+		} else {
+			System.err.println(
+					"WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
+		}
 	}
 
 	public float getFloatFromMinutes(long min) {

@@ -92,7 +92,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 					((Lookup) control).setText("");
 					((Lookup) control).setMessage("?");
 				} else {
-					updateControlFromValue(control, llv.get(0)); // wir setzen ja oben und verlassen dann diese Methode
+					field.setValue(llv.get(0), false);
+					updateControlFromValue(control, llv.get(0));
+					// verlassen dann diese Methode
 				}
 			}));
 		}
