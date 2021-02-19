@@ -2,8 +2,6 @@ package aero.minova.rcp.preferencewindow.control;
 
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -20,9 +18,8 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWCheckBox(final String label, final String propertyKey, PreferenceWindow pwindow) {
+	public CustomPWCheckBox(final String label, final String propertyKey) {
 		super(label, propertyKey, 1, true);
-		this.pwindow = pwindow;
 	}
 
 	/**
@@ -30,16 +27,11 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		Point widthWindow = pwindow.getShell().getSize();
-		
 		if (getLabel() == null) {
 			throw new UnsupportedOperationException("Please specify a label for a checkbox");
 		}
 		final Button button = new Button(parent, SWT.CHECK);
 		addControl(button);
-//		GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-//		buttonGridData.widthHint = widthWindow.x - 50;
-//		button.setLayoutData(buttonGridData);
 		button.setText(getLabel());
 		final boolean originalSelection = (Boolean) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
 		button.setSelection(originalSelection);
