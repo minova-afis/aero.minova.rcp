@@ -64,7 +64,7 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.Layout", null), 0.2);
 		psd = new PreferenceSectionDescriptor("GeneralDesign", translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.LOCALE_LANGUAGE, translationService.translate("@Preferences.General.LocalLanguage", null), 0.1,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.LOCALE_LANGUAGE, translationService.translate("@Preferences.General.LocalLanguage", null), 0.2,
 				DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(Locale.getDefault())));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEZONE, "Zeitzone", 0.3, DisplayType.ZONEID,
 				CustomTimeZone.displayTimeZone(ZoneId.systemDefault().getDisplayName(TextStyle.FULL, locale), locale),
@@ -88,15 +88,15 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.Advanced", null), 0.3);
 		psd = new PreferenceSectionDescriptor("GeneralExpanded", translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_LOAD_INDEX, translationService.translate("@Preferences.General.AutoLoadIndex", null), 0.4,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_LOAD_INDEX, translationService.translate("@Preferences.General.AutoLoadIndex", null), 0.1,
 				DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_RELOAD_INDEX, translationService.translate("@Preferences.General.AutoReloadIndex", null),
-				0.5, DisplayType.CHECK, false));
+				0.2, DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES,
-				translationService.translate("@Preferences.General.SheetStylesMessageBoxes", null), 0.6, DisplayType.CHECK, true));
+				translationService.translate("@Preferences.General.SheetStylesMessageBoxes", null), 0.3, DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DETAIL_BUTTON_TEXT,
-				translationService.translate("@Preferences.General.ShowDetailButtonText", null), 0.7, DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.USE_FORM_BUFFER, translationService.translate("@Preferences.UseFormBuffer", null), 0.8,
+				translationService.translate("@Preferences.General.ShowDetailButtonText", null), 0.4, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.USE_FORM_BUFFER, translationService.translate("@Preferences.UseFormBuffer", null), 0.5,
 				DisplayType.CHECK, true));
 
 		psd = new PreferenceSectionDescriptor("Buffer", translationService.translate("@Preferences.Buffer", null), 0.2);
@@ -111,16 +111,17 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS,
 				translationService.translate("@Preferences.Table.TableSelectionBufferMs", null), 0.1, DisplayType.INTEGER, 150));
 
-		psd = new PreferenceSectionDescriptor("Grid", translationService.translate("@Preferences.Grid", null) + "(Deprecated)", 0.6);
-		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_BUTTON_TEXT, translationService.translate("@Preferences.Grid.ShowButtonText", null), 0.1,
-				DisplayType.CHECK, false));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_BUTTON_IN_SECTION,
-				translationService.translate("@Preferences.Grid.ShowButtonsInSection", null), 0.2, DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_GROUPS, translationService.translate("@Preferences.Grid.ShowGroups", null), 0.4,
-				DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_CHANGED_ROWS, translationService.translate("@Preferences.CHANGED.ShowChangedRows", null),
-				0.5, DisplayType.CHECK, true));
+//		Die Section Teiltabelle wird ausgeblendet. Die Preferences werden zu einem späteren Zeitpunkt teilweise wieder implementiert.
+//		psd = new PreferenceSectionDescriptor("Grid", translationService.translate("@Preferences.Grid", null), 0.6);
+//		ptd.add(psd);
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_BUTTON_TEXT, translationService.translate("@Preferences.Grid.ShowButtonText", null), 0.1,
+//				DisplayType.CHECK, false));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_BUTTON_IN_SECTION,
+//				translationService.translate("@Preferences.Grid.ShowButtonsInSection", null), 0.2, DisplayType.CHECK, true));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_GROUPS, translationService.translate("@Preferences.Grid.ShowGroups", null), 0.4,
+//				DisplayType.CHECK, true));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_CHANGED_ROWS, translationService.translate("@Preferences.CHANGED.ShowChangedRows", null),
+//				0.5, DisplayType.CHECK, true));
 
 		return ptd;
 	}
