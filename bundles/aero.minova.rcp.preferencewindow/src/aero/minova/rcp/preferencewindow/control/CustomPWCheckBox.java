@@ -4,7 +4,6 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -24,7 +23,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 *            associated key
 	 */
 	public CustomPWCheckBox(final String label, final String propertyKey, TranslationService translationService) {
-		super(label, propertyKey, 1, true);
+		super(label, propertyKey, 2, true);
 		this.translationService = translationService;
 	}
 
@@ -33,26 +32,16 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("Please specify a label for a checkbox");
-		}
-		final Button button = new Button(parent, SWT.CHECK);
-		addControl(button);
-		button.setText(getLabel());
-		final boolean originalSelection = (Boolean) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		button.setSelection(originalSelection);
-
-		button.addListener(SWT.Selection, e -> {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), button.getSelection());
-		});
-
+		
+		
 		Label explanation = new Label(parent, SWT.NONE);
-		explanation.setText(translationService.translate("@" + getCustomPropertyKey() + "Explanation", null));
-		GridData explanationGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+		explanation.setText(getLabel());
+		GridData explanationGridData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		explanationGridData.horizontalSpan = 2;
 		explanationGridData.horizontalIndent = getIndent();
 		explanation.setLayoutData(explanationGridData);
-
-		return button;
+		
+		return explanation;
 	}
 
 	/**
@@ -71,3 +60,4 @@ public class CustomPWCheckBox extends CustomPWWidget {
 		}
 	}
 }
+
