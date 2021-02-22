@@ -167,7 +167,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(DEFAULT_CONFIG_FOLDER).resolve(KEYSTORE_FILE_NAME);
 			if (isRegularFile(trustStorePath)) {
-				trustStore.load(new FileInputStream(trustStorePath.toString()), "minova123".toCharArray());
+				trustStore.load(new FileInputStream(trustStorePath.toString()), "password".toCharArray());
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 				tmf.init(trustStore);
 				TrustManager[] trustManagers = tmf.getTrustManagers();
@@ -241,11 +241,13 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		} catch (ConnectException ex) {
 			throw new WorkspaceException("Server nicht bekannt!");
 		} catch (IOException e) {
-			throw new WorkspaceException("User oder Passwort nicht korrekt");
+			throw new WorkspaceException("User oder Passwort nicht korrekt" + e.getMessage());
 		} catch (InterruptedException i) {
 			throw new WorkspaceException("Try Again!");
 		} catch (IllegalArgumentException i) {
 			throw new WorkspaceException("Ungültige URL!");
+		} catch (NullPointerException e) {
+			throw new WorkspaceException("Bitte Passwort nochmal eintragen!!!");
 		}
 	}
 

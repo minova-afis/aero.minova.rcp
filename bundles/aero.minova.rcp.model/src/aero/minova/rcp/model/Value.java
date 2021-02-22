@@ -104,8 +104,12 @@ public class Value implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		Value v = null;
-		if (obj instanceof Value) v = (Value) obj;
-		if (v == null) return false; // wir sind gesetzt und vergleichen mit null -> false
-		return (this.type == v.type && this.value.equals(v.value));
+		if (obj instanceof Value) {
+			v = (Value) obj;
+		}
+		if (v == null) {
+			return false; // wir sind gesetzt und vergleichen mit null -> false
+		}
+		return (this.type == v.type && this.value.equals(v.value) && this.getClass().equals(v.getClass()));
 	}
 }
