@@ -16,6 +16,7 @@ import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
@@ -183,7 +184,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
-			widget = new CustomPWCheckBox(pref.getLabel(), key).setIndent(25).setAlignment(SWT.FILL);
+			widget = new PWCheckbox(pref.getLabel(), key).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		case URL:
 			widget = new PWURLText(pref.getLabel(), key);
@@ -202,6 +203,9 @@ public class ApplicationPreferenceWindow {
 			break;
 		case CUSTOMCHECK:
 			widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+			break;
+		case CHECKEXPLANATION:
+			widget = new CustomPWCheckBox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		default:
 			break;
