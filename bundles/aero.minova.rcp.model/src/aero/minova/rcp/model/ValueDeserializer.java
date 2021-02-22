@@ -13,8 +13,12 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 
 	@Override
 	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-		String typeString = json.getAsString().substring(0, 1);
-		String value = json.getAsString().substring(2);
+		return deserialize(json.getAsString());
+	}
+
+	public static Value deserialize(String valueText) {
+		String typeString = valueText.substring(0, 1);
+		String value = valueText.substring(2);
 		switch (typeString) {
 		case "n":
 			return new Value(Integer.parseInt(value));
@@ -28,6 +32,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			return new Value(ZonedDateTime.parse(value));
 		case "b":
 			return new Value(Boolean.valueOf(value));
+		case "f": // Filter
+			return new FilterValue(value);
 		default:
 			break;
 		}
