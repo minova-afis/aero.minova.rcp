@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-public class CustomPWCheckBox extends CustomPWWidget {
+public class ExplanationLabelForPWCheckbox extends CustomPWWidget {
 
 	PreferenceWindow pwindow;
 	
@@ -22,7 +22,7 @@ public class CustomPWCheckBox extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWCheckBox(final String label, final String propertyKey, TranslationService translationService) {
+	public ExplanationLabelForPWCheckbox(final String label, final String propertyKey, TranslationService translationService) {
 		super(label, propertyKey, 2, true);
 		this.translationService = translationService;
 	}

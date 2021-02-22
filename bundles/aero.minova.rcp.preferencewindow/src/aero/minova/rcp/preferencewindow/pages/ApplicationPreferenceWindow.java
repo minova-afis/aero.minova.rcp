@@ -40,7 +40,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.preferencewindow.control.CustomPWCheckBox;
+import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -205,7 +205,7 @@ public class ApplicationPreferenceWindow {
 			widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
 			break;
 		case CHECKEXPLANATION:
-			widget = new CustomPWCheckBox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
+			widget = new ExplanationLabelForPWCheckbox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		default:
 			break;
