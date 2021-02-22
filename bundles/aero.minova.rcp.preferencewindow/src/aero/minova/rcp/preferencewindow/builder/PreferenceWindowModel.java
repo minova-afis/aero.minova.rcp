@@ -51,8 +51,10 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
 				translationService.translate("@Preferences.EnterSelectFirstRequired", null), 0.1, DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED,
-				translationService.translate("@Preferences.LookupEnterSelectNextRequired", null), 0.2, DisplayType.CHECKEXPLANATION, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SELECT_ALL_CONTROLS, translationService.translate("@Preferences.SelectAllControls", null), 0.3,
+				translationService.translate("@Preferences.LookupEnterSelectNextRequired", null), 0.2, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED,
+				translationService.translate("@Preferences.LookupEnterSelectNextRequiredExplanation", null), 0.3, DisplayType.CHECKEXPLANATION, true));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SELECT_ALL_CONTROLS, translationService.translate("@Preferences.SelectAllControls", null), 0.4,
 				DisplayType.CHECK, true));
 		return ptd;
 	}
