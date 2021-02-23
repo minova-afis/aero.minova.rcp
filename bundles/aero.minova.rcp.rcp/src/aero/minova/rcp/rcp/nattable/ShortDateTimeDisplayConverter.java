@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
-import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.DateUtil;
 
 public class ShortDateTimeDisplayConverter extends DisplayConverter {
 
@@ -24,7 +24,7 @@ public class ShortDateTimeDisplayConverter extends DisplayConverter {
 			IEclipsePreferences node = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 			String string = node.get("timezone", "UTC");
 			ZoneId z = ZoneId.of(string);
-			return DateTimeUtil.getDateTimeString((Instant) canonicalValue, locale, z);
+			return DateUtil.getDateTimeString((Instant) canonicalValue, locale, z);
 		}
 		return null;
 	}

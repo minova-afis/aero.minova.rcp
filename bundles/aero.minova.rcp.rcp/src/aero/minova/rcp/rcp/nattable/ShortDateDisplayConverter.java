@@ -5,7 +5,7 @@ import java.util.Locale;
 
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
-import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.DateUtil;
 
 public class ShortDateDisplayConverter extends DisplayConverter {
 
@@ -18,7 +18,7 @@ public class ShortDateDisplayConverter extends DisplayConverter {
 	@Override
 	public Object canonicalToDisplayValue(Object canonicalValue) {
 		if (canonicalValue instanceof Instant) {
-			return DateTimeUtil.getDateString((Instant) canonicalValue, locale);
+			return DateUtil.getDateString((Instant) canonicalValue, locale);
 		}
 		return null;
 	}

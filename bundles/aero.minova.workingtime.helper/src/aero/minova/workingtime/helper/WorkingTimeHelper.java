@@ -22,7 +22,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.DateUtil;
 
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
@@ -81,7 +81,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			}));
 		}
 
-		bookingDateValue = new Value(DateTimeUtil.getDate("0"));
+		bookingDateValue = new Value(DateUtil.getDate("0"));
 		bookingDate.setValue(bookingDateValue, false);
 	}
 
@@ -155,7 +155,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 			}
 			employee.setValue(employeeValue, false);
-			bookingDateValue = new Value(DateTimeUtil.getDate("0"));
+			bookingDateValue = new Value(DateUtil.getDate("0"));
 			bookingDate.setValue(bookingDateValue, false);
 			endDateValue = null;
 			break;
@@ -171,7 +171,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		case NEW:
 			employee.setValue(employeeValue, false);
 			if (bookingDateValue == null) {
-				bookingDateValue = new Value(DateTimeUtil.getDate("0"));
+				bookingDateValue = new Value(DateUtil.getDate("0"));
 			}
 			bookingDate.setValue(bookingDateValue, false);
 			if (endDateValue != null) {
