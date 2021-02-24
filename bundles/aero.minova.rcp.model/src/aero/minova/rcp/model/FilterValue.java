@@ -21,13 +21,20 @@ package aero.minova.rcp.model;
  * @author saak
  */
 public class FilterValue extends Value {
-	public final Value filterValue;
+
+	// public final String filterOperator;
+	private final Value filterValue;
 
 	private static final long serialVersionUID = 202102221518L;
 
-	public FilterValue(String value) {
-		super(value.substring(0, value.indexOf("-")));
-		filterValue = ValueDeserializer.deserialize(value.substring(value.indexOf("-") + 1));
+//	public FilterValue(String value) {
+//		super(value.substring(0, value.indexOf("-")));
+//		filterValue = ValueDeserializer.deserialize(value.substring(value.indexOf("-") + 1));
+//	}
+
+	public FilterValue(String operator, Object value) {
+		super(operator, DataType.FILTER);
+		this.filterValue = new Value(value);
 	}
 
 	public static FilterValue valueOf(String value) {
@@ -36,6 +43,22 @@ public class FilterValue extends Value {
 
 	@Override
 	public boolean equals(Object obj) {
-		return super.equals(obj);
+		FilterValue v = null;
+		if (obj instanceof FilterValue) {
+			v = (FilterValue) obj;
+		}
+		if (v == null) {
+			return false;
+		}
+		return super.equals(obj) && this.filterValue.equals(v.filterValue);
+	}
+
+	@Override
+	public String toString() {
+		return ValueSerializer.serialize(this).toString();
+	}
+
+	public Value getFilterValue() {
+		return filterValue;
 	}
 }

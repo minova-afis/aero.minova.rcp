@@ -64,8 +64,17 @@ public class Value implements Serializable {
 		value = zonedDateTimeValue;
 	}
 
+	public Value(FilterValue filterValue) {
+		type = DataType.FILTER;
+		value = filterValue;
+	}
+
 	public Object getValue() {
 		return value;
+	}
+
+	public Value getThis() {
+		return this;
 	}
 
 	public DataType getType() {
@@ -94,6 +103,10 @@ public class Value implements Serializable {
 
 	public Boolean getBooleanValue() {
 		return type == DataType.BOOLEAN ? (Boolean) value : null;
+	}
+
+	public String getOperatorValue() {
+		return type == DataType.FILTER ? (String) value : null;
 	}
 
 	@Override
