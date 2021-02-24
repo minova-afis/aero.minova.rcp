@@ -33,7 +33,9 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		case "b":
 			return new Value(Boolean.valueOf(value));
 		case "f": // Filter
-			return new FilterValue(value);
+			String operator = value.substring(0, value.indexOf("-"));
+			String v = value.substring(value.indexOf("-") + 1);
+			return new FilterValue(operator, deserialize(v).getValue());
 		default:
 			break;
 		}

@@ -51,4 +51,7 @@ public class Constants {
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 
+	// SQL-Operatores
+	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
+
 }
