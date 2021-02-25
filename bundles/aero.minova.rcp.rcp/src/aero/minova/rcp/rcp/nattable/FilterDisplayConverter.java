@@ -138,15 +138,25 @@ public class FilterDisplayConverter extends DisplayConverter {
 				case BOOLEAN:
 					filterValue = Boolean.parseBoolean(filterValueString);
 					break;
-				default:
+				case STRING:
 					filterValue = filterValueString;
+					break;
+				default:
+					break;
 				}
 
 				if (filterValue != null) {
 
-					// Wenn in einem String ein Wildcard-Operator vorkommt soll der Like-Operator verwendet werden
-					if (operator.equals("") && datatype.equals(DataType.STRING) && containsWildcard((String) filterValue))
+					/*
+					 * Ein String soll im Allgemeinen mit dem Like-Operator gesucht werden. Außerdem wird am Ende ein Wildcard-Operator eingefürgt, damit Felder
+					 * die mit der Eingabe beginnen gefunden werden.
+					 */
+					if (operator.equals("") && datatype.equals(DataType.STRING)) {
 						operator = "~";
+						if (!containsWildcard(filterValueString))
+							filterValue = filterValue + "%";
+					}
+
 					else if (operator.equals(""))
 						operator = "=";
 
