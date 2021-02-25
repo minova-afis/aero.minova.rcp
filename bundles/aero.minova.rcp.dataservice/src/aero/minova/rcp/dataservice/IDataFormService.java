@@ -8,8 +8,6 @@ import aero.minova.rcp.model.Table;
 
 public interface IDataFormService {
 
-	Form getForm();
-	
 	Form getForm(String name);
 
 	Table getTableFromFormIndex(Form form);
