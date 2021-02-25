@@ -96,7 +96,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 
 			// Bei "null" und "!null" wird kein Wert eingegeben
 			if (operator.contains("null"))
-				return new FilterValue(operator, null);
+				return new FilterValue(operator, null, valueString);
 
 			String filterValueString = valueString.substring(operatorPos).strip();
 			Object filterValue = null;
@@ -140,7 +140,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 					else if (operator.equals(""))
 						operator = "=";
 
-					return new FilterValue(operator, filterValue);
+					return new FilterValue(operator, filterValue, valueString);
 				} else {
 					throw new RuntimeException("Invalid input " + filterValueString + " for datatype " + datatype);
 				}

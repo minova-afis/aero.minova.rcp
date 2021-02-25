@@ -27,11 +27,13 @@ public class FilterValue extends Value {
 
 	// public final String filterOperator;
 	private final Value filterValue;
+	private final String userInput;
 
 	private static final long serialVersionUID = 202102221518L;
 
-	public FilterValue(String operator, Object value) {
+	public FilterValue(String operator, Object value, String userInput) {
 		super(operator, DataType.FILTER);
+		this.userInput = userInput;
 		if (value == null)
 			this.filterValue = null;
 		else
@@ -61,5 +63,9 @@ public class FilterValue extends Value {
 
 	public Value getFilterValue() {
 		return filterValue;
+	}
+
+	public String getUserInput() {
+		return userInput;
 	}
 }
