@@ -9,14 +9,17 @@ package aero.minova.rcp.model;
  * <li>"<>-Wert"</li>
  * <li>"~-Wert"</li>
  * <li>"!~-Wert"</li>
- * <li>"0-"</li>
- * <li>"!0-"</li>
+ * <li>"null"</li>
+ * <li>"!null"</li>
  * </ul>
  * <br/>
  * Heute ist der 22.02.2021 <br/>
  * Heute Eingabe im Feld "0" -> "f-=-i-2021-02-22 00:00.00" <br/>
  * Gestern Eingabe im Feld "-" -> "f-=-i-2021-02-21 00:00.00"<br/>
- * Gestern Eingabe im Feld "210221" -> "f-=-i-2021-02-21 00:00.00"
+ * Gestern Eingabe im Feld "210221" -> "f-=-i-2021-02-21 00:00.00" <br/>
+ * <br/>
+ * Bei Eingabe von "null" oder "!null" wird kein weiterer Wert akzeptiert, this.filterValue ist null<br/>
+ * "null" -> "f-null"
  * 
  * @author saak
  */
