@@ -2,6 +2,7 @@ package aero.minova.server.tests;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URI;
@@ -9,7 +10,6 @@ import java.nio.file.Path;
 
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -35,11 +35,21 @@ class DataServiceIT {
 
 	@BeforeEach
 	void configureDataService(@TempDir Path path) {
+		URI uri = path.toUri();
+		String stringUri = uri.toString() + File.pathSeparatorChar;
 		dataService = new DataService();
 		dataService.setCredentials(username, password, server, 
-				URI.create(path.toString() + File.separatorChar));
+				URI.create(stringUri));
 	}
 
+	@Test
+	@DisplayName("Simple test to easily debug the created URI")
+	void canCreateUri(@TempDir Path path) {
+		URI uri = path.toUri();
+		String stringUri = uri.toString() + File.pathSeparatorChar;
+		assertNotNull(uri);
+		assertTrue(stringUri.startsWith("file"));
+	}
 
 	@Test
 	@DisplayName("Ensures the server returns not 200 for files that do not exit")
@@ -50,12 +60,12 @@ class DataServiceIT {
 	}
 	
 	@Test
-	@Disabled("Server not yet ready")
 	@DisplayName("Ensures that the server can hash application.mdi")
 	void testName() {
 		String join = dataService.getHashForFile("application.mdi").join();
 		assertNotNull(join);
 	}
+	
 	
 	
 
