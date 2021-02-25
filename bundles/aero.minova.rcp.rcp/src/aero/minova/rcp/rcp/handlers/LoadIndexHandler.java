@@ -74,6 +74,17 @@ public class LoadIndexHandler {
 	@CanExecute
 	public boolean canExecute() {
 		return !loading;
+//		gson = new Gson();
+//		gson = new GsonBuilder() //
+//				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+//				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+//				.setPrettyPrinting() //
+//				.create();
+//		Path path = Path.of(dataService.getStoragePath().toString(), "cache", "jsonTableSearch");
+//
+//		File jsonFile = new File(path.toString());
+//		jsonFile.createNewFile();
+//		Files.write(path, gson.toJson(table).getBytes(StandardCharsets.UTF_8));
 	}
 
 }

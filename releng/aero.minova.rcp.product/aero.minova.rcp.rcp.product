@@ -104,7 +104,6 @@
 
    <features>
       <feature id="aero.minova.rcp.feature" installMode="root"/>
-      <feature id="aero.minova.json.feature" installMode="root"/>
       <feature id="aero.minova.libs.feature" installMode="root"/>
       <feature id="org.eclipse.e4.rcp" installMode="root"/>
       <feature id="org.eclipse.emf.ecore" installMode="root"/>
