@@ -92,7 +92,6 @@ public class WorkspaceDialog extends Dialog {
 					} else {
 						password.setText("xxxxxxxxxxxxxxxxxxxx");
 					}
-					System.out.println("Profil ist gesetzt: " + loadedProfile);
 					connectionString.setText("");
 					applicationArea.setText("");
 					loadProfileData();
