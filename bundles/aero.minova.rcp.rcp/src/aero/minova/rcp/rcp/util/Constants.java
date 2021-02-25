@@ -55,6 +55,6 @@ public class Constants {
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
 	public static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", "null", "!null" };
 	public static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "null", "!null" };
-	public static final String[] WILDCARD_OPERATORS = { "?", "%" };
+	public static final String[] WILDCARD_OPERATORS = { "_", "%" };
 
 }
