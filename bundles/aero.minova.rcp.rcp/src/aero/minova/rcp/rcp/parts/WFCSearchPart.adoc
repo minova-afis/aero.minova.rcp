@@ -99,10 +99,10 @@ Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinha
 Für die folgenden Felder kann ein Interpreter eingesetzt werden: 
 
 ==== Zahlenfelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `<=`, `<>`, `null`, `!null`.
+Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Datums-, Zeit-, DateTimeFelder
-Bei einem Datums-, Zeit-, DateTimeFelder können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `<=`, `<>`, `null`, `!null`.
+Bei einem Datums-, Zeit-, DateTimeFelder können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Textfelder
 Bei einem Textfelder können folgende Operatoren zum Einsatz kommen: `%`, `?`, `=`, `<>`, `null`, `!null`, `~`, `!~`.
@@ -131,7 +131,7 @@ Es werden alle Datensätze gesucht, deren Wert genau dem angegebenen entspricht.
 ==== '>=' Größer-Gleich
 Es werden alle Datensätze gesucht, deren Wert größer oder gleich dem angegebene ist.
 
-==== '<=' Kleiner-Gleich
+==== '\<=' Kleiner-Gleich
 Es werden alle Datensätze gesucht, deren Wert kleiner oder gleich dem angegebene ist.
 
 ==== '<>' Ungleich
