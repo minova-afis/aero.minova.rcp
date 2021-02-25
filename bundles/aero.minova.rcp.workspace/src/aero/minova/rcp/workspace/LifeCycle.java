@@ -40,12 +40,23 @@ public class LifeCycle {
 
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
+		URI workspaceLocation = null;
 
 		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
 			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 			try {
 				if (!Platform.getInstanceLocation().isSet()) {
 					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+					try {
+						workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					}
+					Objects.requireNonNull(workspaceLocation);
+					dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null),
+							sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
+							sPrefs.get(WorkspaceAccessPreferences.URL, null),
+							workspaceLocation);
 				}
 			} catch (StorageException e) {
 				logger.error(e);
@@ -56,16 +67,15 @@ public class LifeCycle {
 				System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
 											// ausgesucht
 			}
+			try {
+				workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			Objects.requireNonNull(workspaceLocation);
+			dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
+					workspaceDialog.getConnection(), workspaceLocation);
 		}
-		URI workspaceLocation = null;
-		try {
-			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		Objects.requireNonNull(workspaceLocation);
-		dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
-				workspaceDialog.getConnection(), workspaceLocation);
 
 		Manager manager = new Manager();
 		manager.postContextCreate(workbenchContext);
