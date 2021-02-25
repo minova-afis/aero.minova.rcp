@@ -80,7 +80,10 @@ public class FilterDisplayConverter extends DisplayConverter {
 
 			int operatorPos;
 			switch (datatype) {
-			case INSTANT, ZONED, INTEGER, DOUBLE:
+			case INSTANT:
+			case ZONED:
+			case INTEGER:
+			case DOUBLE:
 				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.NUMBER_OPERATORS);
 				break;
 			case STRING:
