@@ -3,6 +3,8 @@ package aero.minova.server.tests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.File;
 import java.net.URI;
@@ -36,7 +38,7 @@ class DataServiceIT {
 	@BeforeEach
 	void configureDataService(@TempDir Path path) {
 		URI uri = path.toUri();
-		String stringUri = uri.toString() + File.pathSeparatorChar;
+		String stringUri = uri.toString();
 		dataService = new DataService();
 		dataService.setCredentials(username, password, server, 
 				URI.create(stringUri));
@@ -46,9 +48,10 @@ class DataServiceIT {
 	@DisplayName("Simple test to easily debug the created URI")
 	void canCreateUri(@TempDir Path path) {
 		URI uri = path.toUri();
-		String stringUri = uri.toString() + File.pathSeparatorChar;
+		String stringUri = uri.toString() + File.separator;
 		assertNotNull(uri);
 		assertTrue(stringUri.startsWith("file"));
+		assertFalse(stringUri.endsWith(";"));
 	}
 
 	@Test
@@ -61,11 +64,23 @@ class DataServiceIT {
 	
 	@Test
 	@DisplayName("Ensures that the server can hash application.mdi")
-	void testName() {
+	void hashApplicationMdi() {
 		String join = dataService.getHashForFile("application.mdi").join();
 		assertNotNull(join);
 	}
 	
+	@Test
+	@DisplayName("Get application.mdi twice should load from cache")
+	void receiveTwiceTheSameFileShouldLoadFromCache() {
+		// first call should download and create the cached file
+		String firstVersion = dataService.getHashedFile("application.mdi").join();
+		// second call should read the cached file
+		String secondVersion = dataService.getHashedFile("application.mdi").join();
+
+		// TODO Check that really the hash version was used, maybe Mockito can be used
+		// to wrap the data service?
+		assertEquals(firstVersion, secondVersion);
+	}
 	
 	
 
