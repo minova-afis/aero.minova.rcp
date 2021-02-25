@@ -15,7 +15,7 @@ public class ValueSerializer implements JsonSerializer<Value> {
 	}
 
 	public static JsonElement serialize(Value value) {
-		if (value.getValue() == null) {
+		if (value == null || value.getValue() == null) {
 			return null;
 		}
 		switch (value.getType()) {
@@ -32,6 +32,8 @@ public class ValueSerializer implements JsonSerializer<Value> {
 		case BOOLEAN:
 			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
 		case FILTER:
+			if (((FilterValue) value).getFilterValue() == null)
+				return new JsonPrimitive("f-" + value.getOperatorValue());
 			return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString());
 		default:
 			return null;

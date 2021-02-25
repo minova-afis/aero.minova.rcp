@@ -27,14 +27,12 @@ public class FilterValue extends Value {
 
 	private static final long serialVersionUID = 202102221518L;
 
-//	public FilterValue(String value) {
-//		super(value.substring(0, value.indexOf("-")));
-//		filterValue = ValueDeserializer.deserialize(value.substring(value.indexOf("-") + 1));
-//	}
-
 	public FilterValue(String operator, Object value) {
 		super(operator, DataType.FILTER);
-		this.filterValue = new Value(value);
+		if (value == null)
+			this.filterValue = null;
+		else
+			this.filterValue = new Value(value);
 	}
 
 	public static FilterValue valueOf(String value) {

@@ -43,6 +43,8 @@ public class FilterDisplayConverter extends DisplayConverter {
 		if (canonicalValue instanceof FilterValue) {
 			FilterValue cv = (FilterValue) canonicalValue;
 			String val = "";
+			if (cv.getValue().toString().contains("null"))
+				return cv.getValue().toString();
 			switch (datatype) {
 			case INSTANT:
 				switch (datetimetype) {
@@ -63,6 +65,9 @@ public class FilterDisplayConverter extends DisplayConverter {
 			default:
 				val = cv.getFilterValue().getValue().toString();
 			}
+
+			if (cv.getValue().toString().contains("null"))
+				return cv.getValue().toString();
 			return cv.getValue().toString() + " " + val;
 		}
 		return null;
@@ -85,6 +90,10 @@ public class FilterDisplayConverter extends DisplayConverter {
 				operatorPos = 0;
 			}
 			String operator = valueString.substring(0, operatorPos);
+
+			// Bei "null" und "!null" wird kein Wert eingegeben
+			if (operator.contains("null"))
+				return new FilterValue(operator, null);
 
 			String filterValueString = valueString.substring(operatorPos).strip();
 			Object filterValue = null;
@@ -121,16 +130,16 @@ public class FilterDisplayConverter extends DisplayConverter {
 				}
 
 				if (filterValue != null) {
+
 					// Wenn in einem String ein Wildcard-Operator vorkommt soll der Like-Operator verwendet werden
 					if (operator.equals("") && datatype.equals(DataType.STRING) && containsWildcard((String) filterValue))
 						operator = "~";
 					else if (operator.equals(""))
 						operator = "=";
-//					if (operator.contains("null"))
-//						return new FilterValue(operator, "");
+
 					return new FilterValue(operator, filterValue);
 				} else {
-					throw new NumberFormatException("Invalid input " + filterValueString + " for datatype " + datatype);
+					throw new RuntimeException("Invalid input " + filterValueString + " for datatype " + datatype);
 				}
 			}
 		}
