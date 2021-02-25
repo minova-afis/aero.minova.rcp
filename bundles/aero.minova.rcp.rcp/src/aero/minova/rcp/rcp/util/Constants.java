@@ -51,7 +51,10 @@ public class Constants {
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 
-	// SQL-Operatores
-	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
+	// Operatoren
+	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
+	public static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", "null", "!null" };
+	public static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "null", "!null" };
+	public static final String[] WILDCARD_OPERATORS = { "?", "%" };
 
 }

@@ -9,6 +9,7 @@ import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;
+import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.OperatorExtractionUtil;
 import aero.minova.rcp.rcp.util.TimeUtil;
@@ -72,7 +73,17 @@ public class FilterDisplayConverter extends DisplayConverter {
 		if (displayValue instanceof String) {
 			String valueString = (String) displayValue;
 
-			int operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString);
+			int operatorPos;
+			switch (datatype) {
+			case INSTANT, ZONED, INTEGER, DOUBLE:
+				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.NUMBER_OPERATORS);
+				break;
+			case STRING:
+				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.STRING_OPERATORS);
+				break;
+			default:
+				operatorPos = 0;
+			}
 			String operator = valueString.substring(0, operatorPos);
 
 			String filterValueString = valueString.substring(operatorPos).strip();
@@ -110,13 +121,28 @@ public class FilterDisplayConverter extends DisplayConverter {
 				}
 
 				if (filterValue != null) {
-					if (operator.equals(""))
+					// Wenn in einem String ein Wildcard-Operator vorkommt soll der Like-Operator verwendet werden
+					if (operator.equals("") && datatype.equals(DataType.STRING) && containsWildcard((String) filterValue))
+						operator = "~";
+					else if (operator.equals(""))
 						operator = "=";
+//					if (operator.contains("null"))
+//						return new FilterValue(operator, "");
 					return new FilterValue(operator, filterValue);
+				} else {
+					throw new NumberFormatException("Invalid input " + filterValueString + " for datatype " + datatype);
 				}
 			}
 		}
 		return null;
+	}
+
+	private boolean containsWildcard(String filterValue) {
+		for (String wildcard : Constants.WILDCARD_OPERATORS) {
+			if (filterValue.contains(wildcard))
+				return true;
+		}
+		return false;
 	}
 
 }

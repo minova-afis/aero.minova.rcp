@@ -11,7 +11,7 @@ public class OperatorExtractionUtil {
 	 * @return 0, wenn es keinen Operator gibt
 	 */
 
-	public static int getOperatorEndIndex(String value) {
+	public static int getOperatorEndIndex(String value, String[] operators) {
 
 		if (value == null || value.length() == 0) {
 			return 0;
@@ -25,7 +25,7 @@ public class OperatorExtractionUtil {
 
 		final int shift = value.length() - tmp.length();
 
-		for (final String sqlOperator : Constants.SQL_OPERATORS) {
+		for (final String sqlOperator : operators) {
 
 			if (tmp.startsWith(sqlOperator)) {
 
