@@ -70,8 +70,6 @@ public class WorkspaceDialog extends Dialog {
 		profile.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				int i = profile.getSelectionIndex();
-				logger.info("Item " + i + " selected (" + profile.getText() + ")");
 				username.setText("");
 				loadedProfile = true;
 				password.setText("xxxxxxxxxxxxxxxxxxxx");
@@ -84,7 +82,6 @@ public class WorkspaceDialog extends Dialog {
 			@Override
 			public void focusLost(FocusEvent e) {
 				int i = profile.getSelectionIndex();
-				logger.info("Item " + i + " selected (" + profile.getText() + ")");
 				try {
 					username.setText("");
 					if (profile.getText().isEmpty() || !loadedProfile || i == -1) {
