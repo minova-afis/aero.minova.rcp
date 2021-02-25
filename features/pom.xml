@@ -12,7 +12,6 @@
 	</parent>
 
 	<modules>
-		<module>aero.minova.json.feature</module>
 		<module>aero.minova.rcp.feature</module>
 		<module>aero.minova.libs.feature</module>
 	</modules>
