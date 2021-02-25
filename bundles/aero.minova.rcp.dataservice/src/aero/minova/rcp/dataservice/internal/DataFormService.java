@@ -14,6 +14,7 @@ import org.osgi.service.component.annotations.Component;
 import org.xml.sax.SAXException;
 
 import aero.minova.rcp.dataservice.IDataFormService;
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -157,9 +158,10 @@ public class DataFormService implements IDataFormService {
 
 		Form form = null;
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
+			XmlProcessor xmlProcessor = new XmlProcessor();
 			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
+					Form.class);
 
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
@@ -280,8 +282,8 @@ public class DataFormService implements IDataFormService {
 			if (!formFile.exists()) {
 				// Datei vom Server holen
 			}
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
-			form = (Form) xmlProcessor.load(formFile);
+			XmlProcessor xmlProcessor = new XmlProcessor();
+			form = (Form) xmlProcessor.load(formFile, Form.class);
 		} catch (URISyntaxException | JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
 		}

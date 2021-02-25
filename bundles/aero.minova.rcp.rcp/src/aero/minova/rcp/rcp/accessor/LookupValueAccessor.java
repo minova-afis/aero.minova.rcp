@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import aero.minova.rcp.dataservice.IDataService;
@@ -109,15 +110,24 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (focussed) {
+			Lookup up = ((Lookup) control);
+			// wenn wir dem Feld das erste Mal den Focus geben laden wir alle möglichkeiten.
+			CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
+			listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
 			return; // wenn wir den Focus erhalten, machen wir nichts
 		}
 
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine
 		// Optionen vorlagen oder der DisplayValue neu gesetzt wird
-		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+		if (((Lookup) control).getText().equals("") && field.getValue() == getDisplayValue()) {
 			((Lookup) control).setMessage("");
-			String displayText = ((Lookup) control).getText();
-			if (displayText != null && !displayText.equals("")) {
+			field.setValue(null, false);
+		}
+		return;
+//		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
+//			((Lookup) control).setMessage("");
+//			String displayText = ((Lookup) control).getText();
+//			if (displayText != null && !displayText.equals("")) {
 //				Table optionTable = ((MLookupField) field).getOptions();
 //				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
 //				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
@@ -136,9 +146,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 //						}
 //					}
 //				}
-				return;
-			}
-			field.setValue(null, false);
-		}
+//				return;
+//			}
+//			field.setValue(null, false);
+//		}
 	}
 }

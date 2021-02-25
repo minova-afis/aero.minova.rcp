@@ -99,14 +99,16 @@ Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinha
 Für die folgenden Felder kann ein Interpreter eingesetzt werden: 
 
 ==== Zahlenfelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `<>`, `null`, `!null`.
+Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Datums-, Zeit-, DateTimeFelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `<>`, `null`, `!null`.
+Bei einem Datums-, Zeit-, DateTimeFelder können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Textfelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `%`, `?`, `=`, `<>`, `null`, `!null`.
- * `%` der Weildcard-Operator steht für einen beliebigen Text.
+Bei einem Textfelder können folgende Operatoren zum Einsatz kommen: `%`, `_`, `=`, `<>`, `null`, `!null`, `~`, `!~`.
+ 
+ * `%` der Wildcard-Operator steht für einen beliebigen Text.
+ * `_` steht für eine einzelnes beliebiges Zeichen
  
 |===
 |Eingabe   |Interpretation   |Darstellung beim Verlassen   
@@ -125,11 +127,17 @@ Es werden alle Datensätze gesucht, deren Wert größer als der angegebene ist.
 ==== '<' Kleiner
 Es werden alle Datensätze gesucht, deren Wert kleiner als der angegebene ist.
 
-==== '<>' Ungleich
-Es werden alle Datensätze gesucht, deren Wert nicht gleich dem angegebene ist.
-
 ==== '=' Gleich
 Es werden alle Datensätze gesucht, deren Wert genau dem angegebenen entspricht.
+
+==== '>=' Größer-Gleich
+Es werden alle Datensätze gesucht, deren Wert größer oder gleich dem angegebene ist.
+
+==== '\<=' Kleiner-Gleich
+Es werden alle Datensätze gesucht, deren Wert kleiner oder gleich dem angegebene ist.
+
+==== '<>' Ungleich
+Es werden alle Datensätze gesucht, deren Wert nicht gleich dem angegebene ist.
 
 ==== 'null' Nichts (kein Wert)
 Es werden alle Datensätze gesucht, bei denen in diesem Feld kein Wert eingetragen wurde
