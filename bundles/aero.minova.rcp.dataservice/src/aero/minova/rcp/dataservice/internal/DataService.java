@@ -29,6 +29,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
@@ -63,7 +64,8 @@ public class DataService implements IDataService {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
-	private static final boolean LOG = true;
+	private static final boolean LOG = "true"
+			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
 	private HttpClient httpClient;
 	private Gson gson;
 
