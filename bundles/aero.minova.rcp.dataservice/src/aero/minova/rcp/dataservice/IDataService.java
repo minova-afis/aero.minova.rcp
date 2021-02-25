@@ -1,6 +1,5 @@
 package aero.minova.rcp.dataservice;
 
-import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
@@ -63,9 +62,6 @@ public interface IDataService {
 	 * @return
 	 */
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText);
-
-	File getFileSynch(String filename);
-
 
 	Path getStoragePath();
 

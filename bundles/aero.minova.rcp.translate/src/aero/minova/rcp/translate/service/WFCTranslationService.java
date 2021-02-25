@@ -184,8 +184,6 @@ public class WFCTranslationService extends TranslationService {
 		try {
 			localpath = Platform.getInstanceLocation().getURL().toURI().toString();
 			File propertiesFile = new File(new URI(localpath + filename));
-			if (!propertiesFile.exists())
-				dataService.getFileSynch(filename);
 			if (propertiesFile.exists()) {
 				is = new FileInputStream(propertiesFile);
 				resources.load(is);

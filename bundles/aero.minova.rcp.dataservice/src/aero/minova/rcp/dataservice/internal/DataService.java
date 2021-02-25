@@ -184,21 +184,6 @@ public class DataService implements IDataService {
 
 	}
 
-//	@Override
-//	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
-//		init();
-//		String body = gson.toJson(detailTable);
-//		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
-//				.header("Content-Type", "application/json") //
-//				.POST(BodyPublishers.ofString(body))//
-//				.build();
-//		// return CompletableFuture<Integer> future
-//		logBody(body, ++callCount);
-//		return httpClient.sendAsync(request, BodyHandlers.ofString())
-//				.thenApply(t -> gson.fromJson(t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
-//
-//	}
-
 	private static SSLContext disabledSslVerificationContext() {
 		// Remove certificate validation
 		SSLContext sslContext = null;
@@ -656,12 +641,6 @@ public class DataService implements IDataService {
 		return tableFuture;
 	}
 
-	@Override
-	@Deprecated(forRemoval = true)
-	public File getFileSynch(String filename) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 //	@Override
 //	public <T> T convert(Path f, Class<T> clazz) {
