@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -19,6 +20,9 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
 public class LookupValueAccessor extends AbstractValueAccessor {
+
+	private static final boolean LOG = "true"
+			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupvalueaccessor"));
 
 	@Inject
 	IDataService dataService;
@@ -58,10 +62,13 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
-		try {
-			System.out.println("updateControlFromValue " + value.toString());
-		} catch (NullPointerException npe) {
-			System.out.println("updateControlFromValue null");
+		if (LOG) {
+			try {
+				System.out.println("updateControlFromValue " + value.toString());
+			} catch (NullPointerException npe) {
+				System.out.println("updateControlFromValue null");
+			}
+
 		}
 
 		if (value == null) {
