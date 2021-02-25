@@ -255,7 +255,7 @@ public class DataService implements IDataService {
 					if (serverHashCode.equals(localHashValue)) {
 						updateRequired = false;
 					}
-					logCache("Server hash: " + localHashValue);
+					logCache("Server hash: " + serverHashCode);
 				} catch (RuntimeException e) {
 					// server does not know the file
 				}
