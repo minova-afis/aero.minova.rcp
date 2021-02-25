@@ -148,7 +148,6 @@ public class DataService implements IDataService {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (t.statusCode() == 500) {
 				Table error = new Table();
-				Row r = new Row();
 				error.setName("Error");
 				error.addColumn(new Column("Message", DataType.STRING));
 				// error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
@@ -171,7 +170,6 @@ public class DataService implements IDataService {
 				errorMessage = cutError.matcher(errorMessage).replaceAll("");
 				errorMessage.replace("\"", "");
 				Table error = new Table();
-				Row r = new Row();
 				error.setName("Error");
 				error.addColumn(new Column("Message", DataType.STRING));
 				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
@@ -361,10 +359,14 @@ public class DataService implements IDataService {
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
+
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
-			if (map.get(keyLong) != null) {
-				list.add(map.get(keyLong));
-				return CompletableFuture.supplyAsync(() -> list);
+			if (useCache) {
+				if (map.get(keyLong) != null) {
+					System.out.println("UseCache: " + tableName);
+					list.add(map.get(keyLong));
+					return CompletableFuture.supplyAsync(() -> list);
+				}
 			}
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
@@ -400,9 +402,12 @@ public class DataService implements IDataService {
 			// LookupProcedurePrefix
 			String procedureName = field.getLookupProcedurePrefix() + "Resolve";
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
-			if (map.get(keyLong) != null) {
-				list.add(map.get(keyLong));
-				return CompletableFuture.supplyAsync(() -> list);
+			if (useCache) {
+				if (map.get(keyLong) != null) {
+					System.out.println("UseCache: " + procedureName);
+					list.add(map.get(keyLong));
+					return CompletableFuture.supplyAsync(() -> list);
+				}
 			}
 			Table t = TableBuilder.newTable(procedureName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
@@ -441,12 +446,15 @@ public class DataService implements IDataService {
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
+
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
-// cache
-//			if (map.get(keyLong) != null) {
-//				list.add(map.get(keyLong));
-//				return CompletableFuture.supplyAsync(() -> list);
-//			}
+			if (useCache) {
+				if (!map.isEmpty()) {
+					System.out.println("UseCache: " + tableName);
+					list.addAll(map.values());
+					return CompletableFuture.supplyAsync(() -> list);
+				}
+			}
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
@@ -480,20 +488,28 @@ public class DataService implements IDataService {
 							r.getValue(0).getIntegerValue(), //
 							r.getValue(1).getStringValue(), //
 							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+
 					map.put(lv.keyLong, lv);
 					list.add(lv);
 				}
 			}
 			return CompletableFuture.supplyAsync(() -> list);
 		} else {
+			// Wenn wir eine Prozedur haben müssen wie die Auswahl auf die Werte
+			// einschränken, die möglich sind. Dafür sollten die Kriterien übergeben werden
+			String hashName = CacheUtil.getNameList(field);
 			// LookupProcedurePrefix
 			String procedureName = field.getLookupProcedurePrefix() + "List";
-			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
-// cache
-//			if (map.get(keyLong) != null) {
-//				list.add(map.get(keyLong));
-//				return CompletableFuture.supplyAsync(() -> list);
-//			}
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName,
+					k -> new HashMap<>());
+
+			if (useCache) {
+				if (!map.isEmpty()) {
+					System.out.println("UseCache: " + hashName);
+					list.addAll(map.values());
+					return CompletableFuture.supplyAsync(() -> list);
+				}
+			}
 			Table t = TableBuilder.newTable(procedureName) //
 					.withColumn(TABLE_COUNT, DataType.INTEGER) //
 					.withColumn(TABLE_FILTERLASTACTION, DataType.BOOLEAN) //

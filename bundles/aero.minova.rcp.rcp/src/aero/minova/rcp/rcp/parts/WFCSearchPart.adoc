@@ -105,8 +105,10 @@ Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `
 Bei einem Datums-, Zeit-, DateTimeFelder können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Textfelder
-Bei einem Textfelder können folgende Operatoren zum Einsatz kommen: `%`, `?`, `=`, `<>`, `null`, `!null`, `~`, `!~`.
- * `%` der Weildcard-Operator steht für einen beliebigen Text.
+Bei einem Textfelder können folgende Operatoren zum Einsatz kommen: `%`, `_`, `=`, `<>`, `null`, `!null`, `~`, `!~`.
+ 
+ * `%` der Wildcard-Operator steht für einen beliebigen Text.
+ * `_` steht für eine einzelnes beliebiges Zeichen
  
 |===
 |Eingabe   |Interpretation   |Darstellung beim Verlassen   

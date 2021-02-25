@@ -53,6 +53,11 @@ public class LookupContentProvider {
 		lookup.valuesUpdated();
 	}
 
+	public void setValuesOnly(List<LookupValue> values) {
+		this.values.clear();
+		this.values.addAll(values.stream().sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
+	}
+
 	public void setValues(List<LookupValue> values) {
 		this.values.clear();
 		this.values.addAll(values.stream().sorted((lv1, lv2) -> lv1.compareTo(lv2)).collect(Collectors.toList()));
