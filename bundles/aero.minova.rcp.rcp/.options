@@ -1,0 +1,7 @@
+# Debugging options for the aero.minova.rcp.dataservice plugin.
+
+# Turn on debugging for the plugin.
+aero.minova.rcp.rcp/debug=false
+
+# Turn on tracing of dataservice communication
+aero.minova.rcp.rcp/debug/lookupvalueaccessor=false
