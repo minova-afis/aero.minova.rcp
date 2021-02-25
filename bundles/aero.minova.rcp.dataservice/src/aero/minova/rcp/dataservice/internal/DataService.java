@@ -66,6 +66,9 @@ public class DataService implements IDataService {
 
 	private static final boolean LOG = "true"
 			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
+	private static final boolean LOG_CACHE = "true"
+			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
+
 	private HttpClient httpClient;
 	private Gson gson;
 
@@ -220,6 +223,13 @@ public class DataService implements IDataService {
 
 	}
 
+	private static void logCache(String message) {
+		if (LOG_CACHE) {
+			System.out.println(message);
+		}
+
+	}
+
 	private void logBody(String body, int i) {
 		if (LOG) {
 			logBody("Call: " + i + "\n" + body);
@@ -228,25 +238,27 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<String> getHashedFile(String filename) {
-//		public CompletableFuture<String> getHashedFile(String filename) {
 		String localHashValue = "";
 		String serverHashCode = "";
 		boolean updateRequired = true;
+		logCache("Requested file: " + filename);
 		File cachedFile = Path.of(getStoragePath().toString(), filename).toFile();
 
 		// cached file existiert, wir checken mit dem Server ob das noch aktuell ist
 		if (cachedFile.exists()) {
+			logCache("File exist, building hash");
 			try {
 				localHashValue = HashService.hashFile(cachedFile);
+				logCache("Local hash:  " + localHashValue);
 				try {
 					serverHashCode = getHashForFile(filename).join();
 					if (serverHashCode.equals(localHashValue)) {
 						updateRequired = false;
 					}
+					logCache("Server hash: " + localHashValue);
 				} catch (RuntimeException e) {
 					// server does not know the file
 				}
-
 
 			} catch (IOException e) {
 				// something went wrong we need to download the file again
@@ -254,6 +266,7 @@ public class DataService implements IDataService {
 		}
 		
 		if (updateRequired) {
+			logCache(filename + " need to download / update the file ");
 			CompletableFuture<String> downloadAsync = downloadAsync(filename);
 			saveFile(filename, downloadAsync);
 			return downloadAsync;
@@ -290,7 +303,6 @@ public class DataService implements IDataService {
 				.build();
 		
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(response -> {
-			System.out.println(response.statusCode());
 			if (response.statusCode() != 200) {
 				throw new RuntimeException("Server returned " + response.statusCode());
 			}
@@ -324,62 +336,13 @@ public class DataService implements IDataService {
 					return; 
 				}
 				Files.writeString(cachedFile.toPath(), future.join());
+				logCache("Cached file: " + fileName);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 		});
 	}
-
-	/**
-	 * asynchrones Laden eines Files vom Server
-	 */
-//	public CompletableFuture<String> getFileAsString(String filename) {
-//		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
-//				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-//				.build();
-//		logBody("getFile(" + filename + ")", ++callCount);
-//		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
-//
-//	}
-
-//	public void loadFile(UISynchronize sync, String filename, boolean reload) {
-//		try {
-//			String workspacePath = Platform.getInstanceLocation().getURL().toURI().toString().substring(5);
-//			Path localPath = FileSystems.getDefault().getPath(workspacePath + filename);
-//			if (!reload && Files.exists(localPath)) {
-//				return; // Datei existiert lokal und muss nicht nachgeladen werden
-//			}
-//			Files.createDirectories(localPath.getParent());
-//			try {
-//				CompletableFuture<String> fileFuture = getFileAsString(filename);
-//				fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
-//					try {
-//						byte[] file;
-//						try {
-//							String result = bytes.substring(1, bytes.length() - 2);
-//							String byteValues[] = result.split(",");
-//							file = new byte[byteValues.length];
-//							int i = 0;
-//							for (String string : byteValues) {
-//								file[i++] = Byte.parseByte(string);
-//							}
-//						} catch (NumberFormatException nfe) {
-//							// Es ist wohl keine Datei angekommen
-//							file = new byte[0];
-//						}
-//						Files.write(localPath, file);
-//					} catch (IOException e1) {
-//						e1.printStackTrace();
-//					}
-//				}));
-//			} catch (NullPointerException npe) {
-//				npe.printStackTrace();
-//			}
-//		} catch (URISyntaxException | IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
 
 	@Override
 	public Path getStoragePath() {
