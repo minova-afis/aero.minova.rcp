@@ -180,7 +180,10 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
-		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.DOUBLE);
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.DOUBLE, locale);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, fdc, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 

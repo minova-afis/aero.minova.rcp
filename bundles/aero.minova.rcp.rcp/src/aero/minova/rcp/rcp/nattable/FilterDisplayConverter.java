@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.nattable;
 
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Locale;
@@ -32,6 +33,11 @@ public class FilterDisplayConverter extends DisplayConverter {
 		this.locale = locale;
 		this.datatype = datatype;
 		this.datetimetype = datetimetype;
+	}
+
+	public FilterDisplayConverter(DataType datatype, Locale locale) {
+		this.locale = locale;
+		this.datatype = datatype;
 	}
 
 	public FilterDisplayConverter(DataType datatype) {
@@ -124,6 +130,10 @@ public class FilterDisplayConverter extends DisplayConverter {
 					break;
 				case DOUBLE:
 					filterValue = Double.parseDouble(filterValueString);
+					NumberFormat formatter = NumberFormat.getInstance(locale);
+					formatter.setMaximumFractionDigits(2);
+					formatter.setMinimumFractionDigits(2);
+					filterValue = formatter.format((double) filterValue);
 					break;
 				case BOOLEAN:
 					filterValue = Boolean.parseBoolean(filterValueString);
