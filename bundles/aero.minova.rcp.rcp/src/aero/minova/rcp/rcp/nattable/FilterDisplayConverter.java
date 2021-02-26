@@ -157,6 +157,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 							filterValue = filterValue + "%";
 					}
 
+					// Standart Operator ist "="
 					else if (operator.equals(""))
 						operator = "=";
 
