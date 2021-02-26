@@ -39,6 +39,7 @@ import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -64,10 +65,10 @@ public class DataService implements IDataService {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
-	private static final boolean LOG = "true"
-			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
-	private static final boolean LOG_CACHE = "true"
-			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
+	private static final FilterValue fv = new FilterValue(">", "0", "");
+
+	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
+	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
 
 	private HttpClient httpClient;
 	private Gson gson;
@@ -159,14 +160,12 @@ public class DataService implements IDataService {
 
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
-				Pattern fullError = Pattern
-						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
 				Matcher m = fullError.matcher(t.body());
 				if (m.find()) {
 					errorMessage = m.group(0);
 				}
-				Pattern cutError = Pattern
-						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
 				errorMessage = cutError.matcher(errorMessage).replaceAll("");
 				errorMessage.replace("\"", "");
 				Table error = new Table();
@@ -197,12 +196,10 @@ public class DataService implements IDataService {
 			}
 
 			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
+			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 
 			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
+			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 		} };
 
 		try {
@@ -260,9 +257,9 @@ public class DataService implements IDataService {
 
 			} catch (IOException e) {
 				// something went wrong we need to download the file again
-			}			
+			}
 		}
-		
+
 		if (updateRequired) {
 			logCache(filename + " need to download / update the file ");
 			CompletableFuture<String> downloadAsync = downloadAsync(filename);
@@ -276,14 +273,14 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
-	 *                  mit angehängt.
-	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @param localPath
+	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename
+	 *            relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
 	private CompletableFuture<String> downloadAsync(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
-				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
 		logBody("getFileSynch(" + filename + ")", ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
@@ -296,10 +293,9 @@ public class DataService implements IDataService {
 	 * @return
 	 */
 	public CompletableFuture<String> getHashForFile(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename))
-				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
-		
+
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(response -> {
 			if (response.statusCode() != 200) {
 				throw new RuntimeException("Server returned " + response.statusCode());
@@ -331,7 +327,7 @@ public class DataService implements IDataService {
 					cachedFile = new File(new URI(workspacePath + fileName));
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
-					return; 
+					return;
 				}
 				Files.writeString(cachedFile.toPath(), future.join());
 				logCache("Cached file: " + fileName);
@@ -348,14 +344,12 @@ public class DataService implements IDataService {
 	}
 
 	/**
-	 * Je Prozedur bzw. Tabellenneame gibt es einen Cache je KeyLong mit dem
-	 * LookupValue
+	 * Je Prozedur bzw. Tabellenneame gibt es einen Cache je KeyLong mit dem LookupValue
 	 */
 	private HashMap<String, HashMap<Integer, LookupValue>> cache = new HashMap<>();
 
 	@Override
-	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong,
-			String keyText) {
+	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
@@ -465,14 +459,14 @@ public class DataService implements IDataService {
 					.withValue(null) //
 					.withValue(filterText) //
 					.withValue(null) //
-					.withValue(">0") //
+					.withValue(fv) //
 					.create();
 			t.addRow(row);
 			row = RowBuilder.newRow() //
 					.withValue(null) //
 					.withValue(null) //
 					.withValue(filterText) //
-					.withValue(">0") //
+					.withValue(fv) //
 					.create();
 			t.addRow(row);
 			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
@@ -500,8 +494,7 @@ public class DataService implements IDataService {
 			String hashName = CacheUtil.getNameList(field);
 			// LookupProcedurePrefix
 			String procedureName = field.getLookupProcedurePrefix() + "List";
-			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName,
-					k -> new HashMap<>());
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
 			if (useCache) {
 				if (!map.isEmpty()) {
@@ -619,7 +612,6 @@ public class DataService implements IDataService {
 
 		return tableFuture;
 	}
-
 
 //	@Override
 //	public <T> T convert(Path f, Class<T> clazz) {
