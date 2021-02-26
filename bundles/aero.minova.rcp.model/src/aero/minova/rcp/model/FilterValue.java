@@ -54,7 +54,10 @@ public class FilterValue extends Value {
 			return false;
 		}
 		if (this.filterValue == null && v.filterValue == null) {
-			return super.equals(obj);
+			if (this.userInput.equals(v.userInput))
+				return super.equals(obj);
+			else
+				return false;
 		} else if (this.filterValue == null && v.filterValue != null || this.filterValue != null && v.filterValue == null) {
 			return false;
 		}
