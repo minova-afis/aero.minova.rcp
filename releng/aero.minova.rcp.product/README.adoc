@@ -1,4 +1,4 @@
-=Release Prozess
+= Release Prozess
 
 Um die Anwedung in der Version 12.0.0 intern in den Umlauf zu bringen wurde der "release-prozess" intern umgeändert. 
 Ausgegangen wird von einem Stand des Repositories, von dem die WFC - Anwendung fehlerfrei gebaut werden kann und alle Tests durchlaufen. 
