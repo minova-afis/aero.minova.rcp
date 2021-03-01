@@ -1,6 +1,12 @@
-=== Release Prozess ===
+=Release Prozess
 
 Um die Anwedung in der Version 12.0.0 intern in den Umlauf zu bringen wurde der "release-prozess" intern umgeändert. 
 Ausgegangen wird von einem Stand des Repositories, von dem die WFC - Anwendung fehlerfrei gebaut werden kann und alle Tests durchlaufen. 
+
+== Tag erstellen
+Um den Stand vom dem die Anwendung gebaut wurde sind mehrere Schritte notwendig.
+
+=== Version inkrementieren
+Je nach Änderung und Erweiterungen wir die Versionsnummer der Anwendung angepasst. Bis zur ersten Auslieferung wollen wir zunächst nur das Patch-Level inkrementieren. Um auf dem aktuellen Repository die Version in allen PLugIns automatisch zu setzen kann folegnder Befehl verwendet werder. 
 
 
