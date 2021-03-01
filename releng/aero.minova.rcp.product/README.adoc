@@ -23,7 +23,7 @@ mvn clean verify
 ----
 
 
-*Danach das einchecken nicht vergessen!*
+*Danach das Einchecken nicht vergessen!*
 
 === Tag im Eclipse erstellen
 
@@ -51,7 +51,9 @@ image::doc/images/github-draft-new-release.png[]
 Hier wird der erstellte Tag aus Eclipse ausgewählt und in Tag version eingetragen. Zusätzlich werden die Felder mit sinnvollen Werten gefüllt.
 
 === Hochladen auf ACode
-Wir haben uns vorerst darauf geeinigt, die 3 verschiedenen Anwendngen auf den ACode zu stellen. 
+Wir haben uns vorerst darauf geeinigt, die 3 verschiedenen Anwendngen auf den ACode zu stellen.
+(Verzeichnis: _/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/_)
+
 
 image::doc/images/product-zipfiles.png[]
 
