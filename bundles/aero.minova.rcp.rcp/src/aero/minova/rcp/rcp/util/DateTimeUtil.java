@@ -37,17 +37,17 @@ public class DateTimeUtil {
 			if (!splitInput[0].isEmpty()) {
 				dateIn = DateUtil.getDate(todayNow, splitInput[0]);
 			} else {
-				dateIn = DateUtil.getDate("0");
+				dateIn = DateUtil.getDate(todayNow, "0");
 			}
 
 			if (!splitInput[1].isEmpty()) {
 				timeIn = TimeUtil.getTime(todayNow, splitInput[1]);
 			} else {
-				timeIn = TimeUtil.getTime("0");
+				timeIn = TimeUtil.getTime(todayNow, "0");
 			}
 		} else {
 			dateIn = DateUtil.getDate(todayNow, splitInput[0]);
-			timeIn = TimeUtil.getTime(todayNow,"0");
+			timeIn = TimeUtil.getTime(todayNow, "0");
 		}
 
 		if (null != dateIn && null != timeIn) {
