@@ -12,6 +12,19 @@ public class DateTimeUtil {
 		throw new IllegalStateException("Utility class");
 	}
 
+	public static Instant getDateTime(String input) {
+		return getDateTime(Instant.now(), input);
+	}
+
+	/**
+	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer Leerstelle
+	 * getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist, wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in DateUtil
+	 * und TimeUtil festgelegt.
+	 * 
+	 * @param todayNow
+	 * @param input 
+	 * @return dateTime oder null wenn die Eingabe unzulässig ist
+	 */
 	public static Instant getDateTime(Instant todayNow, String input) {
 
 		String[] splitInput = input.split(" ");
