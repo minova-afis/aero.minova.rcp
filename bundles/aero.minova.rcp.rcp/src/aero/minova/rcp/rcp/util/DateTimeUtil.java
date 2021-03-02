@@ -30,6 +30,8 @@ public class DateTimeUtil {
 		String[] splitInput = input.split(" ");
 		Instant dateIn;
 		Instant timeIn;
+		LocalDate dateLocal;
+		LocalTime timeLocal;
 
 		if (splitInput.length > 1) {
 			if (!splitInput[0].isEmpty()) {
@@ -48,8 +50,12 @@ public class DateTimeUtil {
 			timeIn = TimeUtil.getTime(todayNow,"0");
 		}
 
-		LocalDate dateLocal = LocalDate.ofInstant(dateIn, ZoneOffset.UTC);
-		LocalTime timeLocal = LocalTime.ofInstant(timeIn, ZoneOffset.UTC);
+		if (null != dateIn && null != timeIn) {
+			dateLocal = LocalDate.ofInstant(dateIn, ZoneOffset.UTC);
+			timeLocal = LocalTime.ofInstant(timeIn, ZoneOffset.UTC);
+		} else {
+			return null;
+		}
 
 		Instant dateTime = LocalDateTime.of(dateLocal, timeLocal).toInstant(ZoneOffset.UTC);
 
