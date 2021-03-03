@@ -1,5 +1,6 @@
 package aero.minova.rcp.model.builder;
 
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 
@@ -17,7 +18,9 @@ public class RowBuilder {
 
 	public RowBuilder withValue(Object value) {
 		if (value != null) {
-			if (value instanceof Value) {
+			if (value instanceof FilterValue) {
+				row.addValue((FilterValue) value);
+			} else if (value instanceof Value) {
 				row.addValue((Value) value);
 			} else {
 				row.addValue(new Value(value));

@@ -8,6 +8,7 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -20,7 +21,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	private String[] propertyNames;
 
 	/**
-	 * @param propertyNames of the members of the row bean
+	 * @param propertyNames
+	 *            of the members of the row bean
 	 */
 	public MinovaColumnPropertyAccessor(Table table, Form form) {
 		this.table = table;
@@ -32,6 +34,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	@Override
 	public Object getDataValue(Row rowObject, int columnIndex) {
 		Value value = rowObject.getValue(columnIndex);
+		if (value instanceof FilterValue)
+			return value;
 		return value == null ? "" : value.getValue();
 	}
 
@@ -39,6 +43,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	public void setDataValue(Row rowObject, int columnIndex, Object newValue) {
 		if (newValue == null) {
 			rowObject.setValue(null, columnIndex);
+		} else if (newValue instanceof FilterValue) {
+			rowObject.setValue((FilterValue) newValue, columnIndex);
 		} else {
 			rowObject.setValue(new Value(newValue), columnIndex);
 		}
@@ -60,7 +66,6 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 			getTableHeadersMap().put(column.getName(), translate);
 		}
 	}
-
 
 	@Override
 	public int getColumnCount() {
