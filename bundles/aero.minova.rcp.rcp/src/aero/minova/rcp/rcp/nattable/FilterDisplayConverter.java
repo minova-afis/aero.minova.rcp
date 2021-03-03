@@ -11,6 +11,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.DateUtil;
 import aero.minova.rcp.rcp.util.OperatorExtractionUtil;
 import aero.minova.rcp.rcp.util.TimeUtil;
@@ -118,12 +119,12 @@ public class FilterDisplayConverter extends DisplayConverter {
 						filterValue = TimeUtil.getTime(filterValueString);
 						break;
 					case DATETIME:
-						// TODO: .getDateTime(String s) Methode hinzufügen?
+						filterValue = DateTimeUtil.getDateTime(filterValueString);
 						break;
 					}
 					break;
 				case ZONED:
-					// TODO: .getDateTime(String s) Methode hinzufügen?
+					filterValue = DateTimeUtil.getDateTime(filterValueString);
 					break;
 				case INTEGER:
 					filterValue = Integer.parseInt(filterValueString);
