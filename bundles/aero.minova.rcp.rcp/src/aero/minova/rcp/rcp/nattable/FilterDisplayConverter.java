@@ -11,7 +11,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.rcp.util.Constants;
-import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.DateUtil;
 import aero.minova.rcp.rcp.util.OperatorExtractionUtil;
 import aero.minova.rcp.rcp.util.TimeUtil;
 
@@ -55,18 +55,18 @@ public class FilterDisplayConverter extends DisplayConverter {
 			case INSTANT:
 				switch (datetimetype) {
 				case DATE:
-					val = DateTimeUtil.getDateString((Instant) cv.getFilterValue().getValue(), locale);
+					val = DateUtil.getDateString((Instant) cv.getFilterValue().getValue(), locale);
 					break;
 				case TIME:
 					val = TimeUtil.getTimeString((Instant) cv.getFilterValue().getValue(), locale);
 					break;
 				case DATETIME:
-					val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId);
+					val = DateUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId);
 					break;
 				}
 				break;
 			case ZONED:
-				val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId);
+				val = DateUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId);
 				break;
 			default:
 				val = cv.getFilterValue().getValue().toString();
@@ -112,7 +112,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 				case INSTANT:
 					switch (datetimetype) {
 					case DATE:
-						filterValue = DateTimeUtil.getDate(filterValueString);
+						filterValue = DateUtil.getDate(filterValueString);
 						break;
 					case TIME:
 						filterValue = TimeUtil.getTime(filterValueString);
