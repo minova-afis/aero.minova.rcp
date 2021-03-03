@@ -11,13 +11,16 @@ NatTable {
 	font-style: normal;
 	font-family: tahoma;
 	tree-structure-painter: background tree;
+	
+	font-size: 11px;
+	--nattableFontSize: attr(font-size)
 }
 
 /** #22441: kann jetzt doch wieder verwendet werden */
 NatTable:select {
 	row-height: auto;
 	painter-resolution: false;
-	tree-structure-painter: background padding tree;
+	/*tree-structure-painter: background padding tree;*/
 }
 
 NatTable > .COLUMN_HEADER {
@@ -54,6 +57,8 @@ NatTable > .selectionAnchor:select {
 	color: black;
 	font-style: normal;
 	font-family: tahoma;
+	
+	font-size: var(--nattableFontSize)
 }
 
 
