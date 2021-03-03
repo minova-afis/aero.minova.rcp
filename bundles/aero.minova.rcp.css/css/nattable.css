@@ -12,7 +12,7 @@ NatTable {
 	font-family: tahoma;
 	tree-structure-painter: background tree;
 	
-	font-size: 10px;
+	font-size: 11px;
 	--nattableFontSize: attr(font-size)
 }
 
@@ -20,7 +20,7 @@ NatTable {
 NatTable:select {
 	row-height: auto;
 	painter-resolution: false;
-	tree-structure-painter: background padding tree;
+	/*tree-structure-painter: background padding tree;*/
 }
 
 NatTable > .COLUMN_HEADER {
