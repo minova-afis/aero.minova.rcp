@@ -9,14 +9,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
@@ -41,12 +45,12 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomPWCheckBox;
-import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
+import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 
 public class ApplicationPreferenceWindow {
 
@@ -125,10 +129,8 @@ public class ApplicationPreferenceWindow {
 				for (PreferenceSectionDescriptor section : tab.getSections()) {
 
 					for (PreferenceDescriptor pref : section.getPreferences()) {
-						if (pref.getDisplayType() != DisplayType.ZONEID
-								&& pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
-							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(),
-									window.getValueFor(pref.getKey()), s);
+						if (pref.getDisplayType() != DisplayType.ZONEID && pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
+							InstancePreferenceAccessor.putValue(preferences, pref.getKey(), pref.getDisplayType(), window.getValueFor(pref.getKey()), s);
 						}
 					}
 				}
@@ -167,8 +169,7 @@ public class ApplicationPreferenceWindow {
 					String key = pref.getKey();
 					Object defaultValue = pref.getDefaultValue();
 					if (pref.getDisplayType() != DisplayType.CUSTOMCHECK) {
-						data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(),
-								pref.getDisplayType(), defaultValue, s));
+						data.put(key, InstancePreferenceAccessor.getValue(preferences, pref.getKey(), pref.getDisplayType(), defaultValue, s));
 					}
 
 				}
@@ -180,7 +181,8 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, PreferenceWindow pwindow, Object... values) {
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, PreferenceWindow pwindow,
+			Object... values) {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
