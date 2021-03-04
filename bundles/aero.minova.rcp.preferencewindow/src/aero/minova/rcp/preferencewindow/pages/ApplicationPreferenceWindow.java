@@ -67,13 +67,18 @@ public class ApplicationPreferenceWindow {
 	Locale s;
 
 	@Inject
+	MApplication application;
+
+	@Inject
 	TranslationService translationService;
 
 	@Execute
 	public void execute() {
 		pwm = new PreferenceWindowModel(s);
 
-		Shell shell = new Shell();
+		MWindow appWindow = application.getChildren().get(0);
+		Shell shell = (Shell) appWindow.getWidget();
+		shell.setEnabled(false);
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
