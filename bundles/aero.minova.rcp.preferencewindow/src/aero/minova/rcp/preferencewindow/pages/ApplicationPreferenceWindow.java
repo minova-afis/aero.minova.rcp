@@ -72,6 +72,13 @@ public class ApplicationPreferenceWindow {
 	@Inject
 	TranslationService translationService;
 
+	@SuppressWarnings("restriction")
+	@Inject
+	EHandlerService handlerService;
+
+	@Inject
+	EModelService modelService;
+
 	@Execute
 	public void execute() {
 		pwm = new PreferenceWindowModel(s);
@@ -100,6 +107,10 @@ public class ApplicationPreferenceWindow {
 				}
 			}
 		}
+
+		List<MHandler> preferenceHandlers = modelService.findElements(application, "aero.minova.rcp.rcp.handler.preferencehandler", MHandler.class);
+		MHandler preferenceHandler = preferenceHandlers.get(0);
+		handlerService.deactivateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 
 		window.setSelectedTab(0);
 		if (window.open()) {
@@ -137,6 +148,11 @@ public class ApplicationPreferenceWindow {
 			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
+			shell.setEnabled(true);
+			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
+		} else {
+			shell.setEnabled(true);
+			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		}
 	}
 
