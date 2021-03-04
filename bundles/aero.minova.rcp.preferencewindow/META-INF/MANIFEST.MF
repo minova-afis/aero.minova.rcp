@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.e4.core.di.annotations,
  org.eclipse.nebula.widgets.opal.preferencewindow,
  org.eclipse.e4.core.contexts;bundle-version="1.8.400",
  org.eclipse.equinox.security,
- aero.minova.rcp.preferences
+ aero.minova.rcp.preferences,
+ org.eclipse.e4.core.commands
 Export-Package: aero.minova.rcp.preferencewindow.builder,
  aero.minova.rcp.preferencewindow.control
 Import-Package: org.eclipse.jface.resource
