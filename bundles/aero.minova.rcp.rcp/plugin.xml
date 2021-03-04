@@ -4,14 +4,14 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="org.eclipse.e4.ui.workbench.swt.E4Application"
-            name="RCP Produkt">
+            name="WFC">
          <property
                name="lifeCycleURI"
                value="bundleclass://aero.minova.rcp.workspace/aero.minova.rcp.workspace.LifeCycle">
          </property>
          <property
                name="appName"
-               value="RCP Produkt">
+               value="WFC">
          </property>
          <property
                name="cssTheme"
