@@ -87,8 +87,10 @@ public class ApplicationPreferenceWindow {
 	public void execute() {
 		pwm = new PreferenceWindowModel(s);
 
+		//Shell des Windows der Application finden
 		MWindow appWindow = application.getChildren().get(0);
 		Shell shell = (Shell) appWindow.getWidget();
+		//Die Shell des Windows deaktivieren
 		shell.setEnabled(false);
 
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
@@ -112,8 +114,10 @@ public class ApplicationPreferenceWindow {
 			}
 		}
 
+		//Preference Handler finden
 		List<MHandler> preferenceHandlers = modelService.findElements(application, "aero.minova.rcp.rcp.handler.preferencehandler", MHandler.class);
 		MHandler preferenceHandler = preferenceHandlers.get(0);
+		//Preference Handler deaktivieren
 		handlerService.deactivateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 
 		window.setSelectedTab(0);
@@ -150,10 +154,14 @@ public class ApplicationPreferenceWindow {
 			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
+			//Die Shell des Windows aktivieren
 			shell.setEnabled(true);
+			//Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		} else {
+			//Die Shell des Windows aktivieren
 			shell.setEnabled(true);
+			//Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		}
 	}
