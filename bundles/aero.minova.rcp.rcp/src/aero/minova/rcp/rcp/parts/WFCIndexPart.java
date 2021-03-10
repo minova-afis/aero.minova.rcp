@@ -59,6 +59,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constant.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Page;
@@ -66,7 +67,6 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
-import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;

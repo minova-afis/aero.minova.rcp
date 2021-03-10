@@ -50,6 +50,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import aero.minova.rcp.constant.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
@@ -59,7 +60,6 @@ import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
-import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;

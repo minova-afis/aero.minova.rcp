@@ -7,7 +7,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 
-import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.constant.Constants;
 
 public class DeleteDetailHandler {
 
@@ -16,8 +16,9 @@ public class DeleteDetailHandler {
 
 	@Execute
 	public void execute(@Optional MPerspective perspective) {
-		if (perspective == null)
+		if (perspective == null) {
 			return;
+		}
 		broker.post(Constants.BROKER_DELETEENTRY, perspective);
 
 	}

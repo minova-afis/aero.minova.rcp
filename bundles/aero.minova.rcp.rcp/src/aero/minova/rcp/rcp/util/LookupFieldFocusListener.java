@@ -8,6 +8,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.constant.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -55,7 +56,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	 * Wir versenden eine Anfrage an den CAS, welche die Ticketnummer enthält. Mit
 	 * der Erhaltenen Antwort füllen wir sämltiche LookupFields sowie das
 	 * DescriptionField
-	 * 
+	 *
 	 * @param lc
 	 */
 	private void getTicketFromCAS(Lookup lc) {
