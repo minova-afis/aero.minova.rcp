@@ -1,5 +1,8 @@
 package aero.minova.rcp.rcp.util;
 
+import static aero.minova.rcp.constant.Constants.BROKER_SHOWERROR;
+
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +15,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -19,6 +23,7 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import aero.minova.rcp.constant.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
@@ -29,6 +34,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
@@ -47,6 +53,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private IDataService dataService;
+
+	@Inject
+	private TranslationService translationService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -72,8 +81,6 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private Form form;
-
-	private String lastEndDate = "";
 
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
@@ -209,9 +216,9 @@ public class WFCDetailCASRequestsUtil {
 //					Value lookupValue = new Value(mlookup.getKeyLong());
 //					rb.withValue(lookupValue);
 //				}else {
-					if (field != null) {
-						rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
-					}
+				if (field != null) {
+					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
+				}
 //				}
 				valuePosition++;
 			}
@@ -287,6 +294,24 @@ public class WFCDetailCASRequestsUtil {
 				detail.getHelper().handleDetailAction(ActionCode.SAVE);
 			}
 		}
+	}
+
+	@Inject
+	@Optional
+	public void showErrorMessage(@UIEventTopic(BROKER_SHOWERROR) Table errorTable) {
+		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
+		String messageproperty = "@" + vMessageProperty.getStringValue();
+		String value = translationService.translate(messageproperty, null);
+		// Ticket number {0} is not numeric
+		if (errorTable.getColumnCount() > 1) {
+			List<String> params = new ArrayList<>();
+			for (int i = 1; i < errorTable.getColumnCount(); i++) {
+				Value v = errorTable.getRows().get(0).getValue(i);
+				params.add(v.getStringValue());
+			}
+			value = MessageFormat.format(value, params.toArray(new String[0]));
+		}
+		MessageDialog.openError(shell, "Error", value);
 	}
 
 	/**
