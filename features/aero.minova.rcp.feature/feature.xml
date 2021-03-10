@@ -274,13 +274,20 @@
 
    <plugin
          id="aero.minova.rcp.preferences"
-          download-size="0"
+         download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
-    <plugin
+
+   <plugin
          id="aero.minova.workingtime.helper"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="aero.minova.rcp.constant"
          download-size="0"
          install-size="0"
          version="0.0.0"
