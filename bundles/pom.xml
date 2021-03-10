@@ -13,6 +13,7 @@
 
 	<modules>
 		<module>aero.minova.rcp.css</module>
+		<module>aero.minova.rcp.constant</module>
 		<module>aero.minova.rcp.core</module>
 		<module>aero.minova.rcp.form.model</module>
 		<module>aero.minova.rcp.form.menu</module>
