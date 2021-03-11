@@ -56,7 +56,6 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 
-
 @Component
 public class DataService implements IDataService {
 
@@ -537,7 +536,9 @@ public class DataService implements IDataService {
 				e.printStackTrace();
 			}
 			if (ta != null) {
-				if (!ta.getName().equals("Error")) {
+				if (ta.getName() != null && ta.getName().equals("Error")) {
+					broker.post(Constants.BROKER_SHOWERROR, t);
+				} else {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
 								r.getValue(0).getIntegerValue(), //
@@ -546,8 +547,6 @@ public class DataService implements IDataService {
 						map.put(lv.keyLong, lv);
 						list.add(lv);
 					}
-				} else {
-					broker.post(Constants.BROKER_SHOWERROR, t);
 				}
 			}
 			return CompletableFuture.supplyAsync(() -> list);
