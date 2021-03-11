@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.form.MLookupField;
 
 public class LookupContentProvider {
 	private Lookup lookup;
@@ -19,6 +21,13 @@ public class LookupContentProvider {
 	 *         typed by the user
 	 */
 	public List<LookupValue> getContent(final String entry) {
+		MLookupField mField = (MLookupField) lookup.getData(Constants.CONTROL_FIELD);
+		if (entry != null && entry.startsWith("#")) {
+			// Setzen des Textes, welcher manuell eingetragen wurde
+			mField.setWrittenText(entry);
+		} else {
+			mField.setWrittenText(null);
+		}
 		if ("%".equals(entry)) {
 			return values;
 		} else {
