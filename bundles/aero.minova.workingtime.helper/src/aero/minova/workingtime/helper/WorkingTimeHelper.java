@@ -36,6 +36,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	private MField chargedQuantity;
 	private MField bookingDate;
 	private MLookupField employee;
+	private MLookupField customer;
 	private String user;
 	private LookupValue lookupValueUser;
 
@@ -52,6 +53,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	}
 
 	public void initAccessor() {
+		TicketHelper ticketHelper = new TicketHelper();
 		lookupValueUser = null;
 		startDate = detail.getField("StartDate");
 		endDate = detail.getField("EndDate");
@@ -59,10 +61,12 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		renderedQuantity = detail.getField("RenderedQuantity");
 		chargedQuantity = detail.getField("ChargedQuantity");
 		employee = (MLookupField) detail.getField("EmployeeKey");
+		customer = (MLookupField) detail.getField("CustomerKey");
 
 		// Auf diese werte reagieren wir
 		startDate.addValueChangeListener(this);
 		endDate.addValueChangeListener(this);
+		customer.addValueChangeListener(ticketHelper);
 
 		// Mitarbeiter Setzen
 		user = preferences.get(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, System.getProperty("user.name"));
