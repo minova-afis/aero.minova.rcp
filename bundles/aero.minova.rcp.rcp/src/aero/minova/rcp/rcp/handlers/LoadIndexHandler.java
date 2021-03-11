@@ -63,7 +63,7 @@ public class LoadIndexHandler {
 
 		tableFuture.thenAccept(t -> {
 			if (t.getName().equals("Error")) {
-				broker.post(aero.minova.rcp.constants.Constants.BROKER_SHOWERROR, t);
+				broker.post(Constants.BROKER_SHOWERROR, t);
 			} else {
 				broker.post(Constants.BROKER_LOADINDEXTABLE, Map.of(perspective, t));
 			}
