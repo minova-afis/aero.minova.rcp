@@ -29,6 +29,7 @@ import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -347,6 +348,28 @@ public class WFCDetailCASRequestsUtil {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Versnedet eine Ticketanfrage an den CAS, der Value wird immer ohne
+	 * vorangegangenes '#' übergeben
+	 *
+	 * @param ticketvalue
+	 */
+	@Inject
+	@Optional
+	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
+		Table ticketTable = TableBuilder.newTable("Ticket")
+				.withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT)
+				.create();
+		Row r = RowBuilder.newRow().withValue(ticketvalue).create();
+		ticketTable.addRow(r);
+		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(),
+				ticketTable);
+		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+			selectedTable = ta.getOutputParameters();
+			updateSelectedEntry();
+		}));
 	}
 
 	/**
