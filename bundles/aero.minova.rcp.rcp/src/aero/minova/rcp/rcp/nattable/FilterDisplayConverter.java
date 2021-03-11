@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;

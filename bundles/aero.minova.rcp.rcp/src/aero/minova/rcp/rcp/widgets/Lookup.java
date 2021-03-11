@@ -32,7 +32,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;

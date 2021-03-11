@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.util;
 
-import static aero.minova.rcp.constant.Constants.BROKER_SHOWERROR;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +21,7 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
@@ -298,7 +296,7 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	@Optional
-	public void showErrorMessage(@UIEventTopic(BROKER_SHOWERROR) Table errorTable) {
+	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) Table errorTable) {
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
 		String messageproperty = "@" + vMessageProperty.getStringValue();
 		String value = translationService.translate(messageproperty, null);

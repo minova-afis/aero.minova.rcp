@@ -8,7 +8,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 
 public class TextfieldVerifier implements FocusListener {

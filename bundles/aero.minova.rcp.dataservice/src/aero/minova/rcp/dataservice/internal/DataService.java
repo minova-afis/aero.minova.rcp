@@ -36,8 +36,7 @@ import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;

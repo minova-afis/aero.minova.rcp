@@ -21,7 +21,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.widgets.Shell;
 
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Table;
@@ -63,7 +63,7 @@ public class LoadIndexHandler {
 
 		tableFuture.thenAccept(t -> {
 			if (t.getName().equals("Error")) {
-				broker.post(Constants.BROKER_SHOWERROR, t);
+				broker.post(aero.minova.rcp.constants.Constants.BROKER_SHOWERROR, t);
 			} else {
 				broker.post(Constants.BROKER_LOADINDEXTABLE, Map.of(perspective, t));
 			}

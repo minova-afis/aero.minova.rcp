@@ -50,7 +50,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import aero.minova.rcp.constant.Constants;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
