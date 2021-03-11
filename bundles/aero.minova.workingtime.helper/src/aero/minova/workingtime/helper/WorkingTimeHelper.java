@@ -3,14 +3,21 @@ package aero.minova.workingtime.helper;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
@@ -28,15 +35,13 @@ import aero.minova.rcp.rcp.util.DateUtil;
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	private MDetail detail;
-	public static final String CONTROL_CONSUMER = "consumer";
-	public static final String CONTROL_FIELD = "field";
 	private MField startDate;
 	private MField endDate;
 	private MField renderedQuantity;
 	private MField chargedQuantity;
 	private MField bookingDate;
 	private MLookupField employee;
-	private MLookupField customer;
+	private MLookupField orderreceiver;
 	private String user;
 	private LookupValue lookupValueUser;
 
@@ -46,6 +51,24 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
+	EventAdmin eventAdmin;
+
+	void registerEventAdmin(EventAdmin admin) {
+		this.eventAdmin = admin;
+	}
+
+	void unregisterEventAdmin(EventAdmin admin) {
+		this.eventAdmin = null;
+	}
+
+	public void postEvent(Value value) {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_RESOLVETICKET);
+		data.put(IEventBroker.DATA, value);
+		Event event = new Event(Constants.BROKER_RESOLVETICKET, data);
+		eventAdmin.postEvent(event);
+	}
+
 	@Override
 	public void setControls(MDetail detail) {
 		this.detail = detail;
@@ -53,7 +76,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	}
 
 	public void initAccessor() {
-		TicketHelper ticketHelper = new TicketHelper();
+		TicketHelper ticketHelper = new TicketHelper(this);
 		lookupValueUser = null;
 		startDate = detail.getField("StartDate");
 		endDate = detail.getField("EndDate");
@@ -61,12 +84,12 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		renderedQuantity = detail.getField("RenderedQuantity");
 		chargedQuantity = detail.getField("ChargedQuantity");
 		employee = (MLookupField) detail.getField("EmployeeKey");
-		customer = (MLookupField) detail.getField("CustomerKey");
+		orderreceiver = (MLookupField) detail.getField("OrderReceiverKey");
 
 		// Auf diese werte reagieren wir
 		startDate.addValueChangeListener(this);
 		endDate.addValueChangeListener(this);
-		customer.addValueChangeListener(ticketHelper);
+		orderreceiver.addValueChangeListener(ticketHelper);
 
 		// Mitarbeiter Setzen
 		user = preferences.get(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, System.getProperty("user.name"));
