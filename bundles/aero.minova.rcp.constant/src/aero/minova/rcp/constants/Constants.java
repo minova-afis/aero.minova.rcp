@@ -1,4 +1,4 @@
-package aero.minova.rcp.constant;
+package aero.minova.rcp.constants;
 
 public class Constants {
 
