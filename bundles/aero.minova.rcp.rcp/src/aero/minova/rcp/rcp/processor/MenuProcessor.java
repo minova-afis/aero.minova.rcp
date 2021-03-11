@@ -1,10 +1,5 @@
 package aero.minova.rcp.rcp.processor;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,17 +7,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.xml.sax.SAXException;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dataservice.internal.XmlProcessor;
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
@@ -30,31 +23,31 @@ import aero.minova.rcp.form.menu.mdi.MenuType;
 
 public class MenuProcessor {
 
-	static public String mdiFileName = "application.mdi";
-	static public String mdiFileName_old = "ServicesInvoicingSystem_MDI.xml";
-	static public String xbsFileName = "application.xbs";
+	public static String mdiFileName = "application.mdi";
+	public static String xbsFileName = "application.xbs";
+	private MMenu menu;
+	private EModelService modelService;
+	private MApplication mApplication;
 
 	@Inject
 	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService,
 			IDataService dataService, MApplication mApplication) {
 
-		// TODO Liste mit Nachzuladenen Masken/Ops erstellen und asynchroin nachladen.
+		this.menu = menu;
+		this.modelService = modelService;
+		this.mApplication = mApplication;
+		dataService.getHashedFile(mdiFileName).thenAccept(fileContent -> processXML(fileContent));
+		
+	}
 
-		String basePath = null;
-		File mdiFile = null;
+	private void processXML(String fileContent) {
+		XmlProcessor xmlProcessor = new XmlProcessor();
+		Main mainMDI = null;
 		try {
-			basePath = Platform.getInstanceLocation().getURL().toURI().toString();
-			mdiFile = new File(new URI(basePath + mdiFileName));
-		} catch (URISyntaxException e) {
+			mainMDI = xmlProcessor.get(fileContent, Main.class);
+		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-		if (mdiFile == null || !mdiFile.exists())
-			mdiFile = dataService.getFileSynch(basePath, mdiFileName);
-
-		// hier ist der FallBack auf eine bereits bestehendes MDI File aus dem Verzeichnis.
-		basePath = basePath + mdiFileName_old;
-
-		Main mainMDI = readOutMDI(basePath, mdiFile);
 
 		if (mainMDI != null) {
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
@@ -74,41 +67,6 @@ public class MenuProcessor {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Diese Methode erstellt aus den übergebenen Pfad und der Datei ein Main Element aus einer MDI. Wenn der File nicht
-	 * eingelesen werden kann, gibt es noch einen FallBack auf die URI, beim Aufruf könnten so unterschiedliche
-	 * Dateiorte übergeben werden.
-	 *
-	 * Zum Beispiel: basePath ist der default mit dem Standard, mdiFile könnte eine neue Version der Datei sein, die
-	 * erstmal in einem anderen Ordner liegt.
-	 *
-	 *
-	 * @param basePath
-	 * @param mdiFile
-	 * @return Main oder null wenn es nicht ausgelesen werden kann
-	 */
-	public Main readOutMDI(String basePath, File mdiFile) {
-		URI uri = null;
-		Main mainMDI = null;
-		XmlProcessor xmlProcessor = new XmlProcessor(Main.class);
-
-		if (mdiFile != null) {
-			try {
-				mainMDI = (Main) xmlProcessor.load(mdiFile);
-				return mainMDI;
-			} catch (JAXBException | SAXException | IOException e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			uri = new URI(basePath);
-			mainMDI = (Main) xmlProcessor.load(Path.of(uri).toFile());
-		} catch (JAXBException | SAXException | IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return mainMDI;
 	}
 
 	/**

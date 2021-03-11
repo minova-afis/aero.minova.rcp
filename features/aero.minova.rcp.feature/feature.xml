@@ -2,7 +2,7 @@
 <feature
       id="aero.minova.rcp.feature"
       label="Feature aero.minova.rcp.feature"
-      version="1.2.0.qualifier"
+      version="12.0.1.qualifier"
       provider-name="SAAK">
 
    <description url="http://www.example.com/description">

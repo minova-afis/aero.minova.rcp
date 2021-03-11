@@ -11,7 +11,11 @@ public class ValueSerializer implements JsonSerializer<Value> {
 
 	@Override
 	public JsonElement serialize(Value value, Type type, JsonSerializationContext context) {
-		if (value.getValue() == null) {
+		return serialize(value);
+	}
+
+	public static JsonElement serialize(Value value) {
+		if (value == null || value.getValue() == null) {
 			return null;
 		}
 		switch (value.getType()) {
@@ -27,6 +31,10 @@ public class ValueSerializer implements JsonSerializer<Value> {
 			return new JsonPrimitive("z-" + value.getZonedDateTimeValue().toString());
 		case BOOLEAN:
 			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
+		case FILTER:
+			if (((FilterValue) value).getFilterValue() == null)
+				return new JsonPrimitive("f-" + value.getOperatorValue());
+			return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString());
 		default:
 			return null;
 		}
