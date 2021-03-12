@@ -22,8 +22,7 @@ import aero.minova.rcp.rcp.widgets.Lookup;
 
 public class LookupValueAccessor extends AbstractValueAccessor {
 
-	private static final boolean LOG = "true"
-			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupvalueaccessor"));
+	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupvalueaccessor"));
 
 	@Inject
 	IDataService dataService;
@@ -43,8 +42,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	}
 
 	public LookupValue getValueFromSync(Integer keyLong, String keyText) {
-		CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true,
-				keyLong, keyText);
+		CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true, keyLong, keyText);
 		List<LookupValue> llv = resolveLookup.join();
 		if (!llv.isEmpty()) {
 			return llv.get(0);
@@ -57,8 +55,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	}
 
 	/*
-	 * Wenn wir einen Wert anfragen sollten wir immer nur einen erhalten. Die
-	 * Ausnahme funktioniert nur bei einer Anfrage über KeyText. Dann wird der 1.
+	 * Wenn wir einen Wert anfragen sollten wir immer nur einen erhalten. Die Ausnahme funktioniert nur bei einer Anfrage über KeyText. Dann wird der 1.
 	 * genommen.
 	 */
 	@Override
@@ -73,9 +70,11 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 
 		if (value == null) {
-			((Lookup) control).getDescription().setText("");
-			((Lookup) control).setText("");
-			((Lookup) control).setMessage("");
+			if (((Lookup) control).getEditable()) {
+				((Lookup) control).getDescription().setText("");
+				((Lookup) control).setText("");
+				((Lookup) control).setMessage("");
+			}
 			return;
 		}
 		if (value instanceof LookupValue) {
@@ -92,8 +91,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 				keyText = value.getStringValue();
 			}
 
-			CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true,
-					keyLong, keyText);
+			CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true, keyLong, keyText);
 			resolveLookup.thenAccept(llv -> sync.asyncExec(() -> {
 				if (llv.isEmpty()) {
 					((Lookup) control).getDescription().setText("");
@@ -110,10 +108,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 	@Override
 	/**
-	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der
-	 * Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und
-	 * die Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er
-	 * bereits gesetzt wurde oder ob dies getan Werden muss
+	 * Wenn das Feld den Focus verliert wird der Textinhalt überprüft. Ist der Inhalt in keiner Option vorhanden oder ist der Inhalt leer wird das Feld und die
+	 * Description bereinigt Ist der Wert vorhanden, so wird geschaut ob er bereits gesetzt wurde oder ob dies getan Werden muss
 	 */
 	public void setFocussed(boolean focussed) {
 		if (focussed) {
@@ -127,7 +123,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine
 		// Optionen vorlagen oder der DisplayValue neu gesetzt wird
 		if (((Lookup) control).getText().equals("") && field.getValue() == getDisplayValue()) {
-			((Lookup) control).setMessage("");
+			if (((Lookup) control).getEditable())
+				((Lookup) control).setMessage("");
 			field.setValue(null, false);
 		}
 		return;
