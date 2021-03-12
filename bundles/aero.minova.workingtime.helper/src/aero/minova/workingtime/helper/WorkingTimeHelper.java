@@ -89,8 +89,8 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		employee = (MLookupField) detail.getField("EmployeeKey");
 		orderreceiver = (MLookupField) detail.getField("OrderReceiverKey");
 		service = (MLookupField) detail.getField("ServiceKey");
-		serviceobject = (MLookupField) detail.getField("ServiceKey");
-		servicecontract = (MLookupField) detail.getField("ServiceKey");
+		serviceobject = (MLookupField) detail.getField("ServiceObjectKey");
+		servicecontract = (MLookupField) detail.getField("ServiceContractKey");
 		orderreceiver = (MLookupField) detail.getField("OrderReceiverKey");
 
 		// Auf diese werte reagieren wir

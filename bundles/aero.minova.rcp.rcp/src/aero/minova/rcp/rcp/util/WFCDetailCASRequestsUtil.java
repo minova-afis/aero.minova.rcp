@@ -348,6 +348,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
+		System.out.println("Nafrage an den Cas mit Ticket: #" + ticketvalue.getStringValue());
 		Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
 		Row r = RowBuilder.newRow().withValue(ticketvalue).create();
 		ticketTable.addRow(r);
