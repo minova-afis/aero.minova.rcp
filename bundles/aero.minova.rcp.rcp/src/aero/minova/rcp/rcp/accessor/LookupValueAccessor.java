@@ -70,10 +70,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 
 		if (value == null) {
+			((Lookup) control).getDescription().setText("");
+			((Lookup) control).setText("");
 			if (((Lookup) control).getEditable()) {
-				((Lookup) control).getDescription().setText("");
-				((Lookup) control).setText("");
-				((Lookup) control).setMessage("");
+				((Lookup) control).setMessage("Null");
 			}
 			return;
 		}
@@ -81,7 +81,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			LookupValue lv = (LookupValue) value;
 			((Lookup) control).getDescription().setText(lv.description);
 			((Lookup) control).setText(lv.keyText);
-			((Lookup) control).setMessage("");
+			((Lookup) control).setMessage("Empty");
 		} else {
 			Integer keyLong = null;
 			String keyText = null;
@@ -122,37 +122,19 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine
 		// Optionen vorlagen oder der DisplayValue neu gesetzt wird
-		if (((Lookup) control).getText().equals("") && field.getValue() == getDisplayValue()) {
-			if (((Lookup) control).getEditable())
-				((Lookup) control).setMessage("");
-			field.setValue(null, false);
+		if (field.getValue() == getDisplayValue()) {
+			String displayText = ((Lookup) control).getText();
+			if (("").equals(displayText)) {
+				if (((Lookup) control).getEditable()) {
+					((Lookup) control).setMessage("");
+				}
+				field.setValue(null, false);
+			} else {
+				LookupValue value = (LookupValue) field.getValue();
+				if (value != null && !displayText.equals(value.keyText)) {
+					field.setValue(null, false);
+				}
+			}
 		}
-		return;
-//		if (((MLookupField) field).getOptions() != null && field.getValue() == getDisplayValue()) {
-//			((Lookup) control).setMessage("");
-//			String displayText = ((Lookup) control).getText();
-//			if (displayText != null && !displayText.equals("")) {
-//				Table optionTable = ((MLookupField) field).getOptions();
-//				int indexKeyText = optionTable.getColumnIndex(Constants.TABLE_KEYTEXT);
-//				int indexKeyLong = optionTable.getColumnIndex(Constants.TABLE_KEYLONG);
-//
-//				for (Row r : optionTable.getRows()) {
-//					if (r.getValue(indexKeyText).getStringValue().toLowerCase().startsWith(displayText.toLowerCase())) {
-//						Value rowValue = r.getValue(indexKeyLong);
-//						// Der Wert wurde bereits gesetzt und wurde möglicherweise in der Zeile gekürzt
-//						if (field.getValue() != null && field.getValue().getValue().equals(rowValue.getValue())) {
-//							((Lookup) control).setText(r.getValue(indexKeyText).getStringValue());
-//							return;
-//						} else {
-//							// Ist der Wert noch nicht gesetzt, so wird dies nun getan
-//							field.setValue(rowValue, false);
-//							return;
-//						}
-//					}
-//				}
-//				return;
-//			}
-//			field.setValue(null, false);
-//		}
 	}
 }
