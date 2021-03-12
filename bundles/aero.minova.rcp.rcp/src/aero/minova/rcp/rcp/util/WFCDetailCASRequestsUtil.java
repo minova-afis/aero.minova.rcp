@@ -154,14 +154,12 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void updateSelectedEntry() {
 		if (selectedTable != null) {
-			for (MField field : detail.getFields()) {
-				field.indicateWaiting();
-			}
 			for (int i = 0; i < selectedTable.getColumnCount(); i++) {
 				String name = selectedTable.getColumnName(i);
 				MField c = detail.getField(name);
 				if (c != null && c.getConsumer() != null) {
 					try {
+						c.indicateWaiting();
 						c.setValue(selectedTable.getRows().get(0).getValue(i), false);
 					} catch (Exception e) {
 						e.printStackTrace();
