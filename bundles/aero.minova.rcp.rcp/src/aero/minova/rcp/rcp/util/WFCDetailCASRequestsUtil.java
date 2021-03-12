@@ -348,13 +348,15 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
-		System.out.println("Nafrage an den Cas mit Ticket: #" + ticketvalue.getStringValue());
+		System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
 		Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
 		Row r = RowBuilder.newRow().withValue(ticketvalue).create();
 		ticketTable.addRow(r);
+		indicateWaitForTicket(ticketvalue.getStringValue());
 		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 		// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
 		// Detailfelder vor
+
 		tableFuture.thenAccept(ta -> sync.syncExec(() -> {
 			if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 				showErrorMessage(ta.getResultSet());
@@ -363,6 +365,23 @@ public class WFCDetailCASRequestsUtil {
 				updateSelectedEntry();
 			}
 		}));
+	}
+
+	/**
+	 * Wir setzen die Messages für Loopups (Service, ServiceObject, OrderReciever, ServiceContract, Description) auf '..Waiting #xxxxx'
+	 */
+	private void indicateWaitForTicket(String messageText) {
+		messageText = "...waiting for #" + messageText;
+		MField field = detail.getField("Description");
+		field.getValueAccessor().setMessageText(messageText);
+		field = detail.getField("OrderReceiverKey");
+		field.getValueAccessor().setMessageText(messageText);
+		field = detail.getField("ServiceKey");
+		field.getValueAccessor().setMessageText(messageText);
+		field = detail.getField("ServiceContractKey");
+		field.getValueAccessor().setMessageText(messageText);
+		field = detail.getField("ServiceObjectKey");
+		field.getValueAccessor().setMessageText(messageText);
 	}
 
 	/**
