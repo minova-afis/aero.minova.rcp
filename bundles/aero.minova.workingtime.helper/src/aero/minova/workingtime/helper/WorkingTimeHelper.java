@@ -42,6 +42,9 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	private MField bookingDate;
 	private MLookupField employee;
 	private MLookupField orderreceiver;
+	private MLookupField service;
+	private MLookupField serviceobject;
+	private MLookupField servicecontract;
 	private String user;
 	private LookupValue lookupValueUser;
 
@@ -85,11 +88,18 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		chargedQuantity = detail.getField("ChargedQuantity");
 		employee = (MLookupField) detail.getField("EmployeeKey");
 		orderreceiver = (MLookupField) detail.getField("OrderReceiverKey");
+		service = (MLookupField) detail.getField("ServiceKey");
+		serviceobject = (MLookupField) detail.getField("ServiceKey");
+		servicecontract = (MLookupField) detail.getField("ServiceKey");
+		orderreceiver = (MLookupField) detail.getField("OrderReceiverKey");
 
 		// Auf diese werte reagieren wir
 		startDate.addValueChangeListener(this);
 		endDate.addValueChangeListener(this);
 		orderreceiver.addValueChangeListener(ticketHelper);
+		servicecontract.addValueChangeListener(ticketHelper);
+		serviceobject.addValueChangeListener(ticketHelper);
+		service.addValueChangeListener(ticketHelper);
 
 		// Mitarbeiter Setzen
 		user = preferences.get(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, System.getProperty("user.name"));
