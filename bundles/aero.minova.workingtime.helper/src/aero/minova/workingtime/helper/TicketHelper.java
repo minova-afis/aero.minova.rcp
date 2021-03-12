@@ -19,7 +19,8 @@ public class TicketHelper implements ValueChangeListener {
 		MLookupField lookupField = (MLookupField) evt.getField();
 		String writtenText = lookupField.getWrittenText();
 		if (writtenText != null && writtenText.startsWith("#")) {
-			System.out.println("gelesener Text aus dem Lookup:" + lookupField.getWrittenText());
+			// System.out.println("gelesener Text aus dem Lookup:" + writtenText);
+			lookupField.setWrittenText(null);
 			Value value = new Value(writtenText.replace("#", ""), DataType.STRING);
 			workingTimeHelper.postEvent(value);
 		}
