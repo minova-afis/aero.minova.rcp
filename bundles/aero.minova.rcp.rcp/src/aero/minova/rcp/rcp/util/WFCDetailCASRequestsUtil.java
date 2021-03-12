@@ -366,9 +366,18 @@ public class WFCDetailCASRequestsUtil {
 		ticketTable.addRow(r);
 		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(),
 				ticketTable);
-		tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-			selectedTable = ta.getOutputParameters();
-			updateSelectedEntry();
+		// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
+		// Detailfelder vor
+		for (MField field : detail.getFields()) {
+			field.indicateWaiting();
+		}
+		tableFuture.thenAccept(ta -> sync.syncExec(() -> {
+			if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
+				showErrorMessage(ta.getResultSet());
+			} else {
+				selectedTable = ta.getResultSet();
+				updateSelectedEntry();
+			}
 		}));
 	}
 
