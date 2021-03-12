@@ -352,12 +352,14 @@ public class WFCDetailCASRequestsUtil {
 		Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
 		Row r = RowBuilder.newRow().withValue(ticketvalue).create();
 		ticketTable.addRow(r);
-		indicateWaitForTicket(ticketvalue.getStringValue());
+
+		ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
 		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
+
 		// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
 		// Detailfelder vor
-
 		tableFuture.thenAccept(ta -> sync.syncExec(() -> {
+			ticketFieldsUpdate("", true);
 			if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 				showErrorMessage(ta.getResultSet());
 			} else {
@@ -368,20 +370,29 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Wir setzen die Messages für Loopups (Service, ServiceObject, OrderReciever, ServiceContract, Description) auf '..Waiting #xxxxx'
+	 * Für die Felder, die von einem Ticket gefüllt werden können (Service, ServiceObject, OrderReciever, ServiceContract, Description), wird die Message und
+	 * Editability gesetzt
 	 */
-	private void indicateWaitForTicket(String messageText) {
-		messageText = "...waiting for #" + messageText;
+	private void ticketFieldsUpdate(String messageText, boolean editable) {
 		MField field = detail.getField("Description");
 		field.getValueAccessor().setMessageText(messageText);
+		field.getValueAccessor().setEditable(editable);
+
 		field = detail.getField("OrderReceiverKey");
 		field.getValueAccessor().setMessageText(messageText);
+		field.getValueAccessor().setEditable(editable);
+
 		field = detail.getField("ServiceKey");
 		field.getValueAccessor().setMessageText(messageText);
+		field.getValueAccessor().setEditable(editable);
+
 		field = detail.getField("ServiceContractKey");
 		field.getValueAccessor().setMessageText(messageText);
+		field.getValueAccessor().setEditable(editable);
+
 		field = detail.getField("ServiceObjectKey");
 		field.getValueAccessor().setMessageText(messageText);
+		field.getValueAccessor().setEditable(editable);
 	}
 
 	/**

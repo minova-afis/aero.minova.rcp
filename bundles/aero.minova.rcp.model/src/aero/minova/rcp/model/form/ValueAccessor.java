@@ -19,4 +19,6 @@ public interface ValueAccessor {
 	void setValue(Row row);
 
 	void setMessageText(String message);
+
+	void setEditable(boolean editable);
 }

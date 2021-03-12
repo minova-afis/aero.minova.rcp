@@ -40,12 +40,21 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		});
 	}
 
+	@Override
 	public void setMessageText(String message) {
 		if (control instanceof Lookup) {
 			((Lookup) control).setMessage(message);
-		}
-		else if (control instanceof Text) {
+		} else if (control instanceof Text) {
 			((Text) control).setMessage(message);
+		}
+	}
+
+	@Override
+	public void setEditable(boolean editable) {
+		if (control instanceof Lookup) {
+			((Lookup) control).setEditable(editable);
+		} else if (control instanceof Text) {
+			((Text) control).setEditable(editable);
 		}
 	}
 
