@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
@@ -536,7 +537,7 @@ public class DataService implements IDataService {
 			}
 			if (ta != null) {
 				if (ta.getName() != null && ta.getName().equals("Error")) {
-					broker.post(Constants.BROKER_SHOWERROR, t);
+					broker.post(Constants.BROKER_SHOWERROR, ta);
 				} else {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
