@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.util;
 
+import java.text.DateFormat;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.regex.Matcher;
@@ -132,8 +135,7 @@ public class DateUtil {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
 					// Es beginnt mit eine Tagesangabe
-					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC"))
-							.atStartOfDay();
+					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
@@ -144,6 +146,7 @@ public class DateUtil {
 			startOfToday = null;
 		}
 
+		
 		if (!input.isEmpty() && startOfToday == null) {
 			DateTimeFormatter dtf;
 			FormatStyle[] styles = new FormatStyle[] {FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL};
