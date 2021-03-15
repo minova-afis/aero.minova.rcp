@@ -146,7 +146,8 @@ public class DateUtil {
 
 		if (!input.isEmpty() && startOfToday == null) {
 			DateTimeFormatter dtf;
-			for (FormatStyle formatStyle : FormatStyle.values()) {
+			FormatStyle[] styles = new FormatStyle[] {FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL};
+			for (FormatStyle formatStyle : styles) {
 				try {
 					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
 					LocalDate ld = LocalDate.parse(input, dtf);
