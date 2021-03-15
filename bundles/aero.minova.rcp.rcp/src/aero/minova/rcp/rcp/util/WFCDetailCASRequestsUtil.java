@@ -76,7 +76,8 @@ public class WFCDetailCASRequestsUtil {
 	private String lastEndDate = "";
 
 	/**
-	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
+	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
+	 * Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	 *
 	 * @param rows
 	 */
@@ -135,7 +136,8 @@ public class WFCDetailCASRequestsUtil {
 			Row r = builder.create();
 			rowIndexTable.addRow(r);
 
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
+					rowIndexTable);
 			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
@@ -144,7 +146,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
+	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
+	 * den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	 */
 	public void updateSelectedEntry() {
 		if (selectedTable != null) {
@@ -168,7 +171,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig der gegebenen Keys
+	 * Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
+	 * der gegebenen Keys
 	 *
 	 * @param obj
 	 */
@@ -200,9 +204,15 @@ public class WFCDetailCASRequestsUtil {
 			}
 			while (valuePosition < formTable.getColumnCount()) {
 				MField field = detail.getField(formTable.getColumnName(valuePosition));
-				if (field != null) {
-					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
-				}
+//				if (field instanceof MLookupField) {
+//					MLookupField mlookup = (MLookupField) field;
+//					Value lookupValue = new Value(mlookup.getKeyLong());
+//					rb.withValue(lookupValue);
+//				}else {
+					if (field != null) {
+						rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
+					}
+//				}
 				valuePosition++;
 			}
 
@@ -227,8 +237,8 @@ public class WFCDetailCASRequestsUtil {
 				}));
 			}
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
-					shell);
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
+					"Entry not possible, check for wronginputs in your messured Time", shell);
 			notificationPopUp.open();
 		}
 	}
@@ -244,7 +254,8 @@ public class WFCDetailCASRequestsUtil {
 			// openNotificationPopup("Entry could not be updated:" +
 			// responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while updating Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while updating Entry",
+					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -265,7 +276,8 @@ public class WFCDetailCASRequestsUtil {
 		if (responce.getReturnCode() == -1) {
 			// openNotificationPopup("Entry could not be added:" + responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while adding Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while adding Entry",
+					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -278,7 +290,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
+	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
+	 * eine Abfrage an den CAS zusammen
 	 *
 	 * @param obj
 	 */
@@ -288,7 +301,8 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			if (getKeys() != null) {
 				String tablename = form.getIndexView() != null ? "sp" : "op";
-				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+				if ((!"sp".equals(form.getDetail().getProcedurePrefix())
+						&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
 					tablename = form.getDetail().getProcedurePrefix();
 				}
 				tablename += "Delete";
@@ -313,7 +327,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
+	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
+	 * befüllt um die Anfrage anzupassen
 	 *
 	 * @param responce
 	 */
@@ -321,7 +336,8 @@ public class WFCDetailCASRequestsUtil {
 		if (responce.getReturnCode() == -1) {
 			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while deleting Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while deleting Entry",
+					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -335,7 +351,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner Anfrage informiert
+	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner
+	 * Anfrage informiert
 	 *
 	 * @param message
 	 */
@@ -427,7 +444,8 @@ public class WFCDetailCASRequestsUtil {
 //	}
 
 	/**
-	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten Eintrags zurück
+	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten
+	 * Eintrags zurück
 	 *
 	 * @param obj
 	 */

@@ -139,6 +139,18 @@ public class DataService implements IDataService {
 		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			if (t.statusCode() == 500) {
+				Table error = new Table();
+				Row r = new Row();
+				error.setName("Error");
+				error.addColumn(new Column("Message", DataType.STRING));
+				// error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
+				fromJson = new SqlProcedureResult();
+				fromJson.setResultSet(error);
+				// FehlerCode
+				fromJson.setReturnCode(-1);
+			}
+
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
 				Pattern fullError = Pattern
@@ -434,7 +446,7 @@ public class DataService implements IDataService {
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
-// cache			
+// cache
 //			if (map.get(keyLong) != null) {
 //				list.add(map.get(keyLong));
 //				return CompletableFuture.supplyAsync(() -> list);

@@ -241,11 +241,13 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		} catch (ConnectException ex) {
 			throw new WorkspaceException("Server nicht bekannt!");
 		} catch (IOException e) {
-			throw new WorkspaceException("User oder Passwort nicht korrekt");
+			throw new WorkspaceException("User oder Passwort nicht korrekt" + e.getMessage());
 		} catch (InterruptedException i) {
 			throw new WorkspaceException("Try Again!");
 		} catch (IllegalArgumentException i) {
 			throw new WorkspaceException("Ungültige URL!");
+		} catch (NullPointerException e) {
+			throw new WorkspaceException("Bitte Passwort nochmal eintragen!!!");
 		}
 	}
 
