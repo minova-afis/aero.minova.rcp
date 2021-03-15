@@ -375,24 +375,24 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private void ticketFieldsUpdate(String messageText, boolean editable) {
 		MField field = detail.getField("Description");
-		field.getValueAccessor().setMessageText(messageText);
 		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
 
 		field = detail.getField("OrderReceiverKey");
-		field.getValueAccessor().setMessageText(messageText);
 		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
 
 		field = detail.getField("ServiceKey");
-		field.getValueAccessor().setMessageText(messageText);
 		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
 
 		field = detail.getField("ServiceContractKey");
-		field.getValueAccessor().setMessageText(messageText);
 		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
 
 		field = detail.getField("ServiceObjectKey");
-		field.getValueAccessor().setMessageText(messageText);
 		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
 	}
 
 	/**
