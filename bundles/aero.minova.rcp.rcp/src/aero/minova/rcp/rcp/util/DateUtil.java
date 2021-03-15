@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
  * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in Instant
  *
  * @author Wilfried Saak
- *
  */
 public class DateUtil {
 	private static String day = "d";
@@ -34,16 +33,20 @@ public class DateUtil {
 	}
 
 	/**
-	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet
-	 * werden. Alle Kürzel müssen als Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
-	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol bestehen.
+	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet werden. Alle Kürzel müssen als
+	 * Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol
+	 * bestehen.
 	 *
-	 * @param day   das Kürzel für Tag. Default (englisch) ist "d"
-	 * @param month das Kürzel für Monat. Default (englisch) ist "m"
-	 * @param year  das Kürzel für Jahr. Default (englisch) ist "y"
-	 * @param week  das Kürzel für Woche. Default (englisch) ist "w"
-	 *
-	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
+	 * @param day
+	 *            das Kürzel für Tag. Default (englisch) ist "d"
+	 * @param month
+	 *            das Kürzel für Monat. Default (englisch) ist "m"
+	 * @param year
+	 *            das Kürzel für Jahr. Default (englisch) ist "y"
+	 * @param week
+	 *            das Kürzel für Woche. Default (englisch) ist "w"
+	 * @exception IllegalArgumentException
+	 *                wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
 	 */
 	public static void setShortcuts(String day, String month, String year, String week) {
 		// Es muss immer genau ein Zeichen übergeben werden
