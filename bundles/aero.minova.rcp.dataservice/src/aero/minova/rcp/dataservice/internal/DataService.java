@@ -25,16 +25,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
@@ -56,6 +59,9 @@ import aero.minova.rcp.model.form.MLookupField;
 @Component
 public class DataService implements IDataService {
 
+	@Inject
+	private IEventBroker broker;
+
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	private static final String CONTENT_TYPE = "Content-Type";
 	public static final String TABLE_KEYTEXT = "KeyText";
@@ -67,8 +73,10 @@ public class DataService implements IDataService {
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
-	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
-	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
+	private static final boolean LOG = "true"
+			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
+	private static final boolean LOG_CACHE = "true"
+			.equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
 
 	private HttpClient httpClient;
 	private Gson gson;
@@ -125,7 +133,6 @@ public class DataService implements IDataService {
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
-		// return CompletableFuture<Table> future
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			if (LOG) {
 				logBody(body, ++callCount);
@@ -148,24 +155,22 @@ public class DataService implements IDataService {
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (t.statusCode() == 500) {
-				Table error = new Table();
-				error.setName("Error");
-				error.addColumn(new Column("Message", DataType.STRING));
-				// error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
 				fromJson = new SqlProcedureResult();
-				fromJson.setResultSet(error);
+				fromJson.setResultSet(gson.fromJson(t.body(), Table.class));
 				// FehlerCode
 				fromJson.setReturnCode(-1);
 			}
 
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
-				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Pattern fullError = Pattern
+						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
 				Matcher m = fullError.matcher(t.body());
 				if (m.find()) {
 					errorMessage = m.group(0);
 				}
-				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				Pattern cutError = Pattern
+						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
 				errorMessage = cutError.matcher(errorMessage).replaceAll("");
 				errorMessage.replace("\"", "");
 				Table error = new Table();
@@ -196,10 +201,12 @@ public class DataService implements IDataService {
 			}
 
 			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+			}
 
 			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+			}
 		} };
 
 		try {
@@ -273,14 +280,14 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath
-	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
-	 * @param filename
-	 *            relativer Pfad und Dateiname auf dem Server
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
+	 *                  mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
 	private CompletableFuture<String> downloadAsync(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
+				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
 		logBody("getFileSynch(" + filename + ")", ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
@@ -288,12 +295,13 @@ public class DataService implements IDataService {
 
 	/**
 	 * Only public for the integration tests
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 */
 	public CompletableFuture<String> getHashForFile(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename))
+				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
 
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(response -> {
@@ -344,12 +352,14 @@ public class DataService implements IDataService {
 	}
 
 	/**
-	 * Je Prozedur bzw. Tabellenneame gibt es einen Cache je KeyLong mit dem LookupValue
+	 * Je Prozedur bzw. Tabellenneame gibt es einen Cache je KeyLong mit dem
+	 * LookupValue
 	 */
 	private HashMap<String, HashMap<Integer, LookupValue>> cache = new HashMap<>();
 
 	@Override
-	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
+	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong,
+			String keyText) {
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
@@ -526,13 +536,17 @@ public class DataService implements IDataService {
 				e.printStackTrace();
 			}
 			if (ta != null) {
-				for (Row r : ta.getRows()) {
-					LookupValue lv = new LookupValue(//
-							r.getValue(0).getIntegerValue(), //
-							r.getValue(1).getStringValue(), //
-							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-					map.put(lv.keyLong, lv);
-					list.add(lv);
+				if (ta.getName() != null && ta.getName().equals("Error")) {
+					broker.post(Constants.BROKER_SHOWERROR, ta);
+				} else {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+						map.put(lv.keyLong, lv);
+						list.add(lv);
+					}
 				}
 			}
 			return CompletableFuture.supplyAsync(() -> list);
