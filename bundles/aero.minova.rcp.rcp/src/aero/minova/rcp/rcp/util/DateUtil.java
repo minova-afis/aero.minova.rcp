@@ -144,17 +144,17 @@ public class DateUtil {
 			startOfToday = null;
 		}
 
-		if (!dateUtilFormatStyle.equals("")) {
-			try {
-				FormatStyle formatStyle = FormatStyle.valueOf(dateUtilFormatStyle); 
-				DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
-				LocalDate ld = LocalDate.parse(input, dtf);
-				startOfToday = ld.atStartOfDay();
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-		} else {
-			if (!input.isEmpty() && startOfToday == null) {
+		if (!input.isEmpty() && startOfToday == null) {
+			if (!dateUtilFormatStyle.equals("")) {
+				try {
+					FormatStyle formatStyle = FormatStyle.valueOf(dateUtilFormatStyle);
+					DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					LocalDate ld = LocalDate.parse(input, dtf);
+					startOfToday = ld.atStartOfDay();
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			} else {
 				DateTimeFormatter dtf;
 				FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
 				for (FormatStyle formatStyle : styles) {
