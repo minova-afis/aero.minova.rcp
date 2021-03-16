@@ -19,6 +19,8 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
@@ -41,6 +43,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -376,7 +379,12 @@ public class WFCDetailCASRequestsUtil {
 	private void ticketFieldsUpdate(String messageText, boolean editable) {
 		MField field = detail.getField("Description");
 		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
+		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
+		((TextValueAccessor) field.getValueAccessor()).setText(messageText);
+		if (editable)
+			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+		else
+			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
 
 		field = detail.getField("OrderReceiverKey");
 		field.getValueAccessor().setEditable(editable);
