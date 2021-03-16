@@ -53,12 +53,9 @@
 		<unit id="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" version="2.10.3.v20200512-1600"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-		<repository location="http://download.eclipse.org/nebula/releases/latest"/>
+		<repository location="http://download.eclipse.org/nebula/releases/2.4.3"/>
 		<unit id="org.eclipse.nebula.cwt.feature.feature.group" version="1.1.0.202011020719"/>
 		<unit id="org.eclipse.nebula.effects.stw.feature.feature.group" version="1.0.0.202011020719"/>
-		<unit id="org.eclipse.nebula.examples.feature.feature.group" version="1.0.4.202011020719"/>
-		<unit id="org.eclipse.nebula.examples.release.feature.feature.group" version="1.1.0.202011020719"/>
-		<unit id="org.eclipse.nebula.feature.feature.group" version="2.4.3.202011020719"/>
 		<unit id="org.eclipse.nebula.visualization.feature.feature.group" version="2.1.0.202011020719"/>
 		<unit id="org.eclipse.nebula.widgets.badgedlabel.feature.feature.group" version="1.0.0.202011020719"/>
 		<unit id="org.eclipse.nebula.widgets.cdatetime.css.feature.feature.group" version="1.4.0.202011020719"/>
