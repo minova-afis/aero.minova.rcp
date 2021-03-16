@@ -372,7 +372,7 @@ public class DataService implements IDataService {
 					.withValue(keyLong) //
 					.withValue(keyText) //
 					.withValue(null) //
-					.withValue(">0") //
+					.withValue(fv) //
 					.create();
 			t.addRow(row);
 			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
