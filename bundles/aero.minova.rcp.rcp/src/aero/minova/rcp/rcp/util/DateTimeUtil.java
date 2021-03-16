@@ -12,13 +12,17 @@ public class DateTimeUtil {
 	private DateTimeUtil() {
 		throw new IllegalStateException("Utility class");
 	}
-	
+
 	public static Instant getDateTime(String input) {
 		return getDateTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input);
 	}
 
 	public static Instant getDateTime(Instant todayNow, String input) {
-		return getDateTime(todayNow, input, Locale.getDefault());
+		return getDateTime(todayNow, input, Locale.getDefault(), "");
+	}
+
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale) {
+		return getDateTime(todayNow, input, locale, "");
 	}
 
 	/**
@@ -30,7 +34,7 @@ public class DateTimeUtil {
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale) {
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilFormatStyle) {
 
 		String[] splitInput = null;
 		Instant dateIn;
@@ -51,7 +55,7 @@ public class DateTimeUtil {
 
 		if (splitInput.length > 1) {
 			if (!splitInput[0].isEmpty()) {
-				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale);
+				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilFormatStyle);
 				timeIn = TimeUtil.getTime(todayNow, splitInput[1]);
 			} else {
 				dateIn = DateUtil.getDate(todayNow, "0");
