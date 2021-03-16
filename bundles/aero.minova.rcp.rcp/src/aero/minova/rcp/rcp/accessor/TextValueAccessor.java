@@ -17,7 +17,6 @@ public class TextValueAccessor extends AbstractValueAccessor {
 	protected void updateControlFromValue(Control control, Value value) {
 		String newText = value == null ? "" : value.getStringValue();
 		String currentText = ((Text) control).getText();
-		System.out.println("New Text: [" + newText + "]");
 
 		if (newText.equals(currentText))
 			return; // ist ja schon gesetzt
