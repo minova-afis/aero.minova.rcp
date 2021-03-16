@@ -12,7 +12,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
-import aero.minova.rcp.rcp.util.Constants;
+import aero.minova.rcp.constants.Constants;
 
 public class NewDetailHandler {
 

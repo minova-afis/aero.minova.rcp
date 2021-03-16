@@ -9,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +45,7 @@ class XmlReaderTests {
 		try {
 			XmlProcessor xmlProcessor = new XmlProcessor();
 			form = xmlProcessor.get(content, Form.class);
-		} catch (JAXBException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

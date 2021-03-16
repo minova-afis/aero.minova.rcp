@@ -3,5 +3,8 @@
 # Turn on debugging for the plugin.
 aero.minova.rcp.rcp/debug=false
 
-# Turn on tracing of dataservice communication
+# Turn on tracing of lookupvalueaccessor
 aero.minova.rcp.rcp/debug/lookupvalueaccessor=false
+
+# Turn on tracing of lookupcontentprovider
+aero.minova.rcp.rcp/debug/lookupcontentprovider=false
