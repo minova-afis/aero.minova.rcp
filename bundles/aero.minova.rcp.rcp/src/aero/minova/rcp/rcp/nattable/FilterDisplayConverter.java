@@ -7,10 +7,10 @@ import java.util.Locale;
 
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;
-import aero.minova.rcp.rcp.util.Constants;
 import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.DateUtil;
 import aero.minova.rcp.rcp.util.OperatorExtractionUtil;
@@ -50,8 +50,9 @@ public class FilterDisplayConverter extends DisplayConverter {
 		if (canonicalValue instanceof FilterValue) {
 			FilterValue cv = (FilterValue) canonicalValue;
 			String val = "";
-			if (cv.getValue().toString().contains("null"))
+			if (cv.getValue().toString().contains("null")) {
 				return cv.getValue().toString();
+			}
 			switch (datatype) {
 			case INSTANT:
 				switch (datetimetype) {
@@ -73,8 +74,9 @@ public class FilterDisplayConverter extends DisplayConverter {
 				val = cv.getFilterValue().getValue().toString();
 			}
 
-			if (cv.getValue().toString().contains("null"))
+			if (cv.getValue().toString().contains("null")) {
 				return cv.getValue().toString();
+			}
 			return cv.getValue().toString() + " " + val;
 		}
 		return null;
@@ -102,8 +104,9 @@ public class FilterDisplayConverter extends DisplayConverter {
 			String operator = valueString.substring(0, operatorPos);
 
 			// Bei "null" und "!null" wird kein Wert eingegeben
-			if (operator.contains("null"))
+			if (operator.contains("null")) {
 				return new FilterValue(operator, null, valueString);
+			}
 
 			String filterValueString = valueString.substring(operatorPos).strip();
 			Object filterValue = null;
@@ -154,13 +157,15 @@ public class FilterDisplayConverter extends DisplayConverter {
 					 */
 					if (operator.equals("") && datatype.equals(DataType.STRING)) {
 						operator = "~";
-						if (!containsWildcard(filterValueString))
+						if (!containsWildcard(filterValueString)) {
 							filterValue = filterValue + "%";
+						}
 					}
 
 					// Standart Operator ist "="
-					else if (operator.equals(""))
+					else if (operator.equals("")) {
 						operator = "=";
+					}
 
 					return new FilterValue(operator, filterValue, valueString);
 				} else {
@@ -173,8 +178,9 @@ public class FilterDisplayConverter extends DisplayConverter {
 
 	private boolean containsWildcard(String filterValue) {
 		for (String wildcard : Constants.WILDCARD_OPERATORS) {
-			if (filterValue.contains(wildcard))
+			if (filterValue.contains(wildcard)) {
 				return true;
+			}
 		}
 		return false;
 	}

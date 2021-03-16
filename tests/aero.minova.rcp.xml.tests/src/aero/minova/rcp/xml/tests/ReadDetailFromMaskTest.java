@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -37,7 +35,7 @@ class ReadDetailFromMaskTest {
 					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
 					Form.class);
 
-		} catch (JAXBException | SAXException | IOException e) {
+		} catch (SAXException | IOException e) {
 			e.printStackTrace();
 		}
 		Table tableFromFormDetail = dfs.getTableFromFormDetail(form, "Read");
@@ -69,7 +67,7 @@ class ReadDetailFromMaskTest {
 					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
 					Form.class);
 
-		} catch (JAXBException | SAXException | IOException e) {
+		} catch (SAXException | IOException e) {
 			e.printStackTrace();
 		}
 
@@ -89,7 +87,7 @@ class ReadDetailFromMaskTest {
 					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
 					Form.class);
 
-		} catch (JAXBException | SAXException | IOException e) {
+		} catch (SAXException | IOException e) {
 			e.printStackTrace();
 		}
 		form.setIndexView(null);

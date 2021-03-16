@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.constants;
 
 public class Constants {
 
@@ -50,6 +50,8 @@ public class Constants {
 	public static final String BROKER_RESIZETABLE = "aero/minova/rcp/ResizeTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
+	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
+	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
