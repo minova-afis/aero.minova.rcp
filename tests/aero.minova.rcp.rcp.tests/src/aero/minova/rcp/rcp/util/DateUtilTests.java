@@ -204,14 +204,14 @@ public class DateUtilTests {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
 				.toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(1967, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateUtil.getDate(bithday, "07.01.1967", Locale.GERMANY));
+		assertEquals(expected, DateUtil.getDate(bithday, "07.01.1967", Locale.GERMANY, "MEDIUM"));
 	}
 
 	@Test
 	public void testGetDate7_1_1967() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
 				.toInstant(ZoneOffset.UTC);
-		assertNull(DateUtil.getDate(bithday, "7.1.1967", Locale.GERMANY));
+		assertNull(DateUtil.getDate(bithday, "7.1.1967", Locale.GERMANY, "SHORT"));
 	}
 	
 	@Test
