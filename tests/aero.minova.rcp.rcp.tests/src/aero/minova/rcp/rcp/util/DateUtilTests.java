@@ -219,7 +219,7 @@ public class DateUtilTests {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12)
 				.toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(2020, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateUtil.getDate(bithday, "07.01.20", Locale.GERMANY));
+		assertEquals(expected, DateUtil.getDate(bithday, "07.01.20", Locale.GERMANY, ""));
 	}
 	
 	@Test
@@ -229,14 +229,14 @@ public class DateUtilTests {
 
 	@Test
 	public void testSplitInputPlus4t() {
-		String splits[] = DateUtil.splitInput("123+4t", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("123+4t");
 		assertEquals("123", splits[0]);
 		assertEquals("+4t", splits[1]);
 	}
 
 	@Test
 	public void testSplitInput29February() {
-		String splits[] = DateUtil.splitInput("01012020+2M-1T", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("01012020+2M-1T");
 		assertEquals("01012020", splits[0]);
 		assertEquals("+2m", splits[1]);
 		assertEquals("-1t", splits[2]);
@@ -244,38 +244,38 @@ public class DateUtilTests {
 
 	@Test
 	public void testSplitInputPlusPlus() {
-		String splits[] = DateUtil.splitInput("01012020+++M", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("01012020+++M");
 		assertEquals("01012020", splits[0]);
 		assertEquals("+++m", splits[1]);
 	}
 
 	@Test
 	public void testSplitInputPlusPlusPlus() {
-		String splits[] = DateUtil.splitInput("+++", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("+++");
 		assertEquals("+++t", splits[0]);
 	}
 
 	@Test
 	public void testWrongStringTT() {
-		String splits[] = DateUtil.splitInput("+TT", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("+TT");
 		assertEquals(0, splits.length);
 	}
 
 	@Test
 	public void testWrongStringT() {
-		String splits[] = DateUtil.splitInput("T", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("T");
 		assertEquals(0, splits.length);
 	}
 
 	@Test
 	public void testWrongStringPlusMinus() {
-		String splits[] = DateUtil.splitInput("+0-3t", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("+0-3t");
 		assertEquals(0, splits.length);
 	}
 
 	@Test
 	public void testSplitInputTodayPlus1DayMinus3Day() {
-		String splits[] = DateUtil.splitInput("0+-3t", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("0+-3t");
 		assertEquals(3, splits.length);
 		assertEquals("0", splits[0]);
 		assertEquals("+t", splits[1]);
@@ -284,13 +284,13 @@ public class DateUtilTests {
 
 	@Test
 	public void testSplitInputWrong31Day() {
-		String splits[] = DateUtil.splitInput("3t", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("3t");
 		assertEquals(0, splits.length);
 	}
 
 	@Test
 	public void testSplitInputWrongTodayPlus1DayMinus3DayDay() {
-		String splits[] = DateUtil.splitInput("0+-3tt", Locale.getDefault());
+		String splits[] = DateUtil.splitInput("0+-3tt");
 		assertEquals(0, splits.length);
 	}
 
@@ -333,8 +333,7 @@ public class DateUtilTests {
 	public void testGetDate02Point05() {
 		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12)
 				.toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1967, MAY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateUtil.getDate(bithday, "02.05"));
+		assertNull(DateUtil.getDate(bithday, "02.05"));
 	}
 	
 	@Test
@@ -350,6 +349,6 @@ public class DateUtilTests {
 		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12)
 				.toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(1988, MAY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateUtil.getDate(bithday, "02/05/99", Locale.US));
+		assertEquals(expected, DateUtil.getDate(bithday, "02/05/88", Locale.US, "SHORT"));
 	}
 }
