@@ -27,7 +27,7 @@ public class DateUtil {
 	private static String year = "y";
 	private static String week = "w";
 	private static String shortcuts = day + month + year + week;
-	private static String defaultFormatStyle = "SHORT";
+	private static String defaultFormatStyle = "";
 
 	private DateUtil() {
 		throw new IllegalStateException("Utility class");
