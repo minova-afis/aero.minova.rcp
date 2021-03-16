@@ -12,6 +12,10 @@ public class DateTimeUtil {
 	private DateTimeUtil() {
 		throw new IllegalStateException("Utility class");
 	}
+	
+	public static Instant getDateTime(String input) {
+		return getDateTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input);
+	}
 
 	public static Instant getDateTime(Instant todayNow, String input) {
 		return getDateTime(todayNow, input, Locale.getDefault());
