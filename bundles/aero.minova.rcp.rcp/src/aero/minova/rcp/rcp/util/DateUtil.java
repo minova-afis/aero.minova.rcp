@@ -1,6 +1,5 @@
 package aero.minova.rcp.rcp.util;
 
-import java.text.DateFormat;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -12,8 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.regex.Matcher;
@@ -30,6 +27,7 @@ public class DateUtil {
 	private static String year = "y";
 	private static String week = "w";
 	private static String shortcuts = day + month + year + week;
+	private static String defaultFormatStyle = "SHORT";
 
 	private DateUtil() {
 		throw new IllegalStateException("Utility class");
@@ -101,7 +99,7 @@ public class DateUtil {
 	}
 
 	public static Instant getDate(Instant today, String input) {
-		return getDate(today, input, Locale.getDefault(Category.FORMAT));
+		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultFormatStyle);
 	}
 
 	public static Instant getDate(String input, Locale locale) {
@@ -122,7 +120,7 @@ public class DateUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale) {
+	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilFormatStyle) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
 
@@ -146,18 +144,28 @@ public class DateUtil {
 			startOfToday = null;
 		}
 
-		
-		if (!input.isEmpty() && startOfToday == null) {
-			DateTimeFormatter dtf;
-			FormatStyle[] styles = new FormatStyle[] {FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL};
-			for (FormatStyle formatStyle : styles) {
-				try {
-					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
-					LocalDate ld = LocalDate.parse(input, dtf);
-					startOfToday = ld.atStartOfDay();
-					break;
-				} catch (Exception e) {
-					// dann war is nicht in diesem Format
+		if (!dateUtilFormatStyle.equals("")) {
+			try {
+				FormatStyle formatStyle = FormatStyle.valueOf(dateUtilFormatStyle); 
+				DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+				LocalDate ld = LocalDate.parse(input, dtf);
+				startOfToday = ld.atStartOfDay();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		} else {
+			if (!input.isEmpty() && startOfToday == null) {
+				DateTimeFormatter dtf;
+				FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
+				for (FormatStyle formatStyle : styles) {
+					try {
+						dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+						LocalDate ld = LocalDate.parse(input, dtf);
+						startOfToday = ld.atStartOfDay();
+						break;
+					} catch (Exception e) {
+						// dann war is nicht in diesem Format
+					}
 				}
 			}
 		}
