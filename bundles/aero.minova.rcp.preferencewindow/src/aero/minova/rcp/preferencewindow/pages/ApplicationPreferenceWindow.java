@@ -21,6 +21,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
