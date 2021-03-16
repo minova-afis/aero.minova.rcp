@@ -87,8 +87,8 @@ Die zu interpretiernden Werte aus den Feldern werden in die zugehörigen leeren 
 Die Operatoren vor den Werten werden ebenfalls mit in die Zelle eingetragen. Sie werden vom CAS verarbeitet.
 Nachdem die Tabelle vollständig erstellt wurde, wird dieses Objekt als Anfrage mit einem HttpRequest an den CAS versendet. Die asynchrone Antwort enthält ebenfalls ein Table-Objekt. Dieses wird von dem Indexbereich eingelesen und dargestellt.
 
-== Interpreter
-Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinhalt einen Wert interpretiert. 
+== Operatoren
+Für die folgenden Felder wird ein Operator verwendet, der aus einem Feldinhalt einen Wert interpretiert. 
 
 |===
 |Eingabe   |Interpretation   |Darstellung beim Verlassen   
@@ -96,17 +96,20 @@ Für die folgenden Felder wird ein Interpreter verwendet, der aus einem Feldinha
 |`>1`   |`>` + der 1. des aktuellen Monats   | > 01.12.2020    
 |===
 
-Für die folgenden Felder kann ein Interpreter eingesetzt werden: 
+Die Operatoren (mit Außnahme der Wildcards) müssen als Erstes in dem Feld eingetragen werden und können mit einem Lehrzeichen von der eigentlichen Eingabe getrennt werden.
+Für die folgenden Felder kann ein Operator eingesetzt werden: 
 
 ==== Zahlenfelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `<>`, `null`, `!null`.
+Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Datums-, Zeit-, DateTimeFelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `<>`, `null`, `!null`.
+Bei einem Datums-, Zeit-, DateTimeFelder können folgende Operatoren zum Einsatz kommen: `>`, `<`, `=`, `>=`, `\<=`, `<>`, `null`, `!null`.
 
 ==== Textfelder
-Bei einem Zahlenfeld können folgende Operatoren zum Einsatz kommen: `%`, `?`, `=`, `<>`, `null`, `!null`.
- * `%` der Weildcard-Operator steht für einen beliebigen Text.
+Bei einem Textfelder können folgende Operatoren zum Einsatz kommen: `%`, `_`, `=`, `<>`, `null`, `!null`, `~`, `!~`.
+ 
+ * `%` der Wildcard-Operator steht für einen beliebigen Text
+ * `_` steht für eine einzelnes beliebiges Zeichen
  
 |===
 |Eingabe   |Interpretation   |Darstellung beim Verlassen   
@@ -125,11 +128,17 @@ Es werden alle Datensätze gesucht, deren Wert größer als der angegebene ist.
 ==== '<' Kleiner
 Es werden alle Datensätze gesucht, deren Wert kleiner als der angegebene ist.
 
-==== '<>' Ungleich
-Es werden alle Datensätze gesucht, deren Wert nicht gleich dem angegebene ist.
-
 ==== '=' Gleich
 Es werden alle Datensätze gesucht, deren Wert genau dem angegebenen entspricht.
+
+==== '>=' Größer-Gleich
+Es werden alle Datensätze gesucht, deren Wert größer oder gleich dem angegebene ist.
+
+==== '\<=' Kleiner-Gleich
+Es werden alle Datensätze gesucht, deren Wert kleiner oder gleich dem angegebene ist.
+
+==== '<>' Ungleich
+Es werden alle Datensätze gesucht, deren Wert nicht gleich dem angegebene ist.
 
 ==== 'null' Nichts (kein Wert)
 Es werden alle Datensätze gesucht, bei denen in diesem Feld kein Wert eingetragen wurde
@@ -145,12 +154,44 @@ Das Muster kann die Wildcards `%` und `?` enthalten.
 Es werden alle Datensätze gesucht, bei denen der Wert des Feldes nicht mit dem Muster übereinstimmt.
 Das Muster kann die Wildcards `%` und `?` enthalten.
 
+
+== Verhalten der Felder
+
+Die Eingabe in Datums- und Zeitfelder wird wie link:https://github.com/minova-afis/aero.minova.rcp/edit/master/bundles/aero.minova.rcp.rcp/README.adoc[beschrieben] umgewandelt.
+
+Wenn der Nutzer keinen Operator einträgt, wird in Datums-, Zeit-, DateTime- und Zahlenfeldern automatisch ein `=` eingefügt.
+In Textfeldern ist der Defaultoperator `~`.
+Ist in einem Textfeld zudem kein Wildcard-Operator vorhanden, wird automatisch `%` am Ende des Strings hinzugefügt. 
+Damit wird bei der Eingabe von `ja` der Name `janiak` gefunden.
+Es wird also sichergestellt, dass immer ein Operator vorhanden ist.
+
+Trägt der Nutzer `null` oder `!null` ein, werden alle weiteren Angaben verworfen.
+
+Wenn ein Nutzer in ein Feld klickt, in das bereits etwas eingetragen wurde, erscheint dort wieder der ursprüngliche Inhalt.
+Die Eingabe von `12` in ein Datumsfeld wird als `= 01.02.2021` dargestellt.
+Wird dieses Feld wieder ausgewählt, erscheint dort wieder `12`.
+
+
 == Aufruf des CAS
 
-An das CAS muss immer der Operator gesendet werden. 
-Dies ist auch erforderlich, wenn im UI keine Operator eingetragen wurde.
+Daten werden an das CAS in folgendem Format übertragen:
 
-Der Operator wird immer mit einem Leerzeichen von den Daten getrennt.
+`f-=-s-Beispiel`
+
+Das `f` steht hier für Filter.
+Als nächstes folgt der Operator.
+Dann kommt der Datentyp der eigentlichen Eingabe.
+Diese sind:
+
+* `n`: Integer
+* `d`: Double
+* `s`: String
+* `i`: Instant
+* `z`: ZonedDateTime
+* `b`: Boolean
+
+Zuletzt kommen die Daten.
+Die Daten von Boolean-Feldern werden ohne Filter übertragen (z.B. `b-true`).
 
 Bei Datums und Zeitangaben wir immer der String als SQL-Instant übertragen.
 `{ts '2020-12-31 12:30:00'}` ist die entsprechende Konstante. 

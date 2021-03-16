@@ -1,39 +1,41 @@
 package aero.minova.rcp.xml.tests;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.dataservice.internal.DataFormService;
-import aero.minova.rcp.dataservice.internal.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Table;
 
-public class ReadDetailFromMaskTest {
+class ReadDetailFromMaskTest {
 
 	private DataFormService dfs;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		dfs = new DataFormService();
 	}
 
 	@Test
-	public void dataServiceConvertColumnToDataType() throws Exception {
+	void dataServiceConvertColumnToDataType() throws Exception {
 		String userDir = System.getProperty("user.home");
 
 		Form form = null;
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
+			XmlProcessor xmlProcessor = new XmlProcessor();
 			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
+					Form.class);
 
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
@@ -57,14 +59,15 @@ public class ReadDetailFromMaskTest {
 	}
 
 	@Test
-	public void dataServiceReadDataWithProcedureSuffix() throws Exception {
+	void dataServiceReadDataWithProcedureSuffix() throws Exception {
 		String userDir = System.getProperty("user.home");
 
 		Form form = null;
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
+			XmlProcessor xmlProcessor = new XmlProcessor();
 			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
+					Form.class);
 
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();
@@ -76,14 +79,15 @@ public class ReadDetailFromMaskTest {
 	}
 
 	@Test
-	public void dataServiceReadOptionpage() throws Exception {
+	void dataServiceReadOptionpage() throws Exception {
 		String userDir = System.getProperty("user.home");
 
 		Form form = null;
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor(Form.class);
+			XmlProcessor xmlProcessor = new XmlProcessor();
 			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"));
+					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
+					Form.class);
 
 		} catch (JAXBException | SAXException | IOException e) {
 			e.printStackTrace();

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="RCP Produkt" uid="RCP product" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="WFC" uid="WebFatClient" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.1.qualifier" useFeatures="true" includeLaunchers="true">
+
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <vmArgs>-XX:+ShowCodeDetailsInExceptionMessages
-      </vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
    </launcherArgs>
@@ -17,14 +16,18 @@
 
    <splash
       location="aero.minova.rcp.rcp" />
-   <launcher>
-      <win useIco="false">
+   <launcher name="WFC">
+      <macosx icon="/aero.minova.rcp.product/wfc.icns"/>
+      <win useIco="true">
+         <ico path="/aero.minova.rcp.product/wfc.ico"/>
          <bmp/>
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="aero.minova.rcp.rcp"/>
@@ -104,12 +107,10 @@
 
    <features>
       <feature id="aero.minova.rcp.feature" installMode="root"/>
-      <feature id="aero.minova.json.feature" installMode="root"/>
       <feature id="aero.minova.libs.feature" installMode="root"/>
       <feature id="org.eclipse.e4.rcp" installMode="root"/>
       <feature id="org.eclipse.emf.ecore" installMode="root"/>
       <feature id="org.eclipse.emf.common" installMode="root"/>
-      <feature id="h2" installMode="root"/>
    </features>
 
    <configurations>

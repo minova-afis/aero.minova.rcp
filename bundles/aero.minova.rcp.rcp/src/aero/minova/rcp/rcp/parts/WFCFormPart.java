@@ -31,7 +31,10 @@ public abstract class WFCFormPart {
 		form = perspective.getContext().get(Form.class);
 		if (form == null) {
 			String formName = perspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
-			dataService.getFileSynch(formName); // Datei ggf. vom Server holen
+			// TODO CLIENT SHOULD NOT DOWNLOAD HERE THE FORM NAME!!!!!!
+			// LAYER BREAKAGE FIX FOR
+			// https://github.com/minova-afis/aero.minova.rcp/issues/236
+
 			form = dataFormService.getForm(formName);
 			if (form == null) {
 				LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);

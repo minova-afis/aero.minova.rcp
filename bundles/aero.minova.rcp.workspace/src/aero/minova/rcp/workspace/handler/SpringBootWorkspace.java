@@ -221,7 +221,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				+ "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n" + "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n"
 				+ "    {\n" + "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
 				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n" + "  \"rows\": [\n" + "    {\n"
-				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        \"s-\\u003e0\"\n" + "      ]\n" + "    }\n"
+				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        \"f-\\u003e-s-0\"\n" + "      ]\n" + "    }\n"
 				+ "  ]\n" + "}";
 		try {
 			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //

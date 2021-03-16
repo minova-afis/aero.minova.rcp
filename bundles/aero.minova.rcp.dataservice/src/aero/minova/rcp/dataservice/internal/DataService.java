@@ -11,11 +11,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -23,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,16 +30,16 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -58,6 +56,8 @@ import aero.minova.rcp.model.form.MLookupField;
 @Component
 public class DataService implements IDataService {
 
+	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+	private static final String CONTENT_TYPE = "Content-Type";
 	public static final String TABLE_KEYTEXT = "KeyText";
 	public static final String TABLE_KEYLONG = "KeyLong";
 	public static final String TABLE_DESCRIPTION = "Description";
@@ -65,7 +65,11 @@ public class DataService implements IDataService {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
-	private static final boolean LOG = true;
+	private static final FilterValue fv = new FilterValue(">", "0", "");
+
+	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
+	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
+
 	private HttpClient httpClient;
 	private Gson gson;
 
@@ -82,12 +86,14 @@ public class DataService implements IDataService {
 	 * Anzahl der Aufrufe des Servers
 	 */
 	private int callCount = 0;
+	private URI workspacePath;
 
 	@Override
-	public void setCredentials(String username, String password, String server) {
+	public void setCredentials(String username, String password, String server, URI workspacePath) {
 		this.username = username;
 		this.password = password;
 		this.server = server;
+		this.workspacePath = workspacePath;
 		init();
 	}
 
@@ -116,13 +122,15 @@ public class DataService implements IDataService {
 		String body = gson.toJson(seachTable);
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
-				.header("Content-Type", "application/json") //
+				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<Table> future
-		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
-			System.out.println(t);
+			if (LOG) {
+				logBody(body, ++callCount);
+				System.out.println(t);
+			}
 			return gson.fromJson(t.body(), Table.class);
 		});
 
@@ -132,7 +140,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
-				.header("Content-Type", "application/json") //
+				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<SqlProcedureResult> future
@@ -141,7 +149,6 @@ public class DataService implements IDataService {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (t.statusCode() == 500) {
 				Table error = new Table();
-				Row r = new Row();
 				error.setName("Error");
 				error.addColumn(new Column("Message", DataType.STRING));
 				// error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
@@ -153,18 +160,15 @@ public class DataService implements IDataService {
 
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
-				Pattern fullError = Pattern
-						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
 				Matcher m = fullError.matcher(t.body());
 				if (m.find()) {
 					errorMessage = m.group(0);
 				}
-				Pattern cutError = Pattern
-						.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
 				errorMessage = cutError.matcher(errorMessage).replaceAll("");
 				errorMessage.replace("\"", "");
 				Table error = new Table();
-				Row r = new Row();
 				error.setName("Error");
 				error.addColumn(new Column("Message", DataType.STRING));
 				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
@@ -180,22 +184,7 @@ public class DataService implements IDataService {
 
 	}
 
-	@Override
-	public CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable) {
-		init();
-		String body = gson.toJson(detailTable);
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure-with-return-code")) //
-				.header("Content-Type", "application/json") //
-				.POST(BodyPublishers.ofString(body))//
-				.build();
-		// return CompletableFuture<Integer> future
-		logBody(body, ++callCount);
-		return httpClient.sendAsync(request, BodyHandlers.ofString())
-				.thenApply(t -> gson.fromJson(t.body(), Table.class).getRows().get(0).getValue(0).getIntegerValue());
-
-	}
-
-	public static SSLContext disabledSslVerificationContext() {
+	private static SSLContext disabledSslVerificationContext() {
 		// Remove certificate validation
 		SSLContext sslContext = null;
 
@@ -207,12 +196,10 @@ public class DataService implements IDataService {
 			}
 
 			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
+			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 
 			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-			}
+			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 		} };
 
 		try {
@@ -224,134 +211,136 @@ public class DataService implements IDataService {
 		return sslContext;
 	}
 
-	void logBody(String body) {
+	private void logBody(String body) {
 		if (LOG) {
-			// TODO Logging verbessern
 			System.out.println(body);
 		}
 
 	}
 
+	private static void logCache(String message) {
+		if (LOG_CACHE) {
+			System.out.println(message);
+		}
+
+	}
+
 	private void logBody(String body, int i) {
-		logBody("Call: " + i + "\n" + body);
-	}
-
-	/**
-	 * synchrones laden einer Datei vom Server.
-	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
-	 *                  mit angehängt.
-	 * @param filename  relativer Pfad und Dateiname auf dem Server
-	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
-	 */
-	@Override
-	public File getFileSynch(String filename) {
-		String path = null;
-		try {
-			path = Platform.getInstanceLocation().getURL().toURI().toString();
-			File cachedFile = new File(new URI(path + filename));
-			if (cachedFile.exists()) {
-				return cachedFile;
-			}
-		} catch (URISyntaxException e) {
+		if (LOG) {
+			logBody("Call: " + i + "\n" + body);
 		}
-		return getFileSynch(path, filename);
-	}
-
-	/**
-	 * synchrones laden einer Datei vom Server.
-	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
-	 *                  mit angehängt.
-	 * @param filename  relativer Pfad und Dateiname auf dem Server
-	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
-	 */
-	@Override
-	public File getFileSynch(String localPath, String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
-				.header("Content-Type", "application/octet-stream") //
-				.build();
-
-		try {
-			logBody("getFileSynch(" + filename + ")", ++callCount);
-			String body = httpClient.send(request, BodyHandlers.ofString()).body();
-			URI uri = new URI(localPath + filename);
-			Files.writeString(Path.of(uri), body, StandardOpenOption.CREATE);
-			return new File(uri);
-		} catch (IOException | URISyntaxException | InterruptedException e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
-
-	/**
-	 * asynchrones Laden eines Files vom Server
-	 */
-	@Override
-	public CompletableFuture<String> getFile(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))
-				.header("Content-Type", "application/octet-stream") //
-				.build();
-		logBody("getFile(" + filename + ")", ++callCount);
-		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
-
 	}
 
 	@Override
-	public void loadFile(UISynchronize sync, String filename) {
-		loadFile(sync, filename, false);
-	}
+	public CompletableFuture<String> getHashedFile(String filename) {
+		String localHashValue = "";
+		String serverHashCode = "";
+		boolean updateRequired = true;
+		logCache("Requested file: " + filename);
+		File cachedFile = Path.of(getStoragePath().toString(), filename).toFile();
 
-	public void loadFile(UISynchronize sync, String filename, boolean reload) {
-		try {
-			String workspacePath = Platform.getInstanceLocation().getURL().toURI().toString().substring(5);
-			Path localPath = FileSystems.getDefault().getPath(workspacePath + filename);
-			if (!reload && Files.exists(localPath)) {
-				return; // Datei existiert lokal und muss nicht nachgeladen werden
-			}
-			Files.createDirectories(localPath.getParent());
+		// cached file existiert, wir checken mit dem Server ob das noch aktuell ist
+		if (cachedFile.exists()) {
+			logCache("File exist, building hash");
 			try {
-				CompletableFuture<String> fileFuture = getFile(filename);
-				fileFuture.thenAccept(bytes -> sync.asyncExec(() -> {
-					try {
-						byte[] file;
-						try {
-							String result = bytes.substring(1, bytes.length() - 2);
-							String byteValues[] = result.split(",");
-							file = new byte[byteValues.length];
-							int i = 0;
-							for (String string : byteValues) {
-								file[i++] = Byte.parseByte(string);
-							}
-						} catch (NumberFormatException nfe) {
-							// Es ist wohl keine Datei angekommen
-							file = new byte[0];
-						}
-						Files.write(localPath, file);
-					} catch (IOException e1) {
-						e1.printStackTrace();
+				localHashValue = HashService.hashFile(cachedFile);
+				logCache("Local hash:  " + localHashValue);
+				try {
+					serverHashCode = getHashForFile(filename).join();
+					if (serverHashCode.equals(localHashValue)) {
+						updateRequired = false;
 					}
-				}));
-			} catch (NullPointerException npe) {
-				npe.printStackTrace();
+					logCache("Server hash: " + serverHashCode);
+				} catch (RuntimeException e) {
+					// server does not know the file
+				}
+
+			} catch (IOException e) {
+				// something went wrong we need to download the file again
 			}
-		} catch (URISyntaxException | IOException e) {
-			e.printStackTrace();
 		}
+
+		if (updateRequired) {
+			logCache(filename + " need to download / update the file ");
+			CompletableFuture<String> downloadAsync = downloadAsync(filename);
+			saveFile(filename, downloadAsync);
+			return downloadAsync;
+		}
+		return getCachedFileContent(filename);
+
+	}
+
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath
+	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename
+	 *            relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 */
+	private CompletableFuture<String> downloadAsync(String filename) {
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.build();
+		logBody("getFileSynch(" + filename + ")", ++callCount);
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
+	}
+
+	/**
+	 * Only public for the integration tests
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public CompletableFuture<String> getHashForFile(String filename) {
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.build();
+
+		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(response -> {
+			if (response.statusCode() != 200) {
+				throw new RuntimeException("Server returned " + response.statusCode());
+			}
+			return response;
+		}).thenApply(HttpResponse::body);
+
+	}
+
+	private CompletableFuture<String> getCachedFileContent(String filename) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				File cachedFile = new File(new URI(workspacePath + filename));
+				if (cachedFile.exists()) {
+					return Files.readString(cachedFile.toPath());
+				}
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+			throw new CompletionException("File not found", null);
+		});
+	}
+
+	private void saveFile(String fileName, CompletableFuture<String> future) {
+		future.thenAccept(s -> {
+			try {
+				File cachedFile = null;
+				try {
+					cachedFile = new File(new URI(workspacePath + fileName));
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+					return;
+				}
+				Files.writeString(cachedFile.toPath(), future.join());
+				logCache("Cached file: " + fileName);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		});
 	}
 
 	@Override
 	public Path getStoragePath() {
-		Location instanceLocation = Platform.getInstanceLocation();
-		Path p;
-		try {
-			p = Paths.get(instanceLocation.getURL().toURI());
-		} catch (URISyntaxException e) {
-			Platform.getLog(this.getClass()).error(e.getMessage());
-			throw new RuntimeException(e);
-		}
-		return p;
+		return Path.of(workspacePath);
 	}
 
 	/**
@@ -360,14 +349,18 @@ public class DataService implements IDataService {
 	private HashMap<String, HashMap<Integer, LookupValue>> cache = new HashMap<>();
 
 	@Override
- 	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
+	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
+
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
-			if (map.get(keyLong) != null) {
-				list.add(map.get(keyLong));
-				return CompletableFuture.supplyAsync(() -> list);
+			if (useCache) {
+				if (map.get(keyLong) != null) {
+					System.out.println("UseCache: " + tableName);
+					list.add(map.get(keyLong));
+					return CompletableFuture.supplyAsync(() -> list);
+				}
 			}
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
@@ -379,7 +372,7 @@ public class DataService implements IDataService {
 					.withValue(keyLong) //
 					.withValue(keyText) //
 					.withValue(null) //
-					.withValue(">0") //
+					.withValue(fv) //
 					.create();
 			t.addRow(row);
 			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
@@ -403,9 +396,12 @@ public class DataService implements IDataService {
 			// LookupProcedurePrefix
 			String procedureName = field.getLookupProcedurePrefix() + "Resolve";
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
-			if (map.get(keyLong) != null) {
-				list.add(map.get(keyLong));
-				return CompletableFuture.supplyAsync(() -> list);
+			if (useCache) {
+				if (map.get(keyLong) != null) {
+					System.out.println("UseCache: " + procedureName);
+					list.add(map.get(keyLong));
+					return CompletableFuture.supplyAsync(() -> list);
+				}
 			}
 			Table t = TableBuilder.newTable(procedureName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
@@ -439,18 +435,20 @@ public class DataService implements IDataService {
 		}
 	}
 
-
 	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText) {
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
+
 			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
-// cache
-//			if (map.get(keyLong) != null) {
-//				list.add(map.get(keyLong));
-//				return CompletableFuture.supplyAsync(() -> list);
-//			}
+			if (useCache) {
+				if (!map.isEmpty()) {
+					System.out.println("UseCache: " + tableName);
+					list.addAll(map.values());
+					return CompletableFuture.supplyAsync(() -> list);
+				}
+			}
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
@@ -461,14 +459,14 @@ public class DataService implements IDataService {
 					.withValue(null) //
 					.withValue(filterText) //
 					.withValue(null) //
-					.withValue(">0") //
+					.withValue(fv) //
 					.create();
 			t.addRow(row);
 			row = RowBuilder.newRow() //
 					.withValue(null) //
 					.withValue(null) //
 					.withValue(filterText) //
-					.withValue(">0") //
+					.withValue(fv) //
 					.create();
 			t.addRow(row);
 			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
@@ -484,20 +482,27 @@ public class DataService implements IDataService {
 							r.getValue(0).getIntegerValue(), //
 							r.getValue(1).getStringValue(), //
 							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+
 					map.put(lv.keyLong, lv);
 					list.add(lv);
 				}
 			}
 			return CompletableFuture.supplyAsync(() -> list);
 		} else {
+			// Wenn wir eine Prozedur haben müssen wie die Auswahl auf die Werte
+			// einschränken, die möglich sind. Dafür sollten die Kriterien übergeben werden
+			String hashName = CacheUtil.getNameList(field);
 			// LookupProcedurePrefix
 			String procedureName = field.getLookupProcedurePrefix() + "List";
-			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(procedureName, k -> new HashMap<>());
-// cache
-//			if (map.get(keyLong) != null) {
-//				list.add(map.get(keyLong));
-//				return CompletableFuture.supplyAsync(() -> list);
-//			}
+			HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
+
+			if (useCache) {
+				if (!map.isEmpty()) {
+					System.out.println("UseCache: " + hashName);
+					list.addAll(map.values());
+					return CompletableFuture.supplyAsync(() -> list);
+				}
+			}
 			Table t = TableBuilder.newTable(procedureName) //
 					.withColumn(TABLE_COUNT, DataType.INTEGER) //
 					.withColumn(TABLE_FILTERLASTACTION, DataType.BOOLEAN) //
@@ -608,4 +613,10 @@ public class DataService implements IDataService {
 		return tableFuture;
 	}
 
+//	@Override
+//	public <T> T convert(Path f, Class<T> clazz) {
+//		String content = Files.readString(f, StandardCharsets.UTF_8);
+//		gson.fromJson(f., clazz)
+//		return null;
+//	}
 }

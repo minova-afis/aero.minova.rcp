@@ -69,7 +69,7 @@ Alle Zeitangabe werden auf dem Server in UTC gespeichert.
 Bei Feldern, die Datum und Zeit enthalten, wird der Zeitpunkt an den Server als link:https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html[Instant] gesendet.
 Hierbei muss die lokale Zeitzone, die in den Einstellungen konfiguriert werden kann, berücksichtigt werden.
 
-Bei Feldern, die nur die Zeit enthalten, wird als Datum immer der 31.12.1899 verwendet.
+Bei Feldern, die nur die Zeit enthalten, wird als Datum immer der 01.01.1900 verwendet.
 Die Uhrzeit ist immer im UTC-Format zu setzen.
 Somit wird keine Zeitzone berücksichtigt,
 

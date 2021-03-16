@@ -130,7 +130,6 @@ public class FileWorkspace extends WorkspaceHandler {
 				}
 			}
 
-			System.out.println(connectionXbs.getAbsolutePath());
 			// Verbindungeinstallung prüfen
 			String connectionString = prefs.get("url", null);
 			if (connectionString == null) {

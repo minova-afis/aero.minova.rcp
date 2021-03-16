@@ -32,7 +32,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.ShortDateValueAccessor;
-import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.DateUtil;
 
 public class ShortDateField {
 
@@ -51,7 +51,7 @@ public class ShortDateField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateTimeUtil.getDate(entry, locale);
+				Instant date = DateUtil.getDate(entry, locale);
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {

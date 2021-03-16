@@ -97,7 +97,7 @@ class HashFileTest {
 		assertTrue(Files.exists(file1), "File should exist");
 		String hashDirectory1 = HashService.hashDirectory(tempDir);
 		
-		Path file2 = tempDir.resolve("myfile.txt");
+		Path file2 = tempDir2.resolve("myfile.txt");
 
 		Files.write(file2, input);
 		assertTrue(Files.exists(file2), "File should exist");
