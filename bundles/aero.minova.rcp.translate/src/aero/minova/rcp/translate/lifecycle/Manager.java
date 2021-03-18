@@ -22,19 +22,23 @@ public class Manager {
 	@PostContextCreate
 	public void postContextCreate(IEclipseContext context) {
 		setLocale(context);
-		checkTranslationService(context);
+		configureTranslationService(context);
+		context.set("aero.minova.rcp.applicationid", "WFC");
+		context.set("aero.minova.rcp.customerid", "MIN");
 		initPrefs();
 	}
 
-	private void checkTranslationService(IEclipseContext context) {
-		Object o = context.get(TranslationService.class);
-		if (o.getClass().getName().equals("org.eclipse.e4.core.internal.services.BundleTranslationProvider")) {
+	private void configureTranslationService(IEclipseContext context) {
+		// der Eclipse translation service wird weiterhin für bestimmte Strings (aktuell
+		// welche die mit % anfangen unter der Haube von dem Minova Übersetztungsservice
+		// verwendet)
+		Object currentTranslationService = context.get(TranslationService.class);
+		if ("org.eclipse.e4.core.internal.services.BundleTranslationProvider"
+				.equals(currentTranslationService.getClass().getName())) {
 			WFCTranslationService translationService = ContextInjectionFactory.make(WFCTranslationService.class,
 					context);
-			translationService.setTranslationService((TranslationService) o);
+			translationService.setTranslationService((TranslationService) currentTranslationService);
 			context.set(TranslationService.class, translationService);
-			context.set("aero.minova.rcp.applicationid", "WFC");
-			context.set("aero.minova.rcp.customerid", "MIN");
 		}
 	}
 
