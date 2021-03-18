@@ -2,6 +2,7 @@ package aero.minova.rcp.model.builder;
 
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 
@@ -20,6 +21,11 @@ public class TableBuilder {
 
 	public TableBuilder withColumn(String columnName, DataType dataType) {
 		table.addColumn(new Column(columnName, dataType));
+		return this;
+	}
+
+	public TableBuilder withColumn(String columnName, DataType dataType, OutputType outputType) {
+		table.addColumn(new Column(columnName, dataType, outputType));
 		return this;
 	}
 

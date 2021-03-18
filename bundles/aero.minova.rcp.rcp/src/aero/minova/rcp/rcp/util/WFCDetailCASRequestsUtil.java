@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.util;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,13 +13,17 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
@@ -26,9 +31,11 @@ import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
@@ -36,6 +43,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -47,6 +55,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private IDataService dataService;
+
+	@Inject
+	private TranslationService translationService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -73,11 +84,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	private Form form;
 
-	private String lastEndDate = "";
-
 	/**
-	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine
-	 * Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
+	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	 *
 	 * @param rows
 	 */
@@ -136,8 +144,7 @@ public class WFCDetailCASRequestsUtil {
 			Row r = builder.create();
 			rowIndexTable.addRow(r);
 
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(),
-					rowIndexTable);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
@@ -146,20 +153,17 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit
-	 * den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
+	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	 */
 	public void updateSelectedEntry() {
 		if (selectedTable != null) {
-			for (MField field : detail.getFields()) {
-				field.indicateWaiting();
-			}
 			for (int i = 0; i < selectedTable.getColumnCount(); i++) {
 				String name = selectedTable.getColumnName(i);
 				MField c = detail.getField(name);
 				if (c != null && c.getConsumer() != null) {
 					try {
-						c.getConsumer().accept(selectedTable);
+						c.indicateWaiting();
+						c.setValue(selectedTable.getRows().get(0).getValue(i), false);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -171,8 +175,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig
-	 * der gegebenen Keys
+	 * Erstellen einer Update-Anfrage oder einer Insert-Anfrage an den CAS,abhängig der gegebenen Keys
 	 *
 	 * @param obj
 	 */
@@ -209,9 +212,9 @@ public class WFCDetailCASRequestsUtil {
 //					Value lookupValue = new Value(mlookup.getKeyLong());
 //					rb.withValue(lookupValue);
 //				}else {
-					if (field != null) {
-						rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
-					}
+				if (field != null) {
+					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
+				}
 //				}
 				valuePosition++;
 			}
@@ -237,8 +240,8 @@ public class WFCDetailCASRequestsUtil {
 				}));
 			}
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(),
-					"Entry not possible, check for wronginputs in your messured Time", shell);
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
+					shell);
 			notificationPopUp.open();
 		}
 	}
@@ -254,8 +257,7 @@ public class WFCDetailCASRequestsUtil {
 			// openNotificationPopup("Entry could not be updated:" +
 			// responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while updating Entry",
-					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while updating Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully updated the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -276,8 +278,7 @@ public class WFCDetailCASRequestsUtil {
 		if (responce.getReturnCode() == -1) {
 			// openNotificationPopup("Entry could not be added:" + responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while adding Entry",
-					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while adding Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully added the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -289,9 +290,26 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
+	@Inject
+	@Optional
+	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) Table errorTable) {
+		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
+		String messageproperty = "@" + vMessageProperty.getStringValue();
+		String value = translationService.translate(messageproperty, null);
+		// Ticket number {0} is not numeric
+		if (errorTable.getColumnCount() > 1) {
+			List<String> params = new ArrayList<>();
+			for (int i = 1; i < errorTable.getColumnCount(); i++) {
+				Value v = errorTable.getRows().get(0).getValue(i);
+				params.add(v.getStringValue());
+			}
+			value = MessageFormat.format(value, params.toArray(new String[0]));
+		}
+		MessageDialog.openError(shell, "Error", value);
+	}
+
 	/**
-	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte
-	 * eine Abfrage an den CAS zusammen
+	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
 	 *
 	 * @param obj
 	 */
@@ -301,8 +319,7 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			if (getKeys() != null) {
 				String tablename = form.getIndexView() != null ? "sp" : "op";
-				if ((!"sp".equals(form.getDetail().getProcedurePrefix())
-						&& !"op".equals(form.getDetail().getProcedurePrefix()))) {
+				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
 					tablename = form.getDetail().getProcedurePrefix();
 				}
 				tablename += "Delete";
@@ -327,8 +344,67 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder
-	 * befüllt um die Anfrage anzupassen
+	 * Versnedet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
+	 *
+	 * @param ticketvalue
+	 */
+	@Inject
+	@Optional
+	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
+		System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
+		Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
+		Row r = RowBuilder.newRow().withValue(ticketvalue).create();
+		ticketTable.addRow(r);
+
+		ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
+		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
+
+		// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
+		// Detailfelder vor
+		tableFuture.thenAccept(ta -> sync.syncExec(() -> {
+			ticketFieldsUpdate("", true);
+			if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
+				showErrorMessage(ta.getResultSet());
+			} else {
+				selectedTable = ta.getResultSet();
+				updateSelectedEntry();
+			}
+		}));
+	}
+
+	/**
+	 * Für die Felder, die von einem Ticket gefüllt werden können (Service, ServiceObject, OrderReciever, ServiceContract, Description), wird die Message und
+	 * Editability gesetzt
+	 */
+	private void ticketFieldsUpdate(String messageText, boolean editable) {
+		MField field = detail.getField("Description");
+		field.getValueAccessor().setEditable(editable);
+		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
+		((TextValueAccessor) field.getValueAccessor()).setText(messageText);
+		if (editable)
+			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+		else
+			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+
+		field = detail.getField("OrderReceiverKey");
+		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
+
+		field = detail.getField("ServiceKey");
+		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
+
+		field = detail.getField("ServiceContractKey");
+		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
+
+		field = detail.getField("ServiceObjectKey");
+		field.getValueAccessor().setEditable(editable);
+		field.getValueAccessor().setMessageText(messageText);
+	}
+
+	/**
+	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
 	 *
 	 * @param responce
 	 */
@@ -336,8 +412,7 @@ public class WFCDetailCASRequestsUtil {
 		if (responce.getReturnCode() == -1) {
 			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
 			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while deleting Entry",
-					r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+			MessageDialog.openError(shell, "Error while deleting Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
 		} else {
 			openNotificationPopup("Sucessfully deleted the entry");
 			Map<MPerspective, String> map = new HashMap<>();
@@ -351,8 +426,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner
-	 * Anfrage informiert
+	 * Öffet ein Popup, welches dem Nutzer über den Erfolg oder das Scheitern seiner Anfrage informiert
 	 *
 	 * @param message
 	 */
@@ -362,8 +436,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Diese Methode reagiert wird ausgeführt, wenn der Anwender einen neuen
-	 * Datensatz eintragen möchte.
+	 * Diese Methode reagiert wird ausgeführt, wenn der Anwender einen neuen Datensatz eintragen möchte.
 	 *
 	 * @param origin
 	 */
@@ -444,8 +517,7 @@ public class WFCDetailCASRequestsUtil {
 //	}
 
 	/**
-	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten
-	 * Eintrags zurück
+	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten Eintrags zurück
 	 *
 	 * @param obj
 	 */

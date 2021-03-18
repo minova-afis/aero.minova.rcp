@@ -13,6 +13,7 @@ public class MLookupField extends MField {
 	private String keyText;
 	private String description;
 	private Table options;
+	private String writtenText;
 
 	public String getKeyText() {
 		return keyText;
@@ -43,5 +44,19 @@ public class MLookupField extends MField {
 		if (value == null || (value.getIntegerValue() == null && value.getStringValue() == null)) {
 			super.checkDataType(value);
 		}
+	}
+
+	/**
+	 * Diese Methode liefert den Text zurück, welcher in dem textAssist (Text) Feld
+	 * angezeigt wird
+	 *
+	 * @return
+	 */
+	public String getWrittenText() {
+		return writtenText;
+	}
+
+	public void setWrittenText(String writtenText) {
+		this.writtenText = writtenText;
 	}
 }
