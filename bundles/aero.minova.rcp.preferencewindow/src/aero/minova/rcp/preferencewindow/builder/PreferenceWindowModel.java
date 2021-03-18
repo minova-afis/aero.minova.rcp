@@ -83,9 +83,9 @@ public class PreferenceWindowModel {
 		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilFormatStyle", null), 0.1,
-				DisplayType.COMBO, "", "", "SHORT", "MEDIUM", "LONG", "FULL"));
+				DisplayType.DATE_UTIL, ""));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilFormatStyle", null), 0.1,
-				DisplayType.COMBO, "", "", "SHORT", "MEDIUM", "LONG", "FULL"));
+				DisplayType.TIME_UTIL, ""));
 		return ptd;
 	}
 
