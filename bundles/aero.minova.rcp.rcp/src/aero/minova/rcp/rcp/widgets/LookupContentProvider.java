@@ -4,21 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.Platform;
+
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.form.MLookupField;
 
 public class LookupContentProvider {
 	private Lookup lookup;
 	protected List<LookupValue> values = new ArrayList<>();
 
+	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupcontentprovider"));
+
 	/**
 	 * Provides the content
 	 *
-	 * @param entry text typed by the user
-	 * @return an array list of String that contains propositions for the entry
-	 *         typed by the user
+	 * @param entry
+	 *            text typed by the user
+	 * @return an array list of String that contains propositions for the entry typed by the user
 	 */
 	public List<LookupValue> getContent(final String entry) {
+		MLookupField mField = (MLookupField) lookup.getData(Constants.CONTROL_FIELD);
+		if (entry != null && entry.startsWith("#") && entry.length() > 1) {
+			// Setzen des Textes, welcher manuell eingetragen wurde
+			mField.setWrittenText(entry);
+		} else {
+			mField.setWrittenText(null);
+		}
+		if (LOG) {
+			System.out.println("Entry:[" + entry + "]");
+		}
 		if ("%".equals(entry)) {
 			return values;
 		} else {
@@ -29,7 +45,8 @@ public class LookupContentProvider {
 	}
 
 	/**
-	 * @param lookup the textAssist to set
+	 * @param lookup
+	 *            the textAssist to set
 	 */
 	protected void setLookup(final Lookup lookup) {
 		this.lookup = lookup;

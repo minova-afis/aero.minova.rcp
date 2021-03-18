@@ -3,11 +3,13 @@ package aero.minova.rcp.rcp.accessor;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.ValueAccessor;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 public abstract class AbstractValueAccessor implements ValueAccessor {
 
@@ -20,7 +22,9 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		super();
 		this.field = field;
 		this.control = control;
-		if (control == null) return;
+		if (control == null) {
+			return;
+		}
 		control.addFocusListener(new FocusListener() {
 
 			@Override
@@ -36,6 +40,24 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		});
 	}
 
+	@Override
+	public void setMessageText(String message) {
+		if (control instanceof Lookup) {
+			((Lookup) control).setMessage(message);
+		} else if (control instanceof Text) {
+			((Text) control).setMessage(message);
+		}
+	}
+
+	@Override
+	public void setEditable(boolean editable) {
+		if (control instanceof Lookup) {
+			((Lookup) control).setEditable(editable);
+		} else if (control instanceof Text) {
+			((Text) control).setEditable(editable);
+		}
+	}
+
 	protected abstract void updateControlFromValue(Control control, Value value);
 
 	@Override
@@ -45,7 +67,6 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		if (isFocussed()) {
 			return getDisplayValue();
 		}
-
 
 		updateControlFromValue(control, value);
 		setDisplayValue(value);

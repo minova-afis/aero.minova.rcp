@@ -5,11 +5,11 @@ import java.util.function.Consumer;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.ValueBuilder;
-import aero.minova.rcp.rcp.util.Constants;
 
 public class FieldUtil {
 
