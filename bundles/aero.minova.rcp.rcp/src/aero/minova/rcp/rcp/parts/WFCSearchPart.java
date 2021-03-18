@@ -242,7 +242,9 @@ public class WFCSearchPart extends WFCFormPart {
 			}
 		}
 		// Close Editor
-		natTable.getActiveCellEditor().close();
+		if (natTable.getActiveCellEditor() != null) {
+			natTable.getActiveCellEditor().close();
+		}
 		deleteSearchRow(rows2delete);
 		refreshNatTable();
 	}
