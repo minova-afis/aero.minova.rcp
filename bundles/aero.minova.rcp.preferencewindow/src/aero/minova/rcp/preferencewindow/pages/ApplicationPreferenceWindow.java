@@ -49,8 +49,10 @@ import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
+import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
+import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
 
 public class ApplicationPreferenceWindow {
 
@@ -234,6 +236,12 @@ public class ApplicationPreferenceWindow {
 			break;
 		case CUSTOMCHECK:
 			widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+			break;
+		case DATE_UTIL:
+			widget = new DateFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
+			break;
+		case TIME_UTIL:
+			widget = new TimeFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
 			break;
 		default:
 			break;
