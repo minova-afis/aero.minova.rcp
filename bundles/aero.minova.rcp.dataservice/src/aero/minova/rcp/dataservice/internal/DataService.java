@@ -333,6 +333,7 @@ public class DataService implements IDataService {
 				File cachedFile = null;
 				try {
 					cachedFile = new File(new URI(workspacePath + fileName));
+					ensureFoldersExist(cachedFile);
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 					return;
@@ -344,6 +345,15 @@ public class DataService implements IDataService {
 			}
 
 		});
+	}
+
+	static void ensureFoldersExist(File file) {
+		File folder = file.getParentFile();
+		if (!folder.exists()) {
+			if (!folder.mkdirs()) {
+				ensureFoldersExist(folder.getParentFile());
+			}
+		}
 	}
 
 	@Override
