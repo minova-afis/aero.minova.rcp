@@ -25,6 +25,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
 public class LoadIndexHandler {
 
@@ -46,8 +47,7 @@ public class LoadIndexHandler {
 	volatile boolean loading = false;
 
 	@Execute
-	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective, UISynchronize sync)
-			throws URISyntaxException, IOException {
+	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective, UISynchronize sync) throws URISyntaxException, IOException {
 
 		if (perspective == null) {
 			return;
@@ -58,6 +58,7 @@ public class LoadIndexHandler {
 		broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 
 		List<MPart> findElements = model.findElements(perspective, PartsID.SEARCH_PART, MPart.class);
+		((WFCSearchPart) findElements.get(0).getObject()).saveNattable();
 		Table searchTable = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
 		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
 
