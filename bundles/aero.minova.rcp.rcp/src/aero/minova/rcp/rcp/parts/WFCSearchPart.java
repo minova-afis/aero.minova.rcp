@@ -19,8 +19,10 @@ import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
+import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -41,6 +43,9 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -52,10 +57,12 @@ import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -104,6 +111,8 @@ public class WFCSearchPart extends WFCFormPart {
 			data = mjs.json2Table(string);
 		}
 		data.addRow();
+		// Wir setzen die Verundung auf false im Default-Fall!
+		data.getRows().get(0).setValue(new Value(false), 0);
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
@@ -150,6 +159,8 @@ public class WFCSearchPart extends WFCFormPart {
 					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
 						Table dummy = data;
 						dummy.addRow();
+						//Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
+						dummy.getRows().get(dummy.getRows().size() - 1).setValue(new Value(false), 0);
 						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 					}
 					return true;
@@ -206,6 +217,22 @@ public class WFCSearchPart extends WFCFormPart {
 //
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
+		
+		//Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt! 
+		natTable.addConfiguration(new DefaultEditBindings() {
+
+			@Override
+			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
+				MouseEditAction mouseEditAction = new MouseEditAction();
+//				CellEditDragMode cellEditDragMode = new CellEditDragMode();
+				super.configureUiBindings(uiBindingRegistry);
+				uiBindingRegistry.registerFirstSingleClickBinding(
+						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
+//				uiBindingRegistry.registerFirstMouseDragMode(
+//						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TristateCheckBoxPainter.class), cellEditDragMode);
+			}
+
+		});
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
