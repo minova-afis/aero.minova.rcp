@@ -920,10 +920,6 @@ public class Lookup extends Composite {
 			return;
 		}
 
-		if (text.getText().length() > 0) {
-			showAllElements(text.getText());
-		} else {
-			showAllElements("%");
-		}
+		showAllElements(text.getText());
 	}
 }
