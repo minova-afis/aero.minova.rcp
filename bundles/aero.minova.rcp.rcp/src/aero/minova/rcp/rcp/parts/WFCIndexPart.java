@@ -185,6 +185,13 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
 	@Optional
+	private void translationDownloaded(@UIEventTopic(Constants.BROKER_TRANSLATION_CHANGED) Locale s) {
+		this.locale = s;
+		translate(translationService);
+	}
+
+	@Inject
+	@Optional
 	private void collapseGroups(@UIEventTopic(Constants.BROKER_COLLAPSEINDEX) String s) {
 		natTable.doCommand(new TreeCollapseAllCommand());
 	}
