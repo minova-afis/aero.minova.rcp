@@ -91,8 +91,14 @@ public class WFCSearchPart extends WFCFormPart {
 		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
+		Form searchForm = form;
+		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
+		xsdColumn.setBoolean(Boolean.FALSE);
+		xsdColumn.setLabel("&");
+		xsdColumn.setName("&");
+		searchForm.getIndexView().getColumn().add(0, xsdColumn);
 
-		data = dataFormService.getTableFromFormIndex(form);
+		data = dataFormService.getTableFromFormIndex(searchForm);
 		if (string != null) {
 			// Auslesen der zuletzt gespeicherten Daten
 			data = mjs.json2Table(string);
@@ -101,7 +107,8 @@ public class WFCSearchPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		natTable = createNatTable(parent, form, data);
+
+		natTable = createNatTable(parent, searchForm, data);
 
 	}
 
@@ -127,6 +134,7 @@ public class WFCSearchPart extends WFCFormPart {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
 		SortedList<Row> sortedList = new SortedList<>(eventList, null);
+
 		MinovaColumnPropertyAccessor accessor = new MinovaColumnPropertyAccessor(table, form);
 		accessor.initPropertyNames(translationService);
 

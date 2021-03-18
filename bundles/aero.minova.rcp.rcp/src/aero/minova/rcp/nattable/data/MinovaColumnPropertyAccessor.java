@@ -34,8 +34,9 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	@Override
 	public Object getDataValue(Row rowObject, int columnIndex) {
 		Value value = rowObject.getValue(columnIndex);
-		if (value instanceof FilterValue)
+		if (value instanceof FilterValue) {
 			return value;
+		}
 		return value == null ? "" : value.getValue();
 	}
 

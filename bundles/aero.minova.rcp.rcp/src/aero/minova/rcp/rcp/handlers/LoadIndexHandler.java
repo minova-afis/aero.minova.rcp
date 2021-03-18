@@ -46,8 +46,7 @@ public class LoadIndexHandler {
 	volatile boolean loading = false;
 
 	@Execute
-	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective, UISynchronize sync)
-			throws URISyntaxException, IOException {
+	public void execute(MPart mpart, Shell shell, @Optional MPerspective perspective, UISynchronize sync) throws URISyntaxException, IOException {
 
 		if (perspective == null) {
 			return;
@@ -69,9 +68,15 @@ public class LoadIndexHandler {
 			}
 			sync.asyncExec(() -> {
 				List<MPart> parts = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);
-				partService.activate(parts.get(0));
-				loading = false;
-				broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+				if (!parts.isEmpty()) {
+					partService.activate(parts.get(0));
+					loading = false;
+					broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+				} else {
+					// TODO
+					System.out.println("keine aktiven Parts");
+				}
+
 			});
 		});
 
