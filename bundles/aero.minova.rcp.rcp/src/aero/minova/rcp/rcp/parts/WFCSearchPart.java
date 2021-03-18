@@ -269,4 +269,8 @@ public class WFCSearchPart extends WFCFormPart {
 		// Form form = dataFormService.getForm();
 	}
 
+	public void saveNattable() {
+		natTable.commitAndCloseActiveCellEditor();
+	}
+
 }
