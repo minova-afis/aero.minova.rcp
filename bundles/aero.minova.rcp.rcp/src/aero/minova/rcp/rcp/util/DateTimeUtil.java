@@ -18,11 +18,11 @@ public class DateTimeUtil {
 	}
 
 	public static Instant getDateTime(Instant todayNow, String input) {
-		return getDateTime(todayNow, input, Locale.getDefault(), "");
+		return getDateTime(todayNow, input, Locale.getDefault());
 	}
 
 	public static Instant getDateTime(Instant todayNow, String input, Locale locale) {
-		return getDateTime(todayNow, input, locale, "");
+		return getDateTime(todayNow, input, locale, "", "");
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class DateTimeUtil {
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilFormatStyle) {
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern) {
 
 		String[] splitInput = null;
 		Instant dateIn;
@@ -55,11 +55,11 @@ public class DateTimeUtil {
 
 		if (splitInput.length > 1) {
 			if (!splitInput[0].isEmpty()) {
-				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilFormatStyle);
-				timeIn = TimeUtil.getTime(todayNow, splitInput[1]);
+				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilPattern);
+				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
 			} else {
-				dateIn = DateUtil.getDate(todayNow, "0");
-				timeIn = TimeUtil.getTime(todayNow, splitInput[1]);
+				dateIn = DateUtil.getDate(todayNow, "0", locale, dateUtilPattern);
+				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
 			}
 		} else {
 			return null;
