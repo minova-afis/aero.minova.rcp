@@ -11,7 +11,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -75,11 +74,9 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	private IMinovaJsonService mjs;
-	@Inject
-	TranslationService translationService;
 
 	@Inject
-	private MPerspective perspective;
+	TranslationService translationService;
 
 	private Table data;
 
@@ -94,8 +91,7 @@ public class WFCSearchPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-
-		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
 		Form searchForm = form;
@@ -159,7 +155,7 @@ public class WFCSearchPart extends WFCFormPart {
 					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
 						Table dummy = data;
 						dummy.addRow();
-						//Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
+						// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
 						dummy.getRows().get(dummy.getRows().size() - 1).setValue(new Value(false), 0);
 						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 					}
@@ -217,8 +213,8 @@ public class WFCSearchPart extends WFCFormPart {
 //
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
-		
-		//Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt! 
+
+		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		natTable.addConfiguration(new DefaultEditBindings() {
 
 			@Override
