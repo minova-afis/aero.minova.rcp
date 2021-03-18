@@ -47,17 +47,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.ValueDeserializer;
-import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
@@ -83,9 +77,6 @@ public class WFCSearchPart extends WFCFormPart {
 	private Table data;
 
 	private NatTable natTable;
-
-	private Gson gson;
-
 	@Inject
 	MPart mPart;
 
@@ -112,12 +103,6 @@ public class WFCSearchPart extends WFCFormPart {
 		mPart.getContext().set("NatTableDataSearchArea", data);
 		natTable = createNatTable(parent, form, data);
 
-		gson = new Gson();
-		gson = new GsonBuilder() //
-				.registerTypeAdapter(Value.class, new ValueSerializer()) //
-				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
-				.setPrettyPrinting() //
-				.create();
 	}
 
 	/**
