@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.command.VisualRefreshCommand;
 import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeRowsCommand;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
@@ -20,6 +21,10 @@ public class NatTableUtil {
 			natTable.doCommand(rowCommand);
 		}
 
+	}
+
+	public static void refresh(NatTable natTable) {
+		natTable.doCommand(new VisualRefreshCommand());
 	}
 
 }
