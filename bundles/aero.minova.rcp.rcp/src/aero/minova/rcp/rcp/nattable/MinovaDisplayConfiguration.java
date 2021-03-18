@@ -26,6 +26,7 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 
@@ -137,15 +138,15 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex) {
-		// visuelle anpassung [x] oder [_]
+		// visuelle anpassung [x] oder [_] oder [-]
 		//
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(),
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(),
 				DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
 		// using a CheckBoxCellEditor also needs a Boolean conversion to work
 		// correctly
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER,
-				new DefaultBooleanDisplayConverter(), DisplayMode.NORMAL,
+				new BooleanDisplayConverter(), DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 	}
 
