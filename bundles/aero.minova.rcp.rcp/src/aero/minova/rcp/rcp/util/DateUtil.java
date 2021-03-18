@@ -27,7 +27,7 @@ public class DateUtil {
 	private static String year = "y";
 	private static String week = "w";
 	private static String shortcuts = day + month + year + week;
-	private static String defaultFormatStyle = "";
+	private static String defaultPattern = "";
 
 	private DateUtil() {
 		throw new IllegalStateException("Utility class");
@@ -99,7 +99,7 @@ public class DateUtil {
 	}
 
 	public static Instant getDate(Instant today, String input) {
-		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultFormatStyle);
+		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
 	}
 
 	public static Instant getDate(String input, Locale locale) {
@@ -120,7 +120,7 @@ public class DateUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilFormatStyle) {
+	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilPref) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
 
@@ -143,12 +143,11 @@ public class DateUtil {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
-
+		
 		if (!input.isEmpty() && startOfToday == null) {
-			if (!dateUtilFormatStyle.equals("")) {
+			if (!dateUtilPref.equals("")) {
 				try {
-					FormatStyle formatStyle = FormatStyle.valueOf(dateUtilFormatStyle);
-					DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtilPref, locale);
 					LocalDate ld = LocalDate.parse(input, dtf);
 					startOfToday = ld.atStartOfDay();
 				} catch (Exception e) {
