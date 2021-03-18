@@ -256,6 +256,8 @@ public class WFCSearchPart extends WFCFormPart {
 				rows2delete.add(sortedList.get(i));
 			}
 		}
+		// Close Editor
+		natTable.getActiveCellEditor().close();
 		deleteSearchRow(rows2delete);
 		refreshNatTable();
 	}
