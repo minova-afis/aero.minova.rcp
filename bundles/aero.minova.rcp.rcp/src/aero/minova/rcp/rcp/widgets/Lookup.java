@@ -61,36 +61,28 @@ public class Lookup extends Composite {
 	private MouseListener mouseListener;
 
 	/**
-	 * Constructs a new instance of this class given its parent and a style value
-	 * describing its behavior and appearance.
+	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
 	 * <p>
-	 * The style value is either one of the style constants defined in class
-	 * <code>SWT</code> which is applicable to instances of this class, or must be
-	 * built by <em>bitwise OR</em>'ing together (that is, using the
-	 * <code>int</code> "|" operator) two or more of those <code>SWT</code> style
-	 * constants. The class description lists the style constants that are
-	 * applicable to the class. Style bits are also inherited from superclasses.
+	 * The style value is either one of the style constants defined in class <code>SWT</code> which is applicable to instances of this class, or must be built
+	 * by <em>bitwise OR</em>'ing together (that is, using the <code>int</code> "|" operator) two or more of those <code>SWT</code> style constants. The class
+	 * description lists the style constants that are applicable to the class. Style bits are also inherited from superclasses.
 	 * </p>
 	 *
-	 * @param parent          a composite control which will be the parent of the
-	 *                        new instance (cannot be null)
-	 * @param style           the style of control to construct
-	 * @param contentProvider the content provider
-	 *
+	 * @param parent
+	 *            a composite control which will be the parent of the new instance (cannot be null)
+	 * @param style
+	 *            the style of control to construct
+	 * @param contentProvider
+	 *            the content provider
 	 * @exception IllegalArgumentException
-	 *                                     <ul>
-	 *                                     <li>ERROR_NULL_ARGUMENT - if the parent
-	 *                                     is null</li>
-	 *                                     </ul>
+	 *                <ul>
+	 *                <li>ERROR_NULL_ARGUMENT - if the parent is null</li>
+	 *                </ul>
 	 * @exception SWTException
-	 *                                     <ul>
-	 *                                     <li>ERROR_THREAD_INVALID_ACCESS - if not
-	 *                                     called from the thread that created the
-	 *                                     parent</li>
-	 *                                     <li>ERROR_INVALID_SUBCLASS - if this
-	 *                                     class is not an allowed subclass</li>
-	 *                                     </ul>
-	 *
+	 *                <ul>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the parent</li>
+	 *                <li>ERROR_INVALID_SUBCLASS - if this class is not an allowed subclass</li>
+	 *                </ul>
 	 * @see SWT#SINGLE
 	 * @see SWT#MULTI
 	 * @see SWT#READ_ONLY
@@ -254,7 +246,10 @@ public class Lookup extends Composite {
 
 		popup.setLocation(x, y);
 		popup.setVisible(true);
-//		table.setFocus();
+
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			table.setFocus();
+		}
 	}
 
 	/**
@@ -339,7 +334,8 @@ public class Lookup extends Composite {
 	}
 
 	/**
-	 * @param contentProvider the contentProvider to set
+	 * @param contentProvider
+	 *            the contentProvider to set
 	 */
 	public void setContentProvider(final LookupContentProvider contentProvider) {
 		checkWidget();
@@ -355,7 +351,8 @@ public class Lookup extends Composite {
 	}
 
 	/**
-	 * @param numberOfLines the numberOfLines to set
+	 * @param numberOfLines
+	 *            the numberOfLines to set
 	 */
 	public void setNumberOfLines(final int numberOfLines) {
 		checkWidget();
@@ -626,19 +623,15 @@ public class Lookup extends Composite {
 	/**
 	 * Returns the single click enabled flag.
 	 * <p>
-	 * If the the single click flag is true, the user can select an entry with a
-	 * single click. Otherwise, the user can select an entry with a double click.
+	 * If the the single click flag is true, the user can select an entry with a single click. Otherwise, the user can select an entry with a double click.
 	 * </p>
 	 *
 	 * @return whether or not single is enabled
-	 *
 	 * @exception SWTException
-	 *                         <ul>
-	 *                         <li>ERROR_WIDGET_DISPOSED - if the receiver has been
-	 *                         disposed</li>
-	 *                         <li>ERROR_THREAD_INVALID_ACCESS - if not called from
-	 *                         the thread that created the receiver</li>
-	 *                         </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+	 *                </ul>
 	 */
 	public boolean getUseSingleClick() {
 		checkWidget();
@@ -832,19 +825,16 @@ public class Lookup extends Composite {
 	/**
 	 * Sets the single click enabled flag.
 	 * <p>
-	 * If the the single click flag is true, the user can select an entry with a
-	 * single click. Otherwise, the user can select an entry with a double click.
+	 * If the the single click flag is true, the user can select an entry with a single click. Otherwise, the user can select an entry with a double click.
 	 * </p>
 	 *
-	 * @param singleClick the new single click flag
-	 *
+	 * @param singleClick
+	 *            the new single click flag
 	 * @exception SWTException
-	 *                         <ul>
-	 *                         <li>ERROR_WIDGET_DISPOSED - if the receiver has been
-	 *                         disposed</li>
-	 *                         <li>ERROR_THREAD_INVALID_ACCESS - if not called from
-	 *                         the thread that created the receiver</li>
-	 *                         </ul>
+	 *                <ul>
+	 *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
+	 *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
+	 *                </ul>
 	 */
 	public void setUseSingleClick(boolean singleClick) {
 		checkWidget();
@@ -930,10 +920,6 @@ public class Lookup extends Composite {
 			return;
 		}
 
-		if (text.getText().length() > 0) {
-			showAllElements(text.getText());
-		} else {
-			showAllElements("%");
-		}
+		showAllElements(text.getText());
 	}
 }

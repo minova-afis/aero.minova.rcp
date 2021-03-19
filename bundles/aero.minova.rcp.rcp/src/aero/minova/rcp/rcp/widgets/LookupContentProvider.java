@@ -35,13 +35,21 @@ public class LookupContentProvider {
 		if (LOG) {
 			System.out.println("Entry:[" + entry + "]");
 		}
-		if ("%".equals(entry)) {
-			return values;
-		} else {
-			return values.stream()
-					.filter(lv -> lv.keyText.toUpperCase().startsWith(entry.toUpperCase()) || lv.description.toUpperCase().startsWith(entry.toUpperCase()))
-					.collect(Collectors.toList());
-		}
+
+		String regex = buildRegex(entry);
+
+		return values.stream().filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
+				.collect(Collectors.toList());
+	}
+
+	private String buildRegex(String entry) {
+		String regex = entry;
+
+		regex = regex.replaceAll("%", ".*");
+		regex = regex.replaceAll("_", ".");
+		regex += ".*";
+
+		return regex;
 	}
 
 	/**

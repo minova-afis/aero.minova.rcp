@@ -1,5 +1,9 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -17,6 +21,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
@@ -47,17 +52,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.ValueDeserializer;
-import aero.minova.rcp.model.ValueSerializer;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
@@ -83,11 +82,12 @@ public class WFCSearchPart extends WFCFormPart {
 	private Table data;
 
 	private NatTable natTable;
-
-	private Gson gson;
-
 	@Inject
 	MPart mPart;
+
+	private SortedList<Row> sortedList;
+
+	private SelectionLayer selectionLayer;
 
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
@@ -112,12 +112,6 @@ public class WFCSearchPart extends WFCFormPart {
 		mPart.getContext().set("NatTableDataSearchArea", data);
 		natTable = createNatTable(parent, form, data);
 
-		gson = new Gson();
-		gson = new GsonBuilder() //
-				.registerTypeAdapter(Value.class, new ValueSerializer()) //
-				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
-				.setPrettyPrinting() //
-				.create();
 	}
 
 	/**
@@ -141,7 +135,7 @@ public class WFCSearchPart extends WFCFormPart {
 
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
-		SortedList<Row> sortedList = new SortedList<>(eventList, null);
+		sortedList = new SortedList<>(eventList, null);
 		MinovaColumnPropertyAccessor accessor = new MinovaColumnPropertyAccessor(table, form);
 		accessor.initPropertyNames(translationService);
 
@@ -164,14 +158,13 @@ public class WFCSearchPart extends WFCFormPart {
 				return false;
 			}
 		});
-
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
-		SelectionLayer selectionLayer = new SelectionLayer(columnHideShowLayer);
+		selectionLayer = new SelectionLayer(columnHideShowLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
 		// as the selection mouse bindings are registered for the region label
@@ -238,9 +231,46 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 	}
 
+	@Inject
+	@Optional
+	public void deleteSearchRow(@UIEventTopic(Constants.BROKER_DELETEROWSEARCHTABLE) String id) {
+		Set<Range> selectedRowPositions = selectionLayer.getSelectedRowPositions();
+		List<Row> rows2delete = new ArrayList<>();
+		for (Range range : selectedRowPositions) {
+			for (int i = range.start; i < range.end; i++) {
+				rows2delete.add(sortedList.get(i));
+			}
+		}
+		// Close Editor
+		if (natTable.getActiveCellEditor() != null) {
+			natTable.getActiveCellEditor().close();
+		}
+		deleteSearchRow(rows2delete);
+		refreshNatTable();
+	}
+
+	public void deleteSearchRow(List<Row> rows) {
+		// Löscht eine Liste von Objekten
+		sortedList.removeAll(rows);
+		data.getRows().removeAll(rows);
+		if (sortedList.isEmpty()) {
+			Table dummy = data;
+			dummy.addRow();
+			sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+		}
+	}
+
+	public void refreshNatTable() {
+		NatTableUtil.refresh(natTable);
+	}
+
 	@PreDestroy
 	public void test(Composite parent) {
 		// Form form = dataFormService.getForm();
+	}
+
+	public void saveNattable() {
+		natTable.commitAndCloseActiveCellEditor();
 	}
 
 }

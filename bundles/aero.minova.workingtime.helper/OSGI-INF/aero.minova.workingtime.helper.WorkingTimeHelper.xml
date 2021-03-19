@@ -5,5 +5,5 @@
       <provide interface="aero.minova.rcp.model.event.ValueChangeListener"/>
    </service>
    <implementation class="aero.minova.workingtime.helper.WorkingTimeHelper"/>
-   <reference bind="registerEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="dynamic" unbind="unregisterEventAdmin"/>
+   <reference bind="registerEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="registerEventAdmin" policy="dynamic" unbind="unregisterEventAdmin"/>
 </scr:component>
