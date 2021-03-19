@@ -859,7 +859,13 @@ public class Lookup extends Composite {
 
 	public void fillSelectedValue() {
 		MField field = (MField) getData(Constants.CONTROL_FIELD);
-		if (popup.isVisible() && table.getSelectionIndex() != -1) {
+		// simuliert die Eingabe und refresht die popupValues
+		popupValues = contentProvider.getContent("");
+		if (text.getText().equals("") && popupValues.size() == 1) {
+			LookupValue lv = popupValues.get(0);
+			text.setText(lv.keyText);
+			field.setValue(lv, true);
+		} else if (popup.isVisible() && table.getSelectionIndex() != -1) {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			text.setText(lv.keyText);
 			field.setValue(lv, true);
