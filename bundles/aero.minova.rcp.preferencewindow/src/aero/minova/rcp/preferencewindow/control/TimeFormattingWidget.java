@@ -53,26 +53,26 @@ public class TimeFormattingWidget extends CustomPWWidget {
 
 		Composite cmp = new Composite(parent, SWT.NONE);
 		cmp.setLayout(new GridLayout(2, false));
-		final GridData cmpGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		final GridData cmpGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		cmp.setLayoutData(cmpGridData);
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER);
 		addControl(text);
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
+		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
 		
 		Label example = new Label(cmp, SWT.NONE);
 		addControl(example);
-		final GridData exampleGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		final GridData exampleGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		example.setLayoutData(exampleGridData);
-		example.setText(translationService.translate("@Preferences.TimeExample", null) + ": " + getTimeStringFromPattern(text.getText()));;
+		example.setText(getTimeStringFromPattern(text.getText()));;
 		
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());
-			example.setText(translationService.translate("@Preferences.TimeExample", null) + ": " + getTimeStringFromPattern(text.getText()));
+			example.setText(getTimeStringFromPattern(text.getText()));
 		});
 
 		return text;

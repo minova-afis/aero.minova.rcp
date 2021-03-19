@@ -52,14 +52,14 @@ public class DateFormattingWidget extends CustomPWWidget {
 
 		Composite cmp = new Composite(parent, SWT.NONE);
 		cmp.setLayout(new GridLayout(2, false));
-		final GridData cmpGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
+		final GridData cmpGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		cmp.setLayoutData(cmpGridData);
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER);
 		addControl(text);
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
+		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
 		
