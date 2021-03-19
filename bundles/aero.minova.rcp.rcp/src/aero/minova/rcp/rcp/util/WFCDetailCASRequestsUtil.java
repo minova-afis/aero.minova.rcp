@@ -43,6 +43,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
 public class WFCDetailCASRequestsUtil {
@@ -362,13 +363,14 @@ public class WFCDetailCASRequestsUtil {
 		// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
 		// Detailfelder vor
 		tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-			ticketFieldsUpdate("", true);
 			if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 				showErrorMessage(ta.getResultSet());
 			} else {
 				selectedTable = ta.getResultSet();
 				updateSelectedEntry();
 			}
+			ticketFieldsUpdate("", true);
+			updatePossibleLookupEntries();
 		}));
 	}
 
@@ -401,6 +403,27 @@ public class WFCDetailCASRequestsUtil {
 		field = detail.getField("ServiceObjectKey");
 		field.getValueAccessor().setEditable(editable);
 		field.getValueAccessor().setMessageText(messageText);
+	}
+
+	/**
+	 * Wenn ein Lookup keinen Wert enthält, nachdem das Ticket aufgelöst wurde, werden die möglichen Werte aktualisiert
+	 */
+	private void updatePossibleLookupEntries() {
+		MField field = detail.getField("OrderReceiverKey");
+		if (field.getValue() == null)
+			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+
+		field = detail.getField("ServiceKey");
+		if (field.getValue() == null)
+			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+
+		field = detail.getField("ServiceContractKey");
+		if (field.getValue() == null)
+			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+
+		field = detail.getField("ServiceObjectKey");
+		if (field.getValue() == null)
+			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
 	}
 
 	/**

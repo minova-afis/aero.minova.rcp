@@ -266,8 +266,6 @@ public class Lookup extends Composite {
 				if (string.length() == 0) {
 					popup.setVisible(false);
 					return;
-				} else if (string.length() == 1) {
-					requestAllLookupEntries();
 				}
 				showAllElements(string);
 			}
