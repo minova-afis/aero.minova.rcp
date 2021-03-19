@@ -154,13 +154,6 @@ public class DataService implements IDataService {
 		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			if (t.statusCode() == 500) {
-				fromJson = new SqlProcedureResult();
-				fromJson.setResultSet(gson.fromJson(t.body(), Table.class));
-				// FehlerCode
-				fromJson.setReturnCode(-1);
-			}
-
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
 				Pattern fullError = Pattern
