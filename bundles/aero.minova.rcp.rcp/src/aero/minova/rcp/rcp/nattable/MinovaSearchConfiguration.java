@@ -13,12 +13,9 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
-import org.eclipse.nebula.widgets.nattable.data.convert.DefaultBooleanDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.edit.editor.CheckBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.painter.cell.CheckBoxPainter;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -28,6 +25,8 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
+import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
+import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 
@@ -155,16 +154,16 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex) {
-		// visuelle anpassung [x] oder [_]
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(), DisplayMode.NORMAL,
+		// visuelle anpassung [x] oder [_] oder [-]
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
 		// using a CheckBoxCellEditor also needs a Boolean conversion to work
 		// correctly
-		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new DefaultBooleanDisplayConverter(), DisplayMode.NORMAL,
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new BooleanDisplayConverter(), DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new CheckBoxCellEditor(), DisplayMode.EDIT,
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TriStateCheckBoxCellEditor(), DisplayMode.EDIT,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 
 	}

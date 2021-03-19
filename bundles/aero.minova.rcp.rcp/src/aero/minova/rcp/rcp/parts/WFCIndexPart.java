@@ -108,7 +108,7 @@ public class WFCIndexPart extends WFCFormPart {
 			return;
 		}
 
-		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 
 		data = dataFormService.getTableFromFormIndex(form);
 

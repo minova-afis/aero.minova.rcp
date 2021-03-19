@@ -70,9 +70,15 @@ public class LoadIndexHandler {
 			}
 			sync.asyncExec(() -> {
 				List<MPart> parts = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);
-				partService.activate(parts.get(0));
-				loading = false;
-				broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+				if (!parts.isEmpty()) {
+					partService.activate(parts.get(0));
+					loading = false;
+					broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+				} else {
+					// TODO
+					System.out.println("keine aktiven Parts");
+				}
+
 			});
 		});
 

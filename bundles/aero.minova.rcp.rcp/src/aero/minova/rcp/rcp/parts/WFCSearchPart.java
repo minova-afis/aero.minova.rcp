@@ -15,7 +15,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -24,8 +23,10 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfigurat
 import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
+import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -46,6 +47,9 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -57,10 +61,12 @@ import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -73,11 +79,9 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	private IMinovaJsonService mjs;
-	@Inject
-	TranslationService translationService;
 
 	@Inject
-	private MPerspective perspective;
+	TranslationService translationService;
 
 	private Table data;
 
@@ -96,21 +100,29 @@ public class WFCSearchPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-
-		perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
+		Form searchForm = form;
+		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
+		xsdColumn.setBoolean(Boolean.FALSE);
+		xsdColumn.setLabel("&");
+		xsdColumn.setName("&");
+		searchForm.getIndexView().getColumn().add(0, xsdColumn);
 
-		data = dataFormService.getTableFromFormIndex(form);
+		data = dataFormService.getTableFromFormIndex(searchForm);
 		if (string != null) {
 			// Auslesen der zuletzt gespeicherten Daten
 			data = mjs.json2Table(string);
 		}
 		data.addRow();
+		// Wir setzen die Verundung auf false im Default-Fall!
+		data.getRows().get(0).setValue(new Value(false), 0);
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
-		natTable = createNatTable(parent, form, data);
+
+		natTable = createNatTable(parent, searchForm, data);
 
 	}
 
@@ -151,6 +163,8 @@ public class WFCSearchPart extends WFCFormPart {
 					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
 						Table dummy = data;
 						dummy.addRow();
+						// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
+						dummy.getRows().get(dummy.getRows().size() - 1).setValue(new Value(false), 0);
 						sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 					}
 					return true;
@@ -158,6 +172,7 @@ public class WFCSearchPart extends WFCFormPart {
 				return false;
 			}
 		});
+
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
@@ -206,6 +221,22 @@ public class WFCSearchPart extends WFCFormPart {
 //
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
+
+		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
+		natTable.addConfiguration(new DefaultEditBindings() {
+
+			@Override
+			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
+				MouseEditAction mouseEditAction = new MouseEditAction();
+//				CellEditDragMode cellEditDragMode = new CellEditDragMode();
+				super.configureUiBindings(uiBindingRegistry);
+				uiBindingRegistry.registerFirstSingleClickBinding(
+						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
+//				uiBindingRegistry.registerFirstMouseDragMode(
+//						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TristateCheckBoxPainter.class), cellEditDragMode);
+			}
+
+		});
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 

@@ -30,7 +30,7 @@ public class Table {
 
 	public void addColumn(Column c) {
 		if (rows.size() != 0) {
-			throw new RuntimeException("ss");
+			throw new RuntimeException("Tabelle mit existierenden Zeilen kann nicht erweitert werden!");
 		}
 		columns.add(c);
 	}
