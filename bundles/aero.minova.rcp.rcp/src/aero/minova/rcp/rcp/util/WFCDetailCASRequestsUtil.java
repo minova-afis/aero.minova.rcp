@@ -249,45 +249,56 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Überprüft. ob das Update erfolgreich war
 	 *
-	 * @param responce
+	 * @param response
 	 */
-	private void checkEntryUpdate(SqlProcedureResult responce) {
+	private void checkEntryUpdate(SqlProcedureResult response) {
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
-		if (responce.getReturnCode() == -1) {
-			// openNotificationPopup("Entry could not be updated:" +
-			// responce.getResultSet());
-			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while updating Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+		if (response.getReturnCode() == -1) {
+			showErrorMessage(response.getResultSet());
 		} else {
-			openNotificationPopup("Sucessfully updated the entry");
-			Map<MPerspective, String> map = new HashMap<>();
-			map.put(perspective, Constants.UPDATE_REQUEST);
-			clearFields(map);
-			if (detail.getHelper() != null) {
-				detail.getHelper().handleDetailAction(ActionCode.SAVE);
-			}
+			openNotificationPopup(getTraslation("msg.DataUpdated"));
+			handleUserAction(Constants.UPDATE_REQUEST);
+		}
+	}
+
+	/**
+	 * Ruft den Helper auf, löscht die Felder im Detail nach der Eingabe
+	 *
+	 * @param updateRequest
+	 */
+	private void handleUserAction(String updateRequest) {
+		Map<MPerspective, String> map = new HashMap<>();
+		map.put(perspective, updateRequest);
+		clearFields(map);
+		if (detail.getHelper() != null) {
+			detail.getHelper().handleDetailAction(ActionCode.SAVE);
 		}
 	}
 
 	/**
 	 * Überprüft, ob der neue Eintrag erstellt wurde
 	 *
-	 * @param responce
+	 * @param response
 	 */
-	private void checkNewEntryInsert(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == -1) {
-			// openNotificationPopup("Entry could not be added:" + responce.getResultSet());
-			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while adding Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+	private void checkNewEntryInsert(SqlProcedureResult response) {
+		if (response.getReturnCode() == -1) {
+			showErrorMessage(response.getResultSet());
 		} else {
-			openNotificationPopup("Sucessfully added the entry");
-			Map<MPerspective, String> map = new HashMap<>();
-			map.put(perspective, Constants.INSERT_REQUEST);
-			clearFields(map);
-			if (detail.getHelper() != null) {
-				detail.getHelper().handleDetailAction(ActionCode.SAVE);
-			}
+			openNotificationPopup(getTraslation("msg.DataSaved"));
+			handleUserAction(Constants.INSERT_REQUEST);
 		}
+	}
+
+	/**
+	 * Liefert das übersetzte Objekt zurück
+	 *
+	 * @param translate
+	 * @return
+	 */
+	private String getTraslation(String translate) {
+		String messageproperty = "@" + translate;
+		String value = translationService.translate(messageproperty, null);
+		return value;
 	}
 
 	@Inject
@@ -381,10 +392,11 @@ public class WFCDetailCASRequestsUtil {
 		field.getValueAccessor().setEditable(editable);
 		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
 		((TextValueAccessor) field.getValueAccessor()).setText(messageText);
-		if (editable)
+		if (editable) {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-		else
+		} else {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+		}
 
 		field = detail.getField("OrderReceiverKey");
 		field.getValueAccessor().setEditable(editable);
@@ -406,15 +418,13 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Überprüft, ob die Anfrage erfolgreich war, falls nicht bleiben die Textfelder befüllt um die Anfrage anzupassen
 	 *
-	 * @param responce
+	 * @param response
 	 */
-	public void deleteEntry(SqlProcedureResult responce) {
-		if (responce.getReturnCode() == -1) {
-			openNotificationPopup("Entry could not be deleted:" + responce.getResultSet());
-			Row r = responce.getResultSet().getRows().get(0);
-			MessageDialog.openError(shell, "Error while deleting Entry", r.getValue(responce.getResultSet().getColumnIndex("Message")).getStringValue());
+	public void deleteEntry(SqlProcedureResult response) {
+		if (response.getReturnCode() == -1) {
+			showErrorMessage(response.getResultSet());
 		} else {
-			openNotificationPopup("Sucessfully deleted the entry");
+			openNotificationPopup(getTraslation("msg.DataDeleted"));
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
