@@ -264,6 +264,24 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	@Optional
+	public void revertSearch(@UIEventTopic(Constants.BROKER_REVERTSEARCHTABLE) String id) {
+		// Close Editor
+		if (natTable.getActiveCellEditor() != null) {
+			natTable.getActiveCellEditor().close();
+		}
+
+		// Alle Einträge entfernen
+		data.getRows().clear();
+		sortedList.clear();
+
+		// Neue Zeile hinzufügen (erste Spalte darf nicht null sein)
+		data.addRow();
+		data.getRows().get(0).setValue(new Value(false), 0);
+		sortedList.add(data.getRows().get(0));
+	}
+
+	@Inject
+	@Optional
 	public void deleteSearchRow(@UIEventTopic(Constants.BROKER_DELETEROWSEARCHTABLE) String id) {
 		Set<Range> selectedRowPositions = selectionLayer.getSelectedRowPositions();
 		List<Row> rows2delete = new ArrayList<>();
