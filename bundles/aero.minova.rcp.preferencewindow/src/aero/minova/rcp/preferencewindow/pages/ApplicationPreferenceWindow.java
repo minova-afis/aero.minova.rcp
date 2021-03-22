@@ -21,6 +21,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
+import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
@@ -44,7 +45,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.preferencewindow.control.CustomPWCheckBox;
+import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -111,7 +112,7 @@ public class ApplicationPreferenceWindow {
 					// Preference hinzufügen
 					Object[] values = pref.getPossibleValues();
 					String key = pref.getKey();
-					createWidgets(newTab, pref, key, translationService, window, values);
+					createWidgets(newTab, pref, key, translationService, values);
 				}
 			}
 		}
@@ -191,8 +192,7 @@ public class ApplicationPreferenceWindow {
 		return data;
 	}
 
-	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, PreferenceWindow pwindow,
-			Object... values) {
+	public PWWidget createWidgets(PWTab tab, PreferenceDescriptor pref, String key, @Optional TranslationService translationService, Object... values) {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
@@ -217,7 +217,7 @@ public class ApplicationPreferenceWindow {
 			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
-			widget = new CustomPWCheckBox(pref.getLabel(), key, pwindow).setIndent(25).setAlignment(SWT.FILL);
+			widget = new PWCheckbox(pref.getLabel(), key).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		case URL:
 			widget = new PWURLText(pref.getLabel(), key);
@@ -242,6 +242,8 @@ public class ApplicationPreferenceWindow {
 			break;
 		case TIME_UTIL:
 			widget = new TimeFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
+		case CHECKEXPLANATION:
+			widget = new ExplanationLabelForPWCheckbox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		default:
 			break;

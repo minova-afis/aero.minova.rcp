@@ -36,7 +36,6 @@ public class LifeCycle {
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
 		WorkspaceDialog workspaceDialog;
-		int returnCode;
 
 		// Show login dialog to the user
 		workspaceDialog = new WorkspaceDialog(null, logger, sync);
@@ -52,33 +51,42 @@ public class LifeCycle {
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					}
-					Objects.requireNonNull(workspaceLocation);
-					dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null),
-							sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
-							sPrefs.get(WorkspaceAccessPreferences.URL, null),
-							workspaceLocation);
+					if (workspaceLocation == null) {
+						WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
+						loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+					} else {
+						dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null), sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
+								sPrefs.get(WorkspaceAccessPreferences.URL, null), workspaceLocation);
+					}
 				}
 			} catch (StorageException e) {
 				logger.error(e);
 			}
 		} else {
-			if ((returnCode = workspaceDialog.open()) != 0) {
-				logger.info("ReturnCode: " + returnCode);
-				System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
-											// ausgesucht
-			}
-			try {
-				workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-			Objects.requireNonNull(workspaceLocation);
-			dataService.setCredentials(workspaceDialog.getUsername(), workspaceDialog.getPassword(),
-					workspaceDialog.getConnection(), workspaceLocation);
+			loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 		}
 
 		Manager manager = new Manager();
 		manager.postContextCreate(workbenchContext);
 
+	}
+
+	private void loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
+		int returnCode;
+		if ((returnCode = workspaceDialog.open()) != 0) {
+			logger.info("ReturnCode: " + returnCode);
+			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
+										// ausgesucht
+		}
+		try {
+			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		Objects.requireNonNull(workspaceLocation);
+		dataService.setCredentials(workspaceDialog.getUsername(), //
+				workspaceDialog.getPassword(), //
+				workspaceDialog.getConnection(), //
+				workspaceLocation);
 	}
 }

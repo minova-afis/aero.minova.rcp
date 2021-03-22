@@ -237,4 +237,40 @@ public class CasCommunicationIT {
 		assertEquals(200, response.statusCode());
 	}
 
+	@Test
+	public void getIndexData() {
+		String body = "{\n" + "  \"name\": \"xvcasWorkingTimeIndex2\",\n" + "  \"columns\": [\n" + "    {\n" + "      \"name\": \"\\u0026\",\n"
+				+ "      \"type\": \"BOOLEAN\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"KeyLong\",\n"
+				+ "      \"type\": \"INTEGER\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"EmployeeText\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"CustomerText\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"ProjectText\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"ServiceText\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"BookingDate\",\n"
+				+ "      \"type\": \"INSTANT\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"StartDate\",\n"
+				+ "      \"type\": \"INSTANT\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"EndDate\",\n"
+				+ "      \"type\": \"INSTANT\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"RenderedQuantity\",\n"
+				+ "      \"type\": \"DOUBLE\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"ChargedQuantity\",\n"
+				+ "      \"type\": \"DOUBLE\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"Description\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"ServiceContractText\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"Assigned\",\n"
+				+ "      \"type\": \"BOOLEAN\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"LastDate\",\n"
+				+ "      \"type\": \"INSTANT\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    },\n" + "    {\n" + "      \"name\": \"InvoiceText\",\n"
+				+ "      \"type\": \"STRING\",\n" + "      \"outputType\": \"OUTPUT\"\n" + "    }\n" + "  ],\n" + "  \"rows\": [\n" + "    {\n"
+				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n"
+				+ "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n"
+				+ "        null,\n" + "        null,\n" + "        null,\n" + "        null\n" + "      ]\n" + "    }\n" + "  ]\n" + "}";
+
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://publictest.minova.com:17280/data/index")) //
+				.header("Content-Type", "application/json") //
+				.POST(BodyPublishers.ofString(body)).build();
+		HttpResponse<String> response = null;
+		try {
+			response = httpClient.send(request, BodyHandlers.ofString());
+			System.out.println(response.body());
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		assertEquals(200, response.statusCode());
+	}
+
 }

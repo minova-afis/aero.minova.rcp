@@ -12,8 +12,7 @@ import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 
 /**
- * Stores preferences that are required in order to access a workspace and
- * therefore to set the current platform.
+ * Stores preferences that are required in order to access a workspace and therefore to set the current platform.
  *
  * @author avots
  */
@@ -33,8 +32,8 @@ public class WorkspaceAccessPreferences {
 		throw new UnsupportedOperationException();
 	}
 
-	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password,
-			String profile, String applicationArea, boolean isPrimaryWorksace) {
+	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password, String profile, String applicationArea,
+			boolean isPrimaryWorksace) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
 				.node(WORKSPACES);
@@ -77,10 +76,6 @@ public class WorkspaceAccessPreferences {
 		}
 	}
 
-	/**
-	 * @return a list of all WorkspaceHandler that are store in the preferences. The
-	 *         password is not available before the the workspace is set (#active())
-	 */
 	public static List<ISecurePreferences> getSavedWorkspaceAccessData(Logger logger) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
@@ -94,6 +89,16 @@ public class WorkspaceAccessPreferences {
 			}
 		}
 		return savedWorkspaceHandlers;
+	}
+
+	public static void resetDefaultWorkspace(Logger logger) {
+		ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
+		try {
+			prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
+			prefs.flush();
+		} catch (StorageException | IOException e1) {
+			logger.debug(e1, "Could not reset default workspace.");
+		}
 	}
 
 	public static Optional<ISecurePreferences> getSavedPrimaryWorkspaceAccessData(Logger logger) {

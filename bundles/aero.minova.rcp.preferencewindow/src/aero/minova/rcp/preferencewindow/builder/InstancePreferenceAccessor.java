@@ -41,6 +41,7 @@ public class InstancePreferenceAccessor {
 			return preferences.getInt(preferenceKey, (int) defaultValue);
 		case FLOAT:
 			return preferences.getFloat(preferenceKey, (float) defaultValue);
+		case CHECKEXPLANATION:
 		case CHECK:
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
@@ -88,6 +89,7 @@ public class InstancePreferenceAccessor {
 			preferences.putFloat(preferenceKey, Float.valueOf((float) value));
 			break;
 		case CHECK:
+		case CHECKEXPLANATION:
 			preferences.putBoolean(preferenceKey, Boolean.valueOf((boolean) value));
 			break;
 		case FONT:

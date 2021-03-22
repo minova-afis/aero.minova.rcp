@@ -1,7 +1,5 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.log.Logger;
@@ -92,13 +90,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 			public void widgetSelected(SelectionEvent e) {
 				text.setText(translationService.translate("@msg.NotSet", null));
 				if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-					ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-					try {
-						prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
-						prefs.flush();
-					} catch (StorageException | IOException e1) {
-						e1.printStackTrace();
-					}
+					WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
 				}
 			}
 		});

@@ -113,10 +113,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (focussed) {
-			Lookup up = ((Lookup) control);
 			// wenn wir dem Feld das erste Mal den Focus geben laden wir alle möglichkeiten.
-			CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-			listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+			updatePossibleValues();
 			return; // wenn wir den Focus erhalten, machen wir nichts
 		}
 
@@ -136,5 +134,11 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 				}
 			}
 		}
+	}
+
+	public void updatePossibleValues() {
+		Lookup up = ((Lookup) control);
+		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
 	}
 }
