@@ -305,6 +305,7 @@ public class WFCSearchPart extends WFCFormPart {
 		if (sortedList.isEmpty()) {
 			Table dummy = data;
 			dummy.addRow();
+			dummy.getRows().get(0).setValue(new Value(false), 0);
 			sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 		}
 	}
