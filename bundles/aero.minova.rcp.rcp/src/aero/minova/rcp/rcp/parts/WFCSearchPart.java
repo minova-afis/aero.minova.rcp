@@ -115,9 +115,13 @@ public class WFCSearchPart extends WFCFormPart {
 			// Auslesen der zuletzt gespeicherten Daten
 			data = mjs.json2Table(string);
 		}
-		data.addRow();
-		// Wir setzen die Verundung auf false im Default-Fall!
-		data.getRows().get(0).setValue(new Value(false), 0);
+
+		// Es muss nur dann eine neue Zeile hinzugefügt werden wenn kein geladen wurden
+		if (data.getRows().size() == 0) {
+			data.addRow();
+			// Wir setzen die Verundung auf false im Default-Fall!
+			data.getRows().get(data.getRows().size() - 1).setValue(new Value(false), 0);
+		}
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
@@ -264,6 +268,30 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	@Optional
+	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String id) {
+		// Close Editor
+		if (natTable.getActiveCellEditor() != null) {
+			natTable.getActiveCellEditor().close();
+		}
+
+		String tableName = form.getIndexView().getSource();
+		String string = prefs.get(tableName, null);
+		if (string == null || string.equals(""))
+			return;
+
+		Table prefTable = mjs.json2Table(string);
+
+		// Alle aktuellen Suchzeilen entfernen
+		sortedList.clear();
+		data.getRows().clear();
+
+		// Gespeicherte Zeilen hinzufügen
+		sortedList.addAll(prefTable.getRows());
+		data.getRows().addAll(prefTable.getRows());
+	}
+
+	@Inject
+	@Optional
 	public void revertSearch(@UIEventTopic(Constants.BROKER_REVERTSEARCHTABLE) String id) {
 		// Close Editor
 		if (natTable.getActiveCellEditor() != null) {
@@ -305,7 +333,7 @@ public class WFCSearchPart extends WFCFormPart {
 		if (sortedList.isEmpty()) {
 			Table dummy = data;
 			dummy.addRow();
-			dummy.getRows().get(0).setValue(new Value(false), 0);
+			data.getRows().get(0).setValue(new Value(false), 0);
 			sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 		}
 	}
