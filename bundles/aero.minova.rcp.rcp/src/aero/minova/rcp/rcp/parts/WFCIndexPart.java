@@ -47,6 +47,7 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
+import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
@@ -136,8 +137,7 @@ public class WFCIndexPart extends WFCFormPart {
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
-	 * die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -151,8 +151,7 @@ public class WFCIndexPart extends WFCFormPart {
 	}
 
 	/**
-	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table,
-	 * diese wird dann an den CAS als Anfrage übergeben.
+	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table, diese wird dann an den CAS als Anfrage übergeben.
 	 */
 	@Inject
 	@Optional
@@ -181,15 +180,13 @@ public class WFCIndexPart extends WFCFormPart {
 			columnPropertyAccessor.translate(translationService);
 			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
 			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i,
-						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
 
 	}
 
-	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService,
-			IEclipseContext context) {
+	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
 
 		this.context = context;
 
@@ -199,28 +196,28 @@ public class WFCIndexPart extends WFCFormPart {
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		// create the body stack
-		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
+		bodyLayerStack = new BodyLayerStack<Row>(table.getRows(), columnPropertyAccessor, configRegistry);
 		bodyLayerStack.getBodyDataLayer().setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
-				columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
+				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack,
-				bodyLayerStack.getSelectionLayer());
+		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
-		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer, new GlazedListsSortModel<>(
-				bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
+		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
+
+		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
+		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyLayerStack.getBodyDataProvider());
 		DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
-		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, bodyLayerStack,
-				bodyLayerStack.getSelectionLayer());
+		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
 		// build the corner layer
-		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider,
-				rowHeaderDataProvider);
+		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
 		DataLayer cornerDataLayer = new DataLayer(cornerDataProvider);
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
@@ -229,8 +226,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
-		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer,
-				columnHeaderDataProvider, columnHeaderLayer);
+		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider,
+				columnHeaderLayer);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
@@ -265,8 +262,7 @@ public class WFCIndexPart extends WFCFormPart {
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, groupByHeaderLayer));
 		// adds the key bindings that allow space bar to be pressed to
 		// expand/collapse tree nodes
-		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(),
-				bodyLayerStack.getSelectionLayer()));
+		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
 
 		natTable.configure();
 		// Hier können wir das Theme setzen
@@ -279,8 +275,7 @@ public class WFCIndexPart extends WFCFormPart {
 	}
 
 	/**
-	 * Always encapsulate the body layer stack in an AbstractLayerTransform to
-	 * ensure that the index transformations are performed in later commands.
+	 * Always encapsulate the body layer stack in an AbstractLayerTransform to ensure that the index transformations are performed in later commands.
 	 *
 	 * @param <T>
 	 */
@@ -300,7 +295,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private TreeLayer treeLayer;
 
-		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor) {
+		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
 
@@ -309,7 +304,7 @@ public class WFCIndexPart extends WFCFormPart {
 			// will be set by configuration
 			this.sortedList = new SortedList<>(rowObjectsGlazedList, null);
 
-			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor);
+			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor, configRegistry);
 
 			// we register a custom UpdateDataCommandHandler so that we could add a new
 			// value if desired
@@ -337,8 +332,7 @@ public class WFCIndexPart extends WFCFormPart {
 //			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
 
 			// layer for event handling of GlazedLists and PropertyChanges
-			GlazedListsEventLayer<T> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
-					this.sortedList);
+			GlazedListsEventLayer<T> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
 
 			this.selectionLayer = new SelectionLayer(glazedListsEventLayer);
 
