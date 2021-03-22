@@ -22,7 +22,7 @@ import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
  *
  */
 public class CustomLocale {
-	static Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
+	static Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	/**
 	 * Liefert einen Array mit allen Locales zurück.

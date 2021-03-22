@@ -5,6 +5,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -128,6 +130,12 @@ public class Lookup extends Composite {
 		text.addListener(SWT.KeyDown, createKeyDownListener());
 		text.addListener(SWT.Modify, createModifyListener());
 		text.addListener(SWT.FocusOut, createFocusOutListener());
+		text.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				text.selectAll();
+			}
+		});
 	}
 
 	private void addTableListener() {
@@ -859,7 +867,13 @@ public class Lookup extends Composite {
 
 	public void fillSelectedValue() {
 		MField field = (MField) getData(Constants.CONTROL_FIELD);
-		if (popup.isVisible() && table.getSelectionIndex() != -1) {
+		// simuliert die Eingabe und refresht die popupValues
+		popupValues = contentProvider.getContent("");
+		if (text.getText().equals("") && popupValues.size() == 1) {
+			LookupValue lv = popupValues.get(0);
+			text.setText(lv.keyText);
+			field.setValue(lv, true);
+		} else if (popup.isVisible() && table.getSelectionIndex() != -1) {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			text.setText(lv.keyText);
 			field.setValue(lv, true);
