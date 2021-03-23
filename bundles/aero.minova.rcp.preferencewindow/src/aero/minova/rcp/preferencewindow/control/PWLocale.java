@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
@@ -62,7 +63,7 @@ public class PWLocale extends CustomPWWidget {
 	 */
 	public List<String> getCountries() {
 		List<String> countries = new ArrayList<>();
-		String language = PreferenceWindow.getInstance().getValueFor("LocalLanguage").toString();
+		String language = PreferenceWindow.getInstance().getValueFor(ApplicationPreferences.LOCALE_LANGUAGE).toString();
 		Locale[] locales = CustomLocale.getLocales();
 		for (Locale l : locales) {
 			if (language.equals(l.getDisplayLanguage(l))) {
@@ -99,7 +100,7 @@ public class PWLocale extends CustomPWWidget {
 		for (int i = 0; i < dataL.size(); i++) {
 			final Object language = dataL.get(i);
 			comboLanguage.add(language.toString());
-			if (language.equals(InstancePreferenceAccessor.getValue(preferences, "LocalLanguage", DisplayType.LOCALE,
+			if (language.equals(InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.LOCALE_LANGUAGE, DisplayType.LOCALE,
 					Locale.getDefault().getDisplayLanguage(Locale.getDefault()), context.get(Locale.class)))) {
 				comboLanguage.select(i);
 			}
@@ -107,7 +108,7 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboLanguage.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue("LocalLanguage",
+			PreferenceWindow.getInstance().setValue(ApplicationPreferences.LOCALE_LANGUAGE,
 					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
 			// erneuert Liste mit Ländern
 			comboCountries.removeAll();
@@ -136,14 +137,14 @@ public class PWLocale extends CustomPWWidget {
 		for (int i = 0; i < getCountries().size(); i++) {
 			final Object country = getCountries().get(i);
 			comboCountries.add(country.toString());
-			if (country.equals(InstancePreferenceAccessor.getValue(preferences, "country", DisplayType.LOCALE,
+			if (country.equals(InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.COUNTRY, DisplayType.LOCALE,
 					Locale.getDefault().getDisplayCountry(Locale.getDefault()), context.get(Locale.class)))) {
 				comboCountries.select(i);
 			}
 		}
 
 		comboCountries.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue("country",
+			PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY,
 					comboCountries.getItem(comboCountries.getSelectionIndex()));
 		});
 
