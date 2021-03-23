@@ -19,7 +19,7 @@ public class DateTimeUtil {
 	}
 
 	public static Instant getDateTime(Instant now, String input) {
-		return getDateTime(now, input, ZoneId.ofOffset("UTC", ZoneOffset.UTC));
+		return getDateTime(now, input, "UTC");
 	}
 
 	/**
@@ -31,11 +31,12 @@ public class DateTimeUtil {
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, ZoneId zoneId) {
+	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
 
 		String[] splitInput = input.split(" ");
 		Instant dateIn;
 		Instant timeIn;
+		Instant dateTime;
 		LocalDate dateLocal;
 		LocalTime timeLocal;
 
@@ -62,8 +63,15 @@ public class DateTimeUtil {
 		} else {
 			return null;
 		}
+		
 
-		Instant dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zoneId).toInstant();
+		try {
+			ZoneId zI = ZoneId.of(zoneId);
+			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
+		} catch (Exception e) {
+			//Invalid ZoneId;
+			return null;
+		}
 
 		return dateTime;
 	}
