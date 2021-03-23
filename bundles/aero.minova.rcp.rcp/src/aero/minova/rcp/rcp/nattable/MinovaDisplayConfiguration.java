@@ -107,8 +107,7 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 			}
 
 		}
-		// configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_CHILD_COUNT_PATTERN, "[{0}]");
-
+		configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_CHILD_COUNT_PATTERN, "[{0}]");
 	}
 
 	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex) {
