@@ -20,11 +20,14 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
@@ -47,12 +50,19 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
+import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
+import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -224,12 +234,19 @@ public class WFCIndexPart extends WFCFormPart {
 		// build the grid layer
 		GridLayer gridLayer = new GridLayer(bodyLayerStack, sortHeaderLayer, rowHeaderLayer, cornerLayer);
 
+		FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), gridLayer, configRegistry, false);
+		summaryRowLayer.setSummaryRowLabel("");
+
+		// ensure the body data layer uses a layer painter with correct configured clipping
+		bodyLayerStack.getBodyDataLayer().setLayerPainter(new GridLineCellLayerPainter(false, true));
+
 		// set the group by header on top of the grid
-		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
+		CompositeLayer compositeGridLayer = new CompositeLayer(1, 3);
 		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider,
 				columnHeaderLayer);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
-		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
+		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 2);
+		compositeGridLayer.setChildLayer("Summary", summaryRowLayer, 0, 1);
 
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
 //		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
@@ -264,6 +281,8 @@ public class WFCIndexPart extends WFCFormPart {
 		// expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
 
+		configureSummary(form);
+
 		natTable.configure();
 		// Hier können wir das Theme setzen
 //		ThemeConfiguration darkThemeConfig = new DarkNatTableThemeConfiguration();
@@ -272,6 +291,36 @@ public class WFCIndexPart extends WFCFormPart {
 
 		return natTable;
 
+	}
+
+	private void configureSummary(Form form) {
+		final IDataProvider summaryDataProvider = new ListDataProvider<>(bodyLayerStack.getSortedList(), columnPropertyAccessor);
+
+		// add summary configuration
+		natTable.addConfiguration(new AbstractRegistryConfiguration() {
+
+			@Override
+			public void configureRegistry(IConfigRegistry configRegistry) {
+				int i = 0;
+				for (aero.minova.rcp.form.model.xsd.Column column : form.getIndexView().getColumn()) {
+
+					// Anzahl
+					if (column.getAggregate() != null && column.getAggregate().equals("COUNT")) {
+						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER, new CountSummaryProvider(summaryDataProvider),
+								DisplayMode.NORMAL, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
+					}
+
+					// Summe
+					if (column.isTotal() != null && column.isTotal()) {
+						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER,
+								new SummationSummaryProvider(summaryDataProvider, false), DisplayMode.NORMAL,
+								SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
+					}
+
+					i++;
+				}
+			}
+		});
 	}
 
 	/**
@@ -294,6 +343,8 @@ public class WFCIndexPart extends WFCFormPart {
 		private GroupByDataLayer<T> bodyDataLayer;
 
 		private TreeLayer treeLayer;
+
+		private GlazedListsEventLayer glazedListsEventLayer;
 
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
@@ -332,16 +383,16 @@ public class WFCIndexPart extends WFCFormPart {
 //			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
 
 			// layer for event handling of GlazedLists and PropertyChanges
-			GlazedListsEventLayer<T> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
+			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
 
-			this.selectionLayer = new SelectionLayer(glazedListsEventLayer);
+			ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
+			this.selectionLayer = new SelectionLayer(columnReorderLayer);
 
 			selectionLayer.addLayerListener(new ILayerListener() {
 
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
-					List c = SelectionUtils.getSelectedRowObjects(selectionLayer,
-							(IRowDataProvider<T>) bodyDataProvider, false);
+					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
 					List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
 					if (!collection.isEmpty()) {
 						context.set(Constants.BROKER_ACTIVEROWS, collection);
@@ -354,6 +405,10 @@ public class WFCIndexPart extends WFCFormPart {
 			ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
 
 			setUnderlyingLayer(viewportLayer);
+		}
+
+		public GlazedListsEventLayer getGlazedListsEventLayer() {
+			return glazedListsEventLayer;
 		}
 
 		public SelectionLayer getSelectionLayer() {
@@ -382,6 +437,30 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public EventList<T> getList() {
 			return eventList;
+		}
+	}
+
+	class CountSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public CountSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			int valueRows = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					valueRows++;
+				}
+			}
+			return valueRows;
 		}
 	}
 
