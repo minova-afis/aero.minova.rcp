@@ -1,6 +1,8 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -59,11 +61,19 @@ public class LookupFieldFocusListener implements FocusListener {
 	 */
 	private void getTicketFromCAS(Lookup lc) {
 		Table ticketTable = new Table();
-		String ticketNumber = lc.getText().replaceAll("[^0-9]", "").trim();
+		// das Pattern ist eine unbegrenzte Menge an Zahlen hinter einer Raute
+		Pattern ticketnumber = Pattern.compile("#(\\d*)");
+		Matcher m = ticketnumber.matcher(lc.getText());
+		String tracNumber = "";
+		// true, falls das Pattern vorhanden ist
+		if (m.find()) {
+			// die Tracnummmer, ab dem ersten Symbol --> ohne die Raute
+			tracNumber = m.group(1);
+		}
 		ticketTable.setName("Ticket");
 		ticketTable.addColumn(new Column(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT));
 		Row row = new Row();
-		row.addValue(new Value(ticketNumber, DataType.STRING));
+		row.addValue(new Value(tracNumber, DataType.STRING));
 		ticketTable.addRow(row);
 
 		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
