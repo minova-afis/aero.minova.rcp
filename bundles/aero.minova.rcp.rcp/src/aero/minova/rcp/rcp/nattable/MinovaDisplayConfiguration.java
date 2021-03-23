@@ -25,6 +25,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 
+import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -58,6 +59,7 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 	public void configureRegistry(IConfigRegistry configRegistry) {
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.NEVER_EDITABLE);
 		configureCells(configRegistry);
+		configureGroupSummary(configRegistry);
 	}
 
 	private void configureCells(IConfigRegistry configRegistry) {
@@ -79,33 +81,129 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 			} else {
 				configureTextCell(configRegistry, i++);
 			}
+		}
+	}
 
-			// Anzahl
-			if (formColumns.get(column.getName()).getAggregate() != null && formColumns.get(column.getName()).getAggregate().equals("COUNT")) {
-				configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, new IGroupBySummaryProvider() {
-					@Override
-					public Object summarize(int columnIndex, List children) {
-						return children.size();
-					}
-				}, DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + (i - 1));
+	private void configureGroupSummary(IConfigRegistry configRegistry) {
+		int i = 0;
+		for (Column column : columns) {
+			IGroupBySummaryProvider summaryProvider = null;
+
+			if (formColumns.get(column.getName()).getAggregate() != null) {
+				AggregateOption agg = AggregateOption.valueOf(formColumns.get(column.getName()).getAggregate());
+				switch (agg) {
+				case AVERAGE:
+					summaryProvider = new IGroupBySummaryProvider() {
+						@Override
+						public Object summarize(int columnIndex, List children) {
+							double total = 0;
+							for (Object c : children) {
+								Row r = (Row) c;
+								if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null)
+									total += r.getValue(columnIndex).getIntegerValue();
+								else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
+									total += r.getValue(columnIndex).getDoubleValue();
+							}
+							return total / children.size();
+						}
+					};
+					break;
+
+				case COUNT:
+					summaryProvider = new IGroupBySummaryProvider() {
+						@Override
+						public Object summarize(int columnIndex, List children) {
+							return children.size();
+						}
+					};
+					break;
+
+				case MAX:
+					summaryProvider = new IGroupBySummaryProvider() {
+						@Override
+						public Object summarize(int columnIndex, List children) {
+							double max = Double.MIN_VALUE;
+							for (Object c : children) {
+								Row r = (Row) c;
+								if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
+									if (r.getValue(columnIndex).getIntegerValue() > max)
+										max = r.getValue(columnIndex).getIntegerValue();
+								} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
+									if (r.getValue(columnIndex).getDoubleValue() > max)
+										max = r.getValue(columnIndex).getDoubleValue();
+								}
+							}
+							return max;
+						}
+					};
+					break;
+
+				case MIN:
+					summaryProvider = new IGroupBySummaryProvider() {
+						@Override
+						public Object summarize(int columnIndex, List children) {
+							double min = Double.MAX_VALUE;
+							for (Object c : children) {
+								Row r = (Row) c;
+								if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
+									if (r.getValue(columnIndex).getIntegerValue() < min)
+										min = r.getValue(columnIndex).getIntegerValue();
+								} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
+									if (r.getValue(columnIndex).getDoubleValue() < min)
+										min = r.getValue(columnIndex).getDoubleValue();
+								}
+							}
+							return min;
+						}
+					};
+					break;
+
+				case SUM:
+					summaryProvider = new IGroupBySummaryProvider() {
+						@Override
+						public Object summarize(int columnIndex, List children) {
+							double total = 0;
+							for (Object c : children) {
+								Row r = (Row) c;
+								if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null)
+									total += r.getValue(columnIndex).getIntegerValue();
+								else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
+									total += r.getValue(columnIndex).getDoubleValue();
+							}
+							return total;
+						}
+					};
+					break;
+				default:
+					break;
+				}
+
 			}
 
-			// Summe
+			// Summe ("total" in .xml)
 			if (formColumns.get(column.getName()).isTotal() != null && formColumns.get(column.getName()).isTotal()) {
-				configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, new IGroupBySummaryProvider() {
+				summaryProvider = new IGroupBySummaryProvider() {
 					@Override
 					public Object summarize(int columnIndex, List children) {
 						double total = 0;
 						for (Object c : children) {
 							Row r = (Row) c;
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
+							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null)
+								total += r.getValue(columnIndex).getIntegerValue();
+							else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
 								total += r.getValue(columnIndex).getDoubleValue();
 						}
 						return total;
 					}
-				}, DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + (i - 1));
+				};
 			}
 
+			if (summaryProvider != null) {
+				configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_SUMMARY_PROVIDER, summaryProvider, DisplayMode.NORMAL,
+						ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + i);
+			}
+
+			i++;
 		}
 		configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_CHILD_COUNT_PATTERN, "[{0}]");
 	}

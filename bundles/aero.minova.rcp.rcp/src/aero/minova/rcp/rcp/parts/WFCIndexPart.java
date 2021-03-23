@@ -71,6 +71,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -310,17 +311,38 @@ public class WFCIndexPart extends WFCFormPart {
 			public void configureRegistry(IConfigRegistry configRegistry) {
 				int i = 0;
 				for (aero.minova.rcp.form.model.xsd.Column column : form.getIndexView().getColumn()) {
+					ISummaryProvider summaryProvider = null;
 
-					// Anzahl
-					if (column.getAggregate() != null && column.getAggregate().equals("COUNT")) {
-						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER, new CountSummaryProvider(summaryDataProvider),
-								DisplayMode.NORMAL, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
+					if (column.getAggregate() != null) {
+						AggregateOption agg = AggregateOption.valueOf(column.getAggregate());
+						switch (agg) {
+						case AVERAGE:
+							summaryProvider = new AverageSummaryProvider(summaryDataProvider);
+							break;
+						case COUNT:
+							summaryProvider = new CountSummaryProvider(summaryDataProvider);
+							break;
+						case MAX:
+							summaryProvider = new MaxSummaryProvider(summaryDataProvider);
+							break;
+						case MIN:
+							summaryProvider = new MinSummaryProvider(summaryDataProvider);
+							break;
+						case SUM:
+							summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+							break;
+						default:
+							break;
+						}
 					}
 
-					// Summe
+					// Summe ("total" in .xml)
 					if (column.isTotal() != null && column.isTotal()) {
-						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER,
-								new SummationSummaryProvider(summaryDataProvider, false), DisplayMode.NORMAL,
+						summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+					}
+
+					if (summaryProvider != null) {
+						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER, summaryProvider, DisplayMode.NORMAL,
 								SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
 					}
 
@@ -474,6 +496,88 @@ public class WFCIndexPart extends WFCFormPart {
 				}
 			}
 			return valueRows;
+		}
+	}
+
+	class AverageSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public AverageSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			int valueRows = 0;
+			double total = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					valueRows++;
+					total += ((Number) dataValue).doubleValue();
+				}
+			}
+			if (valueRows == 0)
+				return 0;
+			return total / valueRows;
+		}
+	}
+
+	class MinSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public MinSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			double min = Double.MAX_VALUE;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					if (((Number) dataValue).doubleValue() < min)
+						min = ((Number) dataValue).doubleValue();
+				}
+			}
+			if (min == Double.MAX_VALUE)
+				return 0;
+			return min;
+		}
+	}
+
+	class MaxSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public MaxSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			double max = Double.MIN_VALUE;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					if (((Number) dataValue).doubleValue() > max)
+						max = ((Number) dataValue).doubleValue();
+				}
+			}
+			if (max == Double.MIN_VALUE)
+				return 0;
+			return max;
 		}
 	}
 
