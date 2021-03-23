@@ -43,8 +43,7 @@ public class LookupFieldFocusListener implements FocusListener {
 			Table t = (Table) lc.getData(Constants.CONTROL_OPTIONS);
 			if (t != null) {
 				for (Row r : t.getRows()) {
-					if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc
-							.getData(Constants.CONTROL_KEYLONG)) {
+					if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc.getData(Constants.CONTROL_KEYLONG)) {
 						lc.setText(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 					}
 				}
@@ -53,23 +52,21 @@ public class LookupFieldFocusListener implements FocusListener {
 	}
 
 	/**
-	 * Wir versenden eine Anfrage an den CAS, welche die Ticketnummer enthält. Mit
-	 * der Erhaltenen Antwort füllen wir sämltiche LookupFields sowie das
+	 * Wir versenden eine Anfrage an den CAS, welche die Ticketnummer enthält. Mit der Erhaltenen Antwort füllen wir sämltiche LookupFields sowie das
 	 * DescriptionField
 	 *
 	 * @param lc
 	 */
 	private void getTicketFromCAS(Lookup lc) {
 		Table ticketTable = new Table();
-		String ticketNumber = lc.getText().replace("#", "");
+		String ticketNumber = lc.getText().replace("#", "").trim();
 		ticketTable.setName("Ticket");
 		ticketTable.addColumn(new Column(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT));
 		Row row = new Row();
 		row.addValue(new Value(ticketNumber, DataType.STRING));
 		ticketTable.addRow(row);
 
-		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(),
-				ticketTable);
+		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			if (t.getResultSet() != null) {
 				broker.post(Constants.RECEIVED_TICKET, t.getResultSet());
