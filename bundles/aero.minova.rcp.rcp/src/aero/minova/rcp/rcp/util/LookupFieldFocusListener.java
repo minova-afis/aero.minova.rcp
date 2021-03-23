@@ -59,7 +59,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	 */
 	private void getTicketFromCAS(Lookup lc) {
 		Table ticketTable = new Table();
-		String ticketNumber = lc.getText().replace("#", "").trim();
+		String ticketNumber = lc.getText().replaceAll("[^0-9]", "").trim();
 		ticketTable.setName("Ticket");
 		ticketTable.addColumn(new Column(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT));
 		Row row = new Row();

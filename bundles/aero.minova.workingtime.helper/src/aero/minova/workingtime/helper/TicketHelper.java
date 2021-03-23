@@ -26,7 +26,7 @@ public class TicketHelper implements ValueChangeListener {
 				System.out.println("gelesener Text aus dem Lookup:" + writtenText);
 			}
 			lookupField.setWrittenText(null);
-			Value value = new Value(writtenText.replace("#", "").trim(), DataType.STRING);
+			Value value = new Value(writtenText.replaceAll("[^0-9]", "").trim(), DataType.STRING);
 			workingTimeHelper.postEvent(value);
 		}
 	}
