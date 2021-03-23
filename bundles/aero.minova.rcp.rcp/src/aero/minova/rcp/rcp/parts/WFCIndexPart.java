@@ -65,6 +65,8 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
+import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
+import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
@@ -178,6 +180,18 @@ public class WFCIndexPart extends WFCFormPart {
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
 		this.locale = s;
 		translate(translationService);
+	}
+
+	@Inject
+	@Optional
+	private void collapseGroups(@UIEventTopic(Constants.BROKER_COLLAPSEINDEX) String s) {
+		natTable.doCommand(new TreeCollapseAllCommand());
+	}
+
+	@Inject
+	@Optional
+	private void expandGroups(@UIEventTopic(Constants.BROKER_EXPANDINDEX) String s) {
+		natTable.doCommand(new TreeExpandAllCommand());
 	}
 
 	/**
