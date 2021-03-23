@@ -34,15 +34,16 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
+import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.FixedSummaryRowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultColumnHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.AbstractLayerTransform;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
@@ -221,10 +222,20 @@ public class WFCIndexPart extends WFCFormPart {
 		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
 		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
 
+		// build the Summary Row
+		FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(),
+				configRegistry, false);
+		summaryRowLayer.setHorizontalCompositeDependency(false);
+		CompositeLayer summaryComposite = new CompositeLayer(1, 2);
+		summaryComposite.setChildLayer("SUMMARY", summaryRowLayer, 0, 0);
+		summaryComposite.setChildLayer(GridRegion.BODY, bodyLayerStack.getViewportLayer(), 0, 1);
+
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyLayerStack.getBodyDataProvider());
 		DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
-		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
+		// Special RowHeader for summary
+		ILayer rowHeaderLayer = new FixedSummaryRowHeaderLayer(rowHeaderDataLayer, summaryComposite, bodyLayerStack.getSelectionLayer());
+		((FixedSummaryRowHeaderLayer) rowHeaderLayer).setSummaryRowLabel("");
 
 		// build the corner layer
 		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
@@ -232,21 +243,17 @@ public class WFCIndexPart extends WFCFormPart {
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// build the grid layer
-		GridLayer gridLayer = new GridLayer(bodyLayerStack, sortHeaderLayer, rowHeaderLayer, cornerLayer);
-
-		FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), gridLayer, configRegistry, false);
-		summaryRowLayer.setSummaryRowLabel("");
+		GridLayer gridLayer = new GridLayer(summaryComposite, sortHeaderLayer, rowHeaderLayer, cornerLayer);
 
 		// ensure the body data layer uses a layer painter with correct configured clipping
 		bodyLayerStack.getBodyDataLayer().setLayerPainter(new GridLineCellLayerPainter(false, true));
 
 		// set the group by header on top of the grid
-		CompositeLayer compositeGridLayer = new CompositeLayer(1, 3);
+		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
 		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider,
 				columnHeaderLayer);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
-		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 2);
-		compositeGridLayer.setChildLayer("Summary", summaryRowLayer, 0, 1);
+		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
 //		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
@@ -346,6 +353,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private GlazedListsEventLayer glazedListsEventLayer;
 
+		private ViewportLayer viewportLayer;
+
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
@@ -402,7 +411,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 			treeLayer = new TreeLayer(this.selectionLayer, bodyDataLayer.getTreeRowModel());
 
-			ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
+			viewportLayer = new ViewportLayer(treeLayer);
 
 			setUnderlyingLayer(viewportLayer);
 		}
@@ -413,6 +422,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public SelectionLayer getSelectionLayer() {
 			return this.selectionLayer;
+		}
+
+		public ViewportLayer getViewportLayer() {
+			return this.viewportLayer;
 		}
 
 		public SortedList<T> getSortedList() {
