@@ -433,20 +433,26 @@ public class DateTimeUtilTests {
 	public void testGetDateTimeZoneIDEuropeMonaco() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("Europe/Monaco")).toInstant();
 		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(8).plusMinutes(28).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", ZoneId.of("Europe/Monaco")));
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", "Europe/Monaco"));
 	}
 	
 	@Test
 	public void testGetDateTimeZoneIDEuropeLondon() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("Europe/London")).toInstant();
 		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(9).plusMinutes(28).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", ZoneId.of("Europe/London")));
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", "Europe/London"));
 	}
 	
 	@Test
 	public void testGetDateTimeZoneIDAmericaJuneau() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("America/Juneau")).toInstant();
 		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(28).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", ZoneId.of("America/Juneau")));
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", "America/Juneau"));
+	}
+	
+	@Test
+	public void testGetDateTimeZoneIDAmericaParis() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("America/Juneau")).toInstant();
+		assertNull(null, DateTimeUtil.getDateTime(bithday, "13052020 1028", "America/Paris"));
 	}
 }
