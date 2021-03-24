@@ -32,6 +32,7 @@ NatTable > .COLUMN_HEADER {
 	color: black;
 	text-align: left;
 }
+
 NatTable > .COLUMN_HEADER:select {
 	cell-background-color: RGB(240, 240, 240);
 	render-grid-lines: true;
@@ -57,8 +58,6 @@ NatTable > .selectionAnchor:select {
 	color: black;
 	font-style: normal;
 	font-family: tahoma;
-	
-	font-size: var(--nattableFontSize)
 }
 
 
@@ -92,6 +91,7 @@ NatTable > .SummaryRow {
 	painter-resolution: false;
 	font-weight: bold;
 	cell-background-color: RGB(240, 240, 240);
+	text-align: left;
 }
 
 
