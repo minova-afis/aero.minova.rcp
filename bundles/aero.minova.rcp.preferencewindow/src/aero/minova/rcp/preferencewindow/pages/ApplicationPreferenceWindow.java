@@ -242,6 +242,7 @@ public class ApplicationPreferenceWindow {
 			break;
 		case TIME_UTIL:
 			widget = new TimeFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
+			break;
 		case CHECKEXPLANATION:
 			widget = new ExplanationLabelForPWCheckbox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
 			break;
