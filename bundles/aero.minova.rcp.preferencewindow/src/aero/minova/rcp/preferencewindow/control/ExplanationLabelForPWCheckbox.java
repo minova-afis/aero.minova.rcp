@@ -49,15 +49,8 @@ public class ExplanationLabelForPWCheckbox extends CustomPWWidget {
 	 */
 	@Override
 	public void check() {
-		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		if (value == null) {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
-		} else {
-			if (!(value instanceof Boolean)) {
-				throw new UnsupportedOperationException(
-						"The property '" + getCustomPropertyKey() + "' has to be a Boolean because it is associated to a checkbox");
-			}
-		}
+		//Wird nicht benötigt!
+		
 	}
 }
 
