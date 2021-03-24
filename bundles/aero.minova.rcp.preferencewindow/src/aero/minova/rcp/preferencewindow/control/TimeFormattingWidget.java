@@ -100,7 +100,7 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		} else {
 			if (!(value instanceof String)) {
 				throw new UnsupportedOperationException(
-						"The property '" + getCustomPropertyKey() + "' has to be a Boolean because it is associated to a Text");
+						"The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
 			}
 		}
 	}
