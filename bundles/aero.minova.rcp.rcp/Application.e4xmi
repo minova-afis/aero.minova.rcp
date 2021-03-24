@@ -96,6 +96,7 @@
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
     <bindings xmi:id="_6wlLhcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1s" keySequence="M1+S"/>
     <bindings xmi:id="_6wlLiMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1a" keySequence="M1+A" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
+    <bindings xmi:id="_GhrMEIydEeuboqmDt256_Q" elementId="aero.minova.rcp.rcp.keybinding.m1z" keySequence="M1+Z" command="_Lwy8UIydEeuboqmDt256_Q"/>
     <bindings xmi:id="_Jv9isBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.help" keySequence="F1" command="_DmBwABRcEeu_ctc0PBVTGw">
       <tags>type:user</tags>
     </bindings>
@@ -118,6 +119,7 @@
   </rootContext>
   <commands xmi:id="_6wlLfMgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.exit" commandName="exitCommand"/>
   <commands xmi:id="_6wlLhsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
+  <commands xmi:id="_Lwy8UIydEeuboqmDt256_Q" elementId="org.eclipse.ui.edit.undo" commandName="undoCommand"/>
   <commands xmi:id="_4p5JwLufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="FormName" optional="false"/>
   </commands>
