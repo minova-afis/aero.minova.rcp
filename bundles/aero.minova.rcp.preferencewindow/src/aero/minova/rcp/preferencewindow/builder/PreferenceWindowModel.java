@@ -84,9 +84,9 @@ public class PreferenceWindowModel {
 
 		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilFormatStyle", null), 0.1,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), 0.1,
 				DisplayType.DATE_UTIL, ""));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilFormatStyle", null), 0.1,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilPattern", null), 0.2,
 				DisplayType.TIME_UTIL, ""));
 		return ptd;
 	}
