@@ -95,6 +95,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private WFCDetailCASRequestsUtil casRequestsUtil = null;
 
+	@Inject
 	private TranslationService translationService;
 	private Locale locale;
 
@@ -106,7 +107,6 @@ public class WFCDetailPart extends WFCFormPart {
 			return;
 		}
 		layoutForm(parent);
-		translate(translationService);
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
 		// steuert
 
@@ -118,6 +118,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		casRequestsUtil.setDetail(detail, perspective);
+		translate(composite);
 	}
 
 	private static class HeadOrPageWrapper {
@@ -289,16 +290,11 @@ public class WFCDetailPart extends WFCFormPart {
 	@Optional
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
 		this.locale = s;
-		translate(translationService);
-	}
-
-	@Inject
-	private void translate(TranslationService translationService) {
-		this.translationService = translationService;
 		if (translationService != null && composite != null) {
 			translate(composite);
 		}
 	}
+
 
 	private void translate(Composite composite) {
 		for (Control control : composite.getChildren()) {
