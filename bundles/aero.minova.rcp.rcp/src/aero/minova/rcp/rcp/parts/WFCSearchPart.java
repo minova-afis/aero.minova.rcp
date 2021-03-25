@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -93,6 +94,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 	private SelectionLayer selectionLayer;
 
+	private MinovaColumnPropertyAccessor columnPropertyAccessor;
+
+	private ColumnHeaderLayer columnHeaderLayer;
+
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
 
@@ -152,10 +157,10 @@ public class WFCSearchPart extends WFCFormPart {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
 		sortedList = new SortedList<>(eventList, null);
-		MinovaColumnPropertyAccessor accessor = new MinovaColumnPropertyAccessor(table, form);
-		accessor.initPropertyNames(translationService);
+		columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, form);
+		columnPropertyAccessor.initPropertyNames(translationService);
 
-		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
+		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
@@ -193,12 +198,12 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(accessor.getPropertyNames(), accessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -293,6 +298,19 @@ public class WFCSearchPart extends WFCFormPart {
 		// Gespeicherte Zeilen hinzufügen
 		sortedList.addAll(prefTable.getRows());
 		data.getRows().addAll(prefTable.getRows());
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i,
+						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
 	}
 
 	@Inject
