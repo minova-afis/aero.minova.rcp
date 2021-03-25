@@ -19,6 +19,9 @@ public class Constants {
 	public static final String CONTROL_DATATYPE = "dataType";
 	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
+	
+	// Trenner für Serializer/Deserialiser
+	public static final String SOH = "\u0001";
 
 	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
 	// textfieldVerifier zuzugreifen

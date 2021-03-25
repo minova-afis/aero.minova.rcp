@@ -82,6 +82,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
+import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
@@ -142,8 +143,14 @@ public class WFCIndexPart extends WFCFormPart {
 	}
 
 	@PersistTableSelection
-	public void savePrefs() {
+	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
 		// TODO INDEX Part reihenfolge + Gruppierung speichern
+		System.out.println("saveIndex");
+	}
+	
+	@LoadTableSelection
+	public void loadPrefs(@Named("ConfigName") String name) {		
+		System.out.println("loadIndex");
 	}
 
 	/**
