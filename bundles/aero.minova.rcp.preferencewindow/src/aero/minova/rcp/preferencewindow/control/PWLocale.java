@@ -140,7 +140,7 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboCountries.addListener(SWT.Modify, event -> {
-			if (comboCountries.getChildren().length > 0)
+			if (!comboCountries.getItem(comboCountries.getSelectionIndex()).isEmpty())
 				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY, comboCountries.getItem(comboCountries.getSelectionIndex()));
 		});
 
