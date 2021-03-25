@@ -47,6 +47,8 @@ public class Constants {
 	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
+	public static final String BROKER_COLLAPSEINDEX = "aero/minova/rcp/CollapseIndex";
+	public static final String BROKER_EXPANDINDEX = "aero/minova/rcp/ExpandIndex";
 	public static final String BROKER_CLEARSEARCHTABLE = "aero/minova/rcp/ClearSearchTable";
 	public static final String BROKER_REVERTSEARCHTABLE = "aero/minova/rcp/RevertSearchTable";
 	public static final String BROKER_DELETEROWSEARCHTABLE = "aero/minova/rcp/DelteRowSearchTable";
