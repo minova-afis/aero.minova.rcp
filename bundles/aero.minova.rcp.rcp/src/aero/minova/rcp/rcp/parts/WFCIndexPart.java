@@ -222,7 +222,7 @@ public class WFCIndexPart extends WFCFormPart {
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		// create the body stack
-		bodyLayerStack = new BodyLayerStack<Row>(table.getRows(), columnPropertyAccessor, configRegistry);
+		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor, configRegistry);
 		bodyLayerStack.getBodyDataLayer().setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		// build the column header layer
@@ -535,8 +535,9 @@ public class WFCIndexPart extends WFCFormPart {
 					total += ((Number) dataValue).doubleValue();
 				}
 			}
-			if (valueRows == 0)
+			if (valueRows == 0) {
 				return 0;
+			}
 			return total / valueRows;
 		}
 	}
@@ -558,12 +559,14 @@ public class WFCIndexPart extends WFCFormPart {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
 				if (dataValue instanceof Number) {
-					if (((Number) dataValue).doubleValue() < min)
+					if (((Number) dataValue).doubleValue() < min) {
 						min = ((Number) dataValue).doubleValue();
+					}
 				}
 			}
-			if (min == Double.MAX_VALUE)
+			if (min == Double.MAX_VALUE) {
 				return 0;
+			}
 			return min;
 		}
 	}
@@ -585,12 +588,14 @@ public class WFCIndexPart extends WFCFormPart {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
 				if (dataValue instanceof Number) {
-					if (((Number) dataValue).doubleValue() > max)
+					if (((Number) dataValue).doubleValue() > max) {
 						max = ((Number) dataValue).doubleValue();
+					}
 				}
 			}
-			if (max == Double.MIN_VALUE)
+			if (max == Double.MIN_VALUE) {
 				return 0;
+			}
 			return max;
 		}
 	}
