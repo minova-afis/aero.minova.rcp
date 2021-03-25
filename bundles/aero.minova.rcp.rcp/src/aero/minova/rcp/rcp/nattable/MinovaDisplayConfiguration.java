@@ -24,6 +24,7 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -67,19 +68,28 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		for (Column column : columns) {
 
 			if (column.getType().equals(DataType.BOOLEAN)) {
-				configureBooleanCell(configRegistry, i++);
+				// configureBooleanCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
-				configureShortDateCell(configRegistry, i++);
+				configureShortDateCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortTime() != null) {
-				configureShortTimeCell(configRegistry, i++);
+				configureShortTimeCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getDateTime() != null) {
-				configureDateTimeCell(configRegistry, i++);
+				configureDateTimeCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.DOUBLE)) {
-				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()).getNumber().getDecimals());
+				configureDoubleCell(configRegistry, i, formColumns.get(column.getName()).getNumber().getDecimals(),
+						SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()).getNumber().getDecimals(),
+						ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INTEGER)) {
-				configureIntegerCell(configRegistry, i++);
+				configureIntegerCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else {
-				configureTextCell(configRegistry, i++);
+				configureTextCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			}
 		}
 	}
@@ -208,78 +218,72 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_CHILD_COUNT_PATTERN, "[{0}]");
 	}
 
-	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
 		NumberFormat nf = NumberFormat.getInstance();
 		DefaultIntegerDisplayConverter defaultIntegerDisplayConverter = new DefaultIntegerDisplayConverter(true);
 		defaultIntegerDisplayConverter.setNumberFormat(nf);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultIntegerDisplayConverter, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 
 	}
 
-	private void configureDateTimeCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureDateTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
 		ShortDateTimeDisplayConverter shortDateTimeDisplayConverter = new ShortDateTimeDisplayConverter(locale);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortDateTimeDisplayConverter, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 
 	}
 
-	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
 		ShortTimeDisplayConverter shortTimeDisplayConverter = new ShortTimeDisplayConverter(locale);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortTimeDisplayConverter, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 
 	}
 
-	private void configureShortDateCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureShortDateCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
 		ShortDateDisplayConverter shortDateDisplayConverter = new ShortDateDisplayConverter(locale);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortDateDisplayConverter, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 	}
 
-	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		// visuelle anpassung [x] oder [_] oder [-]
 		//
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL, configLabel + columnIndex);
 
 		// using a CheckBoxCellEditor also needs a Boolean conversion to work
 		// correctly
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new BooleanDisplayConverter(), DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 	}
 
-	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, int decimals) {
+	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, int decimals, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
 		if (locale == null) {
 			locale = Locale.getDefault();
@@ -291,36 +295,32 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		DefaultDoubleDisplayConverter defaultDoubleDisplayConverter = new DefaultDoubleDisplayConverter(true);
 		defaultDoubleDisplayConverter.setNumberFormat(numberFormat);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 
 	}
 
-	private void configureInstantCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureInstantCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
 	}
 
-	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 	}
 
-	private void registerDoubleEditor(IConfigRegistry configRegistry, int columnIndex) {
+	private void registerDoubleEditor(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 		// register a TextCellEditor for column two that commits on key up/down
 		// moves the selection after commit by enter
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TextCellEditor(true, true), DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TextCellEditor(true, true), DisplayMode.NORMAL, configLabel + columnIndex);
 
 		// configure to open the adjacent editor after commit
 		// default behavior - enter - down, tab - right, shift+tab - left, arrows -
 		// arrow direction
-		configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE, DisplayMode.EDIT,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE, DisplayMode.EDIT, configLabel + columnIndex);
 
 		// TODO get the number format of the user
 		NumberFormat nf = NumberFormat.getInstance();
@@ -328,10 +328,10 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		DefaultDoubleDisplayConverter defaultDoubleDisplayConverter = new DefaultDoubleDisplayConverter(true);
 		defaultDoubleDisplayConverter.setNumberFormat(nf);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 	}
 
-	private void registerBooleanEditor(IConfigRegistry configRegistry, int columnIndex) {
+	private void registerBooleanEditor(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 
 		// Das hier würde einen kundenspezifischen Checkbox editor nutzen
 		// configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new
@@ -340,13 +340,12 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		// columnIndex);
 
 		// The CheckBoxCellEditor can also be visualized like a check button
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(), DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(), DisplayMode.NORMAL, configLabel + columnIndex);
 
 		// using a CheckBoxCellEditor also needs a Boolean conversion to work
 		// correctly
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new DefaultBooleanDisplayConverter(), DisplayMode.NORMAL,
-				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+				configLabel + columnIndex);
 	}
 
 }

@@ -11,13 +11,16 @@ NatTable {
 	font-style: normal;
 	font-family: tahoma;
 	tree-structure-painter: background tree;
+	
+	font-size: 11px;
+	--nattableFontSize: attr(font-size)
 }
 
 /** #22441: kann jetzt doch wieder verwendet werden */
 NatTable:select {
 	row-height: auto;
 	painter-resolution: false;
-	tree-structure-painter: background padding tree;
+	/*tree-structure-painter: background padding tree;*/
 }
 
 NatTable > .COLUMN_HEADER {
@@ -29,6 +32,7 @@ NatTable > .COLUMN_HEADER {
 	color: black;
 	text-align: left;
 }
+
 NatTable > .COLUMN_HEADER:select {
 	cell-background-color: RGB(240, 240, 240);
 	render-grid-lines: true;
@@ -87,6 +91,7 @@ NatTable > .SummaryRow {
 	painter-resolution: false;
 	font-weight: bold;
 	cell-background-color: RGB(240, 240, 240);
+	text-align: left;
 }
 
 
