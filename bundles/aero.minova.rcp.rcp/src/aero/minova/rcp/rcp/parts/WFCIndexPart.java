@@ -20,26 +20,30 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
+import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.FixedSummaryRowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultColumnHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.layer.AbstractLayerTransform;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
@@ -47,12 +51,19 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
+import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
+import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -60,6 +71,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -196,7 +208,7 @@ public class WFCIndexPart extends WFCFormPart {
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		// create the body stack
-		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor);
+		bodyLayerStack = new BodyLayerStack<Row>(table.getRows(), columnPropertyAccessor, configRegistry);
 		bodyLayerStack.getBodyDataLayer().setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		// build the column header layer
@@ -208,10 +220,23 @@ public class WFCIndexPart extends WFCFormPart {
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
 
+		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
+		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
+
+		// build the Summary Row
+		FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(),
+				configRegistry, false);
+		summaryRowLayer.setHorizontalCompositeDependency(false);
+		CompositeLayer summaryComposite = new CompositeLayer(1, 2);
+		summaryComposite.setChildLayer("SUMMARY", summaryRowLayer, 0, 0);
+		summaryComposite.setChildLayer(GridRegion.BODY, bodyLayerStack.getViewportLayer(), 0, 1);
+
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyLayerStack.getBodyDataProvider());
 		DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
-		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
+		// Special RowHeader for summary
+		ILayer rowHeaderLayer = new FixedSummaryRowHeaderLayer(rowHeaderDataLayer, summaryComposite, bodyLayerStack.getSelectionLayer());
+		((FixedSummaryRowHeaderLayer) rowHeaderLayer).setSummaryRowLabel("");
 
 		// build the corner layer
 		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
@@ -219,7 +244,10 @@ public class WFCIndexPart extends WFCFormPart {
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// build the grid layer
-		GridLayer gridLayer = new GridLayer(bodyLayerStack, sortHeaderLayer, rowHeaderLayer, cornerLayer);
+		GridLayer gridLayer = new GridLayer(summaryComposite, sortHeaderLayer, rowHeaderLayer, cornerLayer);
+
+		// ensure the body data layer uses a layer painter with correct configured clipping
+		bodyLayerStack.getBodyDataLayer().setLayerPainter(new GridLineCellLayerPainter(false, true));
 
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
@@ -261,6 +289,8 @@ public class WFCIndexPart extends WFCFormPart {
 		// expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
 
+		configureSummary(form);
+
 		natTable.configure();
 		// Hier können wir das Theme setzen
 //		ThemeConfiguration darkThemeConfig = new DarkNatTableThemeConfiguration();
@@ -269,6 +299,57 @@ public class WFCIndexPart extends WFCFormPart {
 
 		return natTable;
 
+	}
+
+	private void configureSummary(Form form) {
+		final IDataProvider summaryDataProvider = new ListDataProvider<>(bodyLayerStack.getSortedList(), columnPropertyAccessor);
+
+		// add summary configuration
+		natTable.addConfiguration(new AbstractRegistryConfiguration() {
+
+			@Override
+			public void configureRegistry(IConfigRegistry configRegistry) {
+				int i = 0;
+				for (aero.minova.rcp.form.model.xsd.Column column : form.getIndexView().getColumn()) {
+					ISummaryProvider summaryProvider = null;
+
+					if (column.getAggregate() != null) {
+						AggregateOption agg = AggregateOption.valueOf(column.getAggregate());
+						switch (agg) {
+						case AVERAGE:
+							summaryProvider = new AverageSummaryProvider(summaryDataProvider);
+							break;
+						case COUNT:
+							summaryProvider = new CountSummaryProvider(summaryDataProvider);
+							break;
+						case MAX:
+							summaryProvider = new MaxSummaryProvider(summaryDataProvider);
+							break;
+						case MIN:
+							summaryProvider = new MinSummaryProvider(summaryDataProvider);
+							break;
+						case SUM:
+							summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+							break;
+						default:
+							break;
+						}
+					}
+
+					// Summe ("total" in .xml)
+					if (column.isTotal() != null && column.isTotal()) {
+						summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
+					}
+
+					if (summaryProvider != null) {
+						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER, summaryProvider, DisplayMode.NORMAL,
+								SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
+					}
+
+					i++;
+				}
+			}
+		});
 	}
 
 	/**
@@ -292,7 +373,11 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private TreeLayer treeLayer;
 
-		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor) {
+		private GlazedListsEventLayer glazedListsEventLayer;
+
+		private ViewportLayer viewportLayer;
+
+		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
 
@@ -301,7 +386,7 @@ public class WFCIndexPart extends WFCFormPart {
 			// will be set by configuration
 			this.sortedList = new SortedList<>(rowObjectsGlazedList, null);
 
-			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor);
+			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor, configRegistry);
 
 			// we register a custom UpdateDataCommandHandler so that we could add a new
 			// value if desired
@@ -329,7 +414,7 @@ public class WFCIndexPart extends WFCFormPart {
 //			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
 
 			// layer for event handling of GlazedLists and PropertyChanges
-			GlazedListsEventLayer<T> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
+			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
 
 			ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
 			this.selectionLayer = new SelectionLayer(columnReorderLayer);
@@ -348,13 +433,21 @@ public class WFCIndexPart extends WFCFormPart {
 
 			treeLayer = new TreeLayer(this.selectionLayer, bodyDataLayer.getTreeRowModel());
 
-			ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
+			viewportLayer = new ViewportLayer(treeLayer);
 
 			setUnderlyingLayer(viewportLayer);
 		}
 
+		public GlazedListsEventLayer getGlazedListsEventLayer() {
+			return glazedListsEventLayer;
+		}
+
 		public SelectionLayer getSelectionLayer() {
 			return this.selectionLayer;
+		}
+
+		public ViewportLayer getViewportLayer() {
+			return this.viewportLayer;
 		}
 
 		public SortedList<T> getSortedList() {
@@ -379,6 +472,112 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public EventList<T> getList() {
 			return eventList;
+		}
+	}
+
+	class CountSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public CountSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			int valueRows = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					valueRows++;
+				}
+			}
+			return valueRows;
+		}
+	}
+
+	class AverageSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public AverageSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			int valueRows = 0;
+			double total = 0;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					valueRows++;
+					total += ((Number) dataValue).doubleValue();
+				}
+			}
+			if (valueRows == 0)
+				return 0;
+			return total / valueRows;
+		}
+	}
+
+	class MinSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public MinSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			double min = Double.MAX_VALUE;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					if (((Number) dataValue).doubleValue() < min)
+						min = ((Number) dataValue).doubleValue();
+				}
+			}
+			if (min == Double.MAX_VALUE)
+				return 0;
+			return min;
+		}
+	}
+
+	class MaxSummaryProvider implements ISummaryProvider {
+
+		private IDataProvider dataProvider;
+
+		public MaxSummaryProvider(IDataProvider dataProvider) {
+			this.dataProvider = dataProvider;
+		}
+
+		@Override
+		public Object summarize(int columnIndex) {
+			int rowCount = this.dataProvider.getRowCount();
+			double max = Double.MIN_VALUE;
+
+			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
+				// this check is necessary because of the GroupByObject
+				if (dataValue instanceof Number) {
+					if (((Number) dataValue).doubleValue() > max)
+						max = ((Number) dataValue).doubleValue();
+				}
+			}
+			if (max == Double.MIN_VALUE)
+				return 0;
+			return max;
 		}
 	}
 
