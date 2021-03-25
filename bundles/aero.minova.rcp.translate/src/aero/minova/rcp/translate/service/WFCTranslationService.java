@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -16,6 +15,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.osgi.service.log.Logger;
 import org.osgi.service.log.LoggerFactory;
@@ -180,12 +180,19 @@ public class WFCTranslationService extends TranslationService {
 				}
 			}
 		}
+		// Sobald die Files heruntergeladen werden, triggered wir ein LocalChangeEvent
+		// damit die neuen Übersetzungsfiles
+		// verwendet werden, damit ein "CHANGE" propagiert wird, wird zunächst ein
+		// localEvent verschickt mit "de" als local und dannach das
+		// echte local
 		CompletableFuture<Void> allFutures = CompletableFuture.allOf(list.toArray(new CompletableFuture[0]));
 		allFutures.thenAccept((Void e) -> {
-			// eventBroker.post(ILocaleChangeService.LOCALE_CHANGE, locale);
-			// eigenes Event damit sich die application new übersetzt, ansonsten wird nur
-			// beim Locale Wechseln das durchgeführt
-			eventBroker.post(aero.minova.rcp.constants.Constants.BROKER_TRANSLATION_CHANGED, new Date());
+			Locale neededToTriggerChange = new Locale("de");
+
+			// required to propagate a change in the next statement
+			eventBroker.post(ILocaleChangeService.LOCALE_CHANGE, neededToTriggerChange); 
+			eventBroker.post(ILocaleChangeService.LOCALE_CHANGE, locale);
+
 		});
 	}
 
