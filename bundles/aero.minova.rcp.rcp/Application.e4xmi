@@ -11,11 +11,22 @@
               <handlers xmi:id="_tp-AkBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_rnXZkNDSEeqZdekMGDv2pg"/>
               <handlers xmi:id="_7_nQcBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.savesearchcriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveSearchCriteriaHandler" command="_sAqqYNDSEeqZdekMGDv2pg"/>
               <handlers xmi:id="_CVRK8Bm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.load" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadSearchCriteriaHandler" command="_r5Qa0NDSEeqZdekMGDv2pg"/>
+              <handlers xmi:id="_rR-60I1QEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handler.saveas" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveAsHandler" command="_z3614I1QEeuoh4vFDPXd3Q"/>
               <toolbar xmi:id="_ZSi0cBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.toolbar.3">
                 <children xsi:type="menu:HandledToolItem" xmi:id="_bneEcBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.Reset" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DiscardSearchCriteria.Command/32x32.png" tooltip="@Action.Reset" command="_y3TngNDREeqZdekMGDv2pg"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_q2z8cBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="@Command.DeleteLine" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Command.DeleteLine" command="_rnXZkNDSEeqZdekMGDv2pg"/>
-                <children xsi:type="menu:HandledToolItem" xmi:id="_3XmjgBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@SelectionCriteria.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" tooltip="@SelectionCriteria.Save" command="_sAqqYNDSEeqZdekMGDv2pg"/>
-                <children xsi:type="menu:HandledToolItem" xmi:id="__vusEBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="@SelectionCriteria.Load" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/LoadSearchCriteria.Command/32x32.png" tooltip="@SelectionCriteria.Load" command="_r5Qa0NDSEeqZdekMGDv2pg"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_3XmjgBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@SelectionCriteria.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" tooltip="@SelectionCriteria.Save" command="_sAqqYNDSEeqZdekMGDv2pg">
+                  <menu xmi:id="_GvzxoI1AEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.menu.0">
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_LSt8II1AEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handledmenuitem.commandsaves" label="Speichern unter..." iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" command="_z3614I1QEeuoh4vFDPXd3Q"/>
+                    <children xsi:type="menu:DynamicMenuContribution" xmi:id="_ddRBAI1AEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.dynamicmenucontribution.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaSaveHandler"/>
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_hUGvsI1AEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handledmenuitem.search.edit" label="@Action.Edit" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/EditSearchCriteria.Command/32x32.png" tooltip="@Action.Edit" command="_sAqqYNDSEeqZdekMGDv2pg"/>
+                  </menu>
+                </children>
+                <children xsi:type="menu:HandledToolItem" xmi:id="__vusEBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="@SelectionCriteria.Load" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/LoadSearchCriteria.Command/32x32.png" tooltip="@SelectionCriteria.Load" command="_r5Qa0NDSEeqZdekMGDv2pg">
+                  <menu xmi:id="_wR16UI1AEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.menu.loadselectioncriteria">
+                    <children xsi:type="menu:DynamicMenuContribution" xmi:id="_0ckOUI1AEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.dynamicmenucontribution.searchCriteriaLoad" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaLoadHandlerer"/>
+                  </menu>
+                </children>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_Fh5fABm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
               </toolbar>
             </children>
@@ -154,6 +165,7 @@
   <commands xmi:id="_aiYXABRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.loaddatawithmatchcode" commandName="Load Data With MatchCode"/>
   <commands xmi:id="_prFbgBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.selectsearchpart" commandName="Select Search Part"/>
   <commands xmi:id="_AOXbMBRdEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.command.selectdetailpart" commandName="Select Detail Part"/>
+  <commands xmi:id="_z3614I1QEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.command.saveas" commandName="SearchCriteriaSaveAs"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
