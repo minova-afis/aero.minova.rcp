@@ -337,14 +337,6 @@ public class DateUtilTests {
 	}
 	
 	@Test
-	public void testGetDate02Point05Point1988() {
-		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12)
-				.toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1988, MAY, 2).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateUtil.getDate(bithday, "02.05.1988"));
-	}
-	
-	@Test
 	public void testGetDate02Slash05Slash1988US() {
 		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12)
 				.toInstant(ZoneOffset.UTC);
