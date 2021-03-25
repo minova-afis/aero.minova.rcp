@@ -100,7 +100,8 @@ public class WFCSearchPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+		// perspective.getContext().set(Form.class, form); // Wir merken es uns im
+		// Context; so können andere es nutzen
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
 		Form searchForm = form;
@@ -131,7 +132,8 @@ public class WFCSearchPart extends WFCFormPart {
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -193,7 +195,8 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(accessor.getPropertyNames(), accessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(accessor.getPropertyNames(),
+				accessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
@@ -206,7 +209,8 @@ public class WFCSearchPart extends WFCFormPart {
 		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
 
 		// build the corner layer
-		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
+		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider,
+				rowHeaderDataProvider);
 		DataLayer cornerDataLayer = new DataLayer(cornerDataProvider);
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
@@ -226,7 +230,8 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
 
-		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
+		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der
+		// Mouselistener anschlägt!
 		natTable.addConfiguration(new DefaultEditBindings() {
 
 			@Override
@@ -234,8 +239,8 @@ public class WFCSearchPart extends WFCFormPart {
 				MouseEditAction mouseEditAction = new MouseEditAction();
 //				CellEditDragMode cellEditDragMode = new CellEditDragMode();
 				super.configureUiBindings(uiBindingRegistry);
-				uiBindingRegistry.registerFirstSingleClickBinding(
-						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
+				uiBindingRegistry.registerFirstSingleClickBinding(new CellPainterMouseEventMatcher(GridRegion.BODY,
+						MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
 //				uiBindingRegistry.registerFirstMouseDragMode(
 //						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TristateCheckBoxPainter.class), cellEditDragMode);
 			}
@@ -255,7 +260,7 @@ public class WFCSearchPart extends WFCFormPart {
 	}
 
 	@PersistTableSelection
-	public void savePrefs(@Named("SpaltenKonfiguration") Boolean name) {
+	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
 
 		// xxx.table
 		// xxx.search.size (name,breite(int));
@@ -263,7 +268,10 @@ public class WFCSearchPart extends WFCFormPart {
 		// xxx.index.sortby (name,[a,d];name....);
 		// xxx.index.groupby (expand[0,1];name;name2...);
 		String tableName = data.getName();
-		prefs.put(tableName, mjs.table2Json(data));
+		prefs.put(tableName + "." + name + ".table", mjs.table2Json(data));
+		if (saveRowConfig) {
+			
+		}
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
