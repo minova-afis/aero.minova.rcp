@@ -34,11 +34,18 @@ public class TicketHelper implements ValueChangeListener {
 			Matcher m = ticketnumber.matcher(writtenText);
 			// true, falls das Pattern vorhanden ist
 			if (m.find()) {
-				// die Tracnummmer, ab dem ersten Symbol --> ohne die Raute
+				// die Tracnummer, ab dem ersten Symbol --> ohne die Raute
 				String tracNumber = m.group(1);
-				Value value = new Value(tracNumber, DataType.STRING);
-				workingTimeHelper.postEvent(value);
+				if (tracNumber.length() > 0) {
+					Value value = new Value(tracNumber, DataType.STRING);
+					workingTimeHelper.postEvent(value);
+				} else {
+					workingTimeHelper.postEvent(new Value(null, DataType.STRING));
+				}
+			} else {
+				workingTimeHelper.postEvent(new Value(null, DataType.STRING));
 			}
+
 		}
 	}
 

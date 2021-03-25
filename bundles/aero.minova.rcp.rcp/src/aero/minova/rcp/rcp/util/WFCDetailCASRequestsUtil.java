@@ -363,26 +363,28 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
-		System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
-		Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
-		Row r = RowBuilder.newRow().withValue(ticketvalue).create();
-		ticketTable.addRow(r);
+		if (ticketvalue.getValue() != null) {
+			System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
+			Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
+			Row r = RowBuilder.newRow().withValue(ticketvalue).create();
+			ticketTable.addRow(r);
 
-		ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
-		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
+			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 
-		// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
-		// Detailfelder vor
-		tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-			if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
-				showErrorMessage(ta.getResultSet());
-			} else {
-				selectedTable = ta.getResultSet();
-				updateSelectedEntry();
-			}
-			ticketFieldsUpdate("", true);
-			updatePossibleLookupEntries();
-		}));
+			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
+			// Detailfelder vor
+			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
+				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
+					showErrorMessage(ta.getResultSet());
+				} else {
+					selectedTable = ta.getResultSet();
+					updateSelectedEntry();
+				}
+				ticketFieldsUpdate("", true);
+				updatePossibleLookupEntries();
+			}));
+		}
 	}
 
 	/**
