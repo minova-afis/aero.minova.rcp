@@ -257,6 +257,11 @@ public class WFCSearchPart extends WFCFormPart {
 	@PersistTableSelection
 	public void savePrefs(@Named("SpaltenKonfiguration") Boolean name) {
 
+		// xxx.table
+		// xxx.search.size (name,breite(int));
+		// xxx.index.size (name,breite(int));
+		// xxx.index.sortby (name,[a,d];name....);
+		// xxx.index.groupby (expand[0,1];name;name2...);
 		String tableName = data.getName();
 		prefs.put(tableName, mjs.table2Json(data));
 		try {
