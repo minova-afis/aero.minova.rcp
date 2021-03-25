@@ -44,7 +44,6 @@ public class WFCTranslationService extends TranslationService {
 		if (logger != null) {
 			logger.info("Locale changed to: " + s.getDisplayName(Locale.ENGLISH));
 		}
-		locale = s;
 		CompletableFuture.runAsync(this::loadResources);
 	}
 
@@ -181,9 +180,19 @@ public class WFCTranslationService extends TranslationService {
 				}
 			}
 		}
+		// Sobald die Files heruntergeladen werden, triggered wir ein LocalChangeEvent
+		// damit die neuen Übersetzungsfiles
+		// verwendet werden, damit ein "CHANGE" propagiert wird, wird zunächst ein
+		// localEvent verschickt mit "de" als local und dannach das
+		// echte local
 		CompletableFuture<Void> allFutures = CompletableFuture.allOf(list.toArray(new CompletableFuture[0]));
 		allFutures.thenAccept((Void e) -> {
-			eventBroker.post(ILocaleChangeService.LOCALE_CHANGE, "");
+			Locale neededToTriggerChange = new Locale("de");
+
+			// required to propagate a change in the next statement
+			eventBroker.post(ILocaleChangeService.LOCALE_CHANGE, neededToTriggerChange); 
+			eventBroker.post(ILocaleChangeService.LOCALE_CHANGE, locale);
+
 		});
 	}
 

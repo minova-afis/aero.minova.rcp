@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -93,6 +94,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 	private SelectionLayer selectionLayer;
 
+	private MinovaColumnPropertyAccessor columnPropertyAccessor;
+
+	private ColumnHeaderLayer columnHeaderLayer;
+
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
 
@@ -100,7 +105,8 @@ public class WFCSearchPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
+		// perspective.getContext().set(Form.class, form); // Wir merken es uns im
+		// Context; so können andere es nutzen
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName, null);
 		Form searchForm = form;
@@ -131,7 +137,8 @@ public class WFCSearchPart extends WFCFormPart {
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -152,10 +159,10 @@ public class WFCSearchPart extends WFCFormPart {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
 		sortedList = new SortedList<>(eventList, null);
-		MinovaColumnPropertyAccessor accessor = new MinovaColumnPropertyAccessor(table, form);
-		accessor.initPropertyNames(translationService);
+		columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, form);
+		columnPropertyAccessor.initPropertyNames(translationService);
 
-		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
+		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 
 		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
@@ -193,12 +200,12 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(accessor.getPropertyNames(), accessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -206,7 +213,8 @@ public class WFCSearchPart extends WFCFormPart {
 		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
 
 		// build the corner layer
-		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
+		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider,
+				rowHeaderDataProvider);
 		DataLayer cornerDataLayer = new DataLayer(cornerDataProvider);
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
@@ -226,7 +234,8 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
 
-		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
+		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der
+		// Mouselistener anschlägt!
 		natTable.addConfiguration(new DefaultEditBindings() {
 
 			@Override
@@ -234,8 +243,8 @@ public class WFCSearchPart extends WFCFormPart {
 				MouseEditAction mouseEditAction = new MouseEditAction();
 //				CellEditDragMode cellEditDragMode = new CellEditDragMode();
 				super.configureUiBindings(uiBindingRegistry);
-				uiBindingRegistry.registerFirstSingleClickBinding(
-						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
+				uiBindingRegistry.registerFirstSingleClickBinding(new CellPainterMouseEventMatcher(GridRegion.BODY,
+						MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
 //				uiBindingRegistry.registerFirstMouseDragMode(
 //						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TristateCheckBoxPainter.class), cellEditDragMode);
 			}
@@ -255,7 +264,7 @@ public class WFCSearchPart extends WFCFormPart {
 	}
 
 	@PersistTableSelection
-	public void savePrefs(@Named("SpaltenKonfiguration") Boolean name) {
+	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
 
 		// xxx.table
 		// xxx.search.size (name,breite(int));
@@ -263,7 +272,10 @@ public class WFCSearchPart extends WFCFormPart {
 		// xxx.index.sortby (name,[a,d];name....);
 		// xxx.index.groupby (expand[0,1];name;name2...);
 		String tableName = data.getName();
-		prefs.put(tableName, mjs.table2Json(data));
+		prefs.put(tableName + "." + name + ".table", mjs.table2Json(data));
+		if (saveRowConfig) {
+			
+		}
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
@@ -293,6 +305,19 @@ public class WFCSearchPart extends WFCFormPart {
 		// Gespeicherte Zeilen hinzufügen
 		sortedList.addAll(prefTable.getRows());
 		data.getRows().addAll(prefTable.getRows());
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i,
+						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
 	}
 
 	@Inject

@@ -105,10 +105,6 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	TranslationService translationService;
 
-	@Inject
-	@Named(value = TranslationService.LOCALE)
-	Locale locale;
-
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 
 	private ColumnHeaderLayer columnHeaderLayer;
@@ -179,8 +175,14 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
-		this.locale = s;
-		translate(translationService);
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i,
+						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
 	}
 
 	@Inject
@@ -195,22 +197,6 @@ public class WFCIndexPart extends WFCFormPart {
 		natTable.doCommand(new TreeExpandAllCommand());
 	}
 
-	/**
-	 * Übersetz die Headerzeile in der NatTable
-	 *
-	 * @param translationService2
-	 */
-	private void translate(TranslationService translationService2) {
-		// TODO wir hlören auf das LocaleChangeEvent dann entfällt der Check!
-		if (columnPropertyAccessor != null) {
-			columnPropertyAccessor.translate(translationService);
-			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
-			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
-			}
-		}
-
-	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
 
