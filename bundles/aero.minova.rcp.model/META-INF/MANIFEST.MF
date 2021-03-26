@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.osgi,
  org.eclipse.e4.ui.di,
  com.google.gson,
  org.eclipse.core.runtime,
- org.eclipse.swt
+ org.eclipse.swt,
+ aero.minova.rcp.constant
 Bundle-ActivationPolicy: lazy
 Import-Package: aero.minova.rcp.form.model.xsd,
  javax.inject;bundle-version="1.0.0",

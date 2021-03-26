@@ -13,7 +13,8 @@ public class SaveSearchCriteriaHandler {
 	public void execute(MPart part) {
 		System.out.println("Save Search Criteria NatTable Search Part");
 		IEclipseContext context = part.getContext();
-		context.set("SpaltenKonfiguration", true);// setzen der Konfiguration, verfügbar auch später.
+		context.set("SaveRowConfig", true);// setzen der Konfiguration, verfügbar auch später.
+		context.set("ConfigName", "DEFAULT");
 		//TODO DIalog zum Speichern der Suchkriterien
 		ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
 	}

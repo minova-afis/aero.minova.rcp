@@ -9,14 +9,31 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
+import aero.minova.rcp.constants.Constants;
+
 public class ValueDeserializer implements JsonDeserializer<Value> {
 
+	private boolean useUserValues;
+
+	public ValueDeserializer() {
+		this(false);
+	}
+
+	public ValueDeserializer(boolean useUserValues) {
+		this.useUserValues = useUserValues;
+	}
+
 	@Override
-	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-		return deserialize(json.getAsString());
+	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+			throws JsonParseException {
+		return deserialize(json.getAsString(), useUserValues);
 	}
 
 	public static Value deserialize(String valueText) {
+		return deserialize(valueText, false);
+	}
+
+	public static Value deserialize(String valueText, boolean useUserValues) {
 		String typeString = valueText.substring(0, 1);
 		String value = valueText.substring(2);
 		switch (typeString) {
@@ -35,7 +52,13 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		case "f": // Filter
 			String operator = value.substring(0, value.indexOf("-"));
 			String v = value.substring(value.indexOf("-") + 1);
-			return new FilterValue(operator, deserialize(v).getValue(), "");
+			if (useUserValues) {
+				String userInput = v.substring(v.indexOf(Constants.SOH) + 1);
+				v = v.substring(0, v.indexOf(Constants.SOH));
+				return new FilterValue(operator, deserialize(v).getValue(), userInput);
+			} else {
+				return new FilterValue(operator, deserialize(v).getValue(), "");
+			}
 		default:
 			break;
 		}

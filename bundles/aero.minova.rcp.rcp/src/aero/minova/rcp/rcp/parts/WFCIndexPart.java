@@ -82,6 +82,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
+import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
@@ -104,10 +105,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
 	TranslationService translationService;
-
-	@Inject
-	@Named(value = TranslationService.LOCALE)
-	Locale locale;
 
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 
@@ -146,8 +143,14 @@ public class WFCIndexPart extends WFCFormPart {
 	}
 
 	@PersistTableSelection
-	public void savePrefs() {
+	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
 		// TODO INDEX Part reihenfolge + Gruppierung speichern
+		System.out.println("saveIndex");
+	}
+	
+	@LoadTableSelection
+	public void loadPrefs(@Named("ConfigName") String name) {		
+		System.out.println("loadIndex");
 	}
 
 	/**
@@ -179,8 +182,14 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
-		this.locale = s;
-		translate(translationService);
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i,
+						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
 	}
 
 	@Inject
@@ -195,22 +204,6 @@ public class WFCIndexPart extends WFCFormPart {
 		natTable.doCommand(new TreeExpandAllCommand());
 	}
 
-	/**
-	 * Übersetz die Headerzeile in der NatTable
-	 *
-	 * @param translationService2
-	 */
-	private void translate(TranslationService translationService2) {
-		// TODO wir hlören auf das LocaleChangeEvent dann entfällt der Check!
-		if (columnPropertyAccessor != null) {
-			columnPropertyAccessor.translate(translationService);
-			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
-			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
-			}
-		}
-
-	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
 

@@ -16,6 +16,8 @@ public class MinovaJsonService implements IMinovaJsonService {
 
 	private Gson gson;
 
+	private Gson gson2;
+
 	void init() {
 		if (gson == null) {
 			gson = new GsonBuilder() //
@@ -24,19 +26,35 @@ public class MinovaJsonService implements IMinovaJsonService {
 					.setPrettyPrinting() //
 					.create();
 		}
+		if (gson2 == null) {
+			gson2 = new GsonBuilder() //
+					.registerTypeAdapter(Value.class, new ValueSerializer(true)) //
+					.registerTypeAdapter(Value.class, new ValueDeserializer(true)) //
+					.setPrettyPrinting() //
+					.create();
+		}
 	}
 
 	@Override
 	public String table2Json(Table t) {
+		return table2Json(t, false);
+	}
+
+	@Override
+	public String table2Json(Table t, boolean useUserValues) {
 		init();
-		String s = gson.toJson(t);
-		return s;
+		return useUserValues ? gson2.toJson(t) : gson.toJson(t);
 	}
 
 	@Override
 	public Table json2Table(String jsonString) {
+		return json2Table(jsonString, false);
+	}
+
+	@Override
+	public Table json2Table(String jsonString, boolean useUserValues) {
 		init();
-		return gson.fromJson(jsonString, Table.class);
+		return useUserValues ? gson2.fromJson(jsonString, Table.class) : gson.fromJson(jsonString, Table.class);
 	}
 
 }
