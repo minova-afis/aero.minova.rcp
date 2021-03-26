@@ -12,7 +12,6 @@ public class SearchCriteriaSaveHandler {
 
 	@AboutToShow
 	public void aboutToShow(EModelService service, List<MMenuElement> items) {
-		System.out.println("Menu");
 		MDirectMenuItem createModelElement = service.createModelElement(MDirectMenuItem.class);
 		createModelElement.setLabel("Test");
 		// Handler der aufgerufen werden soll, wenn wir auf den Button drücken

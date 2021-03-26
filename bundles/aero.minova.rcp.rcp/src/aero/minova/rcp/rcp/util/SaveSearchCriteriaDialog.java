@@ -23,17 +23,20 @@ import org.eclipse.swt.widgets.Text;
 public class SaveSearchCriteriaDialog extends Dialog {
 
 
-	private String criteriaName = "STANDARD";
+	private String criteriaName = "DEFAULT";
 
 	private boolean saveWidths = true;
 
 	private TranslationService translationService;
 	private IEclipsePreferences prefs;
 
-	public SaveSearchCriteriaDialog(final Shell shell, TranslationService translationService, IEclipsePreferences prefs) {
+	private String tableName;
+
+	public SaveSearchCriteriaDialog(final Shell shell, TranslationService translationService, IEclipsePreferences prefs, String tableName) {
 		super(shell);
 		this.translationService = translationService;
 		this.prefs = prefs;
+		this.tableName = tableName;
 	}
 
 	public String open() {
@@ -119,7 +122,7 @@ public class SaveSearchCriteriaDialog extends Dialog {
 
 			@Override
 			public void modifyText(final ModifyEvent e) {
-				final String c = prefs.get(text.getText(), null);
+				final String c = prefs.get(tableName + text.getText() + ".table", null);
 				if (c == null) {
 					infoLabel.setForeground(shell.getDisplay().getSystemColor(SWT.DEFAULT));
 					infoLabel.setText(translationService.translate("@SelectionCriteria.NameAvailable", null));
