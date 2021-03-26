@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -10,8 +11,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -72,6 +75,7 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
@@ -94,6 +98,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
 	private ESelectionService selectionService;
+
+	@Inject
+	@Preference
+	private IEclipsePreferences prefs;
 
 	private Table data;
 
@@ -144,13 +152,58 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@PersistTableSelection
 	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
-		// TODO INDEX Part reihenfolge + Gruppierung speichern
+		// xxx.index.size (index,breite(int));
+		// xxx.index.sortby (index,[a,d];index2....);
+		// xxx.index.groupby (expand[0,1];index;index2...);
+		// Ähnlich im SearchPart
 		System.out.println("saveIndex");
+
+		String tableName = form.getIndexView().getSource();
+		if (saveRowConfig) {
+			String search = "";
+			for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
+				search += i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";";
+			}
+			prefs.put(tableName + "." + name + ".index.size", search);
+		}
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@LoadTableSelection
 	public void loadPrefs(@Named("ConfigName") String name) {
 		System.out.println("loadIndex");
+
+		// Spaltenanordung und -breite
+		String tableName = form.getIndexView().getSource();
+		String string = prefs.get(tableName + "." + name + ".index.size", null);
+		if (string == null || string.equals(""))
+			return;
+		String[] fields = string.split(";");
+		ArrayList<Integer> order = new ArrayList<>();
+		for (String s : fields) {
+			String[] keyValue = s.split(",");
+			int position = Integer.parseInt(keyValue[0].trim());
+			int width = Integer.parseInt(keyValue[1].trim());
+			order.add(position);
+			bodyLayerStack.getBodyDataLayer().setColumnWidthByPosition(position, width);
+		}
+		// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
+		if (bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().size() < order.size()) {
+			ArrayList<Integer> toDelete = new ArrayList<>();
+			for (int i : order) {
+				if (!bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().contains(i)) {
+					toDelete.add(i);
+				}
+			}
+			order.removeAll(toDelete);
+		}
+		bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().removeAll(order);
+		bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().addAll(0, order);
+		bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
 	}
 
 	/**
@@ -384,6 +437,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private ViewportLayer viewportLayer;
 
+		private ColumnReorderLayer columnReorderLayer;
+
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
@@ -423,8 +478,8 @@ public class WFCIndexPart extends WFCFormPart {
 			// layer for event handling of GlazedLists and PropertyChanges
 			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
 
-			ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
-			this.selectionLayer = new SelectionLayer(columnReorderLayer);
+			columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
+			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
 			selectionLayer.addLayerListener(new ILayerListener() {
 
@@ -479,6 +534,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public EventList<T> getList() {
 			return eventList;
+		}
+
+		public ColumnReorderLayer getColumnReorderLayer() {
+			return columnReorderLayer;
 		}
 	}
 

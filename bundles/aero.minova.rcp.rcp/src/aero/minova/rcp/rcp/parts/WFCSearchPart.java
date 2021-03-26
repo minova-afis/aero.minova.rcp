@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -114,7 +113,7 @@ public class WFCSearchPart extends WFCFormPart {
 		// perspective.getContext().set(Form.class, form); // Wir merken es uns im
 		// Context; so können andere es nutzen
 		String tableName = form.getIndexView().getSource();
-		String string = prefs.get(tableName, null);
+		String string = prefs.get(tableName + ".DEFAULT.table", null);
 		Form searchForm = form;
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
 		xsdColumn.setBoolean(Boolean.FALSE);
@@ -125,7 +124,7 @@ public class WFCSearchPart extends WFCFormPart {
 		data = dataFormService.getTableFromFormIndex(searchForm);
 		if (string != null) {
 			// Auslesen der zuletzt gespeicherten Daten
-			data = mjs.json2Table(string);
+			data = mjs.json2Table(string, true);
 		}
 
 		// Es muss nur dann eine neue Zeile hinzugefügt werden wenn kein geladen wurden
@@ -143,8 +142,7 @@ public class WFCSearchPart extends WFCFormPart {
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
-	 * die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -206,14 +204,13 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
-				columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
+				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer),
-				false);
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -221,8 +218,7 @@ public class WFCSearchPart extends WFCFormPart {
 		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
 
 		// build the corner layer
-		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider,
-				rowHeaderDataProvider);
+		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
 		DataLayer cornerDataLayer = new DataLayer(cornerDataProvider);
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
@@ -251,8 +247,8 @@ public class WFCSearchPart extends WFCFormPart {
 				MouseEditAction mouseEditAction = new MouseEditAction();
 //				CellEditDragMode cellEditDragMode = new CellEditDragMode();
 				super.configureUiBindings(uiBindingRegistry);
-				uiBindingRegistry.registerFirstSingleClickBinding(new CellPainterMouseEventMatcher(GridRegion.BODY,
-						MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
+				uiBindingRegistry.registerFirstSingleClickBinding(
+						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
 //				uiBindingRegistry.registerFirstMouseDragMode(
 //						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TristateCheckBoxPainter.class), cellEditDragMode);
 			}
@@ -273,19 +269,17 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@PersistTableSelection
 	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
-
 		// xxx.table
-		// xxx.search.size (index,breite(int));
-		// xxx.index.size (name,breite(int));
-		// xxx.index.sortby (name,[a,d];name....);
-		// xxx.index.groupby (expand[0,1];name;name2...);
+		// xxx.search.size (index,breite(int)), Speichert auch Reihenfolge der Spalten
+		// Ähnlich im IndexPart
+
 		String tableName = data.getName();
 		prefs.put(tableName + "." + name + ".table", mjs.table2Json(data, true));
+
 		if (saveRowConfig) {
-//			natTable.get
 			String search = "";
-			for(int i :columnReorderLayer.getColumnIndexOrder()) {
-				search += i + ","+ bodyDataLayer.getColumnWidthByPosition(i) + ";"; 
+			for (int i : columnReorderLayer.getColumnIndexOrder()) {
+				search += i + "," + bodyDataLayer.getColumnWidthByPosition(i) + ";";
 			}
 			prefs.put(tableName + "." + name + ".search.size", search);
 		}
@@ -303,16 +297,21 @@ public class WFCSearchPart extends WFCFormPart {
 			natTable.getActiveCellEditor().close();
 		}
 
+		// Tabelleninhalt
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".table", null);
 		if (string == null || string.equals(""))
 			return;
 		Table prefTable = mjs.json2Table(string, true);
+		sortedList.clear();
+		data.getRows().clear();
+		sortedList.addAll(prefTable.getRows());
+		data.getRows().addAll(prefTable.getRows());
 
+		// Spaltenanordung und -breite
 		string = prefs.get(tableName + "." + name + ".search.size", null);
 		if (string == null || string.equals(""))
 			return;
-
 		String[] fields = string.split(";");
 		ArrayList<Integer> order = new ArrayList<>();
 		for (String s : fields) {
@@ -322,9 +321,9 @@ public class WFCSearchPart extends WFCFormPart {
 			order.add(position);
 			bodyDataLayer.setColumnWidthByPosition(position, width);
 		}
-		// TODO längen prüfen und ggf ergänzen
+		// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
 		if (columnReorderLayer.getColumnIndexOrder().size() < order.size()) {
-			ArrayList<Integer> toDelete = new ArrayList<>(); 
+			ArrayList<Integer> toDelete = new ArrayList<>();
 			for (int i : order) {
 				if (!columnReorderLayer.getColumnIndexOrder().contains(i)) {
 					toDelete.add(i);
@@ -335,14 +334,6 @@ public class WFCSearchPart extends WFCFormPart {
 		columnReorderLayer.getColumnIndexOrder().removeAll(order);
 		columnReorderLayer.getColumnIndexOrder().addAll(0, order);
 		columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
-
-		// Alle aktuellen Suchzeilen entfernen
-		sortedList.clear();
-		data.getRows().clear();
-
-		// Gespeicherte Zeilen hinzufügen
-		sortedList.addAll(prefTable.getRows());
-		data.getRows().addAll(prefTable.getRows());
 	}
 
 	@Inject
@@ -352,8 +343,7 @@ public class WFCSearchPart extends WFCFormPart {
 			columnPropertyAccessor.translate(translationService);
 			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
 			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i,
-						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
 	}
