@@ -147,9 +147,9 @@ public class WFCIndexPart extends WFCFormPart {
 		// TODO INDEX Part reihenfolge + Gruppierung speichern
 		System.out.println("saveIndex");
 	}
-	
+
 	@LoadTableSelection
-	public void loadPrefs(@Named("ConfigName") String name) {		
+	public void loadPrefs(@Named("ConfigName") String name) {
 		System.out.println("loadIndex");
 	}
 
@@ -174,6 +174,8 @@ public class WFCIndexPart extends WFCFormPart {
 	@Optional
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
+			// clear the group by summary cache so the new summary calculation gets triggered
+			bodyLayerStack.getBodyDataLayer().clearCache();
 			Table table = map.get(perspective);
 			updateData(table.getRows());
 		}
@@ -186,8 +188,7 @@ public class WFCIndexPart extends WFCFormPart {
 			columnPropertyAccessor.translate(translationService);
 			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
 			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i,
-						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
 	}
@@ -203,7 +204,6 @@ public class WFCIndexPart extends WFCFormPart {
 	private void expandGroups(@UIEventTopic(Constants.BROKER_EXPANDINDEX) String s) {
 		natTable.doCommand(new TreeExpandAllCommand());
 	}
-
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
 
