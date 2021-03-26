@@ -375,13 +375,13 @@ public class WFCDetailCASRequestsUtil {
 			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
 			// Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
+				ticketFieldsUpdate("", true);
 				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 					showErrorMessage(ta.getResultSet());
 				} else {
 					selectedTable = ta.getResultSet();
 					updateSelectedEntry();
 				}
-				ticketFieldsUpdate("", true);
 				updatePossibleLookupEntries();
 			}));
 		}
