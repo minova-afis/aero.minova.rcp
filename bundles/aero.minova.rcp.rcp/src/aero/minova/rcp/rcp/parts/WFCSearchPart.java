@@ -1,5 +1,8 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -60,14 +63,17 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
+import aero.minova.rcp.rcp.util.DateUtil;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.rcp.util.TimeUtil;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -275,6 +281,7 @@ public class WFCSearchPart extends WFCFormPart {
 			}
 			prefs.put(tableName + "." + name + ".search.size", search);
 		}
+
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
@@ -297,8 +304,26 @@ public class WFCSearchPart extends WFCFormPart {
 		Table prefTable = mjs.json2Table(string, true);
 		sortedList.clear();
 		data.getRows().clear();
-		sortedList.addAll(prefTable.getRows());
+
 		data.getRows().addAll(prefTable.getRows());
+		// Instants aktualisieren, damit der angezeigte Wert zum Nutzerinput passt
+		for (Row r : data.getRows()) {
+			for (int i = 0; i < data.getColumnCount(); i++) {
+				Value v = r.getValue(i);
+				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
+					FilterValue fv = (FilterValue) v;
+					Instant inst = fv.getFilterValue().getInstantValue();
+					ZonedDateTime zdt = inst.atZone(ZoneId.of("UTC"));
+					if (zdt.getYear() == 1900)
+						inst = TimeUtil.getTime(fv.getUserInput());
+					else
+						inst = DateUtil.getDate(fv.getUserInput());
+
+					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);
+				}
+			}
+		}
+		sortedList.addAll(data.getRows());
 
 		// Spaltenanordung und -breite
 		string = prefs.get(tableName + "." + name + ".search.size", null);
