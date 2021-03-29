@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -124,6 +125,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private GroupByHeaderLayer groupByHeaderLayer;
 
+	private boolean expandGroups = false;
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -183,8 +186,11 @@ public class WFCIndexPart extends WFCFormPart {
 		prefs.put(tableName + "." + name + ".index.sortby", sort);
 
 		// Gruppierung
-		// TODO: autoexpand?
 		String group = "";
+		if (expandGroups)
+			group += 1 + ";";
+		else
+			group += 0 + ";";
 		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes())
 			group += i + ";";
 		prefs.put(tableName + "." + name + ".index.groupby", group);
@@ -249,10 +255,14 @@ public class WFCIndexPart extends WFCFormPart {
 		if (string != null && !string.equals("")) {
 			String[] fields = string.split(";");
 			groupByHeaderLayer.getGroupByModel().clearGroupByColumnIndexes();
-			for (String s : fields) {
+			for (String s : Arrays.copyOfRange(fields, 1, fields.length)) {
 				int index = Integer.parseInt(s);
 				groupByHeaderLayer.getGroupByModel().addGroupByColumnIndex(index);
 			}
+			if (fields[0].equals("0"))
+				collapseGroups("");
+			else
+				expandGroups("");
 		}
 	}
 
@@ -300,12 +310,14 @@ public class WFCIndexPart extends WFCFormPart {
 	@Optional
 	private void collapseGroups(@UIEventTopic(Constants.BROKER_COLLAPSEINDEX) String s) {
 		natTable.doCommand(new TreeCollapseAllCommand());
+		expandGroups = false;
 	}
 
 	@Inject
 	@Optional
 	private void expandGroups(@UIEventTopic(Constants.BROKER_EXPANDINDEX) String s) {
 		natTable.doCommand(new TreeExpandAllCommand());
+		expandGroups = true;
 	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
