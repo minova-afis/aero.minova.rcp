@@ -1,8 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -307,17 +305,16 @@ public class WFCSearchPart extends WFCFormPart {
 		data.getRows().clear();
 
 		data.getRows().addAll(prefTable.getRows());
-		// Instants aktualisieren, damit der angezeigte Wert zum Nutzerinput passt
+		// Instants aktualisieren, damit der angezeigte Wert zur Nutzereingabe passt
 		for (Row r : data.getRows()) {
 			for (int i = 0; i < data.getColumnCount(); i++) {
 				Value v = r.getValue(i);
 				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					FilterValue fv = (FilterValue) v;
 					Instant inst = fv.getFilterValue().getInstantValue();
-					ZonedDateTime zdt = inst.atZone(ZoneId.of("UTC"));
-					if (zdt.getYear() == 1900)
+					if (form.getIndexView().getColumn().get(i).getShortTime() != null)
 						inst = TimeUtil.getTime(fv.getUserInput());
-					else if (zdt.getHour() == 0 && zdt.getMinute() == 0)
+					else if (form.getIndexView().getColumn().get(i).getShortDate() != null)
 						inst = DateUtil.getDate(fv.getUserInput());
 					else
 						inst = DateTimeUtil.getDateTime(fv.getUserInput());
