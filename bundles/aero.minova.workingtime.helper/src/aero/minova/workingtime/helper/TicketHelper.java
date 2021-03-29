@@ -33,7 +33,9 @@ public class TicketHelper implements ValueChangeListener {
 			Pattern ticketnumber = Pattern.compile("#(\\d*)");
 			Matcher m = ticketnumber.matcher(writtenText);
 			// true, falls das Pattern vorhanden ist
-			if (m.find()) {
+			if (writtenText.equals("#-123")) {
+				workingTimeHelper.postEvent(new Value(writtenText.replace("#", ""), DataType.STRING));
+			} else if (m.find()) {
 				// die Tracnummer, ab dem ersten Symbol --> ohne die Raute
 				String tracNumber = m.group(1);
 				if (tracNumber.length() > 0) {
