@@ -148,8 +148,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		if (employee.getValue() instanceof LookupValue) {
 			employeeValue = (LookupValue) employee.getValue();
 		} else {
-			System.err.println(
-					"WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
+			System.err.println("WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
 		}
 	}
 
@@ -185,14 +184,14 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	@Override
 	public void handleDetailAction(ActionCode code) {
+		((LookupValueAccessor) orderreceiver.getValueAccessor()).setFocussed(true);
 		switch (code) {
 		case DEL:
 			if (lookupValueUser != null) {
 				employeeValue = lookupValueUser;
 			} else {
 				employeeValue = null;
-				System.err.println(
-						MessageFormat.format("LookupValue für User: {0} konnte nicht aiufgelöst werden!", user));
+				System.err.println(MessageFormat.format("LookupValue für User: {0} konnte nicht aiufgelöst werden!", user));
 
 			}
 			employee.setValue(employeeValue, false);

@@ -113,6 +113,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	public void setFocussed(boolean focussed) {
 		if (focussed) {
+			control.setFocus();
 			// wenn wir dem Feld das erste Mal den Focus geben laden wir alle möglichkeiten.
 			updatePossibleValues();
 			return; // wenn wir den Focus erhalten, machen wir nichts
