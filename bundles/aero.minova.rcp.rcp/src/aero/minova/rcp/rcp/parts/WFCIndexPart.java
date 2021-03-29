@@ -59,6 +59,7 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -86,9 +87,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
-import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
-import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -121,6 +120,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	MPart mpart;
 
+	private SortHeaderLayer sortHeaderLayer;
+
+	private GroupByHeaderLayer groupByHeaderLayer;
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -148,62 +151,109 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
+		loadPrefs("DEFAULT");
 	}
 
-	@PersistTableSelection
-	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
+	// @PersistTableSelection
+	// public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
+
+	@Inject
+	@Optional
+	public void savePrefs(@UIEventTopic(Constants.BROKER_SAVESEARCHCRITERIA) String name) {
 		// xxx.index.size (index,breite(int));
-		// xxx.index.sortby (index,[a,d];index2....);
+		// xxx.index.sortby (index,sortDirection(ASC|DESC);index2....);
 		// xxx.index.groupby (expand[0,1];index;index2...);
 		// Ähnlich im SearchPart
-		System.out.println("saveIndex");
 
 		String tableName = form.getIndexView().getSource();
-		if (saveRowConfig) {
-			String search = "";
-			for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
-				search += i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";";
-			}
-			prefs.put(tableName + "." + name + ".index.size", search);
+
+		// Spaltenanordung und -breite
+		String size = "";
+		for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
+			size += i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";";
+
 		}
+		prefs.put(tableName + "." + name + ".index.size", size);
+
+		// Sortierung
+		String sort = "";
+		// TODO gibt .getSortedColumnIndexes() richtige Reihenfolge bei Mehrfachsortierung?
+		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes())
+			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+		prefs.put(tableName + "." + name + ".index.sortby", sort);
+
+		// Gruppierung
+		// TODO: autoexpand?
+		String group = "";
+		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes())
+			group += i + ";";
+		prefs.put(tableName + "." + name + ".index.groupby", group);
+
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
+
 	}
 
-	@LoadTableSelection
-	public void loadPrefs(@Named("ConfigName") String name) {
-		System.out.println("loadIndex");
-
+//	@LoadTableSelection
+//	public void loadPrefs(@Named("ConfigName") String name) {
+	@Inject
+	@Optional
+	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
 		// Spaltenanordung und -breite
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".index.size", null);
-		if (string == null || string.equals(""))
-			return;
-		String[] fields = string.split(";");
-		ArrayList<Integer> order = new ArrayList<>();
-		for (String s : fields) {
-			String[] keyValue = s.split(",");
-			int position = Integer.parseInt(keyValue[0].trim());
-			int width = Integer.parseInt(keyValue[1].trim());
-			order.add(position);
-			bodyLayerStack.getBodyDataLayer().setColumnWidthByPosition(position, width);
-		}
-		// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
-		if (bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().size() < order.size()) {
-			ArrayList<Integer> toDelete = new ArrayList<>();
-			for (int i : order) {
-				if (!bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().contains(i)) {
-					toDelete.add(i);
-				}
+		if (string != null && !string.equals("")) {
+
+			String[] fields = string.split(";");
+			ArrayList<Integer> order = new ArrayList<>();
+			for (String s : fields) {
+				String[] keyValue = s.split(",");
+				int position = Integer.parseInt(keyValue[0].trim());
+				int width = Integer.parseInt(keyValue[1].trim());
+				order.add(position);
+				bodyLayerStack.getBodyDataLayer().setColumnWidthByPosition(position, width);
 			}
-			order.removeAll(toDelete);
+			// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
+			if (bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().size() < order.size()) {
+				ArrayList<Integer> toDelete = new ArrayList<>();
+				for (int i : order) {
+					if (!bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().contains(i)) {
+						toDelete.add(i);
+					}
+				}
+				order.removeAll(toDelete);
+			}
+			bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().removeAll(order);
+			bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().addAll(0, order);
+			bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
 		}
-		bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().removeAll(order);
-		bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().addAll(0, order);
-		bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+
+		// Sortierung
+		string = prefs.get(tableName + "." + name + ".index.sortby", null);
+		if (string != null && !string.equals("")) {
+			String[] fields = string.split(";");
+			sortHeaderLayer.getSortModel().clear();
+			for (String s : fields) {
+				String[] keyValue = s.split(",");
+				int index = Integer.parseInt(keyValue[0].trim());
+				SortDirectionEnum direction = SortDirectionEnum.valueOf(keyValue[1].trim());
+				sortHeaderLayer.getSortModel().sort(index, direction, true);
+			}
+		}
+
+		// Gruppierung
+		string = prefs.get(tableName + "." + name + ".index.groupby", null);
+		if (string != null && !string.equals("")) {
+			String[] fields = string.split(";");
+			groupByHeaderLayer.getGroupByModel().clearGroupByColumnIndexes();
+			for (String s : fields) {
+				int index = Integer.parseInt(s);
+				groupByHeaderLayer.getGroupByModel().addGroupByColumnIndex(index);
+			}
+		}
 	}
 
 	/**
@@ -277,7 +327,7 @@ public class WFCIndexPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
-		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
 
 		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
@@ -311,8 +361,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
-		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider,
-				columnHeaderLayer);
+		groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider, columnHeaderLayer);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 

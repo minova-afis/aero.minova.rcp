@@ -112,8 +112,8 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 		// perspective.getContext().set(Form.class, form); // Wir merken es uns im
 		// Context; so können andere es nutzen
-		String tableName = form.getIndexView().getSource();
-		String string = prefs.get(tableName + ".DEFAULT.table", null);
+		// String tableName = form.getIndexView().getSource();
+		// String string = prefs.get(tableName + ".DEFAULT.table", null);
 		Form searchForm = form;
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
 		xsdColumn.setBoolean(Boolean.FALSE);
@@ -122,23 +122,15 @@ public class WFCSearchPart extends WFCFormPart {
 		searchForm.getIndexView().getColumn().add(0, xsdColumn);
 
 		data = dataFormService.getTableFromFormIndex(searchForm);
-		if (string != null) {
-			// Auslesen der zuletzt gespeicherten Daten
-			data = mjs.json2Table(string, true);
-		}
-
-		// Es muss nur dann eine neue Zeile hinzugefügt werden wenn kein geladen wurden
-		if (data.getRows().size() == 0) {
-			data.addRow();
-			// Wir setzen die Verundung auf false im Default-Fall!
-			data.getRows().get(data.getRows().size() - 1).setValue(new Value(false), 0);
-		}
+		data.addRow();
+		// Wir setzen die Verundung auf false im Default-Fall!
+		data.getRows().get(data.getRows().size() - 1).setValue(new Value(false), 0);
 
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", data);
 
 		natTable = createNatTable(parent, searchForm, data);
-
+		loadPrefs("DEFAULT");
 	}
 
 	/**
