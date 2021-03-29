@@ -36,6 +36,10 @@ public abstract class MField {
 	private List<String> lookupParameters;
 	private final DataType dataType;
 	private MDetail detail;
+	private boolean required;
+	private boolean readOnly;
+	private int tabIndex;
+	
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -262,6 +266,30 @@ public abstract class MField {
 
 	void setDetail(MDetail detail) {
 		this.detail = detail;
+	}
+	
+	public boolean isRequired() {
+		return required;
+	}
+	
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+	
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+	
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
+	
+	public int getTabIndex() {
+		return tabIndex;
+	}
+
+	public void setTabIndex(int tabIndex) {
+		this.tabIndex = tabIndex;
 	}
 
 	@Override
