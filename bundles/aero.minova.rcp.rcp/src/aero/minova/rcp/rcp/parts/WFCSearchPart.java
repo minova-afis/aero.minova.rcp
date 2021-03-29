@@ -117,7 +117,7 @@ public class WFCSearchPart extends WFCFormPart {
 		String string = prefs.get(tableName, null);
 		Form searchForm = form;
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
-		xsdColumn.setBoolean(Boolean.FALSE);
+		xsdColumn.setBoolean(Boolean.FALSE, false);
 		xsdColumn.setLabel("&");
 		xsdColumn.setName("&");
 		searchForm.getIndexView().getColumn().add(0, xsdColumn);
