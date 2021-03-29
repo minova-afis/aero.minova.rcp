@@ -69,6 +69,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
 import aero.minova.rcp.rcp.util.DateUtil;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
@@ -316,8 +317,10 @@ public class WFCSearchPart extends WFCFormPart {
 					ZonedDateTime zdt = inst.atZone(ZoneId.of("UTC"));
 					if (zdt.getYear() == 1900)
 						inst = TimeUtil.getTime(fv.getUserInput());
-					else
+					else if (zdt.getHour() == 0 && zdt.getMinute() == 0)
 						inst = DateUtil.getDate(fv.getUserInput());
+					else
+						inst = DateTimeUtil.getDateTime(fv.getUserInput());
 
 					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);
 				}
