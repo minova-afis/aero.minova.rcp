@@ -180,7 +180,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// Sortierung
 		String sort = "";
-		// TODO gibt .getSortedColumnIndexes() richtige Reihenfolge bei Mehrfachsortierung?
 		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes())
 			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
 		prefs.put(tableName + "." + name + ".index.sortby", sort);
