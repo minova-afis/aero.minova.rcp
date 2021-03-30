@@ -64,15 +64,15 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "column", propOrder = { "number", "bignumber", "_boolean", "useTristate", "percentage", "text", "shortDate", "longDate", "shortTime",
-										"longTime", "dateTime", "weekDay", "money" })
+@XmlType(name = "column", propOrder = { "number", "bignumber", "_boolean", "tristate", "percentage", "text", "shortDate", "longDate", "shortTime", "longTime",
+										"dateTime", "weekDay", "money" })
 public class Column {
 
 	protected Number number;
 	protected Bignumber bignumber;
 	@XmlElement(name = "boolean")
 	protected Object _boolean;
-	protected java.lang.Boolean useTristate;
+	protected java.lang.Boolean tristate;
 	protected Percentage percentage;
 	protected Text text;
 	@XmlElement(name = "short-date")
@@ -164,7 +164,7 @@ public class Column {
 	}
 
 	/**
-	 * Legt den Wert der boolean-Eigenschaft fest.
+	 * Legt den Wert der boolean-Eigenschaft fest. Die tristate-Eigenschaft ist per default true.
 	 * 
 	 * @param value
 	 *            allowed object is {@link Object }
@@ -173,13 +173,26 @@ public class Column {
 		setBoolean(value, true);
 	}
 
-	public void setBoolean(Object value, java.lang.Boolean useTristate) {
+	/**
+	 * Legt den Wert der boolean-Eigenschaft und der tristate-Eigenschaft fest.
+	 * 
+	 * @param value
+	 *            allowed object is {@link Object }
+	 * @param tristate
+	 *            allowed object is {@link java.lang.Boolean }
+	 */
+	public void setBoolean(Object value, java.lang.Boolean tristate) {
 		this._boolean = value;
-		this.useTristate = useTristate;
+		this.tristate = tristate;
 	}
 
-	public java.lang.Boolean getUseTristate() {
-		return useTristate;
+	/**
+	 * Ruft den Wert der tristate-Eigenschaft ab.
+	 * 
+	 * @return possible object is {@link java.lang.Boolean }
+	 */
+	public java.lang.Boolean getTristate() {
+		return tristate;
 	}
 
 	/**
