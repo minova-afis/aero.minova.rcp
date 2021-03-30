@@ -156,9 +156,9 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 	}
 
-	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, Boolean useTristate) {
+	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, Boolean tristate) {
 
-		if (useTristate == null || useTristate) {
+		if (tristate == null || tristate) {
 			// visuelle anpassung [x] oder [_] oder [-]
 			configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
