@@ -43,12 +43,14 @@ public class ModelToViewModel {
 			f.setSqlIndex(field.getSqlIndex().intValue());
 			f.setRequired(field.isRequired());
 			f.setReadOnly(field.isReadOnly());
-			f.setTabIndex(field.getTabIndex().intValue());
 			if (field.getNumberColumnsSpanned() != null) {
 				f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 			}
 			if (field.getNumberRowsSpanned() != null) {
 				f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
+			}
+			if(field.getTabIndex().equals(null)) {
+				f.setTabIndex(field.getTabIndex().intValue());
 			}
 			return f;
 		}
