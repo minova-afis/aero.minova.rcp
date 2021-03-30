@@ -39,6 +39,7 @@ public abstract class MField {
 	private boolean required;
 	private boolean readOnly;
 	private int tabIndex;
+	private MPage mPage;
 	
 
 	protected MField(DataType dataType) {
@@ -290,6 +291,14 @@ public abstract class MField {
 
 	public void setTabIndex(int tabIndex) {
 		this.tabIndex = tabIndex;
+	}
+
+	public MPage getmPage() {
+		return mPage;
+	}
+
+	public void setmPage(MPage mPage) {
+		this.mPage = mPage;
 	}
 
 	@Override
