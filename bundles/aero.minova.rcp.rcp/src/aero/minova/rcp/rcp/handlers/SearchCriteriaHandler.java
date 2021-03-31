@@ -28,7 +28,7 @@ import aero.minova.rcp.rcp.util.SaveSearchCriteriaDialog;
 
 public class SearchCriteriaHandler {
 	public enum CriteriaAction {
-		LOAD, SAVE, DELETE, LOAD_DEFAULT, SAVE_DEFAULT
+		LOAD, SAVE, DELETE, LOAD_DEFAULT, SAVE_DEFAULT, SAVE_NAME
 	}
 
 	public static final String COMMAND = "aero.minova.rcp.rcp.command.searchCriteria";
@@ -79,8 +79,10 @@ public class SearchCriteriaHandler {
 					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
+					name = Constants.SEARCHCRITERIA_DEFAULT;// setzen der Konfiguration, verfügbar auch später.
+				case SAVE_NAME:
 					context.set("SaveRowConfig", true);// setzen der Konfiguration, verfügbar auch später.
-					context.set("ConfigName", Constants.SEARCHCRITERIA_DEFAULT);// setzen der Konfiguration, verfügbar auch später.
+					context.set("ConfigName", name);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
 					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, Constants.SEARCHCRITERIA_DEFAULT);
 					break;
