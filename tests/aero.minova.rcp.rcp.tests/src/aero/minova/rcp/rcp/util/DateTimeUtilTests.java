@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Locale;
 
@@ -422,9 +423,36 @@ public class DateTimeUtilTests {
 	}
 	
 	@Test
-	public void testGetDateTime_() {
+	public void testGetDateTime_825PlusPLusPlusM() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(8).plusMinutes(28).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, DateTimeUtil.getDateTime(bithday, " 825+++M"));
+	}
+	
+	@Test
+	public void testGetDateTimeZoneIDEuropeMonaco() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("Europe/Monaco")).toInstant();
+		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(8).plusMinutes(28).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", "Europe/Monaco"));
+	}
+	
+	@Test
+	public void testGetDateTimeZoneIDEuropeLondon() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("Europe/London")).toInstant();
+		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(9).plusMinutes(28).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", "Europe/London"));
+	}
+	
+	@Test
+	public void testGetDateTimeZoneIDAmericaJuneau() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("America/Juneau")).toInstant();
+		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(28).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "13052020 1028", "America/Juneau"));
+	}
+	
+	@Test
+	public void testGetDateTimeZoneIDAmericaParis() {
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("America/Juneau")).toInstant();
+		assertNull(null, DateTimeUtil.getDateTime(bithday, "13052020 1028", "America/Paris"));
 	}
 }

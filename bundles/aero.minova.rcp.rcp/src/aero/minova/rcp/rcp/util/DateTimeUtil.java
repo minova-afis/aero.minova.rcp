@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class DateTimeUtil {
 
@@ -16,20 +18,25 @@ public class DateTimeUtil {
 		return getDateTime(Instant.now(), input);
 	}
 
+	public static Instant getDateTime(Instant now, String input) {
+		return getDateTime(now, input, "UTC");
+	}
+
 	/**
 	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer Leerstelle
-	 * getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist, wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in DateUtil
-	 * und TimeUtil festgelegt.
+	 * getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist, wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in DateUtil und
+	 * TimeUtil festgelegt.
 	 * 
 	 * @param todayNow
-	 * @param input 
+	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input) {
+	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
 
 		String[] splitInput = input.split(" ");
 		Instant dateIn;
 		Instant timeIn;
+		Instant dateTime;
 		LocalDate dateLocal;
 		LocalTime timeLocal;
 
@@ -56,8 +63,15 @@ public class DateTimeUtil {
 		} else {
 			return null;
 		}
+		
 
-		Instant dateTime = LocalDateTime.of(dateLocal, timeLocal).toInstant(ZoneOffset.UTC);
+		try {
+			ZoneId zI = ZoneId.of(zoneId);
+			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
+		} catch (Exception e) {
+			//Invalid ZoneId;
+			return null;
+		}
 
 		return dateTime;
 	}
