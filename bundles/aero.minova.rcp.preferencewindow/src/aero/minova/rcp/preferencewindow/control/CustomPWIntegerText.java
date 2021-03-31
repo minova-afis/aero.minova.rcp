@@ -1,7 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWIntegerText;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
