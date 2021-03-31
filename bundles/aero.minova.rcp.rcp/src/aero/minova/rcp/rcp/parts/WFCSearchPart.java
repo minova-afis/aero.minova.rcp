@@ -127,14 +127,14 @@ public class WFCSearchPart extends WFCFormPart {
 		searchForm.getIndexView().getColumn().add(0, xsdColumn);
 
 		data = dataFormService.getTableFromFormIndex(searchForm);
-		data.addRow();
+		getData().addRow();
 		// Wir setzen die Verundung auf false im Default-Fall!
-		data.getRows().get(data.getRows().size() - 1).setValue(new Value(false), 0);
+		getData().getRows().get(getData().getRows().size() - 1).setValue(new Value(false), 0);
 
 		parent.setLayout(new GridLayout());
-		mPart.getContext().set("NatTableDataSearchArea", data);
+		mPart.getContext().set("NatTableDataSearchArea", getData());
 
-		natTable = createNatTable(parent, searchForm, data);
+		natTable = createNatTable(parent, searchForm, getData());
 
 		//TODO Constants
 		loadPrefs("DEFAULT");
@@ -175,8 +175,8 @@ public class WFCSearchPart extends WFCFormPart {
 			protected boolean doCommand(UpdateDataCommand command) {
 				if (super.doCommand(command)) {
 					Object newValue = command.getNewValue();
-					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
-						Table dummy = data;
+					if (getData().getRows().size() - 1 == command.getRowPosition() && newValue != null) {
+						Table dummy = getData();
 						dummy.addRow();
 						// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
 						dummy.getRows().get(dummy.getRows().size() - 1).setValue(new Value(false), 0);
@@ -273,8 +273,8 @@ public class WFCSearchPart extends WFCFormPart {
 		// xxx.search.size (index,breite(int)), Speichert auch Reihenfolge der Spalten
 		// Ähnlich im IndexPart
 
-		String tableName = data.getName();
-		prefs.put(tableName + "." + name + ".table", mjs.table2Json(data, true));
+		String tableName = getData().getName();
+		prefs.put(tableName + "." + name + ".table", mjs.table2Json(getData(), true));
 		if (saveRowConfig) {
 			String search = "";
 			for (int i : columnReorderLayer.getColumnIndexOrder()) {
@@ -304,12 +304,12 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 		Table prefTable = mjs.json2Table(string, true);
 		sortedList.clear();
-		data.getRows().clear();
+		getData().getRows().clear();
 
-		data.getRows().addAll(prefTable.getRows());
+		getData().getRows().addAll(prefTable.getRows());
 		// Instants aktualisieren, damit der angezeigte Wert zur Nutzereingabe passt
-		for (Row r : data.getRows()) {
-			for (int i = 0; i < data.getColumnCount(); i++) {
+		for (Row r : getData().getRows()) {
+			for (int i = 0; i < getData().getColumnCount(); i++) {
 				Value v = r.getValue(i);
 				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					FilterValue fv = (FilterValue) v;
@@ -326,7 +326,7 @@ public class WFCSearchPart extends WFCFormPart {
 				}
 			}
 		}
-		sortedList.addAll(data.getRows());
+		sortedList.addAll(getData().getRows());
 
 		// Spaltenanordung und -breite
 		string = prefs.get(tableName + "." + name + ".search.size", null);
@@ -380,13 +380,13 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 
 		// Alle Einträge entfernen
-		data.getRows().clear();
+		getData().getRows().clear();
 		sortedList.clear();
 
 		// Neue Zeile hinzufügen (erste Spalte darf nicht null sein)
-		data.addRow();
-		data.getRows().get(0).setValue(new Value(false), 0);
-		sortedList.add(data.getRows().get(0));
+		getData().addRow();
+		getData().getRows().get(0).setValue(new Value(false), 0);
+		sortedList.add(getData().getRows().get(0));
 	}
 
 	@Inject
@@ -410,11 +410,11 @@ public class WFCSearchPart extends WFCFormPart {
 	public void deleteSearchRow(List<Row> rows) {
 		// Löscht eine Liste von Objekten
 		sortedList.removeAll(rows);
-		data.getRows().removeAll(rows);
+		getData().getRows().removeAll(rows);
 		if (sortedList.isEmpty()) {
-			Table dummy = data;
+			Table dummy = getData();
 			dummy.addRow();
-			data.getRows().get(0).setValue(new Value(false), 0);
+			getData().getRows().get(0).setValue(new Value(false), 0);
 			sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 		}
 	}
@@ -430,6 +430,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 	public void saveNattable() {
 		natTable.commitAndCloseActiveCellEditor();
+	}
+
+	public Table getData() {
+		return data;
 	}
 
 }
