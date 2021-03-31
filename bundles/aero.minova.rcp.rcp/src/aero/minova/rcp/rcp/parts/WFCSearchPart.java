@@ -356,6 +356,7 @@ public class WFCSearchPart extends WFCFormPart {
 		columnReorderLayer.getColumnIndexOrder().removeAll(order);
 		columnReorderLayer.getColumnIndexOrder().addAll(0, order);
 		columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+
 	}
 
 	@Inject
