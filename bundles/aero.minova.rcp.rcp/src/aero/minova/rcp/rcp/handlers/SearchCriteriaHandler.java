@@ -80,9 +80,11 @@ public class SearchCriteriaHandler {
 					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
-					// TODO
-					boolean openQuestion = MessageDialog.openQuestion(shell, "Achtung", "Wollen Sie das DEFAULT Suchkriterium überschreiben?");
-					if (!openQuestion) {
+					// TODO Übersetzen!
+					MessageDialog md = new MessageDialog(shell, "Achtung", null, "Wollen Sie das DEFAULT Suchkriterium überschreiben?", MessageDialog.QUESTION,
+							0, "Ja", "Nein");
+					int openQuestion = md.open();
+					if (openQuestion != 0) {
 						break;
 					}
 					name = Constants.SEARCHCRITERIA_DEFAULT;// setzen der Konfiguration, verfügbar auch später.
