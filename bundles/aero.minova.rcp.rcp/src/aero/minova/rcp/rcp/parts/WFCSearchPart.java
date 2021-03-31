@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -65,6 +66,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
+import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
@@ -97,6 +99,10 @@ public class WFCSearchPart extends WFCFormPart {
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 
 	private ColumnHeaderLayer columnHeaderLayer;
+
+	private ColumnReorderLayer columnReorderLayer;
+
+	private DataLayer bodyDataLayer;
 
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
@@ -164,7 +170,7 @@ public class WFCSearchPart extends WFCFormPart {
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 
-		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
 			@Override
@@ -188,7 +194,7 @@ public class WFCSearchPart extends WFCFormPart {
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
-		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
+		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
@@ -200,12 +206,14 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(
+				columnPropertyAccessor.getPropertyNames(), columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer),
+				false);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -267,14 +275,19 @@ public class WFCSearchPart extends WFCFormPart {
 	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
 
 		// xxx.table
-		// xxx.search.size (name,breite(int));
+		// xxx.search.size (index,breite(int));
 		// xxx.index.size (name,breite(int));
 		// xxx.index.sortby (name,[a,d];name....);
 		// xxx.index.groupby (expand[0,1];name;name2...);
-		String tableName = getData().getName();
-		prefs.put(tableName + "." + name + ".table", mjs.table2Json(getData()));
+		String tableName = data.getName();
+		prefs.put(tableName + "." + name + ".table", mjs.table2Json(data, true));
 		if (saveRowConfig) {
-			
+//			natTable.get
+			String search = "";
+			for(int i :columnReorderLayer.getColumnIndexOrder()) {
+				search += i + ","+ bodyDataLayer.getColumnWidthByPosition(i) + ";";
+			}
+			prefs.put(tableName + "." + name + ".search.size", search);
 		}
 		try {
 			prefs.flush();
@@ -283,20 +296,47 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 	}
 
-	@Inject
-	@Optional
-	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String id) {
+	@LoadTableSelection
+	public void loadPrefs(@Named("ConfigName") String name) {
 		// Close Editor
 		if (natTable.getActiveCellEditor() != null) {
 			natTable.getActiveCellEditor().close();
 		}
 
 		String tableName = form.getIndexView().getSource();
-		String string = prefs.get(tableName, null);
-		if (string == null || string.equals(""))
+		String string = prefs.get(tableName + "." + name + ".table", null);
+		if (string == null || string.equals("")) {
 			return;
+		}
+		Table prefTable = mjs.json2Table(string, true);
 
-		Table prefTable = mjs.json2Table(string);
+		string = prefs.get(tableName + "." + name + ".search.size", null);
+		if (string == null || string.equals("")) {
+			return;
+		}
+
+		String[] fields = string.split(";");
+		ArrayList<Integer> order = new ArrayList<>();
+		for (String s : fields) {
+			String[] keyValue = s.split(",");
+			int position = Integer.parseInt(keyValue[0].trim());
+			int width = Integer.parseInt(keyValue[1].trim());
+			order.add(position);
+			bodyDataLayer.setColumnWidthByPosition(position, width);
+		}
+		// TODO längen prüfen und ggf ergänzen
+		if (columnReorderLayer.getColumnIndexOrder().size() < order.size()) {
+			ArrayList<Integer> toDelete = new ArrayList<>();
+			for (int i : order) {
+				if (!columnReorderLayer.getColumnIndexOrder().contains(i)) {
+					toDelete.add(i);
+				}
+			}
+			order.removeAll(toDelete);
+		}
+		columnReorderLayer.getColumnIndexOrder().removeAll(order);
+		columnReorderLayer.getColumnIndexOrder().addAll(0, order);
+		columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
 
 		// Alle aktuellen Suchzeilen entfernen
 		sortedList.clear();
