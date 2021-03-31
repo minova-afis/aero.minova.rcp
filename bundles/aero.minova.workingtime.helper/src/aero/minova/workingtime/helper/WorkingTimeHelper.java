@@ -184,7 +184,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	@Override
 	public void handleDetailAction(ActionCode code) {
-		((LookupValueAccessor) orderreceiver.getValueAccessor()).setFocussed(true);
+		((LookupValueAccessor) orderreceiver.getValueAccessor()).setFocus();
 		switch (code) {
 		case DEL:
 			if (lookupValueUser != null) {
