@@ -74,6 +74,9 @@ public class WFCDetailPart extends WFCFormPart {
 																										// Zwischenräume
 
 	@Inject
+	Logger logger;
+
+	@Inject
 	private IEventBroker broker;
 
 	@Inject
