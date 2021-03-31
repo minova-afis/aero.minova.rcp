@@ -40,7 +40,7 @@ public class WFCTranslationService extends TranslationService {
 
 	@Inject
 	@Optional
-	private void getNotified1(@Named(TranslationService.LOCALE) Locale s) {
+	private void localChanged(@Named(TranslationService.LOCALE) Locale s) {
 		if (logger != null) {
 			logger.info("Locale changed to: " + s.getDisplayName(Locale.ENGLISH));
 		}
@@ -80,9 +80,8 @@ public class WFCTranslationService extends TranslationService {
 				return translate(value);
 			value = resources.getProperty(key);
 			return value == null ? key : translate(value);
-		} else {
-			return key;
 		}
+		return key;
 	}
 
 	@Inject
@@ -198,7 +197,7 @@ public class WFCTranslationService extends TranslationService {
 
 	private void loadAndStore(String filename, List<CompletableFuture<String>> list) {
 		CompletableFuture<String> hashedFile = dataService.getHashedFile(filename + ".properties");
-		hashedFile.thenAccept(e -> loadResources(e));
+		hashedFile.thenAccept(this::loadResources);
 		list.add(hashedFile);
 	}
 
