@@ -12,14 +12,17 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.swt.widgets.Shell;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
+import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import aero.minova.rcp.rcp.util.SaveSearchCriteriaDialog;
 
@@ -44,6 +47,9 @@ public class SearchCriteriaHandler {
 	}
 
 	@Inject
+	IEventBroker broker;
+
+	@Inject
 	TranslationService translationService;
 
 	@Inject
@@ -66,14 +72,18 @@ public class SearchCriteriaHandler {
 			try {
 				switch (ia) {
 				case LOAD_DEFAULT:
-					name = "DEFAULT";
+					name = Constants.SEARCHCRITERIA_DEFAULT;
 				case LOAD:
-					System.out.println("lade: " + name);
+					context.set("ConfigName", name);// setzen der Konfiguration, verfügbar auch später.
+					ContextInjectionFactory.invoke(part.getObject(), LoadTableSelection.class, context);
+					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
 					context.set("SaveRowConfig", true);// setzen der Konfiguration, verfügbar auch später.
-					context.set("ConfigName", "DEFAULT");// setzen der Konfiguration, verfügbar auch später.
+					context.set("ConfigName", Constants.SEARCHCRITERIA_DEFAULT);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
+					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, Constants.SEARCHCRITERIA_DEFAULT);
+					break;
 				case SAVE:
 					final SaveSearchCriteriaDialog sscd = new SaveSearchCriteriaDialog(shell, translationService, prefs, tableName);
 					String criteriaName = sscd.open();
@@ -81,11 +91,11 @@ public class SearchCriteriaHandler {
 					context.set("SaveRowConfig", saveColumnWidth);// setzen der Konfiguration, verfügbar auch später.
 					context.set("ConfigName", criteriaName);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
+					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, criteriaName);
 					break;
 				case DELETE:
 					final DeleteSearchCriteriaDialog dscd = new DeleteSearchCriteriaDialog(shell, translationService, prefs, tableName);
 					dscd.open();
-					System.out.println("löschen");
 					break;
 				}
 			} catch (final Exception ex) {
