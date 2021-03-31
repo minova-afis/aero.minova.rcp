@@ -1,7 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWStringText;
 import org.eclipse.swt.SWT;
 
 public class CustomPWStringText extends CustomPWText {

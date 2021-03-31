@@ -19,7 +19,7 @@ public class Constants {
 	public static final String CONTROL_DATATYPE = "dataType";
 	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
-	
+
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
 
@@ -55,6 +55,7 @@ public class Constants {
 	public static final String BROKER_CLEARSEARCHTABLE = "aero/minova/rcp/ClearSearchTable";
 	public static final String BROKER_REVERTSEARCHTABLE = "aero/minova/rcp/RevertSearchTable";
 	public static final String BROKER_DELETEROWSEARCHTABLE = "aero/minova/rcp/DelteRowSearchTable";
+	public static final String BROKER_SAVESEARCHCRITERIA = "aero/minova/rcp/SaveSearchCriteria";
 	public static final String BROKER_LOADSEARCHCRITERIA = "aero/minova/rcp/LoadSearchCriteria";
 	public static final String BROKER_RESIZETABLE = "aero/minova/rcp/ResizeTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
@@ -67,5 +68,8 @@ public class Constants {
 	public static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", "null", "!null" };
 	public static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "null", "!null" };
 	public static final String[] WILDCARD_OPERATORS = { "_", "%" };
+
+	// SeachCriteria
+	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
 }
