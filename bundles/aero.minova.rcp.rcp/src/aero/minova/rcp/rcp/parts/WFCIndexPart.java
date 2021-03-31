@@ -154,11 +154,8 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
-		loadPrefs("DEFAULT");
+		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
 	}
-
-	// @PersistTableSelection
-	// public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
 
 	@Inject
 	@Optional
@@ -180,18 +177,21 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// Sortierung
 		String sort = "";
-		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes())
+		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
 			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+		}
 		prefs.put(tableName + "." + name + ".index.sortby", sort);
 
 		// Gruppierung
 		String group = "";
-		if (expandGroups)
+		if (expandGroups) {
 			group += 1 + ";";
-		else
+		} else {
 			group += 0 + ";";
-		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes())
+		}
+		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes()) {
 			group += i + ";";
+		}
 		prefs.put(tableName + "." + name + ".index.groupby", group);
 
 		try {
@@ -202,8 +202,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 	}
 
-//	@LoadTableSelection
-//	public void loadPrefs(@Named("ConfigName") String name) {
 	@Inject
 	@Optional
 	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
@@ -258,10 +256,11 @@ public class WFCIndexPart extends WFCFormPart {
 				int index = Integer.parseInt(s);
 				groupByHeaderLayer.getGroupByModel().addGroupByColumnIndex(index);
 			}
-			if (fields[0].equals("0"))
+			if (fields[0].equals("0")) {
 				collapseGroups("");
-			else
+			} else {
 				expandGroups("");
+			}
 		}
 	}
 
