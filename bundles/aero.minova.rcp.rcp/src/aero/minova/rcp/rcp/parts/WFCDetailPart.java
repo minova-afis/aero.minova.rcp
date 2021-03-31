@@ -152,13 +152,14 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent) {
+		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			if (headOrPage instanceof Head) {
-				layoutHead(parent, wrapper);
+				layoutHead(parent, wrapper, traverseListener);
 			} else if (headOrPage instanceof Page) {
-				layoutPage(parent, wrapper);
+				layoutPage(parent, wrapper, traverseListener);
 			}
 		}
 		// Helper-Klasse initialisieren
@@ -173,7 +174,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
+	private void layoutHead(Composite parent, HeadOrPageWrapper head, TraverseListener traverseListener) {
 		RowData headLayoutData = new RowData();
 		Section headSection;
 		if (head.isHead) {
@@ -201,7 +202,7 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, head);
 	}
 
-	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
+	private void layoutPage(Composite parent, HeadOrPageWrapper page, TraverseListener traverseListener) {
 		RowData pageLayoutData = new RowData();
 		Section pageSection = formToolkit.createSection(parent,
 				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
