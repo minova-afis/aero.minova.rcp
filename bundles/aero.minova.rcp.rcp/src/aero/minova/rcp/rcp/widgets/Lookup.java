@@ -203,7 +203,7 @@ public class Lookup extends Composite {
 						break;
 					}
 				} else {
-					if (event.keyCode == SWT.ARROW_DOWN) {
+					if (event.keyCode == SWT.ARROW_DOWN || ((event.stateMask & SWT.CTRL) != 0) && (event.keyCode == SWT.SPACE)) {
 						requestAllLookupEntries();
 					}
 				}
