@@ -231,7 +231,31 @@ public class WFCDetailPart extends WFCFormPart {
 		detail.addPage(mPage);
 	}
 
-	private void createFields(Composite composite, HeadOrPageWrapper headOrPage) {
+	private void sortTabList(MPage mPage, TraverseListener traverseListener) {
+		// TODO: Ergänzen um die Preference-Einstellungen
+		List<MField> tabList = mPage.getTabList();
+		Collections.sort(tabList, new Comparator<MField>() {
+
+			@Override
+			public int compare(MField f1, MField f2) {
+				if (f1.getTabIndex() == 0 && f2.getTabIndex() == 0) {
+					return 0;
+				} else if (f1.getTabIndex() == 0) {
+					return -1;
+				} else if (f2.getTabIndex() == 0) {
+					return 1;
+				} else {
+					return f1.getTabIndex() > f2.getTabIndex() ? +1 : f1.getTabIndex() < f2.getTabIndex() ? -1 : 0;
+				}
+			}
+		});
+		for (MField field : tabList) {
+			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
+		}
+		mPage.setTabList(tabList);
+	}
+
+	private void createFields(Composite composite, HeadOrPageWrapper headOrPage, MPage page) {
 		int row = 0;
 		int column = 0;
 		int width;
