@@ -57,7 +57,6 @@ public class Constants {
 	public static final String BROKER_DELETEROWSEARCHTABLE = "aero/minova/rcp/DelteRowSearchTable";
 	public static final String BROKER_SAVESEARCHCRITERIA = "aero/minova/rcp/SaveSearchCriteria";
 	public static final String BROKER_LOADSEARCHCRITERIA = "aero/minova/rcp/LoadSearchCriteria";
-	public static final String BROKER_SAVEASSEARCHCRITERIA = "aero/minova/rcp/SaveAsSearchCriteria";
 	public static final String BROKER_RESIZETABLE = "aero/minova/rcp/ResizeTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
@@ -69,5 +68,8 @@ public class Constants {
 	public static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", "null", "!null" };
 	public static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "null", "!null" };
 	public static final String[] WILDCARD_OPERATORS = { "_", "%" };
+
+	// SeachCriteria
+	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
 }
