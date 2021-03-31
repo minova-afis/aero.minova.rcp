@@ -99,4 +99,8 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		this.displayValue = displayValue;
 	}
 
+	public Control getControl() {
+		return control;
+	}
+
 }
