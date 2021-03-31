@@ -9,6 +9,8 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -24,10 +26,12 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -51,12 +55,14 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.form.MPage;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -64,6 +70,7 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.handlers.TraverseListenerImpl;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
 @SuppressWarnings("restriction")
@@ -288,7 +295,6 @@ public class WFCDetailPart extends WFCFormPart {
 		addBottonMargin(composite, row + 1, column);
 	}
 
-
 	private int getExtraHeight(Field field) {
 		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
 			return Integer.parseInt(field.getNumberRowsSpanned()) - 1;
@@ -333,7 +339,6 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 	}
 
-
 	private void translate(Composite composite) {
 		for (Control control : composite.getChildren()) {
 			if (control.getData(TRANSLATE_PROPERTY) != null) {
@@ -370,6 +375,5 @@ public class WFCDetailPart extends WFCFormPart {
 		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
-
 
 }
