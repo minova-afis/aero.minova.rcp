@@ -1,5 +1,7 @@
 package aero.minova.rcp.model;
 
+import aero.minova.rcp.constants.Constants;
+
 /**
  * Gültige Werte
  * <ul>
@@ -20,7 +22,7 @@ package aero.minova.rcp.model;
  * <br/>
  * Bei Eingabe von "null" oder "!null" wird kein weiterer Wert akzeptiert, this.filterValue ist null<br/>
  * "null" -> "f-null"
- * 
+ *
  * @author saak
  */
 public class FilterValue extends Value {
@@ -34,10 +36,11 @@ public class FilterValue extends Value {
 	public FilterValue(String operator, Object value, String userInput) {
 		super(operator, DataType.FILTER);
 		this.userInput = userInput;
-		if (value == null)
+		if (value == null) {
 			this.filterValue = null;
-		else
+		} else {
 			this.filterValue = new Value(value);
+		}
 	}
 
 	public static FilterValue valueOf(String value) {
@@ -54,10 +57,11 @@ public class FilterValue extends Value {
 			return false;
 		}
 		if (this.filterValue == null && v.filterValue == null) {
-			if (this.userInput.equals(v.userInput))
+			if (this.userInput.equals(v.userInput)) {
 				return super.equals(obj);
-			else
+			} else {
 				return false;
+			}
 		} else if (this.filterValue == null && v.filterValue != null || this.filterValue != null && v.filterValue == null) {
 			return false;
 		}
@@ -75,5 +79,14 @@ public class FilterValue extends Value {
 
 	public String getUserInput() {
 		return userInput;
+	}
+
+	public String getUserInputWithoutOperator() {
+		String regEx = "[";
+		for (String operator : Constants.OPERATORS) {
+			regEx += "(" + operator + ")";
+		}
+		regEx += "]";
+		return userInput.replaceAll(regEx, "");
 	}
 }
