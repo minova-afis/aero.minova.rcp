@@ -91,7 +91,9 @@ public class SearchCriteriaHandler {
 					context.set("SaveRowConfig", saveColumnWidth);// setzen der Konfiguration, verfügbar auch später.
 					context.set("ConfigName", criteriaName);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
-					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, criteriaName);
+					if (saveColumnWidth) {
+						broker.send(Constants.BROKER_SAVESEARCHCRITERIA, criteriaName);
+					}
 					break;
 				case DELETE:
 					final DeleteSearchCriteriaDialog dscd = new DeleteSearchCriteriaDialog(shell, translationService, prefs, tableName);
