@@ -482,7 +482,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
-	class CountSummaryProvider implements ISummaryProvider {
+	static class CountSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -506,7 +506,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
-	class AverageSummaryProvider implements ISummaryProvider {
+	static class AverageSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -534,7 +534,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
-	class MinSummaryProvider implements ISummaryProvider {
+	static class MinSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -561,7 +561,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
-	class MaxSummaryProvider implements ISummaryProvider {
+	static class MaxSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
