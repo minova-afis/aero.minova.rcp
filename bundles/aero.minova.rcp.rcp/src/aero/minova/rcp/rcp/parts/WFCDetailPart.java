@@ -199,7 +199,11 @@ public class WFCDetailPart extends WFCFormPart {
 		headSection.setClient(composite);
 
 		// Fields
-		createFields(composite, head);
+		MPage mPage = new MPage(true, "open", detail, headSection.getText());
+		createFields(composite, head, mPage);
+		sortTabList(mPage, traverseListener);
+		detail.addPage(mPage);
+
 	}
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page, TraverseListener traverseListener) {
@@ -221,7 +225,10 @@ public class WFCDetailPart extends WFCFormPart {
 		pageSection.setClient(composite);
 
 		// Fields
-		createFields(composite, page);
+		MPage mPage = new MPage(true, "open", detail, pageSection.getText());
+		createFields(composite, page, mPage);
+		sortTabList(mPage, traverseListener);
+		detail.addPage(mPage);
 	}
 
 	private void createFields(Composite composite, HeadOrPageWrapper headOrPage) {
@@ -245,6 +252,9 @@ public class WFCDetailPart extends WFCFormPart {
 				row++;
 			}
 			createField(composite, f, row, column);
+			f.setmPage(page);
+			page.addTabField(f);
+
 			column += width;
 			if (!headOrPage.isHead) {
 				row += getExtraHeight(field);
