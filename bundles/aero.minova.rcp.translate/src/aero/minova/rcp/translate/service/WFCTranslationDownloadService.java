@@ -63,12 +63,12 @@ public class WFCTranslationDownloadService {
 		CompletableFuture.runAsync(() -> {
 			try {
 				boolean checkIfUpdateIsRequired = dataService.checkIfUpdateIsRequired("i18n.zip");
-//				if (checkIfUpdateIsRequired) {
+				if (checkIfUpdateIsRequired) {
 					dataService.downloadFile("i18n.zip");
 					ZipService.unzipFile(dataService.getStoragePath().resolve("i18n.zip").toFile(),
 							dataService.getStoragePath().toString());
 					postEvent();
-//				}
+				}
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}
