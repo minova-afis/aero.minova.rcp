@@ -59,11 +59,14 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureCells(IConfigRegistry configRegistry) {
-		int i = 0;
-		for (Column column : columns) {
 
+		// Verundungsspalte konfigurieren
+		configureBooleanCell(configRegistry, 0, false);
+
+		int i = 1;
+		for (Column column : columns.subList(1, columns.size())) {
 			if (column.getType().equals(DataType.BOOLEAN)) {
-				configureBooleanCell(configRegistry, i++, formColumns.get(column.getName()).getTristate());
+				configureBooleanCell(configRegistry, i++, true);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
 				configureShortDateCell(configRegistry, i++);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortTime() != null) {

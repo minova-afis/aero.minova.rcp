@@ -121,7 +121,7 @@ public class WFCSearchPart extends WFCFormPart {
 		// String string = prefs.get(tableName + ".DEFAULT.table", null);
 		Form searchForm = form;
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
-		xsdColumn.setBoolean(Boolean.FALSE, false);
+		xsdColumn.setBoolean(Boolean.FALSE);
 		xsdColumn.setLabel("&");
 		xsdColumn.setName("&");
 		searchForm.getIndexView().getColumn().add(0, xsdColumn);
@@ -136,13 +136,12 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable = createNatTable(parent, searchForm, getData());
 
-		//TODO Constants
+		// TODO Constants
 		loadPrefs("DEFAULT");
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
-	 * die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -366,8 +365,7 @@ public class WFCSearchPart extends WFCFormPart {
 			columnPropertyAccessor.translate(translationService);
 			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
 			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i,
-						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
 	}
