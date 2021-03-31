@@ -2,7 +2,6 @@ package aero.minova.rcp.preferencewindow.control;
 
 import org.eclipse.nebula.widgets.opal.commons.StringUtil;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFloatText;
 import org.eclipse.swt.SWT;
 
 public class CustomPWFloatText extends CustomPWText {
