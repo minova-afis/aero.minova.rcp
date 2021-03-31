@@ -272,7 +272,7 @@ public class WFCSearchPart extends WFCFormPart {
 		// xxx.table
 		// xxx.search.size (index,breite(int)), Speichert auch Reihenfolge der Spalten
 		// Ähnlich im IndexPart
-
+		saveNattable();
 		String tableName = getData().getName();
 		prefs.put(tableName + "." + name + ".table", mjs.table2Json(getData(), true));
 		if (saveRowConfig) {
@@ -315,11 +315,11 @@ public class WFCSearchPart extends WFCFormPart {
 					FilterValue fv = (FilterValue) v;
 					Instant inst = fv.getFilterValue().getInstantValue();
 					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
-						inst = TimeUtil.getTime(fv.getUserInput());
+						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
 					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
-						inst = DateUtil.getDate(fv.getUserInput());
+						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
 					} else {
-						inst = DateTimeUtil.getDateTime(fv.getUserInput());
+						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());
 					}
 
 					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);
