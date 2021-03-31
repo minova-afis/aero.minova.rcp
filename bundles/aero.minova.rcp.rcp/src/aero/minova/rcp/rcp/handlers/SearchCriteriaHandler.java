@@ -17,6 +17,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
@@ -79,6 +80,11 @@ public class SearchCriteriaHandler {
 					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
+					// TODO
+					boolean openQuestion = MessageDialog.openQuestion(shell, "Achtung", "Wollen Sie das DEFAULT Suchkriterium überschreiben?");
+					if (!openQuestion) {
+						break;
+					}
 					name = Constants.SEARCHCRITERIA_DEFAULT;// setzen der Konfiguration, verfügbar auch später.
 				case SAVE_NAME:
 					context.set("SaveRowConfig", true);// setzen der Konfiguration, verfügbar auch später.
