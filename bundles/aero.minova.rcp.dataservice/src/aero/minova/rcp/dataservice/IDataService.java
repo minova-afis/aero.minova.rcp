@@ -1,5 +1,6 @@
 package aero.minova.rcp.dataservice;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
@@ -63,8 +64,24 @@ public interface IDataService {
 	 */
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText);
 
-	Path getStoragePath();
+	public Path getStoragePath();
+
 
 	CompletableFuture<String> getHashedFile(String filename);
+
+	boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException;
+
+	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
+	 *                  mit angehängt.
+	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+
+	void downloadFile(String serverFileName) throws IOException, InterruptedException;
 
 }
