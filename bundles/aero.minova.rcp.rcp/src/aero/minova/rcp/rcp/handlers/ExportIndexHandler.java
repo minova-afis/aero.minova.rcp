@@ -29,9 +29,18 @@ public class ExportIndexHandler {
 
 			switch (target) {
 			case CLIPBOARD:
-				natTable.doCommand(new CopyDataToClipboardCommand("\t", //$NON-NLS-1$
-						System.getProperty("line.separator"), //$NON-NLS-1$
-						natTable.getConfigRegistry()));
+
+				if (((WFCIndexPart) wfcPart).getSelectionLayer().getSelectedCells().size() > 0) {
+					natTable.doCommand(new CopyDataToClipboardCommand("\t", //$NON-NLS-1$
+							System.getProperty("line.separator"), //$NON-NLS-1$
+							natTable.getConfigRegistry()));
+				} else {
+					((WFCIndexPart) wfcPart).getSelectionLayer().selectAll();
+					natTable.doCommand(new CopyDataToClipboardCommand("\t", //$NON-NLS-1$
+							System.getProperty("line.separator"), //$NON-NLS-1$
+							natTable.getConfigRegistry()));
+					((WFCIndexPart) wfcPart).getSelectionLayer().clear();
+				}
 				break;
 			case FILE:
 				break;

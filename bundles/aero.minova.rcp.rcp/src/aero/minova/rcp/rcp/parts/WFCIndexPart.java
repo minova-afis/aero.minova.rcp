@@ -502,6 +502,10 @@ public class WFCIndexPart extends WFCFormPart {
 		return natTable;
 	}
 
+	public SelectionLayer getSelectionLayer() {
+		return bodyLayerStack.getSelectionLayer();
+	}
+
 	/**
 	 * Always encapsulate the body layer stack in an AbstractLayerTransform to ensure that the index transformations are performed in later commands.
 	 *
