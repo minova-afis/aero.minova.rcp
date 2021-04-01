@@ -67,6 +67,7 @@
                 <children xsi:type="menu:HandledToolItem" xmi:id="_9N7oQBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handledtoolitem.resize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
               </toolbar>
             </children>
+            <children xsi:type="basic:Part" xmi:id="_D4dQIJLJEeuC4eVwEyczZA" elementId="aero.minova.rcp.rcp.part.formpreview" visible="false" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.Preview" label="@Form.Preview" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/PrintPreview/32x32.png" closeable="true"/>
           </children>
         </children>
         <children xsi:type="basic:PartStack" xmi:id="_T04rYLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_r6jD0LqjEeqSa5ZfLepYaA">
