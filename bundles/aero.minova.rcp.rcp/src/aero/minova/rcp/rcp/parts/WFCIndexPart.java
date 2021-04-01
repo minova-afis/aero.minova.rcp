@@ -506,12 +506,16 @@ public class WFCIndexPart extends WFCFormPart {
 		return bodyLayerStack.getSelectionLayer();
 	}
 
+	public BodyLayerStack getBodyLayerStack() {
+		return this.bodyLayerStack;
+	}
+
 	/**
 	 * Always encapsulate the body layer stack in an AbstractLayerTransform to ensure that the index transformations are performed in later commands.
 	 *
 	 * @param <T>
 	 */
-	class BodyLayerStack<T> extends AbstractLayerTransform {
+	public class BodyLayerStack<T> extends AbstractLayerTransform {
 
 		private final SortedList<T> sortedList;
 
@@ -749,6 +753,14 @@ public class WFCIndexPart extends WFCFormPart {
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
+	}
+
+	public SortedList<Row> getSortedList() {
+		return bodyLayerStack.getSortedList();
+	}
+
+	public ColumnHeaderLayer getColumnHeaderLayer() {
+		return columnHeaderLayer;
 	}
 
 }
