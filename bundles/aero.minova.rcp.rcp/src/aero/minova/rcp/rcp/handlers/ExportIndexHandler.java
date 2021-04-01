@@ -6,6 +6,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataToClipboardCommand;
+import org.eclipse.nebula.widgets.nattable.export.command.ExportCommand;
 
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 
@@ -24,11 +25,21 @@ public class ExportIndexHandler {
 
 		Object wfcPart = mpart.getObject();
 		if (wfcPart instanceof WFCIndexPart) {
-
 			NatTable natTable = ((WFCIndexPart) wfcPart).getNattable();
-			natTable.doCommand(new CopyDataToClipboardCommand("\t", //$NON-NLS-1$
-					System.getProperty("line.separator"), //$NON-NLS-1$
-					natTable.getConfigRegistry()));
+
+			switch (target) {
+			case CLIPBOARD:
+				natTable.doCommand(new CopyDataToClipboardCommand("\t", //$NON-NLS-1$
+						System.getProperty("line.separator"), //$NON-NLS-1$
+						natTable.getConfigRegistry()));
+				break;
+			case FILE:
+				break;
+			case EXCEL:
+				natTable.doCommand(new ExportCommand(natTable.getConfigRegistry(), natTable.getShell()));
+				break;
+			}
+
 		}
 
 	}
