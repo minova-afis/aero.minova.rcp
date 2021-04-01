@@ -146,6 +146,26 @@ public class DataService implements IDataService {
 
 	}
 
+	/**
+	 * Laden einer PDF Datei
+	 *
+	 * @param tablename
+	 * @param detailTable
+	 * @return
+	 */
+	public CompletableFuture<Path> getPDFAsync(String tablename, Table detailTable) {
+		String body = gson.toJson(detailTable);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/covid/test/certificate/print")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.build();
+		logBody(body, ++callCount);
+		Path path = getStoragePath().resolve("/PDF/" + tablename + detailTable.getRows().get(0).getValue(0).toString() + ".pdf");
+		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
+			return path;
+		});
+	}
+
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
 		String body = gson.toJson(detailTable);
@@ -303,7 +323,7 @@ public class DataService implements IDataService {
 
 	/**
 	 * Caller muss file.exists() aufgerufen haben
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 */
@@ -316,7 +336,7 @@ public class DataService implements IDataService {
 			}
 			return "-1";
 		});
-		
+
 	}
 
 	@Override
@@ -653,7 +673,7 @@ public class DataService implements IDataService {
 		return tableFuture;
 	}
 
-	
+
 
 //	@Override
 //	public <T> T convert(Path f, Class<T> clazz) {
