@@ -19,6 +19,9 @@ import java.util.Locale;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import aero.minova.rcp.util.DateTimeUtil;
+import aero.minova.rcp.util.DateUtil;
+
 public class DateTimeUtilTests {
 
 	@BeforeClass
