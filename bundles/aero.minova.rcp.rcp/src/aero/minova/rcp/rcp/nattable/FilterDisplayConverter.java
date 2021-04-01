@@ -11,10 +11,10 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;
-import aero.minova.rcp.rcp.util.DateTimeUtil;
-import aero.minova.rcp.rcp.util.DateUtil;
 import aero.minova.rcp.rcp.util.OperatorExtractionUtil;
-import aero.minova.rcp.rcp.util.TimeUtil;
+import aero.minova.rcp.util.DateTimeUtil;
+import aero.minova.rcp.util.DateUtil;
+import aero.minova.rcp.util.TimeUtil;
 
 public class FilterDisplayConverter extends DisplayConverter {
 
