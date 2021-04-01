@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.util;
 
 import java.awt.Desktop;
 import java.io.File;

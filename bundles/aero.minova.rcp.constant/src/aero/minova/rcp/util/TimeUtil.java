@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.util;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

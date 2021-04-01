@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.util;
 
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -168,7 +168,7 @@ public class DateUtil {
 				+ LocalTime.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
 	}
 
-	static String[] splitInput(String input) {
+	public static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
 		Pattern pattern;
