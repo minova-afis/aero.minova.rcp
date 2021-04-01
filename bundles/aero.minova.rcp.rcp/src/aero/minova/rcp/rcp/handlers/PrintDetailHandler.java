@@ -1,36 +1,72 @@
 package aero.minova.rcp.rcp.handlers;
 
-import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.concurrent.CompletableFuture;
+
+import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 
+import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.internal.DataService;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.parts.Preview;
-import aero.minova.rcp.rcp.util.Tools;
+import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.util.Tools;
 
 public class PrintDetailHandler {
+
+	@Inject
+	DataService dataService;
+
+	@Inject
+	protected UISynchronize sync;
+
 	@Execute
 	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, @Optional Preview preview) {
 		try {
-			preview = checkPreview(window, modelService, partService, preview);
+			// String fileName = "/Users/erlanger/Documents/Urlaubsantrag_250221.pdf";
 
-			String fileName = "/Users/erlanger/Documents/Urlaubsantrag_250221.pdf";
-			// Report erzeugen
-//		ReportCreator reportCreator = new IndexReportCreator(form, getColumnInfo(part), getGroupInfo(part), getSortInfo(part), guiFont, indexFont,
-//				optimizeFieldWidth, hideEmptyCols, hideGroupCols, hideSearchCriterias);
-//		String fileName = reportCreator.create();
-//
-//		Log.debug(this, MessageFormat.format("Report {0} wurde erzeugt", fileName));
-			File f = new File(fileName);
-			URL url2 = f.toURI().toURL();
-			showFile(url2.toString(), preview);
+			Object wfcDetailpart = mpart.getObject();
+			WFCDetailPart wfcDetail = null;
+			if (wfcDetailpart instanceof WFCDetailPart) {
+				wfcDetail = (WFCDetailPart) wfcDetailpart;
+			}
+			MField field = wfcDetail.getDetail().getField(Constants.CONTROL_KEYLONG);
+			Integer integerValue = field.getValue().getIntegerValue();
+
+			Table table = TableBuilder.newTable("xpctsPrintTestergebnis").withColumn("KeyLong", DataType.INTEGER).create();
+			Row row = RowBuilder.newRow().withValue(integerValue).create();
+			table.addRow(row);
+
+			// Table Bauen, Tabellenname + KeyLong
+			CompletableFuture<Path> tableFuture = dataService.getPDFAsync("xpctsPrintTestergebnis", table);
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+
+				URL url;
+				try {
+					url = tr.toFile().toURI().toURL();
+					showFile(url.toString(), checkPreview(window, modelService, partService, preview));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+
+			}));
 		} catch (Exception ex) {
 			System.out.println("Drucken geht nicht!");
 			ex.printStackTrace();

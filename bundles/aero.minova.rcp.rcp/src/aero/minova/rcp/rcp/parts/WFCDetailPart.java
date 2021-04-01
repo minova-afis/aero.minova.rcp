@@ -117,7 +117,7 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.setDetail(detail, perspective);
+		casRequestsUtil.setDetail(getDetail(), perspective);
 		translate(composite);
 	}
 
@@ -165,8 +165,8 @@ public class WFCDetailPart extends WFCFormPart {
 			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 		}
 		IHelper iHelper = helperlist.get(0);
-		iHelper.setControls(detail);
-		detail.setHelper(iHelper);
+		iHelper.setControls(getDetail());
+		getDetail().setHelper(iHelper);
 
 	}
 
@@ -230,7 +230,7 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 			Field field = (Field) fieldOrGrid;
 			MField f = ModelToViewModel.convert(field);
-			detail.putField(f);
+			getDetail().putField(f);
 
 			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
@@ -280,7 +280,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MShortTimeField) {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, detail, locale);
+			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, getDetail(), locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}
@@ -331,6 +331,10 @@ public class WFCDetailPart extends WFCFormPart {
 	private int getWidth(Field field) {
 		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
+	}
+
+	public MDetail getDetail() {
+		return detail;
 	}
 
 
