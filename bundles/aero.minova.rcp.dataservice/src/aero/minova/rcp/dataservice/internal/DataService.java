@@ -153,6 +153,7 @@ public class DataService implements IDataService {
 	 * @param detailTable
 	 * @return
 	 */
+	@Override
 	public CompletableFuture<Path> getPDFAsync(String tablename, Table detailTable) {
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/covid/test/certificate/print")) //
