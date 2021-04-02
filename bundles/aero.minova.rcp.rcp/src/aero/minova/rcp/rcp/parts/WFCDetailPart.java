@@ -159,14 +159,16 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 		}
 		// Helper-Klasse initialisieren
-		String helperClass = form.getHelperClass();
-		if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
-			// TODO Übersetzung!
-			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+		if (form.getHelperClass() != null) {
+			String helperClass = form.getHelperClass();
+			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+				// TODO Übersetzung!
+				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+			}
+			IHelper iHelper = helperlist.get(0);
+			iHelper.setControls(getDetail());
+			getDetail().setHelper(iHelper);
 		}
-		IHelper iHelper = helperlist.get(0);
-		iHelper.setControls(getDetail());
-		getDetail().setHelper(iHelper);
 
 	}
 
@@ -174,11 +176,9 @@ public class WFCDetailPart extends WFCFormPart {
 		RowData headLayoutData = new RowData();
 		Section headSection;
 		if (head.isHead) {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
@@ -200,8 +200,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
 		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 
 		pageLayoutData.width = SECTION_WIDTH;
 
@@ -250,7 +249,6 @@ public class WFCDetailPart extends WFCFormPart {
 		addBottonMargin(composite, row + 1, column);
 	}
 
-
 	private int getExtraHeight(Field field) {
 		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
 			return Integer.parseInt(field.getNumberRowsSpanned()) - 1;
@@ -295,7 +293,6 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 	}
 
-
 	private void translate(Composite composite) {
 		for (Control control : composite.getChildren()) {
 			if (control.getData(TRANSLATE_PROPERTY) != null) {
@@ -336,6 +333,5 @@ public class WFCDetailPart extends WFCFormPart {
 	public MDetail getDetail() {
 		return detail;
 	}
-
 
 }
