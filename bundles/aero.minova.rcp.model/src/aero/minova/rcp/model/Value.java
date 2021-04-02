@@ -2,9 +2,8 @@ package aero.minova.rcp.model;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
@@ -48,14 +47,13 @@ public class Value implements Serializable {
 		case ZONED:
 			ZonedDateTime z = (ZonedDateTime) value;
 			Instant i = z.toInstant();
-			LocalDate d = LocalDate.ofInstant(i, ZoneId.of("UTC"));
-			if (d.getYear() == 1900 && d.getDayOfMonth() == 1 && d.getMonthValue() == 1) {
+			if (z.getYear() == 1900 && z.getDayOfMonth() == 1 && z.getMonthValue() == 1) {
 				return TimeUtil.getTimeString(i, locale);
 			}
 			return DateTimeUtil.getDateTimeString(i, locale);
 		case INSTANT:
 			Instant i2 = (Instant) value;
-			LocalDateTime d1 = LocalDateTime.ofInstant(i2, ZoneId.of("UTC"));
+			LocalDateTime d1 = LocalDateTime.ofEpochSecond(i2.getEpochSecond(), i2.getNano(), ZoneOffset.UTC);
 			if (d1.getYear() == 1900 && d1.getDayOfMonth() == 1 && d1.getMonthValue() == 1) {
 				return TimeUtil.getTimeString(i2, locale);
 			}
