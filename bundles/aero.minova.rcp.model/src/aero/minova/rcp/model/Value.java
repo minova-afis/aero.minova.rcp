@@ -2,7 +2,13 @@ package aero.minova.rcp.model;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Locale;
+
+import aero.minova.rcp.util.DateTimeUtil;
+import aero.minova.rcp.util.TimeUtil;
 
 public class Value implements Serializable {
 	private static final long serialVersionUID = 202011291518L;
@@ -27,6 +33,35 @@ public class Value implements Serializable {
 			throw new RuntimeException();
 		}
 		this.value = valueNew;
+	}
+
+	public String getValueString(Locale locale) {
+		String returnValue = "";
+		switch (type) {
+		case DOUBLE:
+		case STRING:
+		case BOOLEAN:
+		case INTEGER:
+			returnValue += value;
+			break;
+		case ZONED:
+			ZonedDateTime z = (ZonedDateTime) value;
+			Instant i = z.toInstant();
+			if (z.getYear() == 1900 && z.getDayOfMonth() == 1 && z.getMonthValue() == 1) {
+				return TimeUtil.getTimeString(i, locale);
+			}
+			return DateTimeUtil.getDateTimeString(i, locale);
+		case INSTANT:
+			Instant i2 = (Instant) value;
+			LocalDateTime d1 = LocalDateTime.ofEpochSecond(i2.getEpochSecond(), i2.getNano(), ZoneOffset.UTC);
+			if (d1.getYear() == 1900 && d1.getDayOfMonth() == 1 && d1.getMonthValue() == 1) {
+				return TimeUtil.getTimeString(i2, locale);
+			}
+			return DateTimeUtil.getDateTimeString(i2, locale);
+		default:
+			break;
+		}
+		return returnValue;
 	}
 
 	public Value(Object valueNew, DataType dataType) {

@@ -257,7 +257,7 @@ public class WFCDetailCASRequestsUtil {
 		if (response.getReturnCode() == -1) {
 			showErrorMessage(response.getResultSet());
 		} else {
-			openNotificationPopup(getTraslation("msg.DataUpdated"));
+			openNotificationPopup(getTranslation("msg.DataUpdated"));
 			handleUserAction(Constants.UPDATE_REQUEST);
 		}
 	}
@@ -285,7 +285,7 @@ public class WFCDetailCASRequestsUtil {
 		if (response.getReturnCode() == -1) {
 			showErrorMessage(response.getResultSet());
 		} else {
-			openNotificationPopup(getTraslation("msg.DataSaved"));
+			openNotificationPopup(getTranslation("msg.DataSaved"));
 			handleUserAction(Constants.INSERT_REQUEST);
 		}
 	}
@@ -296,7 +296,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param translate
 	 * @return
 	 */
-	private String getTraslation(String translate) {
+	private String getTranslation(String translate) {
 		String messageproperty = "@" + translate;
 		String value = translationService.translate(messageproperty, null);
 		return value;
@@ -424,20 +424,24 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private void updatePossibleLookupEntries() {
 		MField field = detail.getField("OrderReceiverKey");
-		if (field.getValue() == null)
+		if (field.getValue() == null) {
 			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+		}
 
 		field = detail.getField("ServiceKey");
-		if (field.getValue() == null)
+		if (field.getValue() == null) {
 			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+		}
 
 		field = detail.getField("ServiceContractKey");
-		if (field.getValue() == null)
+		if (field.getValue() == null) {
 			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+		}
 
 		field = detail.getField("ServiceObjectKey");
-		if (field.getValue() == null)
+		if (field.getValue() == null) {
 			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
+		}
 	}
 
 	/**
@@ -449,7 +453,7 @@ public class WFCDetailCASRequestsUtil {
 		if (response.getReturnCode() == -1) {
 			showErrorMessage(response.getResultSet());
 		} else {
-			openNotificationPopup(getTraslation("msg.DataDeleted"));
+			openNotificationPopup(getTranslation("msg.DataDeleted"));
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
@@ -468,6 +472,12 @@ public class WFCDetailCASRequestsUtil {
 	public void openNotificationPopup(String message) {
 		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, shell);
 		notificationPopUp.open();
+	}
+
+	@Optional
+	@Inject
+	public void newFields(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
+		openNotificationPopup(message);
 	}
 
 	/**

@@ -32,7 +32,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.util.DateUtil;
+import aero.minova.rcp.util.DateUtil;
 
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {

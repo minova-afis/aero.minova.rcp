@@ -54,7 +54,10 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	public void initPropertyNames(TranslationService translationService) {
 		int i = 0;
 		for (Column column : form.getIndexView().getColumn()) {
-			String translate = translationService.translate(column.getLabel(), null);
+			String translate = column.getName();
+			if (column.getLabel() != null) {
+				translate = translationService.translate(column.getLabel(), null);
+			}
 			getTableHeadersMap().put(column.getName(), translate);
 			propertyNames[i++] = column.getName();
 		}

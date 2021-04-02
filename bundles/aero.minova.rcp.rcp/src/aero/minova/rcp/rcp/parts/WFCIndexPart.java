@@ -28,6 +28,7 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
@@ -396,6 +397,11 @@ public class WFCIndexPart extends WFCFormPart {
 //				}));
 
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
+
+		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
+		copyHandler.setCopyFormattedText(true);
+		gridLayer.registerCommandHandler(copyHandler);
+
 		natTable = new NatTable(parent, compositeGridLayer, false);
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
@@ -492,12 +498,24 @@ public class WFCIndexPart extends WFCFormPart {
 		});
 	}
 
+	public NatTable getNattable() {
+		return natTable;
+	}
+
+	public SelectionLayer getSelectionLayer() {
+		return bodyLayerStack.getSelectionLayer();
+	}
+
+	public BodyLayerStack getBodyLayerStack() {
+		return this.bodyLayerStack;
+	}
+
 	/**
 	 * Always encapsulate the body layer stack in an AbstractLayerTransform to ensure that the index transformations are performed in later commands.
 	 *
 	 * @param <T>
 	 */
-	class BodyLayerStack<T> extends AbstractLayerTransform {
+	public class BodyLayerStack<T> extends AbstractLayerTransform {
 
 		private final SortedList<T> sortedList;
 
@@ -735,6 +753,14 @@ public class WFCIndexPart extends WFCFormPart {
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
+	}
+
+	public SortedList<Row> getSortedList() {
+		return bodyLayerStack.getSortedList();
+	}
+
+	public ColumnHeaderLayer getColumnHeaderLayer() {
+		return columnHeaderLayer;
 	}
 
 }
