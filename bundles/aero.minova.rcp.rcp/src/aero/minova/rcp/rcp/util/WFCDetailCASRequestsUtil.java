@@ -304,6 +304,12 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	@Optional
+	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
+		MessageDialog.openError(shell, "Error", message);
+	}
+
+	@Inject
+	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) Table errorTable) {
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
 		String messageproperty = "@" + vMessageProperty.getStringValue();
