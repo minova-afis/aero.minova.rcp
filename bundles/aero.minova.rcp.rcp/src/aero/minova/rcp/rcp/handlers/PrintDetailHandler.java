@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -24,6 +25,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -33,6 +35,9 @@ public class PrintDetailHandler {
 
 	@Inject
 	protected IDataService dataService;
+
+	@Inject
+	protected IEventBroker broker;
 
 	@Inject
 	protected UISynchronize sync;
@@ -47,8 +52,15 @@ public class PrintDetailHandler {
 			if (wfcDetailpart instanceof WFCDetailPart) {
 				wfcDetail = (WFCDetailPart) wfcDetailpart;
 			}
-			MField field = wfcDetail.getDetail().getField(Constants.CONTROL_KEYLONG);
-			Integer integerValue = field.getValue().getIntegerValue();
+			MDetail detail = wfcDetail.getDetail();
+			MField field = detail.getField("KeyLong");
+			Integer integerValue = null;
+			if (field.getValue() != null) {
+				integerValue = field.getValue().getIntegerValue();
+			} else {
+				broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Kein Datensatz zum Drucken selektiert! Bitte Wählen Sie einen Datensatz aus dem Index aus!");
+				return;
+			}
 
 			Table table = TableBuilder.newTable("xpctsPrintTestergebnis").withColumn("KeyLong", DataType.INTEGER).create();
 			Row row = RowBuilder.newRow().withValue(integerValue).create();
@@ -65,11 +77,9 @@ public class PrintDetailHandler {
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
-
 			}));
 		} catch (Exception ex) {
-			System.out.println("Drucken geht nicht!");
-			ex.printStackTrace();
+			broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Es gab ein Problem beim Anzeien des Files!");
 		}
 	}
 
