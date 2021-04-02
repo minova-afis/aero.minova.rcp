@@ -156,15 +156,24 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<Path> getPDFAsync(String tablename, Table detailTable) {
 		String body = gson.toJson(detailTable);
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/covid/test/certificate/print")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		logBody(body, ++callCount);
-		Path path = getStoragePath().resolve("/PDF/" + tablename + detailTable.getRows().get(0).getValue(0).toString() + ".pdf");
+		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
+		try {
+			Files.createDirectories(path.getParent());
+			Files.createFile(path);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
 			return path;
 		});
+//			HttpResponse<Path> send = httpClient.send(request, BodyHandlers.ofFile(path));
+//			System.out.println(send);
 	}
 
 	@Override
@@ -285,18 +294,17 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
-	 *                  mit angehängt.
-	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @param localPath
+	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename
+	 *            relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
 	@Override
-	public void downloadFile(String fileName)
-			throws IOException, InterruptedException {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName))
-				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+	public void downloadFile(String fileName) throws IOException, InterruptedException {
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
 		logBody("getFileSynch(" + fileName + ")", ++callCount);
 		Path localFile = getStoragePath().resolve(fileName);
@@ -352,6 +360,7 @@ public class DataService implements IDataService {
 		String localHash = localHashForFile.join();
 		return (!serverHash.equals(localHash));
 	}
+
 	private CompletableFuture<String> getCachedFileContent(String filename) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -673,8 +682,6 @@ public class DataService implements IDataService {
 
 		return tableFuture;
 	}
-
-
 
 //	@Override
 //	public <T> T convert(Path f, Class<T> clazz) {
