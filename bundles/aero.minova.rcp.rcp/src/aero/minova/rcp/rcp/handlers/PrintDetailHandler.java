@@ -18,7 +18,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.dataservice.internal.DataService;
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -32,7 +32,7 @@ import aero.minova.rcp.util.Tools;
 public class PrintDetailHandler {
 
 	@Inject
-	DataService dataService;
+	protected IDataService dataService;
 
 	@Inject
 	protected UISynchronize sync;
