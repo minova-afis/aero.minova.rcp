@@ -18,7 +18,7 @@ public interface IDataService {
 	/**
 	 * Anfrage an den Server ein Table object zu bekommen, mit den Suchkriterium
 	 * definiert über den searchTab
-	 * 
+	 *
 	 * @param tableName
 	 * @param seachTable
 	 * @return
@@ -26,6 +26,8 @@ public interface IDataService {
 	CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable);
 
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
+
+	CompletableFuture<Path> getPDFAsync(String tableName, Table detailTable);
 
 //	CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable);
 //
@@ -35,7 +37,7 @@ public interface IDataService {
 
 	/**
 	 * Diese Methode löst einen Wert auf.
-	 * 
+	 *
 	 * @param field
 	 *            Über dieser Feld werden alle erforderlichen Konfigurationswerte geselesen.
 	 * @param useCache
@@ -47,11 +49,11 @@ public interface IDataService {
 	 *            Der Keytext muss vollständig angegeben sein (Groß-/Kleinschreibung wir ignoriert). Er wird nur verwendet, wenn der KeyLong null ist.
 	 * @return
 	 */
-	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText);
+	CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText);
 
 	/**
 	 * Diese Methode liefert alle möglichen Werte für den angegebenen Filtertext.
-	 * 
+	 *
 	 * @param field
 	 *            Über dieser Feld werden alle erforderlichen Konfigurationswerte geselesen.
 	 * @param useCache
@@ -62,9 +64,9 @@ public interface IDataService {
 	 *            und "_" erlaubt, wie es im SQL-Server Standard ist.
 	 * @return
 	 */
-	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText);
+	CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText);
 
-	public Path getStoragePath();
+	Path getStoragePath();
 
 
 	CompletableFuture<String> getHashedFile(String filename);
