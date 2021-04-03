@@ -139,7 +139,7 @@ public class PrintIndexHandler {
 		if (xml != null && rows != null && rows.iterator().hasNext()) {
 			int colIndex = 0;
 			addHeader(xml, fileName);
-			xml.append("<Title>" + title + "</Title>");
+			xml.append("<Title>" + title + "</Title>\n");
 			xml.append("<IndexView>\n" + "<Group>\n" + "<Text><![CDATA[Gesamt]]></Text>");
 			xml.append("<Rows>\n");
 			for (final Row r : rows) {
