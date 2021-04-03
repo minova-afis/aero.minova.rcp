@@ -159,7 +159,7 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		}
 
-		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
+		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
 	}
 
@@ -761,6 +761,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 	public ColumnHeaderLayer getColumnHeaderLayer() {
 		return columnHeaderLayer;
+	}
+
+	public Table getData() {
+		return data;
 	}
 
 }

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<WorkingTime>
+<Site>
+<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>
+<Address2><![CDATA[Tröltschstraße 4]]></Address2>
+<Address3><![CDATA[97072 Würzburg]]></Address3>
+<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>
+<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>
+<Application>SIS</Application>
+<Logo>logo.gif</Logo>
+</Site>
+<PrintDate><![CDATA[2021-04-03 14:59]]></PrintDate>
+<Title>Verwaltung Stundenerfassung</Title>
+<IndexView>
+<Group>
+<Text><![CDATA[Gesamt]]></Text>
+<Rows>
+<Row>
+<KeyLong>1.206.412</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZURLAUB]]></ServiceText>
+<BookingDate><![CDATA[30.03.2021]]></BookingDate>
+<StartDate><![CDATA[08:00]]></StartDate>
+<EndDate><![CDATA[16:00]]></EndDate>
+<RenderedQuantity>8,00</RenderedQuantity>
+<ChargedQuantity>8,00</ChargedQuantity>
+<Description><![CDATA[Urlaub Herr Erlanger]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[31.03.2021 09:02]]></LastDate>
+<InvoiceText><![CDATA[PR21-0016]]></InvoiceText>
+</Row>
+<Row>
+<KeyLong>1.206.717</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZBEREIT]]></ServiceText>
+<BookingDate><![CDATA[30.03.2021]]></BookingDate>
+<StartDate><![CDATA[23:00]]></StartDate>
+<EndDate><![CDATA[23:00]]></EndDate>
+<RenderedQuantity>0,00</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#54: Hotline um 23:00 Uhr]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:29]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.411</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[31.03.2021]]></BookingDate>
+<StartDate><![CDATA[08:00]]></StartDate>
+<EndDate><![CDATA[09:00]]></EndDate>
+<RenderedQuantity>1,00</RenderedQuantity>
+<ChargedQuantity>1,00</ChargedQuantity>
+<Description><![CDATA[WFC - RCP Suchkriterien]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[31.03.2021 09:01]]></LastDate>
+<InvoiceText><![CDATA[PR21-0014]]></InvoiceText>
+</Row>
+<Row>
+<KeyLong>1.206.414</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[DISPO]]></ProjectText>
+<ServiceText><![CDATA[ZORGA]]></ServiceText>
+<BookingDate><![CDATA[31.03.2021]]></BookingDate>
+<StartDate><![CDATA[09:00]]></StartDate>
+<EndDate><![CDATA[09:30]]></EndDate>
+<RenderedQuantity>0,50</RenderedQuantity>
+<ChargedQuantity>0,50</ChargedQuantity>
+<Description><![CDATA[#42574: Teambesprechung DISPO]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[31.03.2021 09:23]]></LastDate>
+<InvoiceText><![CDATA[PR21-0016]]></InvoiceText>
+</Row>
+<Row>
+<KeyLong>1.206.493</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[31.03.2021]]></BookingDate>
+<StartDate><![CDATA[09:30]]></StartDate>
+<EndDate><![CDATA[12:15]]></EndDate>
+<RenderedQuantity>2,75</RenderedQuantity>
+<ChargedQuantity>3,00</ChargedQuantity>
+<Description><![CDATA[WFC Suchkriterien]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[31.03.2021 16:38]]></LastDate>
+<InvoiceText><![CDATA[PR21-0014]]></InvoiceText>
+</Row>
+<Row>
+<KeyLong>1.206.494</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[31.03.2021]]></BookingDate>
+<StartDate><![CDATA[12:45]]></StartDate>
+<EndDate><![CDATA[16:30]]></EndDate>
+<RenderedQuantity>3,75</RenderedQuantity>
+<ChargedQuantity>4,00</ChargedQuantity>
+<Description><![CDATA[WFC Suchkriterien
+]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[31.03.2021 16:38]]></LastDate>
+<InvoiceText><![CDATA[PR21-0014]]></InvoiceText>
+</Row>
+<Row>
+<KeyLong>1.206.718</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZBEREIT]]></ServiceText>
+<BookingDate><![CDATA[31.03.2021]]></BookingDate>
+<StartDate><![CDATA[23:00]]></StartDate>
+<EndDate><![CDATA[23:00]]></EndDate>
+<RenderedQuantity>0,00</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#54: Hotline um 23:00 Uhr]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:29]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.708</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[SCHWARZ]]></CustomerText>
+<ProjectText><![CDATA[DWB]]></ProjectText>
+<ServiceText><![CDATA[ZWARTUNG]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[08:00]]></StartDate>
+<EndDate><![CDATA[08:15]]></EndDate>
+<RenderedQuantity>0,25</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#51244: Karte lässt sich nicht mehr öffnen]]></Description>
+<ServiceContractText><![CDATA[dwb-schwarz]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:11]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.709</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZORGA]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[08:15]]></StartDate>
+<EndDate><![CDATA[09:00]]></EndDate>
+<RenderedQuantity>0,75</RenderedQuantity>
+<ChargedQuantity>1,00</ChargedQuantity>
+<Description><![CDATA[Teststrecke Sommerhausen]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:12]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.710</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZVERWALT]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[09:00]]></StartDate>
+<EndDate><![CDATA[09:30]]></EndDate>
+<RenderedQuantity>0,50</RenderedQuantity>
+<ChargedQuantity>0,50</ChargedQuantity>
+<Description><![CDATA[#27591: Betreuung Auszubildender]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:12]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.711</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZLESEN]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[09:30]]></StartDate>
+<EndDate><![CDATA[09:45]]></EndDate>
+<RenderedQuantity>0,25</RenderedQuantity>
+<ChargedQuantity>0,50</ChargedQuantity>
+<Description><![CDATA[#5687: TRAC, Teams, E-Mails]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:12]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.723</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[KLAESER]]></CustomerText>
+<ProjectText><![CDATA[DWB]]></ProjectText>
+<ServiceText><![CDATA[ZWARTUNG]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[09:45]]></StartDate>
+<EndDate><![CDATA[10:00]]></EndDate>
+<RenderedQuantity>0,25</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#51249: Eingabe von mehr als 1000 TDL Produkten nicht möglich]]></Description>
+<ServiceContractText><![CDATA[dwb-klaeser]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:34]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.706</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[WUTH]]></CustomerText>
+<ProjectText><![CDATA[DWB]]></ProjectText>
+<ServiceText><![CDATA[ZWARTUNG]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[10:00]]></StartDate>
+<EndDate><![CDATA[10:15]]></EndDate>
+<RenderedQuantity>0,25</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#51248: doppelte Mengen in Report: Control de Bulletin]]></Description>
+<ServiceContractText><![CDATA[DWB-WUTH]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:10]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.724</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[KLAESER]]></CustomerText>
+<ProjectText><![CDATA[DWB]]></ProjectText>
+<ServiceText><![CDATA[ZWARTUNG]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[10:15]]></StartDate>
+<EndDate><![CDATA[10:30]]></EndDate>
+<RenderedQuantity>0,25</RenderedQuantity>
+<ChargedQuantity>0,50</ChargedQuantity>
+<Description><![CDATA[#51249: Eingabe von mehr als 1000 TDL Produkten nicht möglich]]></Description>
+<ServiceContractText><![CDATA[dwb-klaeser]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:34]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.733</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[10:30]]></StartDate>
+<EndDate><![CDATA[11:15]]></EndDate>
+<RenderedQuantity>0,75</RenderedQuantity>
+<ChargedQuantity>1,00</ChargedQuantity>
+<Description><![CDATA[Druck aus dem Detail]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 11:39]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.732</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[KLAESER]]></CustomerText>
+<ProjectText><![CDATA[DWB]]></ProjectText>
+<ServiceText><![CDATA[ZWARTUNG]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[11:15]]></StartDate>
+<EndDate><![CDATA[11:45]]></EndDate>
+<RenderedQuantity>0,50</RenderedQuantity>
+<ChargedQuantity>0,50</ChargedQuantity>
+<Description><![CDATA[#51249: Eingabe von mehr als 1000 TDL Produkten nicht möglich]]></Description>
+<ServiceContractText><![CDATA[dwb-klaeser]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 11:38]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.844</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[11:45]]></StartDate>
+<EndDate><![CDATA[12:30]]></EndDate>
+<RenderedQuantity>0,75</RenderedQuantity>
+<ChargedQuantity>1,00</ChargedQuantity>
+<Description><![CDATA[Indexdruck ]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 17:28]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.847</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[13:00]]></StartDate>
+<EndDate><![CDATA[17:30]]></EndDate>
+<RenderedQuantity>4,50</RenderedQuantity>
+<ChargedQuantity>4,50</ChargedQuantity>
+<Description><![CDATA[Indexdruck + Detaildruck]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 17:29]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.719</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZBEREIT]]></ServiceText>
+<BookingDate><![CDATA[01.04.2021]]></BookingDate>
+<StartDate><![CDATA[23:00]]></StartDate>
+<EndDate><![CDATA[23:00]]></EndDate>
+<RenderedQuantity>0,00</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#54: Hotline um 23:00 Uhr]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:29]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.887</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[CORE]]></ProjectText>
+<ServiceText><![CDATA[ZPROGRAM]]></ServiceText>
+<BookingDate><![CDATA[02.04.2021]]></BookingDate>
+<StartDate><![CDATA[15:30]]></StartDate>
+<EndDate><![CDATA[19:30]]></EndDate>
+<RenderedQuantity>4,00</RenderedQuantity>
+<ChargedQuantity>4,00</ChargedQuantity>
+<Description><![CDATA[Teststrecken Sommerhausen, Eibelstadt und Winterhausen]]></Description>
+<ServiceContractText><![CDATA[2020-MIN-WFC]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[02.04.2021 19:31]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.720</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZBEREIT]]></ServiceText>
+<BookingDate><![CDATA[02.04.2021]]></BookingDate>
+<StartDate><![CDATA[23:00]]></StartDate>
+<EndDate><![CDATA[23:00]]></EndDate>
+<RenderedQuantity>0,00</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#54: Hotline um 23:00 Uhr]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:29]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.721</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZBEREIT]]></ServiceText>
+<BookingDate><![CDATA[03.04.2021]]></BookingDate>
+<StartDate><![CDATA[23:00]]></StartDate>
+<EndDate><![CDATA[23:00]]></EndDate>
+<RenderedQuantity>0,00</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#54: Hotline um 23:00 Uhr]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:29]]></LastDate>
+</Row>
+<Row>
+<KeyLong>1.206.722</KeyLong>
+<EmployeeText><![CDATA[ERLANGERC]]></EmployeeText>
+<CustomerText><![CDATA[MIN]]></CustomerText>
+<ProjectText><![CDATA[INTERN]]></ProjectText>
+<ServiceText><![CDATA[ZBEREIT]]></ServiceText>
+<BookingDate><![CDATA[04.04.2021]]></BookingDate>
+<StartDate><![CDATA[23:00]]></StartDate>
+<EndDate><![CDATA[23:00]]></EndDate>
+<RenderedQuantity>0,00</RenderedQuantity>
+<ChargedQuantity>0,00</ChargedQuantity>
+<Description><![CDATA[#54: Hotline um 23:00 Uhr]]></Description>
+<ServiceContractText><![CDATA[Intern-MIN]]></ServiceContractText>
+<Assigned>1</Assigned>
+<LastDate><![CDATA[01.04.2021 10:29]]></LastDate>
+</Row>
+</Rows>
+<SumRow>
+<KeyLong>23</KeyLong>
+<RenderedQuantity>29,00</RenderedQuantity>
+<ChargedQuantity>30,00</ChargedQuantity>
+</SumRow>
+</Group>
+</IndexView>
+</WorkingTime>
