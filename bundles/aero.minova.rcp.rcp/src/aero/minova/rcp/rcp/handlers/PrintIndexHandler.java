@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -53,17 +54,21 @@ public class PrintIndexHandler {
 	private IDataService dataService;
 
 	@Inject
+	private TranslationService translationService;
+
+	@Inject
 	private IEventBroker broker;
 
 	@Execute
 	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window, EModelService modelService,
 			EPartService partService, @Optional Preview preview) {
 
-		String fileName = null;
-		String title;
+		String xmlRootTag = null;
+		String title = null;
 		Object o = mpart.getObject();
 		StringBuffer xml = new StringBuffer();
 		title = mpart.getLabel();
+		title = translationService.translate(title, title);
 		List<Column> tableColumns = new ArrayList<>();
 
 		Path path_reports = dataService.getStoragePath().resolve("PDF/");
@@ -71,7 +76,7 @@ public class PrintIndexHandler {
 		if (o instanceof WFCIndexPart) {
 
 			Table data = ((WFCIndexPart) o).getData();
-			fileName = data.getName();
+			xmlRootTag = data.getName();
 			SortedList<Row> sortedDataList = ((WFCIndexPart) o).getSortedList();
 			ColumnReorderLayer columnReorderLayer = ((WFCIndexPart) o).getBodyLayerStack().getColumnReorderLayer();
 			columnReorderLayer.getColumnIndexOrder();
@@ -91,20 +96,19 @@ public class PrintIndexHandler {
 			ReportConfiguration rConfig = new ReportConfiguration();
 
 			try {
-				TableXSLCreator tableCreator = new TableXSLCreator();
-				xslString = tableCreator.createXSL(fileName, tableColumns, sortedDataList, colConfig, rConfig, path_reports);
+				TableXSLCreator tableCreator = new TableXSLCreator(translationService);
+				xslString = tableCreator.createXSL(xmlRootTag, title, tableColumns, sortedDataList, colConfig, rConfig, path_reports);
 			} catch (ReportCreationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			saveIntoXSL(xslString, fileName);
-			saveIntoXML(sortedDataList, columnHeaderList, columnReorderLayer.getColumnIndexOrder(), xml, false, fileName, title);
+			saveIntoXSL(xslString, xmlRootTag);
+			saveIntoXML(sortedDataList, columnHeaderList, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 		}
 
-		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.pdf");
-		Path path_xml = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xml");
-		Path path_xsl = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xsl");
+		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+		Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
+		Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
 		URL url_pdf = null;
 		URL url_xml = null;
 		URL url_xsl = null;

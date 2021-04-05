@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.model.Column;
@@ -19,11 +17,14 @@ import ca.odell.glazedlists.SortedList;
 
 public class TableXSLCreator extends CommonPrint {
 
-	@Inject
 	private TranslationService translationService;
 
 	// Templates
 	private static HashMap<String, String> templates = new HashMap<>();
+
+	public TableXSLCreator(TranslationService translationService2) {
+		this.translationService = translationService2;
+	}
 
 	/**
 	 * Erzeugt ein XSL-Template mittels einer Such- und Datentabelle
@@ -41,9 +42,8 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	public String createXSL(String title, List<Column> headerInfo, SortedList<Row> dataList, List<ColumnInfo> colConfig, ReportConfiguration reportConf,
-			Path path_reports) throws ReportCreationException {
-//		loadTemplates(null);
+	public String createXSL(String xmlRootTag, String reportName, List<Column> headerInfo, SortedList<Row> dataList, List<ColumnInfo> colConfig,
+			ReportConfiguration reportConf, Path path_reports) throws ReportCreationException {
 
 		if (reportConf == null) {
 			reportConf = ReportConfiguration.DEFAULT;
@@ -60,7 +60,7 @@ public class TableXSLCreator extends CommonPrint {
 
 		final Orientation ori = reportConf.calculatePageOrientation(getPrintedRowWidth(colConfig, reportConf));
 		final String xslData = getTemplate(ori);
-		return interpolateXslData(title, dataList, colConfig, reportConf, path_reports, xslData);
+		return interpolateXslData(xmlRootTag, reportName, dataList, colConfig, reportConf, path_reports, xslData);
 	}
 
 	/**
@@ -383,8 +383,8 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	public String interpolateXslData(String title, SortedList<Row> sortedDataList, List<ColumnInfo> cols, ReportConfiguration conf, Path path, String xslData)
-			throws ReportCreationException {
+	public String interpolateXslData(String xmlRootTag, String reportName, SortedList<Row> sortedDataList, List<ColumnInfo> cols, ReportConfiguration conf,
+			Path path, String xslData) throws ReportCreationException {
 		final String columnDefinition = getColumnDefinition(cols, conf);
 		final String tableTitle = getTableTitle(sortedDataList, cols, conf);
 		final String cellDefinition = getCellDefinition(cols, false);
@@ -413,8 +413,8 @@ public class TableXSLCreator extends CommonPrint {
 			xslData = xslData.replace("%%SearchCriteriaValues%%", getSearchCriteriaValues(sortedDataList, cols));
 		}
 
-		xslData = xslData.replace("%%XMLMainTag%%", title);
-		xslData = xslData.replace("%%FormTitle%%", conf.title);
+		xslData = xslData.replace("%%XMLMainTag%%", xmlRootTag);
+		xslData = xslData.replace("%%FormTitle%%", reportName);
 		xslData = xslData.replace("%%ColumnCount%%", "" + cols.size());
 		xslData = xslData.replace("%%SumVisibility%%", "false");
 		// #22149: ohne die vorige Ersetzung sollte das auch nicht auftreten
@@ -447,13 +447,11 @@ public class TableXSLCreator extends CommonPrint {
 	 * Lokalisiert statische Werte im Report
 	 */
 	public String localize(String text) {
-		// TODO
-		// TranslationService
-		text = text.replace("%%tAddress.Phone%%", "Tel.");
-		text = text.replace("%%tAddress.Fax%%", "Fax");
-		text = text.replace("%%tAddress.Page%%", "Seite");
-		text = text.replace("%%tAddress.Index%%", "Index");
-		text = text.replace("%%tDate%%", "Datum");
+		text = text.replace("%%tAddress.Phone%%", translationService.translate("@Phone", "Tel."));
+		text = text.replace("%%tAddress.Fax%%", translationService.translate("@tAddress.Fax", "Fax"));
+		text = text.replace("%%tAddress.Page%%", translationService.translate("@tAddress.Page", "Seite"));
+		text = text.replace("%%tAddress.Index%%", translationService.translate("@tAddress.Index", "Index"));
+		text = text.replace("%%tDate%%", translationService.translate("@tDate", "Datum"));
 		return text;
 	}
 }
