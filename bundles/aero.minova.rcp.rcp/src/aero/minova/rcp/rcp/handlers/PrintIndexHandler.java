@@ -31,11 +31,16 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
+import aero.minova.rcp.rcp.print.ColumnInfo;
+import aero.minova.rcp.rcp.print.ReportConfiguration;
+import aero.minova.rcp.rcp.print.ReportCreationException;
+import aero.minova.rcp.rcp.print.TableXSLCreator;
 import aero.minova.rcp.rcp.util.PDFGenerator;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
@@ -59,11 +64,15 @@ public class PrintIndexHandler {
 		Object o = mpart.getObject();
 		StringBuffer xml = new StringBuffer();
 		title = mpart.getLabel();
+		List<Column> tableColumns = new ArrayList<>();
+
+		Path path_reports = dataService.getStoragePath().resolve("PDF/");
+		String xslString = null;
 		if (o instanceof WFCIndexPart) {
 
 			Table data = ((WFCIndexPart) o).getData();
 			fileName = data.getName();
-			SortedList<Row> sortedList = ((WFCIndexPart) o).getSortedList();
+			SortedList<Row> sortedDataList = ((WFCIndexPart) o).getSortedList();
 			ColumnReorderLayer columnReorderLayer = ((WFCIndexPart) o).getBodyLayerStack().getColumnReorderLayer();
 			columnReorderLayer.getColumnIndexOrder();
 
@@ -73,15 +82,32 @@ public class PrintIndexHandler {
 				columnHeaderList.add(data.getColumnName(((WFCIndexPart) o).getColumnHeaderLayer().getColumnIndexByPosition(i)));
 			}
 
-			saveIntoXML(sortedList, columnHeaderList, columnReorderLayer.getColumnIndexOrder(), xml, false, fileName, title);
+			List<ColumnInfo> colConfig = new ArrayList<>();
+			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
+				tableColumns.add(data.getColumns().get(i1));
+				colConfig.add(new ColumnInfo(data.getColumns().get(i1), columnReorderLayer.getColumnWidthByPosition(i1)));
+			}
+
+			ReportConfiguration rConfig = new ReportConfiguration();
+
+			try {
+				TableXSLCreator tableCreator = new TableXSLCreator();
+				xslString = tableCreator.createXSL(fileName, tableColumns, sortedDataList, colConfig, rConfig, path_reports);
+			} catch (ReportCreationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			saveIntoXSL(xslString, fileName);
+			saveIntoXML(sortedDataList, columnHeaderList, columnReorderLayer.getColumnIndexOrder(), xml, false, fileName, title);
 
 		}
 
 		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.pdf");
 		Path path_xml = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xml");
-//		Path path_xsl = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xsl");
+		Path path_xsl = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xsl");
 		URL url_pdf = null;
 		URL url_xml = null;
+		URL url_xsl = null;
 		try {
 			Files.createDirectories(path_pdf.getParent());
 			Files.createDirectories(path_xml.getParent());
@@ -92,16 +118,31 @@ public class PrintIndexHandler {
 
 			url_pdf = path_pdf.toFile().toURI().toURL();
 			url_xml = path_xml.toFile().toURI().toURL();
+			url_xsl = path_xsl.toFile().toURI().toURL();
 			// Schreibt den Inhalt in die XML Datei
 			IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		generatePDF(url_pdf, url_xml, null);
+		generatePDF(url_pdf, url_xml, url_xsl);
 		showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
 	}
 
+	private void saveIntoXSL(String xslString, String fileName) {
+		if (xslString != null) {
+			Path path_xsl = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xsl");
+			try {
+				Files.createDirectories(path_xsl.getParent());
+				createFile(path_xsl.toString());
+				// Schreibt den Inhalt in die XML Datei
+				IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	/**
 	 * Erstellt eine Datei falls sie existiert, wird sie geleert.
@@ -194,8 +235,7 @@ public class PrintIndexHandler {
 		PDFGenerator pdfGenerator = new PDFGenerator(new HashMap<String, String>());
 		try {
 			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
-			pdfGenerator.createPdfFile(xml.getFile(),
-					"/Users/erlanger/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/pdf/WorkingTime_Index.xsl", pdfOutput);
+			pdfGenerator.createPdfFile(xml.getFile(), xsl.getFile(), pdfOutput);
 			return;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

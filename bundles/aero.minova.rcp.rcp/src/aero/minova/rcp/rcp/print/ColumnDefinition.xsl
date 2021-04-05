@@ -1,0 +1,1 @@
+<fo:table-column column-width="%%Size%%mm"/>

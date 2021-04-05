@@ -74,4 +74,97 @@ public class Constants {
 	// SeachCriteria
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
+	/**
+	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
+	 *
+	 * @author dombrovski
+	 */
+	public enum Standard {
+		/** alte Standardverbindung */
+		CONNECTION("connection"),
+
+		CONNECTION_DRIVER("driver", "net.sourceforge.jtds.jdbc.Driver"),
+
+		/** Standardverbindung für Dienste und Java 2 */
+		CONNECTION2("connection2"),
+
+		/** Verbindung zur Truckdb */
+		TRUCKCONNECTION("truckconnection"),
+
+		/** Kunden-ID, z.B. 'ZOTZ' */
+		CUSTOMER_ID("CustomerID"),
+
+		/** Kodierung der XML-Reports */
+		ENCODING_XML_REPORT("xmlReportEncoding", "UTF-8"),
+
+		/**
+		 * optionale Einstellung für Report-Sprache, Default: Sprache des Users<br>
+		 * z.B. "fr_CH" oder "de"
+		 */
+		REPORT_LOCALE("ReportLocale"),
+
+		/**
+		 * optionale Einstellung für System-Sprache, Default: Sprache des Betriebssystems<br>
+		 * z.B. "fr_CH" oder "de"
+		 */
+		// SYSTEM_LOCALE("SystemLocale"), WIS: wird derzeit über UI-Preferences gemacht
+
+		/** MDI-Dateiname */
+		FILE_MDI("MDIFilename"),
+
+		/** Lizenz gültig von */
+		LICENCE_VALID_FROM("licensedata/validFrom"),
+
+		/** Lizenz gültig bis */
+		LICENCE_VALID_UNTIL("licensedata/validUntil"),
+
+		/** Logo (muss im Report-Pfad liegen) */
+		LOGO("Logo", "logo.gif"),
+
+		/** Bild-Pfad */
+		PATH_IMAGE("ImagePath"),
+
+		/** Report-Pfad */
+		PATH_REPORT("ReportPath"),
+
+		/** Dokumente-Pfad */
+		PATH_DOCUMENT("DocumentPath"),
+
+		/** Lizenz-Signatur */
+		SIGNATURE("signature"),
+
+		/** Stornieren- oder Löschen-Dialog anzeigen? */
+		SHOW_CANCEL_DIALOG("ShowCancelDialog", "1"),
+
+		/** Korrektur-Dialog anzeigen? */
+		SHOW_CORRECTION_DIALOG("ShowCorrectionDialog", "1"),
+
+		SITE_ADDRESS_1("SiteAddress1", "MINOVA Information Systems GmbH"),
+
+		SITE_ADDRESS_2("SiteAddress2", "Tröltschstraße 4"),
+
+		SITE_ADDRESS_3("SiteAddress3", "D-97072 Würzburg"),
+
+		SITE_PHONE("SitePhone", "+49 (931) 322 35-0"),
+
+		SITE_FAX("SiteFax", "+49 (931) 322 35-55");
+
+		public final String defaultValue;
+
+		public final String path;
+
+		/**
+		 * Liefert alle geladenen Standardwerte für die gegebene Applikation
+		 */
+
+		Standard(String path) {
+			this(path, null);
+		}
+
+		Standard(String path, String defaultValue) {
+			this.path = path;
+			this.defaultValue = defaultValue;
+		}
+	}
+
 }
