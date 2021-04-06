@@ -1,7 +1,9 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -59,13 +61,18 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
+import aero.minova.rcp.rcp.util.DateTimeUtil;
+import aero.minova.rcp.rcp.util.DateUtil;
+import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.rcp.util.TimeUtil;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -93,6 +100,14 @@ public class WFCSearchPart extends WFCFormPart {
 
 	private SelectionLayer selectionLayer;
 
+	private MinovaColumnPropertyAccessor columnPropertyAccessor;
+
+	private ColumnHeaderLayer columnHeaderLayer;
+
+	private ColumnReorderLayer columnReorderLayer;
+
+	private DataLayer bodyDataLayer;
+
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
 
@@ -100,9 +115,10 @@ public class WFCSearchPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
-		String tableName = form.getIndexView().getSource();
-		String string = prefs.get(tableName, null);
+		// perspective.getContext().set(Form.class, form); // Wir merken es uns im
+		// Context; so können andere es nutzen
+		// String tableName = form.getIndexView().getSource();
+		// String string = prefs.get(tableName + ".DEFAULT.table", null);
 		Form searchForm = form;
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
 		xsdColumn.setBoolean(Boolean.FALSE);
@@ -111,27 +127,22 @@ public class WFCSearchPart extends WFCFormPart {
 		searchForm.getIndexView().getColumn().add(0, xsdColumn);
 
 		data = dataFormService.getTableFromFormIndex(searchForm);
-		if (string != null) {
-			// Auslesen der zuletzt gespeicherten Daten
-			data = mjs.json2Table(string);
-		}
-
-		// Es muss nur dann eine neue Zeile hinzugefügt werden wenn kein geladen wurden
-		if (data.getRows().size() == 0) {
-			data.addRow();
-			// Wir setzen die Verundung auf false im Default-Fall!
-			data.getRows().get(data.getRows().size() - 1).setValue(new Value(false), 0);
-		}
+		getData().addRow();
+		// Wir setzen die Verundung auf false im Default-Fall!
+		getData().getRows().get(getData().getRows().size() - 1).setValue(new Value(false), 0);
 
 		parent.setLayout(new GridLayout());
-		mPart.getContext().set("NatTableDataSearchArea", data);
+		mPart.getContext().set("NatTableDataSearchArea", getData());
 
-		natTable = createNatTable(parent, searchForm, data);
+		natTable = createNatTable(parent, searchForm, getData());
 
+		//TODO Constants
+		loadPrefs("DEFAULT");
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
+	 * die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -152,20 +163,20 @@ public class WFCSearchPart extends WFCFormPart {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
 		sortedList = new SortedList<>(eventList, null);
-		MinovaColumnPropertyAccessor accessor = new MinovaColumnPropertyAccessor(table, form);
-		accessor.initPropertyNames(translationService);
+		columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, form);
+		columnPropertyAccessor.initPropertyNames(translationService);
 
-		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, accessor);
+		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 
-		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
 			@Override
 			protected boolean doCommand(UpdateDataCommand command) {
 				if (super.doCommand(command)) {
 					Object newValue = command.getNewValue();
-					if (data.getRows().size() - 1 == command.getRowPosition() && newValue != null) {
-						Table dummy = data;
+					if (getData().getRows().size() - 1 == command.getRowPosition() && newValue != null) {
+						Table dummy = getData();
 						dummy.addRow();
 						// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
 						dummy.getRows().get(dummy.getRows().size() - 1).setValue(new Value(false), 0);
@@ -181,7 +192,7 @@ public class WFCSearchPart extends WFCFormPart {
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
-		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
+		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
@@ -193,12 +204,13 @@ public class WFCSearchPart extends WFCFormPart {
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(accessor.getPropertyNames(), accessor.getTableHeadersMap());
+		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
+				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ILayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
 		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer), false);
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -226,7 +238,8 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
 
-		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
+		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der
+		// Mouselistener anschlägt!
 		natTable.addConfiguration(new DefaultEditBindings() {
 
 			@Override
@@ -255,10 +268,21 @@ public class WFCSearchPart extends WFCFormPart {
 	}
 
 	@PersistTableSelection
-	public void savePrefs(@Named("SpaltenKonfiguration") Boolean name) {
+	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
+		// xxx.table
+		// xxx.search.size (index,breite(int)), Speichert auch Reihenfolge der Spalten
+		// Ähnlich im IndexPart
+		saveNattable();
+		String tableName = getData().getName();
+		prefs.put(tableName + "." + name + ".table", mjs.table2Json(getData(), true));
+		if (saveRowConfig) {
+			String search = "";
+			for (int i : columnReorderLayer.getColumnIndexOrder()) {
+				search += i + "," + bodyDataLayer.getColumnWidthByPosition(i) + ";";
+			}
+			prefs.put(tableName + "." + name + ".search.size", search);
+		}
 
-		String tableName = data.getName();
-		prefs.put(tableName, mjs.table2Json(data));
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
@@ -266,28 +290,86 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 	}
 
-	@Inject
-	@Optional
-	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String id) {
+	@LoadTableSelection
+	public void loadPrefs(@Named("ConfigName") String name) {
 		// Close Editor
 		if (natTable.getActiveCellEditor() != null) {
 			natTable.getActiveCellEditor().close();
 		}
 
 		String tableName = form.getIndexView().getSource();
-		String string = prefs.get(tableName, null);
-		if (string == null || string.equals(""))
+		String string = prefs.get(tableName + "." + name + ".table", null);
+		if (string == null || string.equals("")) {
 			return;
-
-		Table prefTable = mjs.json2Table(string);
-
-		// Alle aktuellen Suchzeilen entfernen
+		}
+		Table prefTable = mjs.json2Table(string, true);
 		sortedList.clear();
-		data.getRows().clear();
+		getData().getRows().clear();
 
-		// Gespeicherte Zeilen hinzufügen
-		sortedList.addAll(prefTable.getRows());
-		data.getRows().addAll(prefTable.getRows());
+		getData().getRows().addAll(prefTable.getRows());
+		// Instants aktualisieren, damit der angezeigte Wert zur Nutzereingabe passt
+		for (Row r : getData().getRows()) {
+			for (int i = 0; i < getData().getColumnCount(); i++) {
+				Value v = r.getValue(i);
+				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
+					FilterValue fv = (FilterValue) v;
+					Instant inst = fv.getFilterValue().getInstantValue();
+					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
+						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
+					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
+						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
+					} else {
+						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());
+					}
+
+					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);
+				}
+			}
+		}
+		sortedList.addAll(getData().getRows());
+
+		// Spaltenanordung und -breite
+		string = prefs.get(tableName + "." + name + ".search.size", null);
+		if (string == null || string.equals("")) {
+			return;
+		}
+
+		String[] fields = string.split(";");
+		ArrayList<Integer> order = new ArrayList<>();
+		for (String s : fields) {
+			String[] keyValue = s.split(",");
+			int position = Integer.parseInt(keyValue[0].trim());
+			int width = Integer.parseInt(keyValue[1].trim());
+			order.add(position);
+			bodyDataLayer.setColumnWidthByPosition(position, width);
+		}
+		// TODO längen prüfen und ggf ergänzen
+		if (columnReorderLayer.getColumnIndexOrder().size() < order.size()) {
+			ArrayList<Integer> toDelete = new ArrayList<>();
+			for (int i : order) {
+				if (!columnReorderLayer.getColumnIndexOrder().contains(i)) {
+					toDelete.add(i);
+				}
+			}
+			order.removeAll(toDelete);
+		}
+		columnReorderLayer.getColumnIndexOrder().removeAll(order);
+		columnReorderLayer.getColumnIndexOrder().addAll(0, order);
+		columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i,
+						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
 	}
 
 	@Inject
@@ -299,13 +381,13 @@ public class WFCSearchPart extends WFCFormPart {
 		}
 
 		// Alle Einträge entfernen
-		data.getRows().clear();
+		getData().getRows().clear();
 		sortedList.clear();
 
 		// Neue Zeile hinzufügen (erste Spalte darf nicht null sein)
-		data.addRow();
-		data.getRows().get(0).setValue(new Value(false), 0);
-		sortedList.add(data.getRows().get(0));
+		getData().addRow();
+		getData().getRows().get(0).setValue(new Value(false), 0);
+		sortedList.add(getData().getRows().get(0));
 	}
 
 	@Inject
@@ -329,11 +411,11 @@ public class WFCSearchPart extends WFCFormPart {
 	public void deleteSearchRow(List<Row> rows) {
 		// Löscht eine Liste von Objekten
 		sortedList.removeAll(rows);
-		data.getRows().removeAll(rows);
+		getData().getRows().removeAll(rows);
 		if (sortedList.isEmpty()) {
-			Table dummy = data;
+			Table dummy = getData();
 			dummy.addRow();
-			data.getRows().get(0).setValue(new Value(false), 0);
+			getData().getRows().get(0).setValue(new Value(false), 0);
 			sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 		}
 	}
@@ -349,6 +431,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 	public void saveNattable() {
 		natTable.commitAndCloseActiveCellEditor();
+	}
+
+	public Table getData() {
+		return data;
 	}
 
 }

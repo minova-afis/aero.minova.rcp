@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -10,8 +12,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -56,6 +60,7 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -65,11 +70,14 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
+import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
+import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
@@ -81,7 +89,6 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
-import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -91,6 +98,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
 	private ESelectionService selectionService;
+
+	@Inject
+	@Preference
+	private IEclipsePreferences prefs;
 
 	private Table data;
 
@@ -103,16 +114,18 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	TranslationService translationService;
 
-	@Inject
-	@Named(value = TranslationService.LOCALE)
-	Locale locale;
-
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 
 	private ColumnHeaderLayer columnHeaderLayer;
 
 	@Inject
 	MPart mpart;
+
+	private SortHeaderLayer sortHeaderLayer;
+
+	private GroupByHeaderLayer groupByHeaderLayer;
+
+	private boolean expandGroups = false;
 
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
@@ -141,11 +154,114 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, data, selectionService, perspective.getContext());
+		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
 	}
 
-	@PersistTableSelection
-	public void savePrefs() {
-		// TODO INDEX Part reihenfolge + Gruppierung speichern
+	@Inject
+	@Optional
+	public void savePrefs(@UIEventTopic(Constants.BROKER_SAVESEARCHCRITERIA) String name) {
+		// xxx.index.size (index,breite(int));
+		// xxx.index.sortby (index,sortDirection(ASC|DESC);index2....);
+		// xxx.index.groupby (expand[0,1];index;index2...);
+		// Ähnlich im SearchPart
+
+		String tableName = form.getIndexView().getSource();
+
+		// Spaltenanordung und -breite
+		String size = "";
+		for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
+			size += i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";";
+
+		}
+		prefs.put(tableName + "." + name + ".index.size", size);
+
+		// Sortierung
+		String sort = "";
+		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
+			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+		}
+		prefs.put(tableName + "." + name + ".index.sortby", sort);
+
+		// Gruppierung
+		String group = "";
+		if (expandGroups) {
+			group += 1 + ";";
+		} else {
+			group += 0 + ";";
+		}
+		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes()) {
+			group += i + ";";
+		}
+		prefs.put(tableName + "." + name + ".index.groupby", group);
+
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Inject
+	@Optional
+	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
+		// Spaltenanordung und -breite
+		String tableName = form.getIndexView().getSource();
+		String string = prefs.get(tableName + "." + name + ".index.size", null);
+		if (string != null && !string.equals("")) {
+
+			String[] fields = string.split(";");
+			ArrayList<Integer> order = new ArrayList<>();
+			for (String s : fields) {
+				String[] keyValue = s.split(",");
+				int position = Integer.parseInt(keyValue[0].trim());
+				int width = Integer.parseInt(keyValue[1].trim());
+				order.add(position);
+				bodyLayerStack.getBodyDataLayer().setColumnWidthByPosition(position, width);
+			}
+			// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
+			if (bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().size() < order.size()) {
+				ArrayList<Integer> toDelete = new ArrayList<>();
+				for (int i : order) {
+					if (!bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().contains(i)) {
+						toDelete.add(i);
+					}
+				}
+				order.removeAll(toDelete);
+			}
+			bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().removeAll(order);
+			bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().addAll(0, order);
+			bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+		}
+
+		// Sortierung
+		string = prefs.get(tableName + "." + name + ".index.sortby", null);
+		if (string != null && !string.equals("")) {
+			String[] fields = string.split(";");
+			sortHeaderLayer.getSortModel().clear();
+			for (String s : fields) {
+				String[] keyValue = s.split(",");
+				int index = Integer.parseInt(keyValue[0].trim());
+				SortDirectionEnum direction = SortDirectionEnum.valueOf(keyValue[1].trim());
+				sortHeaderLayer.getSortModel().sort(index, direction, true);
+			}
+		}
+
+		// Gruppierung
+		string = prefs.get(tableName + "." + name + ".index.groupby", null);
+		if (string != null && !string.equals("")) {
+			String[] fields = string.split(";");
+			groupByHeaderLayer.getGroupByModel().clearGroupByColumnIndexes();
+			for (String s : Arrays.copyOfRange(fields, 1, fields.length)) {
+				int index = Integer.parseInt(s);
+				groupByHeaderLayer.getGroupByModel().addGroupByColumnIndex(index);
+			}
+			if (fields[0].equals("0")) {
+				collapseGroups("");
+			} else {
+				expandGroups("");
+			}
+		}
 	}
 
 	/**
@@ -169,6 +285,8 @@ public class WFCIndexPart extends WFCFormPart {
 	@Optional
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
 		if (map.get(perspective) != null) {
+			// clear the group by summary cache so the new summary calculation gets triggered
+			bodyLayerStack.getBodyDataLayer().clearCache();
 			Table table = map.get(perspective);
 			updateData(table.getRows());
 		}
@@ -177,17 +295,6 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
-		this.locale = s;
-		translate(translationService);
-	}
-
-	/**
-	 * Übersetz die Headerzeile in der NatTable
-	 *
-	 * @param translationService2
-	 */
-	private void translate(TranslationService translationService2) {
-		// TODO wir hlören auf das LocaleChangeEvent dann entfällt der Check!
 		if (columnPropertyAccessor != null) {
 			columnPropertyAccessor.translate(translationService);
 			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
@@ -195,7 +302,20 @@ public class WFCIndexPart extends WFCFormPart {
 				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
+	}
 
+	@Inject
+	@Optional
+	private void collapseGroups(@UIEventTopic(Constants.BROKER_COLLAPSEINDEX) String s) {
+		natTable.doCommand(new TreeCollapseAllCommand());
+		expandGroups = false;
+	}
+
+	@Inject
+	@Optional
+	private void expandGroups(@UIEventTopic(Constants.BROKER_EXPANDINDEX) String s) {
+		natTable.doCommand(new TreeExpandAllCommand());
+		expandGroups = true;
 	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
@@ -208,7 +328,7 @@ public class WFCIndexPart extends WFCFormPart {
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		// create the body stack
-		bodyLayerStack = new BodyLayerStack<Row>(table.getRows(), columnPropertyAccessor, configRegistry);
+		bodyLayerStack = new BodyLayerStack<>(table.getRows(), columnPropertyAccessor, configRegistry);
 		bodyLayerStack.getBodyDataLayer().setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		// build the column header layer
@@ -217,7 +337,7 @@ public class WFCIndexPart extends WFCFormPart {
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
-		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
 
 		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
@@ -251,8 +371,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
-		GroupByHeaderLayer groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider,
-				columnHeaderLayer);
+		groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider, columnHeaderLayer);
 		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
@@ -377,6 +496,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private ViewportLayer viewportLayer;
 
+		private ColumnReorderLayer columnReorderLayer;
+
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
@@ -416,8 +537,8 @@ public class WFCIndexPart extends WFCFormPart {
 			// layer for event handling of GlazedLists and PropertyChanges
 			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
 
-			ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
-			this.selectionLayer = new SelectionLayer(columnReorderLayer);
+			columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
+			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
 			selectionLayer.addLayerListener(new ILayerListener() {
 
@@ -473,9 +594,13 @@ public class WFCIndexPart extends WFCFormPart {
 		public EventList<T> getList() {
 			return eventList;
 		}
+
+		public ColumnReorderLayer getColumnReorderLayer() {
+			return columnReorderLayer;
+		}
 	}
 
-	class CountSummaryProvider implements ISummaryProvider {
+	static class CountSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -499,7 +624,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
-	class AverageSummaryProvider implements ISummaryProvider {
+	static class AverageSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -521,13 +646,14 @@ public class WFCIndexPart extends WFCFormPart {
 					total += ((Number) dataValue).doubleValue();
 				}
 			}
-			if (valueRows == 0)
+			if (valueRows == 0) {
 				return 0;
+			}
 			return total / valueRows;
 		}
 	}
 
-	class MinSummaryProvider implements ISummaryProvider {
+	static class MinSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -544,17 +670,19 @@ public class WFCIndexPart extends WFCFormPart {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
 				if (dataValue instanceof Number) {
-					if (((Number) dataValue).doubleValue() < min)
+					if (((Number) dataValue).doubleValue() < min) {
 						min = ((Number) dataValue).doubleValue();
+					}
 				}
 			}
-			if (min == Double.MAX_VALUE)
+			if (min == Double.MAX_VALUE) {
 				return 0;
+			}
 			return min;
 		}
 	}
 
-	class MaxSummaryProvider implements ISummaryProvider {
+	static class MaxSummaryProvider implements ISummaryProvider {
 
 		private IDataProvider dataProvider;
 
@@ -571,12 +699,14 @@ public class WFCIndexPart extends WFCFormPart {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
 				if (dataValue instanceof Number) {
-					if (((Number) dataValue).doubleValue() > max)
+					if (((Number) dataValue).doubleValue() > max) {
 						max = ((Number) dataValue).doubleValue();
+					}
 				}
 			}
-			if (max == Double.MIN_VALUE)
+			if (max == Double.MIN_VALUE) {
 				return 0;
+			}
 			return max;
 		}
 	}

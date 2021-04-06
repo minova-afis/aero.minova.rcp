@@ -17,7 +17,7 @@ import aero.minova.rcp.rcp.fields.FieldUtil;
 
 public class NumberValueAccessor extends AbstractValueAccessor implements VerifyListener {
 
-	public class Result {
+	public static class Result {
 		String text;
 		int caretPosition;
 		Value value;

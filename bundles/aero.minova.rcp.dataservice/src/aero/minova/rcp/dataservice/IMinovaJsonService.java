@@ -8,4 +8,8 @@ public interface IMinovaJsonService {
 
 	Table json2Table(String jsonString);
 
+	String table2Json(Table t, boolean useUserValues);
+	
+	Table json2Table(String jsonString, boolean useUserValues);
+
 }

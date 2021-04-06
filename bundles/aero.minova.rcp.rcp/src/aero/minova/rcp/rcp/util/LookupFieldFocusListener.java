@@ -1,6 +1,8 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -43,8 +45,7 @@ public class LookupFieldFocusListener implements FocusListener {
 			Table t = (Table) lc.getData(Constants.CONTROL_OPTIONS);
 			if (t != null) {
 				for (Row r : t.getRows()) {
-					if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc
-							.getData(Constants.CONTROL_KEYLONG)) {
+					if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc.getData(Constants.CONTROL_KEYLONG)) {
 						lc.setText(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
 					}
 				}
@@ -53,23 +54,29 @@ public class LookupFieldFocusListener implements FocusListener {
 	}
 
 	/**
-	 * Wir versenden eine Anfrage an den CAS, welche die Ticketnummer enthält. Mit
-	 * der Erhaltenen Antwort füllen wir sämltiche LookupFields sowie das
+	 * Wir versenden eine Anfrage an den CAS, welche die Ticketnummer enthält. Mit der Erhaltenen Antwort füllen wir sämltiche LookupFields sowie das
 	 * DescriptionField
 	 *
 	 * @param lc
 	 */
 	private void getTicketFromCAS(Lookup lc) {
 		Table ticketTable = new Table();
-		String ticketNumber = lc.getText().replace("#", "");
+		// das Pattern ist eine unbegrenzte Menge an Zahlen hinter einer Raute
+		Pattern ticketnumber = Pattern.compile("#(\\d*)");
+		Matcher m = ticketnumber.matcher(lc.getText());
+		String tracNumber = "";
+		// true, falls das Pattern vorhanden ist
+		if (m.find()) {
+			// die Tracnummmer, ab dem ersten Symbol --> ohne die Raute
+			tracNumber = m.group(1);
+		}
 		ticketTable.setName("Ticket");
 		ticketTable.addColumn(new Column(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT));
 		Row row = new Row();
-		row.addValue(new Value(ticketNumber, DataType.STRING));
+		row.addValue(new Value(tracNumber, DataType.STRING));
 		ticketTable.addRow(row);
 
-		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(),
-				ticketTable);
+		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			if (t.getResultSet() != null) {
 				broker.post(Constants.RECEIVED_TICKET, t.getResultSet());

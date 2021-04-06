@@ -20,6 +20,9 @@ public class Constants {
 	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
 
+	// Trenner für Serializer/Deserialiser
+	public static final String SOH = "\u0001";
+
 	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
 	// textfieldVerifier zuzugreifen
 	public static final String FOCUSED_ORIGIN = "XMLDetailPart";
@@ -47,9 +50,12 @@ public class Constants {
 	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
+	public static final String BROKER_COLLAPSEINDEX = "aero/minova/rcp/CollapseIndex";
+	public static final String BROKER_EXPANDINDEX = "aero/minova/rcp/ExpandIndex";
 	public static final String BROKER_CLEARSEARCHTABLE = "aero/minova/rcp/ClearSearchTable";
 	public static final String BROKER_REVERTSEARCHTABLE = "aero/minova/rcp/RevertSearchTable";
 	public static final String BROKER_DELETEROWSEARCHTABLE = "aero/minova/rcp/DelteRowSearchTable";
+	public static final String BROKER_SAVESEARCHCRITERIA = "aero/minova/rcp/SaveSearchCriteria";
 	public static final String BROKER_LOADSEARCHCRITERIA = "aero/minova/rcp/LoadSearchCriteria";
 	public static final String BROKER_RESIZETABLE = "aero/minova/rcp/ResizeTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
@@ -62,5 +68,8 @@ public class Constants {
 	public static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", "null", "!null" };
 	public static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "null", "!null" };
 	public static final String[] WILDCARD_OPERATORS = { "_", "%" };
+
+	// SeachCriteria
+	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
 }

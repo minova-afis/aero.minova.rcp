@@ -7,14 +7,30 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import aero.minova.rcp.constants.Constants;
+
 public class ValueSerializer implements JsonSerializer<Value> {
+
+	private boolean useUserValues;
+
+	public ValueSerializer() {
+		this(false);
+	}
+	
+	public ValueSerializer(boolean useUserValues) {
+		this.useUserValues = useUserValues;
+	}
 
 	@Override
 	public JsonElement serialize(Value value, Type type, JsonSerializationContext context) {
-		return serialize(value);
+		return serialize(value, useUserValues);
 	}
 
 	public static JsonElement serialize(Value value) {
+		return serialize(value, false);
+	}
+	
+	public static JsonElement serialize(Value value, boolean useUserValues) {
 		if (value == null || value.getValue() == null) {
 			return null;
 		}
@@ -32,9 +48,13 @@ public class ValueSerializer implements JsonSerializer<Value> {
 		case BOOLEAN:
 			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
 		case FILTER:
-			if (((FilterValue) value).getFilterValue() == null)
-				return new JsonPrimitive("f-" + value.getOperatorValue());
-			return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString());
+			if (useUserValues) {
+				return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString() + Constants.SOH +((FilterValue)value).getUserInput());
+			} else {
+				if (((FilterValue) value).getFilterValue() == null)
+					return new JsonPrimitive("f-" + value.getOperatorValue());
+				return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString());
+			}
 		default:
 			return null;
 		}

@@ -93,4 +93,8 @@ public class LookupContentProvider {
 		return values.isEmpty();
 	}
 
+	public int getValuesSize() {
+		return values.size();
+	}
+
 }

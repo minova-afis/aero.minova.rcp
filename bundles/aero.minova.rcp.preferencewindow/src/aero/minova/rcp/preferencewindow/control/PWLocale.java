@@ -22,13 +22,10 @@ import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 /**
- * Erstellt zwei ComboBoxen und eine Liste mit allen Ländern einer ausgewählten
- * Sprache. Die Länderauswahl reagiert auf die ausgewählte Sprache. Die Sprache
- * wird zuerst ausgewählt, da es intuitiver ist und der Nutzer es von anderen
- * Anwendungen/ Geräten gewöhnt ist.
+ * Erstellt zwei ComboBoxen und eine Liste mit allen Ländern einer ausgewählten Sprache. Die Länderauswahl reagiert auf die ausgewählte Sprache. Die Sprache
+ * wird zuerst ausgewählt, da es intuitiver ist und der Nutzer es von anderen Anwendungen/ Geräten gewöhnt ist.
  * 
  * @author bauer
- *
  */
 public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
@@ -43,16 +40,17 @@ public class PWLocale extends CustomPWWidget {
 	/**
 	 * Constructor
 	 *
-	 * @param label       associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
 	public PWLocale(final String label, final String propertyKey, IEclipseContext context, TranslationService translationService) {
 		super(label, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
 		this.translationService = translationService;
 		Locale l = context.get(Locale.class);
-		if (l == null)
-			l = Locale.getDefault();
+		if (l == null) l = Locale.getDefault();
 		dataL = CustomLocale.getLanguages(l);
 	}
 
@@ -77,8 +75,7 @@ public class PWLocale extends CustomPWWidget {
 	}
 
 	/**
-	 * Erstellt zwei Combo Boxen. Die erste liefert alle mögliche Sprachen wieder.
-	 * Die zweite liefert eine Liste von Ländern wieder, die die vorher ausgewählte
+	 * Erstellt zwei Combo Boxen. Die erste liefert alle mögliche Sprachen wieder. Die zweite liefert eine Liste von Ländern wieder, die die vorher ausgewählte
 	 * Sprache sprechen.
 	 * 
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#build(org.eclipse.swt.widgets.Composite)
@@ -108,8 +105,7 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboLanguage.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue(ApplicationPreferences.LOCALE_LANGUAGE,
-					PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
+			PreferenceWindow.getInstance().setValue(ApplicationPreferences.LOCALE_LANGUAGE, PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
 			// erneuert Liste mit Ländern
 			comboCountries.removeAll();
 			for (String country : getCountries()) {
@@ -144,8 +140,12 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboCountries.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY,
-					comboCountries.getItem(comboCountries.getSelectionIndex()));
+			if (comboCountries.getItems().length == 0) {
+				return;
+			}
+
+			if (!comboCountries.getItem(comboCountries.getSelectionIndex()).isEmpty())
+				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY, comboCountries.getItem(comboCountries.getSelectionIndex()));
 		});
 
 		return comboLanguage;
