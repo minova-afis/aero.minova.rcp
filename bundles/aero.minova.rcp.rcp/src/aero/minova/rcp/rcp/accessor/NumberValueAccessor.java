@@ -268,8 +268,12 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		int newCaretPosition;
 		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
-		int decimalCaretPostion = textBefore.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int decimalCaretPostion = caretPosition + 1; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
 		int countGroupingSeperator = 0;
+		
+		if(decimals > 0) {
+			decimalCaretPostion = textBefore.length() - decimals;
+		}
 
 		for (Character gs : text.toCharArray()) {
 			if (decimalFormatSymbols.getGroupingSeparator() == gs) countGroupingSeperator++;
