@@ -192,6 +192,8 @@ public class PrintIndexHandler {
 					if (r.getValue(d) != null) {
 						if (r.getValue(d).getType() == DataType.DOUBLE || r.getValue(d).getType() == DataType.INTEGER) {
 							xml.append(r.getValue(d).getValueString(Locale.getDefault()));
+						} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
+							xml.append(1);
 						} else {
 							xml.append("<![CDATA[");
 							xml.append(r.getValue(d).getValueString(Locale.getDefault()));
