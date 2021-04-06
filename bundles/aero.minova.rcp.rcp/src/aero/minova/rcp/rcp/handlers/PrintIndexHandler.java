@@ -22,6 +22,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -67,8 +68,9 @@ public class PrintIndexHandler {
 		String title = null;
 		Object o = mpart.getObject();
 		StringBuffer xml = new StringBuffer();
-		title = mpart.getLabel();
-		title = translationService.translate(title, title);
+
+		MPerspective activePerspective = modelService.getActivePerspective(window);
+		title = translationService.translate(activePerspective.getLabel(), activePerspective.getLabel());
 
 		Path path_reports = dataService.getStoragePath().resolve("PDF/");
 		String xslString = null;
