@@ -58,14 +58,14 @@ class DataServiceIT {
 	@DisplayName("Ensures the server returns not 200 for files that do not exit")
 	void ensureThatWeThrowAnExceptionForMissingFiles() {
 		assertThrows(RuntimeException.class, () -> {
-			dataService.getHashForFile("test").join();	
+			dataService.getServerHashForFile("test").join();	
 		});
 	}
 	
 	@Test
 	@DisplayName("Ensures that the server can hash application.mdi")
 	void hashApplicationMdi() {
-		String join = dataService.getHashForFile("application.mdi").join();
+		String join = dataService.getServerHashForFile("application.mdi").join();
 		assertNotNull(join);
 	}
 	

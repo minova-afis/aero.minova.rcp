@@ -5,7 +5,7 @@ import java.util.Locale;
 
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
-import aero.minova.rcp.rcp.util.TimeUtil;
+import aero.minova.rcp.util.TimeUtil;
 
 public class ShortTimeDisplayConverter extends DisplayConverter {
 

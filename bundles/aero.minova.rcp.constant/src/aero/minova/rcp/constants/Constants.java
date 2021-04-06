@@ -62,6 +62,8 @@ public class Constants {
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
 	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
+	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
+	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };

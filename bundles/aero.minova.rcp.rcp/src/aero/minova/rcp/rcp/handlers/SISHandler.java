@@ -20,7 +20,7 @@ public class SISHandler extends SwitchPerspectiveHandler {
 	@Execute
 	public void execute(MWindow window, MApplication app) throws InvocationTargetException, InterruptedException {
 
-		execute(window.getContext(), "aero.minova.rcp.rcp.perspective.sis", "org.eclipse.e4.ui.perspectives.parameters.newWindow", window);
+		execute(window.getContext(), "aero.minova.rcp.rcp.perspective.sis", "org.eclipse.e4.ui.perspectives.parameters.newWindow", null, window);
 	}
 
 }

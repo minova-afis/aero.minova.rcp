@@ -18,6 +18,8 @@ import java.util.Locale;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import aero.minova.rcp.util.DateUtil;
+
 public class DateUtilTests {
 
 	@BeforeClass

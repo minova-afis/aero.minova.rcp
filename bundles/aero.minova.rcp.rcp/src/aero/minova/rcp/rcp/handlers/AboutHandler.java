@@ -15,7 +15,10 @@ public class AboutHandler {
 		Version version = FrameworkUtil.getBundle(getClass()).getVersion();
 		long lastModified = FrameworkUtil.getBundle(getClass()).getLastModified();
 
+		String runtimeVersion = System.getProperty("java.runtime.version");
+		
 		MessageDialog.openInformation(shell, "About", "Version: " + version.toString() + ", BuildDate: "
-				+ LocalDateTime.ofEpochSecond(lastModified / 1000, 0, ZoneOffset.UTC));
+				+ LocalDateTime.ofEpochSecond(lastModified / 1000, 0, ZoneOffset.UTC) + " "+ "Java Runntime: "
+				+ runtimeVersion );
 	}
 }

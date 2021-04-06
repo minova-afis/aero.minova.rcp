@@ -44,13 +44,14 @@ public class SwitchPerspectiveHandler {
 
 	@Execute
 	public void execute(IEclipseContext context,
-			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveID,
+			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String formName,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
+			@Optional MHandledMenuItem handledMenuItem,
 			MWindow window) throws InvocationTargetException, InterruptedException {
 		if (Boolean.parseBoolean(newWindow)) {
-			openNewWindowPerspective(context, perspectiveID);
+			openNewWindowPerspective(context, handledMenuItem.getElementId());
 		} else {
-			openPerspective(context, perspectiveID, window);
+			openPerspective(context, handledMenuItem.getElementId(), window, formName);
 		}
 	}
 
@@ -60,13 +61,13 @@ public class SwitchPerspectiveHandler {
 	 * @param perspectiveId The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException If the perspective could not be opened.
 	 */
-	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window) {
+	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName) {
 		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
 
 		MUIElement element = modelService.find(perspectiveID, application);
 		if (element == null) {
-			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID);
+			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID, formName);
 		} else {
 			switchTo(element, perspectiveID, window);
 		}
@@ -97,12 +98,10 @@ public class SwitchPerspectiveHandler {
 	 * @param perspectiveID
 	 * @return die neue Perspektive
 	 */
-	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID) {
+	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID, String formName) {
 		MWindow window = context.get(MWindow.class);
 		EModelService modelService = context.get(EModelService.class);
-		String[] ids = perspectiveID.split(".xml");
-		String id = ids[0];
-		List<MHandledMenuItem> items = model.findElements(window.getMainMenu(), id, MHandledMenuItem.class);
+		List<MHandledMenuItem> items = model.findElements(window.getMainMenu(), perspectiveID, MHandledMenuItem.class);
 		MHandledMenuItem item = items.get(0);
 
 		@SuppressWarnings("unchecked")
@@ -117,7 +116,7 @@ public class SwitchPerspectiveHandler {
 		} else {
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
-			perspective.getPersistedState().put(E4WorkbenchParameterConstants.FORM_NAME, perspectiveID);
+			perspective.getPersistedState().put(E4WorkbenchParameterConstants.FORM_NAME, formName);
 			perspective.setLabel(item.getLabel());
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);

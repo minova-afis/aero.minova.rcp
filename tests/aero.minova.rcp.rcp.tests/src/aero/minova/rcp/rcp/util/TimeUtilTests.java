@@ -14,6 +14,8 @@ import java.util.Locale;
 
 import org.junit.Test;
 
+import aero.minova.rcp.util.TimeUtil;
+
 public class TimeUtilTests {
 	@Test
 	public void testGetTimeString1_59() {

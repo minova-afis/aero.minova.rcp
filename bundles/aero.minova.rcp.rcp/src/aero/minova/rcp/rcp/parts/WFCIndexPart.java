@@ -28,6 +28,7 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
@@ -62,7 +63,9 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
@@ -73,7 +76,10 @@ import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -338,7 +344,7 @@ public class WFCIndexPart extends WFCFormPart {
 		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
 		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer));
+				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 
 		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
 		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
@@ -391,13 +397,34 @@ public class WFCIndexPart extends WFCFormPart {
 //				}));
 
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
+
+		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
+		copyHandler.setCopyFormattedText(true);
+		gridLayer.registerCommandHandler(copyHandler);
+
 		natTable = new NatTable(parent, compositeGridLayer, false);
 		// as the autoconfiguration of the NatTable is turned off, we have to
 		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
 		// manually
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
-		natTable.addConfiguration(new SingleClickSortConfiguration());
+
+		natTable.addConfiguration(new SingleClickSortConfiguration() {
+			@Override
+			public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+				// normal
+				uiBindingRegistry.registerFirstSingleClickBinding(new ColumnHeaderClickEventMatcher(SWT.NONE, 1), new SortColumnAction(false));
+
+				// multi
+				int keyMask = SWT.MOD3;
+				// für Linux andere Tastenkombi definieren
+				if (System.getProperty("os.name").startsWith("Linux")) {
+					keyMask = SWT.MOD2;
+				}
+				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));
+			}
+		});
+
 		natTable.addConfiguration(new MinovaDisplayConfiguration(table.getColumns(), translationService, form));
 
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
@@ -471,12 +498,24 @@ public class WFCIndexPart extends WFCFormPart {
 		});
 	}
 
+	public NatTable getNattable() {
+		return natTable;
+	}
+
+	public SelectionLayer getSelectionLayer() {
+		return bodyLayerStack.getSelectionLayer();
+	}
+
+	public BodyLayerStack getBodyLayerStack() {
+		return this.bodyLayerStack;
+	}
+
 	/**
 	 * Always encapsulate the body layer stack in an AbstractLayerTransform to ensure that the index transformations are performed in later commands.
 	 *
 	 * @param <T>
 	 */
-	class BodyLayerStack<T> extends AbstractLayerTransform {
+	public class BodyLayerStack<T> extends AbstractLayerTransform {
 
 		private final SortedList<T> sortedList;
 
@@ -714,6 +753,14 @@ public class WFCIndexPart extends WFCFormPart {
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
+	}
+
+	public SortedList<Row> getSortedList() {
+		return bodyLayerStack.getSortedList();
+	}
+
+	public ColumnHeaderLayer getColumnHeaderLayer() {
+		return columnHeaderLayer;
 	}
 
 }
