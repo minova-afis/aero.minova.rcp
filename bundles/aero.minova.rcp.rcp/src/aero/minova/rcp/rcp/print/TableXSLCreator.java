@@ -123,7 +123,7 @@ public class TableXSLCreator extends CommonPrint {
 			}
 
 			boolean isNumeric = false;
-			if (ci.column.getType() == DataType.INTEGER || ci.column.getType() == DataType.DOUBLE) {
+			if (ci.column != null && (ci.column.getType() == DataType.INTEGER || ci.column.getType() == DataType.DOUBLE)) {
 				isNumeric = true;
 			}
 
@@ -310,7 +310,7 @@ public class TableXSLCreator extends CommonPrint {
 			final boolean lastColumn = (iCol == cols.size() - 1);
 			text = ci.column == null ? "" : translationService.translate(ci.column.getLabel(), null);
 			boolean isNumber = false;
-			if (ci.column.getType() == DataType.DOUBLE || ci.column.getType() == DataType.INTEGER) {
+			if (ci.column != null && (ci.column.getType() == DataType.DOUBLE || ci.column.getType() == DataType.INTEGER)) {
 				isNumber = true;
 			}
 			text = getTemplate("TitleColumn").replace("%%ColumnText%%", text);
