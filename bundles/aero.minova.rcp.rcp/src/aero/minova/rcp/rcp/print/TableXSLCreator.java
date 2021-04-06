@@ -44,11 +44,12 @@ public class TableXSLCreator extends CommonPrint {
 		// Wir bereinigen die unsichtbaren Spalten
 		// als unsichtbar zählen auch die Spalten, die nicht mehr auf die Seite passen
 		// hier entscheidet sich auch ob Hoch- oder Querformat
-		// final List<ColumnInfo> cols = filterInvisibleColumns(colConfig, conf);
+
+		final List<ColumnInfo> cols = filterInvisibleColumns(colConfig, reportConf);
 
 		final Orientation ori = reportConf.calculatePageOrientation(getPrintedRowWidth(colConfig, reportConf));
 		final String xslData = getTemplate(ori);
-		return interpolateXslData(xmlRootTag, reportName, dataList, colConfig, reportConf, path_reports, xslData);
+		return interpolateXslData(xmlRootTag, reportName, dataList, cols, reportConf, path_reports, xslData);
 	}
 
 	/**
