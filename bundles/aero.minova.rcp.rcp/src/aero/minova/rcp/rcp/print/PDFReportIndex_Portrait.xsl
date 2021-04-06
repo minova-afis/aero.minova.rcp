@@ -55,10 +55,7 @@
 												<xsl:value-of select="../Site/Fax"/>
 											</fo:block>
 											<fo:block line-height="13pt" text-align="end">
-												<xsl:call-template name="format-date-time">
-													<xsl:with-param name="datum" select="../PrintDate"/>
-													<xsl:with-param name="locale" select="&locale;"/>
-												</xsl:call-template>
+												<xsl:value-of select="../PrintDate"/>
 											</fo:block>
 										</fo:table-cell>
 									</fo:table-row>
