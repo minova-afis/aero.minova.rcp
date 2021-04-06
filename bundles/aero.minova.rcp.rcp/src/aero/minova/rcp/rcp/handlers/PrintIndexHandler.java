@@ -220,7 +220,7 @@ public class PrintIndexHandler {
 		xml.append("<" + filename + ">\n");
 		xml.append("<Site>\n" + "<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>\n" + "<Address2><![CDATA[Tröltschstraße 4]]></Address2>\n"
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
-				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>SIS</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
+				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
 		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(Instant.now(), Locale.getDefault()) + "]]></PrintDate>\n");
 	}
 
