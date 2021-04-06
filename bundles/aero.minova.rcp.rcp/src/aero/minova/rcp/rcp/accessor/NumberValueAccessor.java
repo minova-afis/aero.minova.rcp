@@ -304,7 +304,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			newCaretPosition = decimalCaretPostion; // Trennzeichen ist
 		} else if (formatted0.equals(textBefore)) {
 			if (caretPosition >= 1) {
-				newCaretPosition = caretPosition + insertion.length() - 1;
+				newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator - 1;
 			} else {
 				newCaretPosition = caretPosition + insertion.length();
 			}
