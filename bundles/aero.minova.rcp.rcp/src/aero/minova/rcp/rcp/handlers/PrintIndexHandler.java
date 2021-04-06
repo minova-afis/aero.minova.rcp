@@ -69,7 +69,6 @@ public class PrintIndexHandler {
 		StringBuffer xml = new StringBuffer();
 		title = mpart.getLabel();
 		title = translationService.translate(title, title);
-		List<Column> tableColumns = new ArrayList<>();
 
 		Path path_reports = dataService.getStoragePath().resolve("PDF/");
 		String xslString = null;
@@ -87,10 +86,13 @@ public class PrintIndexHandler {
 				columnHeaderList.add(data.getColumnName(((WFCIndexPart) o).getColumnHeaderLayer().getColumnIndexByPosition(i)));
 			}
 
+			List<Column> tableColumns = new ArrayList<>();
 			List<ColumnInfo> colConfig = new ArrayList<>();
+			int i = 0;
 			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
 				tableColumns.add(data.getColumns().get(i1));
-				colConfig.add(new ColumnInfo(data.getColumns().get(i1), columnReorderLayer.getColumnWidthByPosition(i1)));
+				colConfig.add(new ColumnInfo(data.getColumns().get(i1), columnReorderLayer.getColumnWidthByPosition(i)));
+				i++;
 			}
 
 			ReportConfiguration rConfig = new ReportConfiguration();
