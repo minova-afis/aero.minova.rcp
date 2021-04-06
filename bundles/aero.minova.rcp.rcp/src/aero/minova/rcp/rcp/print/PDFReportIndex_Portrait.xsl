@@ -82,7 +82,8 @@
 								<fo:table-row>
 									<fo:table-cell>
 										<fo:block text-align="start">
-											<xsl:value-of select="../Site/Application"/>
+											<!-- <xsl:value-of select="../Site/Application"/> -->
+											WFC
 										</fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
