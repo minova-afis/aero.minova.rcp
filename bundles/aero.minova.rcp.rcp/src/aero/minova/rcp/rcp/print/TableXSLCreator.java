@@ -99,12 +99,12 @@ public class TableXSLCreator extends CommonPrint {
 	 *
 	 * @throws ReportCreationException
 	 */
-	private static String getCellDefinition(final List<ColumnInfo> cols, final boolean asSum) throws ReportCreationException {
+	private String getCellDefinition(final List<ColumnInfo> cols, final boolean asSum) throws ReportCreationException {
 		final StringBuffer sb = new StringBuffer();
 		String text;
 		for (int i = 0; i < cols.size(); i++) {
 			final ColumnInfo ci = cols.get(i);
-			final String name = ci.column == null ? "" : ci.column.getName();
+			final String name = ci.column == null ? "" : translationService.translate(ci.column.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "");
 
 			if (ci.column == null) {
 				text = getTemplate("CellEmptyDefinition");
@@ -271,12 +271,12 @@ public class TableXSLCreator extends CommonPrint {
 	 * @param cols
 	 * @return
 	 */
-	private static String getSearchCriteriaValues(final SortedList<Row> sortedDataList, final List<ColumnInfo> cols) {
+	private String getSearchCriteriaValues(final SortedList<Row> sortedDataList, final List<ColumnInfo> cols) {
 		String toRet = "";
 
 		for (final ColumnInfo ci : cols) {
 			if (ci != null && ci.column != null) {
-				final String colName = ci.column.getName();
+				final String colName = translationService.translate(ci.column.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "");
 				final String scValues = getSearchCriteriaValue(sortedDataList, ci);
 				if (scValues != null && scValues != "") {
 					if (toRet != "") {
@@ -299,7 +299,7 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	private static String getTableTitle(final SortedList<Row> sortedDataList, final List<ColumnInfo> cols, final ReportConfiguration conf)
+	private String getTableTitle(final SortedList<Row> sortedDataList, final List<ColumnInfo> cols, final ReportConfiguration conf)
 			throws ReportCreationException {
 		String toRet = "";
 		String text;
@@ -307,7 +307,7 @@ public class TableXSLCreator extends CommonPrint {
 		for (int iCol = 0; iCol < cols.size(); iCol++) {
 			final ColumnInfo ci = cols.get(iCol);
 			final boolean lastColumn = (iCol == cols.size() - 1);
-			text = ci.column == null ? "" : ci.column.getName();
+			text = ci.column == null ? "" : translationService.translate(ci.column.getLabel(), null);
 			boolean isNumber = false;
 			if (ci.column.getType() == DataType.DOUBLE || ci.column.getType() == DataType.INTEGER) {
 				isNumber = true;
@@ -393,7 +393,7 @@ public class TableXSLCreator extends CommonPrint {
 		if (!conf.hideSearchCriterias) {
 			for (final ColumnInfo ci : cols) {
 				if (ci != null && ci.column != null) {
-					final String colName = ci.column.getName();
+					final String colName = translationService.translate(ci.column.getLabel(), null);
 					xslData = xslData.replace("%%SearchCriteria#" + colName + "%%", getSearchCriteria(sortedDataList, ci));
 					xslData = xslData.replace("%%SearchCriteriaValue#" + colName + "%%", getSearchCriteriaValue(sortedDataList, ci));
 				}

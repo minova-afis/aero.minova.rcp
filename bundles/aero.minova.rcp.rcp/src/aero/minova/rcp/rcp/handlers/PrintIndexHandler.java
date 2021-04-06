@@ -32,6 +32,7 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -79,12 +80,6 @@ public class PrintIndexHandler {
 			ColumnReorderLayer columnReorderLayer = ((WFCIndexPart) o).getBodyLayerStack().getColumnReorderLayer();
 			columnReorderLayer.getColumnIndexOrder();
 
-			// Sortierte Namen der Columns
-			List<String> columnHeaderList = new ArrayList<>();
-			for (int i = 0; i < columnReorderLayer.getColumnCount(); i++) {
-				columnHeaderList.add(data.getColumnName(((WFCIndexPart) o).getColumnHeaderLayer().getColumnIndexByPosition(i)));
-			}
-
 			List<ColumnInfo> colConfig = new ArrayList<>();
 			int i = 0;
 			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
@@ -102,7 +97,7 @@ public class PrintIndexHandler {
 			}
 
 			saveIntoXSL(xslString, xmlRootTag);
-			saveIntoXML(sortedDataList, columnHeaderList, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
+			saveIntoXML(sortedDataList, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 		}
 
 		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
@@ -171,14 +166,14 @@ public class PrintIndexHandler {
 	 * Schreibt die XML Datei aus den Daten der NatTable
 	 *
 	 * @param rows
-	 * @param cHaederList
+	 * @param colConfig
 	 * @param columnReorderList
 	 * @param xml
 	 * @param tabSeparated
 	 * @param fileName
 	 * @param title
 	 */
-	private void saveIntoXML(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList, StringBuffer xml, boolean tabSeparated,
+	private void saveIntoXML(SortedList<Row> rows, List<ColumnInfo> colConfig, List<Integer> columnReorderList, StringBuffer xml, boolean tabSeparated,
 			String fileName, String title) {
 		if (xml != null && rows != null && rows.iterator().hasNext()) {
 			int colIndex = 0;
@@ -190,7 +185,8 @@ public class PrintIndexHandler {
 				colIndex = 0;
 				xml.append("<Row>\n");
 				for (final Integer d : columnReorderList) {
-					xml.append("<" + cHaederList.get(colIndex % cHaederList.size()) + ">");
+					Column c = colConfig.get(colIndex).column;
+					xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 					if (r.getValue(d) != null) {
 						if (r.getValue(d).getType() == DataType.DOUBLE || r.getValue(d).getType() == DataType.INTEGER) {
 							xml.append(r.getValue(d).getValueString(Locale.getDefault()));
@@ -200,7 +196,7 @@ public class PrintIndexHandler {
 							xml.append("]]>");
 						}
 					}
-					xml.append("</" + cHaederList.get(colIndex % cHaederList.size()) + ">\n");
+					xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 					colIndex++;
 				}
 				xml.append("</Row>\n");
