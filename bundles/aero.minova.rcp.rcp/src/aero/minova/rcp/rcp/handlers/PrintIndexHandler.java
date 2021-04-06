@@ -32,7 +32,6 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -80,17 +79,15 @@ public class PrintIndexHandler {
 			ColumnReorderLayer columnReorderLayer = ((WFCIndexPart) o).getBodyLayerStack().getColumnReorderLayer();
 			columnReorderLayer.getColumnIndexOrder();
 
-			// Sortierte Namen der Coulumns
+			// Sortierte Namen der Columns
 			List<String> columnHeaderList = new ArrayList<>();
 			for (int i = 0; i < columnReorderLayer.getColumnCount(); i++) {
 				columnHeaderList.add(data.getColumnName(((WFCIndexPart) o).getColumnHeaderLayer().getColumnIndexByPosition(i)));
 			}
 
-			List<Column> tableColumns = new ArrayList<>();
 			List<ColumnInfo> colConfig = new ArrayList<>();
 			int i = 0;
 			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
-				tableColumns.add(data.getColumns().get(i1));
 				colConfig.add(new ColumnInfo(data.getColumns().get(i1), columnReorderLayer.getColumnWidthByPosition(i)));
 				i++;
 			}
@@ -99,13 +96,13 @@ public class PrintIndexHandler {
 
 			try {
 				TableXSLCreator tableCreator = new TableXSLCreator(translationService);
-				xslString = tableCreator.createXSL(xmlRootTag, title, tableColumns, sortedDataList, colConfig, rConfig, path_reports);
+				xslString = tableCreator.createXSL(xmlRootTag, title, sortedDataList, colConfig, rConfig, path_reports);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
 			}
+
 			saveIntoXSL(xslString, xmlRootTag);
 			saveIntoXML(sortedDataList, columnHeaderList, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
-
 		}
 
 		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");

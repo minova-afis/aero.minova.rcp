@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 
-import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.rcp.print.ReportCreationException.Cause;
@@ -28,29 +27,18 @@ public class TableXSLCreator extends CommonPrint {
 
 	/**
 	 * Erzeugt ein XSL-Template mittels einer Such- und Datentabelle
-	 *
-	 * @param searchTable
-	 *            Optional. Die Werte dieser Tabelle werden in der Tabellenüberschrift dargestellt
-	 * @param dataTable
-	 *            Tabelle mit Daten
-	 * @param a
-	 *            Applikation. Wird verwendet für die Kodierung und fürs benutzerdefinierte Template-Laden
-	 * @param colInfo
-	 *            Tabellen-Spalten. Wenn null, dann wird die Spaltenbreite automatisch ermittelt
-	 * @param reportConf
-	 *            {@link ReportConfiguration}
-	 * @return
+	 * 
 	 * @throws ReportCreationException
 	 */
-	public String createXSL(String xmlRootTag, String reportName, List<Column> headerInfo, SortedList<Row> dataList, List<ColumnInfo> colConfig,
-			ReportConfiguration reportConf, Path path_reports) throws ReportCreationException {
+	public String createXSL(String xmlRootTag, String reportName, SortedList<Row> dataList, List<ColumnInfo> colConfig, ReportConfiguration reportConf,
+			Path path_reports) throws ReportCreationException {
 
 		if (reportConf == null) {
 			reportConf = ReportConfiguration.DEFAULT;
 		}
 
-		if (colConfig == null && dataList == null && headerInfo == null) {
-			throw new IllegalArgumentException("At least one of the parameters must be set: search table, data table, column info");
+		if (colConfig == null || dataList == null) {
+			throw new IllegalArgumentException("Need dataList and colConfig");
 		}
 
 		// Wir bereinigen die unsichtbaren Spalten
