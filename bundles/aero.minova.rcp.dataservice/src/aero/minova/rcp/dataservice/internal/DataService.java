@@ -43,6 +43,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
+import aero.minova.rcp.dataservice.ZipService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
@@ -127,6 +128,19 @@ public class DataService implements IDataService {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
+
+		// PDF Ordner anfragen
+		CompletableFuture.runAsync(() -> {
+			try {
+				boolean checkIfUpdateIsRequired = this.checkIfUpdateIsRequired("PDF.zip");
+				if (checkIfUpdateIsRequired) {
+					this.downloadFile("PDF.zip");
+					ZipService.unzipFile(this.getStoragePath().resolve("PDF.zip").toFile(), this.getStoragePath().toString());
+				}
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	@Override

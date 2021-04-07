@@ -119,7 +119,6 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			}
 			checkDir(workspaceDir, "config");
 			checkDir(workspaceDir, "data");
-			checkDir(workspaceDir, "i18n");
 			checkDir(workspaceDir, "plugins");
 
 			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
