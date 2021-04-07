@@ -28,8 +28,8 @@ public class AboutDialog extends TitleAreaDialog {
 	public AboutDialog(Shell parentShell, String versionString) {
 		super(parentShell);
 		this.version = versionString;
-		lizenzFont = new Font(parentShell.getDisplay(), new FontData("Arial", 10, SWT.NORMAL));
-		infoFont = new Font(parentShell.getDisplay(), new FontData("Arial", 12, SWT.NORMAL));
+		lizenzFont = new Font(parentShell.getDisplay(), new FontData("Arial", 12, SWT.NORMAL));
+		infoFont = new Font(parentShell.getDisplay(), new FontData("Arial", 14, SWT.NORMAL));
 	}
 
 	@Override
