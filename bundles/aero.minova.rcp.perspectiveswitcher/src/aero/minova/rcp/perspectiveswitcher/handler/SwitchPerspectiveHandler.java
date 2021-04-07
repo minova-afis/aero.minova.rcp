@@ -49,9 +49,9 @@ public class SwitchPerspectiveHandler {
 			@Optional MHandledMenuItem handledMenuItem,
 			MWindow window) throws InvocationTargetException, InterruptedException {
 		if (Boolean.parseBoolean(newWindow)) {
-			openNewWindowPerspective(context, handledMenuItem.getElementId());
+			openNewWindowPerspective(context, formName);
 		} else {
-			openPerspective(context, handledMenuItem.getElementId(), window, formName);
+			openPerspective(context, formName, window, formName);
 		}
 	}
 
