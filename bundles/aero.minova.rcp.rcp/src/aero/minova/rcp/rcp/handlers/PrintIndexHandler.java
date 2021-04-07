@@ -127,7 +127,8 @@ public class PrintIndexHandler {
 		}
 
 		generatePDF(url_pdf, url_xml, url_xsl);
-		showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+//		showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+		showFile(url_pdf.toString(), null);
 	}
 
 	private void saveIntoXSL(String xslString, String fileName) {
@@ -256,6 +257,12 @@ public class PrintIndexHandler {
 		broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Drucken des Index schlug fehl!");
 	}
 
+	/**
+	 * Öffnet entwender das BrowserWiget um den Index-Druck anzuzeigen oder den Default PDF Reader!
+	 *
+	 * @param urlString
+	 * @param preview
+	 */
 	private void showFile(String urlString, Preview preview) {
 		if (urlString != null) {
 			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
@@ -292,6 +299,7 @@ public class PrintIndexHandler {
 	 * @since 11.0.0
 	 */
 	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
+		// Hier erstaml nur Ohne Preview öffnen!
 		if (preview == null) {
 			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
 			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
@@ -304,7 +312,7 @@ public class PrintIndexHandler {
 		} else {
 			preview.clear();
 		}
-
+		preview = null;
 		return preview;
 	}
 
