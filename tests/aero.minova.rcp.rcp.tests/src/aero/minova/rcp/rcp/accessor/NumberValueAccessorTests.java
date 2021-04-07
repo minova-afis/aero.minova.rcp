@@ -1317,5 +1317,93 @@ public class NumberValueAccessorTests {
 		assertEquals("CaretPosition", 1, result.caretPosition);
 		assertEquals("Value", new Value(0.00), result.value);
 	}
+	
+	@Test
+	public void test_s0ce_s10ec() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"10", // insertion
+				0, // start
+				1, // end
+				0, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"0", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "10", result.text);
+		assertEquals("CaretPosition", 2, result.caretPosition);
+		assertEquals("Value", new Value(10), result.value);
+	}
+	
+	@Test
+	public void test_s0ce_s54Point321ec() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"54321", // insertion
+				0, // start
+				1, // end
+				0, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"0", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "54.321", result.text);
+		assertEquals("CaretPosition", 6, result.caretPosition);
+		assertEquals("Value", new Value(54321), result.value);
+	}
+	
+	@Test
+	public void test_s0ce_s87Point654Point321ec() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"87654321", // insertion
+				0, // start
+				1, // end
+				0, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"0", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "87.654.321", result.text);
+		assertEquals("CaretPosition", 10, result.caretPosition);
+		assertEquals("Value", new Value(87654321), result.value);
+	}
+	
+	@Test
+	public void test_123sce_1234sec() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"4", // insertion
+				3, // start
+				3, // end
+				0, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"123", // textBefore
+				decimalFormatSymbols//
+		);
+		assertEquals("Text", "1.234", result.text);
+		assertEquals("CaretPosition", 5, result.caretPosition);
+		assertEquals("Value", new Value(1234), result.value);
+	}
 
 }

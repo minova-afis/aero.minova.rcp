@@ -1,7 +1,9 @@
 package aero.minova.rcp.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -53,10 +55,18 @@ public class TimeUtil {
 	}
 
 	public static Instant getTime(String input) {
-		return getTime(Instant.now(), input);
+		return getTime(Instant.now(), input, "", Locale.getDefault());
+	}
+	
+	public static Instant getTime(Instant now, String input) {
+		return getTime(now, input, "", Locale.getDefault());
+	}
+	
+	public static Instant getTime(Instant now, String input, String timeUtilPref) {
+		return getTime(now, input, timeUtilPref, Locale.getDefault());
 	}
 
-	public static Instant getTime(Instant now, String input) {
+	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
 		if (input.contains("-") || input.contains("+")) {
 			String[] split = splitInput(input);
 			now = changeHours(now, split);
@@ -64,12 +74,37 @@ public class TimeUtil {
 			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 			now = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
-			return now;
 		} else if (input.equals("")) {
 			return null;
 		} else {
 			now = getTimeFromNumbers(input);
 		}
+		
+		if(!timeUtilPref.equals("")) {
+			try {
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+				LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
+				String formatted = lt.format(dtf);
+				now = Instant.parse(formatted);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		} else {
+			DateTimeFormatter dtf;
+			FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
+			for (FormatStyle formatStyle : styles) {
+				try {
+					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
+					String formatted = lt.format(dtf);
+					now = Instant.parse(formatted);
+					break;
+				} catch (Exception e) {
+					// dann war is nicht in diesem Format
+				}
+			}
+		}
+		
 		return now;
 	}
 
