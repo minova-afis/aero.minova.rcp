@@ -11,18 +11,17 @@ import org.eclipse.swt.widgets.Label;
 public class ExplanationLabelForPWCheckbox extends CustomPWWidget {
 
 	PreferenceWindow pwindow;
-	
+
 	TranslationService translationService;
 
 	/**
 	 * Constructor
 	 *
-	 * @param label
-	 *            associated label
-	 * @param propertyKey
-	 *            associated key
+	 * @param label       associated label
+	 * @param propertyKey associated key
 	 */
-	public ExplanationLabelForPWCheckbox(final String label, final String propertyKey, TranslationService translationService) {
+	public ExplanationLabelForPWCheckbox(final String label, final String propertyKey,
+			TranslationService translationService) {
 		super(label, propertyKey, 2, true);
 		this.translationService = translationService;
 	}
@@ -32,15 +31,14 @@ public class ExplanationLabelForPWCheckbox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		
-		
+
 		Label explanation = new Label(parent, SWT.NONE);
 		explanation.setText(getLabel());
 		GridData explanationGridData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		explanationGridData.horizontalSpan = 2;
 		explanationGridData.horizontalIndent = getIndent();
 		explanation.setLayoutData(explanationGridData);
-		
+
 		return explanation;
 	}
 
@@ -49,8 +47,9 @@ public class ExplanationLabelForPWCheckbox extends CustomPWWidget {
 	 */
 	@Override
 	public void check() {
-		//Wird nicht benötigt!
-		
+		// Methode wird nicht benötigt, da das Widget keinen Wert übergibt, der geprüft
+		// werden muss. Die Methode wird von der Parent Klasse vererbt und kann nicht
+		// gelöscht werden.
+
 	}
 }
-
