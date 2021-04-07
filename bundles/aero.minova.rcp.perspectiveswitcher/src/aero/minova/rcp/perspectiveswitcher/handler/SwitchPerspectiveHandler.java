@@ -64,6 +64,8 @@ public class SwitchPerspectiveHandler {
 	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName) {
 		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
+		if (perspectiveID.contains("."))
+			perspectiveID = perspectiveID.substring(0, perspectiveID.indexOf("."));
 
 		MUIElement element = modelService.find(perspectiveID, application);
 		if (element == null) {
