@@ -6,7 +6,7 @@
       <children xsi:type="basic:PartSashContainer" xmi:id="_RRPC4LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partsashcontainer.main" selectedElement="_S7uOwLqjEeqSa5ZfLepYaA" horizontal="true">
         <children xsi:type="basic:PartSashContainer" xmi:id="_S7uOwLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partsashcontainer.left" selectedElement="_ZHU1YLqjEeqSa5ZfLepYaA">
           <children xsi:type="basic:PartStack" xmi:id="_ZHU1YLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_ijnJoLqjEeqSa5ZfLepYaA">
-            <children xsi:type="basic:Part" xmi:id="_ijnJoLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCSearchPart" label="@Form.Search">
+            <children xsi:type="basic:Part" xmi:id="_ijnJoLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCSearchPart" label="@Form.Search" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SearchCriteria/32x32.png">
               <handlers xmi:id="_jr8RMBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.revertsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertSearchHandler" command="_y3TngNDREeqZdekMGDv2pg"/>
               <handlers xmi:id="_tp-AkBm6EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_rnXZkNDSEeqZdekMGDv2pg"/>
               <handlers xmi:id="_rR-60I1QEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handler.saveas" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveAsHandler" command="_z3614I1QEeuoh4vFDPXd3Q"/>
@@ -39,7 +39,7 @@
             </children>
           </children>
           <children xsi:type="basic:PartStack" xmi:id="_Zc6q4LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_nezRQLqjEeqSa5ZfLepYaA">
-            <children xsi:type="basic:Part" xmi:id="_nezRQLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPart" label="@Form.Index">
+            <children xsi:type="basic:Part" xmi:id="_nezRQLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPart" label="@Form.Index" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Index/32x32.png">
               <handlers xmi:id="_W9rZYBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_xHFacOejEeq-Csq7J9vXlA"/>
               <handlers xmi:id="_jCCjIBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.expandindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandIndexHandler" command="_Mt6KEOg0Eeq4vM3bKRf1IQ"/>
               <handlers xmi:id="_rQADEBm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.collapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.CollapseIndexHandler" command="_ZtzH8Og0Eeq4vM3bKRf1IQ"/>
@@ -71,7 +71,7 @@
           </children>
         </children>
         <children xsi:type="basic:PartStack" xmi:id="_T04rYLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_r6jD0LqjEeqSa5ZfLepYaA">
-          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="@Form.Details">
+          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="@Form.Details" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Detail/32x32.png">
             <handlers xmi:id="_Q2Rg0Bm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
             <handlers xmi:id="_YBX1kBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.newdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewDetailHandler" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
             <handlers xmi:id="_ieacMBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
