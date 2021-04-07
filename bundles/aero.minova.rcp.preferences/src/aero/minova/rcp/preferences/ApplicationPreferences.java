@@ -243,6 +243,20 @@ public class ApplicationPreferences {
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String COUNTRY = "country";
+	
+	/**
+	 * Bestimmt den FormatStyle von eingebenen Date. Mögliche FormatStyles sind: FULL, LONG, MEDIUM und SHORT.
+	 * 
+	 * @see ApplicationPreferences#PREFERENCES_NODE
+	 */
+	public static final String DATE_UTIL = "DateUtil";
+	
+	/**
+	 * Bestimmt den FormatStyle von eingegebenen Time. Mögliche FormatStyles sind: FULL, LONG, MEDIUM und SHORT.
+	 * 
+	 * @see ApplicationPreferences#PREFERENCES_NODE
+	 */
+	public static final String TIME_UTIL = "TimeUtil";
 
 	private ApplicationPreferences() {}
 }

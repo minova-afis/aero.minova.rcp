@@ -105,6 +105,23 @@ Die Kürzel können global für die Benutzersprache gesetzt werden.
 | `M` `m` | Minute
 |===
 
+=== "Datum / Zeit" Felder
+
+In einem "Datum / Zeit" Feld werden das Datum und die Zeit gleichzeitig eingegeben. Diese werden entweder durch ein Leerzeichen oder einen Stern getrennt. Im Gesamten gelten für "Datum / Zeit" Felder die selben Kriterien und Abkürzungen, wie für die Datums- und Zeitfelder im einzelnen. 
+
+Für die Trennung durch das Leerzeichen oder einen Stern haben wir uns entschieden, da es eine einfachere Bediengung durch die Zehnertastatur ermöglicht. 
+
+Sonderregelungen für die "Datum / Zeit" Felder sind:
+
+- Wenn für das Datum kein Wert eingegeben wird, dann rechnet man mit dem Wert 0.
+- Für die Zeit muss immer eine Wert angegeben werden, sonst wird ein Fehler geworfen.
+
+|===
+| Eingabe | Wert
+| `*0` | heute und jetzt
+| `0*` | !ErrorConverting
+|===
+
 === Zahlenformatierung
 
 Wir haben für die Formatierung von Zahlen folgende Regeln definiert:

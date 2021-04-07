@@ -45,7 +45,8 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.LICENCE_WARNING_BEFORE_WEEKS,
 				translationService.translate("@Preferences.General.LicenceWarningBeforeWeeks", null), 0.1, DisplayType.INTEGER, 0));
-		psd.add(new PreferenceDescriptor("DefaultWorkspace", translationService.translate("@Preferences.DefaultWorkspace", null), 0.2, DisplayType.CUSTOMCHECK, false));
+		psd.add(new PreferenceDescriptor("DefaultWorkspace", translationService.translate("@Preferences.DefaultWorkspace", null), 0.2, DisplayType.CUSTOMCHECK,
+				false));
 		psd = new PreferenceSectionDescriptor("KeyboardNavigation", translationService.translate("@Preferences.KeyboardNavigation", null), 0.2);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
@@ -80,6 +81,13 @@ public class PreferenceWindowModel {
 				"24x24", "16x16", "24x24", "32x32", "48x48", "64x64"));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ICON_SIZE_BIG, translationService.translate("@Preferences.IconSizeBig", null), 0.3,
 				DisplayType.COMBO, "32x32", "16x16", "24x24", "32x32", "48x48", "64x64"));
+
+		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), 0.1,
+				DisplayType.DATE_UTIL, ""));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilPattern", null), 0.2,
+				DisplayType.TIME_UTIL, ""));
 		return ptd;
 	}
 
