@@ -34,7 +34,8 @@ public class Tools {
 
 		if (isDesktopSupported) {
 			try {
-				if (url.toLowerCase(Locale.ENGLISH).startsWith("http") || url.toLowerCase(Locale.ENGLISH).startsWith("www")) {
+				if (url.toLowerCase(Locale.ENGLISH).startsWith("http") || url.toLowerCase(Locale.ENGLISH).startsWith("www")
+						|| url.toLowerCase(Locale.ENGLISH).startsWith("file:/")) {
 					// Browser
 					final URL toBrowse = new URL(url);
 					Desktop.getDesktop().browse(toBrowse.toURI());
