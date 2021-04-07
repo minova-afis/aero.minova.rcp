@@ -1,10 +1,12 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.util;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 
 public class DateTimeUtil {
@@ -22,23 +24,45 @@ public class DateTimeUtil {
 	}
 
 	public static Instant getDateTime(Instant todayNow, String input, Locale locale) {
-		return getDateTime(todayNow, input, locale, "", "");
+		return getDateTime(todayNow, input, locale, "", "", "UTC");
+	}
+
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern,
+			String timeUtilPattern) {
+		return getDateTime(todayNow, input, locale, dateUtilPattern, timeUtilPattern, "UTC");
+	}
+	
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String zoneId) {
+		return getDateTime(todayNow, input, locale, "", "", zoneId);
+	}
+	
+	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
+		return getDateTime(todayNow, input, Locale.getDefault(), "", "", zoneId);
+	}
+
+	public static String getDateTimeString(Instant instant, Locale locale) {
+		String part1 = DateUtil.getDateString(instant, locale);
+		String part2 = TimeUtil.getTimeString(instant, locale);
+		return part1 + " " + part2;
 	}
 
 	/**
-	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer Leerstelle
-	 * getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist, wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in DateUtil und
-	 * TimeUtil festgelegt.
+	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und
+	 * TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer
+	 * Leerstelle getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist,
+	 * wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in
+	 * DateUtil und TimeUtil festgelegt.
 	 * 
 	 * @param todayNow
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern) {
-
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern,
+			String timeUtilPattern, String zoneId) {
 		String[] splitInput = null;
 		Instant dateIn;
 		Instant timeIn;
+		Instant dateTime;
 		LocalDate dateLocal;
 		LocalTime timeLocal;
 
@@ -72,7 +96,13 @@ public class DateTimeUtil {
 			return null;
 		}
 
-		Instant dateTime = LocalDateTime.of(dateLocal, timeLocal).toInstant(ZoneOffset.UTC);
+		try {
+			ZoneId zI = ZoneId.of(zoneId);
+			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
+		} catch (Exception e) {
+			// Invalid ZoneId;
+			return null;
+		}
 
 		return dateTime;
 	}

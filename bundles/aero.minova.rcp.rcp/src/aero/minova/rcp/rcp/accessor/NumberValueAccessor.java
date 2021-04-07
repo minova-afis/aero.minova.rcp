@@ -208,15 +208,28 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			text = textBefore;
 		}
 
-		try {
-			result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
-			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, decimalFormatSymbols,
-					numberFormat);
-		} catch (NumberFormatException e) {
-			result.value = new Value(0.0);
-			result.text = numberFormat.format(result.value.getDoubleValue());
-			result.caretPosition = 1;
+		if (decimals > 0) {
+			try {
+				result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+				result.text = numberFormat.format(result.value.getDoubleValue());
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, decimalFormatSymbols,
+						numberFormat);
+			} catch (NumberFormatException e) {
+				result.value = new Value(0.0);
+				result.text = numberFormat.format(result.value.getDoubleValue());
+				result.caretPosition = 1;
+			}
+		} else {
+			try {
+				result.value = new Value(Integer.parseInt(text));
+				result.text = numberFormat.format(result.value.getIntegerValue());
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, decimalFormatSymbols,
+						numberFormat);
+			} catch (NumberFormatException e) {
+				result.value = new Value(0);
+				result.text = numberFormat.format(result.value.getIntegerValue());
+				result.caretPosition = 1;
+			}
 		}
 
 		return result;

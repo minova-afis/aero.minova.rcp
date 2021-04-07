@@ -117,7 +117,7 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.setDetail(detail, perspective);
+		casRequestsUtil.setDetail(getDetail(), perspective);
 		translate(composite);
 	}
 
@@ -159,14 +159,16 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 		}
 		// Helper-Klasse initialisieren
-		String helperClass = form.getHelperClass();
-		if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
-			// TODO Übersetzung!
-			throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+		if (form.getHelperClass() != null) {
+			String helperClass = form.getHelperClass();
+			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+				// TODO Übersetzung!
+				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+			}
+			IHelper iHelper = helperlist.get(0);
+			iHelper.setControls(getDetail());
+			getDetail().setHelper(iHelper);
 		}
-		IHelper iHelper = helperlist.get(0);
-		iHelper.setControls(detail);
-		detail.setHelper(iHelper);
 
 	}
 
@@ -174,11 +176,9 @@ public class WFCDetailPart extends WFCFormPart {
 		RowData headLayoutData = new RowData();
 		Section headSection;
 		if (head.isHead) {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
@@ -200,8 +200,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
 		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 
 		pageLayoutData.width = SECTION_WIDTH;
 
@@ -230,7 +229,7 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 			Field field = (Field) fieldOrGrid;
 			MField f = ModelToViewModel.convert(field);
-			detail.putField(f);
+			getDetail().putField(f);
 
 			if (!field.isVisible()) {
 				continue; // nur sichtbare Felder
@@ -249,7 +248,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 		addBottonMargin(composite, row + 1, column);
 	}
-
 
 	private int getExtraHeight(Field field) {
 		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
@@ -280,7 +278,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MShortTimeField) {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, detail, locale);
+			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, getDetail(), locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}
@@ -294,7 +292,6 @@ public class WFCDetailPart extends WFCFormPart {
 			translate(composite);
 		}
 	}
-
 
 	private void translate(Composite composite) {
 		for (Control control : composite.getChildren()) {
@@ -333,5 +330,8 @@ public class WFCDetailPart extends WFCFormPart {
 		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
 
+	public MDetail getDetail() {
+		return detail;
+	}
 
 }

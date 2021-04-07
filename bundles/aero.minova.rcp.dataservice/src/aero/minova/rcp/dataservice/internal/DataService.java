@@ -32,6 +32,8 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
 
 import com.google.gson.Gson;
@@ -40,6 +42,7 @@ import com.google.gson.GsonBuilder;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.IDummyService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
@@ -101,6 +104,9 @@ public class DataService implements IDataService {
 		this.server = server;
 		this.workspacePath = workspacePath;
 		init();
+		BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
+		// allow to trigger components after the service has been initialized, see
+		bundleContext.registerService(IDummyService.class.getName(), new IDummyService(), null);
 	}
 
 	private void init() {
@@ -134,11 +140,40 @@ public class DataService implements IDataService {
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			if (LOG) {
 				logBody(body, ++callCount);
-				System.out.println(t);
 			}
 			return gson.fromJson(t.body(), Table.class);
 		});
 
+	}
+
+	/**
+	 * Laden einer PDF Datei
+	 *
+	 * @param tablename
+	 * @param detailTable
+	 * @return
+	 */
+	@Override
+	public CompletableFuture<Path> getPDFAsync(String tablename, Table detailTable) {
+		String body = gson.toJson(detailTable);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.build();
+		logBody(body, ++callCount);
+		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
+		try {
+			Files.createDirectories(path.getParent());
+			Files.createFile(path);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
+			return path;
+		});
+//			HttpResponse<Path> send = httpClient.send(request, BodyHandlers.ofFile(path));
+//			System.out.println(send);
 	}
 
 	@Override
@@ -227,38 +262,14 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<String> getHashedFile(String filename) {
-		String localHashValue = "";
-		String serverHashCode = "";
-		boolean updateRequired = true;
 		logCache("Requested file: " + filename);
-		File cachedFile = Path.of(getStoragePath().toString(), filename).toFile();
-
-		// cached file existiert, wir checken mit dem Server ob das noch aktuell ist
-		if (cachedFile.exists()) {
-			logCache("File exist, building hash");
-			try {
-				localHashValue = HashService.hashFile(cachedFile);
-				logCache("Local hash:  " + localHashValue);
-				try {
-					serverHashCode = getHashForFile(filename).join();
-					if (serverHashCode.equals(localHashValue)) {
-						updateRequired = false;
-					}
-					logCache("Server hash: " + serverHashCode);
-				} catch (RuntimeException e) {
-					// server does not know the file
-				}
-
-			} catch (IOException e) {
-				// something went wrong we need to download the file again
+		try {
+			if (checkIfUpdateIsRequired(filename)) {
+				logCache(filename + " need to download / update the file ");
+				downloadFile(filename);
 			}
-		}
-
-		if (updateRequired) {
-			logCache(filename + " need to download / update the file ");
-			CompletableFuture<String> downloadAsync = downloadAsync(filename);
-			saveFile(filename, downloadAsync);
-			return downloadAsync;
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
 		}
 		return getCachedFileContent(filename);
 
@@ -281,12 +292,32 @@ public class DataService implements IDataService {
 	}
 
 	/**
+	 * synchrones laden einer Datei vom Server.
+	 *
+	 * @param localPath
+	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename
+	 *            relativer Pfad und Dateiname auf dem Server
+	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	@Override
+	public void downloadFile(String fileName) throws IOException, InterruptedException {
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.build();
+		logBody("getFileSynch(" + fileName + ")", ++callCount);
+		Path localFile = getStoragePath().resolve(fileName);
+		httpClient.send(request, BodyHandlers.ofFile(localFile));
+	}
+
+	/**
 	 * Only public for the integration tests
 	 *
 	 * @param filename
 	 * @return
 	 */
-	public CompletableFuture<String> getHashForFile(String filename) {
+	public CompletableFuture<String> getServerHashForFile(String filename) {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
 
@@ -297,6 +328,37 @@ public class DataService implements IDataService {
 			return response;
 		}).thenApply(HttpResponse::body);
 
+	}
+
+	/**
+	 * Caller muss file.exists() aufgerufen haben
+	 *
+	 * @param file
+	 * @return
+	 */
+	public CompletableFuture<String> getLocalHashForFile(File file) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return HashService.hashFile(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return "-1";
+		});
+
+	}
+
+	@Override
+	public boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException {
+		File file = getStoragePath().resolve(fileName).toFile();
+		if (!file.exists()) {
+			return true;
+		}
+		CompletableFuture<String> serverHashForFile = getServerHashForFile(fileName);
+		CompletableFuture<String> localHashForFile = getLocalHashForFile(file);
+		String serverHash = serverHashForFile.join();
+		String localHash = localHashForFile.join();
+		return (!serverHash.equals(localHash));
 	}
 
 	private CompletableFuture<String> getCachedFileContent(String filename) {

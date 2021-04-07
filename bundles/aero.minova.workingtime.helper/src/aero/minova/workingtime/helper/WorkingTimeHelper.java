@@ -32,7 +32,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.util.DateUtil;
+import aero.minova.rcp.util.DateUtil;
 
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
@@ -148,8 +148,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		if (employee.getValue() instanceof LookupValue) {
 			employeeValue = (LookupValue) employee.getValue();
 		} else {
-			System.err.println(
-					"WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
+			System.err.println("WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
 		}
 	}
 
@@ -185,14 +184,14 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	@Override
 	public void handleDetailAction(ActionCode code) {
+		((LookupValueAccessor) orderreceiver.getValueAccessor()).setFocus();
 		switch (code) {
 		case DEL:
 			if (lookupValueUser != null) {
 				employeeValue = lookupValueUser;
 			} else {
 				employeeValue = null;
-				System.err.println(
-						MessageFormat.format("LookupValue für User: {0} konnte nicht aiufgelöst werden!", user));
+				System.err.println(MessageFormat.format("LookupValue für User: {0} konnte nicht aiufgelöst werden!", user));
 
 			}
 			employee.setValue(employeeValue, false);

@@ -32,7 +32,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.ShortTimeValueAccessor;
-import aero.minova.rcp.rcp.util.TimeUtil;
+import aero.minova.rcp.util.TimeUtil;
 
 public class ShortTimeField {
 

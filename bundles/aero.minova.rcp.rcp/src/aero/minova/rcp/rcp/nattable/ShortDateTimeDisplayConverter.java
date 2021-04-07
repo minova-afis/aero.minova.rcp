@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
-import aero.minova.rcp.rcp.util.DateUtil;
+import aero.minova.rcp.util.DateUtil;
 
 public class ShortDateTimeDisplayConverter extends DisplayConverter {
 
