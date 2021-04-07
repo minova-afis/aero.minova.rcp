@@ -88,8 +88,8 @@ public class AboutDialog extends TitleAreaDialog {
 		createText(info, null, "97072 Würzburg", lizenzFont, IMessageProvider.INFORMATION);
 		createText(info, null, "AG Würzburg HRB 7625", lizenzFont, IMessageProvider.INFORMATION);
 
-		createText(info, ImageUtil.getImageDefault("phone.png"), "+49(0)931-32235 -0", lizenzFont, IMessageProvider.INFORMATION);
-		createText(info, ImageUtil.getImageDefault("fax.png"), "+49(0)931-32235 -55", lizenzFont, IMessageProvider.INFORMATION);
+		createText(info, ImageUtil.getImageDefault("phone.png"), "+49 (0) 931 - 32235 - 0", lizenzFont, IMessageProvider.INFORMATION);
+		createText(info, ImageUtil.getImageDefault("fax.png"), "+49 (0) 931 - 32235 - 55", lizenzFont, IMessageProvider.INFORMATION);
 		createText(info, ImageUtil.getImageDefault("mail.png"), "info@minova.de", lizenzFont, IMessageProvider.INFORMATION);
 
 		createText(info, ImageUtil.getImageDefault("version.png"), version, lizenzFont, IMessageProvider.INFORMATION);
