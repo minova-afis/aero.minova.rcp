@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ENTITY logo-landscape-height "297mm">
+<!ENTITY logo-landscape-left "-10mm">
+<!ENTITY logo-landscape-top "-10mm">
+<!ENTITY logo-landscape-width "297mm">
+<!ENTITY logo-portrait-height "210mm">
+<!ENTITY logo-portrait-left "-10mm">
+<!ENTITY logo-portrait-top "-10mm">
+<!ENTITY logo-portrait-width "210mm">

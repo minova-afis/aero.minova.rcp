@@ -35,8 +35,9 @@ public class DataFormService implements IDataFormService {
 		Table dataTable = new Table();
 		dataTable.setName(form.getIndexView().getSource());
 		for (Column c : form.getIndexView().getColumn()) {
-			aero.minova.rcp.model.Column tableColumn = new aero.minova.rcp.model.Column(c.getName(), getDataType(c),
-					OutputType.OUTPUT);
+			aero.minova.rcp.model.Column tableColumn = new aero.minova.rcp.model.Column(c.getName(), getDataType(c), OutputType.OUTPUT);
+			tableColumn.setLabel(c.getLabel());
+
 			dataTable.addColumn(tableColumn);
 		}
 		return dataTable;
@@ -46,8 +47,7 @@ public class DataFormService implements IDataFormService {
 	public Table getTableFromFormDetail(Form form, String prefix) {
 		Table dataTable = new Table();
 		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if (!("sp".equals(form.getDetail().getProcedurePrefix())
-				|| "op".equals(form.getDetail().getProcedurePrefix()))) {
+		if (!("sp".equals(form.getDetail().getProcedurePrefix()) || "op".equals(form.getDetail().getProcedurePrefix()))) {
 			tablename = form.getDetail().getProcedurePrefix();
 		}
 		if (prefix != null) {
@@ -109,8 +109,7 @@ public class DataFormService implements IDataFormService {
 
 	public aero.minova.rcp.model.Column createColumnFromField(Field f, String prefix) {
 		DataType type = null;
-		if (f.getPercentage() != null || f.getMoney() != null
-				|| (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
+		if (f.getPercentage() != null || f.getMoney() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
 		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
@@ -121,19 +120,25 @@ public class DataFormService implements IDataFormService {
 		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
 			type = DataType.INSTANT;
 		}
+
+		aero.minova.rcp.model.Column c;
 		if (prefix.equals("Read")) {
-			return new aero.minova.rcp.model.Column(f.getName(), type, OutputType.OUTPUT);
+			c = new aero.minova.rcp.model.Column(f.getName(), type, OutputType.OUTPUT);
 		} else {
-			return new aero.minova.rcp.model.Column(f.getName(), type);
+			c = new aero.minova.rcp.model.Column(f.getName(), type);
 		}
+
+		c.setLabel(f.getLabel());
+
+		return c;
 
 	}
 
 	/**
-	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element
-	 * zurück
+	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element zurück
 	 *
-	 * @param c aero.minova.rcp.form.model.xsd.Column;
+	 * @param c
+	 *            aero.minova.rcp.form.model.xsd.Column;
 	 * @return DataType
 	 */
 	public DataType getDataType(Column c) {
@@ -161,7 +166,7 @@ public class DataFormService implements IDataFormService {
 		CompletableFuture<String> hashedFile = dataService.getHashedFile(name); // Datei ggf. vom Server holen
 		// form wird synchron geladen, das sollte später auch asynchron werden
 		String formContent = hashedFile.join();
-		
+
 		XmlProcessor xmlProcessor = new XmlProcessor();
 		try {
 			String localpath = Platform.getInstanceLocation().getURL().toURI().toString();

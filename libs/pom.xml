@@ -13,5 +13,6 @@
 
 	<modules>
 		<module>aero.minova.libs.jtds</module>
+		<module>aero.minova.libs.fop</module>
 	</modules>
 </project>
