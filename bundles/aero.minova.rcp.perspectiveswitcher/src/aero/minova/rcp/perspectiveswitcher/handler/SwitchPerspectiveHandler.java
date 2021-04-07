@@ -32,7 +32,7 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
-	
+
 	@Inject
 	EPartService partService;
 
@@ -46,7 +46,6 @@ public class SwitchPerspectiveHandler {
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String formName,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
-			@Optional MHandledMenuItem handledMenuItem,
 			MWindow window) throws InvocationTargetException, InterruptedException {
 		if (Boolean.parseBoolean(newWindow)) {
 			openNewWindowPerspective(context, formName);
