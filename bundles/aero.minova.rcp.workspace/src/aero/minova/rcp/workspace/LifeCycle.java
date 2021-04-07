@@ -14,7 +14,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.StorageException;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
@@ -42,8 +41,8 @@ public class LifeCycle {
 		URI workspaceLocation = null;
 
 		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 			try {
+				ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 				if (!Platform.getInstanceLocation().isSet()) {
 					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
 					try {
@@ -59,8 +58,9 @@ public class LifeCycle {
 								sPrefs.get(WorkspaceAccessPreferences.URL, null), workspaceLocation);
 					}
 				}
-			} catch (StorageException e) {
+			} catch (Exception e) {
 				logger.error(e);
+				loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 			}
 		} else {
 			loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
