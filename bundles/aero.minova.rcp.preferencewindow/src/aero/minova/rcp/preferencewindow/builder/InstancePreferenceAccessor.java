@@ -13,21 +13,18 @@ import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
  * Liefert Methoden zu holen und setzen von Wert aus und in die Preferences.
  * 
  * @author bauer
- *
  */
 public class InstancePreferenceAccessor {
 
 	/**
-	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen
-	 * Preferences.
+	 * Holt den an den übergebenen Key gebunden Wert aus den angegebenen Preferences.
 	 * 
 	 * @param preferences
 	 * @param preferenceKey
 	 * @param type
 	 * @return
 	 */
-	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue,
-			Locale l) {
+	public static Object getValue(Preferences preferences, String preferenceKey, DisplayType type, Object defaultValue, Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -37,6 +34,8 @@ public class InstancePreferenceAccessor {
 		case PASSWORD:
 		case LOCALE:
 		case TEXT:
+		case DATE_UTIL:
+		case TIME_UTIL:
 			return preferences.get(preferenceKey, (String) defaultValue);
 		case INTEGER:
 			return preferences.getInt(preferenceKey, (int) defaultValue);
@@ -69,8 +68,7 @@ public class InstancePreferenceAccessor {
 	 * @param type
 	 * @param value
 	 */
-	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value,
-			Locale l) {
+	public static void putValue(Preferences preferences, String preferenceKey, DisplayType type, Object value, Locale l) {
 		switch (type) {
 		case STRING:
 		case FILE:
@@ -80,6 +78,8 @@ public class InstancePreferenceAccessor {
 		case LOCALE:
 		case PASSWORD:
 		case TEXT:
+		case DATE_UTIL:
+		case TIME_UTIL:
 			preferences.put(preferenceKey, (String) value);
 			break;
 		case INTEGER:

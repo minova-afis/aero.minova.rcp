@@ -16,11 +16,28 @@ public class DateTimeUtil {
 	}
 
 	public static Instant getDateTime(String input) {
-		return getDateTime(Instant.now(), input);
+		return getDateTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDateTime(Instant now, String input) {
-		return getDateTime(now, input, "UTC");
+	public static Instant getDateTime(Instant todayNow, String input) {
+		return getDateTime(todayNow, input, Locale.getDefault());
+	}
+
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale) {
+		return getDateTime(todayNow, input, locale, "", "", "UTC");
+	}
+
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern,
+			String timeUtilPattern) {
+		return getDateTime(todayNow, input, locale, dateUtilPattern, timeUtilPattern, "UTC");
+	}
+	
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String zoneId) {
+		return getDateTime(todayNow, input, locale, "", "", zoneId);
+	}
+	
+	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
+		return getDateTime(todayNow, input, Locale.getDefault(), "", "", zoneId);
 	}
 
 	public static String getDateTimeString(Instant instant, Locale locale) {
@@ -30,38 +47,46 @@ public class DateTimeUtil {
 	}
 
 	/**
-	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer Leerstelle
-	 * getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist, wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in DateUtil und
-	 * TimeUtil festgelegt.
-	 *
+	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und
+	 * TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer
+	 * Leerstelle getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist,
+	 * wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in
+	 * DateUtil und TimeUtil festgelegt.
+	 * 
 	 * @param todayNow
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
-
-		String[] splitInput = input.split(" ");
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern,
+			String timeUtilPattern, String zoneId) {
+		String[] splitInput = null;
 		Instant dateIn;
 		Instant timeIn;
 		Instant dateTime;
 		LocalDate dateLocal;
 		LocalTime timeLocal;
 
+		if (input.contains(" ")) {
+			splitInput = input.split(" ");
+		} else if (input.contains("*")) {
+			String first = input.substring(0, input.indexOf("*"));
+			String last = input.substring(input.lastIndexOf("*") + 1);
+			String firstLast = first + " " + last;
+			splitInput = firstLast.split(" ");
+		} else {
+			return null;
+		}
+
 		if (splitInput.length > 1) {
 			if (!splitInput[0].isEmpty()) {
-				dateIn = DateUtil.getDate(todayNow, splitInput[0]);
+				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilPattern);
+				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
 			} else {
-				dateIn = DateUtil.getDate(todayNow, "0");
-			}
-
-			if (!splitInput[1].isEmpty()) {
-				timeIn = TimeUtil.getTime(todayNow, splitInput[1]);
-			} else {
-				timeIn = TimeUtil.getTime(todayNow, "0");
+				dateIn = DateUtil.getDate(todayNow, "0", locale, dateUtilPattern);
+				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
 			}
 		} else {
-			dateIn = DateUtil.getDate(todayNow, splitInput[0]);
-			timeIn = TimeUtil.getTime(todayNow, "0");
+			return null;
 		}
 
 		if (null != dateIn && null != timeIn) {
@@ -71,12 +96,11 @@ public class DateTimeUtil {
 			return null;
 		}
 
-
 		try {
 			ZoneId zI = ZoneId.of(zoneId);
 			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
 		} catch (Exception e) {
-			//Invalid ZoneId;
+			// Invalid ZoneId;
 			return null;
 		}
 

@@ -32,7 +32,7 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	ECommandService commandService;
-	
+
 	@Inject
 	EPartService partService;
 
@@ -46,12 +46,11 @@ public class SwitchPerspectiveHandler {
 	public void execute(IEclipseContext context,
 			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String formName,
 			@Optional @Named(E4WorkbenchParameterConstants.COMMAND_PERSPECTIVE_NEW_WINDOW) String newWindow,
-			@Optional MHandledMenuItem handledMenuItem,
 			MWindow window) throws InvocationTargetException, InterruptedException {
 		if (Boolean.parseBoolean(newWindow)) {
-			openNewWindowPerspective(context, handledMenuItem.getElementId());
+			openNewWindowPerspective(context, formName);
 		} else {
-			openPerspective(context, handledMenuItem.getElementId(), window, formName);
+			openPerspective(context, formName, window, formName);
 		}
 	}
 
@@ -64,6 +63,8 @@ public class SwitchPerspectiveHandler {
 	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName) {
 		MApplication application = context.get(MApplication.class);
 		EModelService modelService = context.get(EModelService.class);
+		if (perspectiveID.contains("."))
+			perspectiveID = perspectiveID.substring(0, perspectiveID.indexOf("."));
 
 		MUIElement element = modelService.find(perspectiveID, application);
 		if (element == null) {

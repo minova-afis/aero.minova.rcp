@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
  * Diese Klasse enthält alle Methoden, zum Konvertieren von Zeitangaben in Instant
  *
  * @author Wilfried Saak
- *
  */
 public class DateUtil {
 	private static String day = "d";
@@ -28,22 +27,27 @@ public class DateUtil {
 	private static String year = "y";
 	private static String week = "w";
 	private static String shortcuts = day + month + year + week;
+	private static String defaultPattern = "";
 
 	private DateUtil() {
 		throw new IllegalStateException("Utility class");
 	}
 
 	/**
-	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet
-	 * werden. Alle Kürzel müssen als Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen
-	 * bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol bestehen.
+	 * Mit dieser Methode kann man die sprachspezifischen Kürzel einstellen. Es dürfen keine doppelten Kürzel verwendet werden. Alle Kürzel müssen als
+	 * Kleinbuchstaben angegeben werden. Die Kürzel müssen aus genau einem Zeichen bestehen. Sie dürfen weder aus einer Zahl oder dem "+" oder "-" Symbol
+	 * bestehen.
 	 *
-	 * @param day   das Kürzel für Tag. Default (englisch) ist "d"
-	 * @param month das Kürzel für Monat. Default (englisch) ist "m"
-	 * @param year  das Kürzel für Jahr. Default (englisch) ist "y"
-	 * @param week  das Kürzel für Woche. Default (englisch) ist "w"
-	 *
-	 * @exception IllegalArgumentException wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
+	 * @param day
+	 *            das Kürzel für Tag. Default (englisch) ist "d"
+	 * @param month
+	 *            das Kürzel für Monat. Default (englisch) ist "m"
+	 * @param year
+	 *            das Kürzel für Jahr. Default (englisch) ist "y"
+	 * @param week
+	 *            das Kürzel für Woche. Default (englisch) ist "w"
+	 * @exception IllegalArgumentException
+	 *                wird geworfen, wenn eine der obigen Bedingungen nicht erfüllt ist
 	 */
 	public static void setShortcuts(String day, String month, String year, String week) {
 		// Es muss immer genau ein Zeichen übergeben werden
@@ -95,7 +99,7 @@ public class DateUtil {
 	}
 
 	public static Instant getDate(Instant today, String input) {
-		return getDate(today, input, Locale.getDefault(Category.FORMAT));
+		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
 	}
 
 	public static Instant getDate(String input, Locale locale) {
@@ -116,7 +120,7 @@ public class DateUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale) {
+	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilPref) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
 
@@ -129,8 +133,7 @@ public class DateUtil {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
 					// Es beginnt mit eine Tagesangabe
-					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC"))
-							.atStartOfDay();
+					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
@@ -140,17 +143,28 @@ public class DateUtil {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
-
+		
 		if (!input.isEmpty() && startOfToday == null) {
-			DateTimeFormatter dtf;
-			for (FormatStyle formatStyle : FormatStyle.values()) {
+			if (!dateUtilPref.equals("")) {
 				try {
-					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtilPref, locale);
 					LocalDate ld = LocalDate.parse(input, dtf);
 					startOfToday = ld.atStartOfDay();
-					break;
 				} catch (Exception e) {
-					// dann war is nicht in diesem Format
+					// TODO: handle exception
+				}
+			} else {
+				DateTimeFormatter dtf;
+				FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
+				for (FormatStyle formatStyle : styles) {
+					try {
+						dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+						LocalDate ld = LocalDate.parse(input, dtf);
+						startOfToday = ld.atStartOfDay();
+						break;
+					} catch (Exception e) {
+						// dann war is nicht in diesem Format
+					}
 				}
 			}
 		}
