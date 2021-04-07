@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: WorkingTimeHelper
 Bundle-SymbolicName: aero.minova.workingtime.helper
-Bundle-Version: 12.0.8.qualifier
+Bundle-Version: 12.0.9.qualifier
 Automatic-Module-Name: aero.minova.workingtime.helper
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: aero.minova.rcp.dataservice,
