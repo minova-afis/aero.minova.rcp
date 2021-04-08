@@ -1,0 +1,46 @@
+@import url("platform:/plugin/aero.minova.rcp.css/css/colors.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/margin.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/common.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
+
+Widget, CTabItem, LookupControl, ToolBar, ToolTip, Label, Button, MinovaSection, LookupTwistie {
+	font-size: 13px;
+}
+	
+Text, Label.DescriptionLabel, MinovaSection, LookupText {
+	font-size: 15px;
+}
+
+MinovaSection {
+	table-spacing: 22px;
+	section-spacing: 8px;
+	label-margin-top: 6px;
+	description-margin-top: 3px;
+	description-margin-left: 3px;
+	multiline-margin-right: 0px;
+	multiline-margin-bottom: -12px;
+	unit-label-margin-left: 17px;
+	checkbox-margin-top: 9px;
+	row-height: 36px;
+	date-time-width: 164px;
+	date-width: 108px;
+	time-width: 64px;
+	number-width: 120px;
+	text-width: 172px;
+}
+
+NatTable {
+	font-size: 14;
+	padding: 4;
+	/*row-height: 34;*/
+}
+
+NatTable > .BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
+	.selectionAnchor:select, .SummaryRow,
+	.TREE_EXPANDED, .TREE_EXPANDED:select,
+	.TREE_COLLAPSED, .TREE_COLLAPSED:select,
+	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {
+	font-size: 14;
+	padding: 4;
+	/*row-height: 34;*/
+}

@@ -73,7 +73,8 @@ public class PrintDetailHandler {
 				URL url;
 				try {
 					url = tr.toFile().toURI().toURL();
-					showFile(url.toString(), checkPreview(window, modelService, partService, preview));
+//					showFile(url.toString(), checkPreview(window, modelService, partService, preview));
+					showFile(url.toString(), null);
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
