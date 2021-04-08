@@ -41,6 +41,24 @@
              id="aero.minova.rcp.defaulttheme-XL"
              label="Light Size XL">
        </theme>
+       <theme
+             basestylesheeturi="css/default-macosx.css"
+             id="aero.minova.rcp.defaulttheme"
+             label="Default Mac"
+             os="macosx">
+       </theme>
+       <theme
+             basestylesheeturi="css/default-linux.css"
+             id="aero.minova.rcp.defaulttheme"
+             label="Default Linux"
+             os="linux">
+       </theme>
+       <theme
+             basestylesheeturi="css/default-win32-m.css"
+             id="aero.minova.rcp.defaulttheme"
+             label="Default Windows"
+             os="win32">
+       </theme>
    </extension>
 
 </plugin>
