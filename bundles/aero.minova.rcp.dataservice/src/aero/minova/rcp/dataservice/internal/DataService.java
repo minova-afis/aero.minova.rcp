@@ -17,7 +17,9 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -25,7 +27,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -35,6 +36,12 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -59,12 +66,29 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.util.ErrorObject;
 
 @Component
 public class DataService implements IDataService {
 
-	@Inject
-	private IEventBroker broker;
+	EventAdmin eventAdmin;
+
+	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
+	void registerEventAdmin(EventAdmin admin) {
+		this.eventAdmin = admin;
+	}
+
+	void unregisterEventAdmin(EventAdmin admin) {
+		this.eventAdmin = null;
+	}
+
+	public void postError(ErrorObject value) {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_RESOLVETICKET);
+		data.put(IEventBroker.DATA, value);
+		Event event = new Event(Constants.BROKER_RESOLVETICKET, data);
+		eventAdmin.postEvent(event);
+	}
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	private static final String CONTENT_TYPE = "Content-Type";
@@ -151,11 +175,13 @@ public class DataService implements IDataService {
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
+		if (LOG) {
+			logBody(body, ++callCount);
+		}
+
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
-			if (LOG) {
-				logBody(body, ++callCount);
-			}
-			return gson.fromJson(t.body(), Table.class);
+			Table fromJson = gson.fromJson(t.body(), Table.class);
+			return fromJson;
 		});
 
 	}
@@ -186,8 +212,6 @@ public class DataService implements IDataService {
 		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
 			return path;
 		});
-//			HttpResponse<Path> send = httpClient.send(request, BodyHandlers.ofFile(path));
-//			System.out.println(send);
 	}
 
 	@Override
@@ -201,6 +225,11 @@ public class DataService implements IDataService {
 		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			if(fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName()))
+			{
+				ErrorObject e = new ErrorObject(fromJson.getResultSet(), "USER", tableName);
+				postError(e);
+			}
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
 				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
@@ -607,7 +636,8 @@ public class DataService implements IDataService {
 			}
 			if (ta != null) {
 				if (ta.getName() != null && ta.getName().equals("Error")) {
-					broker.post(Constants.BROKER_SHOWERROR, ta);
+					ErrorObject e = new ErrorObject(ta, "USER", procedureName);
+					postError(e);
 				} else {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
