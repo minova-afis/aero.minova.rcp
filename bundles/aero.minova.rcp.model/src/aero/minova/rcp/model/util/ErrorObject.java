@@ -4,23 +4,23 @@ import aero.minova.rcp.model.Table;
 
 public class ErrorObject {
 
-	public ErrorObject(Table errorTable, String user, String serverRequest) {
+	public ErrorObject(Table errorTable, String user, Throwable t) {
 		super();
 		this.setErrorTable(errorTable);
 		this.setUser(user);
-		this.setServerRequest(serverRequest);
+		this.setT(t);
 	}
 
 	public ErrorObject(Table errorTable, String user) {
 		super();
 		this.setErrorTable(errorTable);
 		this.setUser(user);
-		this.setServerRequest(null);
+		this.t = null;
 	}
 
 	private Table errorTable;
 	private String user;
-	private String serverRequest;
+	private Throwable t;
 
 	public Table getErrorTable() {
 		return errorTable;
@@ -38,13 +38,12 @@ public class ErrorObject {
 		this.user = user;
 	}
 
-	public String getServerRequest() {
-		return serverRequest;
+	public Throwable getT() {
+		return t;
 	}
 
-	public void setServerRequest(String serverRequest) {
-		this.serverRequest = serverRequest;
+	public void setT(Throwable t) {
+		this.t = t;
 	}
-
 
 }

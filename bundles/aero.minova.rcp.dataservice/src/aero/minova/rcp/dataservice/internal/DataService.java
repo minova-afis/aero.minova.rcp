@@ -84,9 +84,9 @@ public class DataService implements IDataService {
 
 	public void postError(ErrorObject value) {
 		Dictionary<String, Object> data = new Hashtable<>(2);
-		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_RESOLVETICKET);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
 		data.put(IEventBroker.DATA, value);
-		Event event = new Event(Constants.BROKER_RESOLVETICKET, data);
+		Event event = new Event(Constants.BROKER_SHOWERROR, data);
 		eventAdmin.postEvent(event);
 	}
 
@@ -225,11 +225,6 @@ public class DataService implements IDataService {
 		logBody(body, ++callCount);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			if(fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName()))
-			{
-				ErrorObject e = new ErrorObject(fromJson.getResultSet(), "USER", tableName);
-				postError(e);
-			}
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
 				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
@@ -248,7 +243,13 @@ public class DataService implements IDataService {
 				fromJson.setResultSet(error);
 				// FehlerCode
 				fromJson.setReturnCode(-1);
-
+			}
+			if (fromJson.getReturnCode() == -1) {
+				if (fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName())) {
+					ErrorObject e = new ErrorObject(fromJson.getResultSet(), username);
+					postError(e);
+					return null;
+				}
 			}
 			logBody(t.body());
 			return fromJson;
@@ -631,22 +632,17 @@ public class DataService implements IDataService {
 			Table ta = null;
 			try {
 				ta = tableFuture.get().getResultSet();
-			} catch (InterruptedException | ExecutionException e) {
+			} catch (InterruptedException | ExecutionException | NullPointerException e) {
 				e.printStackTrace();
 			}
 			if (ta != null) {
-				if (ta.getName() != null && ta.getName().equals("Error")) {
-					ErrorObject e = new ErrorObject(ta, "USER", procedureName);
-					postError(e);
-				} else {
-					for (Row r : ta.getRows()) {
-						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-						map.put(lv.keyLong, lv);
-						list.add(lv);
-					}
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+					map.put(lv.keyLong, lv);
+					list.add(lv);
 				}
 			}
 			return CompletableFuture.supplyAsync(() -> list);
@@ -725,6 +721,11 @@ public class DataService implements IDataService {
 		}
 
 		return tableFuture;
+	}
+
+	@Override
+	public String getUserName() {
+		return username;
 	}
 
 //	@Override

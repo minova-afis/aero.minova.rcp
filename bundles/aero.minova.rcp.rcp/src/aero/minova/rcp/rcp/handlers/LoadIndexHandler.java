@@ -65,7 +65,7 @@ public class LoadIndexHandler {
 
 		tableFuture.thenAccept(t -> {
 			if (t.getName().equals("Error")) {
-				ErrorObject e = new ErrorObject(t, "User", searchTable.getName());
+				ErrorObject e = new ErrorObject(t, dataService.getUserName());
 				broker.post(Constants.BROKER_SHOWERROR, e);
 			} else {
 				broker.post(Constants.BROKER_LOADINDEXTABLE, Map.of(perspective, t));

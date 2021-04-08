@@ -256,7 +256,7 @@ public class WFCDetailCASRequestsUtil {
 	private void checkEntryUpdate(SqlProcedureResult response) {
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
 		if (response.getReturnCode() == -1) {
-			ErrorObject e = new ErrorObject(response.getResultSet(), "USER");
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
 			showErrorMessage(e);
 		} else {
 			openNotificationPopup(getTranslation("msg.DataUpdated"));
@@ -285,7 +285,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private void checkNewEntryInsert(SqlProcedureResult response) {
 		if (response.getReturnCode() == -1) {
-			ErrorObject e = new ErrorObject(response.getResultSet(), "USER");
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
 			showErrorMessage(e);
 		} else {
 			openNotificationPopup(getTranslation("msg.DataSaved"));
@@ -328,10 +328,13 @@ public class WFCDetailCASRequestsUtil {
 			value = MessageFormat.format(value, params.toArray(new String[0]));
 		}
 
-		if (et.getServerRequest() != null) {
-			value += "\n\nUser : " + et.getUser() + "\nProcedure/View: " + et.getServerRequest();
+		value += "\n\nUser : " + et.getUser() + "\nProcedure/View: " + et.getErrorTable().getRows().get(0).getValue(1).getStringValue();
+
+		if (et.getT() == null) {
+			MessageDialog.openError(shell, "Error", value);
+		} else {
+			ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
 		}
-		MessageDialog.openError(shell, "Error", value);
 	}
 
 	/**
@@ -466,7 +469,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void deleteEntry(SqlProcedureResult response) {
 		if (response.getReturnCode() == -1) {
-			ErrorObject e = new ErrorObject(response.getResultSet(), "USER");
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
 			showErrorMessage(e);
 		} else {
 			openNotificationPopup(getTranslation("msg.DataDeleted"));
