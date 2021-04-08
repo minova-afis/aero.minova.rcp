@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
@@ -44,12 +43,11 @@ public class LookupField {
 
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
-	private static final int COLUMN_WIDTH = 140;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5; // Zwischenräume
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			IEventBroker broker, MPerspective perspective, MDetail detail, Locale locale) {
+			MPerspective perspective, Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
@@ -65,24 +63,25 @@ public class LookupField {
 		FormData descriptionLabelFormData = new FormData();
 
 		IEclipseContext context = perspective.getContext();
-		LookupValueAccessor lookupValueAccessor = new LookupValueAccessor(field, detail, lookupControl, descriptionLabel);
+		LookupValueAccessor lookupValueAccessor = new LookupValueAccessor(field, lookupControl);
 		ContextInjectionFactory.inject(lookupValueAccessor, context);
 		field.setValueAccessor(lookupValueAccessor);
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
 
 		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
-		lookupFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		lookupFormData.width = COLUMN_WIDTH;
+		lookupFormData.left = new FormAttachment(composite,
+				MARGIN_LEFT * (column + 1) + (column + 1) * FieldUtil.COLUMN_WIDTH);
+		lookupFormData.width = FieldUtil.COLUMN_WIDTH;
 
 		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
 		labelFormData.right = new FormAttachment(lookupControl, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
+		labelFormData.width = FieldUtil.COLUMN_WIDTH;
 
 		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
 		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
 		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
-			descriptionLabelFormData.width = MARGIN_LEFT * 2 + COLUMN_WIDTH * 2;
+			descriptionLabelFormData.width = MARGIN_LEFT * 2 + FieldUtil.COLUMN_WIDTH * 2;
 		} else {
 			descriptionLabelFormData.width = 0;
 		}
@@ -137,7 +136,6 @@ public class LookupField {
 	@Inject
 	@Optional
 	public static void requestLookUpEntriesAll(MField field, MDetail detail, Lookup lookup) {
-		CompletableFuture<?> tableFuture;
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
