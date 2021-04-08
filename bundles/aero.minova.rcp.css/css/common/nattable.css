@@ -11,11 +11,11 @@ NatTable {
 	font-style: normal;
 	font-family: tahoma;
 	tree-structure-painter: background tree;
+	row-height: auto;
 }
 
 /** #22441: kann jetzt doch wieder verwendet werden */
 NatTable:select {
-	row-height: auto;
 	painter-resolution: false;
 	/*tree-structure-painter: background padding tree;*/
 }
