@@ -4,20 +4,28 @@
    <extension
          point="org.eclipse.e4.ui.css.swt.theme">
       <theme
-            basestylesheeturi="css/default.css"
+            basestylesheeturi="css/default-win32.css"
             id="aero.minova.rcp.defaulttheme"
-            label="Light">
+            label="Light Windows"
+            os="win32">
       </theme>
        <theme
             basestylesheeturi="css/minova-debugcolors.css"
             id="aero.minova.rcp.debugtheme"
-            label="Light">
+            label="Debug light">
       </theme>
-      <theme
-            basestylesheeturi="css/default.css"
-            id="aero.minova.rcp.default"
-            label="Default">
-      </theme>
+       <theme
+             basestylesheeturi="css/default-macosx.css"
+             id="aero.minova.rcp.defaulttheme"
+             label="Light Mac"
+             os="macosx">
+       </theme>
+       <theme
+             basestylesheeturi="css/default-macosx.css"
+             id="aero.minova.rcp.defaulttheme"
+             label="Light  Linux"
+             os="linux">
+       </theme>
    </extension>
 
 </plugin>
