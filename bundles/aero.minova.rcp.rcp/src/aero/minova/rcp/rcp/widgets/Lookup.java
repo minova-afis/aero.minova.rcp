@@ -908,7 +908,7 @@ public class Lookup extends Composite {
 		label.addMouseListener(mouseListener = new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				// Lookup.this.setFocus();
+				Lookup.this.setFocus();
 				requestAllLookupEntries();
 			}
 		});

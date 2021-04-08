@@ -25,16 +25,19 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		if (control == null) {
 			return;
 		}
+		System.out.println("Fokuslistemner hinzufügen" + field.getLabel());
 		control.addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusLost(FocusEvent e) {
 				setFocussed(false);
+				// Überprüfung ob der eingetragenen Wert in der Liste ist und ebenfalls gültig!
 				field.setValue(field.getValue(), false);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
+				// TODO
 				setFocussed(true);
 			}
 		});

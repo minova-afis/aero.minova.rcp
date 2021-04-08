@@ -151,6 +151,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 	}
 
+	/**
+	 * Wir springen in das Feld!
+	 */
 	public void setFocus() {
 		if (!control.isFocusControl()) {
 			control.setFocus();
