@@ -1,0 +1,5 @@
+@import url("platform:/plugin/ch.minova.e4.ui/css/S/size_8.css");
+
+CTabFolder {
+	swt-tab-height: 30px;
+}
