@@ -93,14 +93,13 @@ public class ApplicationPreferenceWindowHandler {
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
 		pwm = new PreferenceWindowModel(s);
 
-		//Shell des Windows der Application finden
+		// Shell des Windows der Application finden
 		MWindow appWindow = application.getChildren().get(0);
 		Shell shell = (Shell) appWindow.getWidget();
-		//Die Shell des Windows deaktivieren
+		// Die Shell des Windows deaktivieren
 		shell.setEnabled(false);
 
-		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences,
-				ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
+		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
 		PreferenceWindow window = PreferenceWindow.create(shell, data);
@@ -122,10 +121,10 @@ public class ApplicationPreferenceWindowHandler {
 			}
 		}
 
-		//Preference Handler finden
+		// Preference Handler finden
 		List<MHandler> preferenceHandlers = modelService.findElements(application, "aero.minova.rcp.rcp.handler.preferencehandler", MHandler.class);
 		MHandler preferenceHandler = preferenceHandlers.get(0);
-		//Preference Handler deaktivieren
+		// Preference Handler deaktivieren
 		handlerService.deactivateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 
 		window.setSelectedTab(0);
@@ -154,23 +153,21 @@ public class ApplicationPreferenceWindowHandler {
 			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
-			//Die Shell des Windows aktivieren
+			// Die Shell des Windows aktivieren
 			shell.setEnabled(true);
-			//Preference Handler wieder aktivieren
+			// Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		} else {
-			//Die Shell des Windows aktivieren
+			// Die Shell des Windows aktivieren
 			shell.setEnabled(true);
-			//Preference Handler wieder aktivieren
+			// Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		}
 
-		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE,
-				DisplayType.COMBO, "M", s);
+		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
 		if (!currentTheme.equals(newTheme)) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
-			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart",
-					"Soll das Theme geändert werden und die Applikation neu gestarted werden");
+			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "Soll das Theme geändert werden und die Applikation neu gestarted werden");
 			if (openConfirm) {
 				updateTheme(newTheme, themeEngine, workbench);
 			}
@@ -183,23 +180,21 @@ public class ApplicationPreferenceWindowHandler {
 		switch (newTheme) {
 		case "S":
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme-S", true);
-			workbench.restart();
 			break;
 		case "M":
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme-M", true);
-			workbench.restart();
 			break;
 		case "L":
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme-L", true);
-			workbench.restart();
 			break;
 		case "XL":
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme-XL", true);
-			workbench.restart();
 			break;
 		default:
 			break;
 		}
+
+		workbench.restart();
 	}
 
 	public Map<String, Object> fillData(List<PreferenceTabDescriptor> preferenceTabs) {
