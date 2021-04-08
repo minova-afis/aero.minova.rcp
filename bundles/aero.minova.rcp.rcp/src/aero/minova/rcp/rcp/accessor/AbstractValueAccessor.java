@@ -25,8 +25,11 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 		if (control == null) {
 			return;
 		}
-		System.out.println("Fokuslistemner hinzufügen" + field.getLabel());
+		System.out.println("Fokuslistener hinzufügen" + field.getLabel());
 		control.addFocusListener(new FocusListener() {
+
+			private int time;
+			private String widget;
 
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -38,6 +41,14 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 			@Override
 			public void focusGained(FocusEvent e) {
 				// TODO
+				if (e.time == time && e.widget.toString().equals(widget)) {
+					return;
+				}
+				time = e.time;
+				widget = e.widget.toString();
+				System.out.println("Hier ist der Fokus time: " + e.time);
+				System.out.println("Hier ist der Fokus: " + field.getLabel());
+				System.out.println("Hier ist der Fokus widget: " + e.widget.toString());
 				setFocussed(true);
 			}
 		});
