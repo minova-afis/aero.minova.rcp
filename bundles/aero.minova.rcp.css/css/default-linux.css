@@ -2,5 +2,4 @@
 
 NatTable {
 	font-size: 8px;
-	--nattableFontSize: attr(font-size)
 }

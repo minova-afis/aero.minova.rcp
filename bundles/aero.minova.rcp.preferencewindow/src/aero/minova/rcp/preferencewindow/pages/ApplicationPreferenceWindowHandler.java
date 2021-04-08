@@ -15,10 +15,13 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
@@ -45,17 +48,17 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
+import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
 
-public class ApplicationPreferenceWindow {
+public class ApplicationPreferenceWindowHandler {
 
 	// Konstante für den Pfad der .prefs erstellen
 	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -87,7 +90,7 @@ public class ApplicationPreferenceWindow {
 	EModelService modelService;
 
 	@Execute
-	public void execute() {
+	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
 		pwm = new PreferenceWindowModel(s);
 
 		//Shell des Windows der Application finden
@@ -96,6 +99,8 @@ public class ApplicationPreferenceWindow {
 		//Die Shell des Windows deaktivieren
 		shell.setEnabled(false);
 
+		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences,
+				ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
 		PreferenceWindow window = PreferenceWindow.create(shell, data);
@@ -145,14 +150,6 @@ public class ApplicationPreferenceWindow {
 			}
 			try {
 				preferences.flush();
-				Display display = Display.getDefault();
-				if (display == null) {
-					System.out.println("Display = null");
-				}
-				if (display.getThread() != Thread.currentThread()) {
-					System.out.println("Invalid Access");
-				}
-				// eventuell muss es synchronisiert ausgeführt werden.
 				lcs.changeApplicationLocale(CustomLocale.getLocale());
 			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
@@ -166,6 +163,42 @@ public class ApplicationPreferenceWindow {
 			shell.setEnabled(true);
 			//Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
+		}
+
+		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE,
+				DisplayType.COMBO, "M", s);
+		if (!currentTheme.equals(newTheme)) {
+			Shell activeShell = Display.getCurrent().getActiveShell();
+			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart",
+					"Soll das Theme geändert werden und die Applikation neu gestarted werden");
+			if (openConfirm) {
+				updateTheme(newTheme, themeEngine, workbench);
+			}
+		}
+
+	}
+
+	private void updateTheme(String newTheme, IThemeEngine themeEngine, IWorkbench workbench) {
+
+		switch (newTheme) {
+		case "S":
+			themeEngine.setTheme("aero.minova.rcp.defaulttheme-S", true);
+			workbench.restart();
+			break;
+		case "M":
+			themeEngine.setTheme("aero.minova.rcp.defaulttheme-M", true);
+			workbench.restart();
+			break;
+		case "L":
+			themeEngine.setTheme("aero.minova.rcp.defaulttheme-L", true);
+			workbench.restart();
+			break;
+		case "XL":
+			themeEngine.setTheme("aero.minova.rcp.defaulttheme-XL", true);
+			workbench.restart();
+			break;
+		default:
+			break;
 		}
 	}
 
