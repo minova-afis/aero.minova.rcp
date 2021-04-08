@@ -64,6 +64,8 @@ public class TraverseListenerImpl implements TraverseListener {
 			break;
 		case SWT.TRAVERSE_RETURN:
 			logger.info("SWT.TRAVERSE_RETURN");
+			getNextRequired(focussedControl);
+			e.doit = false;
 			break;
 		case SWT.TRAVERSE_TAB_NEXT:
 			logger.info("SWT.TRAVERSE_TAB_NEXT");
@@ -80,7 +82,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			e.doit = false;
 			break;
 		default:
-			logger.info("UNNOWN");
+			logger.info("UNKNOWN");
 		}
 
 	}
