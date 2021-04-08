@@ -41,12 +41,12 @@ import aero.minova.rcp.rcp.widgets.LookupContentProvider;
 
 public class LookupField {
 
+
 	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 	private static final int COLUMN_WIDTH = 140;
 	private static final int MARGIN_LEFT = 5;
 	private static final int MARGIN_TOP = 5; // Zwischenräume
-	private static final int COLUMN_HEIGHT = 28;
 
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
 			IEventBroker broker, MPerspective perspective, MDetail detail, Locale locale) {
@@ -70,7 +70,8 @@ public class LookupField {
 		field.setValueAccessor(lookupValueAccessor);
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
-		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
+
+		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		lookupFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
 		lookupFormData.width = COLUMN_WIDTH;
 

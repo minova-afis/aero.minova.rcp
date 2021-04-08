@@ -1,17 +1,23 @@
 package aero.minova.rcp.rcp.fields;
 
-import java.util.function.Consumer;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Text;
-
-import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.builder.ValueBuilder;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 
 public class FieldUtil {
+
+	static {
+		Display display = Display.getCurrent();
+		Shell shell = new Shell(display);
+		Label label = new Label(shell, SWT.NONE);
+		shell.setLayout(new GridLayout());
+		shell.layout();
+		Point size = label.getSize();
+		COLUMN_HEIGHT = size.y + 20;
+	}
 
 	public static final String TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	public static final String TRANSLATE_LOCALE = "aero.minova.rcp.translate.locale";
@@ -33,42 +39,11 @@ public class FieldUtil {
 	public static final int SHORT_TIME_WIDTH = 52;
 	public static final int MARGIN_LEFT = 5;
 	public static final int MARGIN_TOP = 5;
-	public static final int COLUMN_HEIGHT = 28;
+	public static int COLUMN_HEIGHT;
 	public static final int MARGIN_BORDER = 2;
 
 	private FieldUtil() {
 	}
 
-//	protected static void addDataToText(Widget control, MField f, DataType datatype) {
-//		control.setData(Constants.CONTROL_FIELD, f);
-//		control.setData(Constants.CONTROL_DATATYPE, datatype);
-//	}
-
-	public static int getRowIndex(Table t, Field field) {
-		return t.getColumnIndex(field.getName());
-	}
-
-	protected static void addConsumer(Object o, Field field) {
-		if (o instanceof Text) {
-			Text text = (Text) o;
-			text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
-
-				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
-				text.setText(ValueBuilder.value(value, f).getText());
-				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
-				text.setData(Constants.CONTROL_VALUE, value);
-			});
-		} else if (o instanceof Button) {
-			Button b = (Button) o;
-			b.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
-
-				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-				Field f = (Field) b.getData(Constants.CONTROL_FIELD);
-				b.setText(ValueBuilder.value(value, f).getText());
-				b.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
-			});
-		}
-	}
 
 }
