@@ -13,12 +13,23 @@ public class FieldUtil {
 		Display display = Display.getCurrent();
 		Shell shell = new Shell(display);
 		Label label = new Label(shell, SWT.NONE);
-		label.setText("000.000.000.000");
 		shell.setLayout(new GridLayout());
+
+		label.setText("000.000.000.000");
 		shell.layout();
 		Point size = label.getSize();
 		COLUMN_HEIGHT = size.y + 20;
 		COLUMN_WIDTH = size.x + 40;
+
+		label.setText("00:00");
+		shell.layout();
+		size = label.getSize();
+		SHORT_TIME_WIDTH = size.x + 5;
+
+		label.setText("00.00.0000");
+		shell.layout();
+		size = label.getSize();
+		SHORT_DATE_WIDTH = size.x + 5;
 	}
 
 	public static final String TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
@@ -38,8 +49,8 @@ public class FieldUtil {
 	public static int COLUMN_WIDTH; // war 140
 	public static final int TEXT_WIDTH = COLUMN_WIDTH;
 	public static final int NUMBER_WIDTH = COLUMN_WIDTH - 40; // war 104
-	public static final int SHORT_DATE_WIDTH = 88;
-	public static final int SHORT_TIME_WIDTH = 52;
+	public static int SHORT_DATE_WIDTH; // war 88
+	public static int SHORT_TIME_WIDTH; // war 52
 	public static final int MARGIN_LEFT = 5;
 	public static final int MARGIN_TOP = 5;
 	public static final int MARGIN_BORDER = 2;
