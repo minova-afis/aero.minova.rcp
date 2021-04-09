@@ -60,6 +60,7 @@ public class LoadIndexHandler {
 
 		List<MPart> findElements = model.findElements(perspective, PartsID.SEARCH_PART, MPart.class);
 		((WFCSearchPart) findElements.get(0).getObject()).saveNattable();
+		((WFCSearchPart) findElements.get(0).getObject()).updateUserInput();
 		Table searchTable = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
 		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
 
