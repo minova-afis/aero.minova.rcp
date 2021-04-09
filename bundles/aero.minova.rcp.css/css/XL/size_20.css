@@ -7,7 +7,7 @@ Widget, CTabItem, LookupControl, ToolBar, ToolTip, Label, Button, MinovaSection,
 	font-size: 18px;
 }
 
-Text, Label.DescriptionLabel, MinovaSection, LookupText {
+Text, Label.DescriptionLabel, MinovaSection, LookupText, TextAssist {
 	font-size: 20px;
 }
 

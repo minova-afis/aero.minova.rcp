@@ -7,7 +7,7 @@ Label, LookupTwistie {
 	/* font-size: 14px; *//* TODO SAW - CSS Fontsize */
 }
 
-Widget, CTabItem, LookupControl, Text, ToolBar, ToolTip, Button, MinovaSection, LookupText {
+Widget, CTabItem, LookupControl, Text, ToolBar, ToolTip, Button, MinovaSection, LookupText, TextAssist {
 	/* font-size: 14px; *//* TODO SAW - CSS Fontsize */
 }
 
