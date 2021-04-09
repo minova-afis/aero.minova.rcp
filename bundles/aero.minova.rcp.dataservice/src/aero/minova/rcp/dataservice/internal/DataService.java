@@ -632,8 +632,12 @@ public class DataService implements IDataService {
 			Table ta = null;
 			try {
 				ta = tableFuture.get().getResultSet();
-			} catch (InterruptedException | ExecutionException | NullPointerException e) {
+			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
+			} catch (NullPointerException ex) {
+				if (LOG) {
+					System.out.println("listLookup: Wir haben ein Problem, posten es an den Benutzer, aber null ist hier in Ordnung!");
+				}
 			}
 			if (ta != null) {
 				for (Row r : ta.getRows()) {
