@@ -152,6 +152,7 @@ public class WFCSearchPart extends WFCFormPart {
 		if (!mPart.equals(this.mPart)) {
 			return;
 		}
+		natTable.commitAndCloseActiveCellEditor();
 		NatTableUtil.resize(natTable);
 	}
 
