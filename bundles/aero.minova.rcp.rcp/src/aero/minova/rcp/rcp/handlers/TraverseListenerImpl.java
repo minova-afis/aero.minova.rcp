@@ -164,13 +164,40 @@ public class TraverseListenerImpl implements TraverseListener {
 				}
 			}
 		}
+
 		for (MPage page : pageList) {
 			if (pageList.indexOf(page) >= pageList.indexOf(focussedControl)) {
 				List<MField> tabList = page.getTabList();
-				for (MField field : tabList) {
-					if ((selectedField.getmPage() == page && tabList.indexOf(field) > tabList.indexOf(selectedField))
-							|| (pageList.indexOf(selectedField.getmPage()) < pageList.indexOf(page))) {
-						if (field.isRequired() == true) {
+
+				if (lookupEnterSelectsNextRequired == false) {
+					if (enterSelectsFirstRequired == false) {
+						focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
+						focussedControl.setFocus();
+						return;
+					} else {
+						for (MField field : tabList) {
+							if (field.isRequired() && null == field.getValue()) {
+								focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
+								focussedControl.setFocus();
+								return;
+							}
+						}
+					}
+				} else if (enterSelectsFirstRequired == false) {
+					for (MField field : tabList) {
+						if ((selectedField.getmPage() == page
+								&& tabList.indexOf(field) > tabList.indexOf(selectedField))
+								|| (pageList.indexOf(selectedField.getmPage()) < pageList.indexOf(page))) {
+							if (field.isRequired() == true) {
+								focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
+								focussedControl.setFocus();
+								return;
+							}
+						}
+					}
+				} else {
+					for (MField field : tabList) {
+						if (field.isRequired() && null == field.getValue()) {
 							focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 							focussedControl.setFocus();
 							return;
