@@ -20,4 +20,5 @@ Export-Package: aero.minova.rcp.model,
  aero.minova.rcp.model.builder,
  aero.minova.rcp.model.event,
  aero.minova.rcp.model.form,
- aero.minova.rcp.model.helper
+ aero.minova.rcp.model.helper,
+ aero.minova.rcp.model.util

@@ -29,12 +29,6 @@ public interface IDataService {
 
 	CompletableFuture<Path> getPDFAsync(String tableName, Table detailTable);
 
-//	CompletableFuture<Integer> getReturnCodeAsync(String tableName, Table detailTable);
-//
-//	CompletableFuture<List<LookupValue>> resolveLookupAsync(Integer keyLong, String keyText, MLookupField field, boolean useCache);
-//
-//	CompletableFuture<List<LookupValue>> listLookupAsync(String filterText, MLookupField field, boolean useCache);
-
 	/**
 	 * Diese Methode löst einen Wert auf.
 	 *
@@ -86,4 +80,5 @@ public interface IDataService {
 
 	void downloadFile(String serverFileName) throws IOException, InterruptedException;
 
+	String getUserName();
 }

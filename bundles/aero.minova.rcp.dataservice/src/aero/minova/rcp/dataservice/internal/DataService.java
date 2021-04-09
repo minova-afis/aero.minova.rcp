@@ -17,7 +17,9 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -30,13 +32,21 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
@@ -56,9 +66,30 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.util.ErrorObject;
 
 @Component
 public class DataService implements IDataService {
+
+
+	EventAdmin eventAdmin;
+
+	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
+	void registerEventAdmin(EventAdmin admin) {
+		this.eventAdmin = admin;
+	}
+
+	void unregisterEventAdmin(EventAdmin admin) {
+		this.eventAdmin = null;
+	}
+
+	public void postError(ErrorObject value) {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
+		data.put(IEventBroker.DATA, value);
+		Event event = new Event(Constants.BROKER_SHOWERROR, data);
+		eventAdmin.postEvent(event);
+	}
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	private static final String CONTENT_TYPE = "Content-Type";
@@ -145,11 +176,13 @@ public class DataService implements IDataService {
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
+		if (LOG) {
+			logBody(body, ++callCount);
+		}
+
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
-			if (LOG) {
-				logBody(body, ++callCount);
-			}
-			return gson.fromJson(t.body(), Table.class);
+			Table fromJson = gson.fromJson(t.body(), Table.class);
+			return fromJson;
 		});
 
 	}
@@ -180,8 +213,6 @@ public class DataService implements IDataService {
 		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
 			return path;
 		});
-//			HttpResponse<Path> send = httpClient.send(request, BodyHandlers.ofFile(path));
-//			System.out.println(send);
 	}
 
 	@Override
@@ -213,7 +244,13 @@ public class DataService implements IDataService {
 				fromJson.setResultSet(error);
 				// FehlerCode
 				fromJson.setReturnCode(-1);
-
+			}
+			if (fromJson.getReturnCode() == -1) {
+				if (fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName())) {
+					ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, tableName);
+					postError(e);
+					return null;
+				}
 			}
 			logBody(t.body());
 			return fromJson;
@@ -598,19 +635,19 @@ public class DataService implements IDataService {
 				ta = tableFuture.get().getResultSet();
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
+			} catch (NullPointerException ex) {
+				if (LOG) {
+					System.out.println("listLookup: Wir haben ein Problem, posten es an den Benutzer, aber null ist hier in Ordnung!");
+				}
 			}
 			if (ta != null) {
-				if (ta.getName() != null && ta.getName().equals("Error")) {
-					// TODO send out event
-				} else {
-					for (Row r : ta.getRows()) {
-						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-						map.put(lv.keyLong, lv);
-						list.add(lv);
-					}
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+					map.put(lv.keyLong, lv);
+					list.add(lv);
 				}
 			}
 			return CompletableFuture.supplyAsync(() -> list);
@@ -689,6 +726,11 @@ public class DataService implements IDataService {
 		}
 
 		return tableFuture;
+	}
+
+	@Override
+	public String getUserName() {
+		return username;
 	}
 
 //	@Override

@@ -43,6 +43,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
@@ -241,7 +242,7 @@ public class WFCDetailCASRequestsUtil {
 				}));
 			}
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wrong inputs in your messured Time",
 					shell);
 			notificationPopUp.open();
 		}
@@ -253,9 +254,13 @@ public class WFCDetailCASRequestsUtil {
 	 * @param response
 	 */
 	private void checkEntryUpdate(SqlProcedureResult response) {
+		if (response == null) {
+			return;
+		}
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
 		if (response.getReturnCode() == -1) {
-			showErrorMessage(response.getResultSet());
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
+			showErrorMessage(e);
 		} else {
 			openNotificationPopup(getTranslation("msg.DataUpdated"));
 			handleUserAction(Constants.UPDATE_REQUEST);
@@ -282,8 +287,12 @@ public class WFCDetailCASRequestsUtil {
 	 * @param response
 	 */
 	private void checkNewEntryInsert(SqlProcedureResult response) {
+		if (response == null) {
+			return;
+		}
 		if (response.getReturnCode() == -1) {
-			showErrorMessage(response.getResultSet());
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
+			showErrorMessage(e);
 		} else {
 			openNotificationPopup(getTranslation("msg.DataSaved"));
 			handleUserAction(Constants.INSERT_REQUEST);
@@ -310,7 +319,8 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	@Optional
-	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) Table errorTable) {
+	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
+		Table errorTable = et.getErrorTable();
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
 		String messageproperty = "@" + vMessageProperty.getStringValue();
 		String value = translationService.translate(messageproperty, null);
@@ -323,7 +333,14 @@ public class WFCDetailCASRequestsUtil {
 			}
 			value = MessageFormat.format(value, params.toArray(new String[0]));
 		}
-		MessageDialog.openError(shell, "Error", value);
+		value += "\n\nUser : " + et.getUser();
+		value += "\nProcedure/View: " + et.getProcedureOrView();
+
+		if (et.getT() == null) {
+			MessageDialog.openError(shell, "Error", value);
+		} else {
+			ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
+		}
 	}
 
 	/**
@@ -383,7 +400,8 @@ public class WFCDetailCASRequestsUtil {
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
 				ticketFieldsUpdate("", true);
 				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
-					showErrorMessage(ta.getResultSet());
+					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
+					showErrorMessage(e);
 				} else {
 					selectedTable = ta.getResultSet();
 					updateSelectedEntry();
@@ -457,7 +475,8 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void deleteEntry(SqlProcedureResult response) {
 		if (response.getReturnCode() == -1) {
-			showErrorMessage(response.getResultSet());
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
+			showErrorMessage(e);
 		} else {
 			openNotificationPopup(getTranslation("msg.DataDeleted"));
 			Map<MPerspective, String> map = new HashMap<>();

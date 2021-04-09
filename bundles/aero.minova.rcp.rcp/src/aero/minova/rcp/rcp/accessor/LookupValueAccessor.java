@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -139,9 +140,20 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	public void updatePossibleValues() {
 		Lookup up = ((Lookup) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+		try {
+			if (!(listLookup.get()).isEmpty()) {
+				listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+			} else {
+				control.getParent().setFocus();
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
+	/**
+	 * Wir springen in das Feld!
+	 */
 	public void setFocus() {
 		if (!control.isFocusControl()) {
 			control.setFocus();
