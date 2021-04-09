@@ -40,14 +40,9 @@ import aero.minova.rcp.rcp.widgets.LookupContentProvider;
 
 public class LookupField {
 
-
-	private static final String AERO_MINOVA_RCP_TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
-	private static final int MARGIN_LEFT = 5;
-	private static final int MARGIN_TOP = 5; // Zwischenräume
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			MPerspective perspective, Locale locale) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, MPerspective perspective, Locale locale) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
@@ -68,25 +63,23 @@ public class LookupField {
 		field.setValueAccessor(lookupValueAccessor);
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
-
-		lookupFormData.top = new FormAttachment(composite, MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
-		lookupFormData.left = new FormAttachment(composite,
-				MARGIN_LEFT * (column + 1) + (column + 1) * FieldUtil.COLUMN_WIDTH);
+		lookupFormData.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
+		lookupFormData.left = new FormAttachment(composite, FieldUtil.MARGIN_LEFT * (column + 1) + (column + 1) * FieldUtil.COLUMN_WIDTH);
 		lookupFormData.width = FieldUtil.COLUMN_WIDTH;
 
 		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(lookupControl, MARGIN_LEFT * -1, SWT.LEFT);
+		labelFormData.right = new FormAttachment(lookupControl, FieldUtil.MARGIN_LEFT * -1, SWT.LEFT);
 		labelFormData.width = FieldUtil.COLUMN_WIDTH;
 
 		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
 		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
 		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
-			descriptionLabelFormData.width = MARGIN_LEFT * 2 + FieldUtil.COLUMN_WIDTH * 2;
+			descriptionLabelFormData.width = FieldUtil.MARGIN_LEFT * 2 + FieldUtil.COLUMN_WIDTH * 2;
 		} else {
 			descriptionLabelFormData.width = 0;
 		}
 
-		label.setData(AERO_MINOVA_RCP_TRANSLATE_PROPERTY, labelText);
+		label.setData(FieldUtil.TRANSLATE_PROPERTY, labelText);
 		label.setData(AERO_MINOVA_RCP_LOOKUP, lookupControl);
 		label.setLayoutData(labelFormData);
 
@@ -127,9 +120,8 @@ public class LookupField {
 	}
 
 	/**
-	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in
-	 * Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird
-	 * dem benutzer zur verfügung gestellt.
+	 * Auslesen aller bereits einhgetragenen key die mit diesem Controll in Zusammenhang stehen Es wird eine Liste von Ergebnissen Erstellt, diese wird dem
+	 * benutzer zur verfügung gestellt.
 	 *
 	 * @param luc
 	 */
@@ -158,8 +150,7 @@ public class LookupField {
 	}
 
 	/**
-	 * Diese Mtethode setzt die den Ausgewählten Wert direkt in das Control oder
-	 * lässt eine Liste aus möglichen Werten zur Auswahl erscheinen.
+	 * Diese Mtethode setzt die den Ausgewählten Wert direkt in das Control oder lässt eine Liste aus möglichen Werten zur Auswahl erscheinen.
 	 *
 	 * @param lookUpControl
 	 */
@@ -173,8 +164,7 @@ public class LookupField {
 			if (t.getRows().size() == 1) {
 				if (lookUpControl != null && lookUpControl.getText() != null && !twisty) {
 					Value value = t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT));
-					if (value.getStringValue().toLowerCase()
-							.startsWith((lookUpControl.getText().toString().toLowerCase()))) {
+					if (value.getStringValue().toLowerCase().startsWith((lookUpControl.getText().toString().toLowerCase()))) {
 						field.setValue(t.getRows().get(0).getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
 					}
 				}
@@ -195,8 +185,7 @@ public class LookupField {
 							filteredTable.addRow(r);
 						} else if (r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
 							if ((r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
-									.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION))
-											.getStringValue().toLowerCase()))) {
+									.startsWith(r.getValue(t.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue().toLowerCase()))) {
 								filteredTable.addRow(r);
 							}
 						}
@@ -207,11 +196,10 @@ public class LookupField {
 					// Wert gesetzt
 					if (filteredTable.getRows().size() == 1) {
 						Row row = filteredTable.getRows().get(0);
-						if ((row.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue()
-								.toLowerCase().equals(lookUpControl.getText().toLowerCase()))
+						if ((row.getValue(filteredTable.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue().toLowerCase()
+								.equals(lookUpControl.getText().toLowerCase()))
 								|| (row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null
-										&& row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION))
-												.getStringValue().toLowerCase()
+										&& row.getValue(filteredTable.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue().toLowerCase()
 												.equals(lookUpControl.getText().toLowerCase()))) {
 							field.setValue(row.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)), false);
 						}
