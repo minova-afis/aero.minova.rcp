@@ -3,6 +3,8 @@ package aero.minova.rcp.rcp.handlers;
 import java.util.List;
 import java.util.Locale;
 
+import javax.swing.Popup;
+
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -27,11 +29,6 @@ public class TraverseListenerImpl implements TraverseListener {
 	MDetail detail;
 	Locale locale;
 
-	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-	boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
-			ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
-	boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
-			ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED, DisplayType.CHECK, true, locale);
 
 	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale) {
 		this.logger = logger;
@@ -160,6 +157,22 @@ public class TraverseListenerImpl implements TraverseListener {
 	}
 
 	private void getNextRequired(Control focussedControl) {
+
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
+				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
+		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
+				ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED, DisplayType.CHECK, true, locale);
+		
+		boolean popupOpen = false;
+		if (focussedControl instanceof Lookup) {
+			Lookup lookup = (Lookup) focussedControl;
+			popupOpen = lookup.popupIsOpen();
+		}
+		if (focussedControl instanceof TextAssist) {
+			popupOpen = true;
+		}
+		
 		MField selectedField = null;
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
@@ -171,25 +184,17 @@ public class TraverseListenerImpl implements TraverseListener {
 			}
 		}
 
+		if (lookupEnterSelectsNextRequired == false && popupOpen) {
+			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
+			focussedControl.setFocus();
+			return;
+		}
+
 		for (MPage page : pageList) {
 			if (pageList.indexOf(page) >= pageList.indexOf(focussedControl)) {
 				List<MField> tabList = page.getTabList();
-
-				if (lookupEnterSelectsNextRequired == false) {
-					if (enterSelectsFirstRequired == false) {
-						focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
-						focussedControl.setFocus();
-						return;
-					} else {
-						for (MField field : tabList) {
-							if (field.isRequired() && null == field.getValue()) {
-								focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
-								focussedControl.setFocus();
-								return;
-							}
-						}
-					}
-				} else if (enterSelectsFirstRequired == false) {
+				
+				if (enterSelectsFirstRequired == false || popupOpen) {
 					for (MField field : tabList) {
 						if ((selectedField.getmPage() == page
 								&& tabList.indexOf(field) > tabList.indexOf(selectedField))
@@ -210,6 +215,7 @@ public class TraverseListenerImpl implements TraverseListener {
 						}
 					}
 				}
+
 			}
 		}
 
