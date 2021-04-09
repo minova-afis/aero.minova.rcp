@@ -1,6 +1,7 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -135,6 +136,26 @@ public class DataService implements IDataService {
 		bundleContext.registerService(IDummyService.class.getName(), new IDummyService(), null);
 	}
 
+	/**
+	 * Erstellt eine Datei falls sie existiert, wird sie geleert.
+	 *
+	 * @param path
+	 */
+	public void createFile(String path) {
+		try {
+			File file = new File(path);
+			if (!file.exists()) {
+				file.createNewFile();
+			} else {
+				FileOutputStream writer = new FileOutputStream(path);
+				writer.write(("").getBytes());
+				writer.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void init() {
 
 		Authenticator authentication = new Authenticator() {
@@ -205,7 +226,7 @@ public class DataService implements IDataService {
 		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
 		try {
 			Files.createDirectories(path.getParent());
-			Files.createFile(path);
+			createFile(path.toString());
 
 		} catch (IOException e) {
 			e.printStackTrace();
