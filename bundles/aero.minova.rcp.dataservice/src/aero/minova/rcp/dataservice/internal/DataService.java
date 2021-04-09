@@ -25,13 +25,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
@@ -39,7 +37,6 @@ import org.osgi.service.component.annotations.Component;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
@@ -62,9 +59,6 @@ import aero.minova.rcp.model.form.MLookupField;
 
 @Component
 public class DataService implements IDataService {
-
-	@Inject
-	private IEventBroker broker;
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	private static final String CONTENT_TYPE = "Content-Type";
@@ -607,7 +601,7 @@ public class DataService implements IDataService {
 			}
 			if (ta != null) {
 				if (ta.getName() != null && ta.getName().equals("Error")) {
-					broker.post(Constants.BROKER_SHOWERROR, ta);
+					// TODO send out event
 				} else {
 					for (Row r : ta.getRows()) {
 						LookupValue lv = new LookupValue(//
