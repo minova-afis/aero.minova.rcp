@@ -26,6 +26,8 @@ import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -40,6 +42,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.osgi.service.event.Event;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -278,7 +281,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MShortTimeField) {
 			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, broker, perspective, getDetail(), locale);
+			LookupField.create(composite, field, row, column, formToolkit, perspective, locale);
 		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, formToolkit);
 		}
@@ -332,6 +335,11 @@ public class WFCDetailPart extends WFCFormPart {
 
 	public MDetail getDetail() {
 		return detail;
+	}
+
+	@Inject
+	public void relayout(@UIEventTopic(IThemeEngine.Events.THEME_CHANGED) @Optional Event event) {
+		System.out.println();
 	}
 
 }

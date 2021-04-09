@@ -4,42 +4,42 @@
    <extension
          point="org.eclipse.e4.ui.css.swt.theme">
       <theme
-            basestylesheeturi="css/default-win32-m.css"
-            id="aero.minova.rcp.defaulttheme-M"
-            label="Light Windows Medium"
-            os="win32">
+            basestylesheeturi="css/default-s.css"
+            id="aero.minova.rcp.defaulttheme-S"
+            label="Light Size S">
       </theme>
-       <theme
-            basestylesheeturi="css/minova-debugcolors.css"
-            id="aero.minova.rcp.debugtheme"
-            label="Debug light">
+      <theme
+            basestylesheeturi="css/default-win32.css"
+            id="aero.minova.rcp.defaulttheme"
+            label="Light Size M Windows (Default)"
+            os="win32">
       </theme>
        <theme
              basestylesheeturi="css/default-macosx.css"
              id="aero.minova.rcp.defaulttheme"
-             label="Light Mac"
+             label="Light Size M Mac (Default)"
              os="macosx">
        </theme>
        <theme
              basestylesheeturi="css/default-linux.css"
              id="aero.minova.rcp.defaulttheme"
-             label="Light  Linux"
+             label="Light Size M Linux (Default)"
              os="linux">
        </theme>
        <theme
-             basestylesheeturi="css/default-win32-l.css"
+             basestylesheeturi="css/default-l.css"
              id="aero.minova.rcp.defaulttheme-L"
              label="Light Size L">
        </theme>
        <theme
-             basestylesheeturi="css/default-win32-s.css"
-             id="aero.minova.rcp.defaulttheme-S"
-             label="Light Size S">
-       </theme>
-       <theme
-             basestylesheeturi="css/default-win32-xl.css"
+             basestylesheeturi="css/default-xl.css"
              id="aero.minova.rcp.defaulttheme-XL"
              label="Light Size XL">
+       </theme>
+       <theme
+             basestylesheeturi="css/minova-debugcolors.css"
+             id="aero.minova.rcp.debugtheme"
+             label="Debug">
        </theme>
    </extension>
 
