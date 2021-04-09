@@ -31,11 +31,11 @@ public class DateTimeUtil {
 			String timeUtilPattern) {
 		return getDateTime(todayNow, input, locale, dateUtilPattern, timeUtilPattern, "UTC");
 	}
-	
+
 	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String zoneId) {
 		return getDateTime(todayNow, input, locale, "", "", zoneId);
 	}
-	
+
 	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
 		return getDateTime(todayNow, input, Locale.getDefault(), "", "", zoneId);
 	}
@@ -52,7 +52,7 @@ public class DateTimeUtil {
 	 * Leerstelle getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist,
 	 * wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in
 	 * DateUtil und TimeUtil festgelegt.
-	 * 
+	 *
 	 * @param todayNow
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
@@ -73,11 +73,9 @@ public class DateTimeUtil {
 			String last = input.substring(input.lastIndexOf("*") + 1);
 			String firstLast = first + " " + last;
 			splitInput = firstLast.split(" ");
-		} else {
-			return null;
 		}
 
-		if (splitInput.length > 1) {
+		if (splitInput != null && splitInput.length > 1) {
 			if (!splitInput[0].isEmpty()) {
 				dateIn = DateUtil.getDate(todayNow, splitInput[0], locale, dateUtilPattern);
 				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
@@ -86,7 +84,8 @@ public class DateTimeUtil {
 				timeIn = TimeUtil.getTime(todayNow, splitInput[1], timeUtilPattern);
 			}
 		} else {
-			return null;
+			dateIn = DateUtil.getDate(todayNow, input, locale, dateUtilPattern);
+			timeIn = TimeUtil.getTime(todayNow, "0", timeUtilPattern);
 		}
 
 		if (null != dateIn && null != timeIn) {

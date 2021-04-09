@@ -272,7 +272,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MNumberField) {
 			NumberField.create(composite, (MNumberField) field, row, column, formToolkit, locale);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, formToolkit);
+			DateTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MShortDateField) {
 			ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
 		} else if (field instanceof MShortTimeField) {
