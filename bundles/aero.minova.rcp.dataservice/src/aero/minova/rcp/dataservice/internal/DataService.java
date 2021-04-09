@@ -32,7 +32,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
@@ -46,7 +45,6 @@ import org.osgi.service.event.EventConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.HashService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
@@ -70,6 +68,7 @@ import aero.minova.rcp.model.util.ErrorObject;
 
 @Component
 public class DataService implements IDataService {
+
 
 	EventAdmin eventAdmin;
 
