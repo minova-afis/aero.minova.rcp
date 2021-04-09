@@ -159,7 +159,7 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent) {
-		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail);
+		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
