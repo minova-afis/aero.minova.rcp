@@ -242,7 +242,7 @@ public class WFCDetailCASRequestsUtil {
 				}));
 			}
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wronginputs in your messured Time",
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wrong inputs in your messured Time",
 					shell);
 			notificationPopUp.open();
 		}
@@ -254,6 +254,9 @@ public class WFCDetailCASRequestsUtil {
 	 * @param response
 	 */
 	private void checkEntryUpdate(SqlProcedureResult response) {
+		if (response == null) {
+			return;
+		}
 		// Wenn es Hier negativ ist dann haben wir einen Fehler
 		if (response.getReturnCode() == -1) {
 			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
@@ -284,6 +287,9 @@ public class WFCDetailCASRequestsUtil {
 	 * @param response
 	 */
 	private void checkNewEntryInsert(SqlProcedureResult response) {
+		if (response == null) {
+			return;
+		}
 		if (response.getReturnCode() == -1) {
 			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
 			showErrorMessage(e);
@@ -327,8 +333,8 @@ public class WFCDetailCASRequestsUtil {
 			}
 			value = MessageFormat.format(value, params.toArray(new String[0]));
 		}
-
-		value += "\n\nUser : " + et.getUser() + "\nProcedure/View: " + et.getErrorTable().getRows().get(0).getValue(1).getStringValue();
+		value += "\n\nUser : " + et.getUser();
+		value += "\nProcedure/View: " + et.getProcedureOrView();
 
 		if (et.getT() == null) {
 			MessageDialog.openError(shell, "Error", value);

@@ -246,7 +246,7 @@ public class DataService implements IDataService {
 			}
 			if (fromJson.getReturnCode() == -1) {
 				if (fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName())) {
-					ErrorObject e = new ErrorObject(fromJson.getResultSet(), username);
+					ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, tableName);
 					postError(e);
 					return null;
 				}
