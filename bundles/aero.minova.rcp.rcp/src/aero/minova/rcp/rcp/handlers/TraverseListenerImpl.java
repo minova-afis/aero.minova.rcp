@@ -19,10 +19,18 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	Logger logger;
 	MDetail detail;
+	Locale locale;
 
-	public TraverseListenerImpl(Logger logger, MDetail detail) {
+	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+	boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
+			ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
+	boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
+			ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED, DisplayType.CHECK, true, locale);
+
+	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale) {
 		this.logger = logger;
 		this.detail = detail;
+		this.locale = locale;
 	}
 
 	@Override
