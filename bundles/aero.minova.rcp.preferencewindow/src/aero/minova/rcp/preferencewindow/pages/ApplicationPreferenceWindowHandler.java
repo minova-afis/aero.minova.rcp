@@ -178,19 +178,11 @@ public class ApplicationPreferenceWindowHandler {
 	private void updateTheme(String newTheme, IThemeEngine themeEngine, IWorkbench workbench) {
 
 		switch (newTheme) {
-		case "S":
-			themeEngine.setTheme("aero.minova.rcp.defaulttheme-S", true);
-			break;
 		case "M":
-			themeEngine.setTheme("aero.minova.rcp.defaulttheme-M", true);
-			break;
-		case "L":
-			themeEngine.setTheme("aero.minova.rcp.defaulttheme-L", true);
-			break;
-		case "XL":
-			themeEngine.setTheme("aero.minova.rcp.defaulttheme-XL", true);
+			themeEngine.setTheme("aero.minova.rcp.defaulttheme", true);
 			break;
 		default:
+			themeEngine.setTheme("aero.minova.rcp.defaulttheme-" + newTheme, true);
 			break;
 		}
 
