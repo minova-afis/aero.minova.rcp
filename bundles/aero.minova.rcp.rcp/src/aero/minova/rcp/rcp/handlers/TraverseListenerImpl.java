@@ -28,12 +28,16 @@ public class TraverseListenerImpl implements TraverseListener {
 	Logger logger;
 	MDetail detail;
 	Locale locale;
+	EModelService modelService;
+	MApplication application;
 
-
-	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale) {
+	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale, EModelService modelService,
+			MApplication application) {
 		this.logger = logger;
 		this.detail = detail;
 		this.locale = locale;
+		this.modelService = modelService;
+		this.application = application;
 	}
 
 	@Override
