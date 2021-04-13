@@ -439,10 +439,10 @@ public class PrintIndexHandler {
 	 * @since 11.0.0
 	 */
 	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
+		// Hier erstaml nur Ohne Preview öffnen!
 		if (preview == null) {
 			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
 			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
-			// Hier erstaml nur Ohne Preview öffnen!
 			if (previewPart.getObject() == null) {
 				partService.showPart(previewPart, PartState.CREATE);
 			}
@@ -453,7 +453,6 @@ public class PrintIndexHandler {
 			preview.clear();
 		}
 		preview = null;
-
 		return preview;
 	}
 
