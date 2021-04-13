@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -30,7 +31,12 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
+import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -49,6 +55,7 @@ import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
 import aero.minova.rcp.util.Tools;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.TreeList;
 
 public class PrintIndexHandler {
 
@@ -77,11 +84,16 @@ public class PrintIndexHandler {
 		String xslString = null;
 		if (o instanceof WFCIndexPart) {
 
-			Table data = ((WFCIndexPart) o).getData();
+			WFCIndexPart indexPart = (WFCIndexPart) o;
+			Table data = indexPart.getData();
 			xmlRootTag = data.getName();
-			SortedList<Row> sortedDataList = ((WFCIndexPart) o).getSortedList();
-			ColumnReorderLayer columnReorderLayer = ((WFCIndexPart) o).getBodyLayerStack().getColumnReorderLayer();
+			SortedList<Row> sortedDataList = indexPart.getSortedList();
+			ColumnReorderLayer columnReorderLayer = indexPart.getBodyLayerStack().getColumnReorderLayer();
 			columnReorderLayer.getColumnIndexOrder();
+
+			// Gruppierung
+			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
+			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
 
 			List<ColumnInfo> colConfig = new ArrayList<>();
 			int i = 0;
@@ -100,7 +112,7 @@ public class PrintIndexHandler {
 			}
 
 			saveIntoXSL(xslString, xmlRootTag);
-			saveIntoXML(sortedDataList, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
+			saveIntoXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 		}
 
 		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
@@ -127,8 +139,7 @@ public class PrintIndexHandler {
 		}
 
 		generatePDF(url_pdf, url_xml, url_xsl);
-//		showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
-		showFile(url_pdf.toString(), null);
+		showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
 	}
 
 	private void saveIntoXSL(String xslString, String fileName) {
@@ -168,7 +179,10 @@ public class PrintIndexHandler {
 
 	/**
 	 * Schreibt die XML Datei aus den Daten der NatTable
-	 *
+	 * 
+	 * @param indexPart
+	 * @param groupByIndices
+	 * @param treeList
 	 * @param rows
 	 * @param colConfig
 	 * @param columnReorderList
@@ -177,40 +191,166 @@ public class PrintIndexHandler {
 	 * @param fileName
 	 * @param title
 	 */
-	private void saveIntoXML(SortedList<Row> rows, List<ColumnInfo> colConfig, List<Integer> columnReorderList, StringBuffer xml, boolean tabSeparated,
-			String fileName, String title) {
-		if (xml != null && rows != null && rows.iterator().hasNext()) {
-			int colIndex = 0;
-			addHeader(xml, fileName);
-			xml.append("<Title>" + title + "</Title>\n");
-			xml.append("<IndexView>\n" + "<Group>\n" + "<Text><![CDATA[Gesamt]]></Text>");
-			xml.append("<Rows>\n");
-			for (final Row r : rows) {
-				colIndex = 0;
-				xml.append("<Row>\n");
-				for (final Integer d : columnReorderList) {
-					Column c = colConfig.get(colIndex).column;
-					xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
-					if (r.getValue(d) != null) {
-						if (r.getValue(d).getType() == DataType.DOUBLE || r.getValue(d).getType() == DataType.INTEGER) {
-							xml.append(r.getValue(d).getValueString(Locale.getDefault()));
-						} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
-							xml.append(1);
-						} else {
-							xml.append("<![CDATA[");
-							xml.append(r.getValue(d).getValueString(Locale.getDefault()));
-							xml.append("]]>");
+	private void saveIntoXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
+			List<Integer> columnReorderList, StringBuffer xml, boolean tabSeparated, String fileName, String title) {
+
+		// Viewport layer umgehen, damit in addSumRow() auf alle Zeilen zugegriffen werden kann
+		ILayer layer = indexPart.getBodyLayerStack().getUnderlyingLayerByPosition(2, 4).getUnderlyingLayerByPosition(2, 4);
+
+		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+		numberFormat.setMinimumFractionDigits(2);
+		numberFormat.setMaximumFractionDigits(2); // TODO anpassen?
+
+		addHeader(xml, fileName);
+		xml.append("<Title>" + title + "</Title>\n");
+		xml.append("<IndexView>\n");
+		xml.append("<Group>\n" + "<Text><![CDATA[Gesamt]]></Text>\n"); // TODO: Übersetzen!
+
+		if (groupByIndices.isEmpty()) { // Keine Gruppierung
+			addRows(xml, treeList, colConfig, columnReorderList, numberFormat);
+		} else {
+			int level = 0; // "Level" der Gruppierung (1: erste Gruppierung, 2: zweite Gruppierung, ...)
+			int newLevel = 0;
+			int rowIndex = 0;
+			String[] sumRows = new String[groupByIndices.size() + 1];
+
+			// Liste der Zeilen (inklusive Gruppierungs-Zeilen) der Reihe nach abarbeiten
+			for (Object o : treeList) {
+				if (o instanceof GroupByObject) {
+					GroupByObject gbo = (GroupByObject) o;
+
+					// Zusammenfassung am Ende der Gruppierung einfügen
+					newLevel = gbo.getDescriptor().size();
+					for (int i = level; i >= newLevel; i--) {
+						xml.append(sumRows[i]);
+					}
+					level = newLevel;
+
+					// Überschrift für Gruppierung
+					String tableTitle = "";
+					String colName = "";
+					String colValString = "";
+					for (int i : groupByIndices) {
+						if (gbo.getDescriptor().containsKey(i)) {
+							colName = translationService.translate(colConfig.get(columnReorderList.indexOf(i)).column.getLabel(), null);
+							Object colVal = gbo.getDescriptor().get(i);
+							colValString = colVal.toString();
+							if (colVal instanceof Instant) {
+								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, Locale.getDefault());
+							}
+							tableTitle += colName + ": " + colValString + ", ";
 						}
 					}
-					xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
-					colIndex++;
+					tableTitle = tableTitle.substring(0, tableTitle.length() - 2);
+
+					// Gruppierung in xml
+					xml.append("<Group>\n" + "<Text><![CDATA[" + colName + "]]></Text>\n");
+					xml.append("<Field>" + colName + "</Field>\n");
+					xml.append("<Value><![CDATA[" + colValString + "]]></Value>\n");
+					xml.append("<GroupText><![CDATA[" + tableTitle + "]]></GroupText>\n");
+
+					// Tabelle wird nur für "tiefste" Gruppe gedruckt
+					if (gbo.getDescriptor().containsKey(groupByIndices.get(groupByIndices.size() - 1))) {
+						addRows(xml, indexPart.getBodyLayerStack().getBodyDataLayer().getItemsInGroup(gbo), colConfig, columnReorderList, numberFormat);
+					}
+
+					// Zusammenfassung als String erstellen und für später speichern
+					String sumRow = addSumRow(indexPart, colConfig, columnReorderList, rowIndex, gbo, layer, numberFormat);
+					sumRow += "</Group>\n";
+					sumRows[level] = sumRow;
 				}
-				xml.append("</Row>\n");
+				rowIndex++;
 			}
-			xml.append("</Rows>\n");
-			xml.append("</Group>\n" + "</IndexView>\n");
-			xml.append("</" + fileName + ">");
+
+			// Letzten Zusammenfassungen einfügen
+			for (int i = level; i > 0; i--) {
+				xml.append(sumRows[i]);
+			}
 		}
+		addFinalSummary(xml, indexPart, colConfig, columnReorderList, numberFormat);
+		xml.append("</Group>\n");
+
+		xml.append("</IndexView>\n");
+		xml.append("</" + fileName + ">");
+
+	}
+
+	private void addRows(StringBuffer xml, List<Row> rows, List<ColumnInfo> colConfig, List<Integer> columnReorderList, NumberFormat numberFormat) {
+		xml.append("<Rows>\n");
+		for (final Row r : rows) {
+			int colIndex = 0;
+			xml.append("<Row>\n");
+			for (final Integer d : columnReorderList) {
+				Column c = colConfig.get(colIndex).column;
+				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				if (r.getValue(d) != null) {
+					if (r.getValue(d).getType() == DataType.DOUBLE) {
+						xml.append(numberFormat.format(r.getValue(d).getDoubleValue()));
+					} else if (r.getValue(d).getType() == DataType.INTEGER) {
+						xml.append(r.getValue(d).getValueString(Locale.getDefault()));
+					} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
+						xml.append(1);
+					} else {
+						xml.append("<![CDATA[");
+						xml.append(r.getValue(d).getValueString(Locale.getDefault()));
+						xml.append("]]>");
+					}
+				}
+				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				colIndex++;
+			}
+			xml.append("</Row>\n");
+		}
+		xml.append("</Rows>\n");
+
+	}
+
+	private String addSumRow(WFCIndexPart indexPart, List<ColumnInfo> colConfig, List<Integer> columnReorderList, int rowIndex, GroupByObject gbo, ILayer layer,
+			NumberFormat numberFormat) {
+		String sumRow = "<SumRow>\n";
+
+		for (int i = 0; i < colConfig.size(); i++) {
+			LabelStack labelStack = layer.getConfigLabelsByPosition(i, rowIndex);
+			IGroupBySummaryProvider<Row> summaryProvider = indexPart.getBodyLayerStack().getBodyDataLayer().getGroupBySummaryProvider(labelStack);
+
+			if (summaryProvider != null) {
+				int columnIndex = columnReorderList.get(i);
+				List<Row> children = indexPart.getBodyLayerStack().getBodyDataLayer().getItemsInGroup(gbo);
+				Object summary = summaryProvider.summarize(columnIndex, children);
+				if (summary instanceof Double) {
+					summary = numberFormat.format(summary);
+				}
+
+				Column c = colConfig.get(i).column;
+				sumRow += "<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
+				sumRow += summary;
+				sumRow += "</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
+			}
+		}
+
+		sumRow += "</SumRow>\n";
+		return sumRow;
+	}
+
+	private void addFinalSummary(StringBuffer xml, WFCIndexPart indexPart, List<ColumnInfo> colConfig, List<Integer> columnReorderList,
+			NumberFormat numberFormat) {
+		xml.append("<SumRow>\n");
+
+		FixedSummaryRowLayer summaryLayer = indexPart.getSummaryRowLayer();
+		for (int i = 0; i < colConfig.size(); i++) {
+			Object summary = summaryLayer.getDataValueByPosition(i, 0);
+			if (summary instanceof Double) {
+				summary = numberFormat.format(summary);
+			}
+			if (summary != null) {
+				Column c = colConfig.get(i).column;
+				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append(summary);
+				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+			}
+		}
+
+		xml.append("</SumRow>\n");
 	}
 
 	/**
@@ -257,12 +397,6 @@ public class PrintIndexHandler {
 		broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Drucken des Index schlug fehl!");
 	}
 
-	/**
-	 * Öffnet entwender das BrowserWiget um den Index-Druck anzuzeigen oder den Default PDF Reader!
-	 *
-	 * @param urlString
-	 * @param preview
-	 */
 	private void showFile(String urlString, Preview preview) {
 		if (urlString != null) {
 			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
@@ -299,7 +433,6 @@ public class PrintIndexHandler {
 	 * @since 11.0.0
 	 */
 	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
-		// Hier erstaml nur Ohne Preview öffnen!
 		if (preview == null) {
 			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
 			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
@@ -312,7 +445,7 @@ public class PrintIndexHandler {
 		} else {
 			preview.clear();
 		}
-		preview = null;
+
 		return preview;
 	}
 
