@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Control;
 
 public class MPage {
 
@@ -20,12 +21,16 @@ public class MPage {
 	private String label;
 	// Symbol für diese Page
 	private Image icon;
+	
+	private Control control;
 
-	public MPage(boolean isHead, String status, MDetail mDetail, String label) {
+
+	public MPage(boolean isHead, String status, MDetail mDetail, String label, Control control) {
 		this.isHead = isHead;
 		this.status = status;
 		this.mDetail = mDetail;
 		this.label = label;
+		this.control = control;
 	}
 
 	public boolean isHead() {
@@ -50,6 +55,14 @@ public class MPage {
 
 	public void setmDetail(MDetail mDetail) {
 		this.mDetail = mDetail;
+	}
+
+	public Control getSection() {
+		return control;
+	}
+
+	public void setSection(Control section) {
+		this.control = section;
 	}
 
 	public List<MField> getTabList() {
