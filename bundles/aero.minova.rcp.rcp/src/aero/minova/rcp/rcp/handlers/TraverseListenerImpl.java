@@ -3,10 +3,11 @@ package aero.minova.rcp.rcp.handlers;
 import java.util.List;
 import java.util.Locale;
 
-import javax.swing.Popup;
-
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
@@ -140,11 +141,25 @@ public class TraverseListenerImpl implements TraverseListener {
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
+
 			for (MField f : tabList) {
 				if (((AbstractValueAccessor) f.getValueAccessor()).getControl() == focussedControl) {
 					if (tabList.indexOf(f) == tabList.size() - 1) {
 						// Wir sind an der Letzen Stelle der Section
-						if (pageList.indexOf(page) == pageList.size() - 1) {
+						if (selectAllControls == true) {
+							if (pageList.indexOf(page) == pageList.size() - 1) {
+								// Wir sind in der Letzten Section
+								focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0)
+										.getValueAccessor()).getControl();
+							} else if (null != pageList.get(pageList.indexOf(page) + 1).getSection()) {
+								focussedControl = pageList.get(pageList.indexOf(page) + 1).getSection();
+
+							} else {
+								focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(page) + 1)
+										.getTabList().get(0).getValueAccessor()).getControl();
+							}
+
+						} else if (pageList.indexOf(page) == pageList.size() - 1) {
 							// Wir sind in der Letzten Section
 							focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0)
 									.getValueAccessor()).getControl();
@@ -171,7 +186,7 @@ public class TraverseListenerImpl implements TraverseListener {
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
 		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
 				ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED, DisplayType.CHECK, true, locale);
-		
+
 		boolean popupOpen = false;
 		if (focussedControl instanceof Lookup) {
 			Lookup lookup = (Lookup) focussedControl;
@@ -180,7 +195,7 @@ public class TraverseListenerImpl implements TraverseListener {
 		if (focussedControl instanceof TextAssist) {
 			popupOpen = true;
 		}
-		
+
 		MField selectedField = null;
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
@@ -201,7 +216,7 @@ public class TraverseListenerImpl implements TraverseListener {
 		for (MPage page : pageList) {
 			if (pageList.indexOf(page) >= pageList.indexOf(focussedControl)) {
 				List<MField> tabList = page.getTabList();
-				
+
 				if (enterSelectsFirstRequired == false || popupOpen) {
 					for (MField field : tabList) {
 						if ((selectedField.getmPage() == page
