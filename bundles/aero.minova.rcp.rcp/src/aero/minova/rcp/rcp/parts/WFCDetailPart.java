@@ -8,6 +8,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +31,9 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
@@ -108,6 +112,12 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private TranslationService translationService;
 	private Locale locale;
+	
+	@Inject
+	EModelService modelService;
+	
+	@Inject
+	MApplication application;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
@@ -159,7 +169,7 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent) {
-		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale);
+		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale, modelService, application);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
@@ -206,9 +216,9 @@ public class WFCDetailPart extends WFCFormPart {
 		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
 		formToolkit.paintBordersFor(composite);
 		headSection.setClient(composite);
-
+		
 		// Fields
-		MPage mPage = new MPage(true, "open", detail, headSection.getText());
+		MPage mPage = new MPage(true, "open", detail, headSection.getText(), null);
 		createFields(composite, head, mPage);
 		sortTabList(mPage, traverseListener);
 		detail.addPage(mPage);
@@ -233,8 +243,10 @@ public class WFCDetailPart extends WFCFormPart {
 		formToolkit.paintBordersFor(composite);
 		pageSection.setClient(composite);
 
+		Control[] sectionControls = pageSection.getChildren();
+		
 		// Fields
-		MPage mPage = new MPage(true, "open", detail, pageSection.getText());
+		MPage mPage = new MPage(true, "open", detail, pageSection.getText(), sectionControls[0]);
 		createFields(composite, page, mPage);
 		sortTabList(mPage, traverseListener);
 		detail.addPage(mPage);
