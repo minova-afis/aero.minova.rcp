@@ -129,6 +129,10 @@ public class TraverseListenerImpl implements TraverseListener {
 	}
 
 	private void getNextField(Control focussedControl) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		boolean selectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences,
+				ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK, true, locale);
+
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
