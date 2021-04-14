@@ -7,7 +7,7 @@ Widget, CTabItem, LookupControl, ToolBar, ToolTip, Label, Button, LookupTwistie 
 	font-size: 14px;
 }
 	
-Text, Label.DescriptionLabel, LookupText {
+Text, Label.DescriptionLabel, LookupText, TextAssist {
 	font-size: 14px;
 }
 
