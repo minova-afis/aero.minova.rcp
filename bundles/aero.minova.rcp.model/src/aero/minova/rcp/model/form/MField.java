@@ -99,7 +99,7 @@ public abstract class MField {
 	}
 
 	public void setValue(Value value, boolean user) {
-		if (displayValue != null && displayValue.equals(value)) {
+		if (fieldValue != null && fieldValue.equals(value)) {
 			return; // auch true, wenn beide null sind
 		}
 		checkDataType(value);
@@ -115,16 +115,17 @@ public abstract class MField {
 	/**
 	 * Der Datentyp muss geprüft werden, bevor er gesetzt werden darf.
 	 *
-	 * @param value zu prüfender Datentyp
-	 * @throws IllegalArgumentException Wenn der Typ ungültig für das Feld ist.
+	 * @param value
+	 *            zu prüfender Datentyp
+	 * @throws IllegalArgumentException
+	 *             Wenn der Typ ungültig für das Feld ist.
 	 */
 	protected void checkDataType(Value value) {
 		if (value == null) {
 			return;
 		}
 		if (value.getType() != getDataType()) {
-			throw new IllegalArgumentException(
-					"Value of field " + getName() + " must be of type " + getDataType().toString() + "!");
+			throw new IllegalArgumentException("Value of field " + getName() + " must be of type " + getDataType().toString() + "!");
 		}
 	}
 
@@ -236,8 +237,7 @@ public abstract class MField {
 	}
 
 	/**
-	 * Wenn das Feld anzeigen soll, dass wir auf Daten warten, muss dieses Methode
-	 * aufgerufen werden. Dabei wird auch der Wert
+	 * Wenn das Feld anzeigen soll, dass wir auf Daten warten, muss dieses Methode aufgerufen werden. Dabei wird auch der Wert
 	 * {@link #setValue(Value, boolean)}} auf null gesetzt.
 	 */
 	public void indicateWaiting() {
