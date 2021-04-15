@@ -101,6 +101,10 @@ public class TraverseListenerImpl implements TraverseListener {
 	}
 
 	private void getPreviousField(Control focussedControl) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		boolean selectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
+				true, locale);
+
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
@@ -108,7 +112,18 @@ public class TraverseListenerImpl implements TraverseListener {
 				if (((AbstractValueAccessor) f.getValueAccessor()).getControl() == focussedControl) {
 					if (tabList.indexOf(f) == 0) {
 						// Wir sind an der ersten Stelle der Section
-						if (pageList.indexOf(page) == 0) {
+						if (selectAllControls == true) {
+							if (pageList.indexOf(page) == 0) {
+								// Wir sind in der ersten Section
+								MToolBar toolbarElements = partService.getActivePart().getToolbar();
+								focussedControl = (Control) toolbarElements.getWidget();
+							} else if (null != pageList.get(pageList.indexOf(page)).getSection()) {
+								focussedControl = pageList.get(pageList.indexOf(page)).getSection();
+							} else {
+								List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
+								focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
+							}
+						} else if (pageList.indexOf(page) == 0) {
 							// Wir sind in der ersten Section
 							List<MField> lastTabList = pageList.get(pageList.size() - 1).getTabList();
 							focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1)
