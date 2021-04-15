@@ -29,23 +29,20 @@ public class TraverseListenerImpl implements TraverseListener {
 	Logger logger;
 	MDetail detail;
 	Locale locale;
-	EModelService modelService;
-	MApplication application;
+	EPartService partService;
 
-	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale, EModelService modelService,
-			MApplication application) {
+	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale, EPartService partService) {
 		this.logger = logger;
 		this.detail = detail;
 		this.locale = locale;
-		this.modelService = modelService;
-		this.application = application;
+		this.partService = partService;
 	}
 
 	@Override
 	public void keyTraversed(TraverseEvent e) {
 
-		logger.info("keyTraversed(detail=" + e.detail + ", stateMask=" + Integer.toHexString(e.stateMask)
-				+ ", keyCode= " + Integer.toHexString(e.keyCode) + ")");
+		logger.info(
+				"keyTraversed(detail=" + e.detail + ", stateMask=" + Integer.toHexString(e.stateMask) + ", keyCode= " + Integer.toHexString(e.keyCode) + ")");
 		List<MPage> pageList;
 		// if (!e.doit) return; // wir tun nichts, wenn ein anderer etwas getan hat
 
