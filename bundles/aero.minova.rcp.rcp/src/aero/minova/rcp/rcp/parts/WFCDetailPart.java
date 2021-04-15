@@ -8,7 +8,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,9 +30,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
