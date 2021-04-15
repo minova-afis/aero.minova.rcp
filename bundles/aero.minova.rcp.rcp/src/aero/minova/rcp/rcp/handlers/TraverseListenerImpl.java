@@ -5,14 +5,19 @@ import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.HandledToolItemImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.model.form.MDetail;
@@ -126,16 +131,13 @@ public class TraverseListenerImpl implements TraverseListener {
 						} else if (pageList.indexOf(page) == 0) {
 							// Wir sind in der ersten Section
 							List<MField> lastTabList = pageList.get(pageList.size() - 1).getTabList();
-							focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1)
-									.getValueAccessor()).getControl();
+							focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1).getValueAccessor()).getControl();
 						} else {
 							List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
-							focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1)
-									.getValueAccessor()).getControl();
+							focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
 						}
 					} else {
-						focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(f) - 1)
-								.getValueAccessor()).getControl();
+						focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(f) - 1).getValueAccessor()).getControl();
 					}
 					focussedControl.setFocus();
 					return;
@@ -147,8 +149,8 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	private void getNextField(Control focussedControl) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-		boolean selectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences,
-				ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK, true, locale);
+		boolean selectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
+				true, locale);
 
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
@@ -168,21 +170,19 @@ public class TraverseListenerImpl implements TraverseListener {
 								focussedControl = pageList.get(pageList.indexOf(page) + 1).getSection();
 
 							} else {
-								focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(page) + 1)
-										.getTabList().get(0).getValueAccessor()).getControl();
+								focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(page) + 1).getTabList().get(0).getValueAccessor())
+										.getControl();
 							}
 
 						} else if (pageList.indexOf(page) == pageList.size() - 1) {
 							// Wir sind in der Letzten Section
-							focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0)
-									.getValueAccessor()).getControl();
+							focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0).getValueAccessor()).getControl();
 						} else {
-							focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(page) + 1)
-									.getTabList().get(0).getValueAccessor()).getControl();
+							focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(page) + 1).getTabList().get(0).getValueAccessor())
+									.getControl();
 						}
 					} else {
-						focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(f) + 1)
-								.getValueAccessor()).getControl();
+						focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(f) + 1).getValueAccessor()).getControl();
 					}
 					focussedControl.setFocus();
 					return;
@@ -197,8 +197,8 @@ public class TraverseListenerImpl implements TraverseListener {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
-		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
-				ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED, DisplayType.CHECK, true, locale);
+		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
+				DisplayType.CHECK, true, locale);
 
 		boolean popupOpen = false;
 		if (focussedControl instanceof Lookup) {
@@ -232,8 +232,7 @@ public class TraverseListenerImpl implements TraverseListener {
 
 				if (enterSelectsFirstRequired == false || popupOpen) {
 					for (MField field : tabList) {
-						if ((selectedField.getmPage() == page
-								&& tabList.indexOf(field) > tabList.indexOf(selectedField))
+						if ((selectedField.getmPage() == page && tabList.indexOf(field) > tabList.indexOf(selectedField))
 								|| (pageList.indexOf(selectedField.getmPage()) < pageList.indexOf(page))) {
 							if (field.isRequired() == true) {
 								focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
