@@ -114,10 +114,7 @@ public class WFCDetailPart extends WFCFormPart {
 	private Locale locale;
 	
 	@Inject
-	EModelService modelService;
-	
-	@Inject
-	MApplication application;
+	EPartService partService;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
@@ -169,7 +166,7 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent) {
-		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale, modelService, application);
+		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale, partService);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
