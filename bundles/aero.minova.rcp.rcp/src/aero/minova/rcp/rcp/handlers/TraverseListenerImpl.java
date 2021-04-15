@@ -146,8 +146,9 @@ public class TraverseListenerImpl implements TraverseListener {
 						if (selectAllControls == true) {
 							if (pageList.indexOf(page) == pageList.size() - 1) {
 								// Wir sind in der Letzten Section
-								focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0)
-										.getValueAccessor()).getControl();
+								MToolBar toolbarElements = partService.getActivePart().getToolbar();
+								focussedControl = (Control) toolbarElements.getWidget();
+
 							} else if (null != pageList.get(pageList.indexOf(page) + 1).getSection()) {
 								focussedControl = pageList.get(pageList.indexOf(page) + 1).getSection();
 
