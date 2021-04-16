@@ -30,7 +30,7 @@ public class MPage {
 	 * @param isHead
 	 *            makiert die Section als HEAD. Es gibt nur einen HEAD in einem Part.
 	 * @param status
-	 *            der Status der Section, ob sie offen oder geschlossen ist.
+	 *            der Zustand der Section (invisible, open, closed, minimized)
 	 * @param mDetail
 	 *            das Detail in dem die Section erstellt werden soll.
 	 * @param label
