@@ -204,7 +204,7 @@ public class PrintIndexHandler {
 		addHeader(xml, fileName);
 		xml.append("<Title>" + title + "</Title>\n");
 		xml.append("<IndexView>\n");
-		xml.append("<Group>\n" + "<Text><![CDATA[Gesamt]]></Text>\n"); // TODO: Übersetzen!
+		xml.append("<Group>\n" + "<Text><![CDATA[" + translationService.translate("@Total", null) + "]]></Text>\n");
 
 		if (groupByIndices.isEmpty()) { // Keine Gruppierung
 			addRows(xml, treeList, colConfig, columnReorderList, numberFormat);
