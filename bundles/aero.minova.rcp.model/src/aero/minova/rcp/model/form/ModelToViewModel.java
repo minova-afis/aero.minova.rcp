@@ -1,6 +1,5 @@
 package aero.minova.rcp.model.form;
 
-import aero.minova.rcp.form.model.xsd.Color;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.TypeParam;
 
