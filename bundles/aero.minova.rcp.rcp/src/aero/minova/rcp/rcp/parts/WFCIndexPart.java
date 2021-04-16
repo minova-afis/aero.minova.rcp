@@ -753,6 +753,7 @@ public class WFCIndexPart extends WFCFormPart {
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
+		natTable.refresh(); // Damit Summary-Row richtig aktualisiert wird
 	}
 
 	public SortedList<Row> getSortedList() {
