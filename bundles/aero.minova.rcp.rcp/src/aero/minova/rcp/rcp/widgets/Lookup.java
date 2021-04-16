@@ -240,7 +240,7 @@ public class Lookup extends Composite {
 
 		final int nrLines = Math.min(15, popupValues.size());
 		final int width = table.getColumn(0).getWidth() + table.getColumn(1).getWidth() + 50;
-		final int height = table.getItemHeight() * nrLines + 5;
+		final int height = table.getItemHeight() * nrLines + 15;
 		popup.setBounds(x, y, width, height);
 
 		if (y + height > displayRect.y + displayRect.height) {
