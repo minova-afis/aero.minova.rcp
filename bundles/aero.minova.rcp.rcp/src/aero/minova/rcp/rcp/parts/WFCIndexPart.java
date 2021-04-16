@@ -133,6 +133,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private boolean expandGroups = false;
 
+	private FixedSummaryRowLayer summaryRowLayer;
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -195,7 +197,7 @@ public class WFCIndexPart extends WFCFormPart {
 		} else {
 			group += 0 + ";";
 		}
-		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes()) {
+		for (int i : getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes()) {
 			group += i + ";";
 		}
 		prefs.put(tableName + "." + name + ".index.groupby", group);
@@ -257,10 +259,10 @@ public class WFCIndexPart extends WFCFormPart {
 		string = prefs.get(tableName + "." + name + ".index.groupby", null);
 		if (string != null && !string.equals("")) {
 			String[] fields = string.split(";");
-			groupByHeaderLayer.getGroupByModel().clearGroupByColumnIndexes();
+			getGroupByHeaderLayer().getGroupByModel().clearGroupByColumnIndexes();
 			for (String s : Arrays.copyOfRange(fields, 1, fields.length)) {
 				int index = Integer.parseInt(s);
-				groupByHeaderLayer.getGroupByModel().addGroupByColumnIndex(index);
+				getGroupByHeaderLayer().getGroupByModel().addGroupByColumnIndex(index);
 			}
 			if (fields[0].equals("0")) {
 				collapseGroups("");
@@ -350,11 +352,10 @@ public class WFCIndexPart extends WFCFormPart {
 		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
 
 		// build the Summary Row
-		FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(),
-				configRegistry, false);
-		summaryRowLayer.setHorizontalCompositeDependency(false);
+		summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(), configRegistry, false);
+		getSummaryRowLayer().setHorizontalCompositeDependency(false);
 		CompositeLayer summaryComposite = new CompositeLayer(1, 2);
-		summaryComposite.setChildLayer("SUMMARY", summaryRowLayer, 0, 0);
+		summaryComposite.setChildLayer("SUMMARY", getSummaryRowLayer(), 0, 0);
 		summaryComposite.setChildLayer(GridRegion.BODY, bodyLayerStack.getViewportLayer(), 0, 1);
 
 		// build the row header layer
@@ -378,7 +379,7 @@ public class WFCIndexPart extends WFCFormPart {
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
 		groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider, columnHeaderLayer);
-		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
+		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, getGroupByHeaderLayer(), 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
@@ -430,7 +431,7 @@ public class WFCIndexPart extends WFCFormPart {
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
 //
 //		// add group by configuration
-		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, groupByHeaderLayer));
+		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
 		// adds the key bindings that allow space bar to be pressed to
 		// expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
@@ -753,6 +754,7 @@ public class WFCIndexPart extends WFCFormPart {
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
+		natTable.refresh(); // Damit Summary-Row richtig aktualisiert wird
 	}
 
 	public SortedList<Row> getSortedList() {
@@ -765,6 +767,14 @@ public class WFCIndexPart extends WFCFormPart {
 
 	public Table getData() {
 		return data;
+	}
+
+	public GroupByHeaderLayer getGroupByHeaderLayer() {
+		return groupByHeaderLayer;
+	}
+
+	public FixedSummaryRowLayer getSummaryRowLayer() {
+		return summaryRowLayer;
 	}
 
 }

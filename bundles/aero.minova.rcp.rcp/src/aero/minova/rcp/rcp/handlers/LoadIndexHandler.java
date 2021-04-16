@@ -25,6 +25,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
 public class LoadIndexHandler {
@@ -59,12 +60,14 @@ public class LoadIndexHandler {
 
 		List<MPart> findElements = model.findElements(perspective, PartsID.SEARCH_PART, MPart.class);
 		((WFCSearchPart) findElements.get(0).getObject()).saveNattable();
+		((WFCSearchPart) findElements.get(0).getObject()).updateUserInput();
 		Table searchTable = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
 		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
 
 		tableFuture.thenAccept(t -> {
 			if (t.getName().equals("Error")) {
-				broker.post(Constants.BROKER_SHOWERROR, t);
+				ErrorObject e = new ErrorObject(t, dataService.getUserName());
+				broker.post(Constants.BROKER_SHOWERROR, e);
 			} else {
 				broker.post(Constants.BROKER_LOADINDEXTABLE, Map.of(perspective, t));
 			}

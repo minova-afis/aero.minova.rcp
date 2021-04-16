@@ -1,17 +1,41 @@
 package aero.minova.rcp.rcp.fields;
 
-import java.util.function.Consumer;
-
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.builder.ValueBuilder;
-
 public class FieldUtil {
+
+	static {
+		Display display = Display.getCurrent();
+		Shell shell = new Shell(display);
+		Text text = new Text(shell, SWT.NONE);
+		shell.setLayout(new GridLayout());
+
+		text.setText("000.000.000.000");
+		shell.layout();
+		Point size = text.getSize();
+		COLUMN_HEIGHT = size.y + 20;
+		COLUMN_WIDTH = size.x + 40;
+
+		text.setText("00:00");
+		shell.layout();
+		size = text.getSize();
+		SHORT_TIME_WIDTH = size.x + 5;
+
+		text.setText("12.12.2020 22:55");
+		shell.layout();
+		size = text.getSize();
+		DATE_TIME_WIDTH = size.x + 5;
+
+		text.setText("00.00.0000");
+		shell.layout();
+		size = text.getSize();
+		SHORT_DATE_WIDTH = size.x + 5;
+	}
 
 	public static final String TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	public static final String TRANSLATE_LOCALE = "aero.minova.rcp.translate.locale";
@@ -26,49 +50,17 @@ public class FieldUtil {
 	 * Wert des Feldes analog der Definition des Feldes
 	 */
 	public static final String FIELD_VALUE = "aero.minova.rcp.field.value";
-	public static final int COLUMN_WIDTH = 140;
+	public static int COLUMN_HEIGHT;
+	public static int COLUMN_WIDTH; // war 140
 	public static final int TEXT_WIDTH = COLUMN_WIDTH;
-	public static final int NUMBER_WIDTH = 104;
-	public static final int SHORT_DATE_WIDTH = 88;
-	public static final int SHORT_TIME_WIDTH = 52;
+	public static final int NUMBER_WIDTH = COLUMN_WIDTH - 40; // war 104
+	public static int SHORT_DATE_WIDTH; // war 88
+	public static int DATE_TIME_WIDTH; //
+	public static int SHORT_TIME_WIDTH; // war 52
 	public static final int MARGIN_LEFT = 5;
 	public static final int MARGIN_TOP = 5;
-	public static final int COLUMN_HEIGHT = 28;
 	public static final int MARGIN_BORDER = 2;
 
-	private FieldUtil() {
-	}
-
-//	protected static void addDataToText(Widget control, MField f, DataType datatype) {
-//		control.setData(Constants.CONTROL_FIELD, f);
-//		control.setData(Constants.CONTROL_DATATYPE, datatype);
-//	}
-
-	public static int getRowIndex(Table t, Field field) {
-		return t.getColumnIndex(field.getName());
-	}
-
-	protected static void addConsumer(Object o, Field field) {
-		if (o instanceof Text) {
-			Text text = (Text) o;
-			text.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
-
-				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-				Field f = (Field) text.getData(Constants.CONTROL_FIELD);
-				text.setText(ValueBuilder.value(value, f).getText());
-				text.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
-				text.setData(Constants.CONTROL_VALUE, value);
-			});
-		} else if (o instanceof Button) {
-			Button b = (Button) o;
-			b.setData(Constants.CONTROL_CONSUMER, (Consumer<Table>) t -> {
-
-				Value value = t.getRows().get(0).getValue(t.getColumnIndex(field.getName()));
-				Field f = (Field) b.getData(Constants.CONTROL_FIELD);
-				b.setText(ValueBuilder.value(value, f).getText());
-				b.setData(Constants.CONTROL_DATATYPE, ValueBuilder.value(value).getDataType());
-			});
-		}
-	}
+	private FieldUtil() {}
 
 }

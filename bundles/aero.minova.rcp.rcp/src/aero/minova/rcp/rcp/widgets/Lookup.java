@@ -212,6 +212,7 @@ public class Lookup extends Composite {
 	}
 
 	public void showAllElements(String value) {
+		table.setFont(text.getFont());
 		popupValues = contentProvider.getContent(value);
 		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
@@ -229,6 +230,7 @@ public class Lookup extends Composite {
 			final TableItem tableItem = new TableItem(table, SWT.NONE);
 			tableItem.setText(0, popupValues.get(i).keyText);
 			tableItem.setText(1, popupValues.get(i).description);
+			tableItem.setFont(text.getFont());
 		}
 		table.getColumn(0).pack();
 		table.getColumn(0).setWidth(table.getColumn(0).getWidth() + 5);

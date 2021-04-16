@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -9,13 +10,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.widgets.Lookup;
@@ -30,14 +29,8 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	@Inject
 	UISynchronize sync;
 
-	private MDetail detail;
-
-	private Label description;
-
-	public LookupValueAccessor(MField field, MDetail detail, Lookup control, Label description) {
+	public LookupValueAccessor(MField field, Lookup control) {
 		super(field, control);
-		this.description = description;
-		this.detail = detail;
 
 	}
 
@@ -139,9 +132,20 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	public void updatePossibleValues() {
 		Lookup up = ((Lookup) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+		try {
+			if (!(listLookup.get()).isEmpty()) {
+				listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+			} else {
+				control.getParent().setFocus();
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
+	/**
+	 * Wir springen in das Feld!
+	 */
 	public void setFocus() {
 		if (!control.isFocusControl()) {
 			control.setFocus();

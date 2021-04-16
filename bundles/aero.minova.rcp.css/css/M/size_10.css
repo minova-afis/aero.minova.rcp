@@ -3,30 +3,12 @@
 @import url("platform:/plugin/aero.minova.rcp.css/css/common.css");
 @import url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
 
-Label, LookupTwistie {
-	/* font-size: 14px; *//* TODO SAW - CSS Fontsize */
+Widget, CTabItem, LookupControl, ToolBar, ToolTip, Label, Button, LookupTwistie {
+	/*font-size: 10px;*/
 }
 
-Widget, CTabItem, LookupControl, Text, ToolBar, ToolTip, Button, MinovaSection, LookupText {
-	/* font-size: 14px; *//* TODO SAW - CSS Fontsize */
-}
-
-MinovaSection {
-	table-spacing: 16px;
-	section-spacing: 8px;
-	label-margin-top: 4px;
-	description-margin-top: 4px;
-	description-margin-left: 3px;
-	multiline-margin-right: 0px;
-	multiline-margin-bottom: -10px;
-	unit-label-margin-left: 13px;
-	checkbox-margin-top: 3px;
-	row-height: 26px;
-	date-time-width: 112px;
-	date-width: 72px;
-	time-width: 40px;
-	number-width: 86px;
-	text-width: 123px;
+Text, Label.DescriptionLabel, LookupText, TextAssist {
+	/*font-size: 10px;*/
 }
 
 NatTable {
@@ -36,7 +18,7 @@ NatTable {
 }
 
 NatTable > .BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
-	.selectionAnchor:select, .SummaryRow,
+	.selectionAnchor:select, .SummaryRow, .ROW_HEADER,
 	.TREE_EXPANDED, .TREE_EXPANDED:select,
 	.TREE_COLLAPSED, .TREE_COLLAPSED:select,
 	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {

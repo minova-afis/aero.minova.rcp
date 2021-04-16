@@ -136,13 +136,12 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable = createNatTable(parent, searchForm, getData());
 
-		//TODO Constants
+		// TODO Constants
 		loadPrefs("DEFAULT");
 	}
 
 	/**
-	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf
-	 * die Maximale Breite des Inhalts.
+	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
 	 *
 	 * @param mPart
 	 */
@@ -152,6 +151,7 @@ public class WFCSearchPart extends WFCFormPart {
 		if (!mPart.equals(this.mPart)) {
 			return;
 		}
+		natTable.commitAndCloseActiveCellEditor();
 		NatTableUtil.resize(natTable);
 	}
 
@@ -303,30 +303,10 @@ public class WFCSearchPart extends WFCFormPart {
 			return;
 		}
 		Table prefTable = mjs.json2Table(string, true);
-		sortedList.clear();
+
 		getData().getRows().clear();
-
 		getData().getRows().addAll(prefTable.getRows());
-		// Instants aktualisieren, damit der angezeigte Wert zur Nutzereingabe passt
-		for (Row r : getData().getRows()) {
-			for (int i = 0; i < getData().getColumnCount(); i++) {
-				Value v = r.getValue(i);
-				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
-					FilterValue fv = (FilterValue) v;
-					Instant inst = fv.getFilterValue().getInstantValue();
-					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
-						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
-					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
-						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
-					} else {
-						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());
-					}
-
-					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);
-				}
-			}
-		}
-		sortedList.addAll(getData().getRows());
+		updateUserInput();
 
 		// Spaltenanordung und -breite
 		string = prefs.get(tableName + "." + name + ".search.size", null);
@@ -366,8 +346,7 @@ public class WFCSearchPart extends WFCFormPart {
 			columnPropertyAccessor.translate(translationService);
 			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
 			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i,
-						columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
 	}
@@ -437,4 +416,28 @@ public class WFCSearchPart extends WFCFormPart {
 		return data;
 	}
 
+	// Instants aktualisieren, damit der angezeigte Wert zur Nutzereingabe passt
+	public void updateUserInput() {
+		for (Row r : getData().getRows()) {
+			for (int i = 0; i < getData().getColumnCount(); i++) {
+				Value v = r.getValue(i);
+				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
+					FilterValue fv = (FilterValue) v;
+					Instant inst = fv.getFilterValue().getInstantValue();
+					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
+						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
+					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
+						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
+					} else {
+						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());
+					}
+
+					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);
+				}
+			}
+		}
+
+		sortedList.clear();
+		sortedList.addAll(getData().getRows());
+	}
 }
