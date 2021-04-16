@@ -206,7 +206,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			popupOpen = lookup.popupIsOpen();
 		}
 		if (focussedControl instanceof TextAssist) {
-			popupOpen = true;
+			popupOpen = false;
 		}
 
 		MField selectedField = null;
@@ -230,7 +230,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			if (pageList.indexOf(page) >= pageList.indexOf(focussedControl)) {
 				List<MField> tabList = page.getTabList();
 
-				if (enterSelectsFirstRequired == false || popupOpen) {
+				if (enterSelectsFirstRequired == false && !popupOpen) {
 					for (MField field : tabList) {
 						if ((selectedField.getmPage() == page && tabList.indexOf(field) > tabList.indexOf(selectedField))
 								|| (pageList.indexOf(selectedField.getmPage()) < pageList.indexOf(page))) {
