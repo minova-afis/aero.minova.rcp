@@ -109,7 +109,7 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private TranslationService translationService;
 	private Locale locale;
-	
+
 	@Inject
 	EPartService partService;
 
@@ -191,11 +191,9 @@ public class WFCDetailPart extends WFCFormPart {
 		RowData headLayoutData = new RowData();
 		Section headSection;
 		if (head.isHead) {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
@@ -210,8 +208,8 @@ public class WFCDetailPart extends WFCFormPart {
 		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
 		formToolkit.paintBordersFor(composite);
 		headSection.setClient(composite);
-		
-		// Fields
+
+		// Wir erstellen den HEAD Details.
 		MPage mPage = new MPage(true, "open", detail, headSection.getText(), null);
 		createFields(composite, head, mPage);
 		sortTabList(mPage, traverseListener);
@@ -221,8 +219,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void layoutPage(Composite parent, HeadOrPageWrapper page, TraverseListener traverseListener) {
 		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent,
-				ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 
 		pageLayoutData.width = SECTION_WIDTH;
 
@@ -238,16 +235,17 @@ public class WFCDetailPart extends WFCFormPart {
 		pageSection.setClient(composite);
 
 		Control[] sectionControls = pageSection.getChildren();
-		
-		// Fields
+
+		// Erstellen eine Section.
 		MPage mPage = new MPage(true, "open", detail, pageSection.getText(), sectionControls[0]);
+		// Erstellen der Field des Section.
 		createFields(composite, page, mPage);
+		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mPage, traverseListener);
 		detail.addPage(mPage);
 	}
 
 	private void sortTabList(MPage mPage, TraverseListener traverseListener) {
-		// TODO: Ergänzen um die Preference-Einstellungen
 		List<MField> tabList = mPage.getTabList();
 		Collections.sort(tabList, new Comparator<MField>() {
 
