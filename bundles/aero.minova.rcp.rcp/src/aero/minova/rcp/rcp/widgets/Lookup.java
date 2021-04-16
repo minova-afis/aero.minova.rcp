@@ -916,6 +916,10 @@ public class Lookup extends Composite {
 		});
 	}
 
+	public Label getLabel() {
+		return this.label;
+	}
+
 	protected void requestAllLookupEntries() {
 		setMessage("...");
 
