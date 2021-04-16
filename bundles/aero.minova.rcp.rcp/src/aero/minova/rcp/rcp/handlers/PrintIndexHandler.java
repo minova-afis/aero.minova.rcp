@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -365,10 +364,7 @@ public class PrintIndexHandler {
 		xml.append("<Site>\n" + "<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>\n" + "<Address2><![CDATA[Tröltschstraße 4]]></Address2>\n"
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
-
-		// TODO: Entfernen
-		Instant now = Instant.now().plus(2, ChronoUnit.HOURS);
-		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(now, Locale.getDefault()) + "]]></PrintDate>\n");
+		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), Locale.getDefault()) + "]]></PrintDate>\n");
 	}
 
 	/**
