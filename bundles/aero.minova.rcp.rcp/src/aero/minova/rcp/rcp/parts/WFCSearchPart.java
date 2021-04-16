@@ -421,7 +421,7 @@ public class WFCSearchPart extends WFCFormPart {
 		for (Row r : getData().getRows()) {
 			for (int i = 0; i < getData().getColumnCount(); i++) {
 				Value v = r.getValue(i);
-				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
+				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					FilterValue fv = (FilterValue) v;
 					Instant inst = fv.getFilterValue().getInstantValue();
 					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
