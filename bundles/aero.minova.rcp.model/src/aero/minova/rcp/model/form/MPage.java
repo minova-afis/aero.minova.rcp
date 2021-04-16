@@ -21,10 +21,23 @@ public class MPage {
 	private String label;
 	// Symbol für diese Page
 	private Image icon;
-	
+
 	private Control control;
 
-
+	/**
+	 * Erstellt eine neue MPage.
+	 * 
+	 * @param isHead
+	 *            makiert die Section als HEAD. Es gibt nur einen HEAD in einem Part.
+	 * @param status
+	 *            der Status der Section, ob sie offen oder geschlossen ist.
+	 * @param mDetail
+	 *            das Detail in dem die Section erstellt werden soll.
+	 * @param label
+	 *            das Label der Section.
+	 * @param control
+	 *            das Twistie Element einer Section. Der HEAD hat keinen Twistie.
+	 */
 	public MPage(boolean isHead, String status, MDetail mDetail, String label, Control control) {
 		this.isHead = isHead;
 		this.status = status;
