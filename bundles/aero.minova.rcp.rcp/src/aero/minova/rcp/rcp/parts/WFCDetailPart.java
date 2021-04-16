@@ -253,14 +253,12 @@ public class WFCDetailPart extends WFCFormPart {
 
 			@Override
 			public int compare(MField f1, MField f2) {
-				if (f1.getTabIndex() == 0 && f2.getTabIndex() == 0) {
+				if (f1.getTabIndex() == f2.getTabIndex()) {
 					return 0;
-				} else if (f1.getTabIndex() == 0) {
+				} else if (f1.getTabIndex() < f2.getTabIndex()) {
 					return -1;
-				} else if (f2.getTabIndex() == 0) {
-					return 1;
 				} else {
-					return f1.getTabIndex() > f2.getTabIndex() ? +1 : f1.getTabIndex() < f2.getTabIndex() ? -1 : 0;
+					return 1;
 				}
 			}
 		});
