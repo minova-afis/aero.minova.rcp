@@ -209,10 +209,13 @@ public class WFCDetailPart extends WFCFormPart {
 		formToolkit.paintBordersFor(composite);
 		headSection.setClient(composite);
 
-		// Wir erstellen den HEAD Details.
+		// Wir erstellen die HEAD Section des Details.
 		MPage mPage = new MPage(true, "open", detail, headSection.getText(), null);
+		// Erstellen der Field des Section.
 		createFields(composite, head, mPage);
+		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mPage, traverseListener);
+		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mPage);
 
 	}
@@ -236,15 +239,24 @@ public class WFCDetailPart extends WFCFormPart {
 
 		Control[] sectionControls = pageSection.getChildren();
 
-		// Erstellen eine Section.
+		// Erstellen einer Section.
 		MPage mPage = new MPage(true, "open", detail, pageSection.getText(), sectionControls[0]);
 		// Erstellen der Field des Section.
 		createFields(composite, page, mPage);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mPage, traverseListener);
+		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mPage);
 	}
 
+	/**
+	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
+	 * 
+	 * @param mPage
+	 *            die Section in der die Fields sortiert werden müssen
+	 * @param traverseListener
+	 *            der zuzuweisende TraverseListener für die Fields
+	 */
 	private void sortTabList(MPage mPage, TraverseListener traverseListener) {
 		List<MField> tabList = mPage.getTabList();
 		Collections.sort(tabList, new Comparator<MField>() {
@@ -266,6 +278,16 @@ public class WFCDetailPart extends WFCFormPart {
 		mPage.setTabList(tabList);
 	}
 
+	/**
+	 * Erstellt die Field einer Section.
+	 * 
+	 * @param composite
+	 *            der parent des Fields
+	 * @param headOrPage
+	 *            bestimmt ob die Fields nach den Regeln des Heads erstellt werden oder der einer Page.
+	 * @param page
+	 *            die Section deren Fields erstellt werden.
+	 */
 	private void createFields(Composite composite, HeadOrPageWrapper headOrPage, MPage page) {
 		int row = 0;
 		int column = 0;
