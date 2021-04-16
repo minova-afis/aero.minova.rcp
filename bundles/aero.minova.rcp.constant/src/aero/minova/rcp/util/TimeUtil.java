@@ -1,7 +1,6 @@
 package aero.minova.rcp.util;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -38,15 +37,18 @@ public class TimeUtil {
 	 */
 	public static void setShortcuts(String hour, String minute) {
 		// Es muss immer genau ein Zeichen übergeben werden
-		if (hour.length() != 1) throw new IllegalArgumentException("Shortcut for hour must have length of 1!");
-		if (minute.length() != 1) throw new IllegalArgumentException("Shortcut for minute must have length of 1!");
+		if (hour.length() != 1)
+			throw new IllegalArgumentException("Shortcut for hour must have length of 1!");
+		if (minute.length() != 1)
+			throw new IllegalArgumentException("Shortcut for minute must have length of 1!");
 
 		// nur Kleinbuchstaben zulassen
 		hour = hour.toLowerCase();
 		minute = minute.toLowerCase();
 
 		// keine Symbol darf doppelt verwendet werden
-		if (hour.equals(minute)) throw new IllegalArgumentException("Shortcut for day and month must be different!");
+		if (hour.equals(minute))
+			throw new IllegalArgumentException("Shortcut for day and month must be different!");
 
 		// jetzt können wir uns die Werte merken
 		TimeUtil.hour = hour;
@@ -55,13 +57,13 @@ public class TimeUtil {
 	}
 
 	public static Instant getTime(String input) {
-		return getTime(Instant.now(), input, "", Locale.getDefault());
+		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, "", Locale.getDefault());
 	}
-	
+
 	public static Instant getTime(Instant now, String input) {
 		return getTime(now, input, "", Locale.getDefault());
 	}
-	
+
 	public static Instant getTime(Instant now, String input, String timeUtilPref) {
 		return getTime(now, input, timeUtilPref, Locale.getDefault());
 	}
@@ -79,8 +81,8 @@ public class TimeUtil {
 		} else {
 			now = getTimeFromNumbers(input);
 		}
-		
-		if(!timeUtilPref.equals("")) {
+
+		if (!timeUtilPref.equals("")) {
 			try {
 				DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
 				LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
@@ -104,7 +106,7 @@ public class TimeUtil {
 				}
 			}
 		}
-		
+
 		return now;
 	}
 
@@ -132,7 +134,8 @@ public class TimeUtil {
 		while (input.length() > 0) {
 			matcher = pattern.matcher(input);
 			boolean b = matcher.find();
-			if (!b) break;
+			if (!b)
+				break;
 			String result = matcher.group(0);
 			splits.add(checkMissingHour(result));
 			input = input.substring(result.length());
@@ -147,8 +150,10 @@ public class TimeUtil {
 	}
 
 	private static String checkMissingHour(String result) {
-		if ((result.endsWith("+") || result.endsWith("-"))) return result + hour;
-		else return result;
+		if ((result.endsWith("+") || result.endsWith("-")))
+			return result + hour;
+		else
+			return result;
 	}
 
 	public static String getTimeString(Instant instant, Locale locale) {
@@ -286,7 +291,7 @@ public class TimeUtil {
 				return time;
 			case 4:
 				time = new int[2];
-				hour = input.substring(0,2);
+				hour = input.substring(0, 2);
 				time[0] = Integer.valueOf(hour);
 				minutesString = input.substring(2);
 				time[1] = Integer.valueOf(minutesString);
