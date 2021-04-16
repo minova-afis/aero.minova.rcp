@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,12 +56,14 @@ import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
@@ -347,6 +350,13 @@ public class WFCIndexPart extends WFCFormPart {
 
 		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Zeilen, die keinen von- oder bis-Wert haben)
+		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
+		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
+		for (int i = 0; i < columnHeaderDataLayer.getColumnCount(); i++) {
+			labelAccumulator.registerColumnOverrides(i, Constants.COMPARATOR_LABEL);
+		}
+		configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new CustomComparator(), DisplayMode.NORMAL, Constants.COMPARATOR_LABEL);
 
 		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
 		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
@@ -748,6 +758,26 @@ public class WFCIndexPart extends WFCFormPart {
 				return 0;
 			}
 			return max;
+		}
+	}
+
+	private class CustomComparator implements Comparator<Object> {
+		@Override
+		public int compare(Object o1, Object o2) {
+			if (o1 == null) {
+				if (o2 == null) {
+					return 0;
+				} else {
+					return -1;
+				}
+			} else if (o2 == null) {
+				return 1;
+			} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
+																														// gleiche Klasse haben
+				return ((Comparable) o1).compareTo(o2);
+			} else {
+				return o1.toString().compareTo(o2.toString());
+			}
 		}
 	}
 
