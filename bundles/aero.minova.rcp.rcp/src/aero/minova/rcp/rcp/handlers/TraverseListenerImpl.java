@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -35,12 +36,14 @@ public class TraverseListenerImpl implements TraverseListener {
 	MDetail detail;
 	Locale locale;
 	EPartService partService;
+	IEclipseContext context;
 
-	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale, EPartService partService) {
+	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale, EPartService partService, IEclipseContext context) {
 		this.logger = logger;
 		this.detail = detail;
 		this.locale = locale;
 		this.partService = partService;
+		this.context = context;
 	}
 
 	@Override

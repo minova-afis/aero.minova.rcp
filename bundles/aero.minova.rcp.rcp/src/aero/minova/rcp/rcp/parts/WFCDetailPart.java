@@ -120,7 +120,7 @@ public class WFCDetailPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-		layoutForm(parent);
+		layoutForm(parent, partContext);
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
 		// steuert
 
@@ -162,8 +162,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private void layoutForm(Composite parent) {
-		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale, partService);
+	private void layoutForm(Composite parent, IEclipseContext context) {
+		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale, partService, context);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
