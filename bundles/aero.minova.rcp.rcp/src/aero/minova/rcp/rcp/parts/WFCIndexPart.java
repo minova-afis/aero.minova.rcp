@@ -650,17 +650,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		@Override
 		public Object summarize(int columnIndex) {
-			int rowCount = this.dataProvider.getRowCount();
-			int valueRows = 0;
-
-			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
-				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number) {
-					valueRows++;
-				}
-			}
-			return valueRows;
+			return this.dataProvider.getRowCount();
 		}
 	}
 
