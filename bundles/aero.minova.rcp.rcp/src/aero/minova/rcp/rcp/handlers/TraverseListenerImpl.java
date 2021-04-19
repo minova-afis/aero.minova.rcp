@@ -118,21 +118,23 @@ public class TraverseListenerImpl implements TraverseListener {
 			List<MField> tabList = page.getTabList();
 			for (MField f : tabList) {
 				if (((AbstractValueAccessor) f.getValueAccessor()).getControl() == focussedControl) {
+					// Wir sind an der ersten Stelle der Section
 					if (tabList.indexOf(f) == 0) {
-						// Wir sind an der ersten Stelle der Section
+						// Die Preference SelectAllControls ist gesetzt.
 						if (selectAllControls == true) {
+							// Wir sind in der ersten Section
 							if (pageList.indexOf(page) == 0) {
-								// Wir sind in der ersten Section
 								MToolBar toolbarElements = partService.getActivePart().getToolbar();
 								focussedControl = (Control) toolbarElements.getWidget();
+								// Wir prüfen nach dem Twistie der Section
 							} else if (null != pageList.get(pageList.indexOf(page)).getSection()) {
 								focussedControl = pageList.get(pageList.indexOf(page)).getSection();
 							} else {
 								List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
 								focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
 							}
-						} else if (pageList.indexOf(page) == 0) {
 							// Wir sind in der ersten Section
+						} else if (pageList.indexOf(page) == 0) {
 							List<MField> lastTabList = pageList.get(pageList.size() - 1).getTabList();
 							focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1).getValueAccessor()).getControl();
 						} else {
@@ -159,18 +161,21 @@ public class TraverseListenerImpl implements TraverseListener {
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
 
-			//Wir prüfen 
 			if (context.get("PreviousField") instanceof MField && ((MField) context.get("PreviousField")).getmPage().equals(page)) {
+				// Wir prüfen, ob das ausgewählte Feld als vorheriges Feld gespeichert wurde oder ob ein vorheriges Feld gesetzt ist.
 				if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get("PreviousField")).getValueAccessor()).getControl())) {
+					// Wir holen uns das vorherige Feld aus dem Context.
 					MField field = (MField) context.get("PreviousField");
+					// Wir sind im letzten Feld der Page.
 					if (tabList.indexOf(field) == tabList.size() - 1) {
-						// Wir sind an der Letzen Stelle der Section
+						// Die Preference SelectAllControls is gesetzt.
 						if (selectAllControls == true) {
+							// Wir sind in der Letzten Section
 							if (pageList.indexOf(page) == pageList.size() - 1) {
-								// Wir sind in der Letzten Section
 								MToolBar toolbarElements = partService.getActivePart().getToolbar();
 								focussedControl = (Control) toolbarElements.getWidget();
 								context.set("PreviousField", (Control) toolbarElements.getWidget());
+								// Wir prüfen nach dem Twistie der Section
 							} else if (null != pageList.get(pageList.indexOf(page) + 1).getSection()) {
 								focussedControl = pageList.get(pageList.indexOf(page) + 1).getSection();
 								context.set("PreviousField", pageList.get(pageList.indexOf(page) + 1).getSection());
@@ -179,9 +184,8 @@ public class TraverseListenerImpl implements TraverseListener {
 										.getControl();
 								context.set("PreviousField", pageList.get(pageList.indexOf(page) + 1).getTabList().get(0));
 							}
-
-						} else if (pageList.indexOf(page) == pageList.size() - 1) {
 							// Wir sind in der Letzten Section
+						} else if (pageList.indexOf(page) == pageList.size() - 1) {
 							focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0).getValueAccessor()).getControl();
 							context.set("PreviousField", pageList.get(0).getTabList().get(0));
 						} else {
@@ -203,8 +207,8 @@ public class TraverseListenerImpl implements TraverseListener {
 					if (tabList.indexOf(f) == tabList.size() - 1) {
 						// Wir sind an der Letzen Stelle der Section
 						if (selectAllControls == true) {
+							// Wir sind in der Letzten Section
 							if (pageList.indexOf(page) == pageList.size() - 1) {
-								// Wir sind in der Letzten Section
 								MToolBar toolbarElements = partService.getActivePart().getToolbar();
 								focussedControl = (Control) toolbarElements.getWidget();
 								context.set("PreviousField", toolbarElements.getWidget());
@@ -217,9 +221,8 @@ public class TraverseListenerImpl implements TraverseListener {
 										.getControl();
 								context.set("PreviousField", pageList.get(pageList.indexOf(page) + 1).getTabList().get(0));
 							}
-
-						} else if (pageList.indexOf(page) == pageList.size() - 1) {
 							// Wir sind in der Letzten Section
+						} else if (pageList.indexOf(page) == pageList.size() - 1) {
 							focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0).getValueAccessor()).getControl();
 							context.set("PreviousField", pageList.get(0).getTabList().get(0));
 						} else {
@@ -256,6 +259,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			popupOpen = false;
 		}
 
+		// Wir holen uns das selektierte Feld.
 		MField selectedField = null;
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
@@ -267,6 +271,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			}
 		}
 
+		// Die Preference LookupEnterSelectsNextRequired ist gesetzt.
 		if (lookupEnterSelectsNextRequired == false && popupOpen) {
 			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
 			focussedControl.setFocus();
@@ -277,6 +282,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			if (pageList.indexOf(page) >= pageList.indexOf(focussedControl)) {
 				List<MField> tabList = page.getTabList();
 
+				// Die Preference EnterSelectsFirstRequired ist gesetzt.
 				if (enterSelectsFirstRequired == false && !popupOpen) {
 					for (MField field : tabList) {
 						if ((selectedField.getmPage() == page && tabList.indexOf(field) > tabList.indexOf(selectedField))
