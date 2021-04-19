@@ -159,7 +159,8 @@ public class TraverseListenerImpl implements TraverseListener {
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
 
-			if (context.get("PreviousField") instanceof MField && ((MField) context.get("PreviousField")).getmPage().equals(pageList)) {
+			//Wir prüfen 
+			if (context.get("PreviousField") instanceof MField && ((MField) context.get("PreviousField")).getmPage().equals(page)) {
 				if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get("PreviousField")).getValueAccessor()).getControl())) {
 					MField field = (MField) context.get("PreviousField");
 					if (tabList.indexOf(field) == tabList.size() - 1) {
