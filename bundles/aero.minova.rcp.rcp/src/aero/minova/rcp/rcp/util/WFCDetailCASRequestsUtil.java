@@ -497,6 +497,10 @@ public class WFCDetailCASRequestsUtil {
 			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
 			showErrorMessage(e);
 		} else {
+			if (autoReloadIndex) {
+				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+				handlerService.executeHandler(cmd);
+			}
 			openNotificationPopup(getTranslation("msg.DataDeleted"));
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);

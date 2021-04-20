@@ -100,6 +100,7 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_LOAD_INDEX, translationService.translate("@Preferences.General.AutoLoadIndex", null), 0.1,
 				DisplayType.CHECK, false));
+		// TODO Übersetzung anpassen, damit sowohl beim Löschen als auch beim Speichern der Index neugeladen wird.
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_RELOAD_INDEX, translationService.translate("@Preferences.General.AutoReloadIndex", null),
 				0.2, DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES,
