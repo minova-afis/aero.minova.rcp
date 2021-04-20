@@ -13,7 +13,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -101,6 +104,7 @@ import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import ca.odell.glazedlists.EventList;
@@ -116,6 +120,16 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
+
+	@Inject
+	private ECommandService commandService;
+
+	@Inject
+	private EHandlerService handlerService;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_LOAD_INDEX)
+	boolean autoLoadIndex;
 
 	private Table data;
 
@@ -171,6 +185,11 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
+
+		if (autoLoadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+			handlerService.executeHandler(cmd);
+		}
 	}
 
 	@Inject
