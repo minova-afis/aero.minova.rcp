@@ -220,10 +220,10 @@ public class Lookup extends Composite {
 		firstValue = popupValues.get(0);
 
 		table.removeAll();
-		for (int i = 0; i < popupValues.size(); i++) {
+		for (LookupValue popupValue : popupValues) {
 			final TableItem tableItem = new TableItem(table, SWT.NONE);
-			tableItem.setText(0, popupValues.get(i).keyText);
-			tableItem.setText(1, popupValues.get(i).description);
+			tableItem.setText(0, popupValue.keyText);
+			tableItem.setText(1, popupValue.description);
 			tableItem.setFont(text.getFont());
 		}
 		table.getColumn(0).pack();
@@ -253,7 +253,7 @@ public class Lookup extends Composite {
 		popup.setLocation(x, y);
 		popup.setVisible(true);
 
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (!System.getProperty("os.name").startsWith("Mac")) {
 			table.setFocus();
 		}
 	}
