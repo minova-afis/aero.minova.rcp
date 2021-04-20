@@ -293,7 +293,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+	public void resize(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
 		if (!mPart.equals(this.mpart)) {
 			return;
 		}
@@ -397,20 +397,6 @@ public class WFCIndexPart extends WFCFormPart {
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
-//		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
-//		selectionLayer
-//				.setSelectionModel(new RowSelectionModel<>(selectionLayer, bodyDataProvider, new IRowIdAccessor<>() {
-//					@Override
-//					public Serializable getRowId(Object rowObject) {
-//						if (rowObject instanceof Row) {
-//							return ((Row) rowObject).hashCode();
-//						} else if (rowObject instanceof GroupByObject) {
-//							return ((GroupByObject) rowObject).hashCode();
-//						}
-//						return rowObject.toString();
-//					}
-//				}));
-
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
 		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
@@ -418,9 +404,7 @@ public class WFCIndexPart extends WFCFormPart {
 		gridLayer.registerCommandHandler(copyHandler);
 
 		natTable = new NatTable(parent, compositeGridLayer, false);
-		// as the autoconfiguration of the NatTable is turned off, we have to
-		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
-		// manually
+		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
@@ -442,12 +426,9 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable.addConfiguration(new MinovaDisplayConfiguration(table.getColumns(), translationService, form));
 
-//		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
-//
-//		// add group by configuration
+		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
-		// adds the key bindings that allow space bar to be pressed to
-		// expand/collapse tree nodes
+		// adds the key bindings that allow space bar to be pressed to expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
 
 		// Menü für Ungrouping bauen (für Öffnen mit Doppelklick)
@@ -630,7 +611,6 @@ public class WFCIndexPart extends WFCFormPart {
 			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
 			selectionLayer.addLayerListener(new ILayerListener() {
-
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
 					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
@@ -825,5 +805,4 @@ public class WFCIndexPart extends WFCFormPart {
 	public FixedSummaryRowLayer getSummaryRowLayer() {
 		return summaryRowLayer;
 	}
-
 }
