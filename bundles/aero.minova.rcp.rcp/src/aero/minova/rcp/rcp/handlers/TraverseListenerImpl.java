@@ -313,7 +313,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			}
 		}
 
-		// Die Preference LookupEnterSelectsNextRequired ist gesetzt.
+		// Die Preference LookupEnterSelectsNextRequired ist gesetzt und das Lookup ist offen
 		if (lookupEnterSelectsNextRequired == false && popupOpen) {
 			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
 			focussedControl.setFocus();
@@ -324,6 +324,36 @@ public class TraverseListenerImpl implements TraverseListener {
 			if (pageList.indexOf(page) >= pageList.indexOf(focussedControl)) {
 				List<MField> tabList = page.getTabList();
 
+				if (context.get("PreviousField") instanceof MField && ((MField) context.get("PreviousField")).getmPage().equals(page)) {
+					// Wir prüfen, ob das ausgewählte Feld als vorheriges Feld gespeichert wurde oder ob ein vorheriges Feld gesetzt ist.
+					if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get("PreviousField")).getValueAccessor()).getControl())) {
+						MField field = (MField) context.get("PreviousField");
+						System.out.println(context.get("PreviousField").toString());
+						// Die Preference EnterSelectsFirstRequired ist nicht gesetzt und das Lookup ist nicht offen
+						if (enterSelectsFirstRequired == false && !popupOpen) {
+							if ((selectedField.getmPage() == page && tabList.indexOf(tabList.get(tabList.indexOf(field) + 1)) > tabList.indexOf(selectedField))
+									|| (pageList.indexOf(selectedField.getmPage()) < pageList.indexOf(page))) {
+								if (field.isRequired() == true) {
+									focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(field) + 1).getValueAccessor()).getControl();
+									focussedControl.setFocus();
+									context.set("PreviousField", tabList.get(tabList.indexOf(tabList.get(tabList.indexOf(field) + 1))));
+									System.out.println(context.get("PreviousField"));
+									return;
+								}
+							}
+						} else {
+							for (MField f : tabList) {
+								if (f.isRequired() && null == f.getValue()) {
+									focussedControl = ((AbstractValueAccessor) f.getValueAccessor()).getControl();
+									focussedControl.setFocus();
+									context.set("PreviousField", tabList.get(tabList.indexOf(f)));
+									return;
+								}
+							}
+						}
+					}
+				}
+
 				// Die Preference EnterSelectsFirstRequired ist gesetzt.
 				if (enterSelectsFirstRequired == false && !popupOpen) {
 					for (MField field : tabList) {
@@ -332,6 +362,7 @@ public class TraverseListenerImpl implements TraverseListener {
 							if (field.isRequired() == true) {
 								focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 								focussedControl.setFocus();
+								context.set("PreviousField", tabList.get(tabList.indexOf(field)));
 								return;
 							}
 						}
@@ -341,6 +372,7 @@ public class TraverseListenerImpl implements TraverseListener {
 						if (field.isRequired() && null == field.getValue()) {
 							focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 							focussedControl.setFocus();
+							context.set("PreviousField", tabList.get(tabList.indexOf(field)));
 							return;
 						}
 					}
