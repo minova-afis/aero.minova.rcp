@@ -110,6 +110,48 @@ public class TraverseListenerImpl implements TraverseListener {
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
+
+			if (context.get("PreviousField") instanceof MField && ((MField) context.get("PreviousField")).getmPage().equals(page)) {
+				if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get("PreviousField")).getValueAccessor()).getControl())) {
+					MField field = (MField) context.get("PreviousField");
+					System.out.println(context.get("PreviousField"));
+					if (tabList.indexOf(field) == 0) {
+						// Die Preference SelectAllControls ist gesetzt.
+						if (selectAllControls == true) {
+							// Wir sind in der ersten Section
+							if (pageList.indexOf(page) == 0) {
+								MToolBar toolbarElements = partService.getActivePart().getToolbar();
+								focussedControl = (Control) toolbarElements.getWidget();
+								context.set("PreviousField", (Control) toolbarElements.getWidget());
+								// Wir prüfen nach dem Twistie der Section
+							} else if (null != pageList.get(pageList.indexOf(page)).getSection()) {
+								focussedControl = pageList.get(pageList.indexOf(page)).getSection();
+								context.set("PreviousField", pageList.get(pageList.indexOf(page)).getSection());
+							} else {
+								List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
+								focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
+								context.set("PreviousField", previousTabList.get(previousTabList.size() - 1));
+							}
+							// Wir sind in der ersten Section
+						} else if (pageList.indexOf(page) == 0) {
+							List<MField> lastTabList = pageList.get(pageList.size() - 1).getTabList();
+							focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1).getValueAccessor()).getControl();
+							context.set("PreviousField", lastTabList.get(lastTabList.size() - 1));
+						} else {
+							List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
+							focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
+							context.set("PreviousField", previousTabList.get(previousTabList.size() - 1));
+						}
+					} else {
+						focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(field) - 1).getValueAccessor()).getControl();
+						context.set("PreviousField", tabList.get(tabList.indexOf(field) - 1));
+					}
+					focussedControl.setFocus();
+					System.out.println(context.get("PreviousField"));
+					return;
+				}
+			}
+
 			for (MField f : tabList) {
 				if (((AbstractValueAccessor) f.getValueAccessor()).getControl() == focussedControl) {
 					// Wir sind an der ersten Stelle der Section
@@ -120,23 +162,29 @@ public class TraverseListenerImpl implements TraverseListener {
 							if (pageList.indexOf(page) == 0) {
 								MToolBar toolbarElements = partService.getActivePart().getToolbar();
 								focussedControl = (Control) toolbarElements.getWidget();
+								context.set("PreviousField", (Control) toolbarElements.getWidget());
 								// Wir prüfen nach dem Twistie der Section
 							} else if (null != pageList.get(pageList.indexOf(page)).getSection()) {
 								focussedControl = pageList.get(pageList.indexOf(page)).getSection();
+								context.set("PreviousField", pageList.get(pageList.indexOf(page)).getSection());
 							} else {
 								List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
 								focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
+								context.set("PreviousField", previousTabList.get(previousTabList.size() - 1));
 							}
 							// Wir sind in der ersten Section
 						} else if (pageList.indexOf(page) == 0) {
 							List<MField> lastTabList = pageList.get(pageList.size() - 1).getTabList();
 							focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1).getValueAccessor()).getControl();
+							context.set("PreviousField", lastTabList.get(lastTabList.size() - 1));
 						} else {
 							List<MField> previousTabList = pageList.get(pageList.indexOf(page) - 1).getTabList();
 							focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
+							context.set("PreviousField", previousTabList.get(previousTabList.size() - 1));
 						}
 					} else {
 						focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(f) - 1).getValueAccessor()).getControl();
+						context.set("PreviousField", tabList.get(tabList.indexOf(f) - 1));
 					}
 					focussedControl.setFocus();
 					return;
