@@ -5,3 +5,7 @@
 == Workspace Preferences
 
 * link: doc/adoc/workspace.adoc[Workspace Preferences]
+
+== TraverseListener Verhalten
+
+* link: doc/adoc/traverselistener.adoc[TraverseListener Verhalten]

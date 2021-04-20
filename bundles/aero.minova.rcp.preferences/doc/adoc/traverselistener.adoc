@@ -1,0 +1,29 @@
+
+= TraverseListener Verhalten
+
+Dokumentation der Verhaltensweise des TraverseListeners. Der TraverseListener bestimmt das Tab- und Enter-Verhalten im Detail Bereich.
+
+==== Preferences die das Tab- und Enter-Verhalten beeinflussen
+
+EnterSelectsFirstRequired (ESFR) = Genau Beschreibung hier: xref:application.adoc#Nach dem Betätigen von ENTER wird das erste erforderliche Feld selektiert[EnterSelectsFirstRequired]
+
+LookupEnterSelectsNextRequired (LESNR) = Genau Beschreibung hier: xref:application.adoc#Das Betätigen von Enter in einer Auswahlbox bewirkt die Übernahme des ausgewählten Wertes. Nach der Übernahme wird das nächste erforderliche Feld selektiert[LookupEnterSelectsNextRequired]
+
+SelectAllControls (SAC) = Genau Beschreibung hier: xref:application.adoc#Aktiviert die Selektion aller möglichen Felder inkl. Registerkarte und Schaltflächen[SelectAllControls]
+
+==== Tab-Verhalten
+
+
+Für Tab haben wir folgendes Verhalten Festgelegt:
+
+|===
+| Eingabe | Verhalten
+| Tab | Benutzer springt ins nächste Feld.
+| Shift + Tab | Benutzer springt ins vorherige Feld.
+| Tab + SAC / Shift + Tab + SAC   = true | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page selektiert
+| Tab + SAC/ Shift + Tab + SAC  = false | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page nicht selektiert
+|===
+
+==== Enter-Verhalten
+
+
