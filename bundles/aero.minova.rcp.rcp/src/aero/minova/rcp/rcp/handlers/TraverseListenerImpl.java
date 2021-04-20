@@ -208,6 +208,7 @@ public class TraverseListenerImpl implements TraverseListener {
 				if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get("PreviousField")).getValueAccessor()).getControl())) {
 					// Wir holen uns das vorherige Feld aus dem Context.
 					MField field = (MField) context.get("PreviousField");
+					System.out.println(context.get("PreviousField"));
 					// Wir sind im letzten Feld der Page.
 					if (tabList.indexOf(field) == tabList.size() - 1) {
 						// Die Preference SelectAllControls is gesetzt.
@@ -240,6 +241,7 @@ public class TraverseListenerImpl implements TraverseListener {
 						context.set("PreviousField", tabList.get(tabList.indexOf(field) + 1));
 					}
 					focussedControl.setFocus();
+					System.out.println(context.get("PreviousField"));
 					return;
 				}
 			}
