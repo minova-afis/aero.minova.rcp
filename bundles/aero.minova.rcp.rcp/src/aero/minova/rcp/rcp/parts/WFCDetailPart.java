@@ -70,8 +70,8 @@ import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 public class WFCDetailPart extends WFCFormPart {
 
 	private static final int MARGIN_SECTION = 8;
-	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION; // 4 Spalten = 5
-																										// Zwischenräume
+	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5
+																											// Zwischenräume
 
 	@Inject
 	private IEventBroker broker;
