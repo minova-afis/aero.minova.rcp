@@ -23,8 +23,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.nebula.widgets.nattable.Messages;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -39,6 +41,7 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.command.UngroupByColumnIndexCommand;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -54,6 +57,7 @@ import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
@@ -76,12 +80,22 @@ import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
+import org.eclipse.nebula.widgets.nattable.ui.NatEventData;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.menu.IMenuItemProvider;
+import org.eclipse.nebula.widgets.nattable.ui.menu.MenuItemProviders;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuBuilder;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -435,6 +449,41 @@ public class WFCIndexPart extends WFCFormPart {
 		// adds the key bindings that allow space bar to be pressed to
 		// expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
+
+		// Menü für Ungrouping bauen (für Öffnen mit Doppelklick)
+		final Menu columnGroupHeaderMenu = new PopupMenuBuilder(natTable)
+				.withMenuItemProvider(GroupByHeaderMenuConfiguration.UNGROUP_BY_MENU_ITEM_ID, new IMenuItemProvider() {
+					@Override
+					public void addMenuItem(final NatTable natTable, Menu popupMenu) {
+						MenuItem menuItem = new MenuItem(popupMenu, SWT.PUSH);
+						menuItem.setText(Messages.getLocalizedMessage("%GroupByHeaderMenuConfiguration.ungroupBy")); //$NON-NLS-1$
+						menuItem.setEnabled(true);
+						menuItem.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent event) {
+								NatEventData natEventData = MenuItemProviders.getNatEventData(event);
+								MouseEvent originalEvent = natEventData.getOriginalEvent();
+								int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(originalEvent.x, originalEvent.y);
+								natTable.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
+							}
+						});
+					}
+				}).build();
+		// Menü öffnen, wenn Doppelklick auf ein gruppiertes Element erfolgt
+		natTable.addConfiguration(new AbstractUiBindingConfiguration() {
+			@Override
+			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
+				uiBindingRegistry.registerDoubleClickBinding(new MouseEventMatcher(SWT.NONE, GroupByHeaderLayer.GROUP_BY_REGION) {
+					@Override
+					public boolean matches(NatTable natTable, MouseEvent event, LabelStack regionLabels) {
+						if (super.matches(natTable, event, regionLabels)) {
+							return groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y) >= 0;
+						}
+						return false;
+					}
+				}, new PopupMenuAction(columnGroupHeaderMenu));
+			}
+		});
 
 		configureSummary(form);
 
