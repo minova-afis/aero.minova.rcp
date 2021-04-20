@@ -25,6 +25,7 @@ import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -39,6 +40,7 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.command.UngroupByColumnIndexCommand;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -54,6 +56,7 @@ import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
@@ -76,10 +79,12 @@ import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
+import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -279,7 +284,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+	public void resize(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
 		if (!mPart.equals(this.mpart)) {
 			return;
 		}
@@ -383,20 +388,6 @@ public class WFCIndexPart extends WFCFormPart {
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
-//		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
-//		selectionLayer
-//				.setSelectionModel(new RowSelectionModel<>(selectionLayer, bodyDataProvider, new IRowIdAccessor<>() {
-//					@Override
-//					public Serializable getRowId(Object rowObject) {
-//						if (rowObject instanceof Row) {
-//							return ((Row) rowObject).hashCode();
-//						} else if (rowObject instanceof GroupByObject) {
-//							return ((GroupByObject) rowObject).hashCode();
-//						}
-//						return rowObject.toString();
-//					}
-//				}));
-
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
 		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
@@ -404,9 +395,7 @@ public class WFCIndexPart extends WFCFormPart {
 		gridLayer.registerCommandHandler(copyHandler);
 
 		natTable = new NatTable(parent, compositeGridLayer, false);
-		// as the autoconfiguration of the NatTable is turned off, we have to
-		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
-		// manually
+		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
@@ -428,13 +417,32 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable.addConfiguration(new MinovaDisplayConfiguration(table.getColumns(), translationService, form));
 
-//		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
-//
-//		// add group by configuration
+		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
-		// adds the key bindings that allow space bar to be pressed to
-		// expand/collapse tree nodes
+		// adds the key bindings that allow space bar to be pressed to expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
+
+		// Bei Doppelklick auf ein gruppiertes Element diese Gruppierung entfernen
+		natTable.addConfiguration(new AbstractUiBindingConfiguration() {
+			@Override
+			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
+				uiBindingRegistry.registerDoubleClickBinding(new MouseEventMatcher(SWT.NONE, GroupByHeaderLayer.GROUP_BY_REGION) {
+					@Override
+					public boolean matches(NatTable natTable, MouseEvent event, LabelStack regionLabels) {
+						if (super.matches(natTable, event, regionLabels)) {
+							return groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y) >= 0;
+						}
+						return false;
+					}
+				}, new IMouseAction() {
+					@Override
+					public void run(NatTable natTable, MouseEvent event) {
+						int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y);
+						natTable.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
+					}
+				});
+			}
+		});
 
 		configureSummary(form);
 
@@ -581,7 +589,6 @@ public class WFCIndexPart extends WFCFormPart {
 			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
 			selectionLayer.addLayerListener(new ILayerListener() {
-
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
 					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
@@ -776,5 +783,4 @@ public class WFCIndexPart extends WFCFormPart {
 	public FixedSummaryRowLayer getSummaryRowLayer() {
 		return summaryRowLayer;
 	}
-
 }
