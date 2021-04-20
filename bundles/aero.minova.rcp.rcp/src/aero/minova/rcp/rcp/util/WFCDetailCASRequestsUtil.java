@@ -11,6 +11,9 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -44,6 +47,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
@@ -62,6 +66,12 @@ public class WFCDetailCASRequestsUtil {
 	private TranslationService translationService;
 
 	@Inject
+	private ECommandService commandService;
+
+	@Inject
+	private EHandlerService handlerService;
+
+	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	private Shell shell;
 
@@ -72,6 +82,10 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = "aero.minova.rcp.preferencewindow", value = "timezone")
 	String timezone;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_RELOAD_INDEX)
+	boolean autoReloadIndex;
 
 	private MDetail detail;
 
@@ -296,6 +310,11 @@ public class WFCDetailCASRequestsUtil {
 		} else {
 			openNotificationPopup(getTranslation("msg.DataSaved"));
 			handleUserAction(Constants.INSERT_REQUEST);
+
+			if (autoReloadIndex) {
+				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+				handlerService.executeHandler(cmd);
+			}
 		}
 	}
 

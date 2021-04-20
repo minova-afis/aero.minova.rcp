@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -12,7 +13,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -25,6 +29,7 @@ import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -39,6 +44,7 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByModel;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.command.UngroupByColumnIndexCommand;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -54,13 +60,16 @@ import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
@@ -76,10 +85,12 @@ import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
+import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -93,6 +104,7 @@ import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import ca.odell.glazedlists.EventList;
@@ -108,6 +120,16 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
+
+	@Inject
+	private ECommandService commandService;
+
+	@Inject
+	private EHandlerService handlerService;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_LOAD_INDEX)
+	boolean autoLoadIndex;
 
 	private Table data;
 
@@ -132,6 +154,8 @@ public class WFCIndexPart extends WFCFormPart {
 	private GroupByHeaderLayer groupByHeaderLayer;
 
 	private boolean expandGroups = false;
+
+	private FixedSummaryRowLayer summaryRowLayer;
 
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
@@ -161,6 +185,11 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
+
+		if (autoLoadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+			handlerService.executeHandler(cmd);
+		}
 	}
 
 	@Inject
@@ -195,7 +224,7 @@ public class WFCIndexPart extends WFCFormPart {
 		} else {
 			group += 0 + ";";
 		}
-		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes()) {
+		for (int i : getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes()) {
 			group += i + ";";
 		}
 		prefs.put(tableName + "." + name + ".index.groupby", group);
@@ -257,10 +286,10 @@ public class WFCIndexPart extends WFCFormPart {
 		string = prefs.get(tableName + "." + name + ".index.groupby", null);
 		if (string != null && !string.equals("")) {
 			String[] fields = string.split(";");
-			groupByHeaderLayer.getGroupByModel().clearGroupByColumnIndexes();
+			getGroupByHeaderLayer().getGroupByModel().clearGroupByColumnIndexes();
 			for (String s : Arrays.copyOfRange(fields, 1, fields.length)) {
 				int index = Integer.parseInt(s);
-				groupByHeaderLayer.getGroupByModel().addGroupByColumnIndex(index);
+				getGroupByHeaderLayer().getGroupByModel().addGroupByColumnIndex(index);
 			}
 			if (fields[0].equals("0")) {
 				collapseGroups("");
@@ -277,7 +306,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
+	public void resize(@UIEventTopic(Constants.BROKER_RESIZETABLE) MPart mPart) {
 		if (!mPart.equals(this.mpart)) {
 			return;
 		}
@@ -345,16 +374,22 @@ public class WFCIndexPart extends WFCFormPart {
 
 		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Zeilen, die keinen von- oder bis-Wert haben)
+		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
+		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
+		for (int i = 0; i < columnHeaderDataLayer.getColumnCount(); i++) {
+			labelAccumulator.registerColumnOverrides(i, Constants.COMPARATOR_LABEL);
+		}
+		configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new CustomComparator(), DisplayMode.NORMAL, Constants.COMPARATOR_LABEL);
 
 		// connect sortModel to GroupByDataLayer to support sorting by group by summary values
 		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
 
 		// build the Summary Row
-		FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(),
-				configRegistry, false);
-		summaryRowLayer.setHorizontalCompositeDependency(false);
+		summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(), configRegistry, false);
+		getSummaryRowLayer().setHorizontalCompositeDependency(false);
 		CompositeLayer summaryComposite = new CompositeLayer(1, 2);
-		summaryComposite.setChildLayer("SUMMARY", summaryRowLayer, 0, 0);
+		summaryComposite.setChildLayer("SUMMARY", getSummaryRowLayer(), 0, 0);
 		summaryComposite.setChildLayer(GridRegion.BODY, bodyLayerStack.getViewportLayer(), 0, 1);
 
 		// build the row header layer
@@ -378,24 +413,10 @@ public class WFCIndexPart extends WFCFormPart {
 		// set the group by header on top of the grid
 		CompositeLayer compositeGridLayer = new CompositeLayer(1, 2);
 		groupByHeaderLayer = new GroupByHeaderLayer(bodyLayerStack.getGroupByModel(), gridLayer, columnHeaderDataProvider, columnHeaderLayer);
-		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, groupByHeaderLayer, 0, 0);
+		compositeGridLayer.setChildLayer(GroupByHeaderLayer.GROUP_BY_REGION, getGroupByHeaderLayer(), 0, 0);
 		compositeGridLayer.setChildLayer("Grid", gridLayer, 0, 1);
 
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
-//		IRowDataProvider<Object> bodyDataProvider = (IRowDataProvider<Object>) bodyLayerStack.getBodyDataProvider();
-//		selectionLayer
-//				.setSelectionModel(new RowSelectionModel<>(selectionLayer, bodyDataProvider, new IRowIdAccessor<>() {
-//					@Override
-//					public Serializable getRowId(Object rowObject) {
-//						if (rowObject instanceof Row) {
-//							return ((Row) rowObject).hashCode();
-//						} else if (rowObject instanceof GroupByObject) {
-//							return ((GroupByObject) rowObject).hashCode();
-//						}
-//						return rowObject.toString();
-//					}
-//				}));
-
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
 		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
@@ -403,9 +424,7 @@ public class WFCIndexPart extends WFCFormPart {
 		gridLayer.registerCommandHandler(copyHandler);
 
 		natTable = new NatTable(parent, compositeGridLayer, false);
-		// as the autoconfiguration of the NatTable is turned off, we have to
-		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
-		// manually
+		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
@@ -427,13 +446,32 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable.addConfiguration(new MinovaDisplayConfiguration(table.getColumns(), translationService, form));
 
-//		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
-//
-//		// add group by configuration
-		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, groupByHeaderLayer));
-		// adds the key bindings that allow space bar to be pressed to
-		// expand/collapse tree nodes
+		// add group by configuration
+		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
+		// adds the key bindings that allow space bar to be pressed to expand/collapse tree nodes
 		natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
+
+		// Bei Doppelklick auf ein gruppiertes Element diese Gruppierung entfernen
+		natTable.addConfiguration(new AbstractUiBindingConfiguration() {
+			@Override
+			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
+				uiBindingRegistry.registerDoubleClickBinding(new MouseEventMatcher(SWT.NONE, GroupByHeaderLayer.GROUP_BY_REGION) {
+					@Override
+					public boolean matches(NatTable natTable, MouseEvent event, LabelStack regionLabels) {
+						if (super.matches(natTable, event, regionLabels)) {
+							return groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y) >= 0;
+						}
+						return false;
+					}
+				}, new IMouseAction() {
+					@Override
+					public void run(NatTable natTable, MouseEvent event) {
+						int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y);
+						natTable.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
+					}
+				});
+			}
+		});
 
 		configureSummary(form);
 
@@ -580,7 +618,6 @@ public class WFCIndexPart extends WFCFormPart {
 			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
 			selectionLayer.addLayerListener(new ILayerListener() {
-
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
 					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
@@ -649,17 +686,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		@Override
 		public Object summarize(int columnIndex) {
-			int rowCount = this.dataProvider.getRowCount();
-			int valueRows = 0;
-
-			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
-				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number) {
-					valueRows++;
-				}
-			}
-			return valueRows;
+			return this.dataProvider.getRowCount();
 		}
 	}
 
@@ -750,9 +777,30 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
+	private class CustomComparator implements Comparator<Object> {
+		@Override
+		public int compare(Object o1, Object o2) {
+			if (o1 == null) {
+				if (o2 == null) {
+					return 0;
+				} else {
+					return -1;
+				}
+			} else if (o2 == null) {
+				return 1;
+			} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
+																														// gleiche Klasse haben
+				return ((Comparable) o1).compareTo(o2);
+			} else {
+				return o1.toString().compareTo(o2.toString());
+			}
+		}
+	}
+
 	public void updateData(List<Row> list) {
 		bodyLayerStack.getSortedList().clear();
 		bodyLayerStack.getSortedList().addAll(list);
+		natTable.refresh(); // Damit Summary-Row richtig aktualisiert wird
 	}
 
 	public SortedList<Row> getSortedList() {
@@ -767,4 +815,11 @@ public class WFCIndexPart extends WFCFormPart {
 		return data;
 	}
 
+	public GroupByHeaderLayer getGroupByHeaderLayer() {
+		return groupByHeaderLayer;
+	}
+
+	public FixedSummaryRowLayer getSummaryRowLayer() {
+		return summaryRowLayer;
+	}
 }

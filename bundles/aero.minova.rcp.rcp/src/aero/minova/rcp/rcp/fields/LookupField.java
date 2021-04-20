@@ -49,7 +49,6 @@ public class LookupField {
 		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT, lookUpContentProvider);
 		// TODO übersetzen
 		lookupControl.setMessage("...");
-		lookupControl.setNumberOfLines(50);
 		lookupControl.setLabel(label);
 
 		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);

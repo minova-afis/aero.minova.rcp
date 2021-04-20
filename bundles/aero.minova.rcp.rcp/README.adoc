@@ -71,7 +71,7 @@ Hierbei muss die lokale Zeitzone, die in den Einstellungen konfiguriert werden k
 
 Bei Feldern, die nur die Zeit enthalten, wird als Datum immer der 01.01.1900 verwendet.
 Die Uhrzeit ist immer im UTC-Format zu setzen.
-Somit wird keine Zeitzone berücksichtigt,
+Somit wird keine Zeitzone berücksichtigt.
 
 ==== Shortcuts
 
@@ -79,7 +79,7 @@ Wir haben für die Zeit bestimmte Shortcuts definiert.
 
 |===
 | Eingabe | Wert
-| `0` | jetzt 
+| `0` | jetzt -> 12:34 Uhr bei Eingabe um 12:34 Uhr lokale Zeit
 | `00` | 00:00 Uhr 
 | `1` | die Stunde am Tag und 0 Minuten -> 0**1**:00 Uhr
 | `12` | dies liefert die Stunde am Tag. 

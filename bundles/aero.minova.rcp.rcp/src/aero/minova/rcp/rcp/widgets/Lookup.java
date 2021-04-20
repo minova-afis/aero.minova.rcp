@@ -48,7 +48,6 @@ public class Lookup extends Composite {
 	private final Shell popup;
 	private final Table table;
 	private LookupContentProvider contentProvider;
-	private int numberOfLines;
 	private boolean useSingleClick = false;
 	private LookupValue firstValue;
 	/**
@@ -105,11 +104,10 @@ public class Lookup extends Composite {
 		this.contentProvider.setLookup(this);
 
 		setLayout(new FillLayout());
-		numberOfLines = 10;
 		text = new Text(this, style);
 		popup = new Shell(getDisplay(), SWT.ON_TOP);
 		popup.setLayout(new FillLayout());
-		table = new Table(popup, SWT.SINGLE);
+		table = new Table(popup, SWT.SINGLE | SWT.V_SCROLL);
 		table.setLinesVisible(true);
 		new TableColumn(table, SWT.NONE); // KeyText
 		new TableColumn(table, SWT.NONE); // Description
@@ -212,6 +210,7 @@ public class Lookup extends Composite {
 	}
 
 	public void showAllElements(String value) {
+		table.setFont(text.getFont());
 		popupValues = contentProvider.getContent(value);
 		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
@@ -219,16 +218,13 @@ public class Lookup extends Composite {
 			return;
 		}
 		firstValue = popupValues.get(0);
-		if (popupValues.size() > numberOfLines) {
-			popupValues = popupValues.subList(0, numberOfLines);
-		}
 
 		table.removeAll();
-		final int numberOfRows = Math.min(popupValues.size(), numberOfLines);
-		for (int i = 0; i < numberOfRows; i++) {
+		for (int i = 0; i < popupValues.size(); i++) {
 			final TableItem tableItem = new TableItem(table, SWT.NONE);
 			tableItem.setText(0, popupValues.get(i).keyText);
 			tableItem.setText(1, popupValues.get(i).description);
+			tableItem.setFont(text.getFont());
 		}
 		table.getColumn(0).pack();
 		table.getColumn(0).setWidth(table.getColumn(0).getWidth() + 5);
@@ -241,9 +237,11 @@ public class Lookup extends Composite {
 
 		final Rectangle displayRect = getMonitor().getClientArea();
 		final Rectangle parentRect = getDisplay().map(getParent(), null, getBounds());
-		popup.pack();
-		final int width = popup.getBounds().width;
-		final int height = popup.getBounds().height;
+
+		final int nrLines = Math.min(15, popupValues.size());
+		final int width = table.getColumn(0).getWidth() + table.getColumn(1).getWidth() + 50;
+		final int height = table.getItemHeight() * nrLines + 15;
+		popup.setBounds(x, y, width, height);
 
 		if (y + height > displayRect.y + displayRect.height) {
 			y = parentRect.y - height;
@@ -348,23 +346,6 @@ public class Lookup extends Composite {
 	public void setContentProvider(final LookupContentProvider contentProvider) {
 		checkWidget();
 		this.contentProvider = contentProvider;
-	}
-
-	/**
-	 * @return the numberOfLines
-	 */
-	public int getNumberOfLines() {
-		checkWidget();
-		return numberOfLines;
-	}
-
-	/**
-	 * @param numberOfLines
-	 *            the numberOfLines to set
-	 */
-	public void setNumberOfLines(final int numberOfLines) {
-		checkWidget();
-		this.numberOfLines = numberOfLines;
 	}
 
 	/**
@@ -912,6 +893,10 @@ public class Lookup extends Composite {
 				requestAllLookupEntries();
 			}
 		});
+	}
+
+	public Label getLabel() {
+		return this.label;
 	}
 
 	protected void requestAllLookupEntries() {
