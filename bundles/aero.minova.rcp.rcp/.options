@@ -8,3 +8,6 @@ aero.minova.rcp.rcp/debug/lookupvalueaccessor=false
 
 # Turn on tracing of lookupcontentprovider
 aero.minova.rcp.rcp/debug/lookupcontentprovider=false
+
+# Turn on tracing of traverselistenerimpl
+aero.minova.rcp.rcp/debug/traverselistenerimpl=false
