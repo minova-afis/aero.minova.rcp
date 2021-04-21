@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.handlers;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
@@ -106,6 +107,15 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	}
 
+	/**
+	 * Ermittelt das in der Tab Reihenfolge vorherige Feld und selektiert dieses.
+	 * <p>
+	 * Wenn SelectAllControls gesetzt ist, wird beim Wechsel der Page die Registerkarte der Page selektiert. Falls sich der Benutzer im ersten Feld vom HEAD
+	 * befindet und SelectAllControls gesetzt ist, wird die Toolbar des Details selektiert.
+	 * 
+	 * @param focussedControl
+	 *            das aktuell selektierte Feld
+	 */
 	private void getPreviousField(Control focussedControl) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean selectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
@@ -215,6 +225,15 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	}
 
+	/**
+	 * Ermittelt das in der Tab Reihenfolge nachfolgende Feld und selektiert dieses.
+	 * <p>
+	 * Wenn SelectAllControls gesetzt ist, wird beim Wechsel der Page die Registerkarte der Page selektiert. Falls sich der Benutzer im letzten Feld von der
+	 * letzten Page befindet und SelectAllControls gesetzt ist, wird die Toolbar des Details selektiert.
+	 * 
+	 * @param focussedControl
+	 *            das aktuell selektierte Feld
+	 */
 	private void getNextField(Control focussedControl) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean selectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
@@ -321,6 +340,17 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	}
 
+	/**
+	 * Ermittelt das in der Tab Reihenfolge nachfolgende Pflichtfeld und selektiert dieses.
+	 * <p>
+	 * Wenn LookupEnterSelectsNextRequired gesetzt ist und das Lookup offen ist, wird der ausgewählte Wert festgesetzt und das nächste Pflichtfeld wird
+	 * selektiert. Wenn LookupEnterSelectsNextRequired nicht gesetzt ist, wird der Wert fesetgesetzt und der Benutzer bleibt im Feld.
+	 * <p>
+	 * Wenn EnterSelectsFirstRequired gesetzt ist, wird das erste nicht ausgefüllte Pflichtfeld ermittelt und selektiert.
+	 * 
+	 * @param focussedControl
+	 *            das aktuell selektierte Feld
+	 */
 	private void getNextRequired(Control focussedControl) {
 
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -332,13 +362,14 @@ public class TraverseListenerImpl implements TraverseListener {
 		boolean popupOpen = false;
 		if (focussedControl instanceof Lookup) {
 			Lookup lookup = (Lookup) focussedControl;
+			// Wir holen uns den Status des Popup des Lookup
 			popupOpen = lookup.popupIsOpen();
 		}
 		if (focussedControl instanceof TextAssist) {
 			popupOpen = false;
 		}
 
-		// Wir holen uns das selektierte Feld.
+		// Wir holen uns das MField des selektierten Felds.
 		MField selectedField = null;
 		List<MPage> pageList = detail.getPageList();
 		for (MPage page : pageList) {
@@ -350,7 +381,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			}
 		}
 
-		// Die Preference LookupEnterSelectsNextRequired ist gesetzt und das Lookup ist offen
+		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (lookupEnterSelectsNextRequired == false && popupOpen) {
 			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
 			focussedControl.setFocus();
@@ -372,7 +403,7 @@ public class TraverseListenerImpl implements TraverseListener {
 					System.out.println(context.get(INIT_FIELD));
 				}
 
-				// Die Preference EnterSelectsFirstRequired ist gesetzt.
+				// Wir prüfen ob die Preference EnterSelectsFirstRequired nicht gesetzt ist und das Lookup geschlossen ist.
 				if (enterSelectsFirstRequired == false && !popupOpen) {
 					if ((selectedField.getmPage() == initPage && tabList.indexOf(tabList.get(tabList.indexOf(field) + 1)) > tabList.indexOf(selectedField))
 							|| (pageList.indexOf(selectedField.getmPage()) < pageList.indexOf(initPage))) {
@@ -426,7 +457,6 @@ public class TraverseListenerImpl implements TraverseListener {
 				}
 			}
 		}
-
 	}
 
 }
