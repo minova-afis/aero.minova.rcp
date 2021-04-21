@@ -129,16 +129,16 @@ public class TraverseListenerImpl implements TraverseListener {
 				// Wir holen uns die Page des initial Feldes
 				MPage initPage = pageList.get(pageList.indexOf(((MField) context.get(INIT_FIELD)).getmPage()));
 				// Wir holen uns die Tab Liste der Initial Page
-				List<MField> tabList = initPage.getTabList();
+				List<MField> initTabList = initPage.getTabList();
 				// Wir holen uns das initial Feld aus dem Context.
-				MField field = (MField) context.get(INIT_FIELD);
+				MField initiField = (MField) context.get(INIT_FIELD);
 
 				// Wir geben uns das initial Feld aus.
 				if (LOG) {
 					System.out.println(context.get(INIT_FIELD));
 				}
 
-				if (tabList.indexOf(field) == 0) {
+				if (initTabList.indexOf(initiField) == 0) {
 					// Die Preference SelectAllControls ist gesetzt.
 					if (selectAllControls == true) {
 						// Wir sind in der ersten Section
@@ -166,8 +166,8 @@ public class TraverseListenerImpl implements TraverseListener {
 						context.set(INIT_FIELD, previousTabList.get(previousTabList.size() - 1));
 					}
 				} else {
-					focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(field) - 1).getValueAccessor()).getControl();
-					context.set(INIT_FIELD, tabList.get(tabList.indexOf(field) - 1));
+					focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) - 1).getValueAccessor()).getControl();
+					context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initiField) - 1));
 				}
 				focussedControl.setFocus();
 
@@ -247,9 +247,9 @@ public class TraverseListenerImpl implements TraverseListener {
 				// Wir holen uns die Page des initial Feldes
 				MPage initPage = pageList.get(pageList.indexOf(((MField) context.get(INIT_FIELD)).getmPage()));
 				// Wir holen uns die Tab Liste der Initial Page
-				List<MField> tabList = initPage.getTabList();
+				List<MField> initTabList = initPage.getTabList();
 				// Wir holen uns das initial Feld aus dem Context.
-				MField field = (MField) context.get(INIT_FIELD);
+				MField initiField = (MField) context.get(INIT_FIELD);
 
 				// Wir geben uns das initial Feld aus.
 				if (LOG) {
@@ -257,7 +257,7 @@ public class TraverseListenerImpl implements TraverseListener {
 				}
 
 				// Wir sind im letzten Feld der Page.
-				if (tabList.indexOf(field) == tabList.size() - 1) {
+				if (initTabList.indexOf(initiField) == initTabList.size() - 1) {
 					// Die Preference SelectAllControls is gesetzt.
 					if (selectAllControls == true) {
 						// Wir sind in der Letzten Section
@@ -284,8 +284,8 @@ public class TraverseListenerImpl implements TraverseListener {
 						context.set(INIT_FIELD, pageList.get(pageList.indexOf(initPage) + 1).getTabList().get(0));
 					}
 				} else {
-					focussedControl = ((AbstractValueAccessor) tabList.get(tabList.indexOf(field) + 1).getValueAccessor()).getControl();
-					context.set(INIT_FIELD, tabList.get(tabList.indexOf(field) + 1));
+					focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + 1).getValueAccessor()).getControl();
+					context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initiField) + 1));
 				}
 				focussedControl.setFocus();
 
@@ -394,9 +394,9 @@ public class TraverseListenerImpl implements TraverseListener {
 				// Wir holen uns die Page des initial Feldes
 				MPage initPage = pageList.get(pageList.indexOf(((MField) context.get(INIT_FIELD)).getmPage()));
 				// Wir holen uns die Tab Liste der Initial Page
-				List<MField> tabList = initPage.getTabList();
+				List<MField> initTabList = initPage.getTabList();
 				// Wir holen uns das initial Feld aus dem Context.
-				MField field = (MField) context.get(INIT_FIELD);
+				MField initiField = (MField) context.get(INIT_FIELD);
 
 				// Wir geben uns das initial Feld aus.
 				if (LOG) {
