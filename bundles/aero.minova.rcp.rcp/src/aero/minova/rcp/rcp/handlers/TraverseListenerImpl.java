@@ -388,74 +388,89 @@ public class TraverseListenerImpl implements TraverseListener {
 			return;
 		}
 
-		if (context.get(INIT_FIELD) instanceof MField) {
-			// Wir prüfen, ob das ausgewählte Feld als initial Feld gespeichert wurde oder ob ein initial Feld gesetzt ist.
-			if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get(INIT_FIELD)).getValueAccessor()).getControl())) {
-				// Wir holen uns die Page des initial Feldes
-				MPage initPage = pageList.get(pageList.indexOf(((MField) context.get(INIT_FIELD)).getmPage()));
-				// Wir holen uns die Tab Liste der Initial Page
-				List<MField> initTabList = initPage.getTabList();
-				// Wir holen uns das initial Feld aus dem Context.
-				MField initiField = (MField) context.get(INIT_FIELD);
-
-				// Wir geben uns das initial Feld aus.
-				if (LOG) {
-					System.out.println(context.get(INIT_FIELD));
-				}
-
-				// Wir prüfen ob die Preference EnterSelectsFirstRequired nicht gesetzt ist und das Lookup geschlossen ist.
-				if (enterSelectsFirstRequired == false && !popupOpen) {
-					if (initTabList.indexOf(initiField) != (initTabList.size() - 1)) {
-						int indexInt = initTabList.indexOf(initiField);
-						for (int i = 1; indexInt < initTabList.size(); indexInt++) {
-							if (initTabList.get(indexInt + i).isRequired() == true) {
-								focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + i).getValueAccessor())
-										.getControl();
-								focussedControl.setFocus();
-								context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initTabList.get(initTabList.indexOf(initiField) + 1))));
-								break;
-							}
-						}
-					} else {
-						if (pageList.indexOf(initPage) != (pageList.size() - 1)) {
-							focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(initPage) + 1).getTabList().get(0).getValueAccessor())
-									.getControl();
-							context.set(INIT_FIELD, pageList.get(pageList.indexOf(initPage) + 1).getTabList().get(0));
-						} else {
-							focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0).getValueAccessor()).getControl();
-							context.set(INIT_FIELD, pageList.get(0).getTabList().get(0));
-						}
-
-					}
-					focussedControl.setFocus();
-
-					// Wir geben uns das neue initial Feld aus.
-					if (LOG) {
-						System.out.println(context.get(INIT_FIELD));
-					}
-					return;
-
-				} else {
-					for (MPage page : pageList) {
-						List<MField> tabList = page.getTabList();
-						for (MField f : tabList) {
-							if (f.isRequired() && null == f.getValue()) {
-								focussedControl = ((AbstractValueAccessor) f.getValueAccessor()).getControl();
-								context.set(INIT_FIELD, tabList.get(tabList.indexOf(f)));
-								focussedControl.setFocus();
-
-								// Wir geben uns das neue initial Feld aus.
-								if (LOG) {
-									System.out.println(context.get(INIT_FIELD));
-								}
-								return;
-							}
-						}
-
-					}
-				}
-			}
-		}
+//		if (context.get(INIT_FIELD) instanceof MField) {
+//			// Wir prüfen, ob das ausgewählte Feld als initial Feld gespeichert wurde oder ob ein initial Feld gesetzt ist.
+//			if (focussedControl.equals(((AbstractValueAccessor) ((MField) context.get(INIT_FIELD)).getValueAccessor()).getControl())) {
+//				// Wir holen uns die Page des initial Feldes
+//				MPage initPage = pageList.get(pageList.indexOf(((MField) context.get(INIT_FIELD)).getmPage()));
+//				// Wir holen uns die Tab Liste der Initial Page
+//				List<MField> initTabList = initPage.getTabList();
+//				// Wir holen uns das initial Feld aus dem Context.
+//				MField initiField = (MField) context.get(INIT_FIELD);
+//
+//				// Wir geben uns das initial Feld aus.
+//				if (LOG) {
+//					System.out.println(context.get(INIT_FIELD));
+//				}
+//
+//				// Wir prüfen ob die Preference EnterSelectsFirstRequired nicht gesetzt ist und das Lookup geschlossen ist.
+//				if (enterSelectsFirstRequired == false && !popupOpen) {
+//					if (initTabList.indexOf(initiField) != (initTabList.size() - 1)) {
+//						int indexInt = initTabList.indexOf(initiField);
+//						for (int i = 1; indexInt < initTabList.size(); indexInt++) {
+//							if (initTabList.get(indexInt + i).isRequired() == true) {
+//								focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + i).getValueAccessor())
+//										.getControl();
+//								focussedControl.setFocus();
+//								context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initTabList.get(initTabList.indexOf(initiField) + 1))));
+//								break;
+//							}
+//						}
+//					} else {
+//						if (pageList.indexOf(initPage) != (pageList.size() - 1)) {
+//							int indexInt = 0;
+//							for (int i = 1; indexInt < pageList.get(pageList.indexOf(initPage) + 1).getTabList().size(); indexInt++) {
+//								if (initTabList.get(indexInt + i).isRequired() == true) {
+//									focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + i).getValueAccessor())
+//											.getControl();
+//									focussedControl.setFocus();
+//									context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initTabList.get(initTabList.indexOf(initiField) + 1))));
+//									break;
+//								}
+//							}
+//						} else {
+//							int indexInt = 0;
+//							for (int i = 1; indexInt < pageList.get(0).getTabList().size(); indexInt++) {
+//								if (initTabList.get(indexInt + i).isRequired() == true) {
+//									focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + i).getValueAccessor())
+//											.getControl();
+//									focussedControl.setFocus();
+//									context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initTabList.get(initTabList.indexOf(initiField) + 1))));
+//									break;
+//								}
+//							}
+//						}
+//
+//					}
+//					focussedControl.setFocus();
+//
+//					// Wir geben uns das neue initial Feld aus.
+//					if (LOG) {
+//						System.out.println(context.get(INIT_FIELD));
+//					}
+//					return;
+//
+//				} else {
+//					for (MPage page : pageList) {
+//						List<MField> tabList = page.getTabList();
+//						for (MField f : tabList) {
+//							if (f.isRequired() && null == f.getValue()) {
+//								focussedControl = ((AbstractValueAccessor) f.getValueAccessor()).getControl();
+//								context.set(INIT_FIELD, tabList.get(tabList.indexOf(f)));
+//								focussedControl.setFocus();
+//
+//								// Wir geben uns das neue initial Feld aus.
+//								if (LOG) {
+//									System.out.println(context.get(INIT_FIELD));
+//								}
+//								return;
+//							}
+//						}
+//
+//					}
+//				}
+//			}
+//		}
 
 		for (MPage page : pageList) {
 			List<MField> tabList = page.getTabList();
