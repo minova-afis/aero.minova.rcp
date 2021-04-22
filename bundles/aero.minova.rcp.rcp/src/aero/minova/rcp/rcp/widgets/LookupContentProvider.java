@@ -87,10 +87,6 @@ public class LookupContentProvider {
 		lookup.valuesUpdated();
 	}
 
-	public boolean isEmpty() {
-		return values.isEmpty();
-	}
-
 	public int getValuesSize() {
 		return values.size();
 	}
