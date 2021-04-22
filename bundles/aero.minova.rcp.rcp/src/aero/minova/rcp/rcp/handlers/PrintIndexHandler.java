@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -35,7 +36,9 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
+import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -43,6 +46,7 @@ import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
@@ -66,6 +70,28 @@ public class PrintIndexHandler {
 
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.CREATE_XML_XS)
+	public boolean createXmlXsl;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_FONT)
+	public String indexFont;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.OPTIMIZED_WIDTHS)
+	public boolean optimizeWidths;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.HIDE_EMPTY_COLS)
+	public boolean hideEmptyCols;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.HIDE_GROUP_COLS)
+	public boolean hideGroupCols;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.HIDE_SEARCH_CRITERIAS)
+	public boolean hideSearchCriterias;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DISABLE_PREVIEW)
+	public boolean disablePreview;
 
 	@Execute
 	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window, EModelService modelService,
@@ -93,19 +119,48 @@ public class PrintIndexHandler {
 			// Gruppierung
 			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
+			List<Integer> groupByIndicesReordered = new ArrayList<Integer>();
 
+			// Optimalen Spaltenbreiten ermitteln
+			int[] widths = new int[columnReorderLayer.getColumnCount()];
+			if (optimizeWidths) {
+				for (int i = 0; i < widths.length; i++) {
+					widths[i] = i;
+				}
+				ILayer layer = indexPart.getBodyLayerStack().getGlazedListsEventLayer();
+				int[] widthsBody = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
+						new GCFactory(indexPart.getNattable()), layer, widths);
+				layer = indexPart.getColumnHeaderLayer();
+				int[] widthsHeader = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
+						new GCFactory(indexPart.getNattable()), layer, widths);
+
+				for (int i = 0; i < widths.length; i++) {
+					widths[i] = Math.max(widthsBody[i], widthsHeader[i]);
+				}
+			}
+
+			// ColumnInfo erstellen und evtl Gruppierungsspaten entfernen
 			List<ColumnInfo> colConfig = new ArrayList<>();
 			int i = 0;
 			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
-				colConfig.add(new ColumnInfo(data.getColumns().get(i1), columnReorderLayer.getColumnWidthByPosition(i)));
+				int width = columnReorderLayer.getColumnWidthByPosition(i);
+				if (optimizeWidths) {
+					width = widths[i1];
+				}
+				boolean vis = !hideEmptyCols || !isColumnEmpty(i1, sortedDataList);
+				colConfig.add(new ColumnInfo(data.getColumns().get(i1), width, vis));
+
+				if (groupByIndices.contains(i1)) {
+					groupByIndicesReordered.add(i);
+				}
 				i++;
 			}
 
 			ReportConfiguration rConfig = new ReportConfiguration();
 
 			try {
-				TableXSLCreator tableCreator = new TableXSLCreator(translationService);
-				xslString = tableCreator.createXSL(xmlRootTag, title, sortedDataList, colConfig, rConfig, path_reports);
+				TableXSLCreator tableCreator = new TableXSLCreator(translationService, indexPart, this);
+				xslString = tableCreator.createXSL(xmlRootTag, title, sortedDataList, colConfig, rConfig, path_reports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
 			}
@@ -139,6 +194,15 @@ public class PrintIndexHandler {
 
 		generatePDF(url_pdf, url_xml, url_xsl);
 		showFile(url_pdf.toString(), null);
+	}
+
+	private boolean isColumnEmpty(Integer i, SortedList<Row> rows) {
+		for (Row r : rows) {
+			if (r.getValue(i) != null) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void saveIntoXSL(String xslString, String fileName) {

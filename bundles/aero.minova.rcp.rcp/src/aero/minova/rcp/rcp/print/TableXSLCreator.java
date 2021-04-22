@@ -10,6 +10,8 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.rcp.handlers.PrintIndexHandler;
+import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ReportCreationException.Cause;
 import aero.minova.rcp.util.IOUtil;
 import ca.odell.glazedlists.SortedList;
@@ -17,21 +19,26 @@ import ca.odell.glazedlists.SortedList;
 public class TableXSLCreator extends CommonPrint {
 
 	private TranslationService translationService;
+	private WFCIndexPart indexPart;
+	private PrintIndexHandler printHandler;
 
 	// Templates
 	private static HashMap<String, String> templates = new HashMap<>();
 
-	public TableXSLCreator(TranslationService translationService2) {
+	public TableXSLCreator(TranslationService translationService2, WFCIndexPart indexPart, PrintIndexHandler printHandler) {
 		this.translationService = translationService2;
+		this.indexPart = indexPart;
+		this.printHandler = printHandler;
 	}
 
 	/**
 	 * Erzeugt ein XSL-Template mittels einer Such- und Datentabelle
 	 * 
+	 * @param groupByIndicesReordered
 	 * @throws ReportCreationException
 	 */
 	public String createXSL(String xmlRootTag, String reportName, SortedList<Row> dataList, List<ColumnInfo> colConfig, ReportConfiguration reportConf,
-			Path path_reports) throws ReportCreationException {
+			Path path_reports, List<Integer> groupByIndicesReordered) throws ReportCreationException {
 
 		if (reportConf == null) {
 			reportConf = ReportConfiguration.DEFAULT;
@@ -41,11 +48,18 @@ public class TableXSLCreator extends CommonPrint {
 			throw new IllegalArgumentException("Need dataList and colConfig");
 		}
 
-		// Wir bereinigen die unsichtbaren Spalten
-		// als unsichtbar zählen auch die Spalten, die nicht mehr auf die Seite passen
-		// hier entscheidet sich auch ob Hoch- oder Querformat
+		// Wir bereinigen die unsichtbaren Spalten als unsichtbar zählen auch die Spalten, die nicht mehr auf die Seite passen hier entscheidet sich auch ob
+		// Hoch- oder Querformat
+		List<ColumnInfo> cols = filterInvisibleColumns(colConfig, reportConf);
 
-		final List<ColumnInfo> cols = filterInvisibleColumns(colConfig, reportConf);
+		// Gruppierungsspalten entfernen
+		if (printHandler.hideGroupCols) {
+			List<ColumnInfo> toRemove = new ArrayList<ColumnInfo>();
+			for (Integer i : groupByIndicesReordered) {
+				toRemove.add(cols.get(i));
+			}
+			cols.removeAll(toRemove);
+		}
 
 		final Orientation ori = reportConf.calculatePageOrientation(getPrintedRowWidth(colConfig, reportConf));
 		final String xslData = getTemplate(ori);
@@ -59,7 +73,7 @@ public class TableXSLCreator extends CommonPrint {
 	 * - die den Druckbereich nicht übersteigen<br>
 	 * Außerdem wird der restliche verfügbare Platz mit einer leeren Spalte aufgefüllt, sodass das Design passt.
 	 */
-	protected static List<ColumnInfo> filterInvisibleColumns(List<ColumnInfo> cols, ReportConfiguration conf) {
+	protected List<ColumnInfo> filterInvisibleColumns(List<ColumnInfo> cols, ReportConfiguration conf) {
 		final List<ColumnInfo> toRet = new ArrayList<>();
 		if (cols == null || cols.size() == 0) {
 			return toRet;
@@ -69,7 +83,7 @@ public class TableXSLCreator extends CommonPrint {
 		int mmLeft = conf.getAvailLandscapeWidth();
 		int mmUsed = 0;
 		for (final ColumnInfo ci : cols) {
-			if (ci.width > MIN_COL_SIZE_PX && ci.visible) {
+			if ((ci.width > MIN_COL_SIZE_PX && ci.visible) || !printHandler.hideEmptyCols) {
 				final int mmWidth = getPrintedRowWidth(ci, conf);
 				if (mmLeft < mmWidth) {
 					break;
@@ -170,9 +184,8 @@ public class TableXSLCreator extends CommonPrint {
 		dColSize += conf.CELL_PADDING_MM;
 
 		if (col.column == null || isOptimized) {
-			// WIS: empty field oder optimizeFieldWidth schon geschehen
-			// wir haben die Breite schon so berechnet, dass es stimmt
-			// darf also nicht noch mal umgerechnet werden!
+			// WIS: empty field oder optimizeFieldWidth schon geschehen wir haben die Breite schon so berechnet, dass es stimmt darf also nicht noch mal
+			// umgerechnet werden!
 			return (int) (dColSize + 0.5);
 		}
 
@@ -391,7 +404,7 @@ public class TableXSLCreator extends CommonPrint {
 		xslData = xslData.replace("%%TableTitle%%", tableTitle);
 
 		// #22149: i.a. wollen wir die Suchkriterien auch nicht mit drucken!
-		if (!conf.hideSearchCriterias) {
+		if (!printHandler.hideSearchCriterias) {
 			for (final ColumnInfo ci : cols) {
 				if (ci != null && ci.column != null) {
 					final String colName = translationService.translate(ci.column.getLabel(), null);
