@@ -45,8 +45,7 @@ public class LookupField {
 	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
-		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT, lookUpContentProvider);
+		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT);
 		// TODO übersetzen
 		lookupControl.setMessage("...");
 		lookupControl.setLabel(label);
