@@ -130,7 +130,7 @@ public class PrintIndexHandler {
 				ILayer layer = indexPart.getBodyLayerStack().getGlazedListsEventLayer();
 				int[] widthsBody = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
 						new GCFactory(indexPart.getNattable()), layer, widths);
-				layer = indexPart.getColumnHeaderLayer();
+				layer = indexPart.getColumnHeaderDataLayer();
 				int[] widthsHeader = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
 						new GCFactory(indexPart.getNattable()), layer, widths);
 
