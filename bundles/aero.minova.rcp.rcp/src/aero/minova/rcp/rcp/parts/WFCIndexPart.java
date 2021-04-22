@@ -438,7 +438,7 @@ public class WFCIndexPart extends WFCFormPart {
 				int keyMask = SWT.MOD3;
 				// für Linux andere Tastenkombi definieren
 				if (System.getProperty("os.name").startsWith("Linux")) {
-					keyMask = SWT.MOD2;
+					keyMask |= SWT.MOD2;
 				}
 				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));
 			}
