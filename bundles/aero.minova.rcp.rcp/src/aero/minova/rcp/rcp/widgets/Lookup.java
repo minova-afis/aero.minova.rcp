@@ -34,7 +34,6 @@ import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.rcp.fields.LookupField;
 
 public class Lookup extends Composite {
 
@@ -493,7 +492,7 @@ public class Lookup extends Composite {
 		setMessage("...");
 
 		MLookupField field = (MLookupField) getData(Constants.CONTROL_FIELD);
-		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
+		BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
