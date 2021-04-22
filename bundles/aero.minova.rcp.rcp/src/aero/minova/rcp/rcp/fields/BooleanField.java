@@ -12,13 +12,13 @@ import java.util.Locale;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
@@ -27,10 +27,11 @@ import aero.minova.rcp.rcp.accessor.BooleanValueAccessor;
 
 public class BooleanField {
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		FormData formData = new FormData();
-		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
+
+		Button button = ButtonFactory.newButton(SWT.CHECK).text(field.getLabel()).create(composite);
 
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
