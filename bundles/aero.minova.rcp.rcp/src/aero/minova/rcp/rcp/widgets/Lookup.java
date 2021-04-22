@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.swt.SWT;
@@ -466,14 +467,8 @@ public class Lookup extends Composite {
 	}
 
 	public void setLabel(Label label) {
-		if (this.label != null && mouseListener != null) {
-			label.removeMouseListener(mouseListener);
-		}
-
+		Objects.requireNonNull(label);
 		this.label = label;
-		if (label == null) {
-			return;
-		}
 
 		label.addMouseListener(mouseListener = new MouseAdapter() {
 			@Override
