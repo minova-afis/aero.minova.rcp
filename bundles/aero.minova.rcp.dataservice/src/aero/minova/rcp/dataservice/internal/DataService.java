@@ -72,7 +72,6 @@ import aero.minova.rcp.model.util.ErrorObject;
 @Component
 public class DataService implements IDataService {
 
-
 	EventAdmin eventAdmin;
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
@@ -147,6 +146,10 @@ public class DataService implements IDataService {
 			if (!file.exists()) {
 				file.createNewFile();
 			} else {
+				if (file.delete()) {
+					file.createNewFile();
+					return;
+				}
 				FileOutputStream writer = new FileOutputStream(path);
 				writer.write(("").getBytes());
 				writer.close();
