@@ -56,7 +56,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
-import aero.minova.rcp.model.form.MPage;
+import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
@@ -217,26 +217,26 @@ public class WFCDetailPart extends WFCFormPart {
 		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
-		MPage mPage = new MPage(true, "open", detail, section.getText(), sectionControl);
+		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
 		// Erstellen der Field des Section.
-		createFields(composite, headOrPage, mPage);
+		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
-		sortTabList(mPage, traverseListener);
+		sortTabList(mSection, traverseListener);
 		// Section wird zum Detail hinzugefügt.
-		detail.addPage(mPage);
+		detail.addPage(mSection);
 
 	}
 
 	/**
 	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
 	 *
-	 * @param mPage
+	 * @param mSection
 	 *            die Section in der die Fields sortiert werden müssen
 	 * @param traverseListener
 	 *            der zuzuweisende TraverseListener für die Fields
 	 */
-	private void sortTabList(MPage mPage, TraverseListener traverseListener) {
-		List<MField> tabList = mPage.getTabList();
+	private void sortTabList(MSection mSection, TraverseListener traverseListener) {
+		List<MField> tabList = mSection.getTabList();
 		Collections.sort(tabList, new Comparator<MField>() {
 
 			@Override
@@ -253,7 +253,7 @@ public class WFCDetailPart extends WFCFormPart {
 		for (MField field : tabList) {
 			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
 		}
-		mPage.setTabList(tabList);
+		mSection.setTabList(tabList);
 	}
 
 	/**
@@ -266,7 +266,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param page
 	 *            die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageWrapper headOrPage, MPage page) {
+	private void createFields(Composite composite, HeadOrPageWrapper headOrPage, MSection page) {
 		int row = 0;
 		int column = 0;
 		int width;

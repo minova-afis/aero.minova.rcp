@@ -16,7 +16,7 @@ public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
 
-	private List<MPage> pageList = new ArrayList<MPage>();
+	private List<MSection> pageList = new ArrayList<MSection>();
 
 	private IHelper helper;
 
@@ -59,15 +59,15 @@ public class MDetail {
 		return fields.values();
 	}
 
-	public List<MPage> getPageList() {
+	public List<MSection> getPageList() {
 		return pageList;
 	}
 
-	public void setPageList(List<MPage> pageList) {
+	public void setPageList(List<MSection> pageList) {
 		this.pageList = pageList;
 	}
 
-	public void addPage(MPage page) {
+	public void addPage(MSection page) {
 		this.pageList.add(page);
 
 	}

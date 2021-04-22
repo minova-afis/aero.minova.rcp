@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 
-public class MPage {
+public class MSection {
 
 	// nur für die 1. Page möglich. Befindet sich immer an oberster Stelle
 	private boolean isHead;
@@ -16,7 +16,7 @@ public class MPage {
 	private MDetail mDetail;
 	// Liste an allen mit Tab erreichbaren Feldern der Section. Festlegen dieser
 	// anhand der Preferences
-	private List<MField> tabList = new ArrayList<MField>();
+	private List<MField> tabList = new ArrayList<>();
 	// Text für diese Page
 	private String label;
 	// Symbol für diese Page
@@ -25,8 +25,8 @@ public class MPage {
 	private Control control;
 
 	/**
-	 * Erstellt eine neue MPage.
-	 * 
+	 * Erstellt eine neue MSection.
+	 *
 	 * @param isHead
 	 *            makiert die Section als HEAD. Es gibt nur einen HEAD in einem Part.
 	 * @param status
@@ -38,7 +38,7 @@ public class MPage {
 	 * @param control
 	 *            das Twistie Element einer Section. Der HEAD hat keinen Twistie.
 	 */
-	public MPage(boolean isHead, String status, MDetail mDetail, String label, Control control) {
+	public MSection(boolean isHead, String status, MDetail mDetail, String label, Control control) {
 		this.isHead = isHead;
 		this.status = status;
 		this.mDetail = mDetail;
