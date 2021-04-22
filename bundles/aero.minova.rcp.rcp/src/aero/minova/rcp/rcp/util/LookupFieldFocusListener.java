@@ -36,24 +36,6 @@ public class LookupFieldFocusListener implements FocusListener {
 	}
 
 	/**
-	 * Wenn der Keylong nicht gesetzt wurde, so wird das Feld bereinigt
-	 */
-	private void clearColumn(Lookup lc) {
-		if (lc.getData(Constants.CONTROL_KEYLONG) == null) {
-			lc.setText("");
-		} else {
-			Table t = (Table) lc.getData(Constants.CONTROL_OPTIONS);
-			if (t != null) {
-				for (Row r : t.getRows()) {
-					if (r.getValue(t.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue() == lc.getData(Constants.CONTROL_KEYLONG)) {
-						lc.setText(r.getValue(t.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Wir versenden eine Anfrage an den CAS, welche die Ticketnummer enthält. Mit der Erhaltenen Antwort füllen wir sämltiche LookupFields sowie das
 	 * DescriptionField
 	 *
