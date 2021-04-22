@@ -293,7 +293,7 @@ public abstract class MField {
 		this.tabIndex = tabIndex;
 	}
 
-	public MSection getmPage() {
+	public MSection getmSection() {
 		return mSection;
 	}
 

@@ -70,7 +70,10 @@ public class MSection {
 		this.mDetail = mDetail;
 	}
 
-	public Control getSection() {
+	/**
+	 * @return Twistie wenn es vorhanden ist.
+	 */
+	public Control getSectionControl() {
 		return control;
 	}
 
