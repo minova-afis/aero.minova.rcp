@@ -167,7 +167,7 @@ public class WFCDetailPart extends WFCFormPart {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			layoutHeadOrPage(parent, wrapper, traverseListener);
+			layoutSection(parent, wrapper, traverseListener);
 		}
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -183,7 +183,16 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private void layoutHeadOrPage(Composite parent, HeadOrPageWrapper headOrPage, TraverseListener traverseListener) {
+	/**
+	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten) oder
+	 * eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
+	 * festlegt.
+	 *
+	 * @param parent
+	 * @param headOrPage
+	 * @param traverseListener
+	 */
+	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, TraverseListener traverseListener) {
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
@@ -199,7 +208,6 @@ public class WFCDetailPart extends WFCFormPart {
 		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
 		section.setLayoutData(headLayoutData);
 		section.setText(headOrPage.getTranslationText());
-
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(section);
