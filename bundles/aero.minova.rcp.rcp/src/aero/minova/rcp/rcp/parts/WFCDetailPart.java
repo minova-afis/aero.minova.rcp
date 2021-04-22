@@ -167,11 +167,7 @@ public class WFCDetailPart extends WFCFormPart {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			if (headOrPage instanceof Head) {
-				layoutHead(parent, wrapper, traverseListener);
-			} else if (headOrPage instanceof Page) {
-				layoutPage(parent, wrapper, traverseListener);
-			}
+			layoutHeadOrPage(parent, wrapper, traverseListener);
 		}
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -187,71 +183,45 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private void layoutHead(Composite parent, HeadOrPageWrapper head, TraverseListener traverseListener) {
+	private void layoutHeadOrPage(Composite parent, HeadOrPageWrapper headOrPage, TraverseListener traverseListener) {
 		RowData headLayoutData = new RowData();
-		Section headSection;
-		if (head.isHead) {
-			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		Section section;
+		Control sectionControl = null;
+		if (headOrPage.isHead) {
+			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			sectionControl = section.getChildren()[0];
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
 
-		headSection.setLayoutData(headLayoutData);
-		headSection.setText(head.getTranslationText());
-		headSection.setData(TRANSLATE_PROPERTY, "@Head");
+		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
+		section.setLayoutData(headLayoutData);
+		section.setText(headOrPage.getTranslationText());
+
 
 		// Client Area
-		Composite composite = formToolkit.createComposite(headSection);
+		Composite composite = formToolkit.createComposite(section);
 		composite.setLayout(new FormLayout());
 		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
 		formToolkit.paintBordersFor(composite);
-		headSection.setClient(composite);
+		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
-		MPage mPage = new MPage(true, "open", detail, headSection.getText(), null);
+		MPage mPage = new MPage(true, "open", detail, section.getText(), sectionControl);
 		// Erstellen der Field des Section.
-		createFields(composite, head, mPage);
+		createFields(composite, headOrPage, mPage);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mPage, traverseListener);
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mPage);
 
-	}
-
-	private void layoutPage(Composite parent, HeadOrPageWrapper page, TraverseListener traverseListener) {
-		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
-
-		pageLayoutData.width = SECTION_WIDTH;
-
-		pageSection.setLayoutData(pageLayoutData);
-		pageSection.setText(page.getTranslationText());
-		pageSection.setData(TRANSLATE_PROPERTY, page.getTranslationText());
-
-		// Client Area
-		Composite composite = formToolkit.createComposite(pageSection);
-		composite.setLayout(new FormLayout());
-		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
-		formToolkit.paintBordersFor(composite);
-		pageSection.setClient(composite);
-
-		Control[] sectionControls = pageSection.getChildren();
-
-		// Erstellen einer Section.
-		MPage mPage = new MPage(true, "open", detail, pageSection.getText(), sectionControls[0]);
-		// Erstellen der Field des Section.
-		createFields(composite, page, mPage);
-		// Sortieren der Fields nach Tab-Index.
-		sortTabList(mPage, traverseListener);
-		// Section wird zum Detail hinzugefügt.
-		detail.addPage(mPage);
 	}
 
 	/**
 	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
-	 * 
+	 *
 	 * @param mPage
 	 *            die Section in der die Fields sortiert werden müssen
 	 * @param traverseListener
@@ -280,7 +250,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 	/**
 	 * Erstellt die Field einer Section.
-	 * 
+	 *
 	 * @param composite
 	 *            der parent des Fields
 	 * @param headOrPage
