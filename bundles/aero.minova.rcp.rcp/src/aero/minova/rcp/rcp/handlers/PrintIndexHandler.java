@@ -163,7 +163,7 @@ public class PrintIndexHandler {
 
 			try {
 				TableXSLCreator tableCreator = new TableXSLCreator(translationService, indexPart, this, ePartService);
-				xslString = tableCreator.createXSL(xmlRootTag, title, sortedDataList, colConfig, rConfig, path_reports, groupByIndicesReordered);
+				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, path_reports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
 			}
