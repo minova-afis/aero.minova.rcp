@@ -72,6 +72,9 @@ public class PrintIndexHandler {
 	private IEventBroker broker;
 
 	@Inject
+	private EPartService ePartService;
+
+	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.CREATE_XML_XS)
 	public boolean createXmlXsl;
 	@Inject
@@ -159,7 +162,7 @@ public class PrintIndexHandler {
 			ReportConfiguration rConfig = new ReportConfiguration();
 
 			try {
-				TableXSLCreator tableCreator = new TableXSLCreator(translationService, indexPart, this);
+				TableXSLCreator tableCreator = new TableXSLCreator(translationService, indexPart, this, ePartService);
 				xslString = tableCreator.createXSL(xmlRootTag, title, sortedDataList, colConfig, rConfig, path_reports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
