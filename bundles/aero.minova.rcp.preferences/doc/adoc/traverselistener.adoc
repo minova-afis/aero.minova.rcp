@@ -1,0 +1,96 @@
+
+= TraverseListener Verhalten
+
+Dokumentation der Verhaltensweise des TraverseListeners. Der TraverseListener bestimmt das Tab- und Enter-Verhalten im Detail Bereich.
+
+==== Preferences die das Tab- und Enter-Verhalten beeinflussen
+
+EnterSelectsFirstRequired (ESFR) = Genau Beschreibung hier: xref:application.adoc#Nach dem Betätigen von ENTER wird das erste erforderliche Feld selektiert[EnterSelectsFirstRequired]
+
+LookupEnterSelectsNextRequired (LESNR) = Genau Beschreibung hier: xref:application.adoc#Das Betätigen von Enter in einer Auswahlbox bewirkt die Übernahme des ausgewählten Wertes. Nach der Übernahme wird das nächste erforderliche Feld selektiert[LookupEnterSelectsNextRequired]
+
+SelectAllControls (SAC) = Genau Beschreibung hier: xref:application.adoc#Aktiviert die Selektion aller möglichen Felder inkl. Registerkarte und Schaltflächen[SelectAllControls]
+
+==== Tab-Verhalten
+
+
+Für die Eingabe von Tab haben wir folgendes Verhalten festgelegt:
+
+|===
+| *Eingabe* | *Verhalten*
+| Tab | Benutzer springt ins nächste Feld.
+| Shift + Tab | Benutzer springt ins vorherige Feld.
+| Tab + SAC / Shift + Tab + SAC   = true | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page selektiert
+| Tab + SAC/ Shift + Tab + SAC  = false | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page nicht selektiert
+|===
+
+==== Enter-Verhalten
+
+Für die Eingabe von Enter haben wir folgendes Verhalten festgelegt:
+
+
+|===
+| *Eingabe* | *Verhalten*
+| Enter | Benutzer springt ins nächste Pflichtfeld.
+| Tab + ESFR = true | Der benutzer springt ins erste nicht ausgefüllte Pflichtfeld.
+| Tab + ESFR = false | Der benutzer springt ins nächste Pflichtfeld.
+|===
+
+==== Ermittlung des nächsten Feldes
+
+Folgende Bedingungen werden beim Ermitteln des nächsten Feldes beachtet:
+
+- Wenn sich der Benutzer im letzten Feld der letzten Page befindet und SAC ist gesetzt, springt er bei der Eingabe von Tab in die Toolbar des Detail Parts.
+- Sobald alle Pflichtfelder ausgefüllt sind, wird bei der Eingabe von Enter der SaveHandler ausgeführt und der Datensatz wird gespeichert.
+- Das Feld in das der Benutzer mit einem Traverse Event springt wird als initial Feld im Context gespeichert. Solange der Benutzer zwischenzeitlich kein anderes  Feld selektiert hat, wird das gespeicherte Feld als Ausgangsfeld genutzt. Das gespeicherte Feld wird dann mit dem neuen Feld überschrieben. Dies reduziert die Verwendung von Foreach-Schleifen und macht die Anwendung schneller.
+
+==== Beispiel für das Speichern des InitialFields
+
+*Beispiel Eingabe Tab:* +
+Der Benutzer befindet sich im Feld 2, das als InitialField gespeichert wurde, und drückt Tab.
+
+Feld 1 : +
+Feld 2 : init <- USER hier +
+Feld 3 : +
+Feld 4 : +
+
+Die Methode getNextField() liest das gespeicherte Feld aus dem Kontext. Sie nutzt das Feld und wählt in der TabListe der Page das Feld mit dem Index des gespeicherten Felds + 1 aus. 
+
+image::images/get_next_field_snippet.png[False,1000,200]
+
+Das neue Feld wird jetzt als neues InitialField gespeichert, um beim nächsten TraverseEvent als Ausgangspunkt genutzt zu werden.
+
+Feld 1 : +
+Feld 2 : +
+Feld 3 : init <- USER hier +
+Feld 4 : +
+
+Im nächsten TraverseEvent wird dann Feld 3 als InitialField genommen.
+
+*Beispiel Eingabe Shift + Tab:* +
+Der Benutzer befindet sich im Feld 3, das als InitialField gespeichert wurde, und drückt Shift + Tab.
+
+Feld 1 : +
+Feld 2 : +
+Feld 3 : init <- USER hier +
+Feld 4 : +
+
+Die Methode getPreviousField() liest das gespeicherte Feld aus dem Kontext. Sie nutzt das Feld und wählt in der TabListe der Page das Feld mit dem Index des gespeicherten Felds - 1 aus. 
+
+image::images/get_previous_field_snippet.png[False,1000,200]
+
+Das neue Feld wird jetzt als neues InitialField gespeichert, um beim nächsten TraverseEvent als Ausgangspunkt genutzt zu werden.
+
+Feld 1 : +
+Feld 2 : init <- USER hier +
+Feld 3 : +
+Feld 4 : +
+
+Im nächsten TraverseEvent wird dann Feld 2 als InitialField genommen.
+
+*Beispiel Eingabe Enter:* +
+Bei der Eingabe von Enter wird nicht mit dem InitialField gearbeitet, da für die Ermittlung des nächsten bzw. ersten Pflichtfeld For-Schleifen benötigt werden.
+Dies ist der Fall, da das nächste Pflichtfeld sich überall auf dem Detail befindet könnte. 
+Die Ermittlung des nächsten Pflichtfelds mit dem InitialField würde den Code nur aufblähen und keine Verbesserung bewirken, wie in den anderen beiden Methoden.
+
+Wenn der Benutzer ein anderes Feld mit der Maus selektiert und dann ein TraverseEvent auslöst, wird nicht das gespeicherte Feld genommen, sonder mit einer For-Schleife das zu selektierende Feld ermittelt.
