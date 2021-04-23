@@ -89,6 +89,8 @@ Feld 4 : +
 Im nächsten TraverseEvent wird dann Feld 2 als InitialField genommen.
 
 *Beispiel Eingabe Enter:* +
-Bei der Eingabe von Enter wird nicht mit dem InitialField gearbeitet, da für die Ermittlung des nächsten bzw. ersten Pflichtfeld For-Schleifen benötigt werden. Die Ermittlung des nächsten Pflichtfelds würde den Code nur aufblähen und keine Verbesserung bewirken, wie in den anderen beiden Methoden.
+Bei der Eingabe von Enter wird nicht mit dem InitialField gearbeitet, da für die Ermittlung des nächsten bzw. ersten Pflichtfeld For-Schleifen benötigt werden.
+Dies ist der Fall, da das nächste Pflichtfeld sich überall auf dem Detail befindet könnte. 
+Die Ermittlung des nächsten Pflichtfelds mit dem InitialField würde den Code nur aufblähen und keine Verbesserung bewirken, wie in den anderen beiden Methoden.
 
 Wenn der Benutzer ein anderes Feld mit der Maus selektiert und dann ein TraverseEvent auslöst, wird nicht das gespeicherte Feld genommen, sonder mit einer For-Schleife das zu selektierende Feld ermittelt.
