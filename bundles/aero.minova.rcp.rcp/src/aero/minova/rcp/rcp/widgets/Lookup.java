@@ -273,7 +273,7 @@ public class Lookup extends Composite {
 
 				final String string = text.getText();
 				if (string.length() == 0) {
-					popup.setVisible(false);
+					// popup.setVisible(false);
 					return;
 				}
 				showAllElements(string);
