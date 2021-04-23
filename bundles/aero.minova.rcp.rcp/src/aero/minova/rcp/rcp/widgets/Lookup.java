@@ -921,4 +921,8 @@ public class Lookup extends Composite {
 
 		showAllElements(text.getText());
 	}
+	
+	public void closePopup() {
+		popup.setVisible(false);
+	}
 }
