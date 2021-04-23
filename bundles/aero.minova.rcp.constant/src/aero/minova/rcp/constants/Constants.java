@@ -74,6 +74,9 @@ public class Constants {
 	// SeachCriteria
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
+	// Column Label für eigene Sortierung
+	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL";
+
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
 	 *

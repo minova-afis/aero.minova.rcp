@@ -87,6 +87,6 @@ public class FilterValue extends Value {
 			regEx += "(" + operator + ")";
 		}
 		regEx += "]";
-		return userInput.replaceAll(regEx, "");
+		return userInput.replaceAll(regEx, "").trim();
 	}
 }

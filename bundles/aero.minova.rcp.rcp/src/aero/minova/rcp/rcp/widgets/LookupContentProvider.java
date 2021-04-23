@@ -60,13 +60,6 @@ public class LookupContentProvider {
 		this.lookup = lookup;
 	}
 
-	/**
-	 * @return the max number of propositions.
-	 */
-	protected int getMaxNumberOfLines() {
-		return this.lookup.getNumberOfLines();
-	}
-
 	public void setTable(Table table) {
 		values.clear();
 		values.addAll(table.getRows().stream().map(r -> {

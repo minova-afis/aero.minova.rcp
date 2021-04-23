@@ -127,7 +127,6 @@
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_6wlLgsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1o" keySequence="M1+O"/>
     <bindings xmi:id="_6wlLhcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1s" keySequence="M1+S"/>
-    <bindings xmi:id="_6wlLiMgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1a" keySequence="M1+A" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
     <bindings xmi:id="_GhrMEIydEeuboqmDt256_Q" elementId="aero.minova.rcp.rcp.keybinding.m1z" keySequence="M1+Z" command="_Lwy8UIydEeuboqmDt256_Q"/>
     <bindings xmi:id="_Jv9isBRcEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.help" keySequence="F1" command="_DmBwABRcEeu_ctc0PBVTGw">
       <tags>type:user</tags>
