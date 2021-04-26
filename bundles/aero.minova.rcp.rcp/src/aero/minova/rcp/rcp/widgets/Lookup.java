@@ -253,7 +253,7 @@ public class Lookup extends Composite {
 		popup.setLocation(x, y);
 		popup.setVisible(true);
 
-		if (!System.getProperty("os.name").startsWith("Mac")) {
+		if (System.getProperty("os.name").startsWith("Linux")) {
 			table.setFocus();
 		}
 	}
@@ -296,7 +296,7 @@ public class Lookup extends Composite {
 						return;
 					}
 					final Control control = Lookup.this.getDisplay().getFocusControl();
-					if (control == null || (control != text && control != table)) {
+					if (control == null || (control != text && control != table && control != popup)) {
 						popup.setVisible(false);
 					}
 				});
