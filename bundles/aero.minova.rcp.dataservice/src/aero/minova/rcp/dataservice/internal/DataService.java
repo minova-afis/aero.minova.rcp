@@ -485,6 +485,7 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
+		useCache = false;
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
@@ -572,6 +573,7 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText) {
+		useCache = false;
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();

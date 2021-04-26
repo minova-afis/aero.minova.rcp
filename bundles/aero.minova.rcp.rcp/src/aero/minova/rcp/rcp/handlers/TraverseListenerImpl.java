@@ -348,6 +348,8 @@ public class TraverseListenerImpl implements TraverseListener {
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
 			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
 			focussedControl.setFocus();
+			Lookup lookup = (Lookup) focussedControl;
+			lookup.closePopup();
 			return;
 		}
 
@@ -376,6 +378,12 @@ public class TraverseListenerImpl implements TraverseListener {
 			}
 			// Sind auf der selben Section vor meinem Feld noch unausgefüllte Required Fields?
 			fc = getNextRequiredFieldWhichNull(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
+			if (fc == null) {
+				if (focussedControl instanceof Lookup) {
+					Lookup lookup = (Lookup) focussedControl;
+					lookup.closePopup();
+				}
+			}
 		} else {
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();

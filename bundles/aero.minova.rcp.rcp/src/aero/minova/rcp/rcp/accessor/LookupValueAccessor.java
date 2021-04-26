@@ -66,7 +66,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			((Lookup) control).getDescription().setText("");
 			((Lookup) control).setText("");
 			if (((Lookup) control).getEditable()) {
-				((Lookup) control).setMessage("Null");
+				((Lookup) control).setMessage("...");
+				if (LOG) {
+					System.out.println("Lookup " + ((Lookup) control).getLabel().getText() + " ist null");
+				}
 			}
 			return;
 		}
@@ -74,7 +77,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			LookupValue lv = (LookupValue) value;
 			((Lookup) control).getDescription().setText(lv.description);
 			((Lookup) control).setText(lv.keyText);
-			((Lookup) control).setMessage("Empty");
+			((Lookup) control).setMessage("...");
+			if (LOG) {
+				System.out.println("Lookup " + ((Lookup) control).getLabel().getText() + " ist leer");
+			}
 		} else {
 			Integer keyLong = null;
 			String keyText = null;
