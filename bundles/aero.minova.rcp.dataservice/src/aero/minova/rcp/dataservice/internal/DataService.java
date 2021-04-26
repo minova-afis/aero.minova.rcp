@@ -646,7 +646,7 @@ public class DataService implements IDataService {
 					.create();
 			Row row = RowBuilder.newRow() //
 					.withValue(null) //
-					.withValue(false) //
+					.withValue(true) // true, damit gelöschte Einträge nicht zurückgegeben werden
 					.create();
 			for (String paramName : field.getLookupParameters()) {
 				MField paramField = field.getDetail().getField(paramName);
