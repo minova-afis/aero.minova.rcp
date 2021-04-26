@@ -388,7 +388,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
-					if (field.isRequired() && field.getValue() == null) {
+					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
 						context.set(INIT_FIELD, tabList.get(tabList.indexOf(field)));
@@ -432,7 +432,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			// 2. Mein Feld kommt nach dem aktuellen INIT_FIELD, auf nächster Section ##
 			// 3. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf vorheriger Section ##
 			// 4. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf gleicher Section ##
-			if (field.getValue() == null && field.isRequired()) {
+			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
 				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 				focussedControl.setFocus();
 				context.set(INIT_FIELD, field);
