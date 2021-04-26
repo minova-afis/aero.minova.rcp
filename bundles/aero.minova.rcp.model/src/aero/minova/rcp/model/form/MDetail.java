@@ -1,7 +1,9 @@
 package aero.minova.rcp.model.form;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import aero.minova.rcp.model.helper.IHelper;
 
@@ -14,35 +16,39 @@ public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
 
+	private List<MSection> pageList = new ArrayList<MSection>();
+
 	private IHelper helper;
 
 	/**
-	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
+	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit
+	 * geachtet werden. Z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
-	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
+	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske
+	 * CustomerUserCode.op.xml</li>
 	 * </ul>
 	 *
-	 * @param name
-	 *            Name / ID des Feldes
-	 * @param field
-	 *            das eigentliche Feld
+	 * @param name  Name / ID des Feldes
+	 * @param field das eigentliche Feld
 	 */
 	public void putField(MField field) {
-		if (field == null) return;
+		if (field == null)
+			return;
 		fields.put(field.getName(), field);
 		field.setDetail(this);
 	}
 
 	/**
-	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in einer OptionPage haben das Präfix aus der XBS. z.B.
+	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in
+	 * einer OptionPage haben das Präfix aus der XBS. z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
-	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
+	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske
+	 * CustomerUserCode.op.xml</li>
 	 * </ul>
 	 *
-	 * @param name
-	 *            Name des Feldes
+	 * @param name Name des Feldes
 	 * @return Das Feld
 	 */
 	public MField getField(String name) {
@@ -51,6 +57,19 @@ public class MDetail {
 
 	public Collection<MField> getFields() {
 		return fields.values();
+	}
+
+	public List<MSection> getPageList() {
+		return pageList;
+	}
+
+	public void setPageList(List<MSection> pageList) {
+		this.pageList = pageList;
+	}
+
+	public void addPage(MSection page) {
+		this.pageList.add(page);
+
 	}
 
 	public IHelper getHelper() {

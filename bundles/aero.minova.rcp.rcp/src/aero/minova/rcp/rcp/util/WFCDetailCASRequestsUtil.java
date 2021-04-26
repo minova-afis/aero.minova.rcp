@@ -390,7 +390,9 @@ public class WFCDetailCASRequestsUtil {
 				if (t.getRows() != null) {
 					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-						deleteEntry(ta);
+						if (ta != null) {
+							deleteEntry(ta);
+						}
 					}));
 				}
 			}
