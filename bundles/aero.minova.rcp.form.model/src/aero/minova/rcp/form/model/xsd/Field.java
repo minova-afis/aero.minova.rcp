@@ -122,7 +122,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;/attribute&gt;
  *       &lt;attribute name="visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="unit-text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="read-only" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
+ *       &lt;attribute name="read-only" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -1045,7 +1045,7 @@ public class Field {
      */
     public boolean isReadOnly() {
         if (readOnly == null) {
-            return true;
+            return false;
         } else {
             return readOnly;
         }

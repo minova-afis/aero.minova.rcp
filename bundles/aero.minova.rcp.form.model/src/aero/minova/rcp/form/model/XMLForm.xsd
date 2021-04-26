@@ -438,7 +438,7 @@
 		</xs:attribute>
 		<xs:attribute default="true" name="visible" type="xs:boolean" use="optional" />
 		<xs:attribute name="unit-text" type="xs:string" use="optional" />
-		<xs:attribute default="true" name="read-only" type="xs:boolean" use="optional" />
+		<xs:attribute default="false" name="read-only" type="xs:boolean" use="optional" />
 		<!--xs:attribute name="length" type="xs:integer"/ -->
 	</xs:complexType>
 	<xs:complexType name="layout-table">
