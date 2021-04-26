@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,9 +38,13 @@ public class LookupContentProvider {
 		}
 
 		String regex = buildRegex(entry);
-
-		return values.stream().filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
+		List<LookupValue> result = values.stream()
+				.filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
 				.collect(Collectors.toList());
+
+		// Groß- und Kleinschreibung ignorieren
+		result.sort(new SortIgnoreCase());
+		return result;
 	}
 
 	private String buildRegex(String entry) {
@@ -90,4 +95,12 @@ public class LookupContentProvider {
 		return values.size();
 	}
 
+	public class SortIgnoreCase implements Comparator<Object> {
+		@Override
+		public int compare(Object o1, Object o2) {
+			String s1 = ((LookupValue) o1).keyText;
+			String s2 = ((LookupValue) o2).keyText;
+			return s1.toLowerCase().compareTo(s2.toLowerCase());
+		}
+	}
 }
