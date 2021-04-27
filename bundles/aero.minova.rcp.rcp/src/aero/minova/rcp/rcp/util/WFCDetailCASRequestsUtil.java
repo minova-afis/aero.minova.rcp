@@ -278,6 +278,11 @@ public class WFCDetailCASRequestsUtil {
 		} else {
 			openNotificationPopup(getTranslation("msg.DataUpdated"));
 			handleUserAction(Constants.UPDATE_REQUEST);
+
+			if (autoReloadIndex) {
+				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+				handlerService.executeHandler(cmd);
+			}
 		}
 	}
 
