@@ -54,6 +54,7 @@ public class SaveDetailHandler implements ValueChangeListener {
 
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
+		// canExecute() Methode wird aufgerufen
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
 	}
 }

@@ -31,7 +31,6 @@ public abstract class MField {
 	private Integer numberRowsSpanned = 1;
 	private Double maximumValue;
 	private Double minimumValue;
-
 	private int maxTextLength;
 	private boolean fillToRight = false;
 	private String lookupTable;
@@ -346,6 +345,16 @@ public abstract class MField {
 		valueAccessor.setCSSClass(newClass);
 	}
 
+	/**
+	 * Kann (laut diesem Feld) gespeichtert werden
+	 * <p>
+	 * <ul>
+	 * <li>Nicht angezeigte Felder (mSection == null) oder Felder ohne "required" brauchen keinen Wert
+	 * <li>Ansonsten kann gespeichtert werden, wenn ein Wert eingetragen ist
+	 * </ul>
+	 * <p>
+	 * Weitere Validierung findet in Unterklassen statt (z.B. Textlänge in MTextField)
+	 */
 	public boolean isValid() {
 		if (!isRequired() || mSection == null) {
 			return true;
