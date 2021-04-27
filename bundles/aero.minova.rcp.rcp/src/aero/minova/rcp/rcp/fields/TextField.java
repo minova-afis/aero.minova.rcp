@@ -41,7 +41,7 @@ public class TextField {
 		int style = SWT.BORDER;
 		if (field.getNumberRowsSpanned() > 1) {
 			// Maskenentwickler hat mehrzeilige Eingabe definiert
-			style |= SWT.MULTI;
+			style |= SWT.MULTI | SWT.WRAP;
 		}
 		Text text = formToolkit.createText(composite, "", style);
 		text.addFocusListener(new FocusAdapter() {
