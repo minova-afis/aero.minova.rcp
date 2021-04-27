@@ -31,6 +31,8 @@ public abstract class MField {
 	private Integer numberRowsSpanned = 1;
 	private Double maximumValue;
 	private Double minimumValue;
+
+	private int maxTextLength;
 	private boolean fillToRight = false;
 	private String lookupTable;
 	private String lookupProcedurePrefix;
@@ -122,6 +124,7 @@ public abstract class MField {
 		} else {
 			updateCssClass(Constants.CSS_STANDARD);
 		}
+		isValid();
 	}
 
 	/**
@@ -207,6 +210,14 @@ public abstract class MField {
 
 	public void setMinimumValue(Double maximumValue) {
 		this.minimumValue = maximumValue;
+	}
+
+	public int getMaxTextLength() {
+		return maxTextLength;
+	}
+
+	public void setMaxTextLength(int maxTextLength) {
+		this.maxTextLength = maxTextLength;
 	}
 
 	public boolean isFillToRight() {
@@ -321,13 +332,6 @@ public abstract class MField {
 		return "MField(" + getName() + ")";
 	}
 
-	public boolean isValid() {
-		if (!isRequired() || mSection == null) {
-			return true;
-		}
-		return fieldValue != null;
-	}
-
 	public void updateCssClass(String newClass) {
 		if (valueAccessor == null) {
 			return;
@@ -340,5 +344,16 @@ public abstract class MField {
 		}
 
 		valueAccessor.setCSSClass(newClass);
+	}
+
+	public boolean isValid() {
+		if (!isRequired() || mSection == null) {
+			return true;
+		}
+		return fieldValue != null;
+	}
+
+	public void setInvalidColor() {
+		updateCssClass(Constants.CSS_INVALID);
 	}
 }
