@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
 import org.eclipse.swt.SWT;
@@ -40,8 +43,8 @@ public class ShortTimeField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			Locale locale, String timezone) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone,
+			MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
@@ -57,8 +60,7 @@ public class ShortTimeField {
 					field.setValue(null, true);
 				} else {
 					LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
-					result.add(
-							localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+					result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 					field.setValue(new Value(time), true);
 				}
 				return result;
@@ -66,8 +68,7 @@ public class ShortTimeField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		text.setMessage(
-				LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+		text.setMessage(LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {
@@ -77,7 +78,10 @@ public class ShortTimeField {
 			}
 		});
 
-		field.setValueAccessor(new ShortTimeValueAccessor(field, text));
+		IEclipseContext context = perspective.getContext();
+		ShortTimeValueAccessor valueAccessor = new ShortTimeValueAccessor(field, text);
+		ContextInjectionFactory.inject(valueAccessor, context);
+		field.setValueAccessor(valueAccessor);
 
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();

@@ -39,22 +39,21 @@ CTabItem:selected {
 	background-color: white;
 }
 
-LookupText, Text {
+Text.Standard, Lookup.Standard, TextAssist.Standard {
 	color: black;
 	background-color: white;
 }
 
-LookupText.ValueRequired, Text.ValueRequired {
-	/*background-color: #FFC300;*/
+Text.ValueRequired, Lookup.ValueRequired, TextAssist.ValueRequired {
 	background-color: #FCD267;
 }
 
-LookupText.InvalidValue, Text.InvalidValue {
+Text.InvalidValue, Lookup.InvalidValue, TextAssist.InvalidValue {
 	color: white;
 	background-color: red;
 }
 
-LookupText.ReadOnly, Text.ReadOnly {
+Text.ReadOnly, Lookup.ReadOnly, TextAssist.ReadOnly {
 	background-color: inherit;
 }
 

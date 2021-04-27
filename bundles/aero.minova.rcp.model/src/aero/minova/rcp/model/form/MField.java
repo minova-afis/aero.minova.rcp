@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -40,6 +41,7 @@ public abstract class MField {
 	private boolean readOnly;
 	private int tabIndex;
 	private MSection mSection;
+	private String cssClass = Constants.CSS_STANDARD;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -114,6 +116,12 @@ public abstract class MField {
 			displayValue = getValueAccessor().setValue(value, user);
 		}
 		fire(new ValueChangeEvent(this, oldValue, value, user));
+
+		if (value == null) {
+			updateCssClass(cssClass);
+		} else {
+			updateCssClass(Constants.CSS_STANDARD);
+		}
 	}
 
 	/**
@@ -258,6 +266,7 @@ public abstract class MField {
 
 	public void setValueAccessor(ValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
+		updateCssClass(cssClass);
 	}
 
 	public MDetail getDetail() {
@@ -274,6 +283,10 @@ public abstract class MField {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+		// Readonly hat Vorrang
+		if (required && !cssClass.equals(Constants.CSS_READONLY)) {
+			cssClass = Constants.CSS_REQUIRED;
+		}
 	}
 
 	public boolean isReadOnly() {
@@ -282,6 +295,9 @@ public abstract class MField {
 
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
+		if (readOnly) {
+			cssClass = Constants.CSS_READONLY;
+		}
 	}
 
 	public int getTabIndex() {
@@ -310,5 +326,19 @@ public abstract class MField {
 			return true;
 		}
 		return fieldValue != null;
+	}
+
+	public void updateCssClass(String newClass) {
+		if (valueAccessor == null) {
+			return;
+		}
+
+		// Readonly wird nie geändert
+		if (cssClass.equals(Constants.CSS_READONLY)) {
+			valueAccessor.setCSSClass(Constants.CSS_READONLY);
+			return;
+		}
+
+		valueAccessor.setCSSClass(newClass);
 	}
 }

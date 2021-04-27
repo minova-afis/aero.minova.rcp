@@ -318,19 +318,19 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void createField(Composite composite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
-			BooleanField.create(composite, field, row, column, formToolkit, locale);
+			BooleanField.create(composite, field, row, column, formToolkit, locale, perspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, formToolkit, locale);
+			NumberField.create(composite, (MNumberField) field, row, column, formToolkit, locale, perspective);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
+			DateTimeField.create(composite, field, row, column, formToolkit, locale, timezone, perspective);
 		} else if (field instanceof MShortDateField) {
-			ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
+			ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone, perspective);
 		} else if (field instanceof MShortTimeField) {
-			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
+			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone, perspective);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, perspective, locale);
+			LookupField.create(composite, field, row, column, formToolkit, locale, perspective);
 		} else if (field instanceof MTextField) {
-			TextField.create(composite, field, row, column, formToolkit);
+			TextField.create(composite, field, row, column, formToolkit, perspective);
 		}
 	}
 

@@ -81,12 +81,10 @@ public class MDetail {
 
 	public boolean allFieldsValid() {
 		for (MField field : fields.values()) {
-			System.out.println(field + " " + field.isValid());
 			if (!field.isValid()) {
 				return false;
 			}
 		}
-		System.out.println("--- All Valid");
 		return true;
 	}
 }

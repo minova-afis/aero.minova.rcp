@@ -8,6 +8,9 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -29,7 +32,7 @@ public class TextField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
@@ -59,7 +62,10 @@ public class TextField {
 			}
 		});
 
-		field.setValueAccessor(new TextValueAccessor(field, text));
+		IEclipseContext context = perspective.getContext();
+		TextValueAccessor valueAccessor = new TextValueAccessor(field, text);
+		ContextInjectionFactory.inject(valueAccessor, context);
+		field.setValueAccessor(valueAccessor);
 
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
