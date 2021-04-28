@@ -597,6 +597,15 @@ public class TraverseListenerImpl implements TraverseListener {
 		}
 	}
 
+	/**
+	 * Prüft die Felder der Sections der übergebenen SectionList in der angegebenen Reihenfolge und ermittelt das zu selektierende nicht ReadOnly Feld.
+	 * 
+	 * @param selectedField
+	 *            das selektierte Feld
+	 * @param sectionList
+	 *            Liste von Sections
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getNextRequiredControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
 		Control focussedControl = null;
 		for (MSection section : sectionList) {
@@ -623,6 +632,13 @@ public class TraverseListenerImpl implements TraverseListener {
 		return focussedControl;
 	}
 
+	/**
+	 * Durchsucht die übergebene TabListe nach dem ersten nicht ReadOnly Feld und liefert es zurück.
+	 *
+	 * @param tabList
+	 *            die zu durchsuchende TabListe
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getNextRequiredFieldWhichNull(List<MField> tabListAfter) {
 		Control focussedControl = null;
 		for (MField field : tabListAfter) {
