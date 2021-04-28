@@ -185,24 +185,72 @@ public class TraverseListenerImpl implements TraverseListener {
 					focussedControl = sectionList.get(sectionList.indexOf(initSection)).getSectionControl();
 					context.set(INIT_FIELD, focussedControl);
 				}
-				// Wir sind in der ersten Section
-			} else if (sectionList.indexOf(initSection) == 0) {
-				List<MField> lastTabList = sectionList.get(sectionList.size() - 1).getTabList();
-				focussedControl = ((AbstractValueAccessor) lastTabList.get(lastTabList.size() - 1).getValueAccessor()).getControl();
-				// MField
-				context.set(INIT_FIELD, lastTabList.get(lastTabList.size() - 1));
 			} else {
-				List<MField> previousTabList = sectionList.get(sectionList.indexOf(initSection) - 1).getTabList();
-				focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
-				// MField
-				context.set(INIT_FIELD, previousTabList.get(previousTabList.size() - 1));
+				focussedControl = getPreviousControlFromSplitSectionList(sectionList, initiField);
 			}
 		} else {
-			focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) - 1).getValueAccessor()).getControl();
-			// MField
-			context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initiField) - 1));
+			focussedControl = getPreviousControlFromSplitSectionList(sectionList, initiField);
 		}
 		focussedControl.setFocus();
+	}
+
+	private Control getPreviousControlFromSplitSectionList(List<MSection> sectionList, MField initField) {
+		Control fc = null;
+		List<MField> tabListFromSelectedFieldSection = initField.getmSection().getTabList();
+		// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
+		// Size = 10
+		int indexOfSelectedField = tabListFromSelectedFieldSection.indexOf(initField);
+		// Sind auf der selben Section nach meinem Feld noch unausgefüllte Required Fields?
+		fc = getPreviousFieldControl(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
+		if (fc != null) {
+			return fc;
+		}
+
+		int indexOfSection = sectionList.indexOf(initField.getmSection());
+
+		fc = getPreviousControlFromSectionIfNull(initField, sectionList.subList(0, indexOfSection));
+		if (fc != null) {
+			return fc;
+		}
+		fc = getPreviousControlFromSectionIfNull(initField, sectionList.subList(indexOfSection + 1, sectionList.size()));
+		if (fc != null) {
+			return fc;
+		}
+		// Sind auf der selben Section vor meinem Feld noch unausgefüllte Required Fields?
+		fc = getPreviousFieldControl(tabListFromSelectedFieldSection.subList(indexOfSelectedField + 1, tabListFromSelectedFieldSection.size()));
+		return fc;
+	}
+
+	private Control getPreviousControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
+		Control focussedControl = null;
+		for (int position = sectionList.size() - 1; position >= 0; position--) {
+			MSection section = sectionList.get(position);
+			List<MField> tabList = section.getTabList();
+
+			focussedControl = getPreviousFieldControl(tabList);
+			if (focussedControl != null) {
+				return focussedControl;
+			}
+		}
+		return focussedControl;
+	}
+
+	private Control getPreviousFieldControl(List<MField> tabList) {
+		Control focussedControl = null;
+		for (int position = tabList.size() - 1; position >= 0; position--) {
+			MField field = tabList.get(position);
+			// 1. mein Feld kommt nach dem aktuellen INIT_FIELD ##
+			// 2. Mein Feld kommt nach dem aktuellen INIT_FIELD, auf nächster Section ##
+			// 3. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf vorheriger Section ##
+			// 4. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf gleicher Section ##
+			if (!field.isReadOnly()) {
+				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
+				focussedControl.setFocus();
+				context.set(INIT_FIELD, field);
+				return focussedControl;
+			}
+		}
+		return focussedControl;
 	}
 
 	/**
@@ -265,43 +313,108 @@ public class TraverseListenerImpl implements TraverseListener {
 	 * Diese Methode sucht das nächste Control und gibt diesem Control den Fokus.
 	 *
 	 * @param selectAllControls
-	 * @param pageList
-	 * @param initPage
+	 * @param sectionList
+	 * @param initSection
 	 * @param initTabList
 	 * @param initiField
 	 */
-	private void setNextControl(boolean selectAllControls, List<MSection> pageList, MSection initPage, List<MField> initTabList, MField initiField) {
+	private void setNextControl(boolean selectAllControls, List<MSection> sectionList, MSection initSection, List<MField> initTabList, MField initiField) {
 		Control focussedControl;
+
 		// Wir sind im letzten Feld der Page.
 		if (initTabList.indexOf(initiField) == initTabList.size() - 1) {
 			// Die Preference SelectAllControls is gesetzt.
 			if (selectAllControls == true) {
 				// Wir sind in der Letzten Section
-				if (pageList.indexOf(initPage) == pageList.size() - 1) {
+				if (sectionList.indexOf(initSection) == sectionList.size() - 1) {
 					MToolBar toolbarElements = partService.getActivePart().getToolbar();
 					focussedControl = (Control) toolbarElements.getWidget();
 					context.set(INIT_FIELD, focussedControl);
 					// Wir prüfen nach dem Twistie der Section
 				} else {
-					focussedControl = pageList.get(pageList.indexOf(initPage) + 1).getSectionControl();
+					focussedControl = sectionList.get(sectionList.indexOf(initSection) + 1).getSectionControl();
 					context.set(INIT_FIELD, focussedControl);
 				}
 				// Wir sind in der Letzten Section
-			} else if (pageList.indexOf(initPage) == pageList.size() - 1) {
-				focussedControl = ((AbstractValueAccessor) pageList.get(0).getTabList().get(0).getValueAccessor()).getControl();
-				// MField
-				context.set(INIT_FIELD, pageList.get(0).getTabList().get(0));
 			} else {
-				focussedControl = ((AbstractValueAccessor) pageList.get(pageList.indexOf(initPage) + 1).getTabList().get(0).getValueAccessor()).getControl();
+				focussedControl = getNextControlFromSplitSectionList(sectionList, initiField);
 				// MField
-				context.set(INIT_FIELD, pageList.get(pageList.indexOf(initPage) + 1).getTabList().get(0));
 			}
 		} else {
-			focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + 1).getValueAccessor()).getControl();
+			focussedControl = getNextControlFromSplitSectionList(sectionList, initiField);
 			// MField
-			context.set(INIT_FIELD, initTabList.get(initTabList.indexOf(initiField) + 1));
 		}
 		focussedControl.setFocus();
+	}
+
+	private Control getNextControlFromSplitSectionList(List<MSection> sectionList, MField initField) {
+		Control fc = null;
+		List<MField> tabListFromSelectedFieldSection = initField.getmSection().getTabList();
+		// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
+		// Size = 10
+		int indexOfSelectedField = tabListFromSelectedFieldSection.indexOf(initField);
+		// Sind auf der selben Section nach meinem Feld noch unausgefüllte Required Fields?
+		fc = getNextFieldControl(tabListFromSelectedFieldSection.subList(indexOfSelectedField + 1, tabListFromSelectedFieldSection.size()));
+		if (fc != null) {
+			return fc;
+		}
+
+		int indexOfSection = sectionList.indexOf(initField.getmSection());
+
+		fc = getNextControlFromSectionIfNull(initField, sectionList.subList(indexOfSection + 1, sectionList.size()));
+		if (fc != null) {
+			return fc;
+		}
+		fc = getNextControlFromSectionIfNull(initField, sectionList.subList(0, indexOfSection));
+		if (fc != null) {
+			return fc;
+		}
+		// Sind auf der selben Section vor meinem Feld noch unausgefüllte Required Fields?
+		fc = getNextFieldControl(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
+		return fc;
+	}
+
+	private Control getNextControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
+		Control focussedControl = null;
+		for (MSection section : sectionList) {
+			List<MField> tabList = section.getTabList();
+
+			if (selectedField.getmSection().equals(section)) {
+				int indexOfSelectedField = tabList.indexOf(selectedField);
+
+				focussedControl = getNextFieldControl(tabList.subList(indexOfSelectedField, tabList.size() - 1));
+				if (focussedControl != null) {
+					return focussedControl;
+				}
+				focussedControl = getNextFieldControl(tabList.subList(0, indexOfSelectedField));
+				if (focussedControl != null) {
+					return focussedControl;
+				}
+			} else {
+				focussedControl = getNextFieldControl(tabList);
+				if (focussedControl != null) {
+					return focussedControl;
+				}
+			}
+		}
+		return focussedControl;
+	}
+
+	private Control getNextFieldControl(List<MField> tabListAfter) {
+		Control focussedControl = null;
+		for (MField field : tabListAfter) {
+			// 1. mein Feld kommt nach dem aktuellen INIT_FIELD ##
+			// 2. Mein Feld kommt nach dem aktuellen INIT_FIELD, auf nächster Section ##
+			// 3. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf vorheriger Section ##
+			// 4. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf gleicher Section ##
+			if (!field.isReadOnly()) {
+				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
+				focussedControl.setFocus();
+				context.set(INIT_FIELD, field);
+				return focussedControl;
+			}
+		}
+		return focussedControl;
 	}
 
 	/**
@@ -368,11 +481,11 @@ public class TraverseListenerImpl implements TraverseListener {
 
 			int indexOfSection = sectionList.indexOf(selectedField.getmSection());
 
-			fc = getNextControlFromSectionIfNull(selectedField, sectionList.subList(indexOfSection + 1, sectionList.size()));
+			fc = getNextRequiredControlFromSectionIfNull(selectedField, sectionList.subList(indexOfSection + 1, sectionList.size()));
 			if (fc != null) {
 				return;
 			}
-			fc = getNextControlFromSectionIfNull(selectedField, sectionList.subList(0, indexOfSection));
+			fc = getNextRequiredControlFromSectionIfNull(selectedField, sectionList.subList(0, indexOfSection));
 			if (fc != null) {
 				return;
 			}
@@ -399,7 +512,7 @@ public class TraverseListenerImpl implements TraverseListener {
 		}
 	}
 
-	private Control getNextControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
+	private Control getNextRequiredControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
 		Control focussedControl = null;
 		for (MSection section : sectionList) {
 			List<MField> tabList = section.getTabList();
