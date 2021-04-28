@@ -196,7 +196,11 @@ public class PrintIndexHandler {
 		}
 
 		generatePDF(url_pdf, url_xml, url_xsl);
-		showFile(url_pdf.toString(), null);
+		if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
+			showFile(url_pdf.toString(), null);
+		} else {
+			showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+		}
 	}
 
 	private boolean isColumnEmpty(Integer i, SortedList<Row> rows) {
@@ -502,7 +506,6 @@ public class PrintIndexHandler {
 	 * @since 11.0.0
 	 */
 	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
-		// Hier erstaml nur Ohne Preview öffnen!
 		if (preview == null) {
 			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
 			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
@@ -515,7 +518,6 @@ public class PrintIndexHandler {
 		} else {
 			preview.clear();
 		}
-		preview = null;
 		return preview;
 	}
 
