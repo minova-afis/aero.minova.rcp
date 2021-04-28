@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -168,39 +167,35 @@ public class PrintIndexHandler {
 				e.printStackTrace();
 			}
 
-			saveIntoXSL(xslString, xmlRootTag);
-			saveIntoXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
-		}
+			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
-		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
-		Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
-		Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
-		URL url_pdf = null;
-		URL url_xml = null;
-		URL url_xsl = null;
-		try {
-			Files.createDirectories(path_pdf.getParent());
-			Files.createDirectories(path_xml.getParent());
-			createFile(path_pdf.toString());
-			createFile(path_xml.toString());
-//			Files.createDirectories(path_xml.getParent());
-//			Files.createFile(path_xml);
+			try {
+				Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+				Files.createDirectories(path_pdf.getParent());
+				createFile(path_pdf.toString());
+				URL url_pdf = path_pdf.toFile().toURI().toURL();
 
-			url_pdf = path_pdf.toFile().toURI().toURL();
-			url_xml = path_xml.toFile().toURI().toURL();
-			url_xsl = path_xsl.toFile().toURI().toURL();
-			// Schreibt den Inhalt in die XML Datei
-			IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+				if (createXmlXsl) {
+					Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
+					Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
+					createFile(path_xml.toString());
+					createFile(path_xsl.toString());
+					IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
+					IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
+				}
 
-		generatePDF(url_pdf, url_xml, url_xsl);
-		// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
-		if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
-			showFile(url_pdf.toString(), null);
-		} else {
-			showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+				generatePDF(url_pdf, xml.toString(), xslString);
+
+				// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
+				if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
+					showFile(url_pdf.toString(), null);
+				} else {
+					showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -211,21 +206,6 @@ public class PrintIndexHandler {
 			}
 		}
 		return true;
-	}
-
-	private void saveIntoXSL(String xslString, String fileName) {
-		if (xslString != null) {
-			Path path_xsl = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xsl");
-			try {
-				Files.createDirectories(path_xsl.getParent());
-				createFile(path_xsl.toString());
-				// Schreibt den Inhalt in die XML Datei
-				IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/**
@@ -262,7 +242,7 @@ public class PrintIndexHandler {
 	 * @param fileName
 	 * @param title
 	 */
-	private void saveIntoXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
+	private void createXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
 			List<Integer> columnReorderList, StringBuffer xml, boolean tabSeparated, String fileName, String title) {
 
 		// Viewport layer umgehen, damit in addSumRow() auf alle Zeilen zugegriffen werden kann
@@ -447,11 +427,11 @@ public class PrintIndexHandler {
 	 * @param xsl
 	 * @return
 	 */
-	public void generatePDF(URL pdf, URL xml, URL xsl) {
-		PDFGenerator pdfGenerator = new PDFGenerator(new HashMap<String, String>());
+	public void generatePDF(URL pdf, String xmlString, String xslString) {
+		PDFGenerator pdfGenerator = new PDFGenerator();
 		try {
 			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
-			pdfGenerator.createPdfFile(xml.getFile(), xsl.getFile(), pdfOutput);
+			pdfGenerator.createPdfFile(xmlString, xslString, pdfOutput);
 			return;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
