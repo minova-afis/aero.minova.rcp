@@ -190,10 +190,19 @@ public class TraverseListenerImpl implements TraverseListener {
 					context.set(INIT_FIELD, focussedControl);
 				}
 			} else {
-				focussedControl = getPreviousControlFromSplitSectionList(sectionList, initiField);
+				List<MField> previousTabList = sectionList.get(sectionList.indexOf(initSection) - 1).getTabList();
+				if (!previousTabList.get(previousTabList.indexOf(initiField) - 1).isReadOnly()) {
+					focussedControl = ((AbstractValueAccessor) previousTabList.get(previousTabList.size() - 1).getValueAccessor()).getControl();
+				} else {
+					focussedControl = getPreviousControlFromSplitSectionList(sectionList, initiField);
+				}
 			}
 		} else {
-			focussedControl = getPreviousControlFromSplitSectionList(sectionList, initiField);
+			if (!initTabList.get(initTabList.indexOf(initiField) - 1).isReadOnly()) {
+				focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) - 1).getValueAccessor()).getControl();
+			} else {
+				focussedControl = getPreviousControlFromSplitSectionList(sectionList, initiField);
+			}
 		}
 		focussedControl.setFocus();
 	}
@@ -378,11 +387,21 @@ public class TraverseListenerImpl implements TraverseListener {
 				}
 				// Wir sind in der Letzten Section
 			} else {
-				focussedControl = getNextControlFromSplitSectionList(sectionList, initiField);
+				if (sectionList.get(sectionList.indexOf(initSection) + 1).getTabList().get(0).isReadOnly()) {
+					focussedControl = ((AbstractValueAccessor) sectionList.get(sectionList.indexOf(initSection) + 1).getTabList().get(0).getValueAccessor())
+							.getControl();
+				} else {
+					focussedControl = getNextControlFromSplitSectionList(sectionList, initiField);
+				}
 				// MField
 			}
 		} else {
-			focussedControl = getNextControlFromSplitSectionList(sectionList, initiField);
+			if (!initTabList.get(initTabList.indexOf(initiField) + 1).isReadOnly()) {
+				focussedControl = ((AbstractValueAccessor) initTabList.get(initTabList.indexOf(initiField) + 1).getValueAccessor()).getControl();
+			} else {
+				focussedControl = getNextControlFromSplitSectionList(sectionList, initiField);
+			}
+
 			// MField
 		}
 		focussedControl.setFocus();
