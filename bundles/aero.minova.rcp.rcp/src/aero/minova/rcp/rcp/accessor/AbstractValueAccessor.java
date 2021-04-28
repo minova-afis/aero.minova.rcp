@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.accessor;
 import javax.inject.Inject;
 
 import org.eclipse.e4.ui.services.IStylingEngine;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
@@ -67,10 +68,16 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	@Override
 	public void setEditable(boolean editable) {
+		if (field.isReadOnly()) {
+			editable = false;
+		}
+
 		if (control instanceof Lookup) {
 			((Lookup) control).setEditable(editable);
 		} else if (control instanceof Text) {
 			((Text) control).setEditable(editable);
+		} else if (control instanceof TextAssist) {
+			((TextAssist) control).setEditable(editable);
 		}
 	}
 

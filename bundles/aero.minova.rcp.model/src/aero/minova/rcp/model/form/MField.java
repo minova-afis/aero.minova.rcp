@@ -277,6 +277,7 @@ public abstract class MField {
 	public void setValueAccessor(ValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
 		updateCssClass(cssClass);
+		valueAccessor.setEditable(!readOnly);
 	}
 
 	public MDetail getDetail() {
