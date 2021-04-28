@@ -196,6 +196,7 @@ public class PrintIndexHandler {
 		}
 
 		generatePDF(url_pdf, url_xml, url_xsl);
+		// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
 		if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
 			showFile(url_pdf.toString(), null);
 		} else {
