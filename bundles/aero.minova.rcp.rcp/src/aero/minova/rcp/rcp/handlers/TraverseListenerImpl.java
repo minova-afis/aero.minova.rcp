@@ -105,6 +105,10 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////// Ermittlung des vorherigen Feldes //////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Ermittelt das in der Tab Reihenfolge vorherige Feld und selektiert dieses.
 	 * <p>
@@ -194,6 +198,23 @@ public class TraverseListenerImpl implements TraverseListener {
 		focussedControl.setFocus();
 	}
 
+	/**
+	 * Setzt die Sections in die richtige Reihenfolge und ermittelt dann das zu selektierende nicht ReadOnly Feld.
+	 * <p>
+	 * 1. Zuerst werden die Felder, die vor dem selektierten Feld und in der aktuellen Section stehen, von oben nach unten geprüft. <br>
+	 * 2. Wenn kein Control gefunden wurde, werden die Sections, die vor der aktuellen Section stehen geprüft. Beginnend mit dem Feld und der Section am Ende
+	 * der Liste. <br>
+	 * 3. Falls immer noch kein Control gefunden wurde, werden die Section nach der aktuellen Section geprüft. Beginnend mit dem letzten Feld in der letzten
+	 * Section. <br>
+	 * 4. Beim der aktuellen Section angekommen und es wurde immer noch kein Control gefunden, werden die Felder, die nach dem slektieren Feld stehen geprüft.
+	 * Beginnend mit dem letzten Feld der Section.
+	 * 
+	 * @param sectionList
+	 *            Liste aller Sections in Part.
+	 * @param initField
+	 *            das selektierte Feld.
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getPreviousControlFromSplitSectionList(List<MSection> sectionList, MField initField) {
 		Control fc = null;
 		List<MField> tabListFromSelectedFieldSection = initField.getmSection().getTabList();
@@ -221,6 +242,15 @@ public class TraverseListenerImpl implements TraverseListener {
 		return fc;
 	}
 
+	/**
+	 * Prüft die Felder der Sections der übergebenen SectionList in der angegebenen Reihenfolge und ermittelt das zu selektierende nicht ReadOnly Feld.
+	 * 
+	 * @param selectedField
+	 *            das selektierte Feld
+	 * @param sectionList
+	 *            Liste von Sections
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getPreviousControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
 		Control focussedControl = null;
 		for (int position = sectionList.size() - 1; position >= 0; position--) {
@@ -235,6 +265,13 @@ public class TraverseListenerImpl implements TraverseListener {
 		return focussedControl;
 	}
 
+	/**
+	 * Durchsucht die übergebene TabListe nach dem ersten nicht ReadOnly Feld und liefert es zurück.
+	 *
+	 * @param tabList
+	 *            die zu durchsuchende TabListe
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getPreviousFieldControl(List<MField> tabList) {
 		Control focussedControl = null;
 		for (int position = tabList.size() - 1; position >= 0; position--) {
@@ -252,6 +289,10 @@ public class TraverseListenerImpl implements TraverseListener {
 		}
 		return focussedControl;
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////// Ermittlung des nächsten Feldes ////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Ermittelt das in der Tab Reihenfolge nachfolgende Feld und selektiert dieses.
@@ -347,6 +388,24 @@ public class TraverseListenerImpl implements TraverseListener {
 		focussedControl.setFocus();
 	}
 
+	/**
+	 * Setzt die Sections in die richtige Reihenfolge und ermittelt dann das zu selektierende nicht ReadOnly Feld.
+	 * <p>
+	 * 1. Zuerst werden die Felder, die hinter dem selektierten Feld und in der aktuellen Section stehen, geprüft. Beginnend mit dem ersten Feld nach dem
+	 * aktuellen Feld <br>
+	 * 2. Wenn kein Control gefunden wurde, werden die Sections, die hinter der aktuellen Section stehen geprüft. Beginnend mit dem Feld und ser Section am
+	 * Anfang der Liste. <br>
+	 * 3. Falls immer noch kein Control gefunden wurde, werden die Section vor der aktuellen Section geprüft. Beginnend mit dem ersten Feld in der ersten
+	 * Section. <br>
+	 * 4. Beim der aktuellen Section angekommen und es wurde immer noch kein Control gefunden, werden die Felder, die vor dem slektieren Feld stehen geprüft.
+	 * Beginnend mit dem ersten Feld der Section.
+	 * 
+	 * @param sectionList
+	 *            Liste aller Sections in Part.
+	 * @param initField
+	 *            das selektierte Feld.
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getNextControlFromSplitSectionList(List<MSection> sectionList, MField initField) {
 		Control fc = null;
 		List<MField> tabListFromSelectedFieldSection = initField.getmSection().getTabList();
@@ -374,6 +433,15 @@ public class TraverseListenerImpl implements TraverseListener {
 		return fc;
 	}
 
+	/**
+	 * Prüft die Felder der Sections der übergebenen SectionList in der angegebenen Reihenfolge und ermittelt das zu selektierende nicht ReadOnly Feld.
+	 * 
+	 * @param selectedField
+	 *            das selektierte Feld
+	 * @param sectionList
+	 *            Liste von Sections
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
 	private Control getNextControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
 		Control focussedControl = null;
 		for (MSection section : sectionList) {
@@ -400,7 +468,14 @@ public class TraverseListenerImpl implements TraverseListener {
 		return focussedControl;
 	}
 
-	private Control getNextFieldControl(List<MField> tabListAfter) {
+	/**
+	 * Durchsucht die übergebene TabListe nach dem ersten nicht ReadOnly Feld und liefert es zurück.
+	 *
+	 * @param tabList
+	 *            die zu durchsuchende TabListe
+	 * @return liefert das ermittelte nicht ReadOnly Feld zurück.
+	 */
+	private Control getNextFieldControl(List<MField> tabList) {
 		Control focussedControl = null;
 		for (MField field : tabListAfter) {
 			// 1. mein Feld kommt nach dem aktuellen INIT_FIELD ##
@@ -416,6 +491,10 @@ public class TraverseListenerImpl implements TraverseListener {
 		}
 		return focussedControl;
 	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////// Ermittlung des nächsten Pflichtfeldes //////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Ermittelt das in der Tab Reihenfolge nachfolgende Pflichtfeld und selektiert dieses.
