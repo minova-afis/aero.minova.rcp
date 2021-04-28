@@ -159,6 +159,16 @@ public class PrintIndexHandler {
 			}
 
 			ReportConfiguration rConfig = new ReportConfiguration();
+			if (indexFont != null) {
+				String[] indexSplit = indexFont.split("\\|");
+				int fontsize = 8;
+				try {
+					fontsize = (int) Double.parseDouble(indexSplit[2]);
+				} catch (Exception e) {}
+				rConfig.setProp("FontSizeCriteria", fontsize + "");
+				rConfig.setProp("FontSizeCell", fontsize + "");
+				rConfig.setProp("FontFamily", indexSplit[1]);
+			}
 
 			try {
 				TableXSLCreator tableCreator = new TableXSLCreator(translationService, indexPart, this, ePartService);

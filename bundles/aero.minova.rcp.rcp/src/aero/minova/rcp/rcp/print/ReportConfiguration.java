@@ -122,6 +122,10 @@ public class ReportConfiguration extends CommonPrint {
 		return (toRet == null ? def : toRet);
 	}
 
+	public void setProp(String key, String val) {
+		props.put(key, val);
+	}
+
 	/**
 	 * berechnet die verfügbare Breite der Seite in mm (abz. Rand)
 	 *
