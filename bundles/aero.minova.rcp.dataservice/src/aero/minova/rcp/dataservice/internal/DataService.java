@@ -335,6 +335,8 @@ public class DataService implements IDataService {
 		try {
 			if (checkIfUpdateIsRequired(filename)) {
 				logCache(filename + " need to download / update the file ");
+				// File löschen, damit es komplett aktualisiert wird
+				getStoragePath().resolve(filename).toFile().delete();
 				downloadFile(filename);
 			}
 		} catch (IOException | InterruptedException e) {
