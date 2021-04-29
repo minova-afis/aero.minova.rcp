@@ -44,6 +44,9 @@ public class ColumnInfo {
 	/** Aktuelle Breite der Column in Pixel */
 	public int width;
 
+	/** Aktueller Index der Column in der Nattable **/
+	public int index;
+
 	/**
 	 * Die Breite der Column kann für den Druck optimiert werden.<br>
 	 * Falls bereits geschehen, steht die optimierte Breite in diesem Feld.
@@ -65,6 +68,11 @@ public class ColumnInfo {
 		this.width = width;
 		this.column = field;
 		this.visible = visible;
+	}
+
+	public ColumnInfo(Column field, int width, boolean visible, int index) {
+		this(field, width, visible);
+		this.index = index;
 	}
 
 	/**

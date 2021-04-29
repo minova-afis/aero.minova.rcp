@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -38,6 +39,7 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
+import org.eclipse.swt.graphics.FontData;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -150,7 +152,7 @@ public class PrintIndexHandler {
 					width = widths[i1];
 				}
 				boolean vis = !hideEmptyCols || !isColumnEmpty(i1, sortedDataList);
-				colConfig.add(new ColumnInfo(data.getColumns().get(i1), width, vis));
+				colConfig.add(new ColumnInfo(data.getColumns().get(i1), width, vis, i));
 
 				if (groupByIndices.contains(i1)) {
 					groupByIndicesReordered.add(i);
@@ -160,14 +162,15 @@ public class PrintIndexHandler {
 
 			ReportConfiguration rConfig = new ReportConfiguration();
 			if (indexFont != null) {
-				String[] indexSplit = indexFont.split("\\|");
+				FontData fontData = new FontData(indexFont);
 				int fontsize = 8;
 				try {
-					fontsize = (int) Double.parseDouble(indexSplit[2]);
+					fontsize = fontData.getHeight();
 				} catch (Exception e) {}
 				rConfig.setProp("FontSizeCriteria", fontsize + "");
 				rConfig.setProp("FontSizeCell", fontsize + "");
-				rConfig.setProp("FontFamily", indexSplit[1]);
+				rConfig.setProp("FontFamily", fontData.getName());
+				rConfig.guiFont = new Font(fontData.getName(), Font.PLAIN, fontsize);
 			}
 
 			try {

@@ -60,8 +60,10 @@ public class TableXSLCreator extends CommonPrint {
 		// Gruppierungsspalten entfernen
 		if (printHandler.hideGroupCols) {
 			List<ColumnInfo> toRemove = new ArrayList<ColumnInfo>();
-			for (Integer i : groupByIndicesReordered) {
-				toRemove.add(cols.get(i));
+			for (ColumnInfo colInf : cols) {
+				if (groupByIndicesReordered.contains(colInf.index)) {
+					toRemove.add(colInf);
+				}
 			}
 			cols.removeAll(toRemove);
 		}
@@ -183,7 +185,7 @@ public class TableXSLCreator extends CommonPrint {
 		}
 
 		dColSize *= conf.PIXEL_SIZE_MM;
-		dColSize += conf.CELL_PADDING_MM;
+		dColSize += conf.CELL_PADDING_MM * 2;
 
 		if (col.column == null || isOptimized) {
 			// WIS: empty field oder optimizeFieldWidth schon geschehen wir haben die Breite schon so berechnet, dass es stimmt darf also nicht noch mal
@@ -197,7 +199,7 @@ public class TableXSLCreator extends CommonPrint {
 		// Umrechnung Schriftgröße
 		double fontFactor = 1;
 		if (!conf.standardFont.equals(conf.guiFont)) {
-			fontFactor = conf.standardFont.getSize2D() / conf.guiFont.getSize2D();
+			fontFactor = conf.guiFont.getSize2D() / conf.standardFont.getSize2D();
 		}
 
 		final int iColSize = (int) (dColSize * dpiFactor * fontFactor);
@@ -238,7 +240,10 @@ public class TableXSLCreator extends CommonPrint {
 					continue;
 				}
 				final FilterValue v = (FilterValue) v1;
-				final String value = v.getOperatorValue() + " " + v.getFilterValue().getValueString(Locale.getDefault());
+				String value = v.getOperatorValue();
+				if (v.getFilterValue() != null) {
+					value += " " + v.getFilterValue().getValueString(Locale.getDefault());
+				}
 
 				searchCriteria = getTemplate("SearchCriteria");
 				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));
@@ -270,7 +275,10 @@ public class TableXSLCreator extends CommonPrint {
 					continue;
 				}
 				final FilterValue v = (FilterValue) v1;
-				final String value = v.getOperatorValue() + " " + v.getFilterValue().getValueString(Locale.getDefault());
+				String value = v.getOperatorValue();
+				if (v.getFilterValue() != null) {
+					value += " " + v.getFilterValue().getValueString(Locale.getDefault());
+				}
 
 				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));
 				searchCriteriaText += value;

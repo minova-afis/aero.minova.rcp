@@ -30,7 +30,7 @@ public class ReportConfiguration extends CommonPrint {
 	 * Falls verfügbar, haben wir hier den von der GUI verwendeten Font (sonst Standardfont)<br>
 	 * wird verwendet, um Breiten automatisch zu berechnen
 	 */
-	public final Font guiFont;
+	public Font guiFont;
 
 	public final String xslFontFamily;
 
