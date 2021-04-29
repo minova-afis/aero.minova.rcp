@@ -92,6 +92,9 @@ public class DataService implements IDataService {
 		data.put(IEventBroker.DATA, value);
 		Event event = new Event(Constants.BROKER_SHOWERROR, data);
 		eventAdmin.postEvent(event);
+
+		log("CAS error:\n" + value.getErrorTable().getRows().get(0).getValue(0).getStringValue() + "\nUser: " + value.getUser() + "\nProcedure/View: "
+				+ value.getProcedureOrView());
 	}
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
