@@ -16,7 +16,6 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.rcp.handlers.PrintIndexHandler;
-import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 import aero.minova.rcp.rcp.print.ReportCreationException.Cause;
 import aero.minova.rcp.util.IOUtil;
@@ -30,7 +29,7 @@ public class TableXSLCreator extends CommonPrint {
 	// Templates
 	private static HashMap<String, String> templates = new HashMap<>();
 
-	public TableXSLCreator(TranslationService translationService2, WFCIndexPart indexPart, PrintIndexHandler printHandler, EPartService ePartService) {
+	public TableXSLCreator(TranslationService translationService2, PrintIndexHandler printHandler, EPartService ePartService) {
 		this.translationService = translationService2;
 		this.printHandler = printHandler;
 		this.searchPart = (WFCSearchPart) ePartService.findPart("aero.minova.rcp.rcp.part.search").getObject();

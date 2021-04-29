@@ -143,7 +143,7 @@ public class PrintIndexHandler {
 				}
 			}
 
-			// ColumnInfo erstellen und evtl Gruppierungsspaten entfernen
+			// ColumnInfo erstellen
 			List<ColumnInfo> colConfig = new ArrayList<>();
 			int i = 0;
 			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
@@ -174,7 +174,7 @@ public class PrintIndexHandler {
 			}
 
 			try {
-				TableXSLCreator tableCreator = new TableXSLCreator(translationService, indexPart, this, ePartService);
+				TableXSLCreator tableCreator = new TableXSLCreator(translationService, this, ePartService);
 				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, path_reports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
