@@ -204,7 +204,7 @@ public class DataService implements IDataService {
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
 
-		log("CAS Request Index:\n" + request.toString() + "\n" + body);
+		log("CAS Request Index:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			Table fromJson = gson.fromJson(t.body(), Table.class);
@@ -228,7 +228,7 @@ public class DataService implements IDataService {
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-		log("CAS Request PDF Detail:\n" + request + "\n" + body);
+		log("CAS Request PDF Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
 		try {
 			Files.createDirectories(path.getParent());
@@ -251,7 +251,7 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<SqlProcedureResult> future
-		log("CAS Request Detail Data:\n" + request + "\n" + body);
+		log("CAS Request Detail Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
