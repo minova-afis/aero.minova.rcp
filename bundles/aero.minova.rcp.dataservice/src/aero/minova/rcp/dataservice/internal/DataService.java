@@ -34,6 +34,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
@@ -73,6 +74,8 @@ import aero.minova.rcp.model.util.ErrorObject;
 public class DataService implements IDataService {
 
 	EventAdmin eventAdmin;
+
+	Logger logger;
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
@@ -200,12 +203,12 @@ public class DataService implements IDataService {
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.build();
-		if (LOG) {
-			logBody(body, ++callCount);
-		}
+
+		log("CAS Request Index:\n" + request.toString() + "\n" + body);
 
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			Table fromJson = gson.fromJson(t.body(), Table.class);
+			log("CAS Answer Index:\n" + t.body());
 			return fromJson;
 		});
 
@@ -225,7 +228,7 @@ public class DataService implements IDataService {
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.build();
-		logBody(body, ++callCount);
+		log("CAS Request PDF Detail:\n" + request + "\n" + body);
 		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
 		try {
 			Files.createDirectories(path.getParent());
@@ -235,6 +238,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
+			log("CAS Answer PDF Detail:\n" + t.body());
 			return path;
 		});
 	}
@@ -247,7 +251,7 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.build();
 		// return CompletableFuture<SqlProcedureResult> future
-		logBody(body, ++callCount);
+		log("CAS Request Detail Data:\n" + request + "\n" + body);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
@@ -276,7 +280,7 @@ public class DataService implements IDataService {
 					return null;
 				}
 			}
-			logBody(t.body());
+			log("CAS Answer Detail Data:\n" + t.body());
 			return fromJson;
 		});
 
@@ -309,24 +313,14 @@ public class DataService implements IDataService {
 		return sslContext;
 	}
 
-	private void logBody(String body) {
-		if (LOG) {
-			System.out.println(body);
-		}
-
-	}
-
-	private static void logCache(String message) {
+	private void logCache(String message) {
 		if (LOG_CACHE) {
 			System.out.println(message);
 		}
-
 	}
 
-	private void logBody(String body, int i) {
-		if (LOG) {
-			logBody("Call: " + i + "\n" + body);
-		}
+	private void log(String body) {
+		logger.info(body);
 	}
 
 	@Override
@@ -356,7 +350,7 @@ public class DataService implements IDataService {
 	private CompletableFuture<String> downloadAsync(String filename) {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
-		logBody("getFileSynch(" + filename + ")", ++callCount);
+		log("CAS Request File Async:\n" + request + "\n" + filename);
 		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
 	}
 
@@ -375,7 +369,7 @@ public class DataService implements IDataService {
 	public void downloadFile(String fileName) throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.build();
-		logBody("getFileSynch(" + fileName + ")", ++callCount);
+		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 		httpClient.send(request, BodyHandlers.ofFile(localFile));
 	}
@@ -757,6 +751,11 @@ public class DataService implements IDataService {
 	@Override
 	public String getUserName() {
 		return username;
+	}
+
+	@Override
+	public void setLogger(Logger logger) {
+		this.logger = logger;
 	}
 
 //	@Override

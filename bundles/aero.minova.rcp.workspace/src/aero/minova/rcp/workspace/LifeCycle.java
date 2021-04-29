@@ -56,6 +56,7 @@ public class LifeCycle {
 					} else {
 						dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null), sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
 								sPrefs.get(WorkspaceAccessPreferences.URL, null), workspaceLocation);
+						dataService.setLogger(logger);
 					}
 				}
 			} catch (Exception e) {
@@ -88,5 +89,6 @@ public class LifeCycle {
 				workspaceDialog.getPassword(), //
 				workspaceDialog.getConnection(), //
 				workspaceLocation);
+		dataService.setLogger(logger);
 	}
 }
