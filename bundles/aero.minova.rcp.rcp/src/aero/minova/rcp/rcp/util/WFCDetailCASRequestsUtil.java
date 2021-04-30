@@ -151,9 +151,7 @@ public class WFCDetailCASRequestsUtil {
 
 			}
 
-			if (newKeys.equals(keys)) {
-				return;
-			} else {
+			if (!newKeys.equals(keys)) {
 				setKeys(newKeys);
 			}
 
