@@ -100,6 +100,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		// Auf diese werte reagieren wir
 		startDate.addValueChangeListener(this);
 		endDate.addValueChangeListener(this);
+		bookingDate.addValueChangeListener(this);
 		orderreceiver.addValueChangeListener(ticketHelper);
 		servicecontract.addValueChangeListener(ticketHelper);
 		serviceobject.addValueChangeListener(ticketHelper);
@@ -127,6 +128,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	}
 
 	protected void calculateTime() {
+		bookingDateValue = bookingDate.getValue();
 		if (startDate.getValue() == null) {
 			return;
 		}
@@ -144,7 +146,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		renderedQuantity.setValue(valueRe, true);
 		chargedQuantity.setValue(valueCh, true);
 		endDateValue = endDate.getValue();
-		bookingDateValue = bookingDate.getValue();
 		if (employee.getValue() instanceof LookupValue) {
 			employeeValue = (LookupValue) employee.getValue();
 		} else {
