@@ -214,7 +214,7 @@ public class DataService implements IDataService {
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
-		sendRequest.exceptionallyAsync(ex -> {
+		sendRequest.exceptionally(ex -> {
 			log("CAS Error Index:\n" + ex.getMessage());
 			return null;
 		});
@@ -254,7 +254,7 @@ public class DataService implements IDataService {
 
 		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
 
-		sendRequest.exceptionallyAsync(ex -> {
+		sendRequest.exceptionally(ex -> {
 			log("CAS Error PDF Detail:\n" + ex.getMessage());
 			return null;
 		});
@@ -277,7 +277,7 @@ public class DataService implements IDataService {
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
-		sendRequest.exceptionallyAsync(ex -> {
+		sendRequest.exceptionally(ex -> {
 			log("CAS Error Detail Data:\n" + ex.getMessage());
 			return null;
 		});
@@ -383,7 +383,7 @@ public class DataService implements IDataService {
 				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 		log("CAS Request File Async:\n" + request + "\n" + filename);
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
-		sendRequest.exceptionallyAsync(ex -> {
+		sendRequest.exceptionally(ex -> {
 			log("CAS Error File Async:\n" + ex.getMessage());
 			return null;
 		});
@@ -426,7 +426,7 @@ public class DataService implements IDataService {
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
-		sendRequest.exceptionallyAsync(ex -> {
+		sendRequest.exceptionally(ex -> {
 			log("CAS Error Server Hash for File:\n" + ex.getMessage());
 			return null;
 		});

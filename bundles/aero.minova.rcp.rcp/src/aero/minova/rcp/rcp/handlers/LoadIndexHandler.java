@@ -85,7 +85,7 @@ public class LoadIndexHandler {
 			});
 		});
 
-		tableFuture.exceptionallyAsync(ex -> {
+		tableFuture.exceptionally(ex -> {
 			// TODO: Nachricht an Nutzende
 			loading = false;
 			broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
