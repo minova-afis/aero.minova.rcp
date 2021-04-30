@@ -209,12 +209,18 @@ public class DataService implements IDataService {
 
 		log("CAS Request Index:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 
-		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionallyAsync(ex -> {
+			log("CAS Answer Index Error:\n" + ex.getMessage());
+			return null;
+		});
+
+		return sendRequest.thenApplyAsync(t -> {
 			Table fromJson = gson.fromJson(t.body(), Table.class);
 			log("CAS Answer Index:\n" + t.body());
 			return fromJson;
 		});
-
 	}
 
 	/**
@@ -607,7 +613,7 @@ public class DataService implements IDataService {
 			Table ta = null;
 			try {
 				ta = tableFuture.get();
-			} catch (InterruptedException | ExecutionException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (ta != null) {
