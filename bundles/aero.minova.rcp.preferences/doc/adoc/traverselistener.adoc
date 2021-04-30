@@ -1,7 +1,15 @@
 
-= TraverseListener Verhalten
+= Tab- und Enter-Verhalten
 
-Dokumentation der Verhaltensweise des TraverseListeners. Der TraverseListener bestimmt das Tab- und Enter-Verhalten im Detail Bereich.
+Diese Dokumentation beschreibt das Verhalten bei der Eingabe von Tab und Enter im DetailPart.
+
+Bei der Umsetzung des Tab-Verhaltens verwenden wir das Verhalten, dass Eclipse schon standardmäßig implementiert hat. Das Enter-Verhalten wird in einem Handler mit Key Binding umgesetzt. 
+Wir haben uns aus folgenden Gründen gegen den TraverseListener entschieden:
+
+- Wir möchten dem Benutzer ein für Ihn gewohntes Verhalten bieten. Er soll sich nicht umgewöhnen und es trägt zu einer einfacheren Bedienung der Anwendung bei.
+- Es ist weniger Code für uns zum pflegen. Der Code wird durch Eclipse aktuell gehalten.
+- Die Funktionalität des Verhaltens ist vielseitiger einsetzbar, da sie nicht an eine Klasse gebunden ist. Zum Beispiel, durch die Umsetzung des
+Enter Verhaltens in einem Handler, können wir diesen von verschiedenen Stellen in der Anwendung aufrufen.
 
 ==== Preferences die das Tab- und Enter-Verhalten beeinflussen
 
@@ -13,8 +21,12 @@ SelectAllControls (SAC) = Genau Beschreibung hier: xref:application.adoc#Aktivie
 
 ==== Tab-Verhalten
 
+Da das Tab-Verhalten durch Eclipse vorgegeben ist, müssen wir nur noch die Tab-Reihenfolge bestimmen. Folgende Bedingungen gelten für die Tab-Reihenfolge:
 
-Für die Eingabe von Tab haben wir folgendes Verhalten festgelegt:
+- Dabei werden in den Sections nur die Felder in die Tab Liste hinzugefügt, die nicht Read Only sind.
+- Wenn die Preference SelectAllControls gesetzt ist werden die Controls des Detail Parts ebenfalls der Tab-Reihenfolge hinzugefügt. Dies ermöglicht die Selektion der Toolbar und der Sections.
+
+Verhalten für die Eingabe von Tab:
 
 |===
 | *Eingabe* | *Verhalten*
@@ -26,71 +38,66 @@ Für die Eingabe von Tab haben wir folgendes Verhalten festgelegt:
 
 ==== Enter-Verhalten
 
-Für die Eingabe von Enter haben wir folgendes Verhalten festgelegt:
+Die Eingabe von Enter wird mit einem Key-Binding im DetailPart erkannt und führt darauhin die entsprechenden Handler aus. Dabei wir wie anschließend beschrieben vorgegangen:
+ 
+- Zuerst wird die CanExecute Methode des GetNextRequiredHandlers ausgeführt. Die CanExecute Methode prüft den DetailPart nach nicht ausgefüllten Pflichtfeldern. Wenn sie keine findet wird false zurückgeliefert. Wenn sie ein Pflichtfeld findet wird true zurückgegeben.
+- Wenn CanExecute true zurückliefert wird die Execute Methode des Handlers ausgeführt. Diese ermittelt das nächste zu selektierende leere Pflichtfeld.
+- Falls die CanExecute Methode des Handlers false zurückliefert, wird die CanExecute Methode des SaveHandlers ausgeführt. Dieser prüft die eingegebenen Werte der Pflichtfelder auf Richtigkeit. Wenn alle Werte richtig sind wird true zurückgegeben. 
+Falls ein Wert nicht stimmt wird false zurück geliefert und das entsprechende Feld selektiert.
+- Bei true wird darufhin die Execute Methode des SaveHandlers ausgeführt, der dann den Datensatz speichert.
 
+Festgelegtes Verhalten für die Eingabe von Enter:
 
 |===
 | *Eingabe* | *Verhalten*
 | Enter | Benutzer springt ins nächste Pflichtfeld.
-| Tab + ESFR = true | Der benutzer springt ins erste nicht ausgefüllte Pflichtfeld.
-| Tab + ESFR = false | Der benutzer springt ins nächste Pflichtfeld.
+| Enter + ESFR = true | Der benutzer springt ins erste nicht ausgefüllte Pflichtfeld.
+| Enter + ESFR = false | Der benutzer springt ins nächste Pflichtfeld.
 |===
 
-==== Ermittlung des nächsten Feldes
+==== Spezifisches Verhalten bei Mac
 
-Folgende Bedingungen werden beim Ermitteln des nächsten Feldes beachtet:
+Für Mac gilt folgendes spezifisches Verhalten:
 
-- Wenn sich der Benutzer im letzten Feld der letzten Page befindet und SAC ist gesetzt, springt er bei der Eingabe von Tab in die Toolbar des Detail Parts.
-- Sobald alle Pflichtfelder ausgefüllt sind, wird bei der Eingabe von Enter der SaveHandler ausgeführt und der Datensatz wird gespeichert.
-- Das Feld in das der Benutzer mit einem Traverse Event springt wird als initial Feld im Context gespeichert. Solange der Benutzer zwischenzeitlich kein anderes  Feld selektiert hat, wird das gespeicherte Feld als Ausgangsfeld genutzt. Das gespeicherte Feld wird dann mit dem neuen Feld überschrieben. Dies reduziert die Verwendung von Foreach-Schleifen und macht die Anwendung schneller.
+- Beim Mac kann die Selektion von Schaltflächen in den Systemeinstellungen aktiviert werden. Dafür muss unter Kurzbefehle in den Tastatureinstellungen der Haken bei "Bewege den Fokus mittels Tastaturnavigation zu Steuerelementen" gesetzt sein.
 
-==== Beispiel für das Speichern des InitialFields
+image::images/mac_activate_button_selection.png[Aktivierung der Button Selektion unter Mac,550,300]
 
-*Beispiel Eingabe Tab:* +
-Der Benutzer befindet sich im Feld 2, das als InitialField gespeichert wurde, und drückt Tab.
+- Standardverhalten für die Eingaben von Tab und Enter mit Modifier:
 
-Feld 1 : +
-Feld 2 : init <- USER hier +
-Feld 3 : +
-Feld 4 : +
+*Tab + Modifier:*
+|===
+|Ctrl + Tab | Benutzer bleibt im Feld und es wird keine Tab erstellt
+|Alt + Tab | Benutzer bleibt im Feld und es wird eine Tab erstellt
+|Cmd + Tab | Unter den geöffneten Apps zur zuletzt verwendeten wechseln.
+|===
 
-Die Methode getNextField() liest das gespeicherte Feld aus dem Kontext. Sie nutzt das Feld und wählt in der TabListe der Page das Feld mit dem Index des gespeicherten Felds + 1 aus. 
+*Enter + Modifier:*
+|===
+| *Eingabe* | *Verhalten*
+|Ctrl + Enter | Benutzer bleibt im Feld und es wird ein Zeilenumbruch erstellt
+|Alt + Enter | Benutzer bleibt im Feld und es wird ein Zeilenumbruch erstellt
+|Cmd + Enter | Benutzer bleibt im Feld es wird kein Zeilenumbruch erstellt, es kommt ein Fehlersound
+|===
 
-image::images/get_next_field_snippet.png[GetNextField,800,75]
+==== Spezifisches Verhalten bei Windows
 
-Das neue Feld wird jetzt als neues InitialField gespeichert, um beim nächsten TraverseEvent als Ausgangspunkt genutzt zu werden.
+Für Windows gilt folgendes spezifisches Verhalten:
 
-Feld 1 : +
-Feld 2 : +
-Feld 3 : init <- USER hier +
-Feld 4 : +
+- Standardverhalten für die Eingaben von Tab und Enter mit Modifier in Text Feld:
 
-Im nächsten TraverseEvent wird dann Feld 3 als InitialField genommen.
+*Tab + Modifier:*
+|===
+| *Eingabe* | *Verhalten*
+|Strg + Tab | Benutzer bleibt im Feld und es wird keine Tab erstellt.
+|Alt + Tab | Windows spezifisches Verhalten wechseln zur letzten Anwendung.
+|Win + Tab | Windows spezifisches Verhalten Übersicht aller offenen Fenster.
+|===
 
-*Beispiel Eingabe Shift + Tab:* +
-Der Benutzer befindet sich im Feld 3, das als InitialField gespeichert wurde, und drückt Shift + Tab.
-
-Feld 1 : +
-Feld 2 : +
-Feld 3 : init <- USER hier +
-Feld 4 : +
-
-Die Methode getPreviousField() liest das gespeicherte Feld aus dem Kontext. Sie nutzt das Feld und wählt in der TabListe der Page das Feld mit dem Index des gespeicherten Felds - 1 aus. 
-
-image::images/get_previous_field_snippet.png[GetPreviousField,800,75]
-
-Das neue Feld wird jetzt als neues InitialField gespeichert, um beim nächsten TraverseEvent als Ausgangspunkt genutzt zu werden.
-
-Feld 1 : +
-Feld 2 : init <- USER hier +
-Feld 3 : +
-Feld 4 : +
-
-Im nächsten TraverseEvent wird dann Feld 2 als InitialField genommen.
-
-*Beispiel Eingabe Enter:* +
-Bei der Eingabe von Enter wird nicht mit dem InitialField gearbeitet, da für die Ermittlung des nächsten bzw. ersten Pflichtfeld For-Schleifen benötigt werden.
-Dies ist der Fall, da das nächste Pflichtfeld sich überall auf dem Detail befindet könnte. 
-Die Ermittlung des nächsten Pflichtfelds mit dem InitialField würde den Code nur aufblähen und keine Verbesserung bewirken, wie in den anderen beiden Methoden.
-
-Wenn der Benutzer ein anderes Feld mit der Maus selektiert und dann ein TraverseEvent auslöst, wird nicht das gespeicherte Feld genommen, sonder mit einer For-Schleife das zu selektierende Feld ermittelt.
+*Enter + Modifier:*
+|===
+| *Eingabe* | *Verhalten*
+|Strg + Enter | Benutzer bleibt im Feld und es wird ein Zeilenumbruch erstellt
+|Alt + Enter | Benutzer bleibt im Feld und es wird kein Zeilenumbruch erstellt
+|Win + Enter | Benutzer bleibt im Feld und es wird kein Zeilenumbruch erstellt
+|===
