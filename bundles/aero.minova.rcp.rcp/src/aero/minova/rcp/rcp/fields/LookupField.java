@@ -93,7 +93,7 @@ public class LookupField {
 			public void keyTraversed(TraverseEvent e) {
 				Text text = ((Text) e.getSource());
 				Lookup t = (Lookup) text.getParent();
-				System.out.println("Pressed key: " + e.keyCode);
+				// System.out.println("Pressed key: " + e.keyCode);
 				switch (e.detail) {
 				case SWT.TRAVERSE_TAB_PREVIOUS:
 					t.fillSelectedValue();
