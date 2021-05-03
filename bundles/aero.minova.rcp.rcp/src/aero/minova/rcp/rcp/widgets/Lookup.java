@@ -107,7 +107,7 @@ public class Lookup extends Composite {
 		text = new Text(this, style);
 		popup = new Shell(getDisplay(), SWT.ON_TOP);
 		popup.setLayout(new FillLayout());
-		table = new Table(popup, SWT.SINGLE | SWT.V_SCROLL);
+		table = new Table(popup, SWT.FULL_SELECTION | SWT.V_SCROLL);
 		table.setLinesVisible(true);
 		new TableColumn(table, SWT.NONE); // KeyText
 		new TableColumn(table, SWT.NONE); // Description
@@ -921,7 +921,7 @@ public class Lookup extends Composite {
 
 		showAllElements(text.getText());
 	}
-	
+
 	public void closePopup() {
 		popup.setVisible(false);
 	}
