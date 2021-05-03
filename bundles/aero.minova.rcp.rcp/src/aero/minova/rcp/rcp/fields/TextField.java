@@ -62,6 +62,7 @@ public class TextField {
 			}
 		});
 
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
 		TextValueAccessor valueAccessor = new TextValueAccessor(field, text);
 		ContextInjectionFactory.inject(valueAccessor, context);

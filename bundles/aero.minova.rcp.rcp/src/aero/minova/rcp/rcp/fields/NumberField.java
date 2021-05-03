@@ -48,6 +48,7 @@ public class NumberField {
 		});
 		text.addVerifyListener(numberValueAccessor);
 
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
 		ContextInjectionFactory.inject(numberValueAccessor, context);
 		field.setValueAccessor(numberValueAccessor);

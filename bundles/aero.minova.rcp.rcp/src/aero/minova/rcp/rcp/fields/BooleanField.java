@@ -32,6 +32,7 @@ public class BooleanField {
 		FormData formData = new FormData();
 		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
 
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
 		BooleanValueAccessor valueAccessor = new BooleanValueAccessor(field, button);
 		ContextInjectionFactory.inject(valueAccessor, context);

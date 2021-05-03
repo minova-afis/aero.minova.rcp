@@ -78,6 +78,7 @@ public class ShortTimeField {
 			}
 		});
 
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
 		ShortTimeValueAccessor valueAccessor = new ShortTimeValueAccessor(field, text);
 		ContextInjectionFactory.inject(valueAccessor, context);
