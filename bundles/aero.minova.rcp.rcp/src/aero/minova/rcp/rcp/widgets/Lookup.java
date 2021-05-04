@@ -9,7 +9,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
@@ -54,7 +53,6 @@ public class Lookup extends Composite {
 	 */
 	private Label label;
 	private List<LookupValue> popupValues;
-	private MouseListener mouseListener;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
@@ -470,7 +468,7 @@ public class Lookup extends Composite {
 		Objects.requireNonNull(label);
 		this.label = label;
 
-		label.addMouseListener(mouseListener = new MouseAdapter() {
+		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
 				Lookup.this.setFocus();
