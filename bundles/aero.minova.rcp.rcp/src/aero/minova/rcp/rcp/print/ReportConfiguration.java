@@ -30,7 +30,7 @@ public class ReportConfiguration extends CommonPrint {
 	 * Falls verfügbar, haben wir hier den von der GUI verwendeten Font (sonst Standardfont)<br>
 	 * wird verwendet, um Breiten automatisch zu berechnen
 	 */
-	public final Font guiFont;
+	public Font guiFont;
 
 	public final String xslFontFamily;
 
@@ -120,6 +120,10 @@ public class ReportConfiguration extends CommonPrint {
 	public String getProp(String key, String def) {
 		final String toRet = this.props.get(key);
 		return (toRet == null ? def : toRet);
+	}
+
+	public void setProp(String key, String val) {
+		props.put(key, val);
 	}
 
 	/**

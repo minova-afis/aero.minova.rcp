@@ -10,17 +10,16 @@ public class NatTableUtil {
 
 	public static void resize(NatTable natTable) {
 		for (int i = 0; i < natTable.getColumnCount(); i++) {
-			InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(natTable, i,
-					natTable.getConfigRegistry(), new GCFactory(natTable));
+			InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(natTable, i, natTable.getConfigRegistry(),
+					new GCFactory(natTable));
 			natTable.doCommand(columnCommand);
 		}
 
-		for (int i = 0; i < natTable.getColumnCount(); i++) {
-			InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable, i,
-					natTable.getConfigRegistry(), new GCFactory(natTable));
+		for (int i = 0; i < natTable.getRowCount(); i++) {
+			InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable, i, natTable.getConfigRegistry(),
+					new GCFactory(natTable));
 			natTable.doCommand(rowCommand);
 		}
-
 	}
 
 	public static void refresh(NatTable natTable) {
