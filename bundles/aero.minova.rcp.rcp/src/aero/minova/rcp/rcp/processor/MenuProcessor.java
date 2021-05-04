@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
@@ -36,19 +37,13 @@ public class MenuProcessor {
 		this.menu = menu;
 		this.modelService = modelService;
 		this.mApplication = mApplication;
-		dataService.getHashedFile(MDI_FILE_NAME).thenAccept(fileContent -> processXML(fileContent));
-		
+		dataService.getHashedFile(MDI_FILE_NAME).thenAccept(this::processXML);
 	}
 
 	private void processXML(String fileContent) {
 		Main mainMDI = null;
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
-
-		if (mainMDI != null) {
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
 			if (!menuOrEntry.isEmpty()) {
 
@@ -65,11 +60,15 @@ public class MenuProcessor {
 					}
 				}
 			}
+		} catch (JAXBException e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	/**
-	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der Einträge
+	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der
+	 * Einträge
 	 *
 	 * @param menu_MDI
 	 * @param menu
@@ -81,7 +80,7 @@ public class MenuProcessor {
 			EModelService modelService, MApplication mApplication) {
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
-		// TODO Übersetzung einbauen
+
 		menuGen.setLabel(menu_MDI.getText());
 
 		// TODO Sortierung des MENUS aus der MDI beachten!!!
@@ -100,7 +99,8 @@ public class MenuProcessor {
 	}
 
 	/**
-	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen MDI-Eintrag
+	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen
+	 * MDI-Eintrag
 	 *
 	 * @param entryMDI
 	 * @param actionMDI
@@ -112,21 +112,40 @@ public class MenuProcessor {
 			MApplication mApplication) {
 
 		MHandledMenuItem handledMenuItem = modelService.createModelElement(MHandledMenuItem.class);
-		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.openform");
-		MParameter mParameter = modelService.createModelElement(MParameter.class);
-		handledMenuItem.setCommand(command);
-		mParameter.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId" + entryMDI.getId());
-		mParameter.setName("aero.minova.rcp.perspectiveswitcher.parameters.formName");
-		mParameter.setValue(actionMDI.getAction());
+		handledMenuItem.getPersistedState().put("persistState", String.valueOf(false));
 
-		handledMenuItem.getParameters().add(mParameter);
-		handledMenuItem.setElementId(actionMDI.getId());
+		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.openform");
+		handledMenuItem.setCommand(command);
+
+		// set the form name as parameter
+		MParameter mParameterForm = modelService.createModelElement(MParameter.class);
+		mParameterForm.setElementId("parameter.formName." + entryMDI.getId()); // not used
+		mParameterForm.setName(Constants.FORM_NAME);
+		mParameterForm.setValue(actionMDI.getAction());
+		handledMenuItem.getParameters().add(mParameterForm);
+
+		// set the perspective id as parameter
+		MParameter mParameterId = modelService.createModelElement(MParameter.class);
+		mParameterId.setElementId("parameter.formId." + entryMDI.getId()); // not used
+		mParameterId.setName(Constants.FORM_ID);
+		mParameterId.setValue(actionMDI.getId());
+
+		handledMenuItem.getParameters().add(mParameterId);
+
+		// set the perspective name as parameter
+		MParameter mParameterPerspectiveName = modelService.createModelElement(MParameter.class);
+		mParameterPerspectiveName.setElementId("parameter.PerspectiveLabel." + entryMDI.getId()); // not used
+		mParameterPerspectiveName.setName(Constants.FORM_LABEL);
+		mParameterPerspectiveName.setValue(actionMDI.getText());
+
+		handledMenuItem.getParameters().add(mParameterPerspectiveName);
+
+		handledMenuItem.setElementId("menuItemFor." + actionMDI.getId());
 
 		handledMenuItem.setLabel(actionMDI.getText());
-		// TODO Icon setzen
+
 		handledMenuItem.setIconURI(actionMDI.getIcon());
 
-		handledMenuItem.getPersistedState().put("persistState", String.valueOf(false));
 		return handledMenuItem;
 
 	}
