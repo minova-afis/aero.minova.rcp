@@ -80,6 +80,7 @@ public class MenuProcessor {
 	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI,
 			EModelService modelService, MApplication mApplication) {
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
+		menuGen.getPersistedState().put("persistState", String.valueOf(false));
 		// TODO Übersetzung einbauen
 		menuGen.setLabel(menu_MDI.getText());
 
