@@ -141,9 +141,16 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		long min = ChronoUnit.MINUTES.between(start, end);
 		float renderedQty = getFloatFromMinutes(min);
 		float chargedQty = getChargedQuantity(renderedQty);
+		// falls Enddate vor StartDate, dann negative renderedQuantity => darf nicht abgespeichert werden
+		if (renderedQty < 0) {
+			endDate.setCanBeValid(false);
+			endDate.setInvalidColor();
+		} else {
+			endDate.setCanBeValid(true);
+		}
 		Value valueRe = new Value((double) renderedQty);
-		Value valueCh = new Value((double) chargedQty);
 		renderedQuantity.setValue(valueRe, true);
+		Value valueCh = new Value((double) chargedQty);
 		chargedQuantity.setValue(valueCh, true);
 		endDateValue = endDate.getValue();
 		if (employee.getValue() instanceof LookupValue) {
@@ -151,6 +158,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		} else {
 			System.err.println("WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
 		}
+
 	}
 
 	public float getFloatFromMinutes(long min) {

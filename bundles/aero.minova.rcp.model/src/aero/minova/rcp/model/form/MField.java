@@ -43,6 +43,8 @@ public abstract class MField {
 	private int tabIndex;
 	private MSection mSection;
 	private String cssClass = Constants.CSS_STANDARD;
+	// Wenn canBeValid = false, dann ist das Feld aufgrund einer Berechnung auf falsch gesetzt
+	private boolean canBeValid = true;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -357,6 +359,10 @@ public abstract class MField {
 	 * Weitere Validierung findet in Unterklassen statt (z.B. Textlänge in MTextField)
 	 */
 	public boolean isValid() {
+		if (!canBeValid) {
+			setInvalidColor();
+			return false;
+		}
 		if (!isRequired() || mSection == null) {
 			return true;
 		}
@@ -365,5 +371,13 @@ public abstract class MField {
 
 	public void setInvalidColor() {
 		updateCssClass(Constants.CSS_INVALID);
+	}
+
+	public boolean isCanBeValid() {
+		return canBeValid;
+	}
+
+	public void setCanBeValid(boolean canBeValid) {
+		this.canBeValid = canBeValid;
 	}
 }
