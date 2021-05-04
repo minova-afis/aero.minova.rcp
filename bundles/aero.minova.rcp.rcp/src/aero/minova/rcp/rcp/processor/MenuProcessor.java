@@ -41,10 +41,9 @@ public class MenuProcessor {
 	}
 
 	private void processXML(String fileContent) {
-		XmlProcessor xmlProcessor = new XmlProcessor();
 		Main mainMDI = null;
 		try {
-			mainMDI = xmlProcessor.get(fileContent, Main.class);
+			mainMDI = XmlProcessor.get(fileContent, Main.class);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
