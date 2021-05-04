@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 
 import aero.minova.rcp.util.DateTimeUtil;
+import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.TimeUtil;
 
 public class Value implements Serializable {
@@ -58,6 +59,48 @@ public class Value implements Serializable {
 				return TimeUtil.getTimeString(i2, locale);
 			}
 			return DateTimeUtil.getDateTimeString(i2, locale);
+		default:
+			break;
+		}
+		return returnValue;
+	}
+
+	public String getValueString(Locale locale, DateTimeType dateTimeType) {
+		if (dateTimeType == null) {
+			return getValueString(locale);
+		}
+
+		String returnValue = "";
+		switch (type) {
+		case ZONED:
+			ZonedDateTime z = (ZonedDateTime) value;
+			Instant i = z.toInstant();
+			switch (dateTimeType) {
+			case TIME:
+				returnValue = TimeUtil.getTimeString(i, locale);
+				break;
+			case DATE:
+				returnValue = DateUtil.getDateString(i, locale);
+				break;
+			case DATETIME:
+				returnValue = DateTimeUtil.getDateTimeString(i, locale);
+				break;
+			}
+			break;
+		case INSTANT:
+			Instant i2 = (Instant) value;
+			switch (dateTimeType) {
+			case TIME:
+				returnValue = TimeUtil.getTimeString(i2, locale);
+				break;
+			case DATE:
+				returnValue = DateUtil.getDateString(i2, locale);
+				break;
+			case DATETIME:
+				returnValue = DateTimeUtil.getDateTimeString(i2, locale);
+				break;
+			}
+			break;
 		default:
 			break;
 		}
