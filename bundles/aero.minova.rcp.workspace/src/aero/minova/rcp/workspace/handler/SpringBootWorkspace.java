@@ -90,8 +90,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	@Override
 	public void open() throws WorkspaceException {
-		if (!getPassword().isEmpty() && !getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
-			// Manuell wurde hier das Psswort eingetragten / geändert
+		if (!getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+			// Entwender das Passwort ist null/leer oder es wurde manuell eingetragten / geändert
 			checkCredentials(getPassword());
 		}
 		if (!Platform.getInstanceLocation().isSet()) {
