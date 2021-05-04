@@ -241,7 +241,7 @@ public class TableXSLCreator extends CommonPrint {
 				final FilterValue v = (FilterValue) v1;
 				String value = v.getOperatorValue();
 				if (v.getFilterValue() != null) {
-					value += " " + v.getFilterValue().getValueString(Locale.getDefault());
+					value += " " + v.getFilterValue().getValueString(Locale.getDefault(), ci.column.getDateTimeType());
 				}
 
 				searchCriteria = getTemplate("SearchCriteria");
