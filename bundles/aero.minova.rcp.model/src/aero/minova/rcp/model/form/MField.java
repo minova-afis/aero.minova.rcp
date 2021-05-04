@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -30,6 +31,7 @@ public abstract class MField {
 	private Integer numberRowsSpanned = 1;
 	private Double maximumValue;
 	private Double minimumValue;
+	private int maxTextLength;
 	private boolean fillToRight = false;
 	private String lookupTable;
 	private String lookupProcedurePrefix;
@@ -40,7 +42,7 @@ public abstract class MField {
 	private boolean readOnly;
 	private int tabIndex;
 	private MSection mSection;
-	
+	private String cssClass = Constants.CSS_STANDARD;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -115,6 +117,13 @@ public abstract class MField {
 			displayValue = getValueAccessor().setValue(value, user);
 		}
 		fire(new ValueChangeEvent(this, oldValue, value, user));
+
+		if (value == null) {
+			updateCssClass(cssClass);
+		} else {
+			updateCssClass(Constants.CSS_STANDARD);
+		}
+		isValid();
 	}
 
 	/**
@@ -202,6 +211,14 @@ public abstract class MField {
 		this.minimumValue = maximumValue;
 	}
 
+	public int getMaxTextLength() {
+		return maxTextLength;
+	}
+
+	public void setMaxTextLength(int maxTextLength) {
+		this.maxTextLength = maxTextLength;
+	}
+
 	public boolean isFillToRight() {
 		return fillToRight;
 	}
@@ -259,6 +276,8 @@ public abstract class MField {
 
 	public void setValueAccessor(ValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
+		updateCssClass(cssClass);
+		valueAccessor.setEditable(!readOnly);
 	}
 
 	public MDetail getDetail() {
@@ -268,23 +287,30 @@ public abstract class MField {
 	void setDetail(MDetail detail) {
 		this.detail = detail;
 	}
-	
+
 	public boolean isRequired() {
 		return required;
 	}
-	
+
 	public void setRequired(boolean required) {
 		this.required = required;
+		// Readonly hat Vorrang
+		if (required && !cssClass.equals(Constants.CSS_READONLY)) {
+			cssClass = Constants.CSS_REQUIRED;
+		}
 	}
-	
+
 	public boolean isReadOnly() {
 		return readOnly;
 	}
-	
+
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
+		if (readOnly) {
+			cssClass = Constants.CSS_READONLY;
+		}
 	}
-	
+
 	public int getTabIndex() {
 		return tabIndex;
 	}
@@ -304,5 +330,40 @@ public abstract class MField {
 	@Override
 	public String toString() {
 		return "MField(" + getName() + ")";
+	}
+
+	public void updateCssClass(String newClass) {
+		if (valueAccessor == null) {
+			return;
+		}
+
+		// Readonly wird nie geändert
+		if (cssClass.equals(Constants.CSS_READONLY)) {
+			valueAccessor.setCSSClass(Constants.CSS_READONLY);
+			return;
+		}
+
+		valueAccessor.setCSSClass(newClass);
+	}
+
+	/**
+	 * Kann (laut diesem Feld) gespeichtert werden
+	 * <p>
+	 * <ul>
+	 * <li>Nicht angezeigte Felder (mSection == null) oder Felder ohne "required" brauchen keinen Wert
+	 * <li>Ansonsten kann gespeichtert werden, wenn ein Wert eingetragen ist
+	 * </ul>
+	 * <p>
+	 * Weitere Validierung findet in Unterklassen statt (z.B. Textlänge in MTextField)
+	 */
+	public boolean isValid() {
+		if (!isRequired() || mSection == null) {
+			return true;
+		}
+		return fieldValue != null;
+	}
+
+	public void setInvalidColor() {
+		updateCssClass(Constants.CSS_INVALID);
 	}
 }

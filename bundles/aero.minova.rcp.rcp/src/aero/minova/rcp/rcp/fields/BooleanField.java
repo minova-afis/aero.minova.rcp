@@ -9,6 +9,9 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.Locale;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -24,13 +27,16 @@ import aero.minova.rcp.rcp.accessor.BooleanValueAccessor;
 
 public class BooleanField {
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			Locale locale) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		FormData formData = new FormData();
 		Button button = formToolkit.createButton(composite, field.getLabel(), SWT.CHECK);
 
-		field.setValueAccessor(new BooleanValueAccessor(field, button));
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		BooleanValueAccessor valueAccessor = new BooleanValueAccessor(field, button);
+		ContextInjectionFactory.inject(valueAccessor, context);
+		field.setValueAccessor(valueAccessor);
 
 		formData.width = COLUMN_WIDTH;
 		formData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);

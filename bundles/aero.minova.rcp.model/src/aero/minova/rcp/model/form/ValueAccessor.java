@@ -21,4 +21,6 @@ public interface ValueAccessor {
 	void setMessageText(String message);
 
 	void setEditable(boolean editable);
+
+	void setCSSClass(String classname);
 }

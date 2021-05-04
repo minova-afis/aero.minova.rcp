@@ -33,6 +33,7 @@ public class ModelToViewModel {
 		} else if (field.getText() != null) {
 			f = new MTextField();
 			f.setFillToRight("toright".equals(field.getFill()));
+			f.setMaxTextLength(field.getText().getLength());
 		} else {
 			return null;
 		}

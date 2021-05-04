@@ -7,4 +7,18 @@ public class MTextField extends MField {
 	public MTextField() {
 		super(DataType.STRING);
 	}
+
+	@Override
+	public boolean isValid() {
+		if (getValue() == null) {
+			return super.isValid();
+		}
+
+		int textLength = getValue().getStringValue().length();
+		boolean validTest = super.isValid() && textLength > 0 && textLength < getMaxTextLength();
+		if (!validTest) {
+			setInvalidColor();
+		}
+		return validTest;
+	}
 }

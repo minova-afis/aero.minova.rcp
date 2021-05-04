@@ -13,6 +13,9 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.Locale;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -29,8 +32,8 @@ import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
 public class NumberField {
 
-	public static Control create(Composite composite, MNumberField field, int row, int column, FormToolkit formToolkit,
-			Locale locale) {
+	public static Control create(Composite composite, MNumberField field, int row, int column, FormToolkit formToolkit, Locale locale,
+			MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
@@ -45,6 +48,9 @@ public class NumberField {
 		});
 		text.addVerifyListener(numberValueAccessor);
 
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		ContextInjectionFactory.inject(numberValueAccessor, context);
 		field.setValueAccessor(numberValueAccessor);
 
 		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
@@ -79,7 +85,7 @@ public class NumberField {
 		text.setData(FIELD_MIN_VALUE, minimum);
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
-		
+
 		// TODO SAW_ERC korrigieren NumberFieldVerifier
 		// text.addVerifyListener(new NumberFieldVerifier(text));
 

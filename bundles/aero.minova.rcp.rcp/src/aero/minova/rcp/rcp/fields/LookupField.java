@@ -42,7 +42,7 @@ public class LookupField {
 
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, MPerspective perspective, Locale locale) {
+	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
 		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
@@ -93,7 +93,7 @@ public class LookupField {
 			public void keyTraversed(TraverseEvent e) {
 				Text text = ((Text) e.getSource());
 				Lookup t = (Lookup) text.getParent();
-				System.out.println("Pressed key: " + e.keyCode);
+				// System.out.println("Pressed key: " + e.keyCode);
 				switch (e.detail) {
 				case SWT.TRAVERSE_TAB_PREVIOUS:
 					t.fillSelectedValue();
