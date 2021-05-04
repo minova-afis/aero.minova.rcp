@@ -25,8 +25,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -80,13 +78,6 @@ public class WFCDetailPart extends WFCFormPart {
 	private static final int MARGIN_SECTION = 8;
 	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5
 																											// Zwischenräume
-
-	@Inject
-	Logger logger;
-
-	@Inject
-	private IEventBroker broker;
-
 	@Inject
 	protected UISynchronize sync;
 
@@ -163,7 +154,7 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent, IEclipseContext context) {
-		TraverseListener traverseListener = new TraverseListenerImpl(logger, detail, locale, partService, context);
+		TraverseListener traverseListener = new TraverseListenerImpl(detail, locale, partService, context);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);

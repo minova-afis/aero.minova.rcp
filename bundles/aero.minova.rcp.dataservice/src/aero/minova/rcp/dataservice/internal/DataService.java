@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
@@ -74,6 +76,8 @@ public class DataService implements IDataService {
 
 	EventAdmin eventAdmin;
 
+	Logger logger;
+
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
 		this.eventAdmin = admin;
@@ -89,6 +93,9 @@ public class DataService implements IDataService {
 		data.put(IEventBroker.DATA, value);
 		Event event = new Event(Constants.BROKER_SHOWERROR, data);
 		eventAdmin.postEvent(event);
+
+		log("CAS error:\n" + value.getErrorTable().getRows().get(0).getValue(0).getStringValue() + "\nUser: " + value.getUser() + "\nProcedure/View: "
+				+ value.getProcedureOrView());
 	}
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
@@ -99,6 +106,8 @@ public class DataService implements IDataService {
 	public static final String TABLE_LASTACTION = "LastAction";
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
+
+	private static final int TIMEOUT_DURATION = 15;
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
@@ -199,16 +208,22 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
-				.build();
-		if (LOG) {
-			logBody(body, ++callCount);
-		}
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 
-		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
-			Table fromJson = gson.fromJson(t.body(), Table.class);
-			return fromJson;
+		log("CAS Request Index:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			log("CAS Error Index:\n" + ex.getMessage());
+			return null;
 		});
 
+		return sendRequest.thenApply(t -> {
+			Table fromJson = gson.fromJson(t.body(), Table.class);
+			log("CAS Answer Index:\n" + t.body());
+			return fromJson;
+		});
 	}
 
 	/**
@@ -224,8 +239,8 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.build();
-		logBody(body, ++callCount);
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+
 		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
 		try {
 			Files.createDirectories(path.getParent());
@@ -234,7 +249,18 @@ public class DataService implements IDataService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return httpClient.sendAsync(request, BodyHandlers.ofFile(path)).thenApply(t -> {
+
+		log("CAS Request PDF Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+
+		sendRequest.exceptionally(ex -> {
+			log("CAS Error PDF Detail:\n" + ex.getMessage());
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer PDF Detail:\n" + t.body());
 			return path;
 		});
 	}
@@ -245,10 +271,18 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.build();
-		// return CompletableFuture<SqlProcedureResult> future
-		logBody(body, ++callCount);
-		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(t -> {
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+
+		log("CAS Request Detail Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			log("CAS Error Detail Data:\n" + ex.getMessage());
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
@@ -276,7 +310,7 @@ public class DataService implements IDataService {
 					return null;
 				}
 			}
-			logBody(t.body());
+			log("CAS Answer Detail Data:\n" + t.body());
 			return fromJson;
 		});
 
@@ -309,24 +343,14 @@ public class DataService implements IDataService {
 		return sslContext;
 	}
 
-	private void logBody(String body) {
-		if (LOG) {
-			System.out.println(body);
-		}
-
-	}
-
-	private static void logCache(String message) {
+	private void logCache(String message) {
 		if (LOG_CACHE) {
 			System.out.println(message);
 		}
-
 	}
 
-	private void logBody(String body, int i) {
-		if (LOG) {
-			logBody("Call: " + i + "\n" + body);
-		}
+	private void log(String body) {
+		logger.info(body);
 	}
 
 	@Override
@@ -356,10 +380,16 @@ public class DataService implements IDataService {
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 */
 	private CompletableFuture<String> downloadAsync(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.build();
-		logBody("getFileSynch(" + filename + ")", ++callCount);
-		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(HttpResponse::body);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))//
+				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+		log("CAS Request File Async:\n" + request + "\n" + filename);
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+		sendRequest.exceptionally(ex -> {
+			log("CAS Error File Async:\n" + ex.getMessage());
+			return null;
+		});
+		return sendRequest.thenApply(HttpResponse::body);
 	}
 
 	/**
@@ -375,9 +405,10 @@ public class DataService implements IDataService {
 	 */
 	@Override
 	public void downloadFile(String fileName) throws IOException, InterruptedException {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.build();
-		logBody("getFileSynch(" + fileName + ")", ++callCount);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName))//
+				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 		httpClient.send(request, BodyHandlers.ofFile(localFile));
 	}
@@ -389,10 +420,21 @@ public class DataService implements IDataService {
 	 * @return
 	 */
 	public CompletableFuture<String> getServerHashForFile(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename)).header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.build();
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename))//
+				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 
-		return httpClient.sendAsync(request, BodyHandlers.ofString()).thenApply(response -> {
+		log("CAS Request Server Hash for File:\n" + request + "\n" + filename);
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			log("CAS Error Server Hash for File:\n" + ex.getMessage());
+			return null;
+		});
+
+		return sendRequest.thenApply(response -> {
+			log("CAS Answer Server Hash for File:\n" + response.body());
 			if (response.statusCode() != 200) {
 				throw new RuntimeException("Server returned " + response.statusCode());
 			}
@@ -612,7 +654,7 @@ public class DataService implements IDataService {
 			Table ta = null;
 			try {
 				ta = tableFuture.get();
-			} catch (InterruptedException | ExecutionException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			if (ta != null) {
@@ -761,10 +803,8 @@ public class DataService implements IDataService {
 		return username;
 	}
 
-//	@Override
-//	public <T> T convert(Path f, Class<T> clazz) {
-//		String content = Files.readString(f, StandardCharsets.UTF_8);
-//		gson.fromJson(f., clazz)
-//		return null;
-//	}
+	@Override
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
 }
