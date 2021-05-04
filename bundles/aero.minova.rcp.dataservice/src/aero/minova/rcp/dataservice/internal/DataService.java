@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -410,7 +411,9 @@ public class DataService implements IDataService {
 				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
-		httpClient.send(request, BodyHandlers.ofFile(localFile));
+
+		httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE,
+										StandardOpenOption.WRITE));
 	}
 
 	/**
