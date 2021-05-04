@@ -111,7 +111,7 @@ public class DataService implements IDataService {
 	private String username = null;// "admin";
 	private String password = null;// "rqgzxTf71EAx8chvchMi";
 	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
-	private String server = null;// "https://publictest.minova.com:17280";
+	private String server = null;// "http://publictest.minova.com:17280/cas";
 
 	// Dies ist der Server, auf welchen wir derzeit zugreifen müssen, um die
 	// Ticket-Anfragen zu versenden
