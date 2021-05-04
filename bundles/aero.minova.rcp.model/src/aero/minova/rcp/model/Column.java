@@ -16,6 +16,8 @@ public class Column {
 	DataType type;
 	OutputType outputType;
 	String label;
+	Integer decimals;
+	DateTimeType dateTimeType;
 
 	@Override
 	public String toString() {
@@ -36,6 +38,22 @@ public class Column {
 
 	public String getLabel() {
 		return label;
+	}
+
+	public Integer getDecimals() {
+		return decimals;
+	}
+
+	public void setDecimals(Integer decimals) {
+		this.decimals = decimals;
+	}
+
+	public DateTimeType getDateTimeType() {
+		return dateTimeType;
+	}
+
+	public void setDateTimeType(DateTimeType dateTimeType) {
+		this.dateTimeType = dateTimeType;
 	}
 
 }

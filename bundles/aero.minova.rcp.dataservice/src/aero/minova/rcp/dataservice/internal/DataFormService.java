@@ -21,6 +21,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
 
@@ -37,6 +38,26 @@ public class DataFormService implements IDataFormService {
 		for (Column c : form.getIndexView().getColumn()) {
 			aero.minova.rcp.model.Column tableColumn = new aero.minova.rcp.model.Column(c.getName(), getDataType(c), OutputType.OUTPUT);
 			tableColumn.setLabel(c.getLabel());
+
+			Integer decimals = null;
+			if (c.getNumber() != null) {
+				decimals = c.getNumber().getDecimals();
+			} else if (c.getMoney() != null) {
+				decimals = c.getMoney().getDecimals();
+			} else if (c.getPercentage() != null) {
+				decimals = c.getPercentage().getDecimals();
+			}
+			tableColumn.setDecimals(decimals);
+
+			DateTimeType dateTimeType = null;
+			if (c.getDateTime() != null) {
+				dateTimeType = DateTimeType.DATETIME;
+			} else if (c.getShortDate() != null) {
+				dateTimeType = DateTimeType.DATE;
+			} else if (c.getShortTime() != null) {
+				dateTimeType = DateTimeType.TIME;
+			}
+			tableColumn.setDateTimeType(dateTimeType);
 
 			dataTable.addColumn(tableColumn);
 		}
@@ -109,8 +130,17 @@ public class DataFormService implements IDataFormService {
 
 	public aero.minova.rcp.model.Column createColumnFromField(Field f, String prefix) {
 		DataType type = null;
+		DateTimeType dateTimeType = null;
+		Integer decimals = null;
 		if (f.getPercentage() != null || f.getMoney() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
+			if (f.getNumber() != null) {
+				decimals = f.getNumber().getDecimals();
+			} else if (f.getMoney() != null) {
+				decimals = f.getMoney().getDecimals();
+			} else if (f.getPercentage() != null) {
+				decimals = f.getPercentage().getDecimals();
+			}
 		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
 		} else if (f.getBoolean() != null) {
@@ -119,6 +149,13 @@ public class DataFormService implements IDataFormService {
 			type = DataType.STRING;
 		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
 			type = DataType.INSTANT;
+			if (f.getDateTime() != null) {
+				dateTimeType = DateTimeType.DATETIME;
+			} else if (f.getShortDate() != null) {
+				dateTimeType = DateTimeType.DATE;
+			} else if (f.getShortTime() != null) {
+				dateTimeType = DateTimeType.TIME;
+			}
 		}
 
 		aero.minova.rcp.model.Column c;
@@ -129,6 +166,8 @@ public class DataFormService implements IDataFormService {
 		}
 
 		c.setLabel(f.getLabel());
+		c.setDecimals(decimals);
+		c.setDateTimeType(dateTimeType);
 
 		return c;
 

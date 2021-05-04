@@ -131,13 +131,17 @@ public class PrintIndexHandler {
 				for (int i = 0; i < widths.length; i++) {
 					widths[i] = i;
 				}
+				// Hier wird die optimale Breite für Spalten aufgrund des Tabellen-Körpers ermittelt. Aufgrund der extremen Länge einzelner Spalten die durch
+				// Gruppierung zustande kommt wird hier der GlazedListsEventLayer verwendet, der die Gruppierungs-Zeilen nicht enthält
 				ILayer layer = indexPart.getBodyLayerStack().getGlazedListsEventLayer();
 				int[] widthsBody = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
 						new GCFactory(indexPart.getNattable()), layer, widths);
+				// Hier wird die optimale Breite für Spalten aufgrund des Headers ermittelt
 				layer = indexPart.getColumnHeaderDataLayer();
 				int[] widthsHeader = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
 						new GCFactory(indexPart.getNattable()), layer, widths);
 
+				// Die Breite einer Spalte ist das Maximum der Header und Body Breite
 				for (int i = 0; i < widths.length; i++) {
 					widths[i] = Math.max(widthsBody[i], widthsHeader[i]);
 				}
@@ -161,7 +165,7 @@ public class PrintIndexHandler {
 			}
 
 			ReportConfiguration rConfig = new ReportConfiguration();
-			if (indexFont != null) {
+			if (indexFont != null && !indexFont.isEmpty()) {
 				FontData fontData = new FontData(indexFont);
 				int fontsize = 8;
 				try {
@@ -263,7 +267,7 @@ public class PrintIndexHandler {
 
 		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 		numberFormat.setMinimumFractionDigits(2);
-		numberFormat.setMaximumFractionDigits(2); // TODO anpassen?
+		numberFormat.setMaximumFractionDigits(2);
 
 		addHeader(xml, fileName);
 		xml.append("<Title>" + title + "</Title>\n");
@@ -349,14 +353,20 @@ public class PrintIndexHandler {
 				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				if (r.getValue(d) != null) {
 					if (r.getValue(d).getType() == DataType.DOUBLE) {
+						// Definierte Nachkommastellen für diese Spalte werden gedruckt
+						if (c.getDecimals() != null) {
+							numberFormat.setMinimumIntegerDigits(c.getDecimals());
+							numberFormat.setMaximumIntegerDigits(c.getDecimals());
+						}
 						xml.append(numberFormat.format(r.getValue(d).getDoubleValue()));
 					} else if (r.getValue(d).getType() == DataType.INTEGER) {
 						xml.append(r.getValue(d).getValueString(Locale.getDefault()));
 					} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
 						xml.append(1);
 					} else {
+						// Information über Instant Formatierung wird übergeben
 						xml.append("<![CDATA[");
-						xml.append(r.getValue(d).getValueString(Locale.getDefault()));
+						xml.append(r.getValue(d).getValueString(Locale.getDefault(), c.getDateTimeType()));
 						xml.append("]]>");
 					}
 				}
