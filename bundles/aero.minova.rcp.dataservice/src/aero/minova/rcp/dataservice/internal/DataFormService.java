@@ -206,14 +206,13 @@ public class DataFormService implements IDataFormService {
 		// form wird synchron geladen, das sollte später auch asynchron werden
 		String formContent = hashedFile.join();
 
-		XmlProcessor xmlProcessor = new XmlProcessor();
 		try {
 			String localpath = Platform.getInstanceLocation().getURL().toURI().toString();
 			File formFile = new File(localpath + name);
 			if (!formFile.exists()) {
 				// Datei vom Server holen
 			}
-			form = xmlProcessor.get(formContent, Form.class);
+			form = XmlProcessor.get(formContent, Form.class);
 		} catch (URISyntaxException | JAXBException ex) {
 			throw new RuntimeException(ex);
 		}
