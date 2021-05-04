@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,7 +12,6 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -35,7 +36,10 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
+import org.eclipse.nebula.widgets.nattable.util.GCFactory;
+import org.eclipse.swt.graphics.FontData;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -43,6 +47,7 @@ import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
@@ -66,6 +71,31 @@ public class PrintIndexHandler {
 
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	private EPartService ePartService;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.CREATE_XML_XS)
+	public boolean createXmlXsl;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_FONT)
+	public String indexFont;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.OPTIMIZED_WIDTHS)
+	public boolean optimizeWidths;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.HIDE_EMPTY_COLS)
+	public boolean hideEmptyCols;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.HIDE_GROUP_COLS)
+	public boolean hideGroupCols;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.HIDE_SEARCH_CRITERIAS)
+	public boolean hideSearchCriterias;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DISABLE_PREVIEW)
+	public boolean disablePreview;
 
 	@Execute
 	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window, EModelService modelService,
@@ -93,67 +123,102 @@ public class PrintIndexHandler {
 			// Gruppierung
 			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
+			List<Integer> groupByIndicesReordered = new ArrayList<Integer>();
 
+			// Optimalen Spaltenbreiten ermitteln
+			int[] widths = new int[columnReorderLayer.getColumnCount()];
+			if (optimizeWidths) {
+				for (int i = 0; i < widths.length; i++) {
+					widths[i] = i;
+				}
+				ILayer layer = indexPart.getBodyLayerStack().getGlazedListsEventLayer();
+				int[] widthsBody = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
+						new GCFactory(indexPart.getNattable()), layer, widths);
+				layer = indexPart.getColumnHeaderDataLayer();
+				int[] widthsHeader = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
+						new GCFactory(indexPart.getNattable()), layer, widths);
+
+				for (int i = 0; i < widths.length; i++) {
+					widths[i] = Math.max(widthsBody[i], widthsHeader[i]);
+				}
+			}
+
+			// ColumnInfo erstellen
 			List<ColumnInfo> colConfig = new ArrayList<>();
 			int i = 0;
 			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
-				colConfig.add(new ColumnInfo(data.getColumns().get(i1), columnReorderLayer.getColumnWidthByPosition(i)));
+				int width = columnReorderLayer.getColumnWidthByPosition(i);
+				if (optimizeWidths) {
+					width = widths[i1];
+				}
+				boolean vis = !hideEmptyCols || !isColumnEmpty(i1, sortedDataList);
+				colConfig.add(new ColumnInfo(data.getColumns().get(i1), width, vis, i));
+
+				if (groupByIndices.contains(i1)) {
+					groupByIndicesReordered.add(i);
+				}
 				i++;
 			}
 
 			ReportConfiguration rConfig = new ReportConfiguration();
+			if (indexFont != null) {
+				FontData fontData = new FontData(indexFont);
+				int fontsize = 8;
+				try {
+					fontsize = fontData.getHeight();
+				} catch (Exception e) {}
+				rConfig.setProp("FontSizeCriteria", fontsize + "");
+				rConfig.setProp("FontSizeCell", fontsize + "");
+				rConfig.setProp("FontFamily", fontData.getName());
+				rConfig.guiFont = new Font(fontData.getName(), Font.PLAIN, fontsize);
+			}
 
 			try {
-				TableXSLCreator tableCreator = new TableXSLCreator(translationService);
-				xslString = tableCreator.createXSL(xmlRootTag, title, sortedDataList, colConfig, rConfig, path_reports);
+				TableXSLCreator tableCreator = new TableXSLCreator(translationService, this, ePartService);
+				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, path_reports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
 			}
 
-			saveIntoXSL(xslString, xmlRootTag);
-			saveIntoXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
-		}
+			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
-		Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
-		Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
-		Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
-		URL url_pdf = null;
-		URL url_xml = null;
-		URL url_xsl = null;
-		try {
-			Files.createDirectories(path_pdf.getParent());
-			Files.createDirectories(path_xml.getParent());
-			createFile(path_pdf.toString());
-			createFile(path_xml.toString());
-//			Files.createDirectories(path_xml.getParent());
-//			Files.createFile(path_xml);
-
-			url_pdf = path_pdf.toFile().toURI().toURL();
-			url_xml = path_xml.toFile().toURI().toURL();
-			url_xsl = path_xsl.toFile().toURI().toURL();
-			// Schreibt den Inhalt in die XML Datei
-			IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		generatePDF(url_pdf, url_xml, url_xsl);
-		showFile(url_pdf.toString(), null);
-	}
-
-	private void saveIntoXSL(String xslString, String fileName) {
-		if (xslString != null) {
-			Path path_xsl = dataService.getStoragePath().resolve("PDF/" + fileName + "_Index.xsl");
 			try {
-				Files.createDirectories(path_xsl.getParent());
-				createFile(path_xsl.toString());
-				// Schreibt den Inhalt in die XML Datei
-				IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
+				Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+				Files.createDirectories(path_pdf.getParent());
+				createFile(path_pdf.toString());
+				URL url_pdf = path_pdf.toFile().toURI().toURL();
 
-			} catch (Exception e) {
+				if (createXmlXsl) {
+					Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
+					Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
+					createFile(path_xml.toString());
+					createFile(path_xsl.toString());
+					IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
+					IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
+				}
+
+				generatePDF(url_pdf, xml.toString(), xslString);
+
+				// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
+				if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
+					showFile(url_pdf.toString(), null);
+				} else {
+					showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+				}
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
 		}
+	}
+
+	private boolean isColumnEmpty(Integer i, SortedList<Row> rows) {
+		for (Row r : rows) {
+			if (r.getValue(i) != null) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -190,7 +255,7 @@ public class PrintIndexHandler {
 	 * @param fileName
 	 * @param title
 	 */
-	private void saveIntoXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
+	private void createXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
 			List<Integer> columnReorderList, StringBuffer xml, boolean tabSeparated, String fileName, String title) {
 
 		// Viewport layer umgehen, damit in addSumRow() auf alle Zeilen zugegriffen werden kann
@@ -375,11 +440,11 @@ public class PrintIndexHandler {
 	 * @param xsl
 	 * @return
 	 */
-	public void generatePDF(URL pdf, URL xml, URL xsl) {
-		PDFGenerator pdfGenerator = new PDFGenerator(new HashMap<String, String>());
+	public void generatePDF(URL pdf, String xmlString, String xslString) {
+		PDFGenerator pdfGenerator = new PDFGenerator();
 		try {
 			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
-			pdfGenerator.createPdfFile(xml.getFile(), xsl.getFile(), pdfOutput);
+			pdfGenerator.createPdfFile(xmlString, xslString, pdfOutput);
 			return;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -435,7 +500,6 @@ public class PrintIndexHandler {
 	 * @since 11.0.0
 	 */
 	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
-		// Hier erstaml nur Ohne Preview öffnen!
 		if (preview == null) {
 			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
 			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
@@ -448,7 +512,6 @@ public class PrintIndexHandler {
 		} else {
 			preview.clear();
 		}
-		preview = null;
 		return preview;
 	}
 

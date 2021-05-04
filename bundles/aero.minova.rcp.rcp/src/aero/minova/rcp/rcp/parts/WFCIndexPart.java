@@ -157,6 +157,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private FixedSummaryRowLayer summaryRowLayer;
 
+	private DefaultColumnHeaderDataLayer columnHeaderDataLayer;
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -369,15 +371,15 @@ public class WFCIndexPart extends WFCFormPart {
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
 				columnPropertyAccessor.getTableHeadersMap());
-		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
+		columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
+		columnHeaderLayer = new ColumnHeaderLayer(getColumnHeaderDataLayer(), bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
 		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, getColumnHeaderDataLayer()), false);
 		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Zeilen, die keinen von- oder bis-Wert haben)
-		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
-		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
-		for (int i = 0; i < columnHeaderDataLayer.getColumnCount(); i++) {
+		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(getColumnHeaderDataLayer());
+		getColumnHeaderDataLayer().setConfigLabelAccumulator(labelAccumulator);
+		for (int i = 0; i < getColumnHeaderDataLayer().getColumnCount(); i++) {
 			labelAccumulator.registerColumnOverrides(i, Constants.COMPARATOR_LABEL);
 		}
 		configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new CustomComparator(), DisplayMode.NORMAL, Constants.COMPARATOR_LABEL);
@@ -419,7 +421,7 @@ public class WFCIndexPart extends WFCFormPart {
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
-		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
+		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, getColumnHeaderDataLayer(), rowHeaderDataLayer);
 		copyHandler.setCopyFormattedText(true);
 		gridLayer.registerCommandHandler(copyHandler);
 
@@ -821,5 +823,9 @@ public class WFCIndexPart extends WFCFormPart {
 
 	public FixedSummaryRowLayer getSummaryRowLayer() {
 		return summaryRowLayer;
+	}
+
+	public DefaultColumnHeaderDataLayer getColumnHeaderDataLayer() {
+		return columnHeaderDataLayer;
 	}
 }
