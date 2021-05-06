@@ -84,4 +84,6 @@ public interface IDataService {
 	String getUserName();
 
 	void setLogger(Logger logger);
+
+	CompletableFuture<String> getCachedFileContent(String filename);
 }

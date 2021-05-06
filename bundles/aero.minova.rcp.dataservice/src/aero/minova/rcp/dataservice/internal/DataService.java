@@ -401,11 +401,8 @@ public class DataService implements IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath
-	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
 	 * @param filename
 	 *            relativer Pfad und Dateiname auf dem Server
-	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
@@ -481,7 +478,8 @@ public class DataService implements IDataService {
 		return (!serverHash.equals(localHash));
 	}
 
-	private CompletableFuture<String> getCachedFileContent(String filename) {
+	@Override
+	public CompletableFuture<String> getCachedFileContent(String filename) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				File cachedFile = new File(new URI(workspacePath + filename));
@@ -567,7 +565,7 @@ public class DataService implements IDataService {
 			try {
 				ta = tableFuture.get();
 			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 			if (ta != null && !ta.getRows().isEmpty()) {
 				Row r = ta.getRows().get(0);
