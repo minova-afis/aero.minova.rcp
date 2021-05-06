@@ -99,6 +99,14 @@ public class DataService implements IDataService {
 				+ value.getProcedureOrView());
 	}
 
+	public void showNoResposeServerError() {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERRORMESSAGE);
+		data.put(IEventBroker.DATA, "msg.WFCNoResponseServer");
+		Event event = new Event(Constants.BROKER_SHOWERRORMESSAGE, data);
+		eventAdmin.postEvent(event);
+	}
+
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	private static final String CONTENT_TYPE = "Content-Type";
 	public static final String TABLE_KEYTEXT = "KeyText";
@@ -108,7 +116,7 @@ public class DataService implements IDataService {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
-	private static final int TIMEOUT_DURATION = 15;
+	private static final int TIMEOUT_DURATION = 5;
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
@@ -127,10 +135,6 @@ public class DataService implements IDataService {
 	// Ticket-Anfragen zu versenden
 	// private String server = "https://mintest.minova.com:8084";
 
-	/**
-	 * Anzahl der Aufrufe des Servers
-	 */
-	private int callCount = 0;
 	private URI workspacePath;
 
 	@Override
@@ -191,6 +195,7 @@ public class DataService implements IDataService {
 		// PDF Ordner anfragen
 		CompletableFuture.runAsync(() -> {
 			try {
+				Thread.sleep(1000); // Kurz Warten, damit Anfrage durchgeht
 				boolean checkIfUpdateIsRequired = this.checkIfUpdateIsRequired("PDF.zip");
 				if (checkIfUpdateIsRequired) {
 					this.downloadFile("PDF.zip");
@@ -216,7 +221,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			log("CAS Error Index:\n" + ex.getMessage());
+			handleCASError(ex, "Index");
 			return null;
 		});
 
@@ -240,7 +245,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+				.timeout(Duration.ofSeconds(TIMEOUT_DURATION * 2)).build();
 
 		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
 		try {
@@ -256,7 +261,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
 
 		sendRequest.exceptionally(ex -> {
-			log("CAS Error PDF Detail:\n" + ex.getMessage());
+			handleCASError(ex, "PDF Detail");
 			return null;
 		});
 
@@ -279,7 +284,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			log("CAS Error Detail Data:\n" + ex.getMessage());
+			handleCASError(ex, "Detail Data");
 			return null;
 		});
 
@@ -387,7 +392,7 @@ public class DataService implements IDataService {
 		log("CAS Request File Async:\n" + request + "\n" + filename);
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 		sendRequest.exceptionally(ex -> {
-			log("CAS Error File Async:\n" + ex.getMessage());
+			handleCASError(ex, "File Async");
 			return null;
 		});
 		return sendRequest.thenApply(HttpResponse::body);
@@ -412,8 +417,7 @@ public class DataService implements IDataService {
 		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 
-		httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE,
-										StandardOpenOption.WRITE));
+		httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
 	}
 
 	/**
@@ -432,7 +436,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			log("CAS Error Server Hash for File:\n" + ex.getMessage());
+			handleCASError(ex, "Server Hash for File");
 			return null;
 		});
 
@@ -657,9 +661,7 @@ public class DataService implements IDataService {
 			Table ta = null;
 			try {
 				ta = tableFuture.get();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			} catch (Exception e) {}
 			if (ta != null) {
 				for (Row r : ta.getRows()) {
 					LookupValue lv = new LookupValue(//
@@ -809,5 +811,10 @@ public class DataService implements IDataService {
 	@Override
 	public void setLogger(Logger logger) {
 		this.logger = logger;
+	}
+
+	private void handleCASError(Throwable ex, String method) {
+		log("CAS Error " + method + ":\n" + ex.getMessage());
+		showNoResposeServerError();
 	}
 }
