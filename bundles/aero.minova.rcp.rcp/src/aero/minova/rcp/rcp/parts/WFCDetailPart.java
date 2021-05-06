@@ -250,9 +250,9 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		});
-		for (MField field : tabList) {
-			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
-		}
+//		for (MField field : tabList) {
+//			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
+//		}
 		mSection.setTabList(tabList);
 	}
 
