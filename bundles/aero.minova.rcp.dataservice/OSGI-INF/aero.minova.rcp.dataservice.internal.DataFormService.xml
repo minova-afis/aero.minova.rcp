@@ -4,5 +4,6 @@
       <provide interface="aero.minova.rcp.dataservice.IDataFormService"/>
    </service>
    <reference cardinality="1..1" field="dataService" interface="aero.minova.rcp.dataservice.IDataService" name="dataService"/>
+   <reference bind="registerEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="registerEventAdmin" policy="dynamic" unbind="unregisterEventAdmin"/>
    <implementation class="aero.minova.rcp.dataservice.internal.DataFormService"/>
 </scr:component>
