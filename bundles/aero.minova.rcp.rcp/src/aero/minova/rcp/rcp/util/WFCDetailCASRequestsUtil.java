@@ -434,7 +434,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
-		if (ticketvalue.getValue() != null) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective) && ticketvalue.getValue() != null) {
 			System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
 			Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
 			Row r = RowBuilder.newRow().withValue(ticketvalue).create();
@@ -443,9 +444,16 @@ public class WFCDetailCASRequestsUtil {
 			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 
+			tableFuture.exceptionally(ex -> {
+				System.out.println("Ticket error");
+				ticketFieldsUpdate("", true);
+				return null;
+			});
+
 			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
 				ticketFieldsUpdate("", true);
+				System.out.println("Ticket got response");
 				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
 					showErrorMessage(e);
