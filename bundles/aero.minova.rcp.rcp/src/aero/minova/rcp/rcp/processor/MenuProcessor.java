@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.processor;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,14 +31,23 @@ public class MenuProcessor {
 	private MApplication mApplication;
 
 	@Inject
-	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService,
-			IDataService dataService, MApplication mApplication) {
+	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService, IDataService dataService, MApplication mApplication) {
 
 		this.menu = menu;
 		this.modelService = modelService;
 		this.mApplication = mApplication;
-		dataService.getHashedFile(MDI_FILE_NAME).thenAccept(fileContent -> processXML(fileContent));
-		
+
+		try {
+			dataService.getHashedFile(MDI_FILE_NAME).thenAccept(fileContent -> processXML(fileContent));
+		} catch (Exception e) {
+			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
+			try {
+				processXML(dataService.getCachedFileContent(MDI_FILE_NAME).get());
+				// TODO: Fehlermeldung, Menü konnte nicht geladen werden, benutzen lokale (evtl. veraltete) Version
+			} catch (InterruptedException | ExecutionException e1) {
+				// TODO: Fehlermeldung, Menü konnte nicht geladen werden
+			}
+		}
 	}
 
 	private void processXML(String fileContent) {
@@ -45,6 +55,7 @@ public class MenuProcessor {
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
 		} catch (JAXBException e) {
+			System.out.println("tis is were we print?");
 			e.printStackTrace();
 		}
 
@@ -77,8 +88,7 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI,
-			EModelService modelService, MApplication mApplication) {
+	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
 		// TODO Übersetzung einbauen
@@ -90,8 +100,7 @@ public class MenuProcessor {
 				if (object instanceof Entry) {
 					Entry entryMDI = (Entry) object;
 					String id2 = ((Action) entryMDI.getId()).getId();
-					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService,
-							mApplication);
+					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
 					menuGen.getChildren().add(handledMenuItem);
 					menu.getChildren().add(menuGen);
 				}
@@ -108,8 +117,7 @@ public class MenuProcessor {
 	 * @param mApplication
 	 * @return
 	 */
-	private MHandledMenuItem createMenuEntry(Entry entryMDI, Action actionMDI, EModelService modelService,
-			MApplication mApplication) {
+	private MHandledMenuItem createMenuEntry(Entry entryMDI, Action actionMDI, EModelService modelService, MApplication mApplication) {
 
 		MHandledMenuItem handledMenuItem = modelService.createModelElement(MHandledMenuItem.class);
 		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.openform");
