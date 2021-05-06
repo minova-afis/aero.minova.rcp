@@ -9,6 +9,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -222,6 +223,7 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection, traverseListener);
+		composite.setTabList(getTabList(mSection));
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
@@ -254,6 +256,22 @@ public class WFCDetailPart extends WFCFormPart {
 //			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
 //		}
 		mSection.setTabList(tabList);
+	}
+	
+	private Control[] getTabList(MSection section) {
+		List<Control> tabList = new ArrayList<Control>();
+		for (MField field : section.getTabList()) {
+			if(!field.isReadOnly()) {
+				tabList.add(((AbstractValueAccessor) field.getValueAccessor()).getControl());
+			}
+		}
+		Control[] tabArray = new Control[tabList.size()];
+		int i = 0;
+		while (i < tabList.size()) {
+			tabArray[i] = tabList.get(0);
+			i++;
+		}
+		return tabArray;
 	}
 
 	/**
