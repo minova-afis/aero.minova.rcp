@@ -356,7 +356,7 @@ public class WFCDetailCASRequestsUtil {
 			List<MPart> findElements = model.findElements(perspective, PartsID.SEARCH_PART, MPart.class);
 			partService.activate(findElements.get(0), true);
 
-			MessageDialog.openError(shell, "Error", message);
+			MessageDialog.openError(shell, "Error", getTranslation(message));
 		}
 	}
 
