@@ -77,6 +77,12 @@ public class Constants {
 	// Column Label für eigene Sortierung
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL";
 
+	// CSS Klassennamen
+	public static final String CSS_STANDARD = "Standard";
+	public static final String CSS_REQUIRED = "ValueRequired";
+	public static final String CSS_INVALID = "InvalidValue";
+	public static final String CSS_READONLY = "ReadOnly";
+
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
 	 *

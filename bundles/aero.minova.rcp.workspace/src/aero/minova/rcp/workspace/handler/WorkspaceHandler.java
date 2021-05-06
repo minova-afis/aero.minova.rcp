@@ -60,7 +60,7 @@ public abstract class WorkspaceHandler {
 			}
 		}
 		URL url;
-		if (connection.isEmpty()) {
+		if (connection == null || connection.isEmpty()) {
 			return null;
 		}
 		try {
@@ -124,8 +124,7 @@ public abstract class WorkspaceHandler {
 	 *            Application Area to read / store files
 	 * @return true, if the connection could be established.
 	 */
-	public abstract boolean checkConnection(String username, String password, String applicationArea,
-			Boolean saveAsDefault) throws WorkspaceException;
+	public abstract boolean checkConnection(String username, String password, String applicationArea, Boolean saveAsDefault) throws WorkspaceException;
 
 	/**
 	 * @return Connection String to service, if different from connectionURL of constructor

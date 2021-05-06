@@ -5,51 +5,71 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.rcp.handlers.PrintIndexHandler;
+import aero.minova.rcp.rcp.parts.WFCSearchPart;
 import aero.minova.rcp.rcp.print.ReportCreationException.Cause;
 import aero.minova.rcp.util.IOUtil;
-import ca.odell.glazedlists.SortedList;
 
 public class TableXSLCreator extends CommonPrint {
 
 	private TranslationService translationService;
+	private WFCSearchPart searchPart;
+	private PrintIndexHandler printHandler;
 
 	// Templates
 	private static HashMap<String, String> templates = new HashMap<>();
 
-	public TableXSLCreator(TranslationService translationService2) {
+	public TableXSLCreator(TranslationService translationService2, PrintIndexHandler printHandler, EPartService ePartService) {
 		this.translationService = translationService2;
+		this.printHandler = printHandler;
+		this.searchPart = (WFCSearchPart) ePartService.findPart("aero.minova.rcp.rcp.part.search").getObject();
 	}
 
 	/**
 	 * Erzeugt ein XSL-Template mittels einer Such- und Datentabelle
 	 * 
+	 * @param groupByIndicesReordered
 	 * @throws ReportCreationException
 	 */
-	public String createXSL(String xmlRootTag, String reportName, SortedList<Row> dataList, List<ColumnInfo> colConfig, ReportConfiguration reportConf,
-			Path path_reports) throws ReportCreationException {
+	public String createXSL(String xmlRootTag, String reportName, List<ColumnInfo> colConfig, ReportConfiguration reportConf, Path path_reports,
+			List<Integer> groupByIndicesReordered) throws ReportCreationException {
 
 		if (reportConf == null) {
 			reportConf = ReportConfiguration.DEFAULT;
 		}
 
-		if (colConfig == null || dataList == null) {
-			throw new IllegalArgumentException("Need dataList and colConfig");
+		if (colConfig == null) {
+			throw new IllegalArgumentException("Need colConfig");
 		}
 
-		// Wir bereinigen die unsichtbaren Spalten
-		// als unsichtbar zählen auch die Spalten, die nicht mehr auf die Seite passen
-		// hier entscheidet sich auch ob Hoch- oder Querformat
+		// Wir bereinigen die unsichtbaren Spalten als unsichtbar zählen auch die Spalten, die nicht mehr auf die Seite passen hier entscheidet sich auch ob
+		// Hoch- oder Querformat
+		List<ColumnInfo> cols = filterInvisibleColumns(colConfig, reportConf);
 
-		final List<ColumnInfo> cols = filterInvisibleColumns(colConfig, reportConf);
+		// Gruppierungsspalten entfernen
+		if (printHandler.hideGroupCols) {
+			List<ColumnInfo> toRemove = new ArrayList<ColumnInfo>();
+			for (ColumnInfo colInf : cols) {
+				if (groupByIndicesReordered.contains(colInf.index)) {
+					toRemove.add(colInf);
+				}
+			}
+			cols.removeAll(toRemove);
+		}
 
 		final Orientation ori = reportConf.calculatePageOrientation(getPrintedRowWidth(colConfig, reportConf));
 		final String xslData = getTemplate(ori);
-		return interpolateXslData(xmlRootTag, reportName, dataList, cols, reportConf, path_reports, xslData);
+		return interpolateXslData(xmlRootTag, reportName, cols, reportConf, path_reports, xslData);
 	}
 
 	/**
@@ -59,17 +79,16 @@ public class TableXSLCreator extends CommonPrint {
 	 * - die den Druckbereich nicht übersteigen<br>
 	 * Außerdem wird der restliche verfügbare Platz mit einer leeren Spalte aufgefüllt, sodass das Design passt.
 	 */
-	protected static List<ColumnInfo> filterInvisibleColumns(List<ColumnInfo> cols, ReportConfiguration conf) {
+	protected List<ColumnInfo> filterInvisibleColumns(List<ColumnInfo> cols, ReportConfiguration conf) {
 		final List<ColumnInfo> toRet = new ArrayList<>();
 		if (cols == null || cols.size() == 0) {
 			return toRet;
 		}
-		// wir gehen erst mal davon aus, dass wir Platz für Querformat haben
-		// sollte Hochformat von der Breite her reichen, wird später noch umgestellt
+		// wir gehen erst mal davon aus, dass wir Platz für Querformat haben sollte Hochformat von der Breite her reichen, wird später noch umgestellt
 		int mmLeft = conf.getAvailLandscapeWidth();
 		int mmUsed = 0;
 		for (final ColumnInfo ci : cols) {
-			if (ci.width > MIN_COL_SIZE_PX && ci.visible) {
+			if ((ci.width > MIN_COL_SIZE_PX && ci.visible) || !printHandler.hideEmptyCols) {
 				final int mmWidth = getPrintedRowWidth(ci, conf);
 				if (mmLeft < mmWidth) {
 					break;
@@ -116,7 +135,6 @@ public class TableXSLCreator extends CommonPrint {
 				text = getTemplate("CellBoolDefinition").replace("%%ColumnName%%", name);
 			} else {
 				text = getTemplate("CellDefinition").replace("%%ColumnName%%", name);
-				// #37748: bei mehrzeiligen Feldern Zeilenumbruch zulassen
 				if (ci.column.getType().equals(DataType.STRING)) {
 					text = text.replace("wrap-option=\"no-wrap\"", "");
 				}
@@ -143,7 +161,6 @@ public class TableXSLCreator extends CommonPrint {
 		for (final ColumnInfo ci : cols) {
 			final int absSize = getPrintedRowWidth(ci, conf);
 			final String colDef = getTemplate("ColumnDefinition").replace("%%Size%%", "" + absSize);
-			// String colDef = TEMPLATE_COLUMN_DEFINITION.replace("%%Size%%", "" + absSize);
 			sb.append(colDef).append("\r\n");
 		}
 		return sb.toString();
@@ -167,12 +184,11 @@ public class TableXSLCreator extends CommonPrint {
 		}
 
 		dColSize *= conf.PIXEL_SIZE_MM;
-		dColSize += conf.CELL_PADDING_MM;
+		dColSize += conf.CELL_PADDING_MM * 2;
 
 		if (col.column == null || isOptimized) {
-			// WIS: empty field oder optimizeFieldWidth schon geschehen
-			// wir haben die Breite schon so berechnet, dass es stimmt
-			// darf also nicht noch mal umgerechnet werden!
+			// WIS: empty field oder optimizeFieldWidth schon geschehen wir haben die Breite schon so berechnet, dass es stimmt darf also nicht noch mal
+			// umgerechnet werden!
 			return (int) (dColSize + 0.5);
 		}
 
@@ -182,11 +198,10 @@ public class TableXSLCreator extends CommonPrint {
 		// Umrechnung Schriftgröße
 		double fontFactor = 1;
 		if (!conf.standardFont.equals(conf.guiFont)) {
-			fontFactor = conf.standardFont.getSize2D() / conf.guiFont.getSize2D();
+			fontFactor = conf.guiFont.getSize2D() / conf.standardFont.getSize2D();
 		}
 
 		final int iColSize = (int) (dColSize * dpiFactor * fontFactor);
-
 		return iColSize;
 	}
 
@@ -197,7 +212,6 @@ public class TableXSLCreator extends CommonPrint {
 		if (cols == null || cols.size() == 0) {
 			return 0;
 		}
-
 		int sumSize = 0;
 		for (final ColumnInfo ci : cols) {
 			sumSize += getPrintedRowWidth(ci, conf);
@@ -213,26 +227,31 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	private static String getSearchCriteria(final SortedList<Row> dataList, final ColumnInfo ci) throws ReportCreationException {
+	private String getSearchCriteria(final ColumnInfo ci) throws ReportCreationException {
 		String searchCriteria, searchCriterias = "", searchCriteriaText;
-//		if (dataList != null && ci.column != null) {
-//			for (int iRow = 0; iRow < dataList.size(); iRow++) {
-//				final Row row = searchTable.getRow(iRow);
-//				// AND / ODER ermitteln
-//				searchCriteria = getTemplate("SearchCriteria");
-//				final Object and = row.getValueContent(ValueDefinition.AND_FIELD_NAME);
-//				final Value v = row.getValue(ci.column.getName());
-//				final String value = ValueFormatter.toString(v);
-//				if (value == null || value.length() == 0) {
-//					continue;
-//				}
-//				searchCriteriaText = (iRow == 0 ? "" : (and == Boolean.TRUE ? "& " : "| "));
-//				searchCriteriaText += value;
-//				searchCriteria = searchCriteria.replace("%%CriteriaText%%", StringTools.replaceSpecialChars(searchCriteriaText));
-//				searchCriterias += searchCriteria + "\r\n";
-//			}
-//		}
-//
+		Table searchTable = searchPart.getData();
+		boolean first = true;
+		if (searchTable != null && ci.column != null) {
+			for (Row row : searchTable.getRows()) {
+				final Value and = row.getValue(0); // AND / ODER ermitteln
+				Value v1 = row.getValue(searchTable.getColumnIndex(ci.column.getName()));
+				if (v1 == null || v1.getValue() == null || !(v1 instanceof FilterValue)) {
+					continue;
+				}
+				final FilterValue v = (FilterValue) v1;
+				String value = v.getOperatorValue();
+				if (v.getFilterValue() != null) {
+					value += " " + v.getFilterValue().getValueString(Locale.getDefault(), ci.column.getDateTimeType());
+				}
+
+				searchCriteria = getTemplate("SearchCriteria");
+				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));
+				searchCriteriaText += value;
+				searchCriteria = searchCriteria.replace("%%CriteriaText%%", replaceSpecialChars(searchCriteriaText));
+				searchCriterias += searchCriteria + "\r\n";
+				first = false;
+			}
+		}
 		return searchCriterias;
 	}
 
@@ -243,25 +262,30 @@ public class TableXSLCreator extends CommonPrint {
 	 * @param ci
 	 * @return einen String mit den Suchkriterien
 	 */
-	private static String getSearchCriteriaValue(final SortedList<Row> sortedDataList, final ColumnInfo ci) {
+	private String getSearchCriteriaValue(final ColumnInfo ci) {
 		String searchCriteria, searchCriterias = "", searchCriteriaText;
-//		if (searchTable != null && ci.column != null) {
-//			for (int iRow = 0; iRow < searchTable.getRowCount(); iRow++) {
-//				final Row row = searchTable.getRow(iRow);
-//				// AND / ODER ermitteln
-//				final Object and = row.getValueContent(ValueDefinition.AND_FIELD_NAME);
-//				final Value v = row.getValue(ci.column.getName());
-//				final String value = ValueFormatter.toString(v);
-//				if (value == null || value.length() == 0) {
-//					continue;
-//				}
-//				searchCriteriaText = (iRow == 0 ? "" : (and == Boolean.TRUE ? "& " : "| "));
-//				searchCriteriaText += value;
-//				searchCriteria = StringTools.replaceSpecialChars(searchCriteriaText);
-//				searchCriterias += searchCriteria;
-//			}
-//		}
+		Table searchTable = searchPart.getData();
+		boolean first = true;
+		if (searchTable != null && ci.column != null) {
+			for (Row row : searchTable.getRows()) {
+				final Value and = row.getValue(0); // AND / ODER ermitteln
+				Value v1 = row.getValue(searchTable.getColumnIndex(ci.column.getName()));
+				if (v1 == null || v1.getValue() == null || !(v1 instanceof FilterValue)) {
+					continue;
+				}
+				final FilterValue v = (FilterValue) v1;
+				String value = v.getOperatorValue();
+				if (v.getFilterValue() != null) {
+					value += " " + v.getFilterValue().getValueString(Locale.getDefault());
+				}
 
+				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));
+				searchCriteriaText += value;
+				searchCriteria = replaceSpecialChars(searchCriteriaText);
+				searchCriterias += searchCriteria;
+				first = false;
+			}
+		}
 		return searchCriterias;
 	}
 
@@ -272,13 +296,12 @@ public class TableXSLCreator extends CommonPrint {
 	 * @param cols
 	 * @return
 	 */
-	private String getSearchCriteriaValues(final SortedList<Row> sortedDataList, final List<ColumnInfo> cols) {
+	private String getSearchCriteriaValues(final List<ColumnInfo> cols) {
 		String toRet = "";
-
 		for (final ColumnInfo ci : cols) {
 			if (ci != null && ci.column != null) {
 				final String colName = translationService.translate(ci.column.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "");
-				final String scValues = getSearchCriteriaValue(sortedDataList, ci);
+				final String scValues = getSearchCriteriaValue(ci);
 				if (scValues != null && scValues != "") {
 					if (toRet != "") {
 						toRet += ",\n";
@@ -287,7 +310,6 @@ public class TableXSLCreator extends CommonPrint {
 				}
 			}
 		}
-
 		return toRet;
 	}
 
@@ -300,14 +322,12 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	private String getTableTitle(final SortedList<Row> sortedDataList, final List<ColumnInfo> cols, final ReportConfiguration conf)
-			throws ReportCreationException {
+	private String getTableTitle(final List<ColumnInfo> cols, final ReportConfiguration conf) throws ReportCreationException {
 		String toRet = "";
 		String text;
 		boolean isFirstRow = true;
-		for (int iCol = 0; iCol < cols.size(); iCol++) {
-			final ColumnInfo ci = cols.get(iCol);
-			final boolean lastColumn = (iCol == cols.size() - 1);
+		for (ColumnInfo ci : cols) {
+			final boolean lastColumn = (ci == cols.get(cols.size() - 1));
 			text = ci.column == null ? "" : translationService.translate(ci.column.getLabel(), null);
 			boolean isNumber = false;
 			if (ci.column != null && (ci.column.getType() == DataType.DOUBLE || ci.column.getType() == DataType.INTEGER)) {
@@ -317,7 +337,7 @@ public class TableXSLCreator extends CommonPrint {
 			text = text.replace("%%TextAlign%%", isNumber ? "right" : "left");
 			text = text.replace("%%BorderLeftStyle%%", isFirstRow ? "solid" : "none");
 			text = text.replace("%%BorderRightStyle%%", lastColumn ? "solid" : "none");
-			text = text.replace("%%SearchCriterias%%", conf.hideSearchCriterias ? "" : getSearchCriteria(sortedDataList, ci));
+			text = text.replace("%%SearchCriterias%%", printHandler.hideSearchCriterias ? "" : getSearchCriteria(ci));
 			toRet += text + "\r\n";
 			isFirstRow = false;
 		}
@@ -335,7 +355,6 @@ public class TableXSLCreator extends CommonPrint {
 	private static String getTemplate(final Orientation ori) throws ReportCreationException {
 		final String templateName = "PDFReportIndex_" + ((ori == Orientation.LANDSCAPE) ? "Wide" : "Portrait");
 		final String template = getTemplate(templateName);
-		// hier könnte man auch die Lokalisierung u.a. einbauen, das nützt uns aber nichts bei XSL-Templates, die individuell aus einer Datei geladen werden
 		return template;
 	}
 
@@ -372,10 +391,10 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	public String interpolateXslData(String xmlRootTag, String reportName, SortedList<Row> sortedDataList, List<ColumnInfo> cols, ReportConfiguration conf,
-			Path path, String xslData) throws ReportCreationException {
+	public String interpolateXslData(String xmlRootTag, String reportName, List<ColumnInfo> cols, ReportConfiguration conf, Path path, String xslData)
+			throws ReportCreationException {
 		final String columnDefinition = getColumnDefinition(cols, conf);
-		final String tableTitle = getTableTitle(sortedDataList, cols, conf);
+		final String tableTitle = getTableTitle(cols, conf);
 		final String cellDefinition = getCellDefinition(cols, false);
 		final String sumCellDefinition = getCellDefinition(cols, true);
 		final String encoding = "UTF-8";
@@ -390,24 +409,22 @@ public class TableXSLCreator extends CommonPrint {
 		xslData = xslData.replace("%%SumCellDefinition%%", sumCellDefinition);
 		xslData = xslData.replace("%%TableTitle%%", tableTitle);
 
-		// #22149: i.a. wollen wir die Suchkriterien auch nicht mit drucken!
-		if (!conf.hideSearchCriterias) {
+		if (!printHandler.hideSearchCriterias) {
 			for (final ColumnInfo ci : cols) {
 				if (ci != null && ci.column != null) {
 					final String colName = translationService.translate(ci.column.getLabel(), null);
-					xslData = xslData.replace("%%SearchCriteria#" + colName + "%%", getSearchCriteria(sortedDataList, ci));
-					xslData = xslData.replace("%%SearchCriteriaValue#" + colName + "%%", getSearchCriteriaValue(sortedDataList, ci));
+					xslData = xslData.replace("%%SearchCriteria#" + colName + "%%", getSearchCriteria(ci));
+					xslData = xslData.replace("%%SearchCriteriaValue#" + colName + "%%", getSearchCriteriaValue(ci));
 				}
 			}
-			xslData = xslData.replace("%%SearchCriteriaValues%%", getSearchCriteriaValues(sortedDataList, cols));
+			xslData = xslData.replace("%%SearchCriteriaValues%%", getSearchCriteriaValues(cols));
 		}
 
 		xslData = xslData.replace("%%XMLMainTag%%", xmlRootTag);
 		xslData = xslData.replace("%%FormTitle%%", reportName);
 		xslData = xslData.replace("%%ColumnCount%%", "" + cols.size());
 		xslData = xslData.replace("%%SumVisibility%%", "false");
-		// #22149: ohne die vorige Ersetzung sollte das auch nicht auftreten
-		if (!conf.hideSearchCriterias) {
+		if (!printHandler.hideSearchCriterias) {
 			xslData = xslData.replace("%%FontSizeCriteria%%", conf.getProp("FontSizeCriteria", "8"));
 		}
 		xslData = xslData.replace("%%FontSizeCell%%", conf.getProp("FontSizeCell", "8"));
@@ -442,5 +459,16 @@ public class TableXSLCreator extends CommonPrint {
 		text = text.replace("%%tAddress.Index%%", translationService.translate("@tAddress.Index", "Index"));
 		text = text.replace("%%tDate%%", translationService.translate("@tDate", "Datum"));
 		return text;
+	}
+
+	public static String replaceSpecialChars(String s) {
+		if (s == null) {
+			return null;
+		}
+		s = s.replace("&", "&amp;");
+		s = s.replace("<", "&lt;");
+		s = s.replace(">", "&gt;");
+		s = s.replace("\"", "&quot;");
+		return s;
 	}
 }

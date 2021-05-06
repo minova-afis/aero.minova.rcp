@@ -21,16 +21,16 @@ public class MDetail {
 	private IHelper helper;
 
 	/**
-	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit
-	 * geachtet werden. Z.B.
+	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
-	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske
-	 * CustomerUserCode.op.xml</li>
+	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
 	 * </ul>
 	 *
-	 * @param name  Name / ID des Feldes
-	 * @param field das eigentliche Feld
+	 * @param name
+	 *            Name / ID des Feldes
+	 * @param field
+	 *            das eigentliche Feld
 	 */
 	public void putField(MField field) {
 		if (field == null)
@@ -40,15 +40,14 @@ public class MDetail {
 	}
 
 	/**
-	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in
-	 * einer OptionPage haben das Präfix aus der XBS. z.B.
+	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in einer OptionPage haben das Präfix aus der XBS. z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
-	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske
-	 * CustomerUserCode.op.xml</li>
+	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
 	 * </ul>
 	 *
-	 * @param name Name des Feldes
+	 * @param name
+	 *            Name des Feldes
 	 * @return Das Feld
 	 */
 	public MField getField(String name) {
@@ -78,5 +77,14 @@ public class MDetail {
 
 	public void setHelper(IHelper helper) {
 		this.helper = helper;
+	}
+
+	public boolean allFieldsValid() {
+		for (MField field : fields.values()) {
+			if (!field.isValid()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

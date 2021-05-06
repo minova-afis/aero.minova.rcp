@@ -6,7 +6,6 @@ import java.util.Locale;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -31,14 +30,12 @@ public class TraverseListenerImpl implements TraverseListener {
 
 	String INIT_FIELD = "InitializeField";
 
-	Logger logger;
 	MDetail detail;
 	Locale locale;
 	EPartService partService;
 	IEclipseContext context;
 
-	public TraverseListenerImpl(Logger logger, MDetail detail, Locale locale, EPartService partService, IEclipseContext context) {
-		this.logger = logger;
+	public TraverseListenerImpl(MDetail detail, Locale locale, EPartService partService, IEclipseContext context) {
 		this.detail = detail;
 		this.locale = locale;
 		this.partService = partService;
@@ -48,45 +45,17 @@ public class TraverseListenerImpl implements TraverseListener {
 	@Override
 	public void keyTraversed(TraverseEvent e) {
 
-		logger.info(
-				"keyTraversed(detail=" + e.detail + ", stateMask=" + Integer.toHexString(e.stateMask) + ", keyCode= " + Integer.toHexString(e.keyCode) + ")");
-		List<MSection> pageList;
-		// if (!e.doit) return; // wir tun nichts, wenn ein anderer etwas getan hat
-
 		Control focussedControl = (Control) e.widget;
 		if ((focussedControl.getParent() instanceof Lookup) || (focussedControl.getParent() instanceof TextAssist)) {
 			focussedControl = focussedControl.getParent();
 		}
 
 		switch (e.detail) {
-		case SWT.TRAVERSE_ARROW_NEXT:
-			logger.info("SWT.TRAVERSE_ARROW_NEXT");
-			break;
-		case SWT.TRAVERSE_ARROW_PREVIOUS:
-			logger.info("SWT.TRAVERSE_ARROW_PREVIOUS");
-			break;
-		case SWT.TRAVERSE_ESCAPE:
-			logger.info("SWT.TRAVERSE_ESCAPE");
-			break;
-		case SWT.TRAVERSE_MNEMONIC:
-			logger.info("SWT.TRAVERSE_MNEMONIC");
-			break;
-		case SWT.TRAVERSE_NONE:
-			logger.info("SWT.TRAVERSE_NONE");
-			break;
-		case SWT.TRAVERSE_PAGE_NEXT:
-			logger.info("SWT.TRAVERSE_PAGE_NEXT");
-			break;
-		case SWT.TRAVERSE_PAGE_PREVIOUS:
-			logger.info("SWT.TRAVERSE_PAGE_PREVIOUS");
-			break;
 		case SWT.TRAVERSE_RETURN:
-			logger.info("SWT.TRAVERSE_RETURN");
 			getNextRequired(focussedControl);
 			e.doit = false;
 			break;
 		case SWT.TRAVERSE_TAB_NEXT:
-			logger.info("SWT.TRAVERSE_TAB_NEXT");
 			if (e.keyCode == SWT.TAB) {
 				getNextField(focussedControl);
 			} else if (e.keyCode == SWT.CR) {
@@ -95,12 +64,11 @@ public class TraverseListenerImpl implements TraverseListener {
 			e.doit = false;
 			break;
 		case SWT.TRAVERSE_TAB_PREVIOUS:
-			logger.info("SWT.TRAVERSE_TAB_PREVIOUS");
 			getPreviousField(focussedControl);
 			e.doit = false;
 			break;
 		default:
-			logger.info("UNKNOWN");
+			break;
 		}
 
 	}
