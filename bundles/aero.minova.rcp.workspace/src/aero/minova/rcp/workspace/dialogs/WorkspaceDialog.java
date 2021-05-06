@@ -103,8 +103,7 @@ public class WorkspaceDialog extends Dialog {
 		btnDefault.setLayoutData(GridDataFactory.fillDefaults().grab(false, false).hint(75, SWT.DEFAULT).create());
 
 		CLabel deleteProfile = new CLabel(container, SWT.CENTER | SWT.VERTICAL);
-		deleteProfile.setLayoutData(GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(false, true)
-				.hint(25, SWT.DEFAULT).create());
+		deleteProfile.setLayoutData(GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(false, true).hint(25, SWT.DEFAULT).create());
 		deleteProfile.setText("\uD83D\uDDD1\uFE0F");
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
@@ -135,16 +134,14 @@ public class WorkspaceDialog extends Dialog {
 		/**
 		 * CONNECTION STRING
 		 */
-		label(SWT.NONE).text("Connection String").layoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1))
-				.create(container);
+		label(SWT.NONE).text("Connection String").layoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1)).create(container);
 		connectionString = new Text(container, SWT.BORDER);
 		connectionString.setLayoutData(GridDataFactory.fillDefaults().hint(400, SWT.DEFAULT).span(5, 1).create());
 
 		/**
 		 * APPLICATION AREA
 		 */
-		label(SWT.NONE).text("Application Area").layoutData(new GridData(SWT.RIGHT, SWT.FILL, false, false, 1, 1))
-				.create(container);
+		label(SWT.NONE).text("Application Area").layoutData(new GridData(SWT.RIGHT, SWT.FILL, false, false, 1, 1)).create(container);
 		applicationArea = new Text(container, SWT.BORDER | SWT.READ_ONLY);
 		applicationArea.setLayoutData(GridDataFactory.fillDefaults().hint(365, SWT.DEFAULT).span(5, 1).create());
 		applicationArea.setEnabled(false);
@@ -154,8 +151,7 @@ public class WorkspaceDialog extends Dialog {
 		 */
 		label(SWT.NONE).text("Message").supplyLayoutData(labelGridData::create).create(container);
 		message = new Text(container, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
-		message.setLayoutData(
-				GridDataFactory.fillDefaults().grab(true, true).hint(365, SWT.DEFAULT).span(5, 2).create());
+		message.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).hint(365, SWT.DEFAULT).span(5, 2).create());
 		message.setEnabled(false);
 		// Wird benötigt, damit 2 Zeilen für das Message-Feld angezeigt werden.
 		new Label(container, SWT.NONE);
@@ -191,17 +187,15 @@ public class WorkspaceDialog extends Dialog {
 	}
 
 	/**
-	 * Prüft die eingetragenen Daten. Wenn das Profil vorhanden ist, werden die
-	 * Dialog-Felder entsprechend der gespeicherten Werte gesetzt. Passwort wird
-	 * nicht gesetzt!
+	 * Prüft die eingetragenen Daten. Wenn das Profil vorhanden ist, werden die Dialog-Felder entsprechend der gespeicherten Werte gesetzt. Passwort wird nicht
+	 * gesetzt!
 	 */
 	private void loadProfileData() {
 		WorkspaceHandler workspaceHandler = null;
 		try {
 			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
 			if (workspaceHandler != null) {
-				workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(),
-						btnDefault.getSelection());
+				workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(), btnDefault.getSelection());
 				profile.setText(workspaceHandler.getProfile());
 				username.setText(workspaceHandler.getUsername());
 				password.setText(workspaceHandler.getPassword());
@@ -232,14 +226,13 @@ public class WorkspaceDialog extends Dialog {
 		WorkspaceHandler workspaceHandler = null;
 		try {
 			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
-			workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(),
-					btnDefault.getSelection());
+			workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(), btnDefault.getSelection());
 			workspaceHandler.open();
 		} catch (WorkspaceException e) {
 			message.setText(e.getMessage());
 			return;
 		} catch (NullPointerException ex) {
-			message.setText("Was stimmt denn nicht mit DIR ?!");
+			message.setText(ex.getMessage());
 			return;
 		}
 		usernameText = username.getText();
