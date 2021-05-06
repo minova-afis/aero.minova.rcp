@@ -21,15 +21,18 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
@@ -79,6 +82,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	EModelService model;
+
+	@Inject
+	EPartService partService;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -346,6 +352,10 @@ public class WFCDetailCASRequestsUtil {
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
+			// Fokus weg von den Lookup setzten (auf search part), damit sich das Fehlerfenster nicht immer wieder öffnet
+			List<MPart> findElements = model.findElements(perspective, PartsID.SEARCH_PART, MPart.class);
+			partService.activate(findElements.get(0), true);
+
 			MessageDialog.openError(shell, "Error", message);
 		}
 	}
@@ -354,7 +364,6 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-
 		if (activePerspective.equals(perspective)) {
 			Table errorTable = et.getErrorTable();
 			Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
@@ -372,7 +381,6 @@ public class WFCDetailCASRequestsUtil {
 			value += "\n\nUser : " + et.getUser();
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
-			System.out.println("showing error " + this.toString());
 			if (et.getT() == null) {
 				MessageDialog.openError(shell, "Error", value);
 			} else {
@@ -435,8 +443,7 @@ public class WFCDetailCASRequestsUtil {
 			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 
-			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
-			// Detailfelder vor
+			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
 				ticketFieldsUpdate("", true);
 				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
