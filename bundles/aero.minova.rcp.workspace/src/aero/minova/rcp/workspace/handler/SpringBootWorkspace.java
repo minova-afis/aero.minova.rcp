@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -41,6 +42,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	private static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
+
+	private static final int TIMEOUT_DURATION = 15;
 
 	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
 		super(logger);
@@ -242,7 +245,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //
 					.header("Content-Type", "application/json") //
 					.method("GET", BodyPublishers.ofString(body))//
-					.build();
+					.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 
 			HttpClient httpClient = HttpClient.newBuilder()//
 					.sslContext(disabledSslVerificationContext())//
@@ -254,9 +257,9 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
 			}
 		} catch (ConnectException ex) {
-			throw new WorkspaceException("Server nicht bekannt!");
+			throw new WorkspaceException("ConnectException");
 		} catch (IOException e) {
-			throw new WorkspaceException("User oder Passwort nicht korrekt" + e.getMessage());
+			throw new WorkspaceException("User oder Passwort nicht korrekt\n" + e.getMessage());
 		} catch (InterruptedException i) {
 			throw new WorkspaceException("Try Again!");
 		} catch (IllegalArgumentException i) {
