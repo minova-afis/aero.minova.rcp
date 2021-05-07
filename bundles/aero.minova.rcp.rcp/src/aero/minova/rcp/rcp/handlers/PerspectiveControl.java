@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 @SuppressWarnings("restriction")
@@ -217,8 +218,13 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 				@Override
 				public void widgetSelected(SelectionEvent event) {
-					Map<String, String> parameter = Map.of("aero.minova.rcp.perspectiveswitcher.parameters.formName",
-							perspective.getElementId());
+					Map<String, String> parameter = Map.of (//
+							Constants.FORM_NAME, perspective.getElementId(), Constants.FORM_ID,
+							perspective.getElementId(),
+							Constants.FORM_LABEL, perspective.getElementId()
+					//
+					);
+
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform",
 							parameter);
 					handlerService.executeHandler(command);
@@ -240,9 +246,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			menu.setData(perspective.getElementId());
 
 			if (perspective.isVisible()) {
-//				if (!"aero.minova.rcp.rcp.perspective.sis".equals(perspective.getElementId())) {
 				addCloseMenuItem(menu, perspectiveId);
-//				}
 			}
 		}
 
@@ -326,14 +330,14 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	}
 
 	private void removeToolItem(ToolItem item) {
-		if (item == null || item.isDisposed())
+		if (item == null || item.isDisposed()) {
 			return;
+		}
 
 		Image icon = item.getImage();
 		if (icon != null) {
 			item.setImage(null);
 			icon.dispose();
-			icon = null;
 		}
 
 		item.dispose();
@@ -360,7 +364,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 			if (oldIcon != null) {
 				oldIcon.dispose();
-				oldIcon = null;
 			}
 
 			if (!showShortcutText) {
