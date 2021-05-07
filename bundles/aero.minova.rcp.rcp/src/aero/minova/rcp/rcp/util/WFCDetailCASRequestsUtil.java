@@ -14,13 +14,16 @@ import javax.inject.Named;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -70,6 +73,12 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private EHandlerService handlerService;
+
+	@Inject
+	IEclipseContext partContext;
+
+	@Inject
+	EModelService model;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -329,39 +338,45 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private String getTranslation(String translate) {
 		String messageproperty = "@" + translate;
-		String value = translationService.translate(messageproperty, null);
-		return value;
+		return translationService.translate(messageproperty, null);
 	}
 
 	@Inject
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
-		MessageDialog.openError(shell, "Error", message);
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			MessageDialog.openError(shell, "Error", message);
+		}
 	}
 
 	@Inject
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
-		Table errorTable = et.getErrorTable();
-		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
-		String messageproperty = "@" + vMessageProperty.getStringValue();
-		String value = translationService.translate(messageproperty, null);
-		// Ticket number {0} is not numeric
-		if (errorTable.getColumnCount() > 1) {
-			List<String> params = new ArrayList<>();
-			for (int i = 1; i < errorTable.getColumnCount(); i++) {
-				Value v = errorTable.getRows().get(0).getValue(i);
-				params.add(v.getStringValue());
-			}
-			value = MessageFormat.format(value, params.toArray(new String[0]));
-		}
-		value += "\n\nUser : " + et.getUser();
-		value += "\nProcedure/View: " + et.getProcedureOrView();
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 
-		if (et.getT() == null) {
-			MessageDialog.openError(shell, "Error", value);
-		} else {
-			ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
+		if (activePerspective.equals(perspective)) {
+			Table errorTable = et.getErrorTable();
+			Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
+			String messageproperty = "@" + vMessageProperty.getStringValue();
+			String value = translationService.translate(messageproperty, null);
+			// Ticket number {0} is not numeric
+			if (errorTable.getColumnCount() > 1) {
+				List<String> params = new ArrayList<>();
+				for (int i = 1; i < errorTable.getColumnCount(); i++) {
+					Value v = errorTable.getRows().get(0).getValue(i);
+					params.add(v.getStringValue());
+				}
+				value = MessageFormat.format(value, params.toArray(new String[0]));
+			}
+			value += "\n\nUser : " + et.getUser();
+			value += "\nProcedure/View: " + et.getProcedureOrView();
+
+			if (et.getT() == null) {
+				MessageDialog.openError(shell, "Error", value);
+			} else {
+				ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
+			}
 		}
 	}
 
