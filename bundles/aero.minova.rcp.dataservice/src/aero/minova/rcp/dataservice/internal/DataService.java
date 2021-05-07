@@ -191,20 +191,6 @@ public class DataService implements IDataService {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
-
-		// PDF Ordner anfragen
-		CompletableFuture.runAsync(() -> {
-			try {
-				Thread.sleep(1000); // Kurz Warten, damit Anfrage durchgeht
-				boolean checkIfUpdateIsRequired = this.checkIfUpdateIsRequired("PDF.zip");
-				if (checkIfUpdateIsRequired) {
-					this.downloadFile("PDF.zip");
-					ZipService.unzipFile(this.getStoragePath().resolve("PDF.zip").toFile(), this.getStoragePath().toString());
-				}
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
 	}
 
 	@Override
@@ -374,6 +360,22 @@ public class DataService implements IDataService {
 		}
 		return getCachedFileContent(filename);
 
+	}
+
+	@Override
+	public boolean getHashedZip(String zipname) {
+		logCache("Requested file: " + zipname);
+		try {
+			if (checkIfUpdateIsRequired(zipname)) {
+				logCache(zipname + " need to download / update the file ");
+				downloadFile(zipname);
+				ZipService.unzipFile(this.getStoragePath().resolve(zipname).toFile(), this.getStoragePath().toString());
+			}
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	/**

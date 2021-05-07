@@ -15,7 +15,7 @@ public class MTextField extends MField {
 		}
 
 		int textLength = getValue().getStringValue().length();
-		boolean validTest = super.isValid() && textLength > 0 && textLength < getMaxTextLength();
+		boolean validTest = super.isValid() && textLength < getMaxTextLength();
 		if (!validTest) {
 			setInvalidColor();
 		}

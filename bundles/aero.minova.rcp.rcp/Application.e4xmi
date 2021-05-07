@@ -153,6 +153,8 @@
   <commands xmi:id="_Lwy8UIydEeuboqmDt256_Q" elementId="org.eclipse.ui.edit.undo" commandName="undoCommand"/>
   <commands xmi:id="_4p5JwLufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
     <parameters xmi:id="_7dRQULufEeqOjqZ1liG0LA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="FormName" optional="false"/>
+    <parameters xmi:id="_CeAmEKzNEeutXsPDGafqQA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formId" name="Form ID"/>
+    <parameters xmi:id="_EKUHIKzeEeutXsPDGafqQA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel" name="Perspective Label"/>
   </commands>
   <commands xmi:id="_Oe_xYMEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
     <parameters xmi:id="_bbbLoOxLEeqe7f1c8iuT3A" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="ClosePerspective"/>

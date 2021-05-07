@@ -94,24 +94,9 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	@Override
 	public void open() throws WorkspaceException {
 
-		// Zuerst überprüfen, ob die Anmeldedaten gültig sind. Damit wird verhindert, dass sich das Passwort nicht ändern lässt, weil die Instance Location
-		// schon gesetzt ist
 		if (!getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
 			// Entwender das Passwort ist null/leer oder es wurde manuell eingetragten / geändert
 			checkCredentials(getPassword());
-		} else {
-			// Passwort aus dem Store benutzen
-			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
-				try {
-					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
-						// ausgelesendes Passwort vom Store checken
-						checkCredentials(store.get(WorkspaceAccessPreferences.PASSWORD, null));
-						break;
-					}
-				} catch (StorageException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 
 		if (!Platform.getInstanceLocation().isSet()) {
@@ -169,6 +154,9 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
 							// ausgelesendes Passwort vom Store nehmen
 							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
+						} else {
+							// ausgelesendes Passwort vom Dialog in den Store setzen
+							store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
 						}
 						break;
 					}

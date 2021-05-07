@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.e4.core.contexts,
  org.eclipse.e4.ui.services,
  org.eclipse.e4.core.services,
  org.eclipse.core.commands,
- org.eclipse.ui.forms
+ org.eclipse.ui.forms,
+ aero.minova.rcp.constant;bundle-version="12.0.15"
 Export-Package: aero.minova.rcp.perspectiveswitcher.commands,
  aero.minova.rcp.perspectiveswitcher.handler
