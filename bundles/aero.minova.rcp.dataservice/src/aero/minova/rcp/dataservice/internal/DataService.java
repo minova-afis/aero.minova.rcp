@@ -187,19 +187,6 @@ public class DataService implements IDataService {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
-
-		// PDF Ordner anfragen
-		CompletableFuture.runAsync(() -> {
-			try {
-				boolean checkIfUpdateIsRequired = this.checkIfUpdateIsRequired("PDF.zip");
-				if (checkIfUpdateIsRequired) {
-					this.downloadFile("PDF.zip");
-					ZipService.unzipFile(this.getStoragePath().resolve("PDF.zip").toFile(), this.getStoragePath().toString());
-				}
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
 	}
 
 	@Override
@@ -368,7 +355,23 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 		return getCachedFileContent(filename);
+		
+	}
 
+	@Override
+	public boolean getHashedZip(String zipname) {
+		logCache("Requested file: " + zipname);
+		try {
+			if (checkIfUpdateIsRequired(zipname)) {
+				logCache(zipname + " need to download / update the file ");
+				downloadFile(zipname);
+				ZipService.unzipFile(this.getStoragePath().resolve(zipname).toFile(), this.getStoragePath().toString());
+			}
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -412,8 +415,7 @@ public class DataService implements IDataService {
 		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 
-		httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE,
-										StandardOpenOption.WRITE));
+		httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
 	}
 
 	/**
