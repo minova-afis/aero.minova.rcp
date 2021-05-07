@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.transform.TransformerException;
 
-import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -98,9 +98,9 @@ public class PrintIndexHandler {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DISABLE_PREVIEW)
 	public boolean disablePreview;
 
-	@CanExecute
-	public boolean canExecute() {
-		return dataService.getHashedZip("PDF.zip");
+	@PostConstruct
+	public void downloadPFDZip() {
+		dataService.getHashedZip("PDF.zip");
 	}
 
 	@Execute
