@@ -84,4 +84,6 @@ public interface IDataService {
 	String getUserName();
 
 	void setLogger(Logger logger);
+
+	boolean getHashedZip(String zipname);
 }
