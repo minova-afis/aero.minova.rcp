@@ -372,7 +372,6 @@ public class WFCDetailCASRequestsUtil {
 			value += "\n\nUser : " + et.getUser();
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
-			System.out.println("showing error " + this.toString());
 			if (et.getT() == null) {
 				MessageDialog.openError(shell, "Error", value);
 			} else {
