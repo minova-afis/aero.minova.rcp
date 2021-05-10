@@ -65,7 +65,6 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
-import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
@@ -108,25 +107,22 @@ public class WFCSearchPart extends WFCFormPart {
 
 	private DataLayer bodyDataLayer;
 
-	Form searchForm;
-
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
 
 		new FormToolkit(parent.getDisplay());
-
-		// Search Form muss seperat geladen werden, da sie verändert wird
-		String formName = perspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
-		searchForm = dataFormService.getForm(formName);
+		if (getForm(parent) == null) {
+			return;
+		}
 
 		// "&" Spalte erstellen
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
 		xsdColumn.setBoolean(Boolean.FALSE);
 		xsdColumn.setLabel("&");
 		xsdColumn.setName("&");
-		searchForm.getIndexView().getColumn().add(0, xsdColumn);
+		form.getIndexView().getColumn().add(0, xsdColumn);
 
-		data = dataFormService.getTableFromFormIndex(searchForm);
+		data = dataFormService.getTableFromFormIndex(form);
 		getData().addRow();
 		// Wir setzen die Verundung auf false im Default-Fall!
 		getData().getRows().get(getData().getRows().size() - 1).setValue(new Value(false), 0);
@@ -134,7 +130,7 @@ public class WFCSearchPart extends WFCFormPart {
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", getData());
 
-		natTable = createNatTable(parent, searchForm, getData());
+		natTable = createNatTable(parent, form, getData());
 
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
 	}
@@ -296,7 +292,7 @@ public class WFCSearchPart extends WFCFormPart {
 			natTable.getActiveCellEditor().close();
 		}
 
-		String tableName = searchForm.getIndexView().getSource();
+		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".table", null);
 		if (string == null || string.equals("")) {
 			return;
@@ -418,9 +414,9 @@ public class WFCSearchPart extends WFCFormPart {
 				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					FilterValue fv = (FilterValue) v;
 					Instant inst = fv.getFilterValue().getInstantValue();
-					if (searchForm.getIndexView().getColumn().get(i).getShortTime() != null) {
+					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
 						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
-					} else if (searchForm.getIndexView().getColumn().get(i).getShortDate() != null) {
+					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
 						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
 					} else {
 						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());
