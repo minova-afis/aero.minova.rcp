@@ -226,9 +226,9 @@ public class DataFormService implements IDataFormService {
 		} catch (Exception e) {
 			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
 			try {
-				postError("msg.WFCUsingLocalMask");
-				// TODO: Fehlermeldung, Maske konnte nicht geladen werden, benutzen lokale (evtl. veraltete) Version
 				formContent = dataService.getCachedFileContent(name).get();
+				// TODO: Fehlermeldung, Maske konnte nicht geladen werden, benutzen lokale (evtl. veraltete) Version
+				postError("msg.WFCUsingLocalMask");
 			} catch (InterruptedException | ExecutionException e1) {
 				// TODO: Fehlermeldung, Maske konnte nicht geladen werden
 				postError("msg.WFCCouldntLoadMask");
@@ -238,7 +238,7 @@ public class DataFormService implements IDataFormService {
 		try {
 			form = XmlProcessor.get(formContent, Form.class);
 		} catch (JAXBException ex) {
-			throw new RuntimeException(ex);
+			// throw new RuntimeException(ex);
 		}
 
 		return form;
