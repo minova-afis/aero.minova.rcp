@@ -2,7 +2,6 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -37,8 +36,6 @@ public class DataFormService implements IDataFormService {
 
 	@Reference
 	IDataService dataService;
-
-	HashMap<String, Form> forms = new HashMap<String, Form>();
 
 	EventAdmin eventAdmin;
 
@@ -221,10 +218,6 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public Form getForm(String name) {
 
-		if (forms.containsKey(name)) {
-			return forms.get(name);
-		}
-
 		Form form = null;
 		String formContent = "";
 		try {
@@ -248,7 +241,6 @@ public class DataFormService implements IDataFormService {
 			throw new RuntimeException(ex);
 		}
 
-		forms.put(name, form);
 		return form;
 	}
 

@@ -79,6 +79,8 @@ public class DataService implements IDataService {
 
 	Logger logger;
 
+	HashMap<String, String> serverHashes = new HashMap<String, String>();
+
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
 		this.eventAdmin = admin;
@@ -359,7 +361,6 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 		return getCachedFileContent(filename);
-
 	}
 
 	@Override
@@ -473,9 +474,17 @@ public class DataService implements IDataService {
 		if (!file.exists()) {
 			return true;
 		}
-		CompletableFuture<String> serverHashForFile = getServerHashForFile(fileName);
+
+		String serverHash;
+		if (serverHashes.containsKey(fileName)) {
+			serverHash = serverHashes.get(fileName);
+		} else {
+			CompletableFuture<String> serverHashForFile = getServerHashForFile(fileName);
+			serverHash = serverHashForFile.join();
+			serverHashes.put(fileName, serverHash);
+		}
+
 		CompletableFuture<String> localHashForFile = getLocalHashForFile(file);
-		String serverHash = serverHashForFile.join();
 		String localHash = localHashForFile.join();
 		return (!serverHash.equals(localHash));
 	}
