@@ -223,24 +223,17 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			}
 		};
 
-		String body = "{\n" + "  \"name\": \"tEmployee\",\n" + "  \"columns\": [\n" + "    {\n" + "      \"name\": \"KeyLong\",\n"
-				+ "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n" + "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n"
-				+ "    {\n" + "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
-				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n" + "  \"rows\": [\n" + "    {\n"
-				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        \"f-\\u003e-s-0\"\n" + "      ]\n" + "    }\n"
-				+ "  ]\n" + "}";
 		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/ping")) //
 					.header("Content-Type", "application/json") //
-					.method("GET", BodyPublishers.ofString(body))//
+					.method("GET", BodyPublishers.ofString(""))//
 					.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 
 			HttpClient httpClient = HttpClient.newBuilder()//
 					.sslContext(disabledSslVerificationContext())//
 					.authenticator(authentication).build();
 
-			HttpResponse<String> answer;
-			answer = httpClient.send(request, BodyHandlers.ofString());
+			HttpResponse<String> answer = httpClient.send(request, BodyHandlers.ofString());
 			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
 				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
 			}
