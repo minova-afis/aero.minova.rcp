@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -30,6 +31,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.core.ui.PartsID;
@@ -114,6 +116,8 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private Form form;
+
+	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
@@ -601,55 +605,6 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 	}
-
-//	/**
-//	 * Antworten des CAS für Ticketnummern werden hier ausgelesen, so das sie wie bei einem Aufruf in der Index-Tabelle ausgewertet werden können
-//	 *
-//	 * @param recievedTable
-//	 */
-//	@Optional
-//	@Inject
-//	public void getTicket(@UIEventTopic(Constants.RECEIVED_TICKET) Table recievedTable) {
-//
-//		for (Control c : controls.values()) {
-//			if (c instanceof LookupControl) {
-//				LookupControl lc = (LookupControl) c;
-//				if (lc != controls.get(Constants.EMPLOYEEKEY)) {
-//					lc.setText("");
-//					lc.setData(Constants.CONTROL_KEYLONG, null);
-//					lc.getDescription().setText("");
-//				}
-//			}
-//		}
-//		Row recievedRow = recievedTable.getRows().get(0);
-//		if (selectedTable == null) {
-//			selectedTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
-//			selectedTable.addRow();
-//		} else if (selectedTable.getRows() == null) {
-//			selectedTable.addRow();
-//		}
-//		Row r = selectedTable.getRows().get(0);
-//		for (int i = 0; i < r.size(); i++) {
-//			if ((recievedTable.getColumnIndex(selectedTable.getColumnName(i))) >= 0) {
-//				r.setValue(recievedRow.getValue(recievedTable.getColumnIndex(selectedTable.getColumnName(i))), i);
-//			} else {
-//				Control c = controls.get(selectedTable.getColumnName(i));
-//				if (c instanceof LookupControl) {
-//					LookupControl lc = (LookupControl) c;
-//					r.setValue(new Value(lc.getData(Constants.CONTROL_KEYLONG), DataType.INTEGER), i);
-//				} else if (c instanceof Text) {
-//					Text t = (Text) c;
-//					if (t.getText() != null) {
-//						r.setValue(new Value(t.getText(), DataType.STRING), i);
-//					} else {
-//						r.setValue(new Value("", DataType.STRING), i);
-//					}
-//				}
-//			}
-//		}
-//
-//		updateSelectedEntry();
-//	}
 
 	/**
 	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten Eintrags zurück
