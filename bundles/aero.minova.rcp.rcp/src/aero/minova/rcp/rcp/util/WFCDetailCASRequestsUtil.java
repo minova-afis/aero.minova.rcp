@@ -444,16 +444,21 @@ public class WFCDetailCASRequestsUtil {
 			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 
+			// Fehler abfangen, Felder wieder freigeben
 			tableFuture.exceptionally(ex -> {
-				System.out.println("Ticket error");
-				ticketFieldsUpdate("", true);
+				// Im Display Thread ausführen
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						ticketFieldsUpdate("...", true);
+					}
+				});
 				return null;
 			});
 
 			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-				ticketFieldsUpdate("", true);
-				System.out.println("Ticket got response");
+				ticketFieldsUpdate("...", true);
 				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
 					showErrorMessage(e);
@@ -474,11 +479,12 @@ public class WFCDetailCASRequestsUtil {
 		MField field = detail.getField("Description");
 		field.getValueAccessor().setEditable(editable);
 		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
-		((TextValueAccessor) field.getValueAccessor()).setText(messageText);
 		if (editable) {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+			((TextValueAccessor) field.getValueAccessor()).setText("");
 		} else {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+			((TextValueAccessor) field.getValueAccessor()).setText(messageText);
 		}
 
 		field = detail.getField("OrderReceiverKey");
