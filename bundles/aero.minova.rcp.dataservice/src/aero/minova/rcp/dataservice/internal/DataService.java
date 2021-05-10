@@ -418,7 +418,12 @@ public class DataService implements IDataService {
 		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 
-		httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
+		try {
+			httpClient.sendAsync(request,
+					BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
+		} catch (Exception e) {
+			handleCASError(e, "File Sync");
+		}
 	}
 
 	/**
