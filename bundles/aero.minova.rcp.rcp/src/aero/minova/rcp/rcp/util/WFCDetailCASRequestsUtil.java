@@ -12,6 +12,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -31,7 +34,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.core.ui.PartsID;
@@ -117,7 +119,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	private Form form;
 
-	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
@@ -125,9 +127,23 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 
-	public void setDetail(MDetail detail, MPerspective perspective) {
+	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
+
+		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
+		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
+		dataService.setTimeoutOpenNotification(preferences.getInt(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION, 1));
+		preferences.addPreferenceChangeListener(new IPreferenceChangeListener() {
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (event.getKey().equals(ApplicationPreferences.TIMEOUT_CAS)) {
+					dataService.setTimeout(Integer.parseInt((String) event.getNewValue()));
+				} else if (event.getKey().equals(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION)) {
+					dataService.setTimeoutOpenNotification(Integer.parseInt((String) event.getNewValue()));
+				}
+			}
+		});
 	}
 
 	@Inject
@@ -570,7 +586,7 @@ public class WFCDetailCASRequestsUtil {
 
 	@Optional
 	@Inject
-	public void newFields(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
+	public void notifyUser(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
 		openNotificationPopup(message);
 	}
 

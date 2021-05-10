@@ -118,7 +118,8 @@ public class DataService implements IDataService {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
-	private static final int TIMEOUT_DURATION = 5;
+	private static int timeoutDuration = 15;
+	private static int timeoutDurationOpenNotification = 1;
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
@@ -202,7 +203,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
 		log("CAS Request Index:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 
@@ -233,7 +234,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION * 2)).build();
+				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
 		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
 		try {
@@ -265,7 +266,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
 		log("CAS Request Detail Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 
@@ -391,7 +392,7 @@ public class DataService implements IDataService {
 	private CompletableFuture<String> downloadAsync(String filename) {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + filename))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 		log("CAS Request File Async:\n" + request + "\n" + filename);
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 		sendRequest.exceptionally(ex -> {
@@ -413,7 +414,7 @@ public class DataService implements IDataService {
 	public void downloadFile(String fileName) throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 
@@ -429,7 +430,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getServerHashForFile(String filename) {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
 		log("CAS Request Server Hash for File:\n" + request + "\n" + filename);
 
@@ -825,5 +826,15 @@ public class DataService implements IDataService {
 	private void handleCASError(Throwable ex, String method) {
 		log("CAS Error " + method + ":\n" + ex.getMessage());
 		showNoResposeServerError();
+	}
+
+	@Override
+	public void setTimeout(int timeout) {
+		timeoutDuration = timeout;
+	}
+
+	@Override
+	public void setTimeoutOpenNotification(int timeoutOpen) {
+		timeoutDurationOpenNotification = timeoutOpen;
 	}
 }
