@@ -227,10 +227,8 @@ public class DataFormService implements IDataFormService {
 			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
 			try {
 				formContent = dataService.getCachedFileContent(name).get();
-				// TODO: Fehlermeldung, Maske konnte nicht geladen werden, benutzen lokale (evtl. veraltete) Version
 				postError("msg.WFCUsingLocalMask");
 			} catch (InterruptedException | ExecutionException e1) {
-				// TODO: Fehlermeldung, Maske konnte nicht geladen werden
 				postError("msg.WFCCouldntLoadMask");
 			}
 		}
@@ -246,9 +244,9 @@ public class DataFormService implements IDataFormService {
 
 	public void postError(String message) {
 		Dictionary<String, Object> data = new Hashtable<>(2);
-		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERRORMESSAGE);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
 		data.put(IEventBroker.DATA, message);
-		Event event = new Event(Constants.BROKER_SHOWERRORMESSAGE, data);
+		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
 		eventAdmin.postEvent(event);
 	}
 

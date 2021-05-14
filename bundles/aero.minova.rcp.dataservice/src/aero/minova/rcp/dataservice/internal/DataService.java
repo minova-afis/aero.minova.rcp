@@ -101,12 +101,16 @@ public class DataService implements IDataService {
 				+ value.getProcedureOrView());
 	}
 
-	public void showNoResposeServerError() {
-		Dictionary<String, Object> data = new Hashtable<>(2);
-		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERRORMESSAGE);
-		data.put(IEventBroker.DATA, "msg.WFCNoResponseServer");
-		Event event = new Event(Constants.BROKER_SHOWERRORMESSAGE, data);
-		eventAdmin.postEvent(event);
+	public void showNoResposeServerError(String message) {
+		// Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
+		if ((System.currentTimeMillis() - timeOfLastConnectionErrorMessage) > minTimeBetweenError * 1000) {
+			Dictionary<String, Object> data = new Hashtable<>(2);
+			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
+			data.put(IEventBroker.DATA, message);
+			Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
+			eventAdmin.postEvent(event);
+			timeOfLastConnectionErrorMessage = System.currentTimeMillis();
+		}
 	}
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
@@ -120,6 +124,8 @@ public class DataService implements IDataService {
 
 	private static int timeoutDuration = 15;
 	private static int timeoutDurationOpenNotification = 1;
+	private int minTimeBetweenError = 3;
+	long timeOfLastConnectionErrorMessage = -1;
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
@@ -198,6 +204,10 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable) {
+		return getIndexDataAsync(tableName, seachTable, true);
+	}
+
+	public CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable, boolean showErrorMessage) {
 		String body = gson.toJson(seachTable);
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
@@ -210,7 +220,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "Index");
+			handleCASError(ex, "Index", showErrorMessage);
 			return null;
 		});
 
@@ -250,7 +260,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "PDF Detail");
+			handleCASError(ex, "PDF Detail", true);
 			return null;
 		});
 
@@ -262,6 +272,10 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable) {
+		return getDetailDataAsync(tableName, detailTable, true);
+	}
+
+	public CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable, boolean showErrorMessage) {
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
@@ -273,7 +287,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "Detail Data");
+			handleCASError(ex, "Detail Data", showErrorMessage);
 			return null;
 		});
 
@@ -396,7 +410,7 @@ public class DataService implements IDataService {
 		log("CAS Request File Async:\n" + request + "\n" + filename);
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "File Async");
+			handleCASError(ex, "File Async", true);
 			return null;
 		});
 		return sendRequest.thenApply(HttpResponse::body);
@@ -422,7 +436,7 @@ public class DataService implements IDataService {
 			httpClient.sendAsync(request,
 					BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
 		} catch (Exception e) {
-			handleCASError(e, "File Sync");
+			handleCASError(e, "File Sync", false);
 		}
 	}
 
@@ -442,7 +456,7 @@ public class DataService implements IDataService {
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "Server Hash for File");
+			handleCASError(ex, "Server Hash for File", false);
 			return null;
 		});
 
@@ -492,7 +506,7 @@ public class DataService implements IDataService {
 
 		CompletableFuture<String> localHashForFile = getLocalHashForFile(file);
 		String localHash = localHashForFile.join();
-		return (!serverHash.equals(localHash));
+		return (!localHash.equals(serverHash));
 	}
 
 	@Override
@@ -577,12 +591,15 @@ public class DataService implements IDataService {
 					.withValue(fv) //
 					.create();
 			t.addRow(row);
-			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
+			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t, false);
 			Table ta = null;
 			try {
 				ta = tableFuture.get();
 			} catch (InterruptedException | ExecutionException e) {
-				// e.printStackTrace();
+				System.out.println("Error, using Cache: " + tableName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				list.add(map.get(keyLong));
+				return CompletableFuture.supplyAsync(() -> list);
 			}
 			if (ta != null && !ta.getRows().isEmpty()) {
 				Row r = ta.getRows().get(0);
@@ -617,12 +634,15 @@ public class DataService implements IDataService {
 					.create();
 			t.addRow(row);
 
-			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t);
+			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t, false);
 			Table ta = null;
 			try {
 				ta = tableFuture.get().getResultSet();
 			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+				System.out.println("Error, using cache: " + procedureName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				list.add(map.get(keyLong));
+				return CompletableFuture.supplyAsync(() -> list);
 			}
 			if (ta != null && !ta.getRows().isEmpty()) {
 				Row r = ta.getRows().get(0);
@@ -672,11 +692,16 @@ public class DataService implements IDataService {
 					.withValue(fv) //
 					.create();
 			t.addRow(row);
-			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t);
+			CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t, false);
 			Table ta = null;
 			try {
 				ta = tableFuture.get();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				System.out.println("Error, using cache: " + tableName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				list.addAll(map.values());
+				return CompletableFuture.supplyAsync(() -> list);
+			}
 			if (ta != null) {
 				for (Row r : ta.getRows()) {
 					LookupValue lv = new LookupValue(//
@@ -719,12 +744,15 @@ public class DataService implements IDataService {
 			}
 			t.addRow(row);
 
-			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t);
+			CompletableFuture<SqlProcedureResult> tableFuture = getDetailDataAsync(t.getName(), t, false);
 			Table ta = null;
 			try {
 				ta = tableFuture.get().getResultSet();
 			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
+				System.out.println("Error, using Cache: " + hashName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				list.addAll(map.values());
+				return CompletableFuture.supplyAsync(() -> list);
 			} catch (NullPointerException ex) {
 				if (LOG) {
 					System.out.println("listLookup: Wir haben ein Problem, posten es an den Benutzer, aber null ist hier in Ordnung!");
@@ -810,9 +838,9 @@ public class DataService implements IDataService {
 		t.addRow(row);
 		CompletableFuture<?> tableFuture;
 		if (field.getLookupTable() != null) {
-			tableFuture = getIndexDataAsync(t.getName(), t);
+			tableFuture = getIndexDataAsync(t.getName(), t, true);
 		} else {
-			tableFuture = getDetailDataAsync(t.getName(), t);
+			tableFuture = getDetailDataAsync(t.getName(), t, true);
 		}
 
 		return tableFuture;
@@ -828,9 +856,11 @@ public class DataService implements IDataService {
 		this.logger = logger;
 	}
 
-	private void handleCASError(Throwable ex, String method) {
+	private void handleCASError(Throwable ex, String method, boolean showErrorMessage) {
 		log("CAS Error " + method + ":\n" + ex.getMessage());
-		showNoResposeServerError();
+		if (showErrorMessage) {
+			showNoResposeServerError("msg.WFCNoResponseServer");
+		}
 	}
 
 	@Override

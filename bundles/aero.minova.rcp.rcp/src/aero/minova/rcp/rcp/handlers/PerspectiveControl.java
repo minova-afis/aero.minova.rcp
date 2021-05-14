@@ -16,6 +16,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
@@ -23,11 +24,13 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4PerspectiveSwitcherPreferences;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4Util;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.EPerspectiveSwitcher;
 import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.IPerspectiveSwitcherControl;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -43,6 +46,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -108,8 +112,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
 	 */
 	@PostConstruct
-	public void createGui(Composite parent, MWindow window,
-			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
+	public void createGui(Composite parent, MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 		perspectiveSwitcher.setControlProvider(this);
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
@@ -170,8 +173,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	private void translate() {
 		for (ToolItem item : toolBar.getItems()) {
-			List<MPerspective> perspectives = modelService.findElements(application, item.getData().toString(),
-					MPerspective.class);
+			List<MPerspective> perspectives = modelService.findElements(application, item.getData().toString(), MPerspective.class);
 			MPerspective perspective = perspectives.get(0);
 			String value = translationService.translate(perspective.getLocalizedLabel(), null);
 			item.setText(value);
@@ -218,15 +220,13 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 				@Override
 				public void widgetSelected(SelectionEvent event) {
-					Map<String, String> parameter = Map.of (//
-							Constants.FORM_NAME, perspective.getElementId(), Constants.FORM_ID,
-							perspective.getElementId(),
-							Constants.FORM_LABEL, perspective.getElementId()
+					Map<String, String> parameter = Map.of(//
+							Constants.FORM_NAME, perspective.getElementId(), Constants.FORM_ID, perspective.getElementId(), Constants.FORM_LABEL,
+							perspective.getElementId()
 					//
 					);
 
-					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform",
-							parameter);
+					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform", parameter);
 					handlerService.executeHandler(command);
 				}
 			});
@@ -391,8 +391,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME, perspectiveId);
-				ParameterizedCommand command = commandService
-						.createCommand("aero.minova.rcp.rcp.command.closeperspective", parameter);
+				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.closeperspective", parameter);
 				handlerService.executeHandler(command);
 			}
 		});
@@ -409,12 +408,10 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME, perspectiveId);
-				ParameterizedCommand command = commandService
-						.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
+				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
 
-				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
-				// Kennzeichen gelöscht wird.
+				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
 				if (!(keepItToolitems != null && keepItToolitems.contains(perspectiveId)) && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
@@ -423,5 +420,17 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		});
 		menuItem.setSelection(keepItToolitems != null && keepItToolitems.contains(perspectiveId));
 
+	}
+
+	@Inject
+	@Optional
+	public void showConnectionErrorMessage(EPartService partService, EModelService model, Shell shell,
+			@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) String message) {
+
+		// Fokus weg von den Lookup setzten (auf search part), damit sich das Fehlerfenster nicht immer wieder öffnet
+//		List<MPart> findElements = model.findElements(modelService.getActivePerspective(window), PartsID.SEARCH_PART, MPart.class);
+//		partService.activate(findElements.get(0), true);
+
+		MessageDialog.openError(shell, "Error", translationService.translate("@" + message, null));
 	}
 }

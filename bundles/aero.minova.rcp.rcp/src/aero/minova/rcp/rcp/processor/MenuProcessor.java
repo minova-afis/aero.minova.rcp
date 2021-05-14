@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -32,6 +33,9 @@ public class MenuProcessor {
 	private MApplication mApplication;
 
 	@Inject
+	private IEventBroker broker;
+
+	@Inject
 	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService, IDataService dataService, MApplication mApplication) {
 
 		this.menu = menu;
@@ -44,9 +48,9 @@ public class MenuProcessor {
 			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
 			try {
 				processXML(dataService.getCachedFileContent(MDI_FILE_NAME).get());
-				// TODO: Fehlermeldung, Menü konnte nicht geladen werden, benutzen lokale (evtl. veraltete) Version
+				broker.post(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, "msg.WFCUsingLocalMenu");
 			} catch (InterruptedException | ExecutionException e1) {
-				// TODO: Fehlermeldung, Menü konnte nicht geladen werden
+				broker.post(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, "msg.WFCCouldntLoadMenu");
 			}
 		}
 	}

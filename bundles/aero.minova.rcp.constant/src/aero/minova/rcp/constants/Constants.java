@@ -64,6 +64,7 @@ public class Constants {
 	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
 	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
+	public static final String BROKER_SHOWCONNECTIONERRORMESSAGE = "aero/minova/rcp/ShowConnectionErrorMessage";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
@@ -84,8 +85,7 @@ public class Constants {
 	public static final String CSS_READONLY = "ReadOnly";
 
 	/**
-	 * Id for command parameter "Perspective ID" (value is
-	 * <code>"org.eclipse.e4.ui.perspectives.parameters.perspectiveId"</code>).
+	 * Id for command parameter "Perspective ID" (value is <code>"org.eclipse.e4.ui.perspectives.parameters.perspectiveId"</code>).
 	 */
 
 	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
