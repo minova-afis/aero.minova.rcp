@@ -385,7 +385,9 @@ public class DataService implements IDataService {
 			if (checkIfUpdateIsRequired(zipname)) {
 				logCache(zipname + " need to download / update the file ");
 				downloadFile(zipname);
-				ZipService.unzipFile(this.getStoragePath().resolve(zipname).toFile(), this.getStoragePath().toString());
+				if (this.getStoragePath().resolve(zipname).toFile().exists()) {
+					ZipService.unzipFile(this.getStoragePath().resolve(zipname).toFile(), this.getStoragePath().toString());
+				}
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -433,8 +435,7 @@ public class DataService implements IDataService {
 		Path localFile = getStoragePath().resolve(fileName);
 
 		try {
-			httpClient.sendAsync(request,
-					BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
+			httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
 		} catch (Exception e) {
 			handleCASError(e, "File Sync", false);
 		}
