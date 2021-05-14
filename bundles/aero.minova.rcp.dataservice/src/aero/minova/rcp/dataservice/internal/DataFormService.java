@@ -2,6 +2,7 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +39,8 @@ public class DataFormService implements IDataFormService {
 	IDataService dataService;
 
 	EventAdmin eventAdmin;
+
+	private HashMap<String, Form> forms = new HashMap<>();
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
@@ -218,8 +221,13 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public Form getForm(String name) {
 
+		if (forms.containsKey(name)) {
+			return forms.get(name);
+		}
+
 		Form form = null;
 		String formContent = "";
+
 		try {
 			// Datei ggf. vom Server holen, form wird synchron geladen, das sollte später auch asynchron werden
 			formContent = dataService.getHashedFile(name).join();
@@ -235,9 +243,9 @@ public class DataFormService implements IDataFormService {
 
 		try {
 			form = XmlProcessor.get(formContent, Form.class);
-		} catch (JAXBException ex) {
-			// throw new RuntimeException(ex);
-		}
+		} catch (JAXBException ex) {}
+
+		forms.put(name, form);
 
 		return form;
 	}
