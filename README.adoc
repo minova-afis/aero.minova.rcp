@@ -275,3 +275,9 @@ So muss man sie auch nur einmal erstellen und bei sich setzen.
 ==== Configuration
 
 Die Configuration habe ich auch standalone erstellt / released.
+
+= Weitere Dokumentationen
+
+* link:bundles/aero.minova.rcp.preferences/README.adoc[Einstellungen]
+* link:bundles/aero.minova.rcp.dataservice/README.adoc[Verhalten wenn CAS nicht erreichbar ist]
+
