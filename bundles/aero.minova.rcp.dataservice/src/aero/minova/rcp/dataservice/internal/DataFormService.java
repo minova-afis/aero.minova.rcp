@@ -2,7 +2,6 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +39,7 @@ public class DataFormService implements IDataFormService {
 
 	EventAdmin eventAdmin;
 
-	private HashMap<String, Form> forms = new HashMap<>();
+	private List<String> requestedForms = new ArrayList<>();
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
@@ -221,10 +220,6 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public Form getForm(String name) {
 
-		if (forms.containsKey(name)) {
-			return forms.get(name);
-		}
-
 		Form form = null;
 		String formContent = "";
 
@@ -235,9 +230,14 @@ public class DataFormService implements IDataFormService {
 			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
 			try {
 				formContent = dataService.getCachedFileContent(name).get();
-				postError("msg.WFCUsingLocalMask");
+				// Fehlermeldung nur einmal pro Form zeigen
+				if (!requestedForms.contains(name)) {
+					postError("msg.WFCUsingLocalMask");
+				}
 			} catch (InterruptedException | ExecutionException e1) {
-				postError("msg.WFCCouldntLoadMask");
+				if (!requestedForms.contains(name)) {
+					postError("msg.WFCCouldntLoadMask");
+				}
 			}
 		}
 
@@ -245,8 +245,7 @@ public class DataFormService implements IDataFormService {
 			form = XmlProcessor.get(formContent, Form.class);
 		} catch (JAXBException ex) {}
 
-		forms.put(name, form);
-
+		requestedForms.add(name);
 		return form;
 	}
 
