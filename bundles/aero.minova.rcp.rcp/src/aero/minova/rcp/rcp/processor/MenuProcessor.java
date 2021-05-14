@@ -176,5 +176,4 @@ public class MenuProcessor {
 		Shell shell = new Shell(Display.getCurrent());
 		MessageDialog.openError(shell, "Error", message);
 	}
-
 }

@@ -426,11 +426,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	@Optional
 	public void showConnectionErrorMessage(EPartService partService, EModelService model, Shell shell,
 			@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) String message) {
-
-		// Fokus weg von den Lookup setzten (auf search part), damit sich das Fehlerfenster nicht immer wieder öffnet
-//		List<MPart> findElements = model.findElements(modelService.getActivePerspective(window), PartsID.SEARCH_PART, MPart.class);
-//		partService.activate(findElements.get(0), true);
-
 		MessageDialog.openError(shell, "Error", translationService.translate("@" + message, null));
 	}
 }
