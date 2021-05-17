@@ -33,25 +33,15 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 			return;
 		}
 		control.addFocusListener(new FocusListener() {
-
-			private int time;
-
 			@Override
 			public void focusLost(FocusEvent e) {
 				setFocussed(false);
-				time = e.time;
 				// Überprüfung ob der eingetragenen Wert in der Liste ist und ebenfalls gültig!
 				field.setValue(field.getValue(), false);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				// Zur gleichen zeit können nicht 2 Elemente fokusiert werden!
-				// Problem existiert nur auf dem Mac
-				if (e.time == time) {
-					return;
-				}
-				time = e.time;
 				setFocussed(true);
 			}
 		});
@@ -85,7 +75,6 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	@Override
 	public Value setValue(Value value, boolean user) {
-
 		// Wenn der Focus auf dem Control liegt, setzen wir keinen Wert
 		if (isFocussed()) {
 			return getDisplayValue();
