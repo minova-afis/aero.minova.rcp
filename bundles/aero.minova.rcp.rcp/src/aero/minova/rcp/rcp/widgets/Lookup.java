@@ -308,7 +308,6 @@ public class Lookup extends Composite {
 		text.addListener(eventType, listener);
 	}
 
-
 	@Override
 	public Point computeSize(final int wHint, final int hHint, final boolean changed) {
 		checkWidget();
@@ -323,8 +322,6 @@ public class Lookup extends Composite {
 		checkWidget();
 		return super.computeTrim(x, y, width, height);
 	}
-
-
 
 	/**
 	 * @see org.eclipse.swt.widgets.Text#getEditable()
@@ -422,6 +419,11 @@ public class Lookup extends Composite {
 		text.setRedraw(redraw);
 	}
 
+	@Override
+	public boolean isFocusControl() {
+		checkWidget();
+		return text.isFocusControl();
+	}
 
 	/**
 	 * @see org.eclipse.swt.widgets.Text#setText(java.lang.String)
@@ -431,8 +433,6 @@ public class Lookup extends Composite {
 		this.text.setData(SETTEXT_KEY, Boolean.TRUE);
 		this.text.setText(text);
 	}
-
-
 
 	public void fillSelectedValue() {
 		MField field = (MField) getData(Constants.CONTROL_FIELD);

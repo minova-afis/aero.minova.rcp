@@ -20,7 +20,6 @@ public class ApplicationPreferences {
 	 */
 	public static final String TIMEZONE = "Timezone";
 
-
 	/**
 	 * Die Daten im Index werden beim Öffnen der Maske automatisch geladen.
 	 * 
@@ -216,8 +215,8 @@ public class ApplicationPreferences {
 	public static final String SHOW_GROUPS = "ShowGroups";
 
 	/**
-	 * Bestimmt die Dauer, die bei einer Auswahl gewartet wird, bevor das Event gesendet wird. Zum Beispiel, wenn man mit den Pfeiltasten durch die Tabelle geht,
-	 * wird nicht bei jeder Auswahl das Event gesendet, sondern nur, wenn in dem angegebenen Zeitraum die Auswahl nicht geändert wurde.
+	 * Bestimmt die Dauer, die bei einer Auswahl gewartet wird, bevor das Event gesendet wird. Zum Beispiel, wenn man mit den Pfeiltasten durch die Tabelle
+	 * geht, wird nicht bei jeder Auswahl das Event gesendet, sondern nur, wenn in dem angegebenen Zeitraum die Auswahl nicht geändert wurde.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
@@ -243,20 +242,34 @@ public class ApplicationPreferences {
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String COUNTRY = "country";
-	
+
 	/**
 	 * Bestimmt den FormatStyle von eingebenen Date. Mögliche FormatStyles sind: FULL, LONG, MEDIUM und SHORT.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String DATE_UTIL = "DateUtil";
-	
+
 	/**
 	 * Bestimmt den FormatStyle von eingegebenen Time. Mögliche FormatStyles sind: FULL, LONG, MEDIUM und SHORT.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String TIME_UTIL = "TimeUtil";
+
+	/**
+	 * Legt die Zeit fest, nach der bei einer Anfrage ans CAS ein Timeout auftritt
+	 * 
+	 * @see ApplicationPreferences#PREFERENCES_NODE
+	 */
+	public static final String TIMEOUT_CAS = "TimeoutCAS";
+
+	/**
+	 * Legt die Zeit fest, nach der sich bei einer Anfrage ans CAS eine Meldung öffnet, dass Daten geladen werden
+	 * 
+	 * @see ApplicationPreferences#PREFERENCES_NODE
+	 */
+	public static final String TIMEOUT_OPEN_NOTIFICATION = "TimeoutOpenNotification";
 
 	private ApplicationPreferences() {}
 }

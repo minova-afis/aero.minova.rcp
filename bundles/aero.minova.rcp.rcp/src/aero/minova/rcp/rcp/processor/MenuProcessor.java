@@ -1,7 +1,9 @@
 package aero.minova.rcp.rcp.processor;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,6 +15,9 @@ import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -30,20 +35,33 @@ public class MenuProcessor {
 	private EModelService modelService;
 	private MApplication mApplication;
 
+	private String usingLocalMenu = "There was no response from the server. Application data may be out of date. Consider checking your connection and restarting the application.";
+	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
+
 	@Inject
-	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService,
-			IDataService dataService, MApplication mApplication) {
+	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService, IDataService dataService, MApplication mApplication) {
 
 		this.menu = menu;
 		this.modelService = modelService;
 		this.mApplication = mApplication;
-		dataService.getHashedFile(MDI_FILE_NAME).thenAccept(this::processXML);
+
+		try {
+			dataService.getHashedFile(MDI_FILE_NAME).thenAccept(this::processXML);
+		} catch (Exception e) {
+			handleNoMDI(dataService);
+		}
+
+		File application = new File(dataService.getStoragePath() + "/" + MDI_FILE_NAME);
+		if (!application.exists()) {
+			handleNoMDI(dataService);
+		}
 	}
 
 	private void processXML(String fileContent) {
 		Main mainMDI = null;
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
+
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
 			if (!menuOrEntry.isEmpty()) {
 
@@ -67,8 +85,7 @@ public class MenuProcessor {
 	}
 
 	/**
-	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der
-	 * Einträge
+	 * Diese Methode erstellt aus dem übergebenen menu ein MMenu inklusiver der Einträge
 	 *
 	 * @param menu_MDI
 	 * @param menu
@@ -76,8 +93,7 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI,
-			EModelService modelService, MApplication mApplication) {
+	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
 
@@ -89,8 +105,7 @@ public class MenuProcessor {
 				if (object instanceof Entry) {
 					Entry entryMDI = (Entry) object;
 					String id2 = ((Action) entryMDI.getId()).getId();
-					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService,
-							mApplication);
+					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
 					menuGen.getChildren().add(handledMenuItem);
 					menu.getChildren().add(menuGen);
 				}
@@ -99,8 +114,7 @@ public class MenuProcessor {
 	}
 
 	/**
-	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen
-	 * MDI-Eintrag
+	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen MDI-Eintrag
 	 *
 	 * @param entryMDI
 	 * @param actionMDI
@@ -108,8 +122,7 @@ public class MenuProcessor {
 	 * @param mApplication
 	 * @return
 	 */
-	private MHandledMenuItem createMenuEntry(Entry entryMDI, Action actionMDI, EModelService modelService,
-			MApplication mApplication) {
+	private MHandledMenuItem createMenuEntry(Entry entryMDI, Action actionMDI, EModelService modelService, MApplication mApplication) {
 
 		MHandledMenuItem handledMenuItem = modelService.createModelElement(MHandledMenuItem.class);
 		handledMenuItem.getPersistedState().put("persistState", String.valueOf(false));
@@ -147,7 +160,20 @@ public class MenuProcessor {
 		handledMenuItem.setIconURI(actionMDI.getIcon());
 
 		return handledMenuItem;
-
 	}
 
+	private void handleNoMDI(IDataService dataService) {
+		// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
+		try {
+			processXML(dataService.getCachedFileContent(MDI_FILE_NAME).get());
+			showConnectionErrorMessage(usingLocalMenu);
+		} catch (InterruptedException | ExecutionException e1) {
+			showConnectionErrorMessage(couldntLoadMenu);
+		}
+	}
+
+	public void showConnectionErrorMessage(String message) {
+		Shell shell = new Shell(Display.getCurrent());
+		MessageDialog.openError(shell, "Error", message);
+	}
 }

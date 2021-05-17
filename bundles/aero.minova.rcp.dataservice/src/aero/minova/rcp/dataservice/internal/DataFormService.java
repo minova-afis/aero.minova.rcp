@@ -1,17 +1,23 @@
 package aero.minova.rcp.dataservice.internal;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.XmlProcessor;
@@ -30,6 +36,19 @@ public class DataFormService implements IDataFormService {
 
 	@Reference
 	IDataService dataService;
+
+	EventAdmin eventAdmin;
+
+	private List<String> requestedForms = new ArrayList<>();
+
+	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
+	void registerEventAdmin(EventAdmin admin) {
+		this.eventAdmin = admin;
+	}
+
+	void unregisterEventAdmin(EventAdmin admin) {
+		this.eventAdmin = null;
+	}
 
 	@Override
 	public Table getTableFromFormIndex(Form form) {
@@ -202,22 +221,40 @@ public class DataFormService implements IDataFormService {
 	public Form getForm(String name) {
 
 		Form form = null;
-		CompletableFuture<String> hashedFile = dataService.getHashedFile(name); // Datei ggf. vom Server holen
-		// form wird synchron geladen, das sollte später auch asynchron werden
-		String formContent = hashedFile.join();
+		String formContent = "";
 
 		try {
-			String localpath = Platform.getInstanceLocation().getURL().toURI().toString();
-			File formFile = new File(localpath + name);
-			if (!formFile.exists()) {
-				// Datei vom Server holen
+			// Datei ggf. vom Server holen, form wird synchron geladen, das sollte später auch asynchron werden
+			formContent = dataService.getHashedFile(name).join();
+		} catch (Exception e) {
+			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
+			try {
+				formContent = dataService.getCachedFileContent(name).get();
+				// Fehlermeldung nur einmal pro Form zeigen
+				if (!requestedForms.contains(name)) {
+					postError("msg.WFCUsingLocalMask");
+				}
+			} catch (InterruptedException | ExecutionException e1) {
+				if (!requestedForms.contains(name)) {
+					postError("msg.WFCCouldntLoadMask");
+				}
 			}
-			form = XmlProcessor.get(formContent, Form.class);
-		} catch (URISyntaxException | JAXBException ex) {
-			throw new RuntimeException(ex);
 		}
 
+		try {
+			form = XmlProcessor.get(formContent, Form.class);
+		} catch (JAXBException ex) {}
+
+		requestedForms.add(name);
 		return form;
+	}
+
+	public void postError(String message) {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
+		data.put(IEventBroker.DATA, message);
+		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
+		eventAdmin.postEvent(event);
 	}
 
 }

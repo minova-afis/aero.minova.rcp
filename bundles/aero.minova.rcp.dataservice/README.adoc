@@ -1,0 +1,19 @@
+= Verhalten wenn CAS nicht erreichbar ist
+
+Wenn das CAS nicht erreichbar ist, soll immer eine entsprechende Fehlermeldungen geworfen werden, was über ein Popup Fenster geschieht.
+Die Anwendung soll soweit möglich nutzbar bleiben. 
+Wenn eine Verbindung wieder möglich ist, soll diese genutzt werden.
+Es gibt einen Default-Timeout von 15 Sekunden, der über die Einstellungen angepasst werden kann.
+
+.Zusätzlich soll sich die Anwendung wie folgt verhalten, je nachdem, wann das CAS nicht erreichbar ist:
+* Beim Starten der Anwendung: (Hier kann die Timeout-Zeit nicht über die Einstellungen verändert werden, da Einstellungen Workspace-Spezifisch sind)
+** Kein Default-Profil: Die Login-Maske bleibt geöffnet. Hier erscheint kein Popup mit der Fehlermeldung, stattdessen wird das "Message" Feld der Login-Maske verwendet.
+** Default-Profil: Profil (mit evtl. veralteten Masken) laden.
+* Anfragen einer Datei/ des Hashes einer Datei: Wenn möglich vorhandene Dateien nutzen, mit entsprechender Warnung an Nutzer das Daten veraltet sein können
+** Bei Anfrage von PDF-Dateien wird der Timeout verdoppelt (30s im Default-Fall)
+** Wenn beim Laden der application.mdi ein Fehler auftritt wird dieser in Englisch angezeigt, da Übersetzungen noch nicht zur Verfügung stehen
+* Laden des Indexes: Vorheriger Zustand des Indexes bleibt bestehen, Ladeknopf kann wieder aktiviert werden
+* Anfrage einer Lookup-Tabelle: Wenn vorhanden Nutzen des Caches, mit entsprechender Warnung an Nutzer das Daten veraltet sein können
+* Beim Speichern/Ändern/Löschen eines Eintrages über das Detail: Die eingetragenen Werte im Detail bleiben stehen
+* Auflösen eines Tickets (SIS): Die Messages in den Feldern werden zurückgesetzt
+ 

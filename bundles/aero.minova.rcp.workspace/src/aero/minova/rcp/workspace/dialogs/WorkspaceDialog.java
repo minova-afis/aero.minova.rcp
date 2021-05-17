@@ -242,7 +242,7 @@ public class WorkspaceDialog extends Dialog {
 			message.setText(e.getMessage());
 			return;
 		} catch (NullPointerException ex) {
-			message.setText("Was stimmt denn nicht mit DIR ?!");
+			message.setText(ex.getMessage());
 			return;
 		}
 		usernameText = username.getText();
