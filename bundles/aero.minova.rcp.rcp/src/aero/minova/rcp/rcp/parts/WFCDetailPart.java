@@ -121,6 +121,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
+		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 	}
 
@@ -193,6 +194,7 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
+
 
 		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
 		section.setLayoutData(headLayoutData);
