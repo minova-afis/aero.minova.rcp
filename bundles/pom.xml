@@ -24,7 +24,6 @@
 		<module>aero.minova.rcp.perspectiveswitcher</module>
 		<module>aero.minova.rcp.preferences</module>
 		<module>aero.minova.rcp.translate</module>
-		<module>org.eclipse.e4.ui.workbench.perspectiveswitcher</module>
 		<module>aero.minova.rcp.preferencewindow</module>
 		<module>aero.minova.rcp.images</module>
 		<module>aero.minova.workingtime.helper</module>
