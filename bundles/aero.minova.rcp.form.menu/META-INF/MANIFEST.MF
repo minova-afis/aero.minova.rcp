@@ -7,3 +7,4 @@ Require-Bundle: javax.xml.bind;bundle-version="2.2.0"
 Import-Package: javax.xml.bind,
  org.eclipse.persistence.jaxb;version="2.7.7"
 Export-Package: aero.minova.rcp.form.menu.mdi
+Bundle-RequiredExecutionEnvironment: JavaSE-11

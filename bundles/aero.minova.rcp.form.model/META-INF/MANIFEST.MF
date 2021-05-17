@@ -7,3 +7,4 @@ Export-Package: aero.minova.rcp.form.model.xsd
 Require-Bundle: javax.xml.bind;bundle-version="2.2.0"
 Import-Package: javax.xml.bind,
  org.eclipse.persistence.jaxb;version="2.7.7"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
