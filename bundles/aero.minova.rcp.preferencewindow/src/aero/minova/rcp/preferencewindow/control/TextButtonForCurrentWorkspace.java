@@ -1,9 +1,14 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
@@ -30,6 +35,10 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 
 	TranslationService translationService;
 
+	IEclipseContext context;
+
+	private IWorkbench workbench;
+
 	/**
 	 * Constructor
 	 *
@@ -37,12 +46,17 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	 *            associated label
 	 * @param propertyKey
 	 *            associated key
+	 * @param workbench
+	 * @param iEclipseContext
 	 * @param dataService2
 	 */
-	public TextButtonForCurrentWorkspace(final String label, final String propertyKey, final TranslationService translationService, IDataService dataService) {
+	public TextButtonForCurrentWorkspace(final String label, final String propertyKey, final TranslationService translationService, IDataService dataService,
+			IEclipseContext context, IWorkbench workbench) {
 		super(label, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.dataService = dataService;
+		this.context = context;
+		this.workbench = workbench;
 	}
 
 	/**
@@ -87,7 +101,17 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Shell activeShell = Display.getCurrent().getActiveShell();
-				boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "");
+				boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "msg.WFCDeleteWorkspaceRestart");
+
+				if (openConfirm) {
+					context.set(IWorkbench.PERSIST_STATE, false);
+					try {
+						FileUtils.deleteDirectory(dataService.getStoragePath().toAbsolutePath().toFile());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					workbench.restart();
+				}
 			}
 		});
 

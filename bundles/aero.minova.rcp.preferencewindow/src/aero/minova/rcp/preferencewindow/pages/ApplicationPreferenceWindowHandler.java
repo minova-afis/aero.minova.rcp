@@ -10,7 +10,6 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
@@ -22,6 +21,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
@@ -69,9 +69,6 @@ public class ApplicationPreferenceWindowHandler {
 	private PreferenceWindowModel pwm;
 
 	@Inject
-	IEclipseContext context;
-
-	@Inject
 	ILocaleChangeService lcs;
 
 	@Inject
@@ -94,9 +91,12 @@ public class ApplicationPreferenceWindowHandler {
 	@Inject
 	EModelService modelService;
 
+	IWorkbench workbench;
+
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
 		pwm = new PreferenceWindowModel(s);
+		this.workbench = workbench;
 
 		// Shell des Windows der Application finden
 		MWindow appWindow = application.getChildren().get(0);
@@ -158,11 +158,9 @@ public class ApplicationPreferenceWindowHandler {
 			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
-			// Die Shell des Windows aktivieren
-			shell.setEnabled(true);
-			// Preference Handler wieder aktivieren
-			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
-		} else {
+		}
+
+		if (Util.isValid(shell)) {
 			// Die Shell des Windows aktivieren
 			shell.setEnabled(true);
 			// Preference Handler wieder aktivieren
@@ -257,13 +255,15 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new CustomPWFontChooser(pref.getLabel(), key, translationService);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), ApplicationPreferences.LOCALE_LANGUAGE, context, translationService).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), ApplicationPreferences.LOCALE_LANGUAGE, application.getContext(), translationService)
+					.setAlignment(GridData.FILL);
 			break;
 		case CUSTOMCHECK:
 			if (pref.getKey().equals("DefaultWorkspace")) {
 				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
 			} else {
-				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), key, translationService, dataService).setIndent(25);
+				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), key, translationService, dataService, application.getContext(), workbench)
+						.setIndent(25);
 			}
 			break;
 		case DATE_UTIL:
