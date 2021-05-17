@@ -79,7 +79,7 @@ public class DataService implements IDataService {
 
 	Logger logger;
 
-	HashMap<String, String> serverHashes = new HashMap<String, String>();
+	HashMap<String, String> serverHashes = new HashMap<>();
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {

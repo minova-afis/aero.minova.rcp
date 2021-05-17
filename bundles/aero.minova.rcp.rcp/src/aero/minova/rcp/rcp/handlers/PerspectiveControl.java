@@ -18,6 +18,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -101,8 +102,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	 */
 	@PreDestroy
 	void cleanUp() {
-		if (perspectiveSwitcher != null)
+		if (perspectiveSwitcher != null) {
 			perspectiveSwitcher.setControlProvider(null);
+		}
 		perspectiveSwitcher = null;
 
 		disposeToolBarImages();
@@ -128,10 +130,12 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			if (!item.getData().equals(null)) {
 				if (item != null && item.getData() != null) {
 					openMenuFor(item, (String) item.getData());
-				} else if (item == null || item.getData().equals(null))
+				} else if (item == null || item.getData().equals(null)) {
 					logger.debug("No item found");
-			} else
+				}
+			} else {
 				logger.debug("Perspective not associated with item");
+			}
 
 		});
 
@@ -146,14 +150,16 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		// The perspectives currently open
 		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
 		if (appPerspectiveStacks.size() >= 0) {
-			for (MPerspectiveStack stack : appPerspectiveStacks)
+			for (MPerspectiveStack stack : appPerspectiveStacks) {
 				for (MPerspective perspective : stack.getChildren()) {
-					if (perspective.isToBeRendered())
+					if (perspective.isToBeRendered()) {
 						addPerspectiveShortcut(perspective);
+					}
 					if (perspective == modelService.getActivePerspective(window)) {
 						setSelectedElement(perspective);
 					}
 				}
+			}
 		}
 		translate(translationService);
 	}
@@ -167,8 +173,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	@Inject
 	private void translate(TranslationService translationService) {
 		this.translationService = translationService;
-		if (translationService != null && toolBar != null)
+		if (translationService != null && toolBar != null) {
 			translate();
+		}
 	}
 
 	private void translate() {
@@ -200,7 +207,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		@SuppressWarnings("unchecked")
 		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
 
-		if (!(keepit != null && keepit.contains(perspective.getElementId()))) {
+		if (((keepit == null) || !keepit.contains(perspective.getElementId()))) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspective.getElementId());
 			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
@@ -281,12 +288,14 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	}
 
 	ToolItem getToolItemFor(String perspectiveId) {
-		if (toolBar == null || toolBar.isDisposed())
+		if (toolBar == null || toolBar.isDisposed()) {
 			return null;
+		}
 		ToolItem toolItem = null;
 		for (int i = 0; i < toolBar.getItems().length && toolItem == null; i++) {
-			if (toolBar.getItem(i).getData().equals(perspectiveId))
+			if (toolBar.getItem(i).getData().equals(perspectiveId)) {
 				toolItem = toolBar.getItem(i);
+			}
 		}
 
 		return toolItem;
@@ -294,8 +303,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	}
 
 	private void disposeToolBarImages() {
-		if (toolBar == null || toolBar.isDisposed())
+		if (toolBar == null || toolBar.isDisposed()) {
 			return;
+		}
 
 		for (ToolItem item : toolBar.getItems()) {
 			Image icon = item.getImage();
@@ -312,8 +322,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		if (perspective == null) {
 			return;
 		}
-		for (ToolItem item : toolBar.getItems())
+		for (ToolItem item : toolBar.getItems()) {
 			item.setSelection(item.getData().equals(perspective.getElementId()));
+		}
 	}
 
 	@Override
@@ -358,8 +369,9 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 			Image newIcon = null;
 			Image oldIcon = item.getImage();
 
-			if (descriptor != null)
+			if (descriptor != null) {
 				newIcon = descriptor.createImage();
+			}
 			item.setImage(newIcon);
 
 			if (oldIcon != null) {
@@ -368,10 +380,11 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 			if (!showShortcutText) {
 				String label = null;
-				if (item.getData() instanceof MPerspective)
+				if (item.getData() instanceof MPerspective) {
 					label = ((MPerspective) item.getData()).getLocalizedLabel();
-				else
+				} else {
 					label = item.getText();
+				}
 
 				item.setText(item.getImage() == null ? label : _null);
 			}
@@ -412,7 +425,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 				handlerService.executeHandler(command);
 
 				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
-				if (!(keepItToolitems != null && keepItToolitems.contains(perspectiveId)) && perspective == null) {
+				if (((keepItToolitems == null) || !keepItToolitems.contains(perspectiveId)) && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
 				}
@@ -427,5 +440,45 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	public void showConnectionErrorMessage(EPartService partService, EModelService model, Shell shell,
 			@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) String message) {
 		MessageDialog.openError(shell, "Error", translationService.translate("@" + message, null));
+	}
+
+	@Inject
+	@Optional
+	private void subscribeSelectionEvent(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+		if (window == null) {
+			return;
+		}
+
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(changedElement instanceof MPerspectiveStack)) {
+			return;
+		}
+
+		MPerspectiveStack perspectiveStack = (MPerspectiveStack) changedElement;
+		if (!perspectiveStack.isToBeRendered()) {
+			return;
+		}
+
+		MWindow stackWindow = modelService.getContainingContext(perspectiveStack).get(MWindow.class);
+		if (window != stackWindow) {
+			return;
+		}
+
+		if (UIEvents.isADD(event)) {
+			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
+				MPerspective added = (MPerspective) o;
+				// Adding invisible elements is a NO-OP
+				if (!added.isToBeRendered()) {
+					continue;
+				}
+
+				this.addPerspectiveShortcut(added);
+			}
+		} else if (UIEvents.isREMOVE(event)) {
+			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
+				MPerspective removed = (MPerspective) o;
+				this.removePerspectiveShortcut(removed);
+			}
+		}
 	}
 }
