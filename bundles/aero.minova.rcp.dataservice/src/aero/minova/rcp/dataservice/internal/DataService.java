@@ -101,12 +101,12 @@ public class DataService implements IDataService {
 				+ value.getProcedureOrView());
 	}
 
-	public void showNoResposeServerError(String message) {
+	public void showNoResposeServerError(String message, Throwable th) {
 		// Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
 		if ((System.currentTimeMillis() - timeOfLastConnectionErrorMessage) > minTimeBetweenError * 1000) {
 			Dictionary<String, Object> data = new Hashtable<>(2);
 			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
-			data.put(IEventBroker.DATA, message);
+			data.put(IEventBroker.DATA, new ErrorObject(message, username, th));
 			Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
 			eventAdmin.postEvent(event);
 			timeOfLastConnectionErrorMessage = System.currentTimeMillis();
@@ -598,7 +598,7 @@ public class DataService implements IDataService {
 				ta = tableFuture.get();
 			} catch (InterruptedException | ExecutionException e) {
 				System.out.println("Error, using Cache: " + tableName);
-				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
 				list.add(map.get(keyLong));
 				return CompletableFuture.supplyAsync(() -> list);
 			}
@@ -641,7 +641,7 @@ public class DataService implements IDataService {
 				ta = tableFuture.get().getResultSet();
 			} catch (InterruptedException | ExecutionException e) {
 				System.out.println("Error, using cache: " + procedureName);
-				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
 				list.add(map.get(keyLong));
 				return CompletableFuture.supplyAsync(() -> list);
 			}
@@ -699,7 +699,7 @@ public class DataService implements IDataService {
 				ta = tableFuture.get();
 			} catch (Exception e) {
 				System.out.println("Error, using cache: " + tableName);
-				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
 				list.addAll(map.values());
 				return CompletableFuture.supplyAsync(() -> list);
 			}
@@ -751,7 +751,7 @@ public class DataService implements IDataService {
 				ta = tableFuture.get().getResultSet();
 			} catch (InterruptedException | ExecutionException e) {
 				System.out.println("Error, using Cache: " + hashName);
-				showNoResposeServerError("msg.WFCNoResponseServerUsingCache");
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
 				list.addAll(map.values());
 				return CompletableFuture.supplyAsync(() -> list);
 			} catch (NullPointerException ex) {
@@ -860,7 +860,7 @@ public class DataService implements IDataService {
 	private void handleCASError(Throwable ex, String method, boolean showErrorMessage) {
 		log("CAS Error " + method + ":\n" + ex.getMessage());
 		if (showErrorMessage) {
-			showNoResposeServerError("msg.WFCNoResponseServer");
+			showNoResposeServerError("msg.WFCNoResponseServer", ex);
 		}
 	}
 

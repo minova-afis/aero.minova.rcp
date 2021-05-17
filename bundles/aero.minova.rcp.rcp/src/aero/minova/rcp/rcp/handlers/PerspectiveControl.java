@@ -46,7 +46,9 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.Event;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
+import aero.minova.rcp.rcp.util.ShowErrorDialogHandler;
 
 @SuppressWarnings("restriction")
 public class PerspectiveControl {
@@ -356,8 +358,13 @@ public class PerspectiveControl {
 	@Inject
 	@Optional
 	public void showConnectionErrorMessage(EPartService partService, EModelService model, Shell shell,
-			@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) String message) {
-		MessageDialog.openError(shell, "Error", translationService.translate("@" + message, null));
+			@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) ErrorObject et) {
+		String translate = translationService.translate("@" + et.getMessage(), null);
+		if (et.getT() == null) {
+			MessageDialog.openError(shell, "Error", translate);
+		} else {
+			ShowErrorDialogHandler.execute(shell, "Error", translate, et.getT());
+		}
 	}
 
 	@Inject

@@ -30,6 +30,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.util.ErrorObject;
 
 @Component
 public class DataFormService implements IDataFormService {
@@ -87,7 +88,7 @@ public class DataFormService implements IDataFormService {
 	public Table getTableFromFormDetail(Form form, String prefix) {
 		Table dataTable = new Table();
 		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if (!("sp".equals(form.getDetail().getProcedurePrefix()) || "op".equals(form.getDetail().getProcedurePrefix()))) {
+		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
 			tablename = form.getDetail().getProcedurePrefix();
 		}
 		if (prefix != null) {
@@ -106,7 +107,7 @@ public class DataFormService implements IDataFormService {
 
 	@Override
 	public List<Field> getFieldsFromForm(Form form) {
-		List<Field> allFields = new ArrayList<Field>();
+		List<Field> allFields = new ArrayList<>();
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
@@ -123,8 +124,8 @@ public class DataFormService implements IDataFormService {
 
 	@Override
 	public List<Field> getAllPrimaryFieldsFromForm(Form form) {
-		List<Field> keyFields = new ArrayList<Field>();
-		List<Field> allFields = new ArrayList<Field>();
+		List<Field> keyFields = new ArrayList<>();
+		List<Field> allFields = new ArrayList<>();
 		allFields = getFieldsFromForm(form);
 		for (Field f : allFields) {
 			if ("primary".equals(f.getKeyType())) {
@@ -135,7 +136,7 @@ public class DataFormService implements IDataFormService {
 	}
 
 	public List<Field> filterFields(List<Object> objects) {
-		List<Field> fields = new ArrayList<Field>();
+		List<Field> fields = new ArrayList<>();
 		for (Object o : objects) {
 			if (o instanceof Field) {
 				Field f = (Field) o;
@@ -232,11 +233,11 @@ public class DataFormService implements IDataFormService {
 				formContent = dataService.getCachedFileContent(name).get();
 				// Fehlermeldung nur einmal pro Form zeigen
 				if (!requestedForms.contains(name)) {
-					postError("msg.WFCUsingLocalMask");
+					postError(new ErrorObject("msg.WFCUsingLocalMask", dataService.getUserName(), e));
 				}
 			} catch (InterruptedException | ExecutionException e1) {
 				if (!requestedForms.contains(name)) {
-					postError("msg.WFCCouldntLoadMask");
+					postError(new ErrorObject("msg.WFCCouldntLoadMask", dataService.getUserName(), e1));
 				}
 			}
 		}
@@ -249,7 +250,7 @@ public class DataFormService implements IDataFormService {
 		return form;
 	}
 
-	public void postError(String message) {
+	public void postError(ErrorObject message) {
 		Dictionary<String, Object> data = new Hashtable<>(2);
 		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
 		data.put(IEventBroker.DATA, message);
