@@ -29,8 +29,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -77,12 +75,6 @@ public class PerspectiveControl {
 	@Inject
 	private TranslationService translationService;
 
-	/*
-	 * Set preferences for showShortcutText
-	 */
-	static String _null = ""; //$NON-NLS-1$
-
-	//
 	Composite composite;
 	ToolBar toolBar;
 	ToolItem shortcut;
@@ -111,29 +103,19 @@ public class PerspectiveControl {
 
 			p = toolBar.getDisplay().map(null, toolBar, p);
 			ToolItem item = tb.getItem(p);
-			if (!item.getData().equals(null)) {
-				if (item != null && item.getData() != null) {
-					openMenuFor(item, (String) item.getData());
-				} else if (item == null || item.getData().equals(null)) {
-					logger.debug("No item found");
-				}
+
+			if (item != null && item.getData() != null) {
+				openMenuFor(item, (String) item.getData());
 			} else {
-				logger.debug("Perspective not associated with item");
-			}
-
-		});
-
-		toolBar.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(DisposeEvent event) {
-				disposeToolBarImages();
+				logger.debug("No item found or item is null");
 			}
 		});
+
+		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
 		// The perspectives currently open
 		List<MPerspectiveStack> appPerspectiveStacks = modelService.findElements(window, null, MPerspectiveStack.class);
-		if (appPerspectiveStacks.size() >= 0) {
+		if (appPerspectiveStacks.isEmpty()) {
 			for (MPerspectiveStack stack : appPerspectiveStacks) {
 				for (MPerspective perspective : stack.getChildren()) {
 					if (perspective.isToBeRendered()) {
@@ -202,7 +184,7 @@ public class PerspectiveControl {
 
 			if (descriptor == null) {
 				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
-				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : _null);
+				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : "");
 			}
 			shortcut.setToolTipText(perspective.getLocalizedTooltip());
 
@@ -257,14 +239,7 @@ public class PerspectiveControl {
 
 			@Override
 			public void menuHidden(MenuEvent e) {
-				toolBar.getDisplay().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						menu.dispose();
-
-					}
-				});
+				toolBar.getDisplay().asyncExec(menu::dispose);
 			}
 		});
 
@@ -295,7 +270,6 @@ public class PerspectiveControl {
 			if (icon != null) {
 				item.setImage(null);
 				icon.dispose();
-				icon = null;
 			}
 		}
 	}
