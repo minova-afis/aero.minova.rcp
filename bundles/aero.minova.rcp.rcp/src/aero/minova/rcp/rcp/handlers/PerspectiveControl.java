@@ -13,7 +13,6 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -26,10 +25,6 @@ import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4PerspectiveSwitcherPreferences;
-import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.E4Util;
-import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.EPerspectiveSwitcher;
-import org.eclipse.e4.ui.workbench.perspectiveswitcher.tools.IPerspectiveSwitcherControl;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -56,7 +51,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 @SuppressWarnings("restriction")
-public class PerspectiveControl implements IPerspectiveSwitcherControl {
+public class PerspectiveControl {
 
 	@Inject
 	private Logger logger;
@@ -74,9 +69,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	private IResourceUtilities<?> resourceUtilities;
 
 	@Inject
-	EPerspectiveSwitcher perspectiveSwitcher;
-
-	@Inject
 	MWindow window;
 
 	@Inject
@@ -88,9 +80,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	/*
 	 * Set preferences for showShortcutText
 	 */
-	@Inject
-	@Preference(value = E4PerspectiveSwitcherPreferences.SHOW_TEXT, nodePath = E4PerspectiveSwitcherPreferences.ROOT_PREFERENCES_NODE)
-	private boolean showShortcutText;
 	static String _null = ""; //$NON-NLS-1$
 
 	//
@@ -103,11 +92,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	 */
 	@PreDestroy
 	void cleanUp() {
-		if (perspectiveSwitcher != null) {
-			perspectiveSwitcher.setControlProvider(null);
-		}
-		perspectiveSwitcher = null;
-
 		disposeToolBarImages();
 	}
 
@@ -116,7 +100,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	 */
 	@PostConstruct
 	public void createGui(Composite parent, MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
-		perspectiveSwitcher.setControlProvider(this);
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		composite.setLayout(rowLayout);
@@ -149,7 +132,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		});
 
 		// The perspectives currently open
-		List<MPerspectiveStack> appPerspectiveStacks = E4Util.getMatchingChildren(window, MPerspectiveStack.class);
+		List<MPerspectiveStack> appPerspectiveStacks = modelService.findElements(window, null, MPerspectiveStack.class);
 		if (appPerspectiveStacks.size() >= 0) {
 			for (MPerspectiveStack stack : appPerspectiveStacks) {
 				for (MPerspective perspective : stack.getChildren()) {
@@ -203,7 +186,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	@Override
 	public void addPerspectiveShortcut(MPerspective perspective) {
 		@SuppressWarnings("unchecked")
 		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
@@ -218,7 +200,7 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 				shortcut.setImage(icon);
 			}
 
-			if (descriptor == null || showShortcutText) {
+			if (descriptor == null) {
 				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
 				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : _null);
 			}
@@ -318,7 +300,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		}
 	}
 
-	@Override
 	public void setSelectedElement(MPerspective perspective) {
 		if (perspective == null) {
 			return;
@@ -328,7 +309,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		}
 	}
 
-	@Override
 	public void removePerspectiveShortcut(MPerspective perspective) {
 		@SuppressWarnings("unchecked")
 		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
@@ -353,43 +333,6 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 		}
 
 		item.dispose();
-	}
-
-	@Override
-	public void updateAttributeFor(MPerspective perspective, String attName, Object newValue) {
-		ToolItem item = getToolItemFor(perspective.getElementId());
-
-		if (showShortcutText && UIEvents.UILabel.LABEL.equals(attName)) {
-			String newName = (String) newValue;
-			item.setText(newName != null ? newName : _null);
-		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
-			String newTip = (String) newValue;
-			item.setToolTipText(newTip);
-		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-			ImageDescriptor descriptor = getIconFor((String) newValue);
-			Image newIcon = null;
-			Image oldIcon = item.getImage();
-
-			if (descriptor != null) {
-				newIcon = descriptor.createImage();
-			}
-			item.setImage(newIcon);
-
-			if (oldIcon != null) {
-				oldIcon.dispose();
-			}
-
-			if (!showShortcutText) {
-				String label = null;
-				if (item.getData() instanceof MPerspective) {
-					label = ((MPerspective) item.getData()).getLocalizedLabel();
-				} else {
-					label = item.getText();
-				}
-
-				item.setText(item.getImage() == null ? label : _null);
-			}
-		}
 	}
 
 	//////////////////////////////////
@@ -445,8 +388,32 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Inject
 	@Optional
-	private void subscribeSelectionEvent(
-			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+	private void subscribeSelectionEvent(@UIEventTopic(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT) Event event) {
+		if (window == null) {
+			return;
+		}
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(changedElement instanceof MPerspectiveStack)) {
+			return;
+		}
+
+		MPerspectiveStack perspectiveStack = (MPerspectiveStack) changedElement;
+		if (!perspectiveStack.isToBeRendered()) {
+			return;
+		}
+
+		MWindow stackWindow = modelService.getContainingContext(perspectiveStack).get(MWindow.class);
+		if (window != stackWindow) {
+			return;
+		}
+
+		MPerspective selectedElement = perspectiveStack.getSelectedElement();
+		this.setSelectedElement(selectedElement);
+	}
+
+	@Inject
+	@Optional
+	private void subscribeChildrenEvent(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 		if (window == null) {
 			return;
 		}
