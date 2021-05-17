@@ -47,6 +47,8 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.General.LicenceWarningBeforeWeeks", null), 0.1, DisplayType.INTEGER, 0));
 		psd.add(new PreferenceDescriptor("DefaultWorkspace", translationService.translate("@Preferences.DefaultWorkspace", null), 0.2, DisplayType.CUSTOMCHECK,
 				false));
+		psd.add(new PreferenceDescriptor("CurrentWorkspace", translationService.translate("@Preferences.CurrentWorkspace", null), 0.3, DisplayType.CUSTOMCHECK,
+				false));
 		psd = new PreferenceSectionDescriptor("KeyboardNavigation", translationService.translate("@Preferences.KeyboardNavigation", null), 0.2);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
