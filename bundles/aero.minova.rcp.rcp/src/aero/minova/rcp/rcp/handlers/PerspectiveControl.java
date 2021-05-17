@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.osgi.service.event.Event;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
@@ -444,7 +445,8 @@ public class PerspectiveControl implements IPerspectiveSwitcherControl {
 
 	@Inject
 	@Optional
-	private void subscribeSelectionEvent(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+	private void subscribeSelectionEvent(
+			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 		if (window == null) {
 			return;
 		}
