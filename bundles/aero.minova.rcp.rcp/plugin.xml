@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <plugin>
+
    <extension
          id="product"
          point="org.eclipse.core.runtime.products">
@@ -20,7 +22,7 @@
       </product>
    </extension>
    <extension
-         id="id1"
+         id="menu"
          point="org.eclipse.e4.workbench.model">
       <processor
             apply="always"
@@ -31,4 +33,13 @@
          </element>
       </processor>
    </extension>
+   <extension
+         id="aero.minova.rcp.rcp.fragment"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            uri="fragment.e4xmi"
+            apply="always">
+      </fragment>
+   </extension>
+
 </plugin>

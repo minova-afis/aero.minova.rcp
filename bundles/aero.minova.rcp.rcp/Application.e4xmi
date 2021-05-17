@@ -109,19 +109,42 @@
       </children>
     </trimBars>
   </children>
-  <handlers xmi:id="_6wlLfcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
-  <handlers xmi:id="_6wlLh8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.aboutCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AboutHandler" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
-  <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler" command="_4p5JwLufEeqOjqZ1liG0LA"/>
-  <handlers xmi:id="_R4qb4MEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler" command="_Oe_xYMEdEeqyRP6BKwa0Bg"/>
-  <handlers xmi:id="_jeEycNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handler.1" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.KeepPerspectiveHandler" command="_gqcNMNF7Eeq2n_R750bOVg"/>
-  <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindowHandler" command="_WsjPEPDoEeqcqsgp84_JDA"/>
-  <handlers xmi:id="_GxZz8BRpEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.handler.loadindexpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_xHFacOejEeq-Csq7J9vXlA"/>
-  <handlers xmi:id="_wNfcgBT0Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.help" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.HelpHandler" command="_DmBwABRcEeu_ctc0PBVTGw"/>
-  <handlers xmi:id="_BMBaMBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.loaddatawithmatcgcode" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadDataWithMatchCodeHandler" command="_aiYXABRcEeu_ctc0PBVTGw"/>
-  <handlers xmi:id="_Mt8lQBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectsearchpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectSearchPart" command="_prFbgBRcEeu_ctc0PBVTGw"/>
-  <handlers xmi:id="_JtsKABm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.resizenattablecolumns" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ResizeTableHandler" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
-  <handlers xmi:id="_RWePkBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart" command="_AOXbMBRdEeu_ctc0PBVTGw"/>
-  <handlers xmi:id="_ahNUMI1vEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handler.searchCriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaHandler" command="_KpQ2AI1tEeuoh4vFDPXd3Q"/>
+  <handlers xmi:id="_6wlLh8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.aboutCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AboutHandler">
+    <command href="fragment.e4xmi#_ciLBFbbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler">
+    <command href="fragment.e4xmi#_ciLBGrbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_R4qb4MEdEeqyRP6BKwa0Bg" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler">
+    <command href="fragment.e4xmi#_ciLBEbbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_jeEycNF7Eeq2n_R750bOVg" elementId="aero.minova.rcp.rcp.handler.1" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.KeepPerspectiveHandler">
+    <command href="fragment.e4xmi#_ciLBE7bdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_ZaHokPDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindowHandler">
+    <command href="fragment.e4xmi#_ciLBGLbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_GxZz8BRpEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.handler.loadindexpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler">
+    <command href="fragment.e4xmi#_ciLBHrbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_wNfcgBT0Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.help" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.HelpHandler">
+    <command href="fragment.e4xmi#_ciLBF7bdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_BMBaMBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.loaddatawithmatcgcode" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadDataWithMatchCodeHandler">
+    <command href="fragment.e4xmi#_ciLBGbbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_Mt8lQBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectsearchpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectSearchPart">
+    <command href="fragment.e4xmi#_ciLBELbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_JtsKABm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.resizenattablecolumns" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ResizeTableHandler">
+    <command href="fragment.e4xmi#_ciLBFrbdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_RWePkBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart">
+    <command href="fragment.e4xmi#_ciLBH7bdEeuZF8ZS2_h9rA"/>
+  </handlers>
+  <handlers xmi:id="_ahNUMI1vEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handler.searchCriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaHandler">
+    <command href="fragment.e4xmi#_ciLBDbbdEeuZF8ZS2_h9rA"/>
+  </handlers>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLesgZEeSyMNYR5xypkQ">
     <tags>type:user</tags>
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
