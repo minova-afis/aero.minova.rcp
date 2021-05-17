@@ -101,7 +101,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Shell activeShell = Display.getCurrent().getActiveShell();
-				boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "msg.WFCDeleteWorkspaceRestart");
+				boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", translationService.translate("@msg.WFCDeleteWorkspaceRestart", null));
 
 				if (openConfirm) {
 					context.set(IWorkbench.PERSIST_STATE, false);
