@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
@@ -55,6 +56,7 @@ import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
 import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
+import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
 
@@ -81,6 +83,9 @@ public class ApplicationPreferenceWindowHandler {
 
 	@Inject
 	TranslationService translationService;
+
+	@Inject
+	IDataService dataService;
 
 	@SuppressWarnings("restriction")
 	@Inject
@@ -255,7 +260,11 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new PWLocale(pref.getLabel(), ApplicationPreferences.LOCALE_LANGUAGE, context, translationService).setAlignment(GridData.FILL);
 			break;
 		case CUSTOMCHECK:
-			widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+			if (pref.getKey().equals("DefaultWorkspace")) {
+				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+			} else {
+				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), key, translationService, dataService).setIndent(25);
+			}
 			break;
 		case DATE_UTIL:
 			widget = new DateFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
