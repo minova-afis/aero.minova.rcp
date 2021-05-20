@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -229,6 +230,15 @@ public class WFCTranslationService extends TranslationService {
 			File file = dataService.getStoragePath().resolve("i18n/usedProperties.properties").toFile();
 			file.createNewFile();
 			usedProperties.store(new FileOutputStream(file), applicationId);
+
+			file = dataService.getStoragePath().resolve("i18n/usedPropertiesList.properties").toFile();
+			file.createNewFile();
+			FileWriter myWriter = new FileWriter(file);
+			for (Object s : usedProperties.values()) {
+				myWriter.write(s + ",");
+			}
+			myWriter.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
