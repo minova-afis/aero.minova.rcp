@@ -75,7 +75,7 @@ public class PreferenceWindowModel {
 				CustomTimeZone.displayTimeZone(ZoneId.systemDefault().getDisplayName(TextStyle.FULL, locale), locale),
 				CustomTimeZone.getTimeZones(locale).toArray()));
 
-		psd = new PreferenceSectionDescriptor("Themes", translationService.translate("@Preference.Themes", null), 0.2);
+		psd = new PreferenceSectionDescriptor("Themes", translationService.translate("@Preferences.Themes", null), 0.2);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
 				"M", "S", "M", "L", "XL"));
