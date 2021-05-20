@@ -89,11 +89,11 @@ public class WFCTranslationService extends TranslationService {
 		}
 
 		String translation = translate(key);
-		if (key.startsWith("@")) {
-			usedProperties.put(key, translation);
-			saveUsedProperties();
-			System.out.println("Translation: " + key + " -> " + translation);
-		}
+//		if (key.startsWith("@")) {
+//			usedProperties.put(key, translation);
+//			saveUsedProperties();
+//			System.out.println("Translation: " + key + " -> " + translation);
+//		}
 		return translation;
 	}
 
@@ -229,7 +229,7 @@ public class WFCTranslationService extends TranslationService {
 		try {
 			File file = dataService.getStoragePath().resolve("i18n/usedProperties.properties").toFile();
 			file.createNewFile();
-			usedProperties.store(new FileOutputStream(file), applicationId);
+			usedProperties.store(new FileOutputStream(file), "");
 
 			file = dataService.getStoragePath().resolve("i18n/usedPropertiesList.properties").toFile();
 			file.createNewFile();
