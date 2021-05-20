@@ -3,6 +3,7 @@ package aero.minova.rcp.translate.service;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -45,7 +46,10 @@ public class WFCTranslationService extends TranslationService {
 	private String applicationId = "WFC";
 	private Properties resources = new Properties();
 
+	private Properties usedProperties = new Properties();
+
 	volatile boolean updateRequired = true;
+
 	@Inject
 	@Optional
 	private void localChanged(@Named(TranslationService.LOCALE) Locale s) {
@@ -57,8 +61,7 @@ public class WFCTranslationService extends TranslationService {
 
 	@Inject
 	@Optional
-	private void downloadedFileChange(@UIEventTopic("i18ndownload") String string)
-	{
+	private void downloadedFileChange(@UIEventTopic("i18ndownload") String string) {
 		updateRequired = true;
 		Locale realLocal = this.locale;
 		Locale neededToTriggerChange = new Locale("de");
@@ -84,7 +87,13 @@ public class WFCTranslationService extends TranslationService {
 			}
 		}
 
-		return translate(key);
+		String translation = translate(key);
+		if (key.startsWith("@")) {
+			usedProperties.put(key, translation);
+			saveUsedProperties();
+			System.out.println("Translation: " + key + " -> " + translation);
+		}
+		return translation;
 	}
 
 	/**
@@ -134,8 +143,7 @@ public class WFCTranslationService extends TranslationService {
 	}
 
 	/**
-	 * Wird verwendet, um den existierenden platform translation service zu cachen
-	 * und für bestimmte String zu verwenden
+	 * Wird verwendet, um den existierenden platform translation service zu cachen und für bestimmte String zu verwenden
 	 * 
 	 * @param bundleTranslationProvider
 	 */
@@ -146,17 +154,12 @@ public class WFCTranslationService extends TranslationService {
 
 	/**
 	 * Resource Bundle Search and Loading Strategy
-	 *
 	 * <p>
-	 * getBundle uses the base name, the specified locale, and the default locale
-	 * (obtained from Locale.getDefault) to generate a sequence of candidate bundle
-	 * names. If the specified locale's language, script, country, and variant are
-	 * all empty strings, then the base name is the only candidate bundle name.
-	 * Otherwise, a list of candidate locales is generated from the attribute values
-	 * of the specified locale (language, script, country and variant) and appended
-	 * to the base name. Typically, this will look like the following:
+	 * getBundle uses the base name, the specified locale, and the default locale (obtained from Locale.getDefault) to generate a sequence of candidate bundle
+	 * names. If the specified locale's language, script, country, and variant are all empty strings, then the base name is the only candidate bundle name.
+	 * Otherwise, a list of candidate locales is generated from the attribute values of the specified locale (language, script, country and variant) and
+	 * appended to the base name. Typically, this will look like the following:
 	 * </p>
-	 *
 	 * baseName + "_" + language + "_" + script + "_" + country + "_" + variant <br>
 	 * baseName + "_" + language + "_" + script + "_" + country <br>
 	 * baseName + "_" + language + "_" + script <br>
@@ -165,7 +168,6 @@ public class WFCTranslationService extends TranslationService {
 	 * baseName + "_" + language
 	 * 
 	 * @throws URISyntaxException
-	 *
 	 */
 	private void loadResources() {
 		String filename;
@@ -210,15 +212,25 @@ public class WFCTranslationService extends TranslationService {
 	private void load(String filename) {
 		File file = dataService.getStoragePath().resolve(filename + ".properties").toFile();
 		if (file.exists()) {
-			try (BufferedInputStream targetStream = new BufferedInputStream(
-					new FileInputStream(file))) {
+			try (BufferedInputStream targetStream = new BufferedInputStream(new FileInputStream(file))) {
 				resources.load(targetStream);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+
 	private boolean isEmpty(String value) {
 		return value == null || value.isEmpty();
+	}
+
+	public void saveUsedProperties() {
+		try {
+			File file = dataService.getStoragePath().resolve("i18n/usedProperties.properties").toFile();
+			file.createNewFile();
+			usedProperties.store(new FileOutputStream(file), applicationId);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
