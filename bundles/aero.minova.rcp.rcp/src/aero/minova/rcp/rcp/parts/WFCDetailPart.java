@@ -30,6 +30,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
@@ -72,6 +73,7 @@ import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.handlers.TraverseListenerImpl;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
@@ -214,7 +216,7 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection, traverseListener);
-		composite.setTabList(getTabList(mSection));
+		composite.setTabList(getTabList(mSection, composite));
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
@@ -246,14 +248,21 @@ public class WFCDetailPart extends WFCFormPart {
 //		for (MField field : tabList) {
 //			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
 //		}
-		mSection.setTabList(tabList);
+//		mSection.setTabList(tabList);
 	}
-	
-	private Control[] getTabList(MSection section) {
+
+	private Control[] getTabList(MSection section, Composite composite) {
 		List<Control> tabList = new ArrayList<Control>();
-		for (MField field : section.getTabList()) {
-			if(!field.isReadOnly()) {
-				tabList.add(((AbstractValueAccessor) field.getValueAccessor()).getControl());
+		Control[] compositeChilds = composite.getChildren();
+		for (Control control : compositeChilds) {
+			if(control instanceof Lookup || control instanceof TextAssist)
+			for (MField field : section.getTabList()) {
+				if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
+					if (!field.isReadOnly()) {
+						tabList.add(((AbstractValueAccessor) field.getValueAccessor()).getControl());
+						break;
+					}
+				}
 			}
 		}
 		Control[] tabArray = new Control[tabList.size()];
