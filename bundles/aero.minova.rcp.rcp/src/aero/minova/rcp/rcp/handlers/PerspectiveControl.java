@@ -317,7 +317,7 @@ public class PerspectiveControl {
 
 	private void addCloseMenuItem(Menu menu, String perspectiveId) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.Activate);
-		menuItem.setText(translationService.translate("@Close", null));
+		menuItem.setText(translationService.translate("@Action.Close", null));
 
 		menuItem.addSelectionListener(new SelectionAdapter() {
 
