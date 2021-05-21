@@ -19,6 +19,16 @@ Getestet mit Server xxxxxx
 ### Gespeicherte Suchkriterien werden geladen
 - [ ] Funktioniert
 
+## Keine Verbindung zum CAS möglich
+- [ ] Die angezeigte Fehlermeldung enthält Details zum Fehler
+- [ ] Beim Indexladen: Fehlermeldung und Knopf ist wieder aktivierbar
+- [ ] Beim Öffnen einer Maske: Wenn die Maske schon einmal geladen wurde wird diese verwendet
+
+## Workspace-Ordner
+- [ ] Der aktuelle Workspace-Ordner wird in den Einstellungen angezeigt
+- [ ] Der aktuelle Workspace-Ordner kann über die Einstellungen gelöscht werden
+- [ ] Das Löschen eines Profils in der Login-Maske löscht auch den entsprechenden Workspace-Ordner
+
 ## Indexdruck
 <img width="946" alt="Bildschirmfoto 2021-04-20 um 20 49 45" src="https://user-images.githubusercontent.com/20420898/115448394-f4361800-a219-11eb-8971-d0a023aa49bf.png">
 
