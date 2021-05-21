@@ -89,6 +89,7 @@ public class WFCTranslationService extends TranslationService {
 		}
 
 		String translation = translate(key);
+		// Einkommentieren, wenn genutzten Übersetzungskeys in Datei geschrieben werden sollen
 //		if (key.startsWith("@")) {
 //			usedProperties.put(key, translation);
 //			saveUsedProperties();
@@ -225,6 +226,7 @@ public class WFCTranslationService extends TranslationService {
 		return value == null || value.isEmpty();
 	}
 
+	/* Schreibt die benutzen Übersetzungskeys in eine Datei im i18n Ordner. Kann bei Bedarf aktiviert werden */
 	public void saveUsedProperties() {
 		try {
 			File file = dataService.getStoragePath().resolve("i18n/usedProperties.properties").toFile();
