@@ -259,7 +259,7 @@ public class WFCDetailPart extends WFCFormPart {
 			for (MField field : section.getTabList()) {
 				if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
 					if (!field.isReadOnly()) {
-						tabList.add(((AbstractValueAccessor) field.getValueAccessor()).getControl());
+						tabList.add(control);
 						break;
 					}
 				}
@@ -268,7 +268,7 @@ public class WFCDetailPart extends WFCFormPart {
 		Control[] tabArray = new Control[tabList.size()];
 		int i = 0;
 		while (i < tabList.size()) {
-			tabArray[i] = tabList.get(0);
+			tabArray[i] = tabList.get(i);
 			i++;
 		}
 		return tabArray;
