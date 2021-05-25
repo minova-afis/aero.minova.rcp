@@ -79,8 +79,7 @@ import aero.minova.rcp.rcp.widgets.Lookup;
 public class WFCDetailPart extends WFCFormPart {
 
 	private static final int MARGIN_SECTION = 8;
-	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5
-																											// Zwischenräume
+	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
@@ -115,8 +114,6 @@ public class WFCDetailPart extends WFCFormPart {
 			return;
 		}
 		layoutForm(parent, partContext);
-		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
-		// steuert
 
 		// erzeuge die util Methoden mit DI
 		IEclipseContext localContext = EclipseContextFactory.create();
@@ -124,8 +121,10 @@ public class WFCDetailPart extends WFCFormPart {
 
 		localContext.setParent(partContext);
 
+		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.setDetail(getDetail(), perspective);
+		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
+		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 	}
 
@@ -198,6 +197,7 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
+
 
 		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
 		section.setLayoutData(headLayoutData);

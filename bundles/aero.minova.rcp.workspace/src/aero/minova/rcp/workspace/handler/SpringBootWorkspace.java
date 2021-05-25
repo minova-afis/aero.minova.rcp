@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -41,6 +42,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	private static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
+
+	private static final int TIMEOUT_DURATION = 15;
 
 	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
 		super(logger);
@@ -220,31 +223,24 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			}
 		};
 
-		String body = "{\n" + "  \"name\": \"tEmployee\",\n" + "  \"columns\": [\n" + "    {\n" + "      \"name\": \"KeyLong\",\n"
-				+ "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n" + "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n"
-				+ "    {\n" + "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
-				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n" + "  \"rows\": [\n" + "    {\n"
-				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        \"f-\\u003e-s-0\"\n" + "      ]\n" + "    }\n"
-				+ "  ]\n" + "}";
 		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/ping")) //
 					.header("Content-Type", "application/json") //
-					.method("GET", BodyPublishers.ofString(body))//
-					.build();
+					.method("GET", BodyPublishers.ofString(""))//
+					.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 
 			HttpClient httpClient = HttpClient.newBuilder()//
 					.sslContext(disabledSslVerificationContext())//
 					.authenticator(authentication).build();
 
-			HttpResponse<String> answer;
-			answer = httpClient.send(request, BodyHandlers.ofString());
+			HttpResponse<String> answer = httpClient.send(request, BodyHandlers.ofString());
 			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
 				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
 			}
 		} catch (ConnectException ex) {
-			throw new WorkspaceException("Server nicht bekannt!");
+			throw new WorkspaceException("ConnectException");
 		} catch (IOException e) {
-			throw new WorkspaceException("User oder Passwort nicht korrekt" + e.getMessage());
+			throw new WorkspaceException("User oder Passwort nicht korrekt\n" + e.getMessage());
 		} catch (InterruptedException i) {
 			throw new WorkspaceException("Try Again!");
 		} catch (IllegalArgumentException i) {

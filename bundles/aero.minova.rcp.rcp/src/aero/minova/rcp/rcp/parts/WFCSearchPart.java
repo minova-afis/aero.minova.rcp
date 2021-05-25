@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -115,18 +114,15 @@ public class WFCSearchPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-		// perspective.getContext().set(Form.class, form); // Wir merken es uns im
-		// Context; so können andere es nutzen
-		// String tableName = form.getIndexView().getSource();
-		// String string = prefs.get(tableName + ".DEFAULT.table", null);
-		Form searchForm = form;
+
+		// "&" Spalte erstellen
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
 		xsdColumn.setBoolean(Boolean.FALSE);
 		xsdColumn.setLabel("&");
 		xsdColumn.setName("&");
-		searchForm.getIndexView().getColumn().add(0, xsdColumn);
+		form.getIndexView().getColumn().add(0, xsdColumn);
 
-		data = dataFormService.getTableFromFormIndex(searchForm);
+		data = dataFormService.getTableFromFormIndex(form);
 		getData().addRow();
 		// Wir setzen die Verundung auf false im Default-Fall!
 		getData().getRows().get(getData().getRows().size() - 1).setValue(new Value(false), 0);
@@ -134,10 +130,9 @@ public class WFCSearchPart extends WFCFormPart {
 		parent.setLayout(new GridLayout());
 		mPart.getContext().set("NatTableDataSearchArea", getData());
 
-		natTable = createNatTable(parent, searchForm, getData());
+		natTable = createNatTable(parent, form, getData());
 
-		// TODO Constants
-		loadPrefs("DEFAULT");
+		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
 	}
 
 	/**
@@ -155,7 +150,7 @@ public class WFCSearchPart extends WFCFormPart {
 		NatTableUtil.resize(natTable);
 	}
 
-	public NatTable createNatTable(Composite parent, Form form, Table table) {
+	public NatTable createNatTable(Composite parent, Form searchForm, Table table) {
 
 		// Datenmodel für die Eingaben
 		ConfigRegistry configRegistry = new ConfigRegistry();
@@ -163,7 +158,7 @@ public class WFCSearchPart extends WFCFormPart {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
 		sortedList = new SortedList<>(eventList, null);
-		columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, form);
+		columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, searchForm);
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
@@ -236,7 +231,7 @@ public class WFCSearchPart extends WFCFormPart {
 //		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
 //
 
-		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, form));
+		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, searchForm));
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der
 		// Mouselistener anschlägt!
@@ -401,11 +396,6 @@ public class WFCSearchPart extends WFCFormPart {
 
 	public void refreshNatTable() {
 		NatTableUtil.refresh(natTable);
-	}
-
-	@PreDestroy
-	public void test(Composite parent) {
-		// Form form = dataFormService.getForm();
 	}
 
 	public void saveNattable() {

@@ -11,6 +11,13 @@ public class ErrorObject {
 		this.setT(t);
 	}
 
+	public ErrorObject(String message, String user, Throwable t) {
+		super();
+		this.setMessage(message);
+		this.setUser(user);
+		this.setT(t);
+	}
+
 	public ErrorObject(Table errorTable, String user) {
 		super();
 		this.setErrorTable(errorTable);
@@ -28,6 +35,7 @@ public class ErrorObject {
 
 	private Table errorTable;
 	private String user;
+	private String message;
 	private Throwable t;
 	private String procedureOrView;
 
@@ -61,6 +69,14 @@ public class ErrorObject {
 		} else {
 			return procedureOrView;
 		}
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 }

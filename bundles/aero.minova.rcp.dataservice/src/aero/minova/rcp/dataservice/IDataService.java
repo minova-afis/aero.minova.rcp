@@ -85,5 +85,11 @@ public interface IDataService {
 
 	void setLogger(Logger logger);
 
+	CompletableFuture<String> getCachedFileContent(String filename);
+
 	boolean getHashedZip(String zipname);
+
+	void setTimeout(int timeout);
+
+	void setTimeoutOpenNotification(int timeoutOpenNotification);
 }

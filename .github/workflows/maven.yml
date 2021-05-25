@@ -15,11 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: 11
+        distribution: 'adopt'
     - name: Build with Maven
-      run: mvn clean verify --file pom.xml -T4
+      run: mvn clean verify --fae --file pom.xml -T4
 
 #    - uses: actions/upload-artifact@v2
 #      with:

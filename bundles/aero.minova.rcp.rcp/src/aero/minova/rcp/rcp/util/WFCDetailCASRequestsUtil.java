@@ -12,6 +12,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -24,6 +28,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -81,6 +86,9 @@ public class WFCDetailCASRequestsUtil {
 	EModelService model;
 
 	@Inject
+	EPartService partService;
+
+	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	private Shell shell;
 
@@ -109,15 +117,31 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	private Form form;
 
+	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	 *
 	 * @param rows
 	 */
 
-	public void setDetail(MDetail detail, MPerspective perspective) {
+	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
+
+		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
+		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
+		dataService.setTimeoutOpenNotification(preferences.getInt(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION, 1));
+		preferences.addPreferenceChangeListener(new IPreferenceChangeListener() {
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (event.getKey().equals(ApplicationPreferences.TIMEOUT_CAS)) {
+					dataService.setTimeout(Integer.parseInt((String) event.getNewValue()));
+				} else if (event.getKey().equals(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION)) {
+					dataService.setTimeoutOpenNotification(Integer.parseInt((String) event.getNewValue()));
+				}
+			}
+		});
 	}
 
 	@Inject
@@ -346,7 +370,7 @@ public class WFCDetailCASRequestsUtil {
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
-			MessageDialog.openError(shell, "Error", message);
+			MessageDialog.openError(shell, "Error", getTranslation(message));
 		}
 	}
 
@@ -354,7 +378,6 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-
 		if (activePerspective.equals(perspective)) {
 			Table errorTable = et.getErrorTable();
 			Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
@@ -425,7 +448,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
-		if (ticketvalue.getValue() != null) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective) && ticketvalue.getValue() != null) {
 			System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
 			Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
 			Row r = RowBuilder.newRow().withValue(ticketvalue).create();
@@ -434,10 +458,21 @@ public class WFCDetailCASRequestsUtil {
 			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 
-			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
-			// Detailfelder vor
+			// Fehler abfangen, Felder wieder freigeben
+			tableFuture.exceptionally(ex -> {
+				// Im Display Thread ausführen
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						ticketFieldsUpdate("...", true);
+					}
+				});
+				return null;
+			});
+
+			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-				ticketFieldsUpdate("", true);
+				ticketFieldsUpdate("...", true);
 				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
 					showErrorMessage(e);
@@ -458,11 +493,12 @@ public class WFCDetailCASRequestsUtil {
 		MField field = detail.getField("Description");
 		field.getValueAccessor().setEditable(editable);
 		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
-		((TextValueAccessor) field.getValueAccessor()).setText(messageText);
 		if (editable) {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+			((TextValueAccessor) field.getValueAccessor()).setText("");
 		} else {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+			((TextValueAccessor) field.getValueAccessor()).setText(messageText);
 		}
 
 		field = detail.getField("OrderReceiverKey");
@@ -544,7 +580,7 @@ public class WFCDetailCASRequestsUtil {
 
 	@Optional
 	@Inject
-	public void newFields(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
+	public void notifyUser(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
 		openNotificationPopup(message);
 	}
 
@@ -579,55 +615,6 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 	}
-
-//	/**
-//	 * Antworten des CAS für Ticketnummern werden hier ausgelesen, so das sie wie bei einem Aufruf in der Index-Tabelle ausgewertet werden können
-//	 *
-//	 * @param recievedTable
-//	 */
-//	@Optional
-//	@Inject
-//	public void getTicket(@UIEventTopic(Constants.RECEIVED_TICKET) Table recievedTable) {
-//
-//		for (Control c : controls.values()) {
-//			if (c instanceof LookupControl) {
-//				LookupControl lc = (LookupControl) c;
-//				if (lc != controls.get(Constants.EMPLOYEEKEY)) {
-//					lc.setText("");
-//					lc.setData(Constants.CONTROL_KEYLONG, null);
-//					lc.getDescription().setText("");
-//				}
-//			}
-//		}
-//		Row recievedRow = recievedTable.getRows().get(0);
-//		if (selectedTable == null) {
-//			selectedTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
-//			selectedTable.addRow();
-//		} else if (selectedTable.getRows() == null) {
-//			selectedTable.addRow();
-//		}
-//		Row r = selectedTable.getRows().get(0);
-//		for (int i = 0; i < r.size(); i++) {
-//			if ((recievedTable.getColumnIndex(selectedTable.getColumnName(i))) >= 0) {
-//				r.setValue(recievedRow.getValue(recievedTable.getColumnIndex(selectedTable.getColumnName(i))), i);
-//			} else {
-//				Control c = controls.get(selectedTable.getColumnName(i));
-//				if (c instanceof LookupControl) {
-//					LookupControl lc = (LookupControl) c;
-//					r.setValue(new Value(lc.getData(Constants.CONTROL_KEYLONG), DataType.INTEGER), i);
-//				} else if (c instanceof Text) {
-//					Text t = (Text) c;
-//					if (t.getText() != null) {
-//						r.setValue(new Value(t.getText(), DataType.STRING), i);
-//					} else {
-//						r.setValue(new Value("", DataType.STRING), i);
-//					}
-//				}
-//			}
-//		}
-//
-//		updateSelectedEntry();
-//	}
 
 	/**
 	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten Eintrags zurück

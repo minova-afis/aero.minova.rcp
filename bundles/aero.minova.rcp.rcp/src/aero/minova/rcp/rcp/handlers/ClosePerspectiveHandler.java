@@ -18,7 +18,7 @@ import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstant
 import aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler;
 
 /**
- * 
+ *
  */
 public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 
@@ -32,8 +32,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 	EPartService partService;
 
 	@Execute
-	public void execute(MWindow window,
-			@Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
+	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
 		List<MPerspective> perspective = modelService.findElements(application, perspectiveId, MPerspective.class);
 
@@ -41,16 +40,16 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		 * Entfernt die aktuelle Perspektive.
 		 */
 
-		MPerspectiveStack perspectiveStack = (MPerspectiveStack) modelService
-				.find("aero.minova.rcp.rcp.perspectivestack", application);
-		perspectiveStack.getChildren().remove(perspective.get(0));
-
+		MPerspectiveStack perspectiveStack = (MPerspectiveStack) modelService.find("aero.minova.rcp.rcp.perspectivestack", application);
+		// perspectiveStack.getChildren().remove(perspective.get(0));
+		modelService.deleteModelElement(perspective.get(0));
 		/*
 		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat.
 		 */
 		List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
-		switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
-
+		if (!perspectiveList.isEmpty()) {
+			switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
+		}
 	}
 
 }

@@ -200,6 +200,14 @@ nicht geändert wurde.
 
 [%hardbreaks]
 
+===== Zeit vor Timeout [s]
+
+Bestimmt die Dauer bevor eine Anfrage an den Server als nicht erfolgreich angesehen wird.
+
+===== Zeit vor "Warten auf Daten" Hinweise [s]
+
+Bestimmt die Dauer, bevor eine Meldung angezeigt wird, dass gerade Daten geladen werden.
+
 
 ==== Drucken Tab
 
