@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -255,7 +256,7 @@ public class WFCDetailPart extends WFCFormPart {
 		List<Control> tabList = new ArrayList<Control>();
 		Control[] compositeChilds = composite.getChildren();
 		for (Control control : compositeChilds) {
-			if(control instanceof Lookup || control instanceof TextAssist)
+			if(control instanceof Lookup || control instanceof TextAssist || control instanceof Text)
 			for (MField field : section.getTabList()) {
 				if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
 					if (!field.isReadOnly()) {
