@@ -488,7 +488,11 @@ public class Lookup extends Composite {
 	}
 
 	protected void requestAllLookupEntries() {
-		if (!isReadOnly() && !checkLastState()) {
+		if (isReadOnly()) {
+			return;
+		}
+
+		if (!checkLastState()) {
 			if (!gettingData) {
 				gettingData = true;
 				setMessage("...");
@@ -508,6 +512,8 @@ public class Lookup extends Composite {
 				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.ActiveRequest", Display.getCurrent().getActiveShell());
 				notificationPopUp.open();
 			}
+		} else {
+			showAllElements(text.getText());
 		}
 	}
 
