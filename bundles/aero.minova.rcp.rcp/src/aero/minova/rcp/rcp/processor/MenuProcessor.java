@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -37,6 +38,7 @@ public class MenuProcessor {
 
 	private String usingLocalMenu = "There was no response from the server. Application data may be out of date. Consider checking your connection and restarting the application.";
 	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
+	private int menuId = 0;
 
 	@Inject
 	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService, IDataService dataService, MApplication mApplication) {
@@ -94,10 +96,18 @@ public class MenuProcessor {
 	 * @param mApplication
 	 */
 	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
+		MMenuContribution menuContribution = modelService.createModelElement(MMenuContribution.class);
+		menuContribution.setParentId("org.eclipse.ui.main.menu");
+		menuContribution.setPositionInParent("after=additions");
+		menuContribution.setElementId("generated" + menuId++);
+		menuContribution.getPersistedState().put("persistState", "false");
+
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
 
 		menuGen.setLabel(menu_MDI.getText());
+
+		menuContribution.getChildren().add(menuGen);
 
 		// TODO Sortierung des MENUS aus der MDI beachten!!!
 		if (!menu_MDI.getEntryOrMenu().isEmpty() && menu_MDI.getEntryOrMenu() != null) {
@@ -107,10 +117,12 @@ public class MenuProcessor {
 					String id2 = ((Action) entryMDI.getId()).getId();
 					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
 					menuGen.getChildren().add(handledMenuItem);
-					menu.getChildren().add(menuGen);
+					
 				}
 			}
 		}
+		mApplication.getMenuContributions().add(menuContribution);
+
 	}
 
 	/**

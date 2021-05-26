@@ -22,6 +22,10 @@
    <extension
          id="id1"
          point="org.eclipse.e4.workbench.model">
+      <fragment
+            apply="always"
+            uri="fragment.e4xmi">
+      </fragment>
       <processor
             apply="always"
             beforefragment="true"
