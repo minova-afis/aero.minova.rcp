@@ -3,13 +3,12 @@ package aero.minova.rcp.rcp.processor;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -41,23 +40,15 @@ public class MenuProcessor {
 	private int menuId = 0;
 
 	@Inject
-	Logger logger;
-
-	@Inject
 	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication) {
 
 		this.modelService = modelService;
 		this.mApplication = mApplication;
 
 		try {
-			dataService.getHashedFile(MDI_FILE_NAME).thenAccept(this::processXML).exceptionally(new Function<Throwable, Void>() {
-
-				@Override
-				public Void apply(Throwable t) {
-					System.out.println(t.getLocalizedMessage());
-					return null;
-				}
-			});
+			CompletableFuture<String> exceptionally = dataService.getHashedFile(MDI_FILE_NAME);
+			String void1 = exceptionally.get();
+			processXML(void1);
 		} catch (Exception e) {
 			handleNoMDI(dataService);
 		}
