@@ -554,7 +554,7 @@ public class Lookup extends Composite {
 			return false;
 		}
 		long time = System.currentTimeMillis();
-		if (time - lastRequestTime >= 15000) {
+		if (time - lastRequestTime >= 2000) {
 			return false;
 		}
 		return true;
