@@ -68,7 +68,6 @@ public class MenuProcessor {
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
 
-
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
 			if (!menuOrEntry.isEmpty()) {
 
@@ -87,7 +86,6 @@ public class MenuProcessor {
 				}
 			}
 
-
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
@@ -102,12 +100,11 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private MMenu createMenu(MenuType menu_MDI, HashMap<String, Action> actions_MDI,
-			EModelService modelService, MApplication mApplication) {
+	private MMenu createMenu(MenuType menu_MDI, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
 
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
-
+		menuGen.setElementId("generated" + menuId++);
 		menuGen.setLabel(menu_MDI.getText());
 
 		// TODO Sortierung des MENUS aus der MDI beachten!!!
@@ -115,10 +112,12 @@ public class MenuProcessor {
 			for (Object object : menu_MDI.getEntryOrMenu()) {
 				if (object instanceof Entry) {
 					Entry entryMDI = (Entry) object;
-					String id2 = ((Action) entryMDI.getId()).getId();
-					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
-					menuGen.getChildren().add(handledMenuItem);
-					
+					if (!entryMDI.getType().equals("separator")) {
+						String id2 = ((Action) entryMDI.getId()).getId();
+						MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
+						menuGen.getChildren().add(handledMenuItem);
+					}
+
 				}
 			}
 		}
