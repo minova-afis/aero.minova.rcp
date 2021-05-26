@@ -8,6 +8,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.awt.event.FocusEvent;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +31,7 @@ import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -69,7 +70,6 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.handlers.TraverseListenerImpl;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
 @SuppressWarnings("restriction")
@@ -282,6 +282,21 @@ public class WFCDetailPart extends WFCFormPart {
 			if (!headOrPage.isHead) {
 				row += getExtraHeight(field);
 			}
+			FocusListener listener = new FocusListener() {
+
+				@Override
+				public void focusLost(org.eclipse.swt.events.FocusEvent e) {
+					page.setSelectedField(null);
+					System.out.println("Fokus verloren");
+				}
+
+				@Override
+				public void focusGained(org.eclipse.swt.events.FocusEvent e) {
+					page.setSelectedField((Control) e.widget);
+					System.out.println("Selektiertes Field ist " + e.widget);
+				}
+			};
+			((AbstractValueAccessor) f.getValueAccessor()).getControl().addFocusListener(listener);
 		}
 
 		addBottonMargin(composite, row + 1, column);
