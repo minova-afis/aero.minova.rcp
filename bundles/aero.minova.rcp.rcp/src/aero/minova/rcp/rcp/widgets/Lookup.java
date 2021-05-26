@@ -507,4 +507,9 @@ public class Lookup extends Composite {
 	public void closePopup() {
 		popup.setVisible(false);
 	}
+
+	private boolean isReadOnly() {
+		MField field = (MField) this.getData(Constants.CONTROL_FIELD);
+		return field.isReadOnly();
+	}
 }
