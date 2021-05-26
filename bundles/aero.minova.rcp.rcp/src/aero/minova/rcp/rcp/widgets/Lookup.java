@@ -31,6 +31,7 @@ import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.internal.CacheUtil;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
@@ -56,6 +57,8 @@ public class Lookup extends Composite {
 	private List<LookupValue> popupValues;
 	// True, wenn gerade eine Anfrage verarbeitet wird. Wenn auf das Label geklickt wird, während die Variable true ist, wird die Anfrage nicht ausgeführt
 	private boolean gettingData = false;
+	private String lastRequestState = "";
+	private long lastRequestTime = 0;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
@@ -474,15 +477,8 @@ public class Lookup extends Composite {
 		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				if (!gettingData) {
-					gettingData = true;
-					Lookup.this.setFocus();
-					requestAllLookupEntries();
-				} else {
-					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.ActiveRequest",
-							Display.getCurrent().getActiveShell());
-					notificationPopUp.open();
-				}
+				Lookup.this.setFocus();
+				requestAllLookupEntries();
 			}
 		});
 	}
@@ -492,18 +488,27 @@ public class Lookup extends Composite {
 	}
 
 	protected void requestAllLookupEntries() {
-		setMessage("...");
+		if (!isReadOnly() && !checkLastState()) {
+			if (!gettingData) {
+				gettingData = true;
+				setMessage("...");
 
-		MLookupField field = (MLookupField) getData(Constants.CONTROL_FIELD);
-		BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
-		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
-		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
+				MLookupField field = (MLookupField) getData(Constants.CONTROL_FIELD);
+				BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
+				ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
+				IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
-		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false, "%");
-		listLookup.thenAccept(l -> {
-			Display.getDefault().asyncExec(() -> contentProvider.setValues(l));
-			gettingData = false;
-		});
+				CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false, "%");
+				setLastState();
+				listLookup.thenAccept(l -> {
+					Display.getDefault().asyncExec(() -> contentProvider.setValues(l));
+					gettingData = false;
+				});
+			} else {
+				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.ActiveRequest", Display.getCurrent().getActiveShell());
+				notificationPopUp.open();
+			}
+		}
 	}
 
 	/**
@@ -524,5 +529,28 @@ public class Lookup extends Composite {
 	private boolean isReadOnly() {
 		MField field = (MField) this.getData(Constants.CONTROL_FIELD);
 		return field.isReadOnly();
+	}
+
+	/**
+	 * Speichert Zeitpunkt auf Millisekundenbasis und Zustand der abhängigen Lookup-Felder der letzten Abfrage.
+	 */
+	private void setLastState() {
+		this.lastRequestState = CacheUtil.getNameList((MField) this.getData(Constants.CONTROL_FIELD));
+		this.lastRequestTime = System.currentTimeMillis();
+	}
+
+	/**
+	 * False, wenn es eine Änderung gab oder mehr als 5 Sekunden zwischen zwei Anfragen vergangen sind.
+	 */
+	private boolean checkLastState() {
+		String state = CacheUtil.getNameList((MField) this.getData(Constants.CONTROL_FIELD));
+		if (!state.equals(lastRequestState)) {
+			return false;
+		}
+		long time = System.currentTimeMillis();
+		if (time - lastRequestTime >= 15000) {
+			return false;
+		}
+		return true;
 	}
 }
