@@ -479,7 +479,7 @@ public class Lookup extends Composite {
 					Lookup.this.setFocus();
 					requestAllLookupEntries();
 				} else {
-					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.activeRequest",
+					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.ActiveRequest",
 							Display.getCurrent().getActiveShell());
 					notificationPopUp.open();
 				}
