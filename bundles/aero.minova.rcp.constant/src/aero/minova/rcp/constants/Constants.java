@@ -19,6 +19,9 @@ public class Constants {
 	public static final String CONTROL_DATATYPE = "dataType";
 	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
+	public static final String CONTROL_ID = "id";
+	public static final String CONTROL_WIZARD = "wizard";
+	public static final String CONTROL_MDETAIL = "mDetail";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";

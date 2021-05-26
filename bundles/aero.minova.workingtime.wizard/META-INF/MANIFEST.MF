@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Wizard
+Bundle-SymbolicName: aero.minova.workingtime.wizard
+Bundle-Version: 12.0.16.qualifier
+Fragment-Host: aero.minova.rcp.rcp;bundle-version="12.0.16"
+Automatic-Module-Name: aero.minova.workingtime.wizard
+Bundle-RequiredExecutionEnvironment: JavaSE-11

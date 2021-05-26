@@ -3,7 +3,6 @@
 
 <product name="WFC" uid="WebFatClient" id="aero.minova.rcp.rcp.product" application="org.eclipse.e4.ui.workbench.swt.E4Application" version="1.2.1.qualifier" useFeatures="true" includeLaunchers="true">
 
-
    <configIni use="default">
    </configIni>
 
@@ -24,10 +23,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="aero.minova.rcp.rcp"/>
@@ -111,6 +108,7 @@
       <feature id="org.eclipse.e4.rcp" installMode="root"/>
       <feature id="org.eclipse.emf.ecore" installMode="root"/>
       <feature id="org.eclipse.emf.common" installMode="root"/>
+      <feature id="aero.minova.debug.feature" installMode="root"/>
    </features>
 
    <configurations>
