@@ -115,7 +115,6 @@ public static Control create(Composite composite, MField field, int row, int col
 				}
 			}
 		});
-
 		return lookupControl;
 	}
 

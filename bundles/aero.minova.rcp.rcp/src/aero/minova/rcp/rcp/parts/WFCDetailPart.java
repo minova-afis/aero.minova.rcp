@@ -255,7 +255,7 @@ public class WFCDetailPart extends WFCFormPart {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					Map<String, String> parameter = Map.of(//
-							Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingTimeWizard");
+							Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingtimeWizard");
 
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
 					handlerService.executeHandler(command);
