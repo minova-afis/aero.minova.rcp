@@ -28,11 +28,8 @@
       </fragment>
       <processor
             apply="always"
-            beforefragment="true"
+            beforefragment="false"
             class="aero.minova.rcp.rcp.processor.MenuProcessor">
-         <element
-               id="org.eclipse.ui.main.menu">
-         </element>
       </processor>
    </extension>
 </plugin>

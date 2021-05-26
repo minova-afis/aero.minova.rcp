@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -32,7 +31,6 @@ public class MenuProcessor {
 
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
-	private MMenu menu;
 	private EModelService modelService;
 	private MApplication mApplication;
 
@@ -41,9 +39,8 @@ public class MenuProcessor {
 	private int menuId = 0;
 
 	@Inject
-	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService, IDataService dataService, MApplication mApplication) {
+	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication) {
 
-		this.menu = menu;
 		this.modelService = modelService;
 		this.mApplication = mApplication;
 
@@ -61,8 +58,16 @@ public class MenuProcessor {
 
 	private void processXML(String fileContent) {
 		Main mainMDI = null;
+
+		MMenuContribution menuContribution = modelService.createModelElement(MMenuContribution.class);
+		menuContribution.setParentId("org.eclipse.ui.main.menu");
+		menuContribution.setPositionInParent("after=additions");
+		menuContribution.setElementId("generated" + menuId++);
+		menuContribution.getPersistedState().put("persistState", "false");
+		mApplication.getMenuContributions().add(menuContribution);
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
+
 
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
 			if (!menuOrEntry.isEmpty()) {
@@ -76,14 +81,16 @@ public class MenuProcessor {
 
 				for (Object object : menuOrEntry) {
 					if (object instanceof MenuType) {
-						createMenu((MenuType) object, menu, actionsMDI, modelService, mApplication);
+						MMenu createMenu = createMenu((MenuType) object, actionsMDI, modelService, mApplication);
+						menuContribution.getChildren().add(createMenu);
 					}
 				}
 			}
+
+
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -95,19 +102,13 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
-		MMenuContribution menuContribution = modelService.createModelElement(MMenuContribution.class);
-		menuContribution.setParentId("org.eclipse.ui.main.menu");
-		menuContribution.setPositionInParent("after=additions");
-		menuContribution.setElementId("generated" + menuId++);
-		menuContribution.getPersistedState().put("persistState", "false");
+	private MMenu createMenu(MenuType menu_MDI, HashMap<String, Action> actions_MDI,
+			EModelService modelService, MApplication mApplication) {
 
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
 
 		menuGen.setLabel(menu_MDI.getText());
-
-		menuContribution.getChildren().add(menuGen);
 
 		// TODO Sortierung des MENUS aus der MDI beachten!!!
 		if (!menu_MDI.getEntryOrMenu().isEmpty() && menu_MDI.getEntryOrMenu() != null) {
@@ -121,7 +122,7 @@ public class MenuProcessor {
 				}
 			}
 		}
-		mApplication.getMenuContributions().add(menuContribution);
+		return menuGen;
 
 	}
 
