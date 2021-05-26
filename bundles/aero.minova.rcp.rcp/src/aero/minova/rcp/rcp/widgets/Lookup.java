@@ -31,6 +31,7 @@ import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
@@ -53,6 +54,8 @@ public class Lookup extends Composite {
 	 */
 	private Label label;
 	private List<LookupValue> popupValues;
+	// True, wenn gerade eine Anfrage verarbeitet wird. Wenn auf das Label geklickt wird, während die Variable true ist, wird die Anfrage nicht ausgeführt
+	private boolean gettingData = false;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
@@ -471,8 +474,15 @@ public class Lookup extends Composite {
 		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				Lookup.this.setFocus();
-				requestAllLookupEntries();
+				if (!gettingData) {
+					gettingData = true;
+					Lookup.this.setFocus();
+					requestAllLookupEntries();
+				} else {
+					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.activeRequest",
+							Display.getCurrent().getActiveShell());
+					notificationPopUp.open();
+				}
 			}
 		});
 	}
@@ -490,7 +500,10 @@ public class Lookup extends Composite {
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false, "%");
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> contentProvider.setValues(l)));
+		listLookup.thenAccept(l -> {
+			Display.getDefault().asyncExec(() -> contentProvider.setValues(l));
+			gettingData = false;
+		});
 	}
 
 	/**
