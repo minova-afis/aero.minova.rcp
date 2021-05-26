@@ -226,6 +226,11 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(t -> {
 			Table fromJson = gson.fromJson(t.body(), Table.class);
+			if (fromJson.getName().equals("Error")) {
+				ErrorObject e = new ErrorObject(fromJson, username, tableName);
+				postError(e);
+				return null;
+			}
 			log("CAS Answer Index:\n" + t.body());
 			return fromJson;
 		});
