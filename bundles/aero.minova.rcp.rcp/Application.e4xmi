@@ -71,7 +71,7 @@
           </children>
         </children>
         <children xsi:type="basic:PartStack" xmi:id="_T04rYLqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_r6jD0LqjEeqSa5ZfLepYaA">
-          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="@Form.Details" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Information/32x32.png">
+          <children xsi:type="basic:Part" xmi:id="_r6jD0LqjEeqSa5ZfLepYaA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="@Form.Details" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Information/32x32.png" bindingContexts="_Am1WYL1SEeugwfAmEQc7dA">
             <handlers xmi:id="_Q2Rg0Bm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_2hwmEOg1Eeq4vM3bKRf1IQ"/>
             <handlers xmi:id="_YBX1kBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.newdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewDetailHandler" command="_5ODNMOg1Eeq4vM3bKRf1IQ"/>
             <handlers xmi:id="_ieacMBm8EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_7pSgkOg1Eeq4vM3bKRf1IQ"/>
@@ -122,6 +122,7 @@
   <handlers xmi:id="_JtsKABm7EeuB6OBNG_CVEA" elementId="aero.minova.rcp.rcp.handler.resizenattablecolumns" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ResizeTableHandler" command="_oYW34Og0Eeq4vM3bKRf1IQ"/>
   <handlers xmi:id="_RWePkBT1Eeu-_fm1mU00Ng" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart" command="_AOXbMBRdEeu_ctc0PBVTGw"/>
   <handlers xmi:id="_ahNUMI1vEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.handler.searchCriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaHandler" command="_KpQ2AI1tEeuoh4vFDPXd3Q"/>
+  <handlers xmi:id="_tiwCML3lEeu6TJZmsnm4Ew" elementId="aero.minova.rcp.rcp.handler.enter" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.TraverseEnterHandler" command="_XHCCUL1REeugwfAmEQc7dA"/>
   <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLesgZEeSyMNYR5xypkQ">
     <tags>type:user</tags>
     <bindings xmi:id="_6wlLf8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
@@ -144,10 +145,14 @@
       <tags>type:user</tags>
     </bindings>
   </bindingTables>
+  <bindingTables xmi:id="_A4GiAL1REeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.bindingtable.enter" bindingContext="_Am1WYL1SEeugwfAmEQc7dA">
+    <bindings xmi:id="_NBsKAL1REeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.keybinding.enter" keySequence="CR" command="_XHCCUL1REeugwfAmEQc7dA"/>
+  </bindingTables>
   <rootContext xmi:id="_6wlLecgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="In Dialog and Windows">
     <children xmi:id="_6wlLesgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.window" name="In Windows"/>
     <children xmi:id="_6wlLe8gZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.contexts.dialog" name="In Dialogs"/>
   </rootContext>
+  <rootContext xmi:id="_Am1WYL1SEeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.bindingcontext.enter" name="Traverse Enter"/>
   <commands xmi:id="_6wlLfMgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.exit" commandName="exitCommand"/>
   <commands xmi:id="_6wlLhsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>
   <commands xmi:id="_Lwy8UIydEeuboqmDt256_Q" elementId="org.eclipse.ui.edit.undo" commandName="undoCommand"/>
@@ -194,6 +199,7 @@
     <parameters xmi:id="_NZvZkI1tEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.commandparameter.criteriaaction" name="criteriaAction" optional="false"/>
     <parameters xmi:id="_TZumEI1tEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.commandparameter.criterianame" name="criteriaName" optional="false"/>
   </commands>
+  <commands xmi:id="_XHCCUL1REeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.command.traverseenter" commandName="Traverse Enter"/>
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>

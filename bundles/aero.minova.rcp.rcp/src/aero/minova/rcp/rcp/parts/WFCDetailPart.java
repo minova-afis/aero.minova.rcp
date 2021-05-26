@@ -153,11 +153,10 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent, IEclipseContext context) {
-		TraverseListener traverseListener = new TraverseListenerImpl(detail, locale, partService, context);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			layoutSection(parent, wrapper, traverseListener);
+			layoutSection(parent, wrapper);
 		}
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -182,7 +181,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param headOrPage
 	 * @param traverseListener
 	 */
-	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, TraverseListener traverseListener) {
+	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage) {
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
@@ -212,7 +211,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
-		sortTabList(mSection, traverseListener);
+		sortTabList(mSection);
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
@@ -226,7 +225,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param traverseListener
 	 *            der zuzuweisende TraverseListener für die Fields
 	 */
-	private void sortTabList(MSection mSection, TraverseListener traverseListener) {
+	private void sortTabList(MSection mSection) {
 		List<MField> tabList = mSection.getTabList();
 		Collections.sort(tabList, new Comparator<MField>() {
 
@@ -241,9 +240,7 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		});
-		for (MField field : tabList) {
-			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
-		}
+		
 		mSection.setTabList(tabList);
 	}
 
