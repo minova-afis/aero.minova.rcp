@@ -13,7 +13,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.osgi.service.prefs.Preferences;
@@ -70,6 +69,24 @@ public class TraverseEnterHandler {
 
 		return false;
 	}
+	
+	private MField getFieldFromControl(Control control, MDetail detail, List<MSection> sectionList) {
+		
+		MField selectedField = null;
+		for (MSection page : sectionList) {
+			List<MField> tabList = page.getTabList();
+			for (MField field : tabList) {
+				if (((AbstractValueAccessor) field.getValueAccessor()).getControl() == control) {
+					selectedField = field;
+					break;
+				}
+			}
+			if (selectedField != null)
+				break;
+
+		}
+		return selectedField;
+	}
 
 	/**
 	 * Ermittelt das in der Tab Reihenfolge nachfolgende Pflichtfeld und selektiert dieses.
@@ -108,20 +125,8 @@ public class TraverseEnterHandler {
 		}
 
 		// Wir holen uns das MField des selektierten Felds.
-		MField selectedField = null;
 		List<MSection> sectionList = detail.getPageList();
-		for (MSection page : sectionList) {
-			List<MField> tabList = page.getTabList();
-			for (MField field : tabList) {
-				if (((AbstractValueAccessor) field.getValueAccessor()).getControl() == focussedControl) {
-					selectedField = field;
-					break;
-				}
-			}
-			if (selectedField != null)
-				break;
-
-		}
+		MField selectedField = getFieldFromControl(focussedControl, detail, sectionList);
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
