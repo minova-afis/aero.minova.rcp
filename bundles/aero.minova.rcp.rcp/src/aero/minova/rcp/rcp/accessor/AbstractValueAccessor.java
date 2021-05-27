@@ -38,11 +38,13 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 				setFocussed(false);
 				// Überprüfung ob der eingetragenen Wert in der Liste ist und ebenfalls gültig!
 				field.setValue(field.getValue(), false);
+				field.getDetail().setSelectedField(null);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
 				setFocussed(true);
+				field.getDetail().setSelectedField(control);
 			}
 		});
 	}
