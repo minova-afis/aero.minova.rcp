@@ -282,21 +282,6 @@ public class WFCDetailPart extends WFCFormPart {
 			if (!headOrPage.isHead) {
 				row += getExtraHeight(field);
 			}
-			FocusListener listener = new FocusListener() {
-
-				@Override
-				public void focusLost(org.eclipse.swt.events.FocusEvent e) {
-					detail.setSelectedField(null);
-					System.out.println("Fokus verloren");
-				}
-
-				@Override
-				public void focusGained(org.eclipse.swt.events.FocusEvent e) {
-					detail.setSelectedField((Control) e.widget);
-					System.out.println("Selektiertes Field ist " + e.widget);
-				}
-			};
-			((AbstractValueAccessor) f.getValueAccessor()).getControl().addFocusListener(listener);
 		}
 
 		addBottonMargin(composite, row + 1, column);
