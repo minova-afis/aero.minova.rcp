@@ -23,9 +23,6 @@ public class MSection {
 	private Image icon;
 
 	private Control control;
-	
-	private Control selectedField;
-
 
 	/**
 	 * Erstellt eine neue MSection.
@@ -111,14 +108,4 @@ public class MSection {
 	public void setIcon(Image icon) {
 		this.icon = icon;
 	}
-	
-	public Control getSelectedField() {
-		return selectedField;
-	}
-
-	public void setSelectedField(Control selectedField) {
-		this.selectedField = selectedField;
-	}
-
-
 }
