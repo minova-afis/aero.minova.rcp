@@ -37,14 +37,10 @@ public class TraverseEnterHandler {
 	@Inject
 	EPartService partService;
 
-	@Inject
-	ESelectionService selectionService;
-
 	@Execute
 	public void execute() {
 		MPart part = partService.getActivePart();
 
-		System.out.println("Key Binding funktioniert");
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
 			if (detail.getSelectedField() != null) {
@@ -59,7 +55,6 @@ public class TraverseEnterHandler {
 		boolean emptyRequiredField = false;
 		MPart part = partService.getActivePart();
 
-		System.out.println("Key Binding funktioniert (CanExecute)");
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
 
@@ -67,13 +62,10 @@ public class TraverseEnterHandler {
 				for (MField field : section.getTabList()) {
 					if (field.isRequired() && field.getValue() == null) {
 						emptyRequiredField = true;
-						break;
+						return emptyRequiredField;
 					}
 				}
 			}
-
-			System.out.println(emptyRequiredField);
-			return emptyRequiredField;
 		}
 
 		return false;
@@ -96,10 +88,10 @@ public class TraverseEnterHandler {
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
 		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
 				DisplayType.CHECK, true, locale);
-		
+
 		Control focussedControl = null;
-		
-		if(control.getParent() instanceof TextAssist || control.getParent() instanceof Lookup) {
+
+		if (control.getParent() instanceof TextAssist || control.getParent() instanceof Lookup) {
 			focussedControl = control.getParent();
 		} else {
 			focussedControl = control;
