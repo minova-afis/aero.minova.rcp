@@ -286,13 +286,13 @@ public class WFCDetailPart extends WFCFormPart {
 
 				@Override
 				public void focusLost(org.eclipse.swt.events.FocusEvent e) {
-					page.setSelectedField(null);
+					detail.setSelectedField(null);
 					System.out.println("Fokus verloren");
 				}
 
 				@Override
 				public void focusGained(org.eclipse.swt.events.FocusEvent e) {
-					page.setSelectedField((Control) e.widget);
+					detail.setSelectedField((Control) e.widget);
 					System.out.println("Selektiertes Field ist " + e.widget);
 				}
 			};
