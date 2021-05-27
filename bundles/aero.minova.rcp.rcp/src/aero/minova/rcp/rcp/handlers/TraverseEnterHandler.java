@@ -47,12 +47,9 @@ public class TraverseEnterHandler {
 		System.out.println("Key Binding funktioniert");
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
-			for (MSection s : detail.getPageList()) {
-				if (s.getSelectedField() != null) {
-					Control focussedControl = s.getSelectedField();
-					getNextRequired(focussedControl.getParent(), detail);
-					break;
-				}
+			if (detail.getSelectedField() != null) {
+				Control focussedControl = detail.getSelectedField();
+				getNextRequired(focussedControl, detail);
 			}
 		}
 	}
@@ -93,7 +90,7 @@ public class TraverseEnterHandler {
 	 * @param focussedControl
 	 *            das aktuell selektierte Feld
 	 */
-	private void getNextRequired(Control focussedControl, MDetail detail) {
+	private void getNextRequired(Control control, MDetail detail) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
