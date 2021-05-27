@@ -96,6 +96,14 @@ public class TraverseEnterHandler {
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
 		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
 				DisplayType.CHECK, true, locale);
+		
+		Control focussedControl = null;
+		
+		if(control.getParent() instanceof TextAssist || control.getParent() instanceof Lookup) {
+			focussedControl = control.getParent();
+		} else {
+			focussedControl = control;
+		}
 
 		boolean popupOpen = false;
 		if (focussedControl instanceof Lookup) {
