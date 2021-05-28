@@ -8,6 +8,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.awt.event.FocusEvent;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -80,6 +82,7 @@ import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.ImageUtil;
+
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
@@ -173,7 +176,7 @@ public class WFCDetailPart extends WFCFormPart {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			layoutSection(parent, wrapper,context);
+			layoutSection(parent, wrapper, context);
 
 		}
 		// Helper-Klasse initialisieren
@@ -199,8 +202,8 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param headOrPage
 	 * @param traverseListener
 	 */
-	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage,IEclipseContext context) {
 
+	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, IEclipseContext context) {
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
@@ -233,6 +236,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection);
 		composite.setTabList(getTabList(mSection, composite));
+
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
@@ -299,15 +303,15 @@ public class WFCDetailPart extends WFCFormPart {
 		List<Control> tabList = new ArrayList<Control>();
 		Control[] compositeChilds = composite.getChildren();
 		for (Control control : compositeChilds) {
-			if(control instanceof Lookup || control instanceof TextAssist || control instanceof Text)
-			for (MField field : section.getTabList()) {
-				if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
-					if (!field.isReadOnly()) {
-						tabList.add(control);
-						break;
+			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text)
+				for (MField field : section.getTabList()) {
+					if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
+						if (!field.isReadOnly()) {
+							tabList.add(control);
+							break;
+						}
 					}
 				}
-			}
 		}
 		Control[] tabArray = new Control[tabList.size()];
 		int i = 0;
@@ -316,6 +320,7 @@ public class WFCDetailPart extends WFCFormPart {
 			i++;
 		}
 		return tabArray;
+
 	}
 
 	/**
