@@ -40,17 +40,18 @@ CTabItem:selected {
 }
 
 Text.Standard, Lookup.Standard, TextAssist.Standard {
-	color: black;
 	background-color: white;
+	color: black;
 }
 
 Text.ValueRequired, Lookup.ValueRequired, TextAssist.ValueRequired {
 	background-color: #FCD267;
+	color: black;
 }
 
 Text.InvalidValue, Lookup.InvalidValue, TextAssist.InvalidValue {
-	color: white;
 	background-color: red;
+	color: black;
 }
 
 Text.ReadOnly, Lookup.ReadOnly, TextAssist.ReadOnly {

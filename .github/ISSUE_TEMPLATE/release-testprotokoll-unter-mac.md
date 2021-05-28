@@ -58,6 +58,15 @@ Getestet mit Server xxxxxx
 - [ ] Perspektiven können über Rechtsklick geschlossen werden (inklusive der letzten)
 - [ ] Es wird unterstützt, dass Masken in der application.mdi unterschiedliche Dateinamen und IDs haben (siehe #487)
 
+## Keybindings
+Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktionieren.
+- [ ] cmd+Q: Anwendung beenden
+- [ ] cmd+Z: Undo (in Textfeldern)
+- [ ] cmd+S: Detail speichern (nur wenn Detailpart im Fokus ist)
+- [ ] cmd+N: neues Detail
+- [ ] F4: Search Part auswählen
+- [ ] F5: Index neu laden
+- [ ] F6: Detail Part auswählen
 
 # Tests für CTS VG Eibelstadt
  

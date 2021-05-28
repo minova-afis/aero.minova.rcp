@@ -583,4 +583,5 @@ public class Lookup extends Composite {
 	public Table getTable() {
 		return table;
 	}
+
 }

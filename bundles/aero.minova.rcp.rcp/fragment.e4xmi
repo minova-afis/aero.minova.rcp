@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_ZOhUYLbcEeuZF8ZS2_h9rA">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ZOhUYrbcEeuZF8ZS2_h9rA" featurename="handlers" parentElementId="xpath:/">
+    <elements xsi:type="commands:Handler" xmi:id="_ZOhUY7bcEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_laMxobbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBAbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.aboutCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AboutHandler" command="_laMxorbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBArbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler" command="_laMxpLbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBA7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler" command="_laMxqLbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBBLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.1" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.KeepPerspectiveHandler" command="_laMxqrbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBBbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.preferencehandler" contributionURI="bundleclass://aero.minova.rcp.preferencewindow/aero.minova.rcp.preferencewindow.pages.ApplicationPreferenceWindowHandler" command="_laMxs7bdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBBrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.loadindexpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_laMxsrbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBB7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.help" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.HelpHandler" command="_laMxwrbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBCLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.loaddatawithmatcgcode" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadDataWithMatchCodeHandler" command="_laMxw7bdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBCbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.selectsearchpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectSearchPart" command="_laMxxLbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBCrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.resizenattablecolumns" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ResizeTableHandler" command="_laMxubbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBC7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart" command="_laMxxbbdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_ciLBDLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.searchCriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaHandler" command="_laMxx7bdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_CeFntLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.newdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewDetailHandler" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_laMxoLbdEeuZF8ZS2_h9rA" featurename="commands" parentElementId="xpath:/">
+    <elements xsi:type="commands:Command" xmi:id="_laMxobbdEeuZF8ZS2_h9rA" elementId="org.eclipse.ui.file.exit" commandName="exitCommand">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxorbdEeuZF8ZS2_h9rA" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxo7bdEeuZF8ZS2_h9rA" elementId="org.eclipse.ui.edit.undo" commandName="undoCommand">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxpLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.openform" commandName="OpenForm">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_laMxpbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="FormName" optional="false"/>
+      <parameters xmi:id="_laMxprbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formId" name="Form ID"/>
+      <parameters xmi:id="_laMxp7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel" name="Perspective Label"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxqLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_laMxqbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="ClosePerspective"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxqrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.keepperspectivecommand" commandName="KeepPerspectiveCommand">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_laMxq7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="KeepPerspective"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxrLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.revertsearch" commandName="RevertSearch">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxrbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.clearsearch" commandName="ClearSearch">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxrrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.loadsearchcriteria" commandName="LoadSearchCriteria">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxr7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.savesearchcriteria" commandName="SaveSearchCriteria">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxsLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.optimizedetail" commandName="OptimizeDetail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxsbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.siscommand" commandName="SISCommand">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxsrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.loadindex" commandName="LoadIndex">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxs7bdEeuZF8ZS2_h9rA" elementId="org.eclipse.ui.window.preferences" commandName="PreferenceCommand">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxtLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.expandindex" commandName="ExpandIndex">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxtbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.collapseindex" commandName="Collapse Index">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxtrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.exportto" commandName="ExportTo">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_laMxt7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.exportto" name="exportTo" optional="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxuLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.printindex" commandName="Print Index">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxubbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.resizenattablecolumns" commandName="Resize NatTableColumns">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxurbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.savedetail" commandName="Save Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxu7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.newdetail" commandName="New Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxvLbdEeuZF8ZS2_h9rA" elementId="bundles.command.canceldetail" commandName="Cancel Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxvbbdEeuZF8ZS2_h9rA" elementId="bundles.command.correctdetail" commandName="Correct Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxvrbdEeuZF8ZS2_h9rA" elementId="bundles.command.bookdetail" commandName="Book Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxv7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.deletedetail" commandName="Delete Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxwLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.revertdetail" commandName="Revert Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxwbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.printdetail" commandName="Print Detail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxwrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.help" commandName="Help">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxw7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.loaddatawithmatchcode" commandName="Load Data With MatchCode">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxxLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.selectsearchpart" commandName="Select Search Part">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxxbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.selectdetailpart" commandName="Select Detail Part">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxxrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.saveas" commandName="SearchCriteriaSaveAs">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_laMxx7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.searchCriteria" commandName="searchCriteriaCommand">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_laMxyLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.criteriaaction" name="criteriaAction" optional="false"/>
+      <parameters xmi:id="_laMxybbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.criterianame" name="criteriaName" optional="false"/>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Le0doLbxEeuZF8ZS2_h9rA" featurename="trimBars" parentElementId="aero.minova.rcp.rcp.window.main">
+    <elements xsi:type="basic:TrimBar" xmi:id="_Le0dobbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.trimbar.top"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MrtukLbxEeuZF8ZS2_h9rA" featurename="trimBars" parentElementId="aero.minova.rcp.rcp.window.main">
+    <elements xsi:type="basic:TrimBar" xmi:id="_MrtukbbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
+      <children xsi:type="menu:ToolControl" xmi:id="_MrtukrbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.toolcontrol.perspectivetoolbar" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PerspectiveControl">
+        <tags>Stretch</tags>
+      </children>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_1jziYLbxEeuZF8ZS2_h9rA" featurename="bindings" parentElementId="aero.minova.rcp.rcp.bindingtable">
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziYbbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.m1q" keySequence="M1+Q" command="_laMxobbdEeuZF8ZS2_h9rA"/>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziZLbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.m1z" keySequence="M1+Z" command="_laMxo7bdEeuZF8ZS2_h9rA"/>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_7O5Q4L-MEeurHOCQHTszDA" elementId="aero.minova.rcp.rcp.keybinding.m1s" keySequence="M1+S" command="_laMxurbdEeuZF8ZS2_h9rA"/>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_C5OfUL-NEeurHOCQHTszDA" elementId="aero.minova.rcp.rcp.keybinding.m1n" keySequence="M1+N" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziZbbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.help" keySequence="F1" command="_laMxwrbdEeuZF8ZS2_h9rA">
+      <tags>type:user</tags>
+    </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziZrbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.loaddatawithmatchcode" keySequence="F3" command="_laMxw7bdEeuZF8ZS2_h9rA">
+      <tags>type:user</tags>
+    </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziZ7bxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.selectsearchpart" keySequence="F4" command="_laMxxLbdEeuZF8ZS2_h9rA">
+      <tags>type:user</tags>
+    </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziaLbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.loadindexpart" keySequence="F5" command="_laMxsrbdEeuZF8ZS2_h9rA">
+      <tags>type:user</tags>
+    </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_1jziabbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_laMxxbbdEeuZF8ZS2_h9rA">
+      <tags>type:user</tags>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_6zWJYLbxEeuZF8ZS2_h9rA" featurename="snippets" parentElementId="aero.minova.rcp.rcp.window.main">
+    <elements xsi:type="advanced:Perspective" xmi:id="_AjQSgLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.perspective.main" selectedElement="_CeFngLbyEeuZF8ZS2_h9rA" label="Snippet">
+      <children xsi:type="basic:PartSashContainer" xmi:id="_CeFngLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partsashcontainer.main" selectedElement="_CeFngbbyEeuZF8ZS2_h9rA" horizontal="true">
+        <children xsi:type="basic:PartSashContainer" xmi:id="_CeFngbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partsashcontainer.left" selectedElement="_CeFngrbyEeuZF8ZS2_h9rA">
+          <children xsi:type="basic:PartStack" xmi:id="_CeFngrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partstack.search" selectedElement="_CeFng7byEeuZF8ZS2_h9rA">
+            <children xsi:type="basic:Part" xmi:id="_CeFng7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCSearchPart" label="@Form.Search" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SearchCriteria/32x32.png">
+              <handlers xmi:id="_CeFnhLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.revertsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertSearchHandler" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnhbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnhrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.saveas" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveAsHandler" command="_laMxxrbdEeuZF8ZS2_h9rA"/>
+              <toolbar xmi:id="_CeFnh7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.toolbar.3">
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFniLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.Reset" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DiscardSearchCriteria.Command/32x32.png" tooltip="@Action.Reset" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnibbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="@Action.DeleteLine" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.DeleteLine" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnirbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.SelectionCriteria.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" tooltip="@Action.SelectionCriteria.Save" command="_laMxx7bdEeuZF8ZS2_h9rA">
+                  <menu xmi:id="_CeFni7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.menu.0">
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnjLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.commandsaves" label="Speichern unter..." iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png">
+                      <parameters xmi:id="_CeFnjbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction_saveas" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="SAVE"/>
+                    </children>
+                    <children xsi:type="menu:DynamicMenuContribution" xmi:id="_CeFnjrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.dynamicmenucontribution.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaSaveHandler"/>
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnj7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.search.edit" label="@Action.Delete" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.Delete">
+                      <parameters xmi:id="_CeFnkLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction_savedelete" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="DELETE"/>
+                      <parameters xmi:id="_CeFnkbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criterianame_savedelete" name="aero.minova.rcp.rcp.commandparameter.criterianame"/>
+                    </children>
+                  </menu>
+                  <parameters xmi:id="_CeFnkrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction_savedefault" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="SAVE_DEFAULT"/>
+                  <parameters xmi:id="_CeFnk7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criterianame_savedefault" name="aero.minova.rcp.rcp.commandparameter.criterianame" value="DEFAULT"/>
+                </children>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnlLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="@Action.SelectionCriteria.Load" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/LoadSearchCriteria.Command/32x32.png" tooltip="@Action.SelectionCriteria.Load" command="_laMxx7bdEeuZF8ZS2_h9rA">
+                  <menu xmi:id="_CeFnlbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.menu.loadselectioncriteria">
+                    <children xsi:type="menu:DynamicMenuContribution" xmi:id="_CeFnlrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.dynamicmenucontribution.searchCriteriaLoad" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaLoadHandler"/>
+                  </menu>
+                  <parameters xmi:id="_CeFnl7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="LOAD_DEFAULT"/>
+                  <parameters xmi:id="_CeFnmLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criterianame" name="aero.minova.rcp.rcp.commandparameter.criterianame" value=""/>
+                </children>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnmbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxubbdEeuZF8ZS2_h9rA"/>
+              </toolbar>
+            </children>
+          </children>
+          <children xsi:type="basic:PartStack" xmi:id="_CeFnmrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_CeFnm7byEeuZF8ZS2_h9rA">
+            <children xsi:type="basic:Part" xmi:id="_CeFnm7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPart" label="@Form.Index" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Index/32x32.png">
+              <handlers xmi:id="_CeFnnLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_laMxsrbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnnbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.expandindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnnrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.collapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.CollapseIndexHandler" command="_laMxtbbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnn7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_laMxtrbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnoLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
+              <toolbar xmi:id="_CeFnobbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.toolbar.4">
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnorbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.load" label="@Action.Load" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/LoadRecord.Command/32x32.png" tooltip="@Action.Load" command="_laMxsrbdEeuZF8ZS2_h9rA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFno7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="@Action.NodesExpand" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandTree.Command/32x32.png" tooltip="@Action.NodesExpand" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnpLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="@Action.NodesCollapse" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/CollapseTree.Command/32x32.png" tooltip="@Action.NodesCollapse" command="_laMxtbbdEeuZF8ZS2_h9rA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnpbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.export" label="@Action.ExportAll" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png" tooltip="@Action.ExportAll" command="_laMxtrbdEeuZF8ZS2_h9rA">
+                  <menu xmi:id="_CeFnprbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.menu.0">
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnp7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttoclipboard" label="In Zwischenablage">
+                      <parameters xmi:id="_CeFnqLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttoclipboard" name="aero.minova.rcp.rcp.commandparameter.exportto" value="CLIPBOARD"/>
+                    </children>
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnqbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttofile" label="Als Datei" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png">
+                      <parameters xmi:id="_CeFnqrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttofile" name="aero.minova.rcp.rcp.commandparameter.exportto" value="FILE"/>
+                    </children>
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnq7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttoexcel" label="Als Excel-Datei" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png">
+                      <parameters xmi:id="_CeFnrLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttoexcel" name="aero.minova.rcp.rcp.commandparameter.exportto" value="EXCEL"/>
+                    </children>
+                  </menu>
+                  <parameters xmi:id="_CeFnrbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttodefault" name="aero.minova.rcp.rcp.commandparameter.exportto" value="CLIPBOARD"/>
+                </children>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnrrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.Print" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Print.Command/32x32.png" tooltip="@Action.Print" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
+                <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnr7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.resize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxubbdEeuZF8ZS2_h9rA"/>
+              </toolbar>
+            </children>
+            <children xsi:type="basic:Part" xmi:id="_CeFnsLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.formpreview" visible="false" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.Preview" label="@Form.Preview" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/PrintPreview/32x32.png" closeable="true"/>
+          </children>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_CeFnsbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_CeFnsrbyEeuZF8ZS2_h9rA">
+          <children xsi:type="basic:Part" xmi:id="_CeFnsrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPart" label="@Form.Details" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Information/32x32.png">
+            <handlers xmi:id="_CeFns7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_laMxurbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_CeFntbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_laMxv7bdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_CeFntrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_laMxwLbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_CeFnt7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_laMxwbbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_CeFnuLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.optimizedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeDetailHandler" command="_laMxsLbdEeuZF8ZS2_h9rA"/>
+            <toolbar xmi:id="_CeFnubbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.toolbar.5">
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnurbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveRecord.Command/32x32.png" tooltip="@Action.Save" command="_laMxurbdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnu7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="@Action.New" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/NewRecord.Command/32x32.png" tooltip="@Action.New" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnvLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.delete" label="@Action.Delete" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteRecord.Command/32x32.png" tooltip="@Action.Delete" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnvbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.Discard" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DiscardRecord.Command/32x32.png" tooltip="@Action.Discard" command="_laMxwLbdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnvrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.booking" visible="false" label="@Action.Book" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Book.Command/32x32.png" tooltip="@Action.Book" command="_laMxvrbdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnv7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.cancel" visible="false" label="@Action.Cancel" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/CancelBooking.Command/32x32.png" tooltip="@Action.Cancel" command="_laMxvLbdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.correct" visible="false" label="@Action.Correct" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/CorrectBooking.Command/32x32.png" tooltip="@Action.Correct" command="_laMxvbbdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.PrintDetail" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Print.Command/32x32.png" tooltip="@Action.PrintDetail" command="_laMxwbbdEeuZF8ZS2_h9rA"/>
+              <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxsLbdEeuZF8ZS2_h9rA"/>
+            </toolbar>
+          </children>
+        </children>
+      </children>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MW0NELcnEeuenNA9OtBfHw" featurename="menuContributions" parentElementId="xpath:/" positionInList="last">
+    <elements xsi:type="menu:MenuContribution" xmi:id="_Pg3HMLcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.menucontribution.file" positionInParent="before=additions" parentId="org.eclipse.ui.main.menu">
+      <persistedState key="persistState" value="false"/>
+      <children xsi:type="menu:Menu" xmi:id="_SIyywLcnEeuenNA9OtBfHw" elementId="org.eclipse.ui.file.menu" label="File">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywbcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handledmenuitem.preferencess" label="Preferences" command="_laMxs7bdEeuZF8ZS2_h9rA"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywrcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_laMxobbdEeuZF8ZS2_h9rA"/>
+      </children>
+    </elements>
+    <elements xsi:type="menu:MenuContribution" xmi:id="_zk8NIL3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.menucontribution.help" positionInParent="last" parentId="org.eclipse.ui.main.menu">
+      <persistedState key="persistState" value="false"/>
+      <children xsi:type="menu:Menu" xmi:id="_zk8NJL3wEeuFCqPujFNcsA" elementId="org.eclipse.ui.help.menu" label="Help">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_zk8NJb3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_laMxorbdEeuZF8ZS2_h9rA"/>
+      </children>
+    </elements>
+  </fragments>
+</fragment:ModelFragments>
