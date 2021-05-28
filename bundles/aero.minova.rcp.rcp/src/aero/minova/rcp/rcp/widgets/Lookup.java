@@ -575,4 +575,12 @@ public class Lookup extends Composite {
 		}
 		return true;
 	}
+
+	public List<LookupValue> getPopupValues() {
+		return popupValues;
+	}
+
+	public Table getTable() {
+		return table;
+	}
 }
