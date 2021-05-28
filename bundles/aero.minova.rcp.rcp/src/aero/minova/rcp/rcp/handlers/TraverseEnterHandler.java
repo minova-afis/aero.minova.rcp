@@ -34,6 +34,12 @@ import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
+/**
+ * Dieser Handler reagiert auf das Enter KeyBinding im DetailPart. Er sucht das nächste leere Pflichtfeld und selktiert es. Sobald kein leeres Feld mehr
+ * gefunden wird und der SaveDetailHandler Enabled ist, wird dieser ausgeführt.
+ * 
+ * @author bauer
+ */
 public class TraverseEnterHandler {
 
 	@Inject
@@ -52,9 +58,12 @@ public class TraverseEnterHandler {
 	@Execute
 	public void execute() {
 		MPart part = partService.getActivePart();
-		
+
+		// SaveDetailHandler holen
 		IHandler handler = commandService.getCommand("aero.minova.rcp.rcp.command.savedetail").getHandler();
+		// prüfen, ob der SaveDetailHandler enabled ist
 		if (handler.isEnabled()) {
+			// ParameterizedCommand des SaveDetailsHandlers erstellen und ausführen
 			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.savedetail", null);
 			handlerService.executeHandler(cmd);
 			return;
@@ -63,14 +72,16 @@ public class TraverseEnterHandler {
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
 			if (detail.getSelectedField() != null) {
+				// aktuell selektiertes Feld holen
 				Control focussedControl = detail.getSelectedField();
+				// nächstes Pflichtfeld suchen und fokussieren
 				getNextRequired(focussedControl, detail);
 			}
 		}
 	}
 
 	private MField getFieldFromControl(Control control, MDetail detail, List<MSection> sectionList) {
-		
+
 		MField selectedField = null;
 		for (MSection page : sectionList) {
 			List<MField> tabList = page.getTabList();
