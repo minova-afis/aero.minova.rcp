@@ -140,9 +140,15 @@ public class TraverseEnterHandler {
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
-			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
-			Lookup lookup = (Lookup) focussedControl;
-			lookup.closePopup();
+			focussedControl.setFocus();
+			if (focussedControl instanceof Lookup) {
+				Lookup lookup = (Lookup) focussedControl;
+				lookup.closePopup();
+				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
+				field.setValue(lv, true);
+			}
+			return;
 		}
 
 		// Wir prüfen ob die Preference EnterSelectsFirstRequired gesetzt ist.
