@@ -14,12 +14,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -30,8 +34,11 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -46,6 +53,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
@@ -71,6 +79,7 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
@@ -104,6 +113,12 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	EPartService partService;
+
+	@Inject
+	private ECommandService commandService;
+
+	@Inject
+	private EHandlerService handlerService;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
@@ -158,7 +173,8 @@ public class WFCDetailPart extends WFCFormPart {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			layoutSection(parent, wrapper);
+			layoutSection(parent, wrapper,context);
+
 		}
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -183,7 +199,8 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param headOrPage
 	 * @param traverseListener
 	 */
-	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage) {
+	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage,IEclipseContext context) {
+
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
@@ -195,7 +212,6 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
-
 
 		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
 		section.setLayoutData(headLayoutData);
@@ -210,6 +226,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Wir erstellen die HEAD Section des Details.
 		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
+		// Button erstellen, falls vorhanden
+		// createButton(composite, headOrPage, mSection, context);
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
@@ -218,6 +236,37 @@ public class WFCDetailPart extends WFCFormPart {
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
+	}
+
+	/**
+	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
+	 *
+	 * @param composite2
+	 * @param headOrPage
+	 * @param mSection
+	 */
+	private void createButton(Composite composite, HeadOrPageWrapper headOrPage, MSection mSection, IEclipseContext partContext) {
+		if (headOrPage.isHead) {
+			return;
+		}
+
+		Page page = (Page) headOrPage.headOrPage;
+		for (aero.minova.rcp.form.model.xsd.Button btn : page.getButton()) {
+			String btnLabel = btn.getText();
+			Button button = ButtonFactory.newButton(SWT.PUSH).text(btnLabel).image(ImageUtil.getImageDefault(btn.getIcon())).create(composite);
+			button.setData(Constants.CONTROL_ID, btn.getId());
+			button.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					Map<String, String> parameter = Map.of(//
+							Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingTimeWizard");
+
+					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+					handlerService.executeHandler(command);
+				}
+			});
+
+		}
 	}
 
 	/**

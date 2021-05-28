@@ -86,7 +86,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		delete.setEnabled(false);
 		// OK-Button
 		final Button ok = new Button(buttons, SWT.PUSH);
-		ok.setText(translationService.translate("@Close", null));
+		ok.setText(translationService.translate("@Action.Close", null));
 
 		// Die entsprechenden Listener anhängen
 		delete.addSelectionListener(new SelectionAdapter() {
