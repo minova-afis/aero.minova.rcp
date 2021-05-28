@@ -31,6 +31,7 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.util.DateUtil;
 
@@ -147,6 +148,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			endDate.setInvalidColor();
 		} else {
 			endDate.setCanBeValid(true);
+			endDate.setValidColor();
 		}
 		Value valueRe = new Value((double) renderedQty);
 		renderedQuantity.setValue(valueRe, true);

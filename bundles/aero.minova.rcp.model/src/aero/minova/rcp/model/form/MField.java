@@ -373,6 +373,10 @@ public abstract class MField {
 		updateCssClass(Constants.CSS_INVALID);
 	}
 
+	public void setValidColor() {
+		updateCssClass(Constants.CSS_STANDARD);
+	}
+
 	public boolean isCanBeValid() {
 		return canBeValid;
 	}
