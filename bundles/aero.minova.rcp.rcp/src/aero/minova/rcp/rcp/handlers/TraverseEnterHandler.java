@@ -143,6 +143,9 @@ public class TraverseEnterHandler {
 				if (focussedControl instanceof Lookup) {
 					Lookup lookup = (Lookup) focussedControl;
 					lookup.closePopup();
+					MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+					LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
+					field.setValue(lv, true);
 				}
 				return;
 			}
