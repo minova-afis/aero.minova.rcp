@@ -36,9 +36,22 @@ public class TraverseEnterHandler {
 	@Inject
 	EPartService partService;
 
+	@Inject
+	ECommandService commandService;
+
+	@Inject
+	EHandlerService handlerService;
+
 	@Execute
 	public void execute() {
 		MPart part = partService.getActivePart();
+		
+		IHandler handler = commandService.getCommand("aero.minova.rcp.rcp.command.savedetail").getHandler();
+		if (handler.isEnabled()) {
+			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.savedetail", null);
+			handlerService.executeHandler(cmd);
+			return;
+		}
 
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
