@@ -7,8 +7,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class NumberFieldUtil {
 
-	private NumberFieldUtil() {
-	}
+	private NumberFieldUtil() {}
 
 	/**
 	 * generiert aus den Properties
@@ -27,7 +26,7 @@ public class NumberFieldUtil {
 		Locale locale = (Locale) text.getData(FieldUtil.TRANSLATE_LOCALE);
 
 		int integer = 0;
-		if (maximum == Float.MAX_VALUE) {
+		if (maximum >= Float.MAX_VALUE) {
 			integer = 9 - decimals;
 		} else {
 			while (maximum > 1) {

@@ -356,7 +356,7 @@ public class TraverseListenerImpl implements TraverseListener {
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
-					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
+					if (field.isRequired() && field.getValue() == null && !field.isReadOnly() && field != selectedField) {
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
 						context.set(INIT_FIELD, tabList.get(tabList.indexOf(field)));
