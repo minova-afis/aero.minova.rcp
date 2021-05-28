@@ -14,6 +14,5 @@
 	<modules>
 		<module>aero.minova.rcp.feature</module>
 		<module>aero.minova.libs.feature</module>
-		<module>aero.minova.debug.feature</module>
 	</modules>
 </project>

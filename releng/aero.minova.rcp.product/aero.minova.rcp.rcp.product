@@ -108,7 +108,6 @@
       <feature id="org.eclipse.e4.rcp" installMode="root"/>
       <feature id="org.eclipse.emf.ecore" installMode="root"/>
       <feature id="org.eclipse.emf.common" installMode="root"/>
-      <feature id="aero.minova.debug.feature" installMode="root"/>
    </features>
 
    <configurations>
