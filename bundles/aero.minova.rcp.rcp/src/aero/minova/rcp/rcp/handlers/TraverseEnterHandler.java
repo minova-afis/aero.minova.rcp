@@ -49,27 +49,6 @@ public class TraverseEnterHandler {
 		}
 	}
 
-	@CanExecute
-	public boolean canExecute() {
-		boolean emptyRequiredField = false;
-		MPart part = partService.getActivePart();
-
-		if (part.getObject() instanceof WFCDetailPart) {
-			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
-
-			for (MSection section : detail.getPageList()) {
-				for (MField field : section.getTabList()) {
-					if (field.isRequired() && field.getValue() == null) {
-						emptyRequiredField = true;
-						return emptyRequiredField;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-	
 	private MField getFieldFromControl(Control control, MDetail detail, List<MSection> sectionList) {
 		
 		MField selectedField = null;
