@@ -7,7 +7,11 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.IHandler;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -17,6 +21,9 @@ import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.model.LookupValue;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MSection;
