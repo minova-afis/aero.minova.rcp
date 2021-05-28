@@ -94,21 +94,10 @@
       </children>
     </snippets>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">
-      <children xsi:type="menu:Menu" xmi:id="_6wlLisgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.file.menu" label="File">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_SW9u4PDoEeqcqsgp84_JDA" elementId="aero.minova.rcp.rcp.handledmenuitem.preferencess" label="Preferences" command="_WsjPEPDoEeqcqsgp84_JDA"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLjcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
-      </children>
-      <children xsi:type="menu:Menu" xmi:id="_6wlLjsgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.help.menu" label="Help">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_6wlLj8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
-      </children>
+      <children xsi:type="menu:MenuSeparator" xmi:id="_mrlfoL3xEeuFCqPujFNcsA" elementId="additions" visible="false"/>
     </mainMenu>
-    <trimBars xmi:id="_6wlLlcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.trimbar.top"/>
-    <trimBars xmi:id="__yOk0ObVEeq4PLO5TyETwg" elementId="aero.minova.rcp.rcp.trimbar.0" side="Bottom">
-      <children xsi:type="menu:ToolControl" xmi:id="_drXssOazEeq4PLO5TyETwg" elementId="aero.minova.rcp.rcp.toolcontrol.perspectivetoolbar" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PerspectiveControl">
-        <tags>Stretch</tags>
-      </children>
-    </trimBars>
   </children>
+
   <handlers xmi:id="_6wlLfcgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_6wlLfMgZEeSyMNYR5xypkQ"/>
   <handlers xmi:id="_6wlLh8gZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.handler.aboutCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AboutHandler" command="_6wlLhsgZEeSyMNYR5xypkQ"/>
   <handlers xmi:id="_P1E28LugEeqOjqZ1liG0LA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler" command="_4p5JwLufEeqOjqZ1liG0LA"/>
@@ -148,6 +137,9 @@
     <bindings xmi:id="_DbgsoBRdEeu_ctc0PBVTGw" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_AOXbMBRdEeu_ctc0PBVTGw">
       <tags>type:user</tags>
     </bindings>
+  <bindingTables xmi:id="_6wlLfsgZEeSyMNYR5xypkQ" elementId="aero.minova.rcp.rcp.bindingtable" bindingContext="_6wlLesgZEeSyMNYR5xypkQ">
+    <tags>type:user</tags>
+
   </bindingTables>
   <bindingTables xmi:id="_A4GiAL1REeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.bindingtable.enter" bindingContext="_Am1WYL1SEeugwfAmEQc7dA">
     <bindings xmi:id="_NBsKAL1REeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.keybinding.enter" keySequence="CR" command="_XHCCUL1REeugwfAmEQc7dA"/>
@@ -204,6 +196,7 @@
     <parameters xmi:id="_TZumEI1tEeuoh4vFDPXd3Q" elementId="aero.minova.rcp.rcp.commandparameter.criterianame" name="criteriaName" optional="false"/>
   </commands>
   <commands xmi:id="_XHCCUL1REeugwfAmEQc7dA" elementId="aero.minova.rcp.rcp.command.traverseenter" commandName="Traverse Enter"/>
+
   <addons xmi:id="_6wlLcsgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_6wlLc8gZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_6wlLdMgZEeSyMNYR5xypkQ" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
