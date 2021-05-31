@@ -24,6 +24,8 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 
+import aero.minova.rcp.rcp.util.UiUtil;
+
 /**
  * Dieser Dialog zeigt die bestehenden (Such-)Kriterien an und bietet die Möglichkeit, welche zu löschen
  */
@@ -151,6 +153,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 
 		// Die Shell packen und öffnen
 		shell.pack();
+		UiUtil.setLocation(shell, parentShell);
 		shell.open();
 
 		// Darauf warten, bis die Shell geschlossen wird

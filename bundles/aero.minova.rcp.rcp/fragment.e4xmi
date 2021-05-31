@@ -144,9 +144,6 @@
     <elements xsi:type="commands:Command" xmi:id="_laMxxbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.selectdetailpart" commandName="Select Detail Part">
       <persistedState key="persistState" value="false"/>
     </elements>
-    <elements xsi:type="commands:Command" xmi:id="_laMxxrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.saveas" commandName="SearchCriteriaSaveAs">
-      <persistedState key="persistState" value="false"/>
-    </elements>
     <elements xsi:type="commands:Command" xmi:id="_laMxx7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.searchCriteria" commandName="searchCriteriaCommand">
       <persistedState key="persistState" value="false"/>
       <parameters xmi:id="_laMxyLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.criteriaaction" name="criteriaAction" optional="false"/>
@@ -192,13 +189,12 @@
             <children xsi:type="basic:Part" xmi:id="_CeFng7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.search" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCSearchPart" label="@Form.Search" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SearchCriteria/32x32.png">
               <handlers xmi:id="_CeFnhLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.revertsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertSearchHandler" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnhbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
-              <handlers xmi:id="_CeFnhrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.saveas" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveAsHandler" command="_laMxxrbdEeuZF8ZS2_h9rA"/>
               <toolbar xmi:id="_CeFnh7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.toolbar.3">
                 <children xsi:type="menu:HandledToolItem" xmi:id="_CeFniLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.Reset" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DiscardSearchCriteria.Command/32x32.png" tooltip="@Action.Reset" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnibbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="@Action.DeleteLine" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.DeleteLine" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnirbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.SelectionCriteria.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" tooltip="@Action.SelectionCriteria.Save" command="_laMxx7bdEeuZF8ZS2_h9rA">
                   <menu xmi:id="_CeFni7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.menu.0">
-                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnjLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.commandsaves" label="Speichern unter..." iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" command="_laMxx7bdEeuZF8ZS2_h9rA">
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnjLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.commandsaves" label="@Action.SaveAs" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" command="_laMxx7bdEeuZF8ZS2_h9rA">
                       <parameters xmi:id="_CeFnjbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction_saveas" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="SAVE"/>
                     </children>
                     <children xsi:type="menu:DynamicMenuContribution" xmi:id="_CeFnjrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.dynamicmenucontribution.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaSaveHandler"/>

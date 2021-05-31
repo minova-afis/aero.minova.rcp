@@ -58,8 +58,7 @@ public class SearchCriteriaHandler {
 	private IEclipsePreferences prefs;
 
 	@Execute
-	public void execute(@Named(COMMAND_ACTION) final String action, @Optional @Named(COMMAND_NAME) String name,
-			final MPart part,
+	public void execute(@Named(COMMAND_ACTION) final String action, @Optional @Named(COMMAND_NAME) String name, final MPart part,
 			@Named(IServiceConstants.ACTIVE_SHELL) final Shell shell, final MPerspective perspective) {
 		Object wfcPart = part.getObject();
 		if (wfcPart != null) {
