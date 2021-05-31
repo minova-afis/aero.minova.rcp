@@ -70,10 +70,10 @@ public class LifeCycle {
 				}
 			} catch (Exception e) {
 				logger.error(e);
-				loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+				workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 			}
 		} else {
-			loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 		}
 
 		checkModelVersion(workspaceLocation);
@@ -136,7 +136,7 @@ public class LifeCycle {
 
 	}
 
-	private void loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
+	private URI loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
 		int returnCode;
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("ReturnCode: " + returnCode);
@@ -154,5 +154,7 @@ public class LifeCycle {
 				workspaceDialog.getConnection(), //
 				workspaceLocation);
 		dataService.setLogger(logger);
+
+		return workspaceLocation;
 	}
 }
