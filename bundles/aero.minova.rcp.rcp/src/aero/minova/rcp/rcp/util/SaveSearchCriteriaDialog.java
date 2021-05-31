@@ -79,8 +79,10 @@ public class SaveSearchCriteriaDialog extends Dialog {
 
 		// Auf Änderungen hören und den OK-Button entsprechend freigeben
 		text.addModifyListener(e -> {
-			final String c = prefs.get(tableName + text.getText() + ".table", null);
-			if (c == null) {
+			final String c = prefs.get(tableName + "." + text.getText() + ".table", null);
+			if (text.getText().isBlank()) {
+				ok.setEnabled(false);
+			} else if (c == null) {
 				infoLabel.setForeground(shell.getDisplay().getSystemColor(SWT.DEFAULT));
 				infoLabel.setText(translationService.translate("@SelectionCriteria.NameAvailable", null));
 				ok.setEnabled(true);
