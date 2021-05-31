@@ -1,19 +1,28 @@
 package aero.minova.rcp.workspace;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
@@ -67,8 +76,63 @@ public class LifeCycle {
 			loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 		}
 
+		checkModelVersion(workspaceLocation);
+
 		Manager manager = new Manager();
 		manager.postContextCreate(workbenchContext);
+
+	}
+
+	/**
+	 * Vergleicht die ModelVersion mit der Datei die in der Application mitgeliefert wird. Ist diese Datei in der Workspacelocation nicht vorhanden, müssen wir
+	 * in jedem Fall clearPersistedState aufrufen. Ist die Datei vorhanden aber hat eine zu alte Version gilt das Gleiche. Andernfalls machen nichts!
+	 */
+	private void checkModelVersion(URI workspaceLocation) {
+		// lese WorkSpaceFile aus der WorkSpaceLocation
+		String readString = null;
+		Path resolve = Path.of(workspaceLocation).resolve("ModelVersion.txt");
+		String modelVersionPlugin = checkModelVersionFromPlugin();
+
+		try {
+			readString = Files.readString(resolve);
+		} catch (IOException e) {
+			// es gibt keins oder kann nicht gelesen werden!
+		}
+		if (!modelVersionPlugin.equals(readString)) {
+			try {
+				Files.deleteIfExists(resolve);
+				Files.createFile(resolve);
+				// neue Versionsnummer schreiben
+				Files.writeString(resolve, modelVersionPlugin);
+				Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
+				showUserDialog();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Lädt aus dem aero.minova.rcp.workspaceplugin den Inhalt aus der ModelVersion.txt. Diese stellt die aktuelle Modelversion bereit.
+	 *
+	 * @return
+	 */
+	private String checkModelVersionFromPlugin() {
+		final Bundle bundle = FrameworkUtil.getBundle(LifeCycle.class);
+		final URL url = FileLocator.find(bundle, new org.eclipse.core.runtime.Path("ModelVersion.txt"), null);
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
+			String readOut = null;
+			readOut = in.readLine();
+			return readOut;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	private void showUserDialog() {
+		MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Reset Workspace",
+				"Due to structural changes, the application area to be loaded is reset!");
 
 	}
 
