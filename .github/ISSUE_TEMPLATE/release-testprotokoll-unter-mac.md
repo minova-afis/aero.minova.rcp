@@ -16,8 +16,11 @@ Getestet mit Server xxxxxx
 - [ ] Anmeldung an den Server durch manuelles eintragen der Anmeldedaten
 - [ ] Wiederholtes Anmelden mit einem Profil, bei dem das Passwort falsch eingetragen wurde und die Anwendung direkt darauf geschlossen wurde (siehe 2. Kommentar #388)
 
-### Gespeicherte Suchkriterien werden geladen
-- [ ] Funktioniert
+### Suchkriterien 
+- [ ] Default Suchkriterien werden beim Starten geladen
+- [ ] Mehrere Suchkriterien können unter verschiedenen Namen gespeichert werden
+- [ ] Nicht-Default Suchkriterien können geladen werden
+- [ ] Suchkriterien können gelöscht werden
 
 ## Keine Verbindung zum CAS möglich
 - [ ] Die angezeigte Fehlermeldung enthält Details zum Fehler
