@@ -92,7 +92,7 @@ public class SearchCriteriaHandler {
 					context.set("SaveRowConfig", true);// setzen der Konfiguration, verfügbar auch später.
 					context.set("ConfigName", name);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
-					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, Constants.SEARCHCRITERIA_DEFAULT);
+					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, name);
 					break;
 				case SAVE:
 					final SaveSearchCriteriaDialog sscd = new SaveSearchCriteriaDialog(shell, translationService, prefs, tableName);
