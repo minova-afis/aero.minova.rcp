@@ -40,7 +40,9 @@
     <elements xsi:type="commands:Handler" xmi:id="_ciLBDLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.searchCriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaHandler" command="_laMxx7bdEeuZF8ZS2_h9rA">
       <persistedState key="persistState" value="false"/>
     </elements>
-    <elements xsi:type="commands:Handler" xmi:id="_CeFntLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.newdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewDetailHandler" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
+    <elements xsi:type="commands:Handler" xmi:id="_CeFntLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.newdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.NewDetailHandler" command="_laMxu7bdEeuZF8ZS2_h9rA">
+      <persistedState key="persistState" value="false"/>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_laMxoLbdEeuZF8ZS2_h9rA" featurename="commands" parentElementId="xpath:/">
     <elements xsi:type="commands:Command" xmi:id="_laMxobbdEeuZF8ZS2_h9rA" elementId="org.eclipse.ui.file.exit" commandName="exitCommand">
@@ -196,11 +198,11 @@
                 <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnibbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="@Action.DeleteLine" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.DeleteLine" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
                 <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnirbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.SelectionCriteria.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" tooltip="@Action.SelectionCriteria.Save" command="_laMxx7bdEeuZF8ZS2_h9rA">
                   <menu xmi:id="_CeFni7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.menu.0">
-                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnjLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.commandsaves" label="Speichern unter..." iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png">
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnjLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.commandsaves" label="Speichern unter..." iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/SaveSearchCriteria.Command/32x32.png" command="_laMxx7bdEeuZF8ZS2_h9rA">
                       <parameters xmi:id="_CeFnjbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction_saveas" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="SAVE"/>
                     </children>
                     <children xsi:type="menu:DynamicMenuContribution" xmi:id="_CeFnjrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.dynamicmenucontribution.0" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SearchCriteriaSaveHandler"/>
-                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnj7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.search.edit" label="@Action.Delete" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.Delete">
+                    <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnj7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.search.edit" label="@Action.Delete" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.Delete" command="_laMxx7bdEeuZF8ZS2_h9rA">
                       <parameters xmi:id="_CeFnkLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criteriaaction_savedelete" name="aero.minova.rcp.rcp.commandparameter.criteriaaction" value="DELETE"/>
                       <parameters xmi:id="_CeFnkbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.criterianame_savedelete" name="aero.minova.rcp.rcp.commandparameter.criterianame"/>
                     </children>
@@ -278,13 +280,15 @@
     <elements xsi:type="menu:MenuContribution" xmi:id="_Pg3HMLcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.menucontribution.file" positionInParent="before=additions" parentId="org.eclipse.ui.main.menu">
       <persistedState key="persistState" value="false"/>
       <children xsi:type="menu:Menu" xmi:id="_SIyywLcnEeuenNA9OtBfHw" elementId="org.eclipse.ui.file.menu" label="File">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywbcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handledmenuitem.preferencess" label="Preferences" command="_laMxs7bdEeuZF8ZS2_h9rA"/>
+        <persistedState key="persistState" value="false"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywbcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handledmenuitem.preferences" label="Preferences" command="_laMxs7bdEeuZF8ZS2_h9rA"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywrcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_laMxobbdEeuZF8ZS2_h9rA"/>
       </children>
     </elements>
     <elements xsi:type="menu:MenuContribution" xmi:id="_zk8NIL3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.menucontribution.help" positionInParent="last" parentId="org.eclipse.ui.main.menu">
       <persistedState key="persistState" value="false"/>
       <children xsi:type="menu:Menu" xmi:id="_zk8NJL3wEeuFCqPujFNcsA" elementId="org.eclipse.ui.help.menu" label="Help">
+        <persistedState key="persistState" value="false"/>
         <children xsi:type="menu:HandledMenuItem" xmi:id="_zk8NJb3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_laMxorbdEeuZF8ZS2_h9rA"/>
       </children>
     </elements>
