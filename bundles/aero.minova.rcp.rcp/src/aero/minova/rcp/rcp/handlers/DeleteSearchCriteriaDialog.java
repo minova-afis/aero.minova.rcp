@@ -9,7 +9,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -34,9 +33,13 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 
 	private String tableName;
 
+	// ungleich 0 oder 1 um zu verhindern, dass Dialog sich schliesst
+	int BuTTON_DELETE_ID = 4;
 	private List<String> criterias;
 	private TableViewer viewer;
 	private Button delete;
+
+	private String criteriaName;
 
 	public DeleteSearchCriteriaDialog(Shell parent, TranslationService translationService, IEclipsePreferences prefs,
 			String tableName) {
@@ -60,6 +63,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		viewer.setLabelProvider(new LabelProvider());
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				StructuredSelection ss = (StructuredSelection) viewer.getSelection();
@@ -67,8 +71,8 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 				if (ss.isEmpty()) {
 					delete.setEnabled(false);
 				} else {
-					String string = ss.getFirstElement().toString();
-					delete.setEnabled(string != null);
+					criteriaName = ss.getFirstElement().toString();
+					delete.setEnabled(criteriaName != null);
 				}
 			}
 		});
@@ -84,7 +88,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 
-		delete = createButton(parent, 1, translationService.translate("@Action.Delete", null), false);
+		delete = createButton(parent, BuTTON_DELETE_ID, translationService.translate("@Action.Delete", null), false);
 		// Button zum Löschen
 		delete.setEnabled(false);
 
@@ -92,17 +96,15 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		delete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				IStructuredSelection ss = viewer.getStructuredSelection();
 				// Ist etwas ausgewählt?
-				if (!ss.isEmpty()) {
+				if (criteriaName != null && !criteriaName.isEmpty()) {
 					// Nach unserer Konvention löschen wir alle Prefs die dazu gehören
-					String criteriaName = ss.getFirstElement().toString();
-					criteriaName = tableName + "." + criteriaName;
-					prefs.remove(criteriaName + ".table");
-					prefs.remove(criteriaName + ".search.size");
-					prefs.remove(criteriaName + ".index.size");
-					prefs.remove(criteriaName + ".index.sortby");
-					prefs.remove(criteriaName + ".index.groupby");
+					String prefCriteriaName = tableName + "." + criteriaName;
+					prefs.remove(prefCriteriaName + ".table");
+					prefs.remove(prefCriteriaName + ".search.size");
+					prefs.remove(prefCriteriaName + ".index.size");
+					prefs.remove(prefCriteriaName + ".index.sortby");
+					prefs.remove(prefCriteriaName + ".index.groupby");
 					try {
 						prefs.flush();
 					} catch (BackingStoreException e1) {
@@ -110,13 +112,13 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 						e1.printStackTrace();
 					}
 
-					criterias.remove(ss.getFirstElement());
+					criterias.remove(criteriaName);
 					viewer.refresh();
 				}
 			}
 		});
 
-		createButton(parent, IDialogConstants.OK_ID, translationService.translate("@Action.Close", null), true);
+		createButton(parent, IDialogConstants.CANCEL_ID, translationService.translate("@Action.Close", null), true);
 
 	}
 
