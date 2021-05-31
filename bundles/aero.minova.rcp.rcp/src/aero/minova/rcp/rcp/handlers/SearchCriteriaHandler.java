@@ -81,8 +81,9 @@ public class SearchCriteriaHandler {
 					break;
 				case SAVE_DEFAULT:
 					// TODO Übersetzen!
-					MessageDialog md = new MessageDialog(shell, "Achtung", null, "Wollen Sie das DEFAULT Suchkriterium überschreiben?", MessageDialog.QUESTION,
-							0, "Ja", "Nein");
+					MessageDialog md = new MessageDialog(shell, translationService.translate("@Command.Warning", null), null,
+							translationService.translate("@SelectionCriteria.WillBeOverwritten", null),
+							MessageDialog.QUESTION, 0, translationService.translate("@Yes", null), translationService.translate("@No", null));
 					int openQuestion = md.open();
 					if (openQuestion != 0) {
 						break;
