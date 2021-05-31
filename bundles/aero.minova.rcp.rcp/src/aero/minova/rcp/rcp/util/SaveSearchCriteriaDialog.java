@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SaveSearchCriteriaDialog extends Dialog {
 
-
 	private String criteriaName = "DEFAULT";
 
 	private boolean saveWidths = true;
@@ -141,6 +140,7 @@ public class SaveSearchCriteriaDialog extends Dialog {
 		shell.pack();
 		shell.setSize(300, shell.getSize().y);
 		shell.layout();
+		UiUtil.setLocation(shell, parentShell);
 		shell.open();
 
 		text.setText(this.criteriaName);
@@ -161,4 +161,5 @@ public class SaveSearchCriteriaDialog extends Dialog {
 	public boolean getSaveWidths() {
 		return this.saveWidths;
 	}
+
 }
