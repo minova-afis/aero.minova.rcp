@@ -95,6 +95,22 @@ public class Lookup extends Composite {
 		text.addListener(SWT.Modify, createModifyListener());
 		text.addListener(SWT.FocusOut, createFocusOutListener());
 		text.addFocusListener(new FocusAdapter() {
+
+			// FocusLost aktualisiert das FieldValue sobald, das Field den Fokus verliert. Dabei ist die Art, wie der Fokus verloren geht egal (Mit Maus was
+			// anderes auswählen oder mit Enter oder Tab nächstes Feld selektieren).
+			//
+			// Grund: Beim KeyBinding mit Enter wird das Event, dass den Wert aktualisiert, nicht ausgeführt, daher wird mit FocusLost der Wert automatisch
+			// gesetzt, sobald das Feld verlassen wird.
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (popup.isVisible() && table.getSelectionIndex() != -1) {
+					MField field = (MField) ((Control) e.widget).getParent().getData(Constants.CONTROL_FIELD);
+					LookupValue lv = popupValues.get(table.getSelectionIndex());
+					text.setText(lv.keyText);
+					field.setValue(lv, true);
+				}
+			}
+
 			@Override
 			public void focusGained(FocusEvent e) {
 				text.selectAll();
@@ -559,4 +575,13 @@ public class Lookup extends Composite {
 		}
 		return true;
 	}
+
+	public List<LookupValue> getPopupValues() {
+		return popupValues;
+	}
+
+	public Table getTable() {
+		return table;
+	}
+
 }

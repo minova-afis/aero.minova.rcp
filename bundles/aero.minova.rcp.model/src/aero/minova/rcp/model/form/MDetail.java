@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Control;
+
 import aero.minova.rcp.model.helper.IHelper;
 
 /**
@@ -19,6 +21,8 @@ public class MDetail {
 	private List<MSection> pageList = new ArrayList<MSection>();
 
 	private IHelper helper;
+	
+	private Control selectedField;
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -86,5 +90,13 @@ public class MDetail {
 			}
 		}
 		return true;
+	}
+	
+	public Control getSelectedField() {
+		return selectedField;
+	}
+
+	public void setSelectedField(Control selectedField) {
+		this.selectedField = selectedField;
 	}
 }

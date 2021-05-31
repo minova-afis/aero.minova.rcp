@@ -8,6 +8,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.awt.event.FocusEvent;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,9 +36,9 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -77,8 +78,9 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.handlers.TraverseListenerImpl;
+
 import aero.minova.rcp.rcp.util.ImageUtil;
+
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
 @SuppressWarnings("restriction")
@@ -168,11 +170,11 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	private void layoutForm(Composite parent, IEclipseContext context) {
-		TraverseListener traverseListener = new TraverseListenerImpl(detail, locale, partService, context);
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			layoutSection(parent, wrapper, traverseListener, context);
+			layoutSection(parent, wrapper, context);
+
 		}
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -197,7 +199,9 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param headOrPage
 	 * @param traverseListener
 	 */
-	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, TraverseListener traverseListener, IEclipseContext context) {
+
+	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, IEclipseContext context) {
+
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
@@ -228,7 +232,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
-		sortTabList(mSection, traverseListener);
+		sortTabList(mSection);
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
@@ -273,7 +277,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param traverseListener
 	 *            der zuzuweisende TraverseListener für die Fields
 	 */
-	private void sortTabList(MSection mSection, TraverseListener traverseListener) {
+	private void sortTabList(MSection mSection) {
 		List<MField> tabList = mSection.getTabList();
 		Collections.sort(tabList, new Comparator<MField>() {
 
@@ -288,9 +292,7 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		});
-		for (MField field : tabList) {
-			((AbstractValueAccessor) field.getValueAccessor()).getControl().addTraverseListener(traverseListener);
-		}
+		
 		mSection.setTabList(tabList);
 	}
 
