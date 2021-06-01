@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
+import aero.minova.rcp.rcp.util.DeleteSearchCriteriaDialog;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import aero.minova.rcp.rcp.util.SaveSearchCriteriaDialog;
@@ -80,10 +81,9 @@ public class SearchCriteriaHandler {
 					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
-					// TODO Übersetzen!
 					MessageDialog md = new MessageDialog(shell, translationService.translate("@Command.Warning", null), null,
-							translationService.translate("@SelectionCriteria.WillBeOverwritten", null),
-							MessageDialog.QUESTION, 0, translationService.translate("@Yes", null), translationService.translate("@No", null));
+							translationService.translate("@SelectionCriteria.WillBeOverwritten", null), MessageDialog.QUESTION, 0,
+							translationService.translate("@Yes", null), translationService.translate("@No", null));
 					int openQuestion = md.open();
 					if (openQuestion != 0) {
 						break;
@@ -97,8 +97,12 @@ public class SearchCriteriaHandler {
 					break;
 				case SAVE:
 					final SaveSearchCriteriaDialog sscd = new SaveSearchCriteriaDialog(shell, translationService, prefs, tableName);
-					String criteriaName = sscd.open();
-					boolean saveColumnWidth = sscd.getSaveWidths();
+					sscd.open();
+					String criteriaName = sscd.getCriteriaName();
+					if (criteriaName == null) {
+						break;
+					}
+					boolean saveColumnWidth = true; // sscd.getSaveWidths();
 					context.set("SaveRowConfig", saveColumnWidth);// setzen der Konfiguration, verfügbar auch später.
 					context.set("ConfigName", criteriaName);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
