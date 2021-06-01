@@ -348,7 +348,10 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	@Optional
-	public void revertSearch(@UIEventTopic(Constants.BROKER_REVERTSEARCHTABLE) String id) {
+	public void revertSearch(@UIEventTopic(Constants.BROKER_REVERTSEARCHTABLE) MPart mPart) {
+		if (!mPart.equals(this.mPart)) {
+			return;
+		}
 		// Close Editor
 		if (natTable.getActiveCellEditor() != null) {
 			natTable.getActiveCellEditor().close();
@@ -378,11 +381,11 @@ public class WFCSearchPart extends WFCFormPart {
 		if (natTable.getActiveCellEditor() != null) {
 			natTable.getActiveCellEditor().close();
 		}
-		deleteSearchRow(rows2delete);
+		deleteSearchRows(rows2delete);
 		refreshNatTable();
 	}
 
-	public void deleteSearchRow(List<Row> rows) {
+	public void deleteSearchRows(List<Row> rows) {
 		// Löscht eine Liste von Objekten
 		sortedList.removeAll(rows);
 		getData().getRows().removeAll(rows);
