@@ -238,15 +238,15 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
 			}
 		} catch (ConnectException ex) {
-			throw new WorkspaceException("ConnectException");
+			throw new WorkspaceException("ConnectException " + ex.getMessage());
 		} catch (IOException e) {
-			throw new WorkspaceException("User oder Passwort nicht korrekt\n" + e.getMessage());
+			throw new WorkspaceException("IOException " + e.getMessage() + "\nUser or Password incorrect?");
 		} catch (InterruptedException i) {
-			throw new WorkspaceException("Try Again!");
+			throw new WorkspaceException("InterruptedException " + i.getMessage());
 		} catch (IllegalArgumentException i) {
-			throw new WorkspaceException("Ungültige URL!");
+			throw new WorkspaceException("IllegalArgumentException " + i.getMessage() + "\ninvalid URL?");
 		} catch (NullPointerException e) {
-			throw new WorkspaceException("Bitte Passwort nochmal eintragen!!!");
+			throw new WorkspaceException("NullPointerException " + e.getMessage() + "Please enter Password again");
 		}
 	}
 
