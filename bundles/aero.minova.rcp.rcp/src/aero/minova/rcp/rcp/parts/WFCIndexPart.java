@@ -186,12 +186,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
-		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
-
-		if (autoLoadIndex) {
-			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
-			handlerService.executeHandler(cmd);
-		}
+		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);
 	}
 
 	@Inject
@@ -242,6 +237,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
+		loadPrefs(name, true);
+	}
+
+	public void loadPrefs(String name, boolean loadIndex) {
 		// Spaltenanordung und -breite
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".index.size", null);
@@ -298,6 +297,11 @@ public class WFCIndexPart extends WFCFormPart {
 			} else {
 				expandGroups("");
 			}
+		}
+
+		if (loadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+			handlerService.executeHandler(cmd);
 		}
 	}
 
