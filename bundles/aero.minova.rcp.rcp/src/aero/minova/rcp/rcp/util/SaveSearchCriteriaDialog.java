@@ -79,8 +79,6 @@ public class SaveSearchCriteriaDialog extends Dialog {
 		text.setText(this.criteriaName);
 		text.selectAll();
 
-		infoLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
 		return parent;
 	}
 
