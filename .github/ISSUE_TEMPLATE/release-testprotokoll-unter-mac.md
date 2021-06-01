@@ -15,9 +15,13 @@ Getestet mit Server xxxxxx
 - [ ]  Anmeldung an den Server mittles Default - Profil
 - [ ] Anmeldung an den Server durch manuelles eintragen der Anmeldedaten
 - [ ] Wiederholtes Anmelden mit einem Profil, bei dem das Passwort falsch eingetragen wurde und die Anwendung direkt darauf geschlossen wurde (siehe 2. Kommentar #388)
+- [ ] Wenn sich die ModelVersion geändert hat wird die workbench.xmi mit entsprechender Warnung gelöscht (Anwendung startet wie mit -clearPersistedState)
 
-### Gespeicherte Suchkriterien werden geladen
-- [ ] Funktioniert
+### Suchkriterien 
+- [ ] Default Suchkriterien werden beim Starten geladen
+- [ ] Mehrere Suchkriterien können unter verschiedenen Namen gespeichert werden
+- [ ] Nicht-Default Suchkriterien können geladen werden
+- [ ] Suchkriterien können gelöscht werden
 
 ## Keine Verbindung zum CAS möglich
 - [ ] Die angezeigte Fehlermeldung enthält Details zum Fehler
@@ -57,7 +61,18 @@ Getestet mit Server xxxxxx
 - [ ] Bei einem Neustart sind in der Leiste die gleichen Perspektiven wieder vorhanden
 - [ ] Perspektiven können über Rechtsklick geschlossen werden (inklusive der letzten)
 - [ ] Es wird unterstützt, dass Masken in der application.mdi unterschiedliche Dateinamen und IDs haben (siehe #487)
+- [ ] Perspektiven können angeheftet werden und bleiben in der Leiste, wenn man sie schließt
+- [ ] Angeheftete und dann geschlossene Perspektiven können wieder geöffnet werden
 
+## Keybindings
+Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktionieren.
+- [ ] cmd+Q: Anwendung beenden
+- [ ] cmd+Z: Undo (in Textfeldern)
+- [ ] cmd+S: Detail speichern (nur wenn Detailpart im Fokus ist)
+- [ ] cmd+N: neues Detail
+- [ ] F4: Search Part auswählen
+- [ ] F5: Index neu laden
+- [ ] F6: Detail Part auswählen
 
 # Tests für CTS VG Eibelstadt
  

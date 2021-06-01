@@ -2,17 +2,18 @@ package aero.minova.rcp.rcp.util;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.widgets.ButtonFactory;
+import org.eclipse.jface.widgets.LabelFactory;
+import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -22,7 +23,6 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SaveSearchCriteriaDialog extends Dialog {
 
-
 	private String criteriaName = "DEFAULT";
 
 	private boolean saveWidths = true;
@@ -30,7 +30,13 @@ public class SaveSearchCriteriaDialog extends Dialog {
 	private TranslationService translationService;
 	private IEclipsePreferences prefs;
 
+	// ungleich 0 oder 1 um zu verhindern, dass Dialog sich schliesst
+	private static final int BUTTON_OK_ID = 4;
+	private static final int BUTTON_CANCEL_ID = 5;
 	private String tableName;
+
+	private Button ok;
+	private Text text;
 
 	public SaveSearchCriteriaDialog(final Shell shell, TranslationService translationService, IEclipsePreferences prefs, String tableName) {
 		super(shell);
@@ -39,120 +45,70 @@ public class SaveSearchCriteriaDialog extends Dialog {
 		this.tableName = tableName;
 	}
 
-	public String open() {
-		// Die Eltern-Shell
-		final Shell parentShell = getParent();
-		// Wir erzeugen unsere Shell für den Dialog
-		final Shell shell = new Shell(parentShell, /* SWT.DIALOG_TRIM | SWT.RESIZE | */SWT.TITLE | SWT.APPLICATION_MODAL);
-		// und setzen ein Layout
-		shell.setLayout(new FillLayout());
+	@Override
+	protected Control createDialogArea(Composite dialogParent) {
+		Composite parent = (Composite) super.createDialogArea(dialogParent);
 
-		// Den Titel aus den Messages holen
-		shell.setText(translationService.translate("@EnterName", null));
+		Label infoLabel = LabelFactory.newLabel(SWT.BORDER).text("").layoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false)).create(parent);
 
-		// Das Composite, auf das die anderen Widgets gepackt werden
-		final Composite parent = new Composite(shell, SWT.BORDER | SWT.FILL);
-		// Ein-spaltig
-		parent.setLayout(new GridLayout(1, true));
+		text = TextFactory.newText(SWT.BORDER).layoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false)).create(parent);
 
-		final Label infoLabel = new Label(parent, SWT.BORDER);
-		infoLabel.setText("");
-
-		final GridData infoGd = new GridData(SWT.FILL, SWT.DEFAULT, true, false);
-		infoLabel.setLayoutData(infoGd);
-
-		final Text text = new Text(parent, SWT.BORDER);
-
-		final Button btnSaveWidths = new Button(parent, SWT.CHECK);
-		btnSaveWidths.setText(translationService.translate("@SelectionCriteria.SaveColumnWidths", null));
+		Button btnSaveWidths = ButtonFactory.newButton(SWT.CHECK).text(translationService.translate("@SelectionCriteria.SaveColumnWidths", null))
+				.onSelect(e -> SaveSearchCriteriaDialog.this.saveWidths = ((Button) e.widget).getSelection()).create(parent);
 		btnSaveWidths.setSelection(true);
 
-		final GridData textGd = new GridData(SWT.FILL, SWT.DEFAULT, true, false);
-		text.setLayoutData(textGd);
+		// Auf Änderungen hören und den OK-Button entsprechend freigeben
+		text.addModifyListener(e -> {
+			final String c = prefs.get(tableName + "." + text.getText() + ".table", null);
+			boolean enabled = false;
+			if (text.getText().isBlank()) {
+				enabled = false;
+			} else if (c == null) {
+				infoLabel.setForeground(Display.getCurrent().getSystemColor(SWT.DEFAULT));
+				infoLabel.setText(translationService.translate("@SelectionCriteria.NameAvailable", null));
+				enabled = true;
+			} else {
+				infoLabel.setText(translationService.translate("@SelectionCriteria.WillBeOverwritten", null));
+				infoLabel.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				enabled = true;
+			}
+			if (ok != null) {
+				ok.setEnabled(enabled);
+			}
+		});
+		text.setText(this.criteriaName);
+		text.selectAll();
 
-		// Composite mit den Buttons
-		final Composite buttons = new Composite(parent, SWT.NONE | SWT.RIGHT | SWT.BOTTOM);
-		buttons.setLayout(new GridLayout(2, true));
+		return parent;
+	}
 
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
 		// Button zum Canceln
-		final Button cancel = new Button(buttons, SWT.PUSH);
-		cancel.setText(translationService.translate("@Abort", null)); // das ist eigentlich Cancel, aber die so bezeichnete messages-property bezieht sich auf
-																		// Storno :-/
-		// OK-Button
-		final Button ok = new Button(buttons, SWT.PUSH);
-		ok.setText(translationService.translate("@OK", null));
-
-		// Die entsprechenden Listener anhängen
-		cancel.addSelectionListener(new SelectionListener() {
+		Button cancel = createButton(parent, BUTTON_CANCEL_ID, translationService.translate("@Abort", null), false);
+		cancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				SaveSearchCriteriaDialog.this.criteriaName = null;
-				shell.close();
+				close();
 			}
-
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent e) {/* DO NOTHING */}
 		});
 
-		ok.addSelectionListener(new SelectionListener() {
+		// Button zum Bestätigen
+		ok = createButton(parent, BUTTON_OK_ID, translationService.translate("@OK", null), true);
+		ok.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				// Ist etwas ausgewählt?
 				SaveSearchCriteriaDialog.this.criteriaName = text.getText();
-				// OK schließt immer die Shell
-				shell.close();
-			}
-
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent e) {/* DO NOTHING */}
-		});
-
-		btnSaveWidths.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				SaveSearchCriteriaDialog.this.saveWidths = btnSaveWidths.getSelection();
-			}
-
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent e) {/* DO NOTHING */}
-		});
-
-		// Auf Änderungen hören und den OK-Button entsprechend freigeben
-		text.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				final String c = prefs.get(tableName + text.getText() + ".table", null);
-				if (c == null) {
-					infoLabel.setForeground(shell.getDisplay().getSystemColor(SWT.DEFAULT));
-					infoLabel.setText(translationService.translate("@SelectionCriteria.NameAvailable", null));
-					ok.setEnabled(true);
-				} else {
-					infoLabel.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_RED));
-					infoLabel.setText(translationService.translate("@SelectionCriteria.WillBeOverwritten", null));
-					ok.setEnabled(true);
-				}
+				close();
 			}
 		});
+	}
 
-		shell.setDefaultButton(ok);
-
-		// Die Shell packen und öffnen
-		shell.pack();
-		shell.setSize(300, shell.getSize().y);
-		shell.layout();
-		shell.open();
-
-		text.setText(this.criteriaName);
-		text.setSelection(0, text.getText().length());
-
-		// Darauf warten, bis die Shell geschlossen wird
-		while (!shell.isDisposed()) {
-			if (!parentShell.getDisplay().readAndDispatch()) {
-				parentShell.getDisplay().sleep();
-			}
-		}
-		return this.criteriaName;
+	@Override
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		shell.setText(translationService.translate("@SelectionCriteria.EnterName", null));
 	}
 
 	/**
@@ -160,5 +116,9 @@ public class SaveSearchCriteriaDialog extends Dialog {
 	 */
 	public boolean getSaveWidths() {
 		return this.saveWidths;
+	}
+
+	public String getCriteriaName() {
+		return criteriaName;
 	}
 }

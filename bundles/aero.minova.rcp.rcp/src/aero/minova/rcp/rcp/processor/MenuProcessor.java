@@ -3,10 +3,10 @@ package aero.minova.rcp.rcp.processor;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -31,22 +32,23 @@ public class MenuProcessor {
 
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
-	private MMenu menu;
 	private EModelService modelService;
 	private MApplication mApplication;
 
 	private String usingLocalMenu = "There was no response from the server. Application data may be out of date. Consider checking your connection and restarting the application.";
 	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
+	private int menuId = 0;
 
 	@Inject
-	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService, IDataService dataService, MApplication mApplication) {
+	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication) {
 
-		this.menu = menu;
 		this.modelService = modelService;
 		this.mApplication = mApplication;
 
 		try {
-			dataService.getHashedFile(MDI_FILE_NAME).thenAccept(this::processXML);
+			CompletableFuture<String> exceptionally = dataService.getHashedFile(MDI_FILE_NAME);
+			String void1 = exceptionally.get();
+			processXML(void1);
 		} catch (Exception e) {
 			handleNoMDI(dataService);
 		}
@@ -59,6 +61,13 @@ public class MenuProcessor {
 
 	private void processXML(String fileContent) {
 		Main mainMDI = null;
+
+		MMenuContribution menuContribution = modelService.createModelElement(MMenuContribution.class);
+		menuContribution.setParentId("org.eclipse.ui.main.menu");
+		menuContribution.setPositionInParent("after=additions");
+		menuContribution.setElementId("generated" + menuId++);
+		menuContribution.getPersistedState().put("persistState", "false");
+		mApplication.getMenuContributions().add(menuContribution);
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
 
@@ -74,14 +83,15 @@ public class MenuProcessor {
 
 				for (Object object : menuOrEntry) {
 					if (object instanceof MenuType) {
-						createMenu((MenuType) object, menu, actionsMDI, modelService, mApplication);
+						MMenu createMenu = createMenu((MenuType) object, actionsMDI, modelService, mApplication);
+						menuContribution.getChildren().add(createMenu);
 					}
 				}
 			}
+
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -93,10 +103,11 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
+	private MMenu createMenu(MenuType menu_MDI, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
+
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
 		menuGen.getPersistedState().put("persistState", String.valueOf(false));
-
+		menuGen.setElementId("generated" + menuId++);
 		menuGen.setLabel(menu_MDI.getText());
 
 		// TODO Sortierung des MENUS aus der MDI beachten!!!
@@ -104,13 +115,17 @@ public class MenuProcessor {
 			for (Object object : menu_MDI.getEntryOrMenu()) {
 				if (object instanceof Entry) {
 					Entry entryMDI = (Entry) object;
-					String id2 = ((Action) entryMDI.getId()).getId();
-					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
-					menuGen.getChildren().add(handledMenuItem);
-					menu.getChildren().add(menuGen);
+					if (!entryMDI.getType().equals("separator")) {
+						String id2 = ((Action) entryMDI.getId()).getId();
+						MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
+						menuGen.getChildren().add(handledMenuItem);
+					}
+
 				}
 			}
 		}
+		return menuGen;
+
 	}
 
 	/**
