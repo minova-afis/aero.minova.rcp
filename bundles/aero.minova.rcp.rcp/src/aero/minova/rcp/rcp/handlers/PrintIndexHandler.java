@@ -99,21 +99,27 @@ public class PrintIndexHandler {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DISABLE_PREVIEW)
 	public boolean disablePreview;
 
-	private boolean canExecute;
+	private boolean pdfFolderExists;
 
 	@PostConstruct
 	public void downloadPFDZip() {
 		try {
 			dataService.getHashedZip("PDF.zip");
-			canExecute = true;
 		} catch (Exception e) {}
 		File pdfFolder = dataService.getStoragePath().resolve("PDF/").toFile();
-		canExecute = pdfFolder.exists() ? true : false;
+		pdfFolderExists = pdfFolder.exists();
 	}
 
 	@CanExecute
-	public boolean canExecute() {
-		return canExecute;
+	public boolean canExecute(MPart mpart) {
+		Object o = mpart.getObject();
+		boolean hasRows = false;
+		if (o instanceof WFCIndexPart) {
+			@SuppressWarnings("unchecked")
+			List<Row> dataList = ((WFCIndexPart) o).getBodyLayerStack().getSortedList();
+			hasRows = !dataList.isEmpty();
+		}
+		return pdfFolderExists && hasRows;
 	}
 
 	@Execute
