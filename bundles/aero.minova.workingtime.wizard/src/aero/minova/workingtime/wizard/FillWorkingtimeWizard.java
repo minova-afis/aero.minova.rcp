@@ -34,6 +34,7 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 	}
 
 	public void sendFillRequest() {
-		dataService.getDetailDataAsync(getDataTable().getName(), getDataTable());
+		Table dataTable = getDataTable();
+		dataService.getDetailDataAsync(dataTable.getName(), dataTable);
 	}
 }

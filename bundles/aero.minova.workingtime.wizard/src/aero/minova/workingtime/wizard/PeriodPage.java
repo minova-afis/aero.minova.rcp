@@ -78,7 +78,7 @@ public class PeriodPage extends WizardPage {
 
 	public Table getDataTable() {
 
-		TableBuilder tb = TableBuilder.newTable("spWorkingTimeFill");
+		TableBuilder tb = TableBuilder.newTable("xpcasWorkingTimeFill");
 		tb = tb.withColumn("EmployeeKey", DataType.INTEGER)//
 				.withColumn("ServiceKey", DataType.INTEGER)//
 				.withColumn("Description", DataType.STRING)//
