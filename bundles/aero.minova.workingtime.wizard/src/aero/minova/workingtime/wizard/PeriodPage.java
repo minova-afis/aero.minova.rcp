@@ -60,8 +60,9 @@ public class PeriodPage extends WizardPage {
 	private MField untilField;
 	private MField descriptionField;
 
-	protected PeriodPage(String pageName) {
-		super(pageName);
+	protected PeriodPage(String pageName, String pageTitle, String pageDescription) {
+		super(pageName, pageTitle, null);
+		setDescription(pageDescription);
 	}
 
 	public void setMPerspective(MPerspective mPerspective) {
