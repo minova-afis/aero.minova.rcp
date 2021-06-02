@@ -15,7 +15,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
@@ -35,9 +34,6 @@ public class LoadIndexHandler {
 
 	@Inject
 	private IDataService dataService;
-
-	@Inject
-	private EPartService partService;
 
 	volatile boolean loading = false;
 
@@ -67,14 +63,6 @@ public class LoadIndexHandler {
 			} else {
 				broker.post(Constants.BROKER_LOADINDEXTABLE, Map.of(perspective, t));
 			}
-			sync.asyncExec(() -> {
-				List<MPart> parts = model.findElements(perspective, PartsID.INDEX_PART, MPart.class);
-				if (!parts.isEmpty()) {
-					partService.activate(parts.get(0));
-				} else {
-					System.out.println("keine aktiven Parts");
-				}
-			});
 		});
 
 		tableFuture.exceptionally(ex -> {
