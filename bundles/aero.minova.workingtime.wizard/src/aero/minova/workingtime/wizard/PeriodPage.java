@@ -45,6 +45,7 @@ import aero.minova.rcp.rcp.parts.WFCDetailPart;
 public class PeriodPage extends WizardPage {
 
 	private MDetail mDetail = new MDetail();
+	private MDetail originalMDetail;
 	private MPart mPart;
 	private MPerspective mPerspective;
 	private TranslationService translationService;

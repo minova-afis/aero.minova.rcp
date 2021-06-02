@@ -33,10 +33,10 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -223,7 +225,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Wir erstellen die HEAD Section des Details.
 		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
 		// Button erstellen, falls vorhanden
-		createButton(composite, headOrPage, mSection, context);
+		createButton(composite, headOrPage, mSection, context, section);
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
@@ -239,18 +241,25 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param composite2
 	 * @param headOrPage
 	 * @param mSection
+	 * @param section
 	 */
-	private void createButton(Composite composite, HeadOrPageWrapper headOrPage, MSection mSection, IEclipseContext partContext) {
+	private void createButton(Composite composite, HeadOrPageWrapper headOrPage, MSection mSection, IEclipseContext partContext, Section section) {
 		if (headOrPage.isHead) {
 			return;
 		}
 
+		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
+
 		Page page = (Page) headOrPage.headOrPage;
 		for (aero.minova.rcp.form.model.xsd.Button btn : page.getButton()) {
-			String btnLabel = btn.getText();
-			Button button = ButtonFactory.newButton(SWT.PUSH).text(btnLabel).image(ImageUtil.getImageDefault(btn.getIcon())).create(composite);
-			button.setData(Constants.CONTROL_ID, btn.getId());
-			button.addSelectionListener(new SelectionAdapter() {
+			final ToolItem item = new ToolItem(bar, SWT.PUSH);
+			item.setData(btn);
+			item.setEnabled(btn.isEnabled());
+			if (btn.getText() != null) {
+				item.setText(btn.getText());
+				item.setToolTipText(btn.getText());
+			}
+			item.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					Map<String, String> parameter = Map.of(//
@@ -261,7 +270,13 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			});
 
+			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+				final Image buttonImage = ImageUtil.getImageDefault(btn.getIcon());
+				item.setImage(buttonImage);
+			}
 		}
+		section.setTextClient(bar);
+
 	}
 
 	/**
