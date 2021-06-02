@@ -16,7 +16,7 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 	public void addPages() {
 		// wird von WizardDialog automatisch aufgerufen
 		super.setWindowTitle(translationService.translate("@Workingtime.FillWizard.Title", null));
-		PeriodPage periodPage = new PeriodPage(translationService.translate("@Workingtime.FillWizard.Pagename", null));
+		PeriodPage periodPage = new PeriodPage("PeriodPage");
 		periodPage.setMPerspective(mPerspective);
 		periodPage.setTranslationService(translationService);
 		periodPage.setmPart(mPart);
@@ -31,5 +31,9 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 		} else {
 			return null;
 		}
+	}
+
+	public void sendFillRequest() {
+		dataService.getDetailDataAsync(getDataTable().getName(), getDataTable());
 	}
 }

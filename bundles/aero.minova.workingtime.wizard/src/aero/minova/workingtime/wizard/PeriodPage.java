@@ -23,7 +23,11 @@ import aero.minova.rcp.form.model.xsd.Detail;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.builder.RowBuilder;
+import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.ModelToViewModel;
@@ -49,6 +53,12 @@ public class PeriodPage extends WizardPage {
 	private Control from;
 	private Control until;
 	private Control description;
+	private Map<String, Field> fieldMap;
+	private MField employeeField;
+	private MField serviceField;
+	private MField fromField;
+	private MField untilField;
+	private MField descriptionField;
 
 	protected PeriodPage(String pageName) {
 		super(pageName);
@@ -67,7 +77,26 @@ public class PeriodPage extends WizardPage {
 	}
 
 	public Table getDataTable() {
-		return null;
+
+		TableBuilder tb = TableBuilder.newTable("spWorkingTimeFill");
+		tb = tb.withColumn("EmployeeKey", DataType.INTEGER)//
+				.withColumn("ServiceKey", DataType.INTEGER)//
+				.withColumn("Description", DataType.STRING)//
+				.withColumn("StartDate", DataType.INSTANT)//
+				.withColumn("EndDate", DataType.INSTANT);//
+
+		// Row mit Daten füllen
+		RowBuilder rb = RowBuilder.newRow();
+		rb.withValue(employeeField.getValue() != null ? employeeField.getValue().getValue() : null);
+		rb.withValue(serviceField.getValue() != null ? serviceField.getValue().getValue() : null);
+		rb.withValue(descriptionField.getValue() != null ? descriptionField.getValue().getValue() : null);
+		rb.withValue(fromField.getValue() != null ? fromField.getValue().getValue() : null);
+		rb.withValue(untilField.getValue() != null ? untilField.getValue().getValue() : null);
+
+		Table t = tb.create();
+		Row r = rb.create();
+		t.addRow(r);
+		return t;
 	}
 
 	private void translate(Composite composite) {
@@ -106,7 +135,7 @@ public class PeriodPage extends WizardPage {
 		composite.setLayout(new FormLayout());
 
 		// Fields sammeln, damit neue MFields erstellt werden können
-		Map<String, Field> fieldMap = new HashMap<>();
+		fieldMap = new HashMap<>();
 		WFCDetailPart wfcDetailPart = (WFCDetailPart) mPart.getObject();
 		Detail detail = wfcDetailPart.getForm(null).getDetail();
 		List<Object> headAndPageList = detail.getHeadAndPage();
@@ -123,27 +152,27 @@ public class PeriodPage extends WizardPage {
 		}
 
 		// Neue MFields und Controls erstellen (Damit echter DetailPart nicht beinflusst wird)
-		MField employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
+		employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
 		employeeField.setDetail(mDetail);
 		employee = LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
 
-		MField serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
+		serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
 		serviceField.setDetail(mDetail);
 		service = LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
 
-		MField fromField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
+		fromField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		fromField.setName("from");
 		fromField.setLabel("@TimeFrom");
 		fromField.setDetail(mDetail);
 		from = ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
 
-		MField untilField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
+		untilField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		untilField.setName("until");
 		untilField.setLabel("@TimeUntil");
 		untilField.setDetail(mDetail);
 		until = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
 
-		MField descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
+		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
 		descriptionField.setDetail(mDetail);
 		description = TextField.create(composite, descriptionField, 4, 0, mPerspective);
 
