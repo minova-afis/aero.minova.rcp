@@ -297,6 +297,7 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
+			log("CAS Answer Detail Data:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
@@ -324,7 +325,6 @@ public class DataService implements IDataService {
 					return null;
 				}
 			}
-			log("CAS Answer Detail Data:\n" + t.body());
 			return fromJson;
 		});
 
