@@ -8,7 +8,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
-import java.awt.event.FocusEvent;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +35,6 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -70,7 +68,6 @@ import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -78,9 +75,7 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-
 import aero.minova.rcp.rcp.util.ImageUtil;
-
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
 @SuppressWarnings("restriction")
@@ -228,7 +223,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Wir erstellen die HEAD Section des Details.
 		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
 		// Button erstellen, falls vorhanden
-		// createButton(composite, headOrPage, mSection, context);
+		createButton(composite, headOrPage, mSection, context);
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
@@ -292,7 +287,7 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		});
-		
+
 		mSection.setTabList(tabList);
 	}
 

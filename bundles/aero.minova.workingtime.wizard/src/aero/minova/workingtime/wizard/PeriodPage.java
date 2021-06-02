@@ -3,10 +3,14 @@ package aero.minova.workingtime.wizard;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
@@ -15,11 +19,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import aero.minova.rcp.form.model.xsd.Detail;
+import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Head;
+import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
 /**
  * Wizard-Page mit allen Daten zum Arbeitszeit auffüllen
@@ -29,16 +40,18 @@ import aero.minova.rcp.rcp.fields.TextField;
  */
 public class PeriodPage extends WizardPage {
 
-	protected PeriodPage(String pageName) {
-		super(pageName);
-	}
-
-	private MDetail mDetail;
+	private MDetail mDetail = new MDetail();
+	private MPart mPart;
 	private MPerspective mPerspective;
 	private TranslationService translationService;
+	private Control employee;
+	private Control service;
+	private Control from;
+	private Control until;
+	private Control description;
 
-	public void setMDetail(MDetail mDetail) {
-		this.mDetail = mDetail;
+	protected PeriodPage(String pageName) {
+		super(pageName);
 	}
 
 	public void setMPerspective(MPerspective mPerspective) {
@@ -47,6 +60,10 @@ public class PeriodPage extends WizardPage {
 
 	public void setTranslationService(TranslationService translationService) {
 		this.translationService = translationService;
+	}
+
+	public void setmPart(MPart mPart) {
+		this.mPart = mPart;
 	}
 
 	public Table getDataTable() {
@@ -87,14 +104,68 @@ public class PeriodPage extends WizardPage {
 	@Override
 	public void createControl(Composite composite) {
 		composite.setLayout(new FormLayout());
-		LookupField.create(composite, mDetail.getField("EmployeeKey"), 0, 0, Locale.getDefault(), mPerspective);
-		LookupField.create(composite, mDetail.getField("ServiceKey"), 1, 0, Locale.getDefault(), mPerspective);
-		ShortDateField.create(composite, mDetail.getField("BookingDate"), 2, 0, Locale.getDefault(), "UTC", mPerspective);
-		ShortDateField.create(composite, mDetail.getField("BookingDate"), 3, 0, Locale.getDefault(), "UTC", mPerspective);
-		TextField.create(composite, mDetail.getField("Description"), 4, 0, mPerspective);
+
+		// Fields sammeln, damit neue MFields erstellt werden können
+		Map<String, Field> fieldMap = new HashMap<>();
+		WFCDetailPart wfcDetailPart = (WFCDetailPart) mPart.getObject();
+		Detail detail = wfcDetailPart.getForm(null).getDetail();
+		List<Object> headAndPageList = detail.getHeadAndPage();
+		for (Object headOrPage : headAndPageList) {
+			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
+			for (Object fieldOrGrid : wrapper.getFieldOrGrid()) {
+				if ((fieldOrGrid instanceof Field)) {
+					Field field = (Field) fieldOrGrid;
+					MField mField = ModelToViewModel.convert(field);
+					mDetail.putField(mField);
+					fieldMap.put(field.getName(), field);
+				}
+			}
+		}
+
+		// Neue MFields und Controls erstellen (Damit echter DetailPart nicht beinflusst wird)
+		MField employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
+		employeeField.setDetail(mDetail);
+		employee = LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
+
+		MField serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
+		serviceField.setDetail(mDetail);
+		service = LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
+
+		MField fromField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
+		fromField.setName("from");
+		fromField.setLabel("@TimeFrom");
+		fromField.setDetail(mDetail);
+		from = ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
+
+		MField untilField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
+		untilField.setName("until");
+		untilField.setLabel("@TimeUntil");
+		untilField.setDetail(mDetail);
+		until = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+
+		MField descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
+		descriptionField.setDetail(mDetail);
+		description = TextField.create(composite, descriptionField, 4, 0, mPerspective);
+
 		translate(composite);
 		composite.layout();
 		super.setControl(composite);
 	}
 
+	private static class HeadOrPageWrapper {
+		private Object headOrPage;
+		private boolean isHead;
+
+		public HeadOrPageWrapper(Object headOrPage) {
+			this.headOrPage = headOrPage;
+			isHead = headOrPage instanceof Head;
+		}
+
+		public List<Object> getFieldOrGrid() {
+			if (isHead) {
+				return ((Head) headOrPage).getFieldOrGrid();
+			}
+			return ((Page) headOrPage).getFieldOrGrid();
+		}
+	}
 }

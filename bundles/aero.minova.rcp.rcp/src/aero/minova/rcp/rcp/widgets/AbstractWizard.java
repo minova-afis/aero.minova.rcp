@@ -4,13 +4,10 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.wizard.Wizard;
 
-import aero.minova.rcp.model.form.MDetail;
-
 public abstract class AbstractWizard extends Wizard {
-
-	protected MDetail mdetail;
 
 	@Inject
 	protected MPerspective mPerspective;
@@ -18,10 +15,8 @@ public abstract class AbstractWizard extends Wizard {
 	@Inject
 	protected TranslationService translationService;
 
-
-	public void setMDetail(MDetail mDetail) {
-		this.mdetail = mDetail;
-	}
+	@Inject
+	protected MPart mPart;
 
 	public void setMPerspective(MPerspective mPerspective) {
 		this.mPerspective = mPerspective;

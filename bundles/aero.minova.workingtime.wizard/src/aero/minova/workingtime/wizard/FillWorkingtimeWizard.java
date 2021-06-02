@@ -4,9 +4,6 @@ import aero.minova.rcp.model.Table;
 
 /**
  * Mit diesem Assistent (Wizard) kann man Arbeitszeiten über mehrere Tage auffüllen
- *
- * @author wild
- * @since 11.0.0
  */
 public class FillWorkingtimeWizard extends MinovaWizard {
 
@@ -19,13 +16,11 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 	public void addPages() {
 		// wird von WizardDialog automatisch aufgerufen
 		super.setWindowTitle(translationService.translate("@Workingtime.FillWizard.Title", null));
-		PeriodPage periodPage = new PeriodPage("Name");
-		periodPage.setMDetail(mdetail);
+		PeriodPage periodPage = new PeriodPage(translationService.translate("@Workingtime.FillWizard.Pagename", null));
 		periodPage.setMPerspective(mPerspective);
 		periodPage.setTranslationService(translationService);
+		periodPage.setmPart(mPart);
 		addPage(periodPage);
-
-		// #23481
 		super.addPages();
 	}
 

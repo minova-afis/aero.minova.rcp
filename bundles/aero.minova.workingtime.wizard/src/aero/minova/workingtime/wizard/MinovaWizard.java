@@ -23,7 +23,6 @@ public class MinovaWizard extends AbstractWizard {
 	@Inject
 	private IEclipseContext context;
 
-
 	public MinovaWizard(String wizardName) {
 		this.setWindowTitle(wizardName);
 		this.init();
@@ -71,9 +70,6 @@ public class MinovaWizard extends AbstractWizard {
 	public void init() {
 		IDialogSettings dialogSettings = new DialogSettings(this.getClass().getSimpleName());
 		this.setDialogSettings(dialogSettings);
-
-		// dummerweise kann man hierüber nicht die Sprache einstellen
-		// die Standard-Texte stehen in IDialogConstants und können nicht verändert werden :-/
 	}
 
 	@Override

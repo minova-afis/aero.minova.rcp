@@ -13,24 +13,14 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.model.form.MDetail;
-import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.rcp.widgets.AbstractWizard;
 
-public class DynamicButtonhandler {
+public class DynamicButtonHandler {
 
 	@Execute
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CONTROL_WIZARD) String className, MPart part) {
-		MDetail mDetail = null;
-
-		if (part.getObject() instanceof WFCDetailPart) {
-			mDetail = ((WFCDetailPart) part.getObject()).getDetail();
-		}
 		try {
 			Class<?> wizardClass = Class.forName(className);
 			Object wizardObject = ContextInjectionFactory.make(wizardClass, context);
-
-			((AbstractWizard) wizardObject).setMDetail(mDetail);
 
 			WizardDialog wizardDialog = new WizardDialog(shell, (Wizard) wizardObject);
 
@@ -38,7 +28,5 @@ public class DynamicButtonhandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }
