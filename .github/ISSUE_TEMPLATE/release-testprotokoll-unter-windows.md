@@ -17,12 +17,6 @@ Getestet mit Server xxxxxx
 - [ ] Wiederholtes Anmelden mit einem Profil, bei dem das Passwort falsch eingetragen wurde und die Anwendung direkt darauf geschlossen wurde (siehe 2. Kommentar #388)
 - [ ] Wenn sich die ModelVersion geändert hat wird die workbench.xmi mit entsprechender Warnung gelöscht (Anwendung startet wie mit -clearPersistedState)
 
-### Suchkriterien 
-- [ ] Default Suchkriterien werden beim Starten geladen
-- [ ] Mehrere Suchkriterien können unter verschiedenen Namen gespeichert werden
-- [ ] Nicht-Default Suchkriterien können geladen werden
-- [ ] Suchkriterien können gelöscht werden
-
 ## Keine Verbindung zum CAS möglich
 - [ ] Die angezeigte Fehlermeldung enthält Details zum Fehler
 - [ ] Beim Indexladen: Fehlermeldung und Knopf ist wieder aktivierbar
@@ -33,19 +27,41 @@ Getestet mit Server xxxxxx
 - [ ] Der aktuelle Workspace-Ordner kann über die Einstellungen gelöscht werden
 - [ ] Das Löschen eines Profils in der Login-Maske löscht auch den entsprechenden Workspace-Ordner
 
-## Indexdruck
+## Suche (Knöpfe in der Toolbar)
+- [ ]  Suchtabelle kann zurückgesetzt werden
+- [ ]  Eine Zeile der Suchtabelle kann gelöscht werden
+- [ ]  Breite der Spalten kann optimiert werden
+
+### Suchkriterien 
+- [ ] Default Suchkriterien werden beim Starten geladen
+- [ ] Mehrere Suchkriterien können unter verschiedenen Namen gespeichert werden
+- [ ] Nicht-Default Suchkriterien können geladen werden
+- [ ] Suchkriterien können gelöscht werden
+
+## Index (Knöpfe in der Toolbar)
+- [ ] Index kann geladen werden und ist nach Suchkriterien gefiltert
+- [ ] Bei Gruppierung können die Gruppen erweitert und zusammengeklappt werden
+- [ ] Daten können exportiert werden
+- [ ]  Breite der Spalten kann optimiert werden
+
+### Indexdruck + Druckeinstellungen
 <img width="946" alt="Bildschirmfoto 2021-04-20 um 20 49 45" src="https://user-images.githubusercontent.com/20420898/115448394-f4361800-a219-11eb-8971-d0a023aa49bf.png">
 
 - [ ] Alle Spalten haben die selbe Reihenfolge wie auch in der Anwendung angezeigt (Reihenfolge kann verändert werden)
-
-### Druckeinstellungen
-- [ ] XML/XSL können erstellt werden (Workspaceordner -> PDF)
+- [ ] XML/XSL können erstellt werden (in /<Workspaceordner>/PDF/)
 - [ ] Schriftgröße kann verändert werden
 - [ ] Spaltenbreite kann optimiert werden, ansonsten wird Breite aus Index übernommen
 - [ ] Leere Spalten können verborgen werden
 - [ ] Gruppenspalten können verborgen werden
 - [ ] Suchkriterien können angezeigt werden 
-- [ ] Interne Vorschau kann aktiviert werden (unter Windows ist interne Vorschau immer deaktiviert)
+- [ ] Interne Vorschau kann aktiviert werden 
+
+## Details (Knöpfe in der Toolbar)
+- [ ] Einträge können gespeichert werden
+- [ ] Ein neues Detail kann erstellt werden
+- [ ] Ein Datensatz kann gelöscht werden
+- [ ] Änderungen können verworfen werden
+- [ ] Die Breite der Anwendung kann optimiert werden
 
 ## Traverselistener
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
