@@ -4,7 +4,7 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 
 import aero.minova.rcp.constants.Constants;
 
@@ -14,9 +14,7 @@ public class RevertSearchHandler {
 	IEventBroker broker;
 
 	@Execute
-	public void execute(Shell shell) {
-		System.out.println("Revert NatTable Search Part");
-		broker.post(Constants.BROKER_REVERTSEARCHTABLE, "Revert Search Table");
+	public void execute(MPart mpart) {
+		broker.post(Constants.BROKER_REVERTSEARCHTABLE, mpart);
 	}
-
 }
