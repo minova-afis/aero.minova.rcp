@@ -1,5 +1,12 @@
 package aero.minova.workingtime.wizard;
 
+import java.util.concurrent.CompletableFuture;
+
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
+
+import aero.minova.rcp.dialogs.NotificationPopUp;
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 
 /**
@@ -21,6 +28,7 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 		periodPage.setMPerspective(mPerspective);
 		periodPage.setTranslationService(translationService);
 		periodPage.setmPart(mPart);
+		periodPage.setOriginalMDetail(originalMDetail);
 		addPage(periodPage);
 		super.addPages();
 	}
@@ -36,6 +44,19 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 
 	public void sendFillRequest() {
 		Table dataTable = getDataTable();
-		dataService.getDetailDataAsync(dataTable.getName(), dataTable);
+		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(dataTable.getName(), dataTable);
+
+		// Wenn Anfrage erfolgreich war Dialogfenster schließen und Notification geben
+		tableFuture.thenAccept(ta -> {
+			if (ta != null) {
+				Display.getDefault().syncExec(() -> {
+					((WizardDialog) getContainer()).close();
+
+					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.DataUpdated", null),
+							Display.getCurrent().getActiveShell());
+					notificationPopUp.open();
+				});
+			}
+		});
 	}
 }
