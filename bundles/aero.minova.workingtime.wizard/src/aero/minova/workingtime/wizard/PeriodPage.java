@@ -74,6 +74,10 @@ public class PeriodPage extends WizardPage {
 		this.translationService = translationService;
 	}
 
+	public void setOriginalMDetail(MDetail originalMDetail) {
+		this.originalMDetail = originalMDetail;
+	}
+
 	public void setmPart(MPart mPart) {
 		this.mPart = mPart;
 	}
@@ -153,20 +157,23 @@ public class PeriodPage extends WizardPage {
 			}
 		}
 
-		// Neue MFields und Controls erstellen (Damit echter DetailPart nicht beinflusst wird)
+		// Neue MFields und Controls erstellen (Damit echter DetailPart nicht beinflusst wird) und diese vorbelegen
 		employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
 		employeeField.setDetail(mDetail);
 		employee = LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
+		employeeField.setValue(originalMDetail.getField("EmployeeKey").getValue(), false);
 
 		serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
 		serviceField.setDetail(mDetail);
 		service = LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
+		serviceField.setValue(originalMDetail.getField("ServiceKey").getValue(), false);
 
 		fromField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		fromField.setName("from");
 		fromField.setLabel("@TimeFrom");
 		fromField.setDetail(mDetail);
 		from = ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
+		fromField.setValue(originalMDetail.getField("BookingDate").getValue(), false);
 
 		untilField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		untilField.setName("until");
@@ -177,6 +184,7 @@ public class PeriodPage extends WizardPage {
 		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
 		descriptionField.setDetail(mDetail);
 		description = TextField.create(composite, descriptionField, 4, 0, mPerspective);
+		descriptionField.setValue(originalMDetail.getField("Description").getValue(), false);
 
 		translate(composite);
 		composite.layout();
