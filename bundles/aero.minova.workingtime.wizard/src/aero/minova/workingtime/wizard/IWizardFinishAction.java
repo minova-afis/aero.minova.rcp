@@ -1,11 +1,10 @@
 package aero.minova.workingtime.wizard;
 
-
 /**
  * Interface für Klassen, die die Aktion definieren, die beim Drücken des "Finish"-Buttons ausgeführt wird.
  *
  * @author erlanger
- * @since 10.6.0
+ * @since 12.0.0
  */
 public interface IWizardFinishAction {
 	/**

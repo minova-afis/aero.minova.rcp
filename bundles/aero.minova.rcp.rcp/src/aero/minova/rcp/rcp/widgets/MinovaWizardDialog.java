@@ -32,5 +32,4 @@ public class MinovaWizardDialog extends WizardDialog {
 	public void setTranslationService(TranslationService translationService) {
 		this.translationService = translationService;
 	}
-
 }

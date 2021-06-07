@@ -59,8 +59,6 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	private MField fromField;
 	private MField untilField;
 	private MField descriptionField;
-	private Composite composite;
-	private Control untilControl;
 
 	protected PeriodPage(String pageName, String pageTitle, String pageDescription) {
 		super(pageName, pageTitle, null);
@@ -84,7 +82,6 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	}
 
 	public Table getDataTable() {
-
 		TableBuilder tb = TableBuilder.newTable("xpcasWorkingTimeFill");
 		tb = tb.withColumn("EmployeeKey", DataType.INTEGER)//
 				.withColumn("ServiceKey", DataType.INTEGER)//
@@ -139,10 +136,9 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 	@Override
 	public void createControl(Composite composite) {
-		this.composite = composite;
 		composite.setLayout(new FormLayout());
 
-		// Fields sammeln, damit neue MFields erstellt werden können
+		// Fields aus der form-XML erstellen
 		Map<String, Field> fieldMap = new HashMap<>();
 		WFCDetailPart wfcDetailPart = (WFCDetailPart) mPart.getObject();
 		Detail detail = wfcDetailPart.getForm(null).getDetail();
@@ -152,9 +148,9 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 			for (Object fieldOrGrid : wrapper.getFieldOrGrid()) {
 				if ((fieldOrGrid instanceof Field)) {
 					Field field = (Field) fieldOrGrid;
+					fieldMap.put(field.getName(), field);
 					MField mField = ModelToViewModel.convert(field);
 					mDetail.putField(mField);
-					fieldMap.put(field.getName(), field);
 				}
 			}
 		}
@@ -184,7 +180,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		untilField.setName("until");
 		untilField.setLabel("@TimeUntil");
 		untilField.setDetail(mDetail);
-		untilControl = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+		ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
 		untilField.addValueChangeListener(this);
 
 		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
@@ -209,6 +205,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		return false;
 	}
 
+	// Bei einer Änderung checken, ob jetzt alle Felder ausgefüllt sind. Wenn ja kann Bestätigt werden
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
 		boolean complete = checkFromBeforeUntil() && //

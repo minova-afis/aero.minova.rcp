@@ -14,7 +14,7 @@ import aero.minova.rcp.rcp.widgets.AbstractWizard;
  * Basisklasse für alle Minova-Assistenten (Wizards)
  *
  * @author erlanger
- * @since 10.6.0
+ * @since 12.0.0
  */
 public class MinovaWizard extends AbstractWizard {
 	private IWizardFinishAction finishAction;

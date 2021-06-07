@@ -71,11 +71,7 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 
 	public Table getDataTable() {
 		PeriodPage page = (PeriodPage) this.getPage("PeriodPage");
-		if (page != null) {
-			return page.getDataTable();
-		} else {
-			return null;
-		}
+		return page != null ? page.getDataTable() : null;
 	}
 
 	public void sendFillRequest() {
