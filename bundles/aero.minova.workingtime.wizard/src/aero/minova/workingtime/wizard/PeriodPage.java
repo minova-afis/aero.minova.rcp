@@ -52,12 +52,6 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	private MPart mPart;
 	private MPerspective mPerspective;
 	private TranslationService translationService;
-	private Control employee;
-	private Control service;
-	private Control from;
-	private Control until;
-	private Control description;
-	private Map<String, Field> fieldMap;
 	private MField employeeField;
 	private MField serviceField;
 	private MField fromField;
@@ -144,7 +138,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		composite.setLayout(new FormLayout());
 
 		// Fields sammeln, damit neue MFields erstellt werden können
-		fieldMap = new HashMap<>();
+		Map<String, Field> fieldMap = new HashMap<>();
 		WFCDetailPart wfcDetailPart = (WFCDetailPart) mPart.getObject();
 		Detail detail = wfcDetailPart.getForm(null).getDetail();
 		List<Object> headAndPageList = detail.getHeadAndPage();
@@ -163,13 +157,13 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		// Neue MFields und Controls erstellen (damit echter DetailPart nicht beinflusst wird) und diese vorbelegen
 		employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
 		employeeField.setDetail(mDetail);
-		employee = LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
+		LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
 		employeeField.setValue(originalMDetail.getField("EmployeeKey").getValue(), false);
 		employeeField.addValueChangeListener(this);
 
 		serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
 		serviceField.setDetail(mDetail);
-		service = LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
+		LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
 		serviceField.setValue(originalMDetail.getField("ServiceKey").getValue(), false);
 		serviceField.addValueChangeListener(this);
 
@@ -177,7 +171,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		fromField.setName("from");
 		fromField.setLabel("@TimeFrom");
 		fromField.setDetail(mDetail);
-		from = ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
+		ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
 		fromField.setValue(originalMDetail.getField("BookingDate").getValue(), false);
 		fromField.addValueChangeListener(this);
 
@@ -185,12 +179,12 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		untilField.setName("until");
 		untilField.setLabel("@TimeUntil");
 		untilField.setDetail(mDetail);
-		until = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+		ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
 		untilField.addValueChangeListener(this);
 
 		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
 		descriptionField.setDetail(mDetail);
-		description = TextField.create(composite, descriptionField, 4, 0, mPerspective);
+		TextField.create(composite, descriptionField, 4, 0, mPerspective);
 		descriptionField.setValue(originalMDetail.getField("Description").getValue(), false);
 		descriptionField.addValueChangeListener(this);
 
