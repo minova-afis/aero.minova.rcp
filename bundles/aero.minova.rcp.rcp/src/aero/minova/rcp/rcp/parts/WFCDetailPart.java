@@ -56,6 +56,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
+import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
@@ -225,7 +226,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Wir erstellen die HEAD Section des Details.
 		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
 		// Button erstellen, falls vorhanden
-		createButton(composite, headOrPage, mSection, context, section);
+		createButton(headOrPage, section);
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
@@ -243,7 +244,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param mSection
 	 * @param section
 	 */
-	private void createButton(Composite composite, HeadOrPageWrapper headOrPage, MSection mSection, IEclipseContext partContext, Section section) {
+	private void createButton(HeadOrPageWrapper headOrPage, Section section) {
 		if (headOrPage.isHead) {
 			return;
 		}
@@ -259,16 +260,19 @@ public class WFCDetailPart extends WFCFormPart {
 				item.setText(translationService.translate(btn.getText(), null));
 				item.setToolTipText(translationService.translate(btn.getText(), null));
 			}
-			item.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					Map<String, String> parameter = Map.of(//
-							Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingtimeWizard");
 
-					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
-					handlerService.executeHandler(command);
-				}
-			});
+			Object event = findEventForID(btn.getId());
+			if (event instanceof Onclick) {
+				item.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						// TODO: Klassenname aus Form auslesen
+						Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingtimeWizard");
+						ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+						handlerService.executeHandler(command);
+					}
+				});
+			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
 				final Image buttonImage = ImageUtil.getImageFromImagesBundle(btn.getIcon());
@@ -277,6 +281,16 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 		section.setTextClient(bar);
 
+	}
+
+	private Object findEventForID(String id) {
+		for (Onclick onclick : form.getEvents().getOnclick()) {
+			if (onclick.getRefid().equals(id)) {
+				return onclick;
+			}
+		}
+		// TODO: Onbinder und valueChange implementieren
+		return null;
 	}
 
 	/**
