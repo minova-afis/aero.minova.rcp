@@ -256,8 +256,8 @@ public class WFCDetailPart extends WFCFormPart {
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
 			if (btn.getText() != null) {
-				item.setText(btn.getText());
-				item.setToolTipText(btn.getText());
+				item.setText(translationService.translate(btn.getText(), null));
+				item.setToolTipText(translationService.translate(btn.getText(), null));
 			}
 			item.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -289,7 +289,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 */
 	private void sortTabList(MSection mSection) {
 		List<MField> tabList = mSection.getTabList();
-		Collections.sort(tabList, new Comparator<MField>() {
+		Collections.sort(tabList, new Comparator<>() {
 
 			@Override
 			public int compare(MField f1, MField f2) {
