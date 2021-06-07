@@ -11,5 +11,4 @@ public abstract class AbstractWizard extends Wizard {
 	public void setOriginalMDetail(MDetail originalMDetail) {
 		this.originalMDetail = originalMDetail;
 	}
-
 }
