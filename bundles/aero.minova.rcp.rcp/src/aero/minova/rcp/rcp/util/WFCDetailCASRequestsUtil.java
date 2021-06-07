@@ -287,9 +287,7 @@ public class WFCDetailCASRequestsUtil {
 				}));
 			}
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wrong inputs in your messured Time",
-					shell);
-			notificationPopUp.open();
+			openNotificationPopup(getTranslation("msg.ActionAborted"));
 		}
 	}
 
@@ -574,7 +572,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
-		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, shell);
+		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, getTranslation("Notification"), shell);
 		notificationPopUp.open();
 	}
 

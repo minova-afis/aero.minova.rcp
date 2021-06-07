@@ -42,15 +42,16 @@ public class LookupField {
 
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 
-
-public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).create(composite);
 
+		IEclipseContext context = perspective.getContext();
+
 		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT);
-		// TODO übersetzen
 		lookupControl.setMessage("...");
 		lookupControl.setLabel(label);
+		ContextInjectionFactory.inject(lookupControl, context); // In Context injected, damit TranslationService genutzt werden kann
 
 		Label descriptionLabel = LabelFactory.newLabel(SWT.LEFT).create(composite);
 
@@ -58,7 +59,6 @@ public static Control create(Composite composite, MField field, int row, int col
 		FormData labelFormData = new FormData();
 		FormData descriptionLabelFormData = new FormData();
 
-		IEclipseContext context = perspective.getContext();
 		LookupValueAccessor lookupValueAccessor = new LookupValueAccessor(field, lookupControl);
 		ContextInjectionFactory.inject(lookupValueAccessor, context);
 		field.setValueAccessor(lookupValueAccessor);
