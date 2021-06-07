@@ -12,6 +12,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.dataservice.IDataService;
@@ -57,6 +58,14 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 		periodPage.setmPart(mPart);
 		periodPage.setOriginalMDetail(originalMDetail);
 		addPage(periodPage);
+
+		// Verhindern, dass sich Fenster bei Escape schließt, wenn gerade ein Popup offen ist
+		((WizardDialog) getContainer()).getShell().addListener(SWT.Traverse, e -> {
+			if (e.detail == SWT.TRAVERSE_ESCAPE && periodPage.popupIsOpen()) {
+				e.doit = false;
+			}
+		});
+
 		super.addPages();
 	}
 
@@ -73,13 +82,13 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 		Table dataTable = getDataTable();
 		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(dataTable.getName(), dataTable);
 
-		// Wenn Anfrage erfolgreich war Dialogfenster schließen und Notification geben
+		// Wenn Anfrage erfolgreich war Dialogfenster schließen, Notification geben und Index gegebenenfalls neu laden
 		tableFuture.thenAccept(ta -> {
 			if (ta != null) {
 				Display.getDefault().syncExec(() -> {
 					((WizardDialog) getContainer()).close();
 
-					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.DataUpdated", null),
+					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.DataSaved", null),
 							Display.getCurrent().getActiveShell());
 					notificationPopUp.open();
 

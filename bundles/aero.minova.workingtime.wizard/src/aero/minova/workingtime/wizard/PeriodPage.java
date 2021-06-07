@@ -35,6 +35,7 @@ import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 /**
  * Wizard-Page mit allen Daten zum Arbeitszeit auffüllen
@@ -206,5 +207,13 @@ public class PeriodPage extends WizardPage {
 			}
 			return ((Page) headOrPage).getFieldOrGrid();
 		}
+	}
+
+	public boolean popupIsOpen() {
+		Control focussedControl = mDetail.getSelectedField();
+		if (focussedControl instanceof Lookup) {
+			return ((Lookup) focussedControl).popupIsOpen();
+		}
+		return false;
 	}
 }
