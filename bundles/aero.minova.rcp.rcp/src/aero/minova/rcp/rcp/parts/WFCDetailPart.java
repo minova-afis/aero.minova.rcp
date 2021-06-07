@@ -271,7 +271,7 @@ public class WFCDetailPart extends WFCFormPart {
 			});
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final Image buttonImage = ImageUtil.getImageDefault(btn.getIcon());
+				final Image buttonImage = ImageUtil.getImageFromImagesBundle(btn.getIcon());
 				item.setImage(buttonImage);
 			}
 		}
