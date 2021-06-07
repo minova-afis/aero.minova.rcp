@@ -89,7 +89,7 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 					((WizardDialog) getContainer()).close();
 
 					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.DataSaved", null),
-							Display.getCurrent().getActiveShell());
+							translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
 					notificationPopUp.open();
 
 					if (autoLoadIndex) {

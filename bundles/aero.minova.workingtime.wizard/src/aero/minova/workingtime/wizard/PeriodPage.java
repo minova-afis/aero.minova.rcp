@@ -3,6 +3,7 @@ package aero.minova.workingtime.wizard;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -12,6 +13,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -57,6 +59,8 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	private MField fromField;
 	private MField untilField;
 	private MField descriptionField;
+	private Composite composite;
+	private Control untilControl;
 
 	protected PeriodPage(String pageName, String pageTitle, String pageDescription) {
 		super(pageName, pageTitle, null);
@@ -135,6 +139,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 	@Override
 	public void createControl(Composite composite) {
+		this.composite = composite;
 		composite.setLayout(new FormLayout());
 
 		// Fields sammeln, damit neue MFields erstellt werden können
@@ -179,7 +184,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		untilField.setName("until");
 		untilField.setLabel("@TimeUntil");
 		untilField.setDetail(mDetail);
-		ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+		untilControl = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
 		untilField.addValueChangeListener(this);
 
 		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
@@ -198,19 +203,41 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		Control focussedControl = mDetail.getSelectedField();
 		if (focussedControl instanceof Lookup) {
 			return ((Lookup) focussedControl).popupIsOpen();
+		} else if (focussedControl instanceof TextAssist) {
+			return true;
 		}
 		return false;
 	}
 
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
-		boolean complete = employeeField.getValue() != null && //
+		boolean complete = checkFromBeforeUntil() && //
+				employeeField.getValue() != null && //
 				serviceField.getValue() != null && //
 				fromField.getValue() != null && //
 				untilField.getValue() != null && //
 				descriptionField.getValue() != null;
 
 		setPageComplete(complete);
+	}
+
+	private boolean checkFromBeforeUntil() {
+		if (fromField == null || untilField == null || fromField.getValue() == null || untilField.getValue() == null) {
+			return false;
+		}
+
+		Instant fromValue = fromField.getValue().getInstantValue();
+		Instant untilValue = untilField.getValue().getInstantValue();
+
+		if (untilValue.isAfter(fromValue) || untilValue.equals(fromValue)) {
+			untilField.setCanBeValid(true);
+			untilField.setValidColor();
+			return true;
+		} else {
+			untilField.setCanBeValid(false);
+			untilField.setInvalidColor();
+			return false;
+		}
 	}
 
 	private static class HeadOrPageWrapper {
