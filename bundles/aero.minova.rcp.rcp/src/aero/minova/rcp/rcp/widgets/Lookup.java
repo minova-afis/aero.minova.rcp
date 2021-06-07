@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -59,6 +62,9 @@ public class Lookup extends Composite {
 	private boolean gettingData = false;
 	private String lastRequestState = "";
 	private long lastRequestTime = 0;
+
+	@Inject
+	private TranslationService translationService;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
@@ -525,7 +531,8 @@ public class Lookup extends Composite {
 					gettingData = false;
 				});
 			} else {
-				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), "@msg.ActiveRequest", Display.getCurrent().getActiveShell());
+				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.ActiveRequest", null),
+						translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
 				notificationPopUp.open();
 			}
 		} else {
