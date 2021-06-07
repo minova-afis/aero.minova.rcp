@@ -28,6 +28,8 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.event.ValueChangeEvent;
+import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.ModelToViewModel;
@@ -43,7 +45,7 @@ import aero.minova.rcp.rcp.widgets.Lookup;
  * @author erlanger
  * @since 12.0.0
  */
-public class PeriodPage extends WizardPage {
+public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 	private MDetail mDetail = new MDetail();
 	private MDetail originalMDetail;
@@ -158,16 +160,18 @@ public class PeriodPage extends WizardPage {
 			}
 		}
 
-		// Neue MFields und Controls erstellen (Damit echter DetailPart nicht beinflusst wird) und diese vorbelegen
+		// Neue MFields und Controls erstellen (damit echter DetailPart nicht beinflusst wird) und diese vorbelegen
 		employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
 		employeeField.setDetail(mDetail);
 		employee = LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
 		employeeField.setValue(originalMDetail.getField("EmployeeKey").getValue(), false);
+		employeeField.addValueChangeListener(this);
 
 		serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
 		serviceField.setDetail(mDetail);
 		service = LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
 		serviceField.setValue(originalMDetail.getField("ServiceKey").getValue(), false);
+		serviceField.addValueChangeListener(this);
 
 		fromField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		fromField.setName("from");
@@ -175,21 +179,44 @@ public class PeriodPage extends WizardPage {
 		fromField.setDetail(mDetail);
 		from = ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
 		fromField.setValue(originalMDetail.getField("BookingDate").getValue(), false);
+		fromField.addValueChangeListener(this);
 
 		untilField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		untilField.setName("until");
 		untilField.setLabel("@TimeUntil");
 		untilField.setDetail(mDetail);
 		until = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+		untilField.addValueChangeListener(this);
 
 		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
 		descriptionField.setDetail(mDetail);
 		description = TextField.create(composite, descriptionField, 4, 0, mPerspective);
 		descriptionField.setValue(originalMDetail.getField("Description").getValue(), false);
+		descriptionField.addValueChangeListener(this);
 
+		valueChange(null);
 		translate(composite);
 		composite.layout();
 		super.setControl(composite);
+	}
+
+	public boolean popupIsOpen() {
+		Control focussedControl = mDetail.getSelectedField();
+		if (focussedControl instanceof Lookup) {
+			return ((Lookup) focussedControl).popupIsOpen();
+		}
+		return false;
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		boolean complete = employeeField.getValue() != null && //
+				serviceField.getValue() != null && //
+				fromField.getValue() != null && //
+				untilField.getValue() != null && //
+				descriptionField.getValue() != null;
+
+		setPageComplete(complete);
 	}
 
 	private static class HeadOrPageWrapper {
@@ -207,13 +234,5 @@ public class PeriodPage extends WizardPage {
 			}
 			return ((Page) headOrPage).getFieldOrGrid();
 		}
-	}
-
-	public boolean popupIsOpen() {
-		Control focussedControl = mDetail.getSelectedField();
-		if (focussedControl instanceof Lookup) {
-			return ((Lookup) focussedControl).popupIsOpen();
-		}
-		return false;
 	}
 }
