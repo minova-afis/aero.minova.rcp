@@ -1101,6 +1101,7 @@
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance" />
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method" />
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set" />
+				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard"/>
 			</xs:choice>
 			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail" />
 		</xs:sequence>
@@ -1242,6 +1243,7 @@
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance" />
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method" />
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set" />
+				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard"/>
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
