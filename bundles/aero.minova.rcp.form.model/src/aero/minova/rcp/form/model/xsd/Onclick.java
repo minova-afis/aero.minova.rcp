@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;element name="instance" type="{}instance" maxOccurs="unbounded" minOccurs="0"/&gt;
  *           &lt;element name="method" type="{}method" maxOccurs="unbounded" minOccurs="0"/&gt;
  *           &lt;element name="set" type="{}set" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *           &lt;element name="wizard" type="{}wizard" minOccurs="0"/&gt;
  *         &lt;/choice&gt;
  *         &lt;element name="onfail" type="{}onfail" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
@@ -56,7 +57,8 @@ public class Onclick {
         @XmlElement(name = "procedure", type = Procedure.class),
         @XmlElement(name = "instance", type = Instance.class),
         @XmlElement(name = "method", type = Method.class),
-        @XmlElement(name = "set", type = Set.class)
+        @XmlElement(name = "set", type = Set.class),
+        @XmlElement(name = "wizard", type = Wizard.class)
     })
     protected List<Object> binderOrProcedureOrInstance;
     protected Onfail onfail;
@@ -88,6 +90,7 @@ public class Onclick {
      * {@link Instance }
      * {@link Method }
      * {@link Set }
+     * {@link Wizard }
      * 
      * 
      */

@@ -58,6 +58,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -263,13 +264,18 @@ public class WFCDetailPart extends WFCFormPart {
 
 			Object event = findEventForID(btn.getId());
 			if (event instanceof Onclick) {
+				Onclick onclick = (Onclick) event;
 				item.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						// TODO: Klassenname aus Form auslesen
-						Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingtimeWizard");
-						ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
-						handlerService.executeHandler(command);
+						// TODO: Andere procedures/bindings/instances auswerten
+
+						Wizard wizard = getWizard(onclick);
+						if (wizard != null) {
+							Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, wizard.getWizardname());
+							ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+							handlerService.executeHandler(command);
+						}
 					}
 				});
 			}
@@ -289,7 +295,16 @@ public class WFCDetailPart extends WFCFormPart {
 				return onclick;
 			}
 		}
-		// TODO: Onbinder und valueChange implementieren
+		// TODO: Onbinder und ValueChange implementieren
+		return null;
+	}
+
+	private Wizard getWizard(Onclick onclick) {
+		for (Object o : onclick.getBinderOrProcedureOrInstance()) {
+			if (o instanceof Wizard) {
+				return (Wizard) o;
+			}
+		}
 		return null;
 	}
 

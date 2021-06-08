@@ -350,6 +350,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Wizard }
+     * 
+     */
+    public Wizard createWizard() {
+        return new Wizard();
+    }
+
+    /**
      * Create an instance of {@link Head }
      * 
      */
