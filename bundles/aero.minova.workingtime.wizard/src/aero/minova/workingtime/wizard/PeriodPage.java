@@ -136,7 +136,10 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 	@Override
 	public void createControl(Composite composite) {
-		composite.setLayout(new FormLayout());
+		FormLayout layout = new FormLayout();
+		layout.marginHeight = 20;
+		layout.marginRight = 20;
+		composite.setLayout(layout);
 
 		// Fields aus der form-XML erstellen
 		Map<String, Field> fieldMap = new HashMap<>();
