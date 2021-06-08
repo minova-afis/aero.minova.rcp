@@ -30,7 +30,7 @@ public class ModelToViewModel {
 	private static MField initializeModelField(Field field) {
 		if (field.getBoolean() != null) {
 			return new MBooleanField();
-		} 
+		}
 
 		if (field.getDateTime() != null) {
 			return new MDateTimeField();
@@ -87,7 +87,11 @@ public class ModelToViewModel {
 			return f;
 		}
 
-		throw new RuntimeException("Typed of field " + field + "cannot  be determined");
+		if (field.getEditor() != null) {
+			throw new RuntimeException("Field " + field.getName() + " is of Type Editor, which isn't implemented yet");
+		}
+
+		throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
 	}
 
 }
