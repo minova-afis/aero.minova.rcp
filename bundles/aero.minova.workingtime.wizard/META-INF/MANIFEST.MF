@@ -6,3 +6,4 @@ Bundle-Version: 12.0.20.qualifier
 Fragment-Host: aero.minova.rcp.rcp;bundle-version="12.0.16"
 Automatic-Module-Name: aero.minova.workingtime.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: aero.minova.rcp.model

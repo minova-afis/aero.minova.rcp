@@ -115,7 +115,6 @@ public class LookupField {
 				}
 			}
 		});
-
 		return lookupControl;
 	}
 

@@ -286,7 +286,7 @@ public abstract class MField {
 		return detail;
 	}
 
-	void setDetail(MDetail detail) {
+	public void setDetail(MDetail detail) {
 		this.detail = detail;
 	}
 
