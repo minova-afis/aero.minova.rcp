@@ -1,6 +1,5 @@
 package aero.minova.workingtime.helper;
 
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Dictionary;
@@ -31,7 +30,6 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.util.DateUtil;
 
@@ -50,7 +48,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	private MLookupField serviceobject;
 	private MLookupField servicecontract;
 	private String user;
-	private LookupValue lookupValueUser;
 
 	private Value endDateValue;
 	private Value bookingDateValue;
@@ -85,7 +82,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	public void initAccessor() {
 		TicketHelper ticketHelper = new TicketHelper(this);
-		lookupValueUser = null;
 		startDate = detail.getField("StartDate");
 		endDate = detail.getField("EndDate");
 		bookingDate = detail.getField("BookingDate");
@@ -102,6 +98,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		startDate.addValueChangeListener(this);
 		endDate.addValueChangeListener(this);
 		bookingDate.addValueChangeListener(this);
+		employee.addValueChangeListener(this);
 		orderreceiver.addValueChangeListener(ticketHelper);
 		servicecontract.addValueChangeListener(ticketHelper);
 		serviceobject.addValueChangeListener(ticketHelper);
@@ -115,9 +112,8 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			CompletableFuture<List<LookupValue>> valueFromAsync = va.getValueFromAsync(null, user);
 			valueFromAsync.thenAccept(l -> Display.getDefault().asyncExec(() -> {
 				if (!l.isEmpty()) {
-					lookupValueUser = l.get(0);
-					employeeValue = lookupValueUser;
-					employee.setValue(l.get(0), false);
+					employeeValue = l.get(0);
+					employee.setValue(employeeValue, false);
 				} else {
 					employee.setValue(null, false);
 				}
@@ -129,7 +125,11 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	}
 
 	protected void calculateTime() {
+		// Zuerst Werte speichern
 		bookingDateValue = bookingDate.getValue();
+		employeeValue = (LookupValue) employee.getValue();
+		endDateValue = endDate.getValue();
+
 		if (startDate.getValue() == null) {
 			return;
 		}
@@ -154,13 +154,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		renderedQuantity.setValue(valueRe, true);
 		Value valueCh = new Value((double) chargedQty);
 		chargedQuantity.setValue(valueCh, true);
-		endDateValue = endDate.getValue();
-		if (employee.getValue() instanceof LookupValue) {
-			employeeValue = (LookupValue) employee.getValue();
-		} else {
-			System.err.println("WorkingTimeHelper.calculateTime() --> Kein LookupValue gefunden, es wird falsch gesetzt! ");
-		}
-
 	}
 
 	public float getFloatFromMinutes(long min) {
@@ -198,13 +191,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		((LookupValueAccessor) orderreceiver.getValueAccessor()).setFocus();
 		switch (code) {
 		case DEL:
-			if (lookupValueUser != null) {
-				employeeValue = lookupValueUser;
-			} else {
-				employeeValue = null;
-				System.err.println(MessageFormat.format("LookupValue für User: {0} konnte nicht aiufgelöst werden!", user));
-
-			}
 			employee.setValue(employeeValue, false);
 			bookingDateValue = new Value(DateUtil.getDate("0"));
 			bookingDate.setValue(bookingDateValue, false);
@@ -232,6 +218,5 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		default:
 			break;
 		}
-
 	}
 }
