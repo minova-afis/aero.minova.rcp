@@ -191,8 +191,9 @@ public class PerspectiveControl {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Map<String, String> parameter = Map.of(//
-							Constants.FORM_NAME, perspective.getPersistedState().get(Constants.FORM_NAME), Constants.FORM_ID, perspective.getElementId(),
-							Constants.FORM_LABEL, perspective.getElementId());
+							Constants.FORM_NAME, perspective.getPersistedState().get(Constants.FORM_NAME), //
+							Constants.FORM_ID, perspective.getElementId(), //
+							Constants.FORM_LABEL, perspective.getLabel());
 
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform", parameter);
 					handlerService.executeHandler(command);
