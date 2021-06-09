@@ -588,4 +588,9 @@ public class Lookup extends Composite {
 		return table;
 	}
 
+	@Override
+	public String toString() {
+		return "Lookup (" + label.getText() + ")";
+	}
+
 }
