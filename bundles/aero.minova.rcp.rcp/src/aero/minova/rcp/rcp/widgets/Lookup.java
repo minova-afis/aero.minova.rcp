@@ -200,9 +200,11 @@ public class Lookup extends Composite {
 		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
 			firstValue = null;
-			NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.NoLookupEntries", null),
-					translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
-			notificationPopUp.open();
+			if (contentProvider.getValuesSize() == 0) {
+				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.NoLookupEntries", null),
+						translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
+				notificationPopUp.open();
+			}
 			return;
 		}
 		firstValue = popupValues.get(0);
