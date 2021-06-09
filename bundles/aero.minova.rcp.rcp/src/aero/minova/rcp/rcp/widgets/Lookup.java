@@ -500,7 +500,7 @@ public class Lookup extends Composite {
 			@Override
 			public void mouseDown(MouseEvent e) {
 				setFocus();
-				showAllElements(text.getText());
+				requestAllLookupEntries();
 			}
 		});
 	}

@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.DataType;
@@ -136,7 +137,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	public void updatePossibleValues() {
 		Lookup up = ((Lookup) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-		listLookup.thenAccept(l -> up.getContentProvider().setValuesOnly(l));
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
 	}
 
 	/**
