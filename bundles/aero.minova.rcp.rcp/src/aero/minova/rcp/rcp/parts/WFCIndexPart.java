@@ -69,6 +69,7 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
@@ -626,10 +627,12 @@ public class WFCIndexPart extends WFCFormPart {
 			selectionLayer.addLayerListener(new ILayerListener() {
 				@Override
 				public void handleLayerEvent(ILayerEvent event) {
-					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
-					List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
-					if (!collection.isEmpty()) {
-						context.set(Constants.BROKER_ACTIVEROWS, collection);
+					if (event instanceof RowSelectionEvent) {
+						List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
+						List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+						if (!collection.isEmpty()) {
+							context.set(Constants.BROKER_ACTIVEROWS, collection);
+						}
 					}
 				}
 			});
