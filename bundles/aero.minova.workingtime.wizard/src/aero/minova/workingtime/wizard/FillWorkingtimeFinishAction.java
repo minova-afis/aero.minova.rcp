@@ -6,20 +6,20 @@ import aero.minova.rcp.rcp.widgets.MinovaWizard;
 /**
  * Arbeitszeit auffüllen mit den im Wizard angegebenen Daten
  */
-public class FinishAction implements IMinovaWizardFinishAction {
-	private MinovaWizard wizard;
+public class FillWorkingtimeFinishAction implements IMinovaWizardFinishAction {
+	private FillWorkingtimeWizard wizard;
 
 	@Override
 	public boolean execute() {
 		boolean success = false;
-		if (wizard instanceof FillWorkingtimeWizard) {
-			((FillWorkingtimeWizard) wizard).sendFillRequest();
+		if (wizard.pageIsReady()) {
+			wizard.sendFillRequest();
 		}
 		return success;
 	}
 
 	@Override
 	public void setWizard(MinovaWizard minovaWizard) {
-		this.wizard = minovaWizard;
+		this.wizard = (FillWorkingtimeWizard) minovaWizard;
 	}
 }
