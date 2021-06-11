@@ -100,6 +100,7 @@ public class Lookup extends Composite {
 		text.addListener(SWT.KeyDown, createKeyDownListener());
 		text.addListener(SWT.Modify, createModifyListener());
 		text.addListener(SWT.FocusOut, createFocusOutListener());
+		text.addDisposeListener(e -> closePopup());
 		text.addFocusListener(new FocusAdapter() {
 
 			// FocusLost aktualisiert das FieldValue sobald, das Field den Fokus verliert. Dabei ist die Art, wie der Fokus verloren geht egal (Mit Maus was
