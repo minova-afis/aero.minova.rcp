@@ -11,11 +11,10 @@ public class FillWorkingtimeFinishAction implements IMinovaWizardFinishAction {
 
 	@Override
 	public boolean execute() {
-		boolean success = false;
 		if (wizard.pageIsReady()) {
 			wizard.sendFillRequest();
 		}
-		return success;
+		return false;
 	}
 
 	@Override

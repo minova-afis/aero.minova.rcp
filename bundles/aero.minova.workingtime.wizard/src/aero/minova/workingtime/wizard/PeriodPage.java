@@ -14,11 +14,13 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import aero.minova.rcp.form.model.xsd.Detail;
@@ -49,7 +51,7 @@ import aero.minova.rcp.rcp.widgets.Lookup;
  */
 public class PeriodPage extends WizardPage implements ValueChangeListener {
 
-	private MDetail mDetail = new MDetail();
+	private MDetail mDetail;
 	private MDetail originalMDetail;
 	private MPart mPart;
 	private MPerspective mPerspective;
@@ -59,10 +61,14 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	private MField fromField;
 	private MField untilField;
 	private MField descriptionField;
+	private PeriodPageEnterHelper enterHelper;
+	private boolean complete;
 
-	protected PeriodPage(String pageName, String pageTitle, String pageDescription) {
+	protected PeriodPage(String pageName, String pageTitle, String pageDescription, boolean selectFirstRequired) {
 		super(pageName, pageTitle, null);
 		setDescription(pageDescription);
+		mDetail = new MDetail();
+		enterHelper = new PeriodPageEnterHelper(this, selectFirstRequired);
 	}
 
 	public void setMPerspective(MPerspective mPerspective) {
@@ -161,41 +167,63 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		// Neue MFields und Controls erstellen (damit echter DetailPart nicht beinflusst wird) und diese vorbelegen
 		employeeField = ModelToViewModel.convert(fieldMap.get("EmployeeKey"));
 		employeeField.setDetail(mDetail);
-		LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
+		Control employeeControl = LookupField.create(composite, employeeField, 0, 0, Locale.getDefault(), mPerspective);
+		employeeControl.addListener(SWT.KeyDown, createKeyListener(employeeField));
 		employeeField.setValue(originalMDetail.getField("EmployeeKey").getValue(), false);
 		employeeField.addValueChangeListener(this);
+		enterHelper.addField(employeeField);
 
 		serviceField = ModelToViewModel.convert(fieldMap.get("ServiceKey"));
 		serviceField.setDetail(mDetail);
-		LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
+		Control serviceControl = LookupField.create(composite, serviceField, 1, 0, Locale.getDefault(), mPerspective);
+		serviceControl.addListener(SWT.KeyDown, createKeyListener(serviceField));
 		serviceField.setValue(originalMDetail.getField("ServiceKey").getValue(), false);
 		serviceField.addValueChangeListener(this);
+		enterHelper.addField(serviceField);
 
 		fromField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		fromField.setName("from");
 		fromField.setLabel("@TimeFrom");
 		fromField.setDetail(mDetail);
-		ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
+		Control fromControl = ShortDateField.create(composite, fromField, 2, 0, Locale.getDefault(), "UTC", mPerspective);
+		fromControl.addListener(SWT.KeyDown, createKeyListener(fromField));
 		fromField.setValue(originalMDetail.getField("BookingDate").getValue(), false);
 		fromField.addValueChangeListener(this);
+		enterHelper.addField(fromField);
 
 		untilField = ModelToViewModel.convert(fieldMap.get("BookingDate"));
 		untilField.setName("until");
 		untilField.setLabel("@TimeUntil");
 		untilField.setDetail(mDetail);
-		ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+		Control untilControl = ShortDateField.create(composite, untilField, 3, 0, Locale.getDefault(), "UTC", mPerspective);
+		untilControl.addListener(SWT.KeyDown, createKeyListener(untilField));
 		untilField.addValueChangeListener(this);
+		enterHelper.addField(untilField);
 
 		descriptionField = ModelToViewModel.convert(fieldMap.get("Description"));
 		descriptionField.setDetail(mDetail);
-		TextField.create(composite, descriptionField, 4, 0, mPerspective);
+		Control descriptionControl = TextField.create(composite, descriptionField, 4, 0, mPerspective);
+		descriptionControl.addListener(SWT.KeyDown, createKeyListener(descriptionField));
 		descriptionField.setValue(originalMDetail.getField("Description").getValue(), false);
 		descriptionField.addValueChangeListener(this);
+		enterHelper.addField(descriptionField);
 
-		valueChange(null);
+		setPageComplete(false);
 		translate(composite);
 		composite.layout();
 		super.setControl(composite);
+	}
+
+	private Listener createKeyListener(MField mField) {
+		return event -> {
+			if ((event.stateMask & SWT.CTRL) != 0 && (event.keyCode == SWT.CR)) {
+				return;
+			} else if (event.keyCode == SWT.CR) {
+				enterHelper.selectNewFieldOrSave(mField);
+				event.doit = false;
+			}
+			setPageComplete(complete && !popupIsOpen());
+		};
 	}
 
 	public boolean popupIsOpen() {
@@ -211,14 +239,14 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	// Bei einer Änderung checken, ob jetzt alle Felder ausgefüllt sind. Wenn ja kann Bestätigt werden
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
-		boolean complete = checkFromBeforeUntil() && //
+		complete = checkFromBeforeUntil() && //
 				employeeField.getValue() != null && //
 				serviceField.getValue() != null && //
 				fromField.getValue() != null && //
 				untilField.getValue() != null && //
 				descriptionField.getValue() != null;
 
-		setPageComplete(complete);
+		setPageComplete(complete && !popupIsOpen());
 	}
 
 	private boolean checkFromBeforeUntil() {
@@ -255,5 +283,9 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 			}
 			return ((Page) headOrPage).getFieldOrGrid();
 		}
+	}
+
+	public void save() {
+		this.getWizard().performFinish();
 	}
 }
