@@ -48,7 +48,7 @@ Getestet mit Server xxxxxx
 <img width="946" alt="Bildschirmfoto 2021-04-20 um 20 49 45" src="https://user-images.githubusercontent.com/20420898/115448394-f4361800-a219-11eb-8971-d0a023aa49bf.png">
 
 - [ ] Alle Spalten haben die selbe Reihenfolge wie auch in der Anwendung angezeigt (Reihenfolge kann verändert werden)
-- [ ] XML/XSL können erstellt werden (in /<Workspaceordner>/PDF/)
+- [ ] XML/XSL können erstellt werden (in /< Workspaceordner >/PDF/)
 - [ ] Schriftgröße kann verändert werden
 - [ ] Spaltenbreite kann optimiert werden, ansonsten wird Breite aus Index übernommen
 - [ ] Leere Spalten können verborgen werden
