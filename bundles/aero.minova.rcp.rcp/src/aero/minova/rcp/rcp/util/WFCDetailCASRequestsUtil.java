@@ -21,6 +21,7 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -87,6 +88,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	EPartService partService;
+
+	@Inject
+	IEventBroker broker;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -277,15 +281,22 @@ public class WFCDetailCASRequestsUtil {
 	private void sendSaveRequest(Table t) {
 		if (t.getRows() != null) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			if (Objects.isNull(getKeys())) {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				// Speichern wieder aktivieren
+				broker.post(Constants.BROKER_SAVECOMPLETE, true);
+				if (Objects.isNull(getKeys())) {
 					checkNewEntryInsert(tr);
-				}));
-			} else {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				} else {
 					checkEntryUpdate(tr);
-				}));
-			}
+				}
+			}));
+
+			// Auch bei Fehler Speichern wieder aktivieren
+			tableFuture.exceptionally(ex -> {
+				broker.post(Constants.BROKER_SAVECOMPLETE, true);
+				return null;
+			});
 		} else {
 			openNotificationPopup(getTranslation("msg.ActionAborted"));
 		}
