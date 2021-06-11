@@ -160,39 +160,36 @@ public class Lookup extends Composite {
 	 * @return a listener for the keydown event
 	 */
 	private Listener createKeyDownListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
-				if (popupIsOpen()) {
-					switch (event.keyCode) {
-					case SWT.ARROW_DOWN:
-						int index = (table.getSelectionIndex() + 1) % table.getItemCount();
-						table.setSelection(index);
-						event.doit = false;
-						break;
-					case SWT.ARROW_UP:
-						index = table.getSelectionIndex() - 1;
-						if (index < 0) {
-							index = table.getItemCount() - 1;
-						}
-						table.setSelection(index);
-						event.doit = false;
-						break;
-					case SWT.CR:
-					case SWT.KEYPAD_CR:
-						if (popup.isVisible() && table.getSelectionIndex() != -1) {
-							text.setText(table.getSelection()[0].getText());
-							popup.setVisible(false);
-						}
-						break;
-					case SWT.ESC:
+		return event -> {
+			if (popupIsOpen()) {
+				switch (event.keyCode) {
+				case SWT.ARROW_DOWN:
+					int index = (table.getSelectionIndex() + 1) % table.getItemCount();
+					table.setSelection(index);
+					event.doit = false;
+					break;
+				case SWT.ARROW_UP:
+					index = table.getSelectionIndex() - 1;
+					if (index < 0) {
+						index = table.getItemCount() - 1;
+					}
+					table.setSelection(index);
+					event.doit = false;
+					break;
+				case SWT.CR:
+				case SWT.KEYPAD_CR:
+					if (popup.isVisible() && table.getSelectionIndex() != -1) {
+						text.setText(table.getSelection()[0].getText());
 						popup.setVisible(false);
-						break;
 					}
-				} else {
-					if (event.keyCode == SWT.ARROW_DOWN || ((event.stateMask & SWT.CTRL) != 0) && (event.keyCode == SWT.SPACE)) {
-						requestAllLookupEntries();
-					}
+					break;
+				case SWT.ESC:
+					popup.setVisible(false);
+					break;
+				}
+			} else {
+				if (event.keyCode == SWT.ARROW_DOWN || ((event.stateMask & SWT.CTRL) != 0) && (event.keyCode == SWT.SPACE)) {
+					showAllElements(text.getText());
 				}
 			}
 		};
@@ -204,6 +201,11 @@ public class Lookup extends Composite {
 		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
 			firstValue = null;
+			if (contentProvider.getValuesSize() == 0) {
+				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.NoLookupEntries", null),
+						translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
+				notificationPopUp.open();
+			}
 			return;
 		}
 		firstValue = popupValues.get(0);
@@ -500,7 +502,7 @@ public class Lookup extends Composite {
 		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				Lookup.this.setFocus();
+				setFocus();
 				requestAllLookupEntries();
 			}
 		});
@@ -590,6 +592,11 @@ public class Lookup extends Composite {
 
 	public Table getTable() {
 		return table;
+	}
+
+	@Override
+	public String toString() {
+		return "Lookup (" + label.getText() + ")";
 	}
 
 }
