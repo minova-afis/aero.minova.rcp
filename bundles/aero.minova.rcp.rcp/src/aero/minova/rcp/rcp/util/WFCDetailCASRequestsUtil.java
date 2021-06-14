@@ -417,7 +417,7 @@ public class WFCDetailCASRequestsUtil {
 	public void showNotification(@UIEventTopic(Constants.BROKER_SHOWNOTIFICATION) String message) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
-			openNotificationPopup(message);
+			openNotificationPopup(getTranslation(message));
 		}
 	}
 
