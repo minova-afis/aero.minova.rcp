@@ -282,13 +282,13 @@
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnpbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.export" label="@Action.ExportAll" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png" tooltip="@Action.ExportAll" command="_laMxtrbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
         <menu xmi:id="_CeFnprbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.menu.0">
-          <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnp7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttoclipboard" label="In Zwischenablage">
+          <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnp7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttoclipboard" label="In Zwischenablage" command="_laMxtrbdEeuZF8ZS2_h9rA">
             <parameters xmi:id="_CeFnqLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttoclipboard" name="aero.minova.rcp.rcp.commandparameter.exportto" value="CLIPBOARD"/>
           </children>
-          <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnqbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttofile" label="Als Datei" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png">
+          <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnqbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttofile" label="Als Datei" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png" command="_laMxtrbdEeuZF8ZS2_h9rA">
             <parameters xmi:id="_CeFnqrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttofile" name="aero.minova.rcp.rcp.commandparameter.exportto" value="FILE"/>
           </children>
-          <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnq7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttoexcel" label="Als Excel-Datei" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png">
+          <children xsi:type="menu:HandledMenuItem" xmi:id="_CeFnq7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledmenuitem.exporttoexcel" label="Als Excel-Datei" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png" command="_laMxtrbdEeuZF8ZS2_h9rA">
             <parameters xmi:id="_CeFnrLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttoexcel" name="aero.minova.rcp.rcp.commandparameter.exportto" value="EXCEL"/>
           </children>
         </menu>
