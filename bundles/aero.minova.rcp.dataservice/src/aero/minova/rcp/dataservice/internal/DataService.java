@@ -888,8 +888,6 @@ public class DataService implements IDataService {
 
 	@Override
 	public void sendLogs() {
-		System.out.println("---Sending logs " + getStoragePath().resolve(".metadata").toString() + " " + getStoragePath().resolve("logs.zip").toString());
-
 		try {
 			ZipService.zipFile(getStoragePath().resolve(".metadata").toString(), getStoragePath().resolve("logs.zip").toString());
 
@@ -909,7 +907,7 @@ public class DataService implements IDataService {
 			});
 
 			sendRequest.thenApply(response -> {
-				log("CAS Answer Send Logs:\n" + response.statusCode() + " " + response.body());
+				log("CAS Answer Send Logs: " + response.statusCode() + " " + response.body());
 				if (response.statusCode() != 200) {
 					throw new RuntimeException("Server returned " + response.statusCode());
 				}
