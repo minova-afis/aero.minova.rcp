@@ -1,11 +1,9 @@
 package aero.minova.rcp.preferencewindow.control;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -34,20 +32,11 @@ public class SendLogsButton extends CustomPWWidget {
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
 
-		final Button button = new Button(parent, SWT.PUSH);
-		button.setText(translationService.translate("@Action.Send", null));
-
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				dataService.sendLogs();
-			}
-		});
-
-		return button;
+		return ButtonFactory.newButton(SWT.PUSH)//
+				.text(translationService.translate("@Action.Send", null))//
+				.onSelect(e -> dataService.sendLogs()).create(parent);
 	}
 
 	@Override
 	protected void check() {}
-
 }
