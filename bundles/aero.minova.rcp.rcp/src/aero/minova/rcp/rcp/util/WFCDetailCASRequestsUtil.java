@@ -412,6 +412,15 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
+	@Inject
+	@Optional
+	public void showNotification(@UIEventTopic(Constants.BROKER_SHOWNOTIFICATION) String message) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			openNotificationPopup(message);
+		}
+	}
+
 	/**
 	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
 	 *
