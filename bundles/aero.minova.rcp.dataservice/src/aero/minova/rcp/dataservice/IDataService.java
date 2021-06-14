@@ -92,4 +92,6 @@ public interface IDataService {
 	void setTimeout(int timeout);
 
 	void setTimeoutOpenNotification(int timeoutOpenNotification);
+
+	void sendLogs();
 }
