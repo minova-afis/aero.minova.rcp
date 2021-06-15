@@ -680,8 +680,8 @@ public class WFCIndexPart extends WFCFormPart {
 				return;
 			}
 
-			List<Row> c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), (IRowDataProvider<Row>) getBodyLayerStack().getBodyDataProvider(), false);
-			List<Row> collection = c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
 			if (!collection.isEmpty()) {
 				context.set(Constants.BROKER_ACTIVEROWS, collection);
 			}
