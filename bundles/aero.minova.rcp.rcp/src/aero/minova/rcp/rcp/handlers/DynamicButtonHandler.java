@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.rcp.widgets.AbstractWizard;
+import aero.minova.rcp.rcp.widgets.MinovaWizard;
 import aero.minova.rcp.rcp.widgets.MinovaWizardDialog;
 
 public class DynamicButtonHandler {
@@ -32,7 +32,7 @@ public class DynamicButtonHandler {
 
 			Class<?> wizardClass = Class.forName(className);
 			Object wizardObject = ContextInjectionFactory.make(wizardClass, context);
-			((AbstractWizard) wizardObject).setOriginalMDetail(detail);
+			((MinovaWizard) wizardObject).setOriginalMDetail(detail);
 
 			MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, (IWizard) wizardObject);
 			wizardDialog.setTranslationService(translationService);

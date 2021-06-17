@@ -20,6 +20,7 @@ import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.widgets.MinovaWizard;
 
 /**
  * Mit diesem Assistent (Wizard) kann man Arbeitszeiten über mehrere Tage auffüllen
@@ -38,21 +39,25 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_LOAD_INDEX)
 	boolean autoLoadIndex;
 	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED)
+	boolean selectFirstRequired;
+	@Inject
 	private ECommandService commandService;
 	@Inject
 	private EHandlerService handlerService;
+	private PeriodPage periodPage;
 
 	public FillWorkingtimeWizard() {
 		super("@Workingtime.FillWizard.Name");
-		this.setFinishAction(new FinishAction());
+		this.setFinishAction(new FillWorkingtimeFinishAction());
 	}
 
 	@Override
 	public void addPages() {
 		// wird von WizardDialog automatisch aufgerufen
 		super.setWindowTitle(translationService.translate("@Workingtime.FillWizard.Name", null));
-		PeriodPage periodPage = new PeriodPage("PeriodPage", translationService.translate("@Workingtime.FillWizard.Title", null),
-				translationService.translate("@Workingtime.FillWizard.Description", null));
+		periodPage = new PeriodPage("PeriodPage", translationService.translate("@Workingtime.FillWizard.Title", null),
+				translationService.translate("@Workingtime.FillWizard.Description", null), selectFirstRequired);
 		periodPage.setMPerspective(mPerspective);
 		periodPage.setTranslationService(translationService);
 		periodPage.setmPart(mPart);
@@ -96,5 +101,9 @@ public class FillWorkingtimeWizard extends MinovaWizard {
 				});
 			}
 		});
+	}
+
+	public boolean pageIsReady() {
+		return periodPage.isPageComplete();
 	}
 }

@@ -56,6 +56,7 @@ import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
 import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
+import aero.minova.rcp.preferencewindow.control.SendLogsButton;
 import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
@@ -274,6 +275,9 @@ public class ApplicationPreferenceWindowHandler {
 			break;
 		case CHECKEXPLANATION:
 			widget = new ExplanationLabelForPWCheckbox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
+			break;
+		case SENDLOGSBUTTON:
+			widget = new SendLogsButton(pref.getLabel(), key, translationService, dataService);
 			break;
 		default:
 			break;

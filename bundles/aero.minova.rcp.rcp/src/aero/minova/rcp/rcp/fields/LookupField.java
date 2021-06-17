@@ -97,20 +97,10 @@ public class LookupField {
 				Lookup t = (Lookup) text.getParent();
 				switch (e.detail) {
 				case SWT.TRAVERSE_TAB_PREVIOUS:
-					t.fillSelectedValue();
-					e.doit = true;
-					// entfernen des Details, damit niemand mehr dieses TRAVERSE_RETURN Event
-					// verwenden kann.
-					break;
 				case SWT.TRAVERSE_TAB_NEXT:
 				case SWT.TRAVERSE_RETURN:
-					// Hier übernehmen wir den ersten Treffer der Liste, falls es einen Eintrag gibt
-					// edit same column previous row
 					t.fillSelectedValue();
 					e.doit = true;
-					// entfernen des Details, damit niemand mehr dieses TRAVERSE_RETURN Event
-					// verwenden kann.
-					e.detail = SWT.TRAVERSE_TAB_NEXT;
 					break;
 				}
 			}
