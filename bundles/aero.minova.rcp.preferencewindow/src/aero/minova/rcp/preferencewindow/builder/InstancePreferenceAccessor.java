@@ -43,6 +43,7 @@ public class InstancePreferenceAccessor {
 			return preferences.getFloat(preferenceKey, (float) defaultValue);
 		case CHECKEXPLANATION:
 		case CHECK:
+		case SENDLOGSBUTTON:
 			return preferences.getBoolean(preferenceKey, (boolean) defaultValue);
 		case FONT:
 			String fd = preferences.get(preferenceKey, (String) defaultValue);
