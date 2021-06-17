@@ -91,15 +91,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 			CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true, keyLong, keyText);
 			resolveLookup.thenAccept(llv -> sync.asyncExec(() -> {
-				if (llv.isEmpty()) {
-					((Lookup) control).getDescription().setText("");
-					((Lookup) control).setText("");
-					((Lookup) control).setMessage("?");
-				} else {
-					field.setValue(llv.get(0), false);
-					updateControlFromValue(control, llv.get(0));
-					// verlassen dann diese Methode
-				}
+				Value v = llv.isEmpty() ? null : llv.get(0);
+				field.setValue(v, false);
+				updateControlFromValue(control, v);
 			}));
 		}
 	}
