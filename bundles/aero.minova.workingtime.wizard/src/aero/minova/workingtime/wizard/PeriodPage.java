@@ -216,7 +216,6 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 	private Listener createKeyListener(MField mField) {
 		return event -> {
-			System.out.println(event.keyCode + " " + SWT.CR);
 			if ((event.stateMask & SWT.CTRL) != 0 && (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR)) {
 				return;
 			} else if (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR) {
