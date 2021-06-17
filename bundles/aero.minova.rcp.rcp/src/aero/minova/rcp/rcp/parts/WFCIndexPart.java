@@ -62,7 +62,6 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
@@ -614,7 +613,8 @@ public class WFCIndexPart extends WFCFormPart {
 					selectionThread = new SelectionThread(tableSelectionBuffer);
 					selectionThread.start();
 				} else if (event instanceof RowStructuralRefreshEvent) {
-						NatTableUtil.resizeRows(natTable);
+					NatTableUtil.resizeRows(natTable);
+				}
 			});
 
 			treeLayer = new TreeLayer(this.selectionLayer, bodyDataLayer.getTreeRowModel());
