@@ -1,4 +1,9 @@
-Version 2.0.2
+Version 2.1
+
+## Version 2.1   ##
+## 18.06.2021    ##
+## 12.0.21       ##
+Toolbar Contributions dynamisch dem Modell hinzugefügen
 
 ## Version 2.0.2 ##
 ## 14.06.2021    ##
