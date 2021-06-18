@@ -43,44 +43,69 @@ public class LifeCycle {
 
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
-		WorkspaceDialog workspaceDialog;
-
-		// Show login dialog to the user
-		workspaceDialog = new WorkspaceDialog(null, logger, sync);
 		URI workspaceLocation = null;
 
-		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-			try {
-				ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-				if (!Platform.getInstanceLocation().isSet()) {
-					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
-					try {
-						workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
-					}
-					if (workspaceLocation == null) {
-						WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
-						loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
-					} else {
-						dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null), sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
-								sPrefs.get(WorkspaceAccessPreferences.URL, null), workspaceLocation);
-						dataService.setLogger(logger);
-					}
-				}
-			} catch (Exception e) {
-				logger.error(e);
-				workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+		// Auslesen der übergabenen ProgrammArgumente
+		String[] applicationArgs = Platform.getApplicationArgs();
+
+		String argUser = null;// "admin";
+		String argPW = null;// "rqgzxTf71EAx8chvchMi";
+		String argURL = null;// "http://publictest.minova.com:17280/cas";
+
+		for (String string : applicationArgs) {
+			if (string.startsWith("-user")) {
+				argUser = string.substring(string.indexOf("=") + 1);
 			}
-		} else {
-			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+			if (string.startsWith("-pw")) {
+				argPW = string.substring(string.indexOf("=") + 1);
+			}
+			if (string.startsWith("-url")) {
+				argURL = string.substring(string.indexOf("=") + 1);
+			}
 		}
 
-		checkModelVersion(workspaceLocation);
+		if (argPW != null && argURL != null && argUser != null) {
+			try {
+				workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			dataService.setCredentials(argUser, argPW, argURL, workspaceLocation);
+			dataService.setLogger(logger);
+		} else {
+			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, logger, sync);
+
+			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
+				try {
+					ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
+					if (!Platform.getInstanceLocation().isSet()) {
+						Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+						try {
+							workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+						} catch (URISyntaxException e) {
+							e.printStackTrace();
+						}
+						if (workspaceLocation == null) {
+							WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
+							loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+						} else {
+							dataService.setCredentials(sPrefs.get(WorkspaceAccessPreferences.USER, null), sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null),
+									sPrefs.get(WorkspaceAccessPreferences.URL, null), workspaceLocation);
+							dataService.setLogger(logger);
+						}
+					}
+				} catch (Exception e) {
+					logger.error(e);
+					workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+				}
+			} else {
+				workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+			}
+			checkModelVersion(workspaceLocation);
+		}
 
 		Manager manager = new Manager();
 		manager.postContextCreate(workbenchContext);
-
 	}
 
 	/**
