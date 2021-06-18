@@ -101,6 +101,14 @@ public class DataService implements IDataService {
 				+ value.getProcedureOrView());
 	}
 
+	public void postNotification(String message) {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWNOTIFICATION);
+		data.put(IEventBroker.DATA, message);
+		Event event = new Event(Constants.BROKER_SHOWNOTIFICATION, data);
+		eventAdmin.postEvent(event);
+	}
+
 	public void showNoResposeServerError(String message, Throwable th) {
 		// Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
 		if ((System.currentTimeMillis() - timeOfLastConnectionErrorMessage) > minTimeBetweenError * 1000) {
@@ -297,6 +305,7 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
+			log("CAS Answer Detail Data:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			if (fromJson.getReturnCode() == null) {
 				String errorMessage = null;
@@ -324,7 +333,6 @@ public class DataService implements IDataService {
 					return null;
 				}
 			}
-			log("CAS Answer Detail Data:\n" + t.body());
 			return fromJson;
 		});
 
@@ -571,7 +579,6 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText) {
-		useCache = false;
 		ArrayList<LookupValue> list = new ArrayList<>();
 		if (field.getLookupTable() != null) {
 			String tableName = field.getLookupTable();
@@ -877,5 +884,39 @@ public class DataService implements IDataService {
 	@Override
 	public void setTimeoutOpenNotification(int timeoutOpen) {
 		timeoutDurationOpenNotification = timeoutOpen;
+	}
+
+	@Override
+	public void sendLogs() {
+		try {
+			ZipService.zipFile(getStoragePath().resolve(".metadata").toString(), getStoragePath().resolve("logs.zip").toString());
+
+			// Kein Timeout, da Upload länger dauer kann
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/upload/logs"))//
+					.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM)//
+					.POST(BodyPublishers.ofByteArray(Files.readAllBytes(getStoragePath().resolve("logs.zip"))))//
+					.build();
+
+			log("CAS Request Send Logs:\n" + request);
+
+			CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+			sendRequest.exceptionally(ex -> {
+				handleCASError(ex, "Send Logs", true);
+				return null;
+			});
+
+			sendRequest.thenApply(response -> {
+				log("CAS Answer Send Logs: " + response.statusCode() + " " + response.body());
+				if (response.statusCode() != 200) {
+					throw new RuntimeException("Server returned " + response.statusCode());
+				}
+				postNotification("msg.UploadSuccess");
+				return response;
+			});
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

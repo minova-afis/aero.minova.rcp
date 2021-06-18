@@ -22,6 +22,14 @@ public class NatTableUtil {
 		}
 	}
 
+	public static void resizeRows(NatTable natTable) {
+		for (int i = 0; i < natTable.getRowCount(); i++) {
+			InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable, i, natTable.getConfigRegistry(),
+					new GCFactory(natTable));
+			natTable.doCommand(rowCommand);
+		}
+	}
+
 	public static void refresh(NatTable natTable) {
 		natTable.doCommand(new VisualRefreshCommand());
 	}

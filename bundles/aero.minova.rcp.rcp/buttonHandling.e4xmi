@@ -7,6 +7,6 @@
     </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_PrpWIL4SEeuQC6-nmD0NNA" featurename="handlers" parentElementId="xpath:/">
-    <elements xsi:type="commands:Handler" xmi:id="_RrMzEL4SEeuQC6-nmD0NNA" elementId="aero.minova.rcp.rcp.handler.dynamicbuttonhandler" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DynamicButtonhandler" command="_9LplsL4REeuQC6-nmD0NNA"/>
+    <elements xsi:type="commands:Handler" xmi:id="_RrMzEL4SEeuQC6-nmD0NNA" elementId="aero.minova.rcp.rcp.handler.dynamicbuttonhandler" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DynamicButtonHandler" command="_9LplsL4REeuQC6-nmD0NNA"/>
   </fragments>
 </fragment:ModelFragments>

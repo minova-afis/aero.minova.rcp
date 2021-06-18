@@ -7,13 +7,12 @@
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.root</artifactId>
-		<version>12.0.18-SNAPSHOT</version>
+		<version>12.0.21-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
 	<modules>
 		<module>aero.minova.rcp.feature</module>
 		<module>aero.minova.libs.feature</module>
-		<!--  module>aero.minova.debug.feature</module>-->
 	</modules>
 </project>

@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.handlers;
+package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +8,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -24,8 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
- * Dieser Dialog zeigt die bestehenden (Such-)Kriterien an und bietet die
- * Möglichkeit, welche zu löschen
+ * Dieser Dialog zeigt die bestehenden (Such-)Kriterien an und bietet die Möglichkeit, welche zu löschen
  */
 public class DeleteSearchCriteriaDialog extends Dialog {
 	private TranslationService translationService;
@@ -34,15 +31,14 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 	private String tableName;
 
 	// ungleich 0 oder 1 um zu verhindern, dass Dialog sich schliesst
-	int BuTTON_DELETE_ID = 4;
+	private static final int BUTTON_DELETE_ID = 4;
 	private List<String> criterias;
 	private TableViewer viewer;
 	private Button delete;
 
 	private String criteriaName;
 
-	public DeleteSearchCriteriaDialog(Shell parent, TranslationService translationService, IEclipsePreferences prefs,
-			String tableName) {
+	public DeleteSearchCriteriaDialog(Shell parent, TranslationService translationService, IEclipsePreferences prefs, String tableName) {
 		super(parent);
 		this.translationService = translationService;
 		this.prefs = prefs;
@@ -62,18 +58,14 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		// Label-und Content-Provider setzen
 		viewer.setLabelProvider(new LabelProvider());
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				StructuredSelection ss = (StructuredSelection) viewer.getSelection();
-				// Ist etwas ausgewählt?
-				if (ss.isEmpty()) {
-					delete.setEnabled(false);
-				} else {
-					criteriaName = ss.getFirstElement().toString();
-					delete.setEnabled(criteriaName != null);
-				}
+		viewer.addSelectionChangedListener(event -> {
+			StructuredSelection ss = (StructuredSelection) viewer.getSelection();
+			// Ist etwas ausgewählt?
+			if (ss.isEmpty()) {
+				delete.setEnabled(false);
+			} else {
+				criteriaName = ss.getFirstElement().toString();
+				delete.setEnabled(criteriaName != null);
 			}
 		});
 
@@ -88,7 +80,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 
-		delete = createButton(parent, BuTTON_DELETE_ID, translationService.translate("@Action.Delete", null), false);
+		delete = createButton(parent, BUTTON_DELETE_ID, translationService.translate("@Action.Delete", null), false);
 		// Button zum Löschen
 		delete.setEnabled(false);
 
@@ -119,7 +111,12 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		});
 
 		createButton(parent, IDialogConstants.CANCEL_ID, translationService.translate("@Action.Close", null), true);
+	}
 
+	@Override
+	protected void configureShell(Shell shell) {
+		super.configureShell(shell);
+		shell.setText(translationService.translate("@SelectionCriteria.DeleteTitle", null));
 	}
 
 	private List<String> getCriteriaNames() {

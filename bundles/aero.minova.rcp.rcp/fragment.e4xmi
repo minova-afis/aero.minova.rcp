@@ -149,6 +149,7 @@
       <parameters xmi:id="_laMxyLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.criteriaaction" name="criteriaAction" optional="false"/>
       <parameters xmi:id="_laMxybbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.criterianame" name="criteriaName" optional="false"/>
     </elements>
+    <elements xsi:type="commands:Command" xmi:id="__iku8L_AEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.command.traverseenter" commandName="Traverse Enter"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Le0doLbxEeuZF8ZS2_h9rA" featurename="trimBars" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="basic:TrimBar" xmi:id="_Le0dobbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.trimbar.top"/>
@@ -180,6 +181,7 @@
     <elements xsi:type="commands:KeyBinding" xmi:id="_1jziabbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_laMxxbbdEeuZF8ZS2_h9rA">
       <tags>type:user</tags>
     </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_YuQUQL_BEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.keybinding.0" keySequence="CR" command="__iku8L_AEeuboN5m_phYZw"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_6zWJYLbxEeuZF8ZS2_h9rA" featurename="snippets" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="advanced:Perspective" xmi:id="_AjQSgLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.perspective.main" selectedElement="_CeFngLbyEeuZF8ZS2_h9rA" label="Snippet">

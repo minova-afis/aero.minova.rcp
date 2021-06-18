@@ -15,12 +15,7 @@ Getestet mit Server xxxxxx
 - [ ]  Anmeldung an den Server mittles Default - Profil
 - [ ] Anmeldung an den Server durch manuelles eintragen der Anmeldedaten
 - [ ] Wiederholtes Anmelden mit einem Profil, bei dem das Passwort falsch eingetragen wurde und die Anwendung direkt darauf geschlossen wurde (siehe 2. Kommentar #388)
-
-### Suchkriterien 
-- [ ] Default Suchkriterien werden beim Starten geladen
-- [ ] Mehrere Suchkriterien können unter verschiedenen Namen gespeichert werden
-- [ ] Nicht-Default Suchkriterien können geladen werden
-- [ ] Suchkriterien können gelöscht werden
+- [ ] Wenn sich die ModelVersion geändert hat wird die workbench.xmi mit entsprechender Warnung gelöscht (Anwendung startet wie mit -clearPersistedState)
 
 ## Keine Verbindung zum CAS möglich
 - [ ] Die angezeigte Fehlermeldung enthält Details zum Fehler
@@ -32,19 +27,41 @@ Getestet mit Server xxxxxx
 - [ ] Der aktuelle Workspace-Ordner kann über die Einstellungen gelöscht werden
 - [ ] Das Löschen eines Profils in der Login-Maske löscht auch den entsprechenden Workspace-Ordner
 
-## Indexdruck
+## Suche (Knöpfe in der Toolbar)
+- [ ]  Suchtabelle kann zurückgesetzt werden
+- [ ]  Eine Zeile der Suchtabelle kann gelöscht werden
+- [ ]  Breite der Spalten kann optimiert werden
+
+### Suchkriterien 
+- [ ] Default Suchkriterien werden beim Starten geladen
+- [ ] Mehrere Suchkriterien können unter verschiedenen Namen gespeichert werden
+- [ ] Nicht-Default Suchkriterien können geladen werden
+- [ ] Suchkriterien können gelöscht werden
+
+## Index (Knöpfe in der Toolbar)
+- [ ] Index kann geladen werden und ist nach Suchkriterien gefiltert
+- [ ] Bei Gruppierung können die Gruppen erweitert und zusammengeklappt werden
+- [ ] Daten können exportiert werden
+- [ ]  Breite der Spalten kann optimiert werden
+
+### Indexdruck + Druckeinstellungen
 <img width="823" alt="Bildschirmfoto 2021-04-20 um 22 27 50" src="https://user-images.githubusercontent.com/77741125/115459729-acb68880-a227-11eb-9ce3-49d04540c6d9.png">
 
 - [ ] Alle Spalten haben die selbe Reihenfolge wie auch in der Anwendung angezeigt (Reihenfolge kann verändert werden)
-
-### Druckeinstellungen
-- [ ] XML/XSL können erstellt werden (Workspaceordner -> PDF)
+- [ ] XML/XSL können erstellt werden (in /< Workspaceordner >/PDF/)
 - [ ] Schriftgröße kann verändert werden
 - [ ] Spaltenbreite kann optimiert werden, ansonsten wird Breite aus Index übernommen
 - [ ] Leere Spalten können verborgen werden
 - [ ] Gruppenspalten können verborgen werden
 - [ ] Suchkriterien können angezeigt werden 
 - [ ] Interne Vorschau kann aktiviert werden 
+
+## Details (Knöpfe in der Toolbar)
+- [ ] Einträge können gespeichert werden
+- [ ] Ein neues Detail kann erstellt werden
+- [ ] Ein Datensatz kann gelöscht werden
+- [ ] Änderungen können verworfen werden
+- [ ] Die Breite der Anwendung kann optimiert werden
 
 ## Traverselistener
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
@@ -60,6 +77,8 @@ Getestet mit Server xxxxxx
 - [ ] Bei einem Neustart sind in der Leiste die gleichen Perspektiven wieder vorhanden
 - [ ] Perspektiven können über Rechtsklick geschlossen werden (inklusive der letzten)
 - [ ] Es wird unterstützt, dass Masken in der application.mdi unterschiedliche Dateinamen und IDs haben (siehe #487)
+- [ ] Perspektiven können angeheftet werden und bleiben in der Leiste, wenn man sie schließt
+- [ ] Angeheftete und dann geschlossene Perspektiven können wieder geöffnet werden
 
 ## Keybindings
 Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktionieren.
