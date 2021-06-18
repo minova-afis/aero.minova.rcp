@@ -6,4 +6,5 @@ Bundle-Version: 12.0.21.qualifier
 Export-Package: aero.minova.rcp.form.menu.mdi
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: com.sun.xml.bind.v2;version="2.3.3",
- javax.xml.bind.annotation;version="2.3.3"
+ javax.xml.bind.annotation;version="2.3.3",
+ javax.xml.bind.annotation.adapters;version="2.3.3"
