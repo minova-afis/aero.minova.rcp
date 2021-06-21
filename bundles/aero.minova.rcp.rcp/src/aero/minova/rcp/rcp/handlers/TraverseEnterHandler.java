@@ -163,10 +163,13 @@ public class TraverseEnterHandler {
 		// Wir prüfen ob die Preference EnterSelectsFirstRequired gesetzt ist.
 		if (!enterSelectsFirstRequired || popupOpen) {
 			Control fc = null;
-			Lookup lookup = (Lookup) focussedControl;
 
-			if (popupOpen) {
-				setLookupValue(selectedField, lookup);
+			Lookup lookup = null;
+			if (focussedControl instanceof Lookup) {
+				lookup = (Lookup) focussedControl;
+				if (popupOpen) {
+					setLookupValue(selectedField, lookup);
+				}
 			}
 
 			List<MField> tabListFromSelectedFieldSection = selectedField.getmSection().getTabList();
