@@ -3,11 +3,10 @@ package aero.minova.rcp.uitests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -28,7 +27,9 @@ public class ExitHandlerTest {
 
 	@Test
 	public void executeExit() {
-		Menu systemMenu = Display.getCurrent().getSystemMenu();
+		if (!SWTUtils.isMac()) {
+			return;
+		}
 		SWTBotMenu fileMenu = bot.menu("File");
 		assertNotNull(fileMenu);
 		SWTBotMenu exitMenu = fileMenu.menu("Exit");
