@@ -60,6 +60,7 @@
 		<unit id="org.eclipse.swtbot.junit5.feature.group" version="0.0.0"/>
         ​<unit id="org.eclipse.swtbot.e4.finder" version="0.0.0"/>
         ​<unit id="org.eclipse.swtbot.go" version="0.0.0"/>
+        ​<unit id="org.eclipse.swtbot.nebula.nattable.finder" version="0.0.0"/>
 	</location>
 	
 </locations>
