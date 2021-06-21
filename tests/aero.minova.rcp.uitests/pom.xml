@@ -16,6 +16,11 @@
 		<relativePath>../</relativePath>
 	</parent>
 	
+	<properties>
+		<uitest.vmparams>-Xms256m -Xmx8096m</uitest.vmparams>
+	</properties>
+	
+	
 	<profiles>
 		<profile>
 			<id>macosx</id>
