@@ -54,7 +54,7 @@
 				<version>${tycho.version}</version>
 				<configuration>
 					<argLine>${ui.test.vmargs}</argLine>
-					<appArgLine>-clearPersistedState -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas</appArgLine>
+					<appArgLine>-nl de -clearPersistedState -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas</appArgLine>
 					<useUIHarness>true</useUIHarness>
 					<useUIThread>false</useUIThread>
 					<product>aero.minova.rcp.rcp.product</product>
