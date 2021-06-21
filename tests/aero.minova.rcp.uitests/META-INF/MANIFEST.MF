@@ -11,4 +11,9 @@ Require-Bundle: org.eclipse.swtbot.e4.finder;bundle-version="3.1.0",
  org.eclipse.swtbot.eclipse.finder;bundle-version="3.1.0",
  org.apache.log4j;bundle-version="1.2.15",
  org.junit;bundle-version="4.13.0",
- org.eclipse.swtbot.junit4_x;bundle-version="3.1.0"
+ org.eclipse.swtbot.junit4_x;bundle-version="3.1.0",
+ org.eclipse.e4.ui.model.workbench;bundle-version="2.1.1000"
+Import-Package: org.eclipse.e4.core.contexts,
+ org.eclipse.e4.ui.workbench,
+ org.osgi.framework;version="1.10.0"
+Bundle-ActivationPolicy: lazy
