@@ -26,6 +26,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -88,6 +89,10 @@ public class OpenStundenerfassungsTest {
 
 	@Test
 	public void openPreferences() {
+
+		if (!SWTUtils.isMac()) {
+			return;
+		}
 
 		Display.getDefault().asyncExec(() -> {
 			Menu systemMenu = Display.getDefault().getSystemMenu();

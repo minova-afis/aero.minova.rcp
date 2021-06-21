@@ -27,7 +27,7 @@ public class ExitHandlerTest {
 
 	@Test
 	public void executeExit() {
-		if (!SWTUtils.isMac()) {
+		if (SWTUtils.isMac()) {
 			return;
 		}
 		SWTBotMenu fileMenu = bot.menu("File");
