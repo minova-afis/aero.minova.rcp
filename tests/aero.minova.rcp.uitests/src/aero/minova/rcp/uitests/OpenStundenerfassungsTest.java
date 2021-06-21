@@ -12,7 +12,10 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
+import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
+import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Before;
@@ -45,9 +48,16 @@ public class OpenStundenerfassungsTest {
 
 		assertNotNull(partByTitle);
 
-//		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-//		SWTBotNatTable nattable = bot.nattable();
-//		int rowCount = nattable.rowCount();
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+		SWTBotNatTable nattable = swtNatTableBot.nattable();
+
+		System.out.println(nattable);
+
+		int row = 5, col = 1;
+		int rowCount = nattable.rowCount();
+		nattable.setCellDataValueByPosition(1, 3, "xxyy");
+		nattable.pressShortcut(Keystrokes.LF);
+		System.out.println(rowCount);
 //		int totalRowCount = nattable.preferredRowCount();
 
 		IEclipseContext eclipseContext = getEclipseContext();
