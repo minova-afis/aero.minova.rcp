@@ -32,10 +32,10 @@ Require-Bundle: org.eclipse.swtbot.e4.finder;bundle-version="3.1.0",
  aero.minova.rcp.preferencewindow;bundle-version="12.0.21",
  aero.minova.rcp.translate;bundle-version="12.0.21",
  aero.minova.workingtime.helper;bundle-version="12.0.21",
- org.eclipse.e4.core.contexts;bundle-version="1.8.400",
- org.junit.jupiter.api
+ org.eclipse.e4.core.contexts;bundle-version="1.8.400"
 Import-Package: org.eclipse.e4.core.contexts,
  org.eclipse.e4.ui.workbench,
  org.eclipse.e4.ui.workbench.modeling,
+ org.junit.jupiter.api;version="5.7.1",
  org.osgi.framework;version="1.10.0"
 Bundle-ActivationPolicy: lazy
