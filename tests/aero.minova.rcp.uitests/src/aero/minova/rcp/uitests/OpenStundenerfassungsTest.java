@@ -21,11 +21,8 @@ import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-<<<<<<< HEAD
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-=======
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
->>>>>>> branch 'swtbot' of https://github.com/minova-afis/aero.minova.rcp.git
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
