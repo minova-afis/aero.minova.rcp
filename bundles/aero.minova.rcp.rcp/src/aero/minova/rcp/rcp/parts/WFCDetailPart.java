@@ -8,7 +8,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
-import java.awt.event.FocusEvent;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,12 +34,11 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -51,6 +49,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -59,7 +59,9 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
+import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -82,7 +84,6 @@ import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.ImageUtil;
-
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
@@ -230,7 +231,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Wir erstellen die HEAD Section des Details.
 		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
 		// Button erstellen, falls vorhanden
-		// createButton(composite, headOrPage, mSection, context);
+		createButton(headOrPage, section);
 		// Erstellen der Field des Section.
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
@@ -248,29 +249,69 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param composite2
 	 * @param headOrPage
 	 * @param mSection
+	 * @param section
 	 */
-	private void createButton(Composite composite, HeadOrPageWrapper headOrPage, MSection mSection, IEclipseContext partContext) {
+	private void createButton(HeadOrPageWrapper headOrPage, Section section) {
 		if (headOrPage.isHead) {
 			return;
 		}
 
+		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
+
 		Page page = (Page) headOrPage.headOrPage;
 		for (aero.minova.rcp.form.model.xsd.Button btn : page.getButton()) {
-			String btnLabel = btn.getText();
-			Button button = ButtonFactory.newButton(SWT.PUSH).text(btnLabel).image(ImageUtil.getImageDefault(btn.getIcon())).create(composite);
-			button.setData(Constants.CONTROL_ID, btn.getId());
-			button.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					Map<String, String> parameter = Map.of(//
-							Constants.CONTROL_WIZARD, "aero.minova.workingtime.wizard.FillWorkingTimeWizard");
+			final ToolItem item = new ToolItem(bar, SWT.PUSH);
+			item.setData(btn);
+			item.setEnabled(btn.isEnabled());
+			if (btn.getText() != null) {
+				item.setText(translationService.translate(btn.getText(), null));
+				item.setToolTipText(translationService.translate(btn.getText(), null));
+			}
 
-					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
-					handlerService.executeHandler(command);
-				}
-			});
+			Object event = findEventForID(btn.getId());
+			if (event instanceof Onclick) {
+				Onclick onclick = (Onclick) event;
+				item.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						// TODO: Andere procedures/bindings/instances auswerten
 
+						Wizard wizard = getWizard(onclick);
+						if (wizard != null) {
+							Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, wizard.getWizardname());
+							ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+							handlerService.executeHandler(command);
+						}
+					}
+				});
+			}
+
+			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+				final Image buttonImage = ImageUtil.getImageFromImagesBundle(btn.getIcon());
+				item.setImage(buttonImage);
+			}
 		}
+		section.setTextClient(bar);
+
+	}
+
+	private Object findEventForID(String id) {
+		for (Onclick onclick : form.getEvents().getOnclick()) {
+			if (onclick.getRefid().equals(id)) {
+				return onclick;
+			}
+		}
+		// TODO: Onbinder und ValueChange implementieren
+		return null;
+	}
+
+	private Wizard getWizard(Onclick onclick) {
+		for (Object o : onclick.getBinderOrProcedureOrInstance()) {
+			if (o instanceof Wizard) {
+				return (Wizard) o;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -283,7 +324,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 */
 	private void sortTabList(MSection mSection) {
 		List<MField> tabList = mSection.getTabList();
-		Collections.sort(tabList, new Comparator<MField>() {
+		Collections.sort(tabList, new Comparator<>() {
 
 			@Override
 			public int compare(MField f1, MField f2) {
@@ -296,6 +337,7 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		});
+		mSection.setTabList(tabList);
 
 	}
 
@@ -320,7 +362,6 @@ public class WFCDetailPart extends WFCFormPart {
 			i++;
 		}
 		return tabArray;
-
 	}
 
 	/**

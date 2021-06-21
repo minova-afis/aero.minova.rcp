@@ -21,6 +21,7 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -87,6 +88,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	EPartService partService;
+
+	@Inject
+	IEventBroker broker;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -277,19 +281,24 @@ public class WFCDetailCASRequestsUtil {
 	private void sendSaveRequest(Table t) {
 		if (t.getRows() != null) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			if (Objects.isNull(getKeys())) {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				// Speichern wieder aktivieren
+				broker.post(Constants.BROKER_SAVECOMPLETE, true);
+				if (Objects.isNull(getKeys())) {
 					checkNewEntryInsert(tr);
-				}));
-			} else {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				} else {
 					checkEntryUpdate(tr);
-				}));
-			}
+				}
+			}));
+
+			// Auch bei Fehler Speichern wieder aktivieren
+			tableFuture.exceptionally(ex -> {
+				broker.post(Constants.BROKER_SAVECOMPLETE, true);
+				return null;
+			});
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wrong inputs in your messured Time",
-					shell);
-			notificationPopUp.open();
+			openNotificationPopup(getTranslation("msg.ActionAborted"));
 		}
 	}
 
@@ -400,6 +409,15 @@ public class WFCDetailCASRequestsUtil {
 			} else {
 				ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
 			}
+		}
+	}
+
+	@Inject
+	@Optional
+	public void showNotification(@UIEventTopic(Constants.BROKER_SHOWNOTIFICATION) String message) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			openNotificationPopup(getTranslation(message));
 		}
 	}
 
@@ -574,7 +592,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
-		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, shell);
+		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, getTranslation("Notification"), shell);
 		notificationPopUp.open();
 	}
 

@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -92,15 +91,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 			CompletableFuture<List<LookupValue>> resolveLookup = dataService.resolveLookup((MLookupField) field, true, keyLong, keyText);
 			resolveLookup.thenAccept(llv -> sync.asyncExec(() -> {
-				if (llv.isEmpty()) {
-					((Lookup) control).getDescription().setText("");
-					((Lookup) control).setText("");
-					((Lookup) control).setMessage("?");
-				} else {
-					field.setValue(llv.get(0), false);
-					updateControlFromValue(control, llv.get(0));
-					// verlassen dann diese Methode
-				}
+				Value v = llv.isEmpty() ? null : llv.get(0);
+				field.setValue(v, false);
+				updateControlFromValue(control, v);
 			}));
 		}
 	}
@@ -138,15 +131,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	public void updatePossibleValues() {
 		Lookup up = ((Lookup) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-		try {
-			if (!(listLookup.get()).isEmpty()) {
-				listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
-			} else {
-				control.getParent().setFocus();
-			}
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
 	}
 
 	/**

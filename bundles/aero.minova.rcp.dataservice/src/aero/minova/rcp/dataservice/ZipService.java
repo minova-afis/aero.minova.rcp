@@ -4,18 +4,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class ZipService {
+
+	private ZipService() {}
 
 	/**
 	 * Unzips a archive file to the defined directory
 	 * 
 	 * @throws IOException
-	 * 
 	 */
-
 	public static void unzipFile(File fileZip, String destDirName) throws IOException {
 		File destDir = new File(destDirName);
 		byte[] buffer = new byte[1024];
@@ -59,5 +63,26 @@ public class ZipService {
 		}
 
 		return destFile;
+	}
+
+	public static void zipFile(String sourceDirPath, String zipFilePath) throws IOException {
+		if (Files.exists(Paths.get(zipFilePath))) {
+			Files.delete(Paths.get(zipFilePath));
+		}
+		Path p = Files.createFile(Paths.get(zipFilePath));
+
+		try (ZipOutputStream zs = new ZipOutputStream(Files.newOutputStream(p))) {
+			Path pp = Paths.get(sourceDirPath);
+			Files.walk(pp).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+				ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
+				try {
+					zs.putNextEntry(zipEntry);
+					Files.copy(path, zs);
+					zs.closeEntry();
+				} catch (IOException e) {
+					System.err.println(e);
+				}
+			});
+		}
 	}
 }

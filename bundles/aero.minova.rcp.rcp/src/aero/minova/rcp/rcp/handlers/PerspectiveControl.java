@@ -93,7 +93,7 @@ public class PerspectiveControl {
 	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
 	 */
 	@PostConstruct
-	public void createGui(Composite parent, MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
+	public void createGui(Composite parent, MWindow window) {
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		composite.setLayout(rowLayout);
@@ -116,17 +116,13 @@ public class PerspectiveControl {
 		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
 		// The perspectives currently open
-		List<MPerspectiveStack> appPerspectiveStacks = modelService.findElements(window, null, MPerspectiveStack.class);
-		if (appPerspectiveStacks.isEmpty()) {
-			for (MPerspectiveStack stack : appPerspectiveStacks) {
-				for (MPerspective perspective : stack.getChildren()) {
-					if (perspective.isToBeRendered()) {
-						addPerspectiveShortcut(perspective);
-					}
-					if (perspective == modelService.getActivePerspective(window)) {
-						setSelectedElement(perspective);
-					}
-				}
+		List<MPerspective> perspectives = modelService.findElements(window, null, MPerspective.class);
+		for (MPerspective perspective : perspectives) {
+			if (perspective.isToBeRendered()) {
+				addPerspectiveShortcut(perspective);
+			}
+			if (perspective == modelService.getActivePerspective(window)) {
+				setSelectedElement(perspective);
 			}
 		}
 		translate(translationService);
@@ -195,10 +191,9 @@ public class PerspectiveControl {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Map<String, String> parameter = Map.of(//
-							Constants.FORM_NAME, perspective.getElementId(), Constants.FORM_ID, perspective.getElementId(), Constants.FORM_LABEL,
-							perspective.getElementId()
-					//
-					);
+							Constants.FORM_NAME, perspective.getPersistedState().get(Constants.FORM_NAME), //
+							Constants.FORM_ID, perspective.getElementId(), //
+							Constants.FORM_LABEL, perspective.getLabel());
 
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform", parameter);
 					handlerService.executeHandler(command);
@@ -337,14 +332,14 @@ public class PerspectiveControl {
 
 		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
-
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				Map<String, String> parameter = Map.of(E4WorkbenchParameterConstants.FORM_NAME, perspectiveId);
 				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
 
-				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
+				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
+				// Kennzeichen gelöscht wird.
 				if (((keepItToolitems == null) || !keepItToolitems.contains(perspectiveId)) && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
@@ -352,7 +347,6 @@ public class PerspectiveControl {
 			}
 		});
 		menuItem.setSelection(keepItToolitems != null && keepItToolitems.contains(perspectiveId));
-
 	}
 
 	@Inject

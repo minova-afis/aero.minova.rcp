@@ -12,7 +12,6 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -23,7 +22,6 @@ import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
-import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MSection;
@@ -59,23 +57,35 @@ public class TraverseEnterHandler {
 	public void execute() {
 		MPart part = partService.getActivePart();
 
-		// SaveDetailHandler holen
-		IHandler handler = commandService.getCommand("aero.minova.rcp.rcp.command.savedetail").getHandler();
-		// prüfen, ob der SaveDetailHandler enabled ist
-		if (handler.isEnabled()) {
-			// ParameterizedCommand des SaveDetailsHandlers erstellen und ausführen
-			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.savedetail", null);
-			handlerService.executeHandler(cmd);
-			return;
-		}
+		boolean popupOpen = false;
 
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
 			if (detail.getSelectedField() != null) {
 				// aktuell selektiertes Feld holen
 				Control focussedControl = detail.getSelectedField();
+
+				// Ist ein Popup offen?
+				if (focussedControl instanceof Lookup) {
+					Lookup lookup = (Lookup) focussedControl;
+					// Wir holen uns den Status des Popup des Lookup
+					popupOpen = lookup.popupIsOpen();
+				}
 				// nächstes Pflichtfeld suchen und fokussieren
 				getNextRequired(focussedControl, detail);
+			}
+		}
+
+		// Bei offenem Lookup-Popup wollen wir nicht speichern
+		if (!popupOpen) {
+			// SaveDetailHandler holen
+			IHandler handler = commandService.getCommand("aero.minova.rcp.rcp.command.savedetail").getHandler();
+			// prüfen, ob der SaveDetailHandler enabled ist
+			if (handler.isEnabled()) {
+				// ParameterizedCommand des SaveDetailsHandlers erstellen und ausführen
+				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.savedetail", null);
+				handlerService.executeHandler(cmd);
+				return;
 			}
 		}
 	}
@@ -140,9 +150,15 @@ public class TraverseEnterHandler {
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
-			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
-			Lookup lookup = (Lookup) focussedControl;
-			lookup.closePopup();
+			focussedControl.setFocus();
+			if (focussedControl instanceof Lookup) {
+				Lookup lookup = (Lookup) focussedControl;
+				lookup.closePopup();
+				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
+				field.setValue(lv, true);
+			}
+			return;
 		}
 
 		// Wir prüfen ob die Preference EnterSelectsFirstRequired gesetzt ist.

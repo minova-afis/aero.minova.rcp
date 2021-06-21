@@ -59,16 +59,16 @@ import org.eclipse.nebula.widgets.nattable.layer.AbstractLayerTransform;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
+import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
@@ -131,6 +131,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_LOAD_INDEX)
 	boolean autoLoadIndex;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
+	int tableSelectionBuffer;
+
 	private Table data;
 
 	private NatTable natTable;
@@ -159,6 +163,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private DefaultColumnHeaderDataLayer columnHeaderDataLayer;
 
+	private SelectionThread selectionThread;
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -186,12 +192,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
-		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
-
-		if (autoLoadIndex) {
-			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
-			handlerService.executeHandler(cmd);
-		}
+		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);
 	}
 
 	@Inject
@@ -242,6 +243,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
+		loadPrefs(name, true);
+	}
+
+	public void loadPrefs(String name, boolean loadIndex) {
 		// Spaltenanordung und -breite
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".index.size", null);
@@ -298,6 +303,11 @@ public class WFCIndexPart extends WFCFormPart {
 			} else {
 				expandGroups("");
 			}
+		}
+
+		if (loadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+			handlerService.executeHandler(cmd);
 		}
 	}
 
@@ -559,7 +569,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private final SortedList<T> sortedList;
 
-		private final IDataProvider bodyDataProvider;
+		private final IRowDataProvider<Row> bodyDataProvider;
 
 		private final SelectionLayer selectionLayer;
 
@@ -581,37 +591,13 @@ public class WFCIndexPart extends WFCFormPart {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
 
-			// use the SortedList constructor with 'null' for the Comparator
-			// because the Comparator
-			// will be set by configuration
+			// use the SortedList constructor with 'null' for the Comparator because the Comparator will be set by configuration
 			this.sortedList = new SortedList<>(rowObjectsGlazedList, null);
 
 			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor, configRegistry);
 
-			// we register a custom UpdateDataCommandHandler so that we could add a new
-			// value if desired
-			// alternative we could add a new line during line selection
-//			this.bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
-//			this.bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(this.bodyDataLayer) {
-//				@SuppressWarnings("unchecked")
-//				@Override
-//				protected boolean doCommand(UpdateDataCommand command) {
-//					if (super.doCommand(command)) {
-//						System.out.println("Custom update handler called");
-//						return true;
-//					}
-//					return false;
-//				}
-//			});
-
 			// get the IDataProvider that was created by the GroupByDataLayer
-			this.bodyDataProvider = bodyDataLayer.getDataProvider();
-
-			// Apply a ColumnLabelAccumulator to address the columns in the
-			// EditConfiguration class
-			// first colum starts at 0, etc
-//			ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(bodyDataProvider);
-//			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
+			this.bodyDataProvider = (IRowDataProvider<Row>) bodyDataLayer.getDataProvider();
 
 			// layer for event handling of GlazedLists and PropertyChanges
 			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
@@ -619,14 +605,15 @@ public class WFCIndexPart extends WFCFormPart {
 			columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
 			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
-			selectionLayer.addLayerListener(new ILayerListener() {
-				@Override
-				public void handleLayerEvent(ILayerEvent event) {
-					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
-					List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
-					if (!collection.isEmpty()) {
-						context.set(Constants.BROKER_ACTIVEROWS, collection);
+			selectionLayer.addLayerListener(event -> {
+				if (event instanceof RowSelectionEvent) {
+					if (selectionThread != null) {
+						selectionThread.interrupt();
 					}
+					selectionThread = new SelectionThread(tableSelectionBuffer);
+					selectionThread.start();
+				} else if (event instanceof RowStructuralRefreshEvent) {
+					NatTableUtil.resizeRows(natTable);
 				}
 			});
 
@@ -661,7 +648,7 @@ public class WFCIndexPart extends WFCFormPart {
 			return this.treeLayer;
 		}
 
-		public IDataProvider getBodyDataProvider() {
+		public IRowDataProvider<Row> getBodyDataProvider() {
 			return this.bodyDataProvider;
 		}
 
@@ -675,6 +662,32 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public ColumnReorderLayer getColumnReorderLayer() {
 			return columnReorderLayer;
+		}
+	}
+
+	class SelectionThread extends Thread {
+		private int sleepMillis;
+
+		/*
+		 * Thread, der für sleepMillis Millisekunden schläft und danach die Daten ins Detail lädt, wenn er nicht unterbrochen wurde
+		 */
+		public SelectionThread(int sleepMillis) {
+			this.sleepMillis = sleepMillis;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(sleepMillis);
+			} catch (InterruptedException e) {
+				return;
+			}
+
+			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			if (!collection.isEmpty()) {
+				context.set(Constants.BROKER_ACTIVEROWS, collection);
+			}
 		}
 	}
 

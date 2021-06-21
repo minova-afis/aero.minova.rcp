@@ -22,6 +22,7 @@ In den Workspaces werden auch zusätzliche Plug-ins gespeichert, die die Anwendu
 
 Wir wollen in dieser Anwendung auch Masken verwenden, ähnlich den heutigen Masken in TTA.
 Dazu müssen wir wieder ein Schema definieren, dass es erlaubt entsprechende Masken zu definieren.
+Das Schema ist link:bundles/aero.minova.rcp.form.model/README.adoc[hier] beschrieben.
 
 === Felder
 

@@ -49,6 +49,7 @@ public class PreferenceWindowModel {
 				false));
 		psd.add(new PreferenceDescriptor("CurrentWorkspace", translationService.translate("@Preferences.CurrentWorkspace", null), 0.3, DisplayType.CUSTOMCHECK,
 				false));
+		psd.add(new PreferenceDescriptor("SendLogs", translationService.translate("@Preferences.SendLogs", null), 0.4, DisplayType.SENDLOGSBUTTON, false));
 		psd = new PreferenceSectionDescriptor("KeyboardNavigation", translationService.translate("@Preferences.KeyboardNavigation", null), 0.2);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,

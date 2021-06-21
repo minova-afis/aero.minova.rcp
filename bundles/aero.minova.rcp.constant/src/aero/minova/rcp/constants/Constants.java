@@ -45,8 +45,9 @@ public class Constants {
 	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
 	public static final String EMPLOYEEKEY = "EmployeeKey";
 
-// Liste an Broker-Konstanten
+	// Liste an Broker-Konstanten
 	public static final String BROKER_SAVEENTRY = "aero/minova/rcp/SaveEntry";
+	public static final String BROKER_SAVECOMPLETE = "aero/minova/rcp/SaveComplete";
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
 	public static final String BROKER_NEWENTRY = "aero/minova/rcp/NewFields";
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
@@ -64,6 +65,7 @@ public class Constants {
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
+	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
 	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
 	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
@@ -189,5 +191,4 @@ public class Constants {
 			this.defaultValue = defaultValue;
 		}
 	}
-
 }
