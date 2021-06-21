@@ -3,6 +3,8 @@ package aero.minova.rcp.uitests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
@@ -24,7 +26,7 @@ public class ExitHandlerTest {
 
     @Test
     public void executeExit() {
-
+		Menu systemMenu = Display.getCurrent().getSystemMenu();
         SWTBotMenu fileMenu = bot.menu("File");
         assertNotNull(fileMenu);
 		SWTBotMenu exitMenu = fileMenu.menu("Exit");
@@ -37,17 +39,6 @@ public class ExitHandlerTest {
         button.click();
     }
     
-	@Test
-	public void openStundenerfassung() {
-
-		SWTBotMenu adminMenu = bot.menu("Administration");
-		assertNotNull(adminMenu);
-		SWTBotMenu stundenErfassung = adminMenu.menu("Stundenerfassung");
-		assertNotNull(stundenErfassung);
-		stundenErfassung.click();
-	}
-
-
 
 
 //  @AfterEach
