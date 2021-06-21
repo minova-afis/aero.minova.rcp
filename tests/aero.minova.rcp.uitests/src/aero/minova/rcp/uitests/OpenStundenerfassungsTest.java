@@ -1,5 +1,6 @@
 package aero.minova.rcp.uitests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
@@ -10,10 +11,17 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,8 +34,9 @@ public class OpenStundenerfassungsTest {
 	private static SWTWorkbenchBot bot;
 
 	@Before
-    public void beforeClass() throws Exception {
+	public void beforeClass() throws Exception {
 		bot = new SWTWorkbenchBot(getEclipseContext());
+		SWTBotPreferences.TIMEOUT = 30000;
 
 	}
 
@@ -51,14 +60,47 @@ public class OpenStundenerfassungsTest {
 //		int totalRowCount = nattable.preferredRowCount();
 
 		IEclipseContext eclipseContext = getEclipseContext();
-		MApplication application = eclipseContext.get(IWorkbench.class).getApplication();		
+		MApplication application = eclipseContext.get(IWorkbench.class).getApplication();
 		EModelService modelService = eclipseContext.get(EModelService.class);
-		
+
 		List<MPart> findElements = modelService.findElements(application, null, MPart.class, null);
 		System.out.println(findElements);
 	}
 
+	@Test
+	public void openPreferences() {
+		Menu systemMenu = Display.getCurrent().getSystemMenu();
+		Item menuItem = systemMenu.getItem(2);
+		assertEquals(menuItem.toString(), "MenuItem {Preferences...}");
+		menuItem.notifyListeners(SWT.Selection, new SelectionEvent(null));
 
+		SWTBotMenu adminMenu = bot.menu("WFC");
+		assertNotNull(adminMenu);
+		SWTBotMenu preferences = adminMenu.menu("Preferences...");
+		assertNotNull(preferences);
+		preferences.click();
+
+		SWTBotShell botShell = bot.activeShell();
+
+//		workspaceAccessPreferences
+		SWTBotView partByTitle = bot.partByTitle("@Form.Search");
+		List<SWTBotToolbarButton> toolbarButtons = partByTitle.getToolbarButtons();
+		toolbarButtons.get(0).click();
+
+		assertNotNull(partByTitle);
+
+//		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+//		SWTBotNatTable nattable = bot.nattable();
+//		int rowCount = nattable.rowCount();
+//		int totalRowCount = nattable.preferredRowCount();
+
+		IEclipseContext eclipseContext = getEclipseContext();
+		MApplication application = eclipseContext.get(IWorkbench.class).getApplication();
+		EModelService modelService = eclipseContext.get(EModelService.class);
+
+		List<MPart> findElements = modelService.findElements(application, null, MPart.class, null);
+		System.out.println(findElements);
+	}
 
 	protected static IEclipseContext getEclipseContext() {
 		final IEclipseContext serviceContext = EclipseContextFactory
