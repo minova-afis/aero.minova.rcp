@@ -155,8 +155,7 @@ public class TraverseEnterHandler {
 				Lookup lookup = (Lookup) focussedControl;
 				lookup.closePopup();
 				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-				LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
-				field.setValue(lv, true);
+				setLookupValue(field, lookup);
 			}
 			return;
 		}
@@ -164,6 +163,15 @@ public class TraverseEnterHandler {
 		// Wir prüfen ob die Preference EnterSelectsFirstRequired gesetzt ist.
 		if (!enterSelectsFirstRequired || popupOpen) {
 			Control fc = null;
+
+			Lookup lookup = null;
+			if (focussedControl instanceof Lookup) {
+				lookup = (Lookup) focussedControl;
+				if (popupOpen) {
+					setLookupValue(selectedField, lookup);
+				}
+			}
+
 			List<MField> tabListFromSelectedFieldSection = selectedField.getmSection().getTabList();
 			// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 			// Size = 10
@@ -188,19 +196,16 @@ public class TraverseEnterHandler {
 			fc = getNextRequiredFieldWhichNull(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
 			if (fc == null) {
 				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
 					lookup.closePopup();
-					MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-					LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
-					field.setValue(lv, true);
 				}
 				return;
 			}
+			
 		} else {
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
-					if (field.isRequired() && field.getValue() == null && !field.isReadOnly() && field != selectedField) {
+					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
 						return;
@@ -251,6 +256,16 @@ public class TraverseEnterHandler {
 			}
 		}
 		return focussedControl;
+	}
+
+	private void setLookupValue(MField field, Lookup lookup) {
+		LookupValue lv = null;
+		if (lookup.getTable().getSelectionIndex() > 0) {
+			lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
+		} else {
+			lv = lookup.getPopupValues().get(0);
+		}
+		field.setValue(lv, true);
 	}
 
 }
