@@ -4,7 +4,7 @@ Bundle-Name: jTDS
 Bundle-SymbolicName: aero.minova.libs.jtds
 Bundle-Version: 12.0.21.qualifier
 Automatic-Module-Name: aero.minova.libs.jtds
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: net.sourceforge.jtds.jdbc,
  net.sourceforge.jtds.jdbc.cache,
  net.sourceforge.jtds.jdbcx,
