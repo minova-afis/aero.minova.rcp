@@ -7,3 +7,4 @@ Fragment-Host: aero.minova.rcp.rcp;bundle-version="12.0.16"
 Automatic-Module-Name: aero.minova.workingtime.wizard
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: aero.minova.rcp.model
+Import-Package: javax.inject;version="1.0.0"
