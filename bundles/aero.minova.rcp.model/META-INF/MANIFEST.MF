@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.osgi,
  aero.minova.rcp.constant
 Bundle-ActivationPolicy: lazy
 Import-Package: aero.minova.rcp.form.model.xsd,
- javax.inject;bundle-version="1.0.0",
  org.eclipse.swt.events
 Export-Package: aero.minova.rcp.model,
  aero.minova.rcp.model.builder,
