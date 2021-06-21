@@ -197,11 +197,12 @@ public class TraverseEnterHandler {
 				}
 				return;
 			}
+			
 		} else {
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
-					if (field.isRequired() && field.getValue() == null && !field.isReadOnly() && field != selectedField) {
+					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
 						return;
