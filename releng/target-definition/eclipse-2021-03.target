@@ -53,9 +53,9 @@
 		<unit id="ca.odell.glazedlists" version="0.0.0"/>
 	</location>
 	<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-		<repository location="http://download.eclipse.org/nebula/releases/2.4.3"/>
-		<unit id="org.eclipse.nebula.widgets.opal.preferencewindow.feature.feature.group" version="1.0.0.202011020719"/>
-		<unit id="org.eclipse.nebula.widgets.opal.textassist.feature.feature.group" version="1.0.0.202011020719"/>
+		<repository location="http://download.eclipse.org/nebula/releases/2.5.0"/>
+		<unit id="org.eclipse.nebula.widgets.opal.preferencewindow.feature.feature.group" version="0.0.0"/>
+		<unit id="org.eclipse.nebula.widgets.opal.textassist.feature.feature.group" version="0.0.0"/>
 	</location>
 </locations>
 
