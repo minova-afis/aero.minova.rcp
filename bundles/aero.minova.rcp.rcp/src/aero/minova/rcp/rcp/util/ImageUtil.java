@@ -23,10 +23,9 @@ public class ImageUtil {
 
 	// TODO: Unterschiedliche ImageBundles unterstützen, diese vom Server laden (siehe #237)
 	// TODO: Verschiedene Größen laden (durch Einstellung gesteuert, siehe #399)
-	public static Image getImageFromImagesBundle(String name) {
+	public static ImageDescriptor getImageDescriptorFromImagesBundle(String name) {
 		final Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
 		final URL url = FileLocator.find(bundle, new Path("images/icons/" + name + "/24x24.png"), null);
-		final ImageDescriptor image = ImageDescriptor.createFromURL(url);
-		return image.createImage();
+		return ImageDescriptor.createFromURL(url);
 	}
 }
