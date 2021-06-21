@@ -163,6 +163,12 @@ public class TraverseEnterHandler {
 		// Wir prüfen ob die Preference EnterSelectsFirstRequired gesetzt ist.
 		if (!enterSelectsFirstRequired || popupOpen) {
 			Control fc = null;
+			Lookup lookup = (Lookup) focussedControl;
+
+			if (popupOpen) {
+				setLookupValue(selectedField, lookup);
+			}
+
 			List<MField> tabListFromSelectedFieldSection = selectedField.getmSection().getTabList();
 			// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 			// Size = 10
@@ -187,10 +193,7 @@ public class TraverseEnterHandler {
 			fc = getNextRequiredFieldWhichNull(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
 			if (fc == null) {
 				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
 					lookup.closePopup();
-					MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-					setLookupValue(field, lookup);
 				}
 				return;
 			}
@@ -245,19 +248,12 @@ public class TraverseEnterHandler {
 			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
 				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 				focussedControl.setFocus();
-				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
-					if (lookup.getTable().getSelectionIndex() < 0) {
-						LookupValue lv = lookup.getPopupValues().get(0);
-						field.setValue(lv, true);
-					} 
-				}
 				return focussedControl;
 			}
 		}
 		return focussedControl;
 	}
-	
+
 	private void setLookupValue(MField field, Lookup lookup) {
 		LookupValue lv = null;
 		if (lookup.getTable().getSelectionIndex() > 0) {
