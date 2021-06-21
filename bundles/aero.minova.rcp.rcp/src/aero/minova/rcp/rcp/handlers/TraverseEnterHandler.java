@@ -155,8 +155,7 @@ public class TraverseEnterHandler {
 				Lookup lookup = (Lookup) focussedControl;
 				lookup.closePopup();
 				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-				LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
-				field.setValue(lv, true);
+				setLookupValue(field, lookup);
 			}
 			return;
 		}
@@ -191,8 +190,7 @@ public class TraverseEnterHandler {
 					Lookup lookup = (Lookup) focussedControl;
 					lookup.closePopup();
 					MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-					LookupValue lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
-					field.setValue(lv, true);
+					setLookupValue(field, lookup);
 				}
 				return;
 			}
@@ -247,10 +245,27 @@ public class TraverseEnterHandler {
 			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
 				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 				focussedControl.setFocus();
+				if (focussedControl instanceof Lookup) {
+					Lookup lookup = (Lookup) focussedControl;
+					if (lookup.getTable().getSelectionIndex() < 0) {
+						LookupValue lv = lookup.getPopupValues().get(0);
+						field.setValue(lv, true);
+					} 
+				}
 				return focussedControl;
 			}
 		}
 		return focussedControl;
+	}
+	
+	private void setLookupValue(MField field, Lookup lookup) {
+		LookupValue lv = null;
+		if (lookup.getTable().getSelectionIndex() > 0) {
+			lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
+		} else {
+			lv = lookup.getPopupValues().get(0);
+		}
+		field.setValue(lv, true);
 	}
 
 }
