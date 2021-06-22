@@ -98,6 +98,10 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
+	
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
+	boolean selectAllControls;
 
 	@Inject
 	@Service
