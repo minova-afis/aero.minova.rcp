@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -182,7 +183,6 @@ public class WFCDetailPart extends WFCFormPart {
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			layoutSection(parent, wrapper, context);
-
 		}
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -240,7 +240,8 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection);
-		composite.setTabList(getTabList(mSection, composite));
+		composite.setTabList(getTabListForSectionComposite(mSection, composite));
+		composite.getParent().setTabList(getTabListForSection((Section) composite.getParent()));
 
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
@@ -345,12 +346,66 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private Control[] getTabList(MSection section, Composite composite) {
+	/**
+	 * Setzt alle Elemente aus der übergebenen Liste in einen Array
+	 * 
+	 * @param tabList
+	 * @return Array mit Controls
+	 */
+	private Control[] listToArray(List<Control> tabList) {
+		Control[] tabArray = new Control[tabList.size()];
+		int i = 0;
+		while (i < tabList.size()) {
+			tabArray[i] = tabList.get(i);
+			i++;
+		}
+		return tabArray;
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe der Section zurück. Wenn SelectAllControls gesetzt ist, wird das SectionControl(der Twistie) mit in
+	 * den Array gesetzt.
+	 * 
+	 * @param composite
+	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForSection(Composite composite) {
 		List<Control> tabList = new ArrayList<Control>();
+
+		if (selectAllControls && composite.getChildren()[0] instanceof Twistie) {
+			int i = 0;
+			while (i < composite.getChildren().length) {
+				tabList.add(composite.getChildren()[i]);
+				i++;
+			}
+		} else {
+			int i = 1;
+			while (i < composite.getChildren().length) {
+				tabList.add(composite.getChildren()[i]);
+				i++;
+			}
+		}
+		return listToArray(tabList);
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe des Composites der Section zurück.
+	 * 
+	 * @param mSection
+	 *            der Section
+	 * @param composite
+	 *            der Section
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
+
+		List<Control> tabList = new ArrayList<Control>();
+
 		Control[] compositeChilds = composite.getChildren();
 		for (Control control : compositeChilds) {
 			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text)
-				for (MField field : section.getTabList()) {
+				for (MField field : mSection.getTabList()) {
 					if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
 						if (!field.isReadOnly()) {
 							tabList.add(control);
@@ -359,13 +414,8 @@ public class WFCDetailPart extends WFCFormPart {
 					}
 				}
 		}
-		Control[] tabArray = new Control[tabList.size()];
-		int i = 0;
-		while (i < tabList.size()) {
-			tabArray[i] = tabList.get(i);
-			i++;
-		}
-		return tabArray;
+
+		return listToArray(tabList);
 	}
 
 	/**
