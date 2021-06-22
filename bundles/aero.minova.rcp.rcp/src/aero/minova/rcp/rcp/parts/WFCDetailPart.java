@@ -184,6 +184,9 @@ public class WFCDetailPart extends WFCFormPart {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			layoutSection(parent, wrapper, context);
 		}
+
+		parent.setTabList(parent.getChildren());
+
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
