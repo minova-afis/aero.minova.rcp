@@ -24,6 +24,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
@@ -200,12 +201,15 @@ public class TraverseEnterHandler {
 				}
 				return;
 			}
-			
+
 		} else {
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
 					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
+						if(field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
+							continue;
+						}
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
 						return;
