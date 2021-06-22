@@ -80,34 +80,23 @@ public class WFCSearchPart extends WFCFormPart {
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
-
 	@Inject
 	private IMinovaJsonService mjs;
-
 	@Inject
 	TranslationService translationService;
-
 	private Table data;
-
 	private NatTable natTable;
 	@Inject
 	MPart mPart;
-
 	private SortedList<Row> sortedList;
-
 	private SelectionLayer selectionLayer;
-
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
-
 	private ColumnHeaderLayer columnHeaderLayer;
-
 	private ColumnReorderLayer columnReorderLayer;
-
 	private DataLayer bodyDataLayer;
 
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
-
 		new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
 			return;
@@ -190,10 +179,8 @@ public class WFCSearchPart extends WFCFormPart {
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
-		// as the selection mouse bindings are registered for the region label
-		// GridRegion.BODY
-		// we need to set that region label to the viewport so the selection via mouse
-		// is working correctly
+		// as the selection mouse bindings are registered for the region label GridRegion.BODY we need to set that region label to the viewport so the selection
+		// via mouse is working correctly
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
@@ -217,43 +204,28 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable = new NatTable(parent, gridLayer, false);
 
-		// as the autoconfiguration of the NatTable is turned off, we have to
-		// add the DefaultNatTableStyleConfiguration and the ConfigRegistry
-		// manually
+		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 		natTable.addConfiguration(new SingleClickSortConfiguration());
-//		natTable.registerCommandHandler(new DisplayPersistenceDialogCommandHandler(natTable));
-//
 
 		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, searchForm));
 
-		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der
-		// Mouselistener anschlägt!
+		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		natTable.addConfiguration(new DefaultEditBindings() {
 
 			@Override
 			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
 				MouseEditAction mouseEditAction = new MouseEditAction();
-//				CellEditDragMode cellEditDragMode = new CellEditDragMode();
 				super.configureUiBindings(uiBindingRegistry);
 				uiBindingRegistry.registerFirstSingleClickBinding(
 						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
-//				uiBindingRegistry.registerFirstMouseDragMode(
-//						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TristateCheckBoxPainter.class), cellEditDragMode);
 			}
 
 		});
 
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-
 		natTable.configure();
-		// set the modern theme to visualize the summary better
-
-//		ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration();
-//		modernTheme.addThemeExtension(new ModernGroupByThemeExtension());
-//
-//		natTable.setTheme(modernTheme);
 		return natTable;
 	}
 
@@ -411,7 +383,7 @@ public class WFCSearchPart extends WFCFormPart {
 				Value v = r.getValue(i);
 				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					FilterValue fv = (FilterValue) v;
-					Instant inst = fv.getFilterValue().getInstantValue();
+					Instant inst;
 					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
 						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
 					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
