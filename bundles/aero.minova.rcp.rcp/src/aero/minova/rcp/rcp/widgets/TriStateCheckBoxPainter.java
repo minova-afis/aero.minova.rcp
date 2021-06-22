@@ -17,7 +17,9 @@ import aero.minova.rcp.rcp.util.ImageUtil;
  */
 public class TriStateCheckBoxPainter extends TreeCheckBoxPainter {
 	public TriStateCheckBoxPainter() {
-		super(ImageUtil.getImageDefault("checkboxon.png"), ImageUtil.getImageDefault("checkboxnull.png"), ImageUtil.getImageDefault("checkboxoff.png"));
+		super(ImageUtil.getImageDefault("checkboxon.png").createImage(), //
+				ImageUtil.getImageDefault("checkboxnull.png").createImage(), //
+				ImageUtil.getImageDefault("checkboxoff.png").createImage());
 	}
 
 	public TriStateCheckBoxPainter(Image checkedImg, Image semicheckedImage, Image uncheckedImg) {
