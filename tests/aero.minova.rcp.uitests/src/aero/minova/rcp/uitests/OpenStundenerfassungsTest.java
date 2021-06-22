@@ -28,6 +28,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
@@ -65,8 +66,6 @@ public class OpenStundenerfassungsTest {
 		assertTrue(toolbarButtons.size() > 0);
 		toolbarButtons.get(0).click();
 
-
-
 //		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 //		SWTBotNatTable nattable = swtNatTableBot.nattable();
 //
@@ -88,8 +87,8 @@ public class OpenStundenerfassungsTest {
 
 	}
 
-
 	@Test
+	@Ignore
 	public void openPreferences() {
 
 		if (!SWTUtils.isMac()) {
@@ -117,7 +116,7 @@ public class OpenStundenerfassungsTest {
 		String pathWorkspace = currentWorkspaceText.getText();
 		shell.close();
 
-		// applicaiton.mdi einlesen und Menü überprüfen
+		// application.mdi einlesen und Menü überprüfen
 		try {
 			Path path = Path.of(pathWorkspace, "application.mdi");
 			String applicationString = Files.readString(path);
