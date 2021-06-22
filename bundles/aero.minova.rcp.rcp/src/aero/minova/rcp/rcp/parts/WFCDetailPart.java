@@ -34,6 +34,9 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -99,7 +102,7 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
-	
+
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
 	boolean selectAllControls;
@@ -128,9 +131,11 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	private EHandlerService handlerService;
+	private LocalResourceManager resManager;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
+		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
@@ -295,7 +300,8 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final Image buttonImage = ImageUtil.getImageFromImagesBundle(btn.getIcon());
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon());
+				Image buttonImage = resManager.createImage(buttonImageDescriptor);
 				item.setImage(buttonImage);
 			}
 		}

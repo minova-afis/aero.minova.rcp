@@ -244,7 +244,9 @@ public class DataFormService implements IDataFormService {
 
 		try {
 			form = XmlProcessor.get(formContent, Form.class);
-		} catch (JAXBException ex) {}
+		} catch (JAXBException ex) {
+			throw new RuntimeException(ex);
+		}
 
 		requestedForms.add(name);
 		return form;
