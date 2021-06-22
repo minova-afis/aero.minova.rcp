@@ -7,33 +7,36 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 public class PreferenceTabDescriptor {
-	ImageDescriptor image;
-
+	ImageDescriptor imageDescriptor;
 	String id;
 	String label;
 	double order;
 	List<PreferenceSectionDescriptor> sections = new ArrayList<>();
 
+	private LocalResourceManager resManager;
+
 	public PreferenceTabDescriptor(String imageBundle, String imagePath, String id, String label, double order) {
 		Bundle bundle = Platform.getBundle(imageBundle);
-		image = ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path(imagePath)));
+		imageDescriptor = ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path(imagePath)));
 		this.id = id;
 		this.label = label;
 		this.order = order;
-		
+
+		resManager = new LocalResourceManager(JFaceResources.getResources());
 	}
 
 	public Image getImage() {
-		return image.createImage();
+		return resManager.createImage(imageDescriptor);
 	}
 
 	/**
-	 * Liefert die interne ID für dieses TAB. Sie kann von anderen Plugins verwendet
-	 * werden
+	 * Liefert die interne ID für dieses TAB. Sie kann von anderen Plugins verwendet werden
 	 * 
 	 * @return
 	 */
