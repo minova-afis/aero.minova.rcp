@@ -28,7 +28,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
@@ -87,8 +86,8 @@ public class OpenStundenerfassungsTest {
 
 	}
 
+	// @Ignore
 	@Test
-	@Ignore
 	public void openPreferences() {
 
 		if (!SWTUtils.isMac()) {
