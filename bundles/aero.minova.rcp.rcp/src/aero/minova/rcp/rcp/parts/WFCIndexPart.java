@@ -26,6 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
@@ -93,6 +94,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -336,6 +338,11 @@ public class WFCIndexPart extends WFCFormPart {
 			bodyLayerStack.getBodyDataLayer().clearCache();
 			Table table = map.get(perspective);
 			updateData(table.getRows());
+
+			if (table.getRows().isEmpty()) {
+				MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
+						translationService.translate("@msg.NoRecordsLoaded", null));
+			}
 		}
 	}
 
