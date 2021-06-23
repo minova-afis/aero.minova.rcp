@@ -54,9 +54,11 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
@@ -335,6 +337,7 @@ public class WFCDetailCASRequestsUtil {
 		Map<MPerspective, String> map = new HashMap<>();
 		map.put(perspective, updateRequest);
 		clearFields(map);
+		focusFirstEmptyField();
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.SAVE);
 		}
@@ -579,6 +582,7 @@ public class WFCDetailCASRequestsUtil {
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
+			focusFirstEmptyField();
 			// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 			if (detail.getHelper() != null) {
 				detail.getHelper().handleDetailAction(ActionCode.DEL);
@@ -611,6 +615,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
 		clearFields(map);
+		focusFirstEmptyField();
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.NEW);
@@ -653,5 +658,21 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setKeys(ArrayList<ArrayList> arrayList) {
 		this.keys = arrayList;
+	}
+
+	private void focusFirstEmptyField() {
+		System.out.println("asdasd");
+		for (MSection section : detail.getPageList()) {
+			for (MField field : section.getTabList()) {
+				System.out.println("checkitng " + field.getLabel());
+				if (field.getValue() == null) {
+					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
+					return;
+				}
+			}
+		}
+
+		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
+		((AbstractValueAccessor) detail.getPageList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
 	}
 }
