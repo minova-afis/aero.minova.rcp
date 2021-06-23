@@ -661,10 +661,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private void focusFirstEmptyField() {
-		System.out.println("asdasd");
 		for (MSection section : detail.getPageList()) {
 			for (MField field : section.getTabList()) {
-				System.out.println("checkitng " + field.getLabel());
 				if (field.getValue() == null) {
 					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
 					return;
