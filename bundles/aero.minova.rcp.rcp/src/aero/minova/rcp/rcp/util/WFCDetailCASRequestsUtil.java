@@ -337,10 +337,10 @@ public class WFCDetailCASRequestsUtil {
 		Map<MPerspective, String> map = new HashMap<>();
 		map.put(perspective, updateRequest);
 		clearFields(map);
-		focusFirstEmptyField();
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.SAVE);
 		}
+		focusFirstEmptyField();
 	}
 
 	/**
@@ -582,11 +582,11 @@ public class WFCDetailCASRequestsUtil {
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
-			focusFirstEmptyField();
 			// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 			if (detail.getHelper() != null) {
 				detail.getHelper().handleDetailAction(ActionCode.DEL);
 			}
+			focusFirstEmptyField();
 		}
 	}
 
@@ -615,11 +615,11 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
 		clearFields(map);
-		focusFirstEmptyField();
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.NEW);
 		}
+		focusFirstEmptyField();
 	}
 
 	/**
