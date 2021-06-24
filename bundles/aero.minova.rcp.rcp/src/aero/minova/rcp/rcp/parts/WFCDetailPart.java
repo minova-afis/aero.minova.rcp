@@ -191,6 +191,13 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		parent.setTabList(parent.getChildren());
+		// Holen des Parts
+		Composite part = parent.getParent();
+		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
+		part.setTabList(getTabListForPart(part));
+		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
+		List<Control> tabList = new ArrayList<Control>();
+		part.getParent().setTabList(listToArray(tabList));
 
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
