@@ -33,7 +33,8 @@ Require-Bundle: org.eclipse.swtbot.e4.finder;bundle-version="3.1.0",
  aero.minova.rcp.translate;bundle-version="12.0.21",
  aero.minova.workingtime.helper;bundle-version="12.0.21",
  org.eclipse.e4.core.contexts;bundle-version="1.8.400",
- org.eclipse.e4.core.commands
+ org.eclipse.e4.core.commands,
+ org.eclipse.e4.core.services
 Import-Package: org.eclipse.e4.core.contexts,
  org.eclipse.e4.ui.workbench,
  org.eclipse.e4.ui.workbench.modeling,
