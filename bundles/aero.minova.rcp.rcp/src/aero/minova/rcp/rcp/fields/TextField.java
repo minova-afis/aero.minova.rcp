@@ -16,6 +16,8 @@ import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -62,6 +64,19 @@ public class TextField {
 					field.setValue(new Value(newValue), true);
 				}
 			}
+		});
+		
+		text.addTraverseListener(new TraverseListener() {
+
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if(e.detail == SWT.TRAVERSE_TAB_NEXT) {
+					e.doit = true;
+//					e.detail = SWT.TRAVERSE;
+					System.out.println("traverse");
+				}
+			}
+			
 		});
 
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
