@@ -399,6 +399,32 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	/**
+	 * Gibt einen Array mit den Controls für die TabListe des Parts zurück. Wenn SelectAllControls gesetzt ist, wird die Toolbar mit in den Array gesetzt.
+	 * 
+	 * @param composite
+	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForPart(Composite composite) {
+		List<Control> tabList = new ArrayList<Control>();
+
+		if (selectAllControls) {
+			int i = 0;
+			while (i < composite.getChildren().length) {
+				tabList.add(composite.getChildren()[i]);
+				i++;
+			}
+		} else {
+			int i = 1;
+			while (i < composite.getChildren().length) {
+				tabList.add(composite.getChildren()[i]);
+				i++;
+			}
+		}
+		return listToArray(tabList);
+	}
+
+	/**
 	 * Gibt einen Array mit den Controls für die TabListe des Composites der Section zurück.
 	 * 
 	 * @param mSection
