@@ -393,16 +393,22 @@ public class WFCDetailPart extends WFCFormPart {
 		List<Control> tabList = new ArrayList<Control>();
 
 		if (selectAllControls && composite.getChildren()[0] instanceof Twistie) {
-			int i = 0;
-			while (i < composite.getChildren().length) {
-				tabList.add(composite.getChildren()[i]);
-				i++;
+			for (Control child : composite.getChildren()) {
+				if (child instanceof ToolBar) {
+					tabList.add(1, child);
+				} else {
+					tabList.add(child);
+				}
 			}
 		} else {
-			int i = 1;
-			while (i < composite.getChildren().length) {
-				tabList.add(composite.getChildren()[i]);
-				i++;
+			for (Control child : composite.getChildren()) {
+				if (child instanceof ToolBar) {
+					tabList.add(2, child);
+				} else if (child instanceof Twistie) {
+					continue;
+				} else {
+					tabList.add(child);
+				}
 			}
 		}
 		return listToArray(tabList);
@@ -424,7 +430,7 @@ public class WFCDetailPart extends WFCFormPart {
 				tabList.add(composite.getChildren()[i]);
 				i++;
 			}
-		} 
+		}
 		return listToArray(tabList);
 	}
 
