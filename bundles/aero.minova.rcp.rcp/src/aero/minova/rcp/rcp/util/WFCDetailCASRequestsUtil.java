@@ -54,9 +54,11 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
@@ -338,6 +340,7 @@ public class WFCDetailCASRequestsUtil {
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.SAVE);
 		}
+		focusFirstEmptyField();
 	}
 
 	/**
@@ -583,6 +586,7 @@ public class WFCDetailCASRequestsUtil {
 			if (detail.getHelper() != null) {
 				detail.getHelper().handleDetailAction(ActionCode.DEL);
 			}
+			focusFirstEmptyField();
 		}
 	}
 
@@ -615,6 +619,7 @@ public class WFCDetailCASRequestsUtil {
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.NEW);
 		}
+		focusFirstEmptyField();
 	}
 
 	/**
@@ -653,5 +658,19 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setKeys(ArrayList<ArrayList> arrayList) {
 		this.keys = arrayList;
+	}
+
+	private void focusFirstEmptyField() {
+		for (MSection section : detail.getPageList()) {
+			for (MField field : section.getTabList()) {
+				if (field.getValue() == null) {
+					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
+					return;
+				}
+			}
+		}
+
+		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
+		((AbstractValueAccessor) detail.getPageList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
 	}
 }
