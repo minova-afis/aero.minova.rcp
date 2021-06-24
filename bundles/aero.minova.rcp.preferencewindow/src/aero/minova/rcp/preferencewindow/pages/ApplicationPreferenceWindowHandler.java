@@ -106,6 +106,7 @@ public class ApplicationPreferenceWindowHandler {
 		shell.setEnabled(false);
 
 		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
+		boolean curentSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK, true, s);
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
 		PreferenceWindow window = PreferenceWindow.create(shell, data);
@@ -167,9 +168,18 @@ public class ApplicationPreferenceWindowHandler {
 			// Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		}
+		
+		boolean newSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK, true, s);
+		if(!curentSelectAllControls == newSelectAllControls) {
+			Shell activeShell = Display.getCurrent().getActiveShell();
+			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "Soll die Tab-Reihenfolge geändert werden und die Applikation neu gestarted werden");
+			if (openConfirm) {
+				workbench.restart();
+			}
+		}
 
 		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
-		if (!currentTheme.equals(newTheme)) {
+		if (!currentTheme.equals(newTheme) ) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
 			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "Soll das Theme geändert werden und die Applikation neu gestarted werden");
 			if (openConfirm) {
