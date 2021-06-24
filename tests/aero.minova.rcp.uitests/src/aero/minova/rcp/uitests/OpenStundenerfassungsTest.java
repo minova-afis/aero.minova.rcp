@@ -46,8 +46,6 @@ public class OpenStundenerfassungsTest {
 	public void beforeClass() throws Exception {
 		bot = new SWTWorkbenchBot(getEclipseContext());
 		SWTBotPreferences.TIMEOUT = 30000;
-		SWTBotPreferences.KEYBOARD_LAYOUT = "com.foo.bar.DE";
-
 	}
 
 	@Test
