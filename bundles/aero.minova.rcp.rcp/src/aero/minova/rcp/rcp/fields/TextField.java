@@ -70,10 +70,8 @@ public class TextField {
 
 			@Override
 			public void keyTraversed(TraverseEvent e) {
-				if(e.detail == SWT.TRAVERSE_TAB_NEXT) {
+				if(e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0 ) {
 					e.doit = true;
-//					e.detail = SWT.TRAVERSE;
-					System.out.println("traverse");
 				}
 			}
 			
