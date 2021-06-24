@@ -7,8 +7,8 @@ import aero.minova.rcp.rcp.util.ImageUtil;
 public class BooleanCheckBoxPainter extends CheckBoxPainter {
 
 	public BooleanCheckBoxPainter() {
-		super(ImageUtil.getImageDefault("checkboxon.png"), //$NON-NLS-1$
-				ImageUtil.getImageDefault("checkboxoff.png") //$NON-NLS-1$
+		super(ImageUtil.getImageDefault("checkboxon.png").createImage(), //$NON-NLS-1$
+				ImageUtil.getImageDefault("checkboxoff.png").createImage() //$NON-NLS-1$
 		);
 	}
 

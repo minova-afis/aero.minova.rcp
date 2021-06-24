@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.widgets;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,23 +24,22 @@ public class AboutDialog extends TitleAreaDialog {
 	private Font lizenzFont;
 	private Font infoFont;
 	private String version;
-
+	private LocalResourceManager resManager;
 
 	public AboutDialog(Shell parentShell, String versionString) {
 		super(parentShell);
 		this.version = versionString;
 		lizenzFont = new Font(parentShell.getDisplay(), new FontData("Arial", 12, SWT.NORMAL));
 		infoFont = new Font(parentShell.getDisplay(), new FontData("Arial", 14, SWT.NORMAL));
+		resManager = new LocalResourceManager(JFaceResources.getResources(), parentShell);
 	}
 
 	@Override
 	public void create() {
 		super.create();
 
-		setTitleImage(ImageUtil.getImageDefault("MINOVAT.png"));
-
-		// IMG-Positionierung des 10er-Stands wurde in v.11 entfernt, weil das Img sonst
-		// gar nicht mehr sichtbar war
+		Image min = resManager.createImage(ImageUtil.getImageDefault("MINOVAT.png"));
+		setTitleImage(min);
 
 		if (getShell() != null) {
 			getShell().pack();
@@ -71,7 +71,8 @@ public class AboutDialog extends TitleAreaDialog {
 		layout.numColumns = 2;
 		layout.verticalSpacing = 1;
 		info.setLayout(layout);
-		createText(info, ImageUtil.getImageDefault("wfc.png"), "WebFatClient CoreApplicationService", infoFont, IMessageProvider.INFORMATION);
+		Image wfc = resManager.createImage(ImageUtil.getImageDefault("wfc.png"));
+		createText(info, wfc, "WebFatClient CoreApplicationService", infoFont, IMessageProvider.INFORMATION);
 		return info;
 	}
 
@@ -82,17 +83,20 @@ public class AboutDialog extends TitleAreaDialog {
 		layout.verticalSpacing = 1;
 		info.setLayout(layout);
 
-		createText(info, ImageUtil.getImageDefault("home.png"), "MINOVA Information Services GmbH", lizenzFont,
-				IMessageProvider.INFORMATION);
+		Image home = resManager.createImage(ImageUtil.getImageDefault("home.png"));
+		createText(info, home, "MINOVA Information Services GmbH", lizenzFont, IMessageProvider.INFORMATION);
 		createText(info, null, "Tröltschstraße 4", lizenzFont, IMessageProvider.INFORMATION);
 		createText(info, null, "97072 Würzburg", lizenzFont, IMessageProvider.INFORMATION);
 		createText(info, null, "AG Würzburg HRB 7625", lizenzFont, IMessageProvider.INFORMATION);
 
-		createText(info, ImageUtil.getImageDefault("phone.png"), "+49 (0) 931 - 32235 - 19", lizenzFont, IMessageProvider.INFORMATION);
-		createText(info, ImageUtil.getImageDefault("fax.png"), "+49 (0) 931 - 32235 - 55", lizenzFont, IMessageProvider.INFORMATION);
-		createText(info, ImageUtil.getImageDefault("mail.png"), "service@minova.de", lizenzFont, IMessageProvider.INFORMATION);
-
-		createText(info, ImageUtil.getImageDefault("version.png"), version, lizenzFont, IMessageProvider.INFORMATION);
+		Image phone = resManager.createImage(ImageUtil.getImageDefault("phone.png"));
+		createText(info, phone, "+49 (0) 931 - 32235 - 19", lizenzFont, IMessageProvider.INFORMATION);
+		Image fax = resManager.createImage(ImageUtil.getImageDefault("fax.png"));
+		createText(info, fax, "+49 (0) 931 - 32235 - 55", lizenzFont, IMessageProvider.INFORMATION);
+		Image mail = resManager.createImage(ImageUtil.getImageDefault("mail.png"));
+		createText(info, mail, "service@minova.de", lizenzFont, IMessageProvider.INFORMATION);
+		Image versionImg = resManager.createImage(ImageUtil.getImageDefault("version.png"));
+		createText(info, versionImg, version, lizenzFont, IMessageProvider.INFORMATION);
 
 		return info;
 	}
@@ -106,7 +110,8 @@ public class AboutDialog extends TitleAreaDialog {
 	 * @param img
 	 * @param text
 	 * @param font
-	 * @param color  (not used)
+	 * @param color
+	 *            (not used)
 	 * @return
 	 */
 	protected Label createText(Composite parent, Image img, String text, Font font, int color) {
