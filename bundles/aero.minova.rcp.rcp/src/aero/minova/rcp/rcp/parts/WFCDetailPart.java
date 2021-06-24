@@ -424,13 +424,7 @@ public class WFCDetailPart extends WFCFormPart {
 				tabList.add(composite.getChildren()[i]);
 				i++;
 			}
-		} else {
-			int i = 1;
-			while (i < composite.getChildren().length) {
-				tabList.add(composite.getChildren()[i]);
-				i++;
-			}
-		}
+		} 
 		return listToArray(tabList);
 	}
 
