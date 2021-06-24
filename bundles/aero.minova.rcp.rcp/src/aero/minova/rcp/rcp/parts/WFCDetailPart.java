@@ -190,6 +190,7 @@ public class WFCDetailPart extends WFCFormPart {
 			layoutSection(parent, wrapper, context);
 		}
 
+		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
 		// Holen des Parts
 		Composite part = parent.getParent();
@@ -255,7 +256,9 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection);
+		// Setzen der TabListe für die einzelnen Sections.
 		composite.setTabList(getTabListForSectionComposite(mSection, composite));
+		// Setzen der TabListe der Sections im Part.
 		composite.getParent().setTabList(getTabListForSection((Section) composite.getParent()));
 
 		// Section wird zum Detail hinzugefügt.
