@@ -396,6 +396,8 @@ public class WFCDetailPart extends WFCFormPart {
 			for (Control child : composite.getChildren()) {
 				if (child instanceof ToolBar) {
 					tabList.add(1, child);
+				} else if (child instanceof Label) {
+					continue;
 				} else {
 					tabList.add(child);
 				}
@@ -403,8 +405,8 @@ public class WFCDetailPart extends WFCFormPart {
 		} else {
 			for (Control child : composite.getChildren()) {
 				if (child instanceof ToolBar) {
-					tabList.add(2, child);
-				} else if (child instanceof Twistie) {
+					tabList.add(1, child);
+				} else if (child instanceof Twistie || child instanceof Label) {
 					continue;
 				} else {
 					tabList.add(child);
