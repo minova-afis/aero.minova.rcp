@@ -170,6 +170,8 @@ public class TraverseEnterHandler {
 				lookup = (Lookup) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
+				} else {
+					selectedField.setValue(selectedField.getValue(), false);
 				}
 			}
 
@@ -203,6 +205,16 @@ public class TraverseEnterHandler {
 			}
 
 		} else {
+			Lookup lookup = null;
+			if (focussedControl instanceof Lookup) {
+				lookup = (Lookup) focussedControl;
+				if (popupOpen) {
+					setLookupValue(selectedField, lookup);
+				} else {
+					selectedField.setValue(selectedField.getValue(), false);
+				}
+			}
+
 			for (MSection section : sectionList) {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
