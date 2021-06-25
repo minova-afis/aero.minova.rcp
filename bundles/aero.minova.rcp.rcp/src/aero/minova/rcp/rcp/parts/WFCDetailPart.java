@@ -9,6 +9,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,11 +51,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -75,6 +79,7 @@ import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -84,6 +89,7 @@ import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
@@ -96,6 +102,10 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
+	boolean selectAllControls;
 
 	@Inject
 	@Service
@@ -178,8 +188,18 @@ public class WFCDetailPart extends WFCFormPart {
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			layoutSection(parent, wrapper, context);
-
 		}
+
+		// Setzen der TabListe der Sections.
+		parent.setTabList(parent.getChildren());
+		// Holen des Parts
+		Composite part = parent.getParent();
+		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
+		part.setTabList(getTabListForPart(part));
+		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
+		List<Control> tabList = new ArrayList<Control>();
+		part.getParent().setTabList(listToArray(tabList));
+
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
@@ -205,7 +225,6 @@ public class WFCDetailPart extends WFCFormPart {
 	 */
 
 	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, IEclipseContext context) {
-
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
@@ -237,6 +256,11 @@ public class WFCDetailPart extends WFCFormPart {
 		createFields(composite, headOrPage, mSection);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection);
+		// Setzen der TabListe für die einzelnen Sections.
+		composite.setTabList(getTabListForSectionComposite(mSection, composite));
+		// Setzen der TabListe der Sections im Part.
+		composite.getParent().setTabList(getTabListForSection((Section) composite.getParent()));
+
 		// Section wird zum Detail hinzugefügt.
 		detail.addPage(mSection);
 
@@ -337,8 +361,106 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		});
-
 		mSection.setTabList(tabList);
+
+	}
+
+	/**
+	 * Setzt alle Elemente aus der übergebenen Liste in einen Array
+	 * 
+	 * @param tabList
+	 * @return Array mit Controls
+	 */
+	private Control[] listToArray(List<Control> tabList) {
+		Control[] tabArray = new Control[tabList.size()];
+		int i = 0;
+		while (i < tabList.size()) {
+			tabArray[i] = tabList.get(i);
+			i++;
+		}
+		return tabArray;
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe der Section zurück. Wenn SelectAllControls gesetzt ist, wird das SectionControl(der Twistie) mit in
+	 * den Array gesetzt.
+	 * 
+	 * @param composite
+	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForSection(Composite composite) {
+		List<Control> tabList = new ArrayList<Control>();
+
+		if (selectAllControls && composite.getChildren()[0] instanceof Twistie) {
+			for (Control child : composite.getChildren()) {
+				if (child instanceof ToolBar) {
+					tabList.add(1, child);
+				} else {
+					tabList.add(child);
+				}
+			}
+		} else {
+			for (Control child : composite.getChildren()) {
+				if (child instanceof ToolBar) {
+					tabList.add(2, child);
+				} else if (child instanceof Twistie) {
+					continue;
+				} else {
+					tabList.add(child);
+				}
+			}
+		}
+		return listToArray(tabList);
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe des Parts zurück. Wenn SelectAllControls gesetzt ist, wird die Toolbar mit in den Array gesetzt.
+	 * 
+	 * @param composite
+	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForPart(Composite composite) {
+		List<Control> tabList = new ArrayList<Control>();
+
+		if (selectAllControls) {
+			int i = 0;
+			while (i < composite.getChildren().length) {
+				tabList.add(composite.getChildren()[i]);
+				i++;
+			}
+		}
+		return listToArray(tabList);
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe des Composites der Section zurück.
+	 * 
+	 * @param mSection
+	 *            der Section
+	 * @param composite
+	 *            der Section
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
+
+		List<Control> tabList = new ArrayList<Control>();
+
+		Control[] compositeChilds = composite.getChildren();
+		for (Control control : compositeChilds) {
+			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text)
+				for (MField field : mSection.getTabList()) {
+					if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
+						if (!field.isReadOnly()) {
+							tabList.add(control);
+							break;
+						}
+					}
+				}
+		}
+
+		return listToArray(tabList);
 	}
 
 	/**
