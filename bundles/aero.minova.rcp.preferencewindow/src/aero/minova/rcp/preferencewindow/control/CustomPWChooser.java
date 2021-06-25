@@ -53,7 +53,7 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 		final Button button = new Button(parent, SWT.PUSH);
 		addControl(button);
 		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		button.setText(translationService.translate("@Chooser.choose", null) + "...");
+		button.setText(translationService.translate("@Preferences.Choose", null) + "...");
 		button.setLayoutData(buttonGridData);
 
 		setButtonAction(text, button);
