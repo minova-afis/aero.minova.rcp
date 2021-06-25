@@ -28,12 +28,7 @@ public class LookupContentProvider {
 	 */
 	public List<LookupValue> getContent(final String entry) {
 		MLookupField mField = (MLookupField) lookup.getData(Constants.CONTROL_FIELD);
-		if (entry != null && entry.startsWith("#") && entry.length() > 1) {
-			// Setzen des Textes, welcher manuell eingetragen wurde
-			mField.setWrittenText(entry);
-		} else {
-			mField.setWrittenText(null);
-		}
+		mField.setWrittenText(entry);
 		if (LOG) {
 			System.out.println("Entry:[" + entry + "]");
 		}

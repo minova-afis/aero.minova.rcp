@@ -253,22 +253,31 @@ public class Lookup extends Composite {
 	 * @return a listener for the modify event
 	 */
 	private Listener createModifyListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
-				if (text.getData(SETTEXT_KEY) != null && Boolean.TRUE.equals(text.getData(SETTEXT_KEY))) {
-					text.setData(SETTEXT_KEY, null);
-					return;
-				}
+		return event -> {
+			if (text.getData(SETTEXT_KEY) != null && Boolean.TRUE.equals(text.getData(SETTEXT_KEY))) {
 				text.setData(SETTEXT_KEY, null);
-
-				final String string = text.getText();
-				if (string.length() == 0) {
-					popup.setVisible(false);
-					return;
-				}
-				showAllElements(string);
+				return;
 			}
+			text.setData(SETTEXT_KEY, null);
+
+			final String string = text.getText();
+
+			// Der Wert des Feldes soll auf null gesetzt werden, wenn der Text gelöscht oder geändert wird
+			MField field = (MField) text.getParent().getData(Constants.CONTROL_FIELD);
+			if (string.isBlank()) {
+				field.setValue(null, false);
+			} else if (field.getValue() instanceof LookupValue) {
+				field.setValue(null, false);
+				// Den Eingetragenen Text wieder ins Textfeld setzten
+				text.setText(string);
+				text.setSelection(text.getText().length());
+			}
+
+			if (string.length() == 0) {
+				popup.setVisible(false);
+				return;
+			}
+			showAllElements(string);
 		};
 	}
 
