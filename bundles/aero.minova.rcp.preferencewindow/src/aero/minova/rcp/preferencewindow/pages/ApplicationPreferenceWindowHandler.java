@@ -175,7 +175,9 @@ public class ApplicationPreferenceWindowHandler {
 		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
 		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
-			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "Zum übernehmen der Änderungen, muss die Applikation neu gestarted werden");
+
+			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", translationService.translate("@Preferences.RestartMessage", null));
+
 			if (openConfirm) {
 				if (!currentTheme.equals(newTheme)) {
 					updateTheme(newTheme, themeEngine, workbench);
