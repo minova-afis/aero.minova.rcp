@@ -248,7 +248,7 @@ public class WFCDetailPart extends WFCFormPart {
 		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
-		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl);
+		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPage, section);
 		// Erstellen der Field des Section.
