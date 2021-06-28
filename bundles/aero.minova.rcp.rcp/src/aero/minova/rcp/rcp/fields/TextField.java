@@ -71,7 +71,13 @@ public class TextField {
 
 			@Override
 			public void keyTraversed(TraverseEvent e) {
-				if(e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0 ) {
+				if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
+					e.doit = true;
+				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
+					e.doit = false;
+					text.setText(text.getText() + "\t");
+					text.setSelection(text.getText().length());
+				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
 					e.doit = true;
 				}
 			}
