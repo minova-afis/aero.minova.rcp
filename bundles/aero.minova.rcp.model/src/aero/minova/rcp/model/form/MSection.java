@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.forms.widgets.Section;
 
 public class MSection {
 
@@ -21,6 +22,7 @@ public class MSection {
 	private String label;
 	// Symbol für diese Page
 	private Image icon;
+	private Section section;
 
 	private Control control;
 
@@ -38,12 +40,13 @@ public class MSection {
 	 * @param control
 	 *            das Twistie Element einer Section. Der HEAD hat keinen Twistie.
 	 */
-	public MSection(boolean isHead, String status, MDetail mDetail, String label, Control control) {
+	public MSection(boolean isHead, String status, MDetail mDetail, String label, Control control, Section section) {
 		this.isHead = isHead;
 		this.status = status;
 		this.mDetail = mDetail;
 		this.label = label;
 		this.control = control;
+		this.section = section;
 	}
 
 	public boolean isHead() {
@@ -108,4 +111,14 @@ public class MSection {
 	public void setIcon(Image icon) {
 		this.icon = icon;
 	}
+
+	public Section getSection() {
+		return section;
+	}
+
+	public void setSection(Section section) {
+		this.section = section;
+	}
+	
+	
 }
