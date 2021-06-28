@@ -79,7 +79,6 @@ import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -451,15 +450,12 @@ public class WFCDetailPart extends WFCFormPart {
 
 		Control[] compositeChilds = composite.getChildren();
 		for (Control control : compositeChilds) {
-			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text)
-				for (MField field : mSection.getTabList()) {
-					if (control == ((AbstractValueAccessor) field.getValueAccessor()).getControl()) {
-						if (!field.isReadOnly()) {
-							tabList.add(control);
-							break;
-						}
-					}
+			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text) {
+				MField field = (MField)control.getData(Constants.CONTROL_FIELD);
+				if(!field.isReadOnly()) {
+					tabList.add(control);
 				}
+			}
 		}
 
 		return listToArray(tabList);

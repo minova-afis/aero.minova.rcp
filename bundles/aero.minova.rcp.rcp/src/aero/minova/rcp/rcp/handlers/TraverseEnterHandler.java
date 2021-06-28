@@ -91,24 +91,6 @@ public class TraverseEnterHandler {
 		}
 	}
 
-	private MField getFieldFromControl(Control control, MDetail detail, List<MSection> sectionList) {
-
-		MField selectedField = null;
-		for (MSection page : sectionList) {
-			List<MField> tabList = page.getTabList();
-			for (MField field : tabList) {
-				if (((AbstractValueAccessor) field.getValueAccessor()).getControl() == control) {
-					selectedField = field;
-					break;
-				}
-			}
-			if (selectedField != null)
-				break;
-
-		}
-		return selectedField;
-	}
-
 	/**
 	 * Ermittelt das in der Tab Reihenfolge nachfolgende Pflichtfeld und selektiert dieses.
 	 * <p>
@@ -147,7 +129,7 @@ public class TraverseEnterHandler {
 
 		// Wir holen uns das MField des selektierten Felds.
 		List<MSection> sectionList = detail.getPageList();
-		MField selectedField = getFieldFromControl(focussedControl, detail, sectionList);
+		MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {

@@ -13,11 +13,11 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * 				
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;p xmlns="http://purl.oclc.org/dsdl/schematron" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;&#13;
- * 					Dieses Element dient zum Platzieren von Elementen auf der&#13;
- * 					Oberfläche. Es kann nur im Element&#13;
- * 					&lt;emph&gt;table&lt;/emph&gt;&#13;
- * 					verwendet werden.&#13;
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;p xmlns="http://purl.oclc.org/dsdl/schematron" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;
+ * 					Dieses Element dient zum Platzieren von Elementen auf der
+ * 					Oberfläche. Es kann nur im Element
+ * 					&lt;emph&gt;table&lt;/emph&gt;
+ * 					verwendet werden.
  * 				&lt;/p&gt;
  * </pre>
  * 

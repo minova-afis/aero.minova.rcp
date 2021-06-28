@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
@@ -85,6 +86,7 @@ public class NumberField {
 		text.setData(FIELD_DECIMALS, decimals);
 		text.setData(FIELD_MAX_VALUE, maximum);
 		text.setData(FIELD_MIN_VALUE, minimum);
+		text.setData(Constants.CONTROL_FIELD, field);
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
 
