@@ -442,31 +442,29 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
-		if (perspective == this.perspective) {
-			if (getKeys() != null) {
-				String tablename = form.getIndexView() != null ? "sp" : "op";
-				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-					tablename = form.getDetail().getProcedurePrefix();
-				}
-				tablename += "Delete";
-				tablename += form.getDetail().getProcedureSuffix();
-				TableBuilder tb = TableBuilder.newTable(tablename);
-				RowBuilder rb = RowBuilder.newRow();
-				for (ArrayList key : getKeys()) {
-					tb.withColumn((String) key.get(0), (DataType) key.get(2));
-					rb.withValue(key.get(1));
-				}
-				Table t = tb.create();
-				Row r = rb.create();
-				t.addRow(r);
-				if (t.getRows() != null) {
-					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
-						if (ta != null) {
-							deleteEntry(ta);
-						}
-					}));
-				}
+		if (perspective == this.perspective && getKeys() != null) {
+			String tablename = form.getIndexView() != null ? "sp" : "op";
+			if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+				tablename = form.getDetail().getProcedurePrefix();
+			}
+			tablename += "Delete";
+			tablename += form.getDetail().getProcedureSuffix();
+			TableBuilder tb = TableBuilder.newTable(tablename);
+			RowBuilder rb = RowBuilder.newRow();
+			for (ArrayList key : getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
+			Table t = tb.create();
+			Row r = rb.create();
+			t.addRow(r);
+			if (t.getRows() != null) {
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					if (ta != null) {
+						deleteEntry(ta);
+					}
+				}));
 			}
 		}
 	}
@@ -492,12 +490,7 @@ public class WFCDetailCASRequestsUtil {
 			// Fehler abfangen, Felder wieder freigeben
 			tableFuture.exceptionally(ex -> {
 				// Im Display Thread ausführen
-				Display.getDefault().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						ticketFieldsUpdate("...", true);
-					}
-				});
+				Display.getDefault().syncExec(() -> ticketFieldsUpdate("...", true));
 				return null;
 			});
 
@@ -509,7 +502,11 @@ public class WFCDetailCASRequestsUtil {
 					showErrorMessage(e);
 				} else {
 					selectedTable = ta.getResultSet();
-					updateSelectedEntry();
+					if (!selectedTable.getRows().isEmpty()) {
+						updateSelectedEntry();
+					} else {
+						showErrorMessage("msg.TicketNotFound");
+					}
 				}
 				updatePossibleLookupEntries();
 			}));
