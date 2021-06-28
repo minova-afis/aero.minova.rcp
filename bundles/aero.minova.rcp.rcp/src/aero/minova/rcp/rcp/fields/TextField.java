@@ -77,7 +77,7 @@ public class TextField {
 					text.setText(text.getText() + "\t");
 					text.setSelection(text.getText().length());
 				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
-					e.doit = false;
+					e.doit = true;
 				}
 			}
 			
