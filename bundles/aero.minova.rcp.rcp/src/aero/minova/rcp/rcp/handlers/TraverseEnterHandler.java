@@ -18,6 +18,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
@@ -201,7 +202,7 @@ public class TraverseEnterHandler {
 				List<MField> tabList = section.getTabList();
 				for (MField field : tabList) {
 					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
-						if(field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
+						if (field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
 							continue;
 						}
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
@@ -249,6 +250,10 @@ public class TraverseEnterHandler {
 			// 4. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf gleicher Section ##
 			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
 				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
+				Section section = field.getmSection().getSection();
+				if (!section.isExpanded()) {
+					section.setExpanded(true);
+				}
 				focussedControl.setFocus();
 				return focussedControl;
 			}
