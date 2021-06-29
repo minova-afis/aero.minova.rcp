@@ -18,6 +18,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
@@ -197,12 +198,18 @@ public class TraverseEnterHandler {
 				}
 			}
 
-			for (MSection section : sectionList) {
-				List<MField> tabList = section.getTabList();
+			for (MSection mSection : sectionList) {
+				List<MField> tabList = mSection.getTabList();
 				for (MField field : tabList) {
 					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
-						if(field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
+						if (field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
 							continue;
+						}
+						Section section = field.getmSection().getSection();
+						// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
+						if (!section.isExpanded()) {
+							//Section öffnen
+							section.setExpanded(true);
 						}
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
@@ -249,6 +256,12 @@ public class TraverseEnterHandler {
 			// 4. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf gleicher Section ##
 			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
 				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
+				Section section = field.getmSection().getSection();
+				// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
+				if (!section.isExpanded()) {
+					// Section öffnen
+					section.setExpanded(true);
+				}
 				focussedControl.setFocus();
 				return focussedControl;
 			}

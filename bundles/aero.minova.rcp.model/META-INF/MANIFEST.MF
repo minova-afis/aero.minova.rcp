@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.osgi,
  com.google.gson,
  org.eclipse.core.runtime,
  org.eclipse.swt,
- aero.minova.rcp.constant
+ aero.minova.rcp.constant,
+ org.eclipse.ui.forms
 Bundle-ActivationPolicy: lazy
 Import-Package: aero.minova.rcp.form.model.xsd,
  org.eclipse.swt.events
