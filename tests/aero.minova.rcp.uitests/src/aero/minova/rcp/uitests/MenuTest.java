@@ -26,7 +26,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
@@ -51,7 +50,6 @@ public class MenuTest {
 		this.translationService = getEclipseContext().get(TranslationService.class);
 	}
 
-	@Ignore
 	@Test
 	public void openPreferencesAndTestMenu() {
 
@@ -86,6 +84,10 @@ public class MenuTest {
 			SWTBotRootMenu menu = bot.menu();
 			for (String menuEntry : menu.menuItems()) {
 				SWTBotMenu menu2 = bot.menu(menuEntry);
+				// File Menü überspringen (nicht von uns)
+				if (menu2.getText().equals("File")) {
+					continue;
+				}
 				getMenuEntries(menuEntries, menu2);
 			}
 
