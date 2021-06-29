@@ -176,7 +176,8 @@ public class ApplicationPreferenceWindowHandler {
 		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
 
-			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", translationService.translate("@Preferences.RestartMessage", null));
+			boolean openConfirm = MessageDialog.openConfirm(activeShell, translationService.translate("@Action.Restart", null),
+					translationService.translate("@Preferences.RestartMessage", null));
 
 			if (openConfirm) {
 				if (!currentTheme.equals(newTheme)) {
