@@ -91,7 +91,7 @@ public class OpenStundenerfassungsTest {
 		searchNattable.click(2, 3);
 		toolbarButtons.get(1).click();
 		try {
-			Thread.sleep(100);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {}
 		assertEquals(4, searchNattable.rowCount());
 		assertEquals("\"f-~-s-row1%\"", searchNattable.getCellDataValueByPosition(1, 3));
@@ -100,7 +100,7 @@ public class OpenStundenerfassungsTest {
 		// Suche zurücksetzten
 		toolbarButtons.get(0).click();
 		try {
-			Thread.sleep(100);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {}
 		assertEquals(2, searchNattable.rowCount());
 
