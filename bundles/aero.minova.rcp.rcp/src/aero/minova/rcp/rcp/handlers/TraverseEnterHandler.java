@@ -206,7 +206,9 @@ public class TraverseEnterHandler {
 							continue;
 						}
 						Section section = field.getmSection().getSection();
+						// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
 						if (!section.isExpanded()) {
+							//Section öffnen
 							section.setExpanded(true);
 						}
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
@@ -255,7 +257,9 @@ public class TraverseEnterHandler {
 			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
 				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 				Section section = field.getmSection().getSection();
+				// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
 				if (!section.isExpanded()) {
+					// Section öffnen
 					section.setExpanded(true);
 				}
 				focussedControl.setFocus();
