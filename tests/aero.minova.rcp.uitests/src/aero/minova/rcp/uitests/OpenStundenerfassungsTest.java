@@ -12,7 +12,6 @@ import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Before;
@@ -68,11 +67,6 @@ public class OpenStundenerfassungsTest {
 
 	@Test
 	public void loadIndex() {
-
-		// Wir haben auf einmal Probleme unter Ubuntu
-		if (!SWTUtils.isMac()) {
-			return;
-		}
 
 		SWTBotView indexPart = bot.partByTitle("@Form.Index");
 		assertNotNull(indexPart);
