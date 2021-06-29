@@ -10,6 +10,8 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
+import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
+import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -17,17 +19,24 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.osgi.framework.FrameworkUtil;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class OpenStundenerfassungsTest {
 
-	private static SWTWorkbenchBot bot;
+	private SWTWorkbenchBot bot;
+
+	private SWTBotView searchPart;
+	private SWTBotView indexPart;
+	private SWTBotView detailPart;
+
+	private SWTBotNatTable searchNattable;
+	private SWTBotNatTable indexNattable;
 
 	@Before
-	public void beforeClass() throws Exception {
-
+	public void beforeClass() {
 		bot = new SWTWorkbenchBot(getEclipseContext());
 		SWTBotPreferences.TIMEOUT = 30000;
 
@@ -36,45 +45,52 @@ public class OpenStundenerfassungsTest {
 
 	public void openStundenerfassung() {
 
+		// Stundenerfassung über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Administration");
 		assertNotNull(adminMenu);
 		SWTBotMenu stundenErfassung = adminMenu.menu("Stundenerfassung");
 		assertNotNull(stundenErfassung);
 		stundenErfassung.click();
-		SWTBotView partByTitle = bot.partByTitle("@Form.Search");
-		assertNotNull(partByTitle);
 
-//		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-//		SWTBotNatTable nattable = swtNatTableBot.nattable();
-//
-//		System.out.println(nattable);
-//
-//		int row = 5, col = 1;
-//		int rowCount = nattable.rowCount();
+		// Parts finden
+		searchPart = bot.partByTitle("@Form.Search");
+		assertNotNull(searchPart);
+		indexPart = bot.partByTitle("@Form.Index");
+		assertNotNull(indexPart);
+		detailPart = bot.partByTitle("@Form.Details");
+		assertNotNull(detailPart);
+
+		// Nattables finden
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+		searchNattable = swtNatTableBot.nattable();
+		assertNotNull(searchNattable);
+		indexNattable = swtNatTableBot.nattable(1);
+		assertNotNull(indexNattable);
+
 //		nattable.setCellDataValueByPosition(1, 3, "xxyy");
 //		nattable.pressShortcut(Keystrokes.LF);
-//		System.out.println(rowCount);
-////		int totalRowCount = nattable.preferredRowCount();
-//
-//		IEclipseContext eclipseContext = getEclipseContext();
-//		MApplication application = eclipseContext.get(IWorkbench.class).getApplication();
-//		EModelService modelService = eclipseContext.get(EModelService.class);
-//
-//		List<MPart> findElements = modelService.findElements(application, null, MPart.class, null);
-//		System.out.println(findElements);
-
 	}
 
 	@Test
+	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	public void loadIndex() {
 
-		SWTBotView indexPart = bot.partByTitle("@Form.Index");
-		assertNotNull(indexPart);
 		List<SWTBotToolbarButton> toolbarButtons = indexPart.getToolbarButtons();
 		assertTrue(!toolbarButtons.isEmpty());
 		toolbarButtons.get(0).click();
 
-		// TODO: Tabelle nach einträgen überprüfen
+		// Warten bis Daten geladen sind
+		do {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		} while (!toolbarButtons.get(0).isEnabled());
+
+		// Überprüfen, ob Daten geladen wurden
+
+		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
+		assertNotNull(numberEntriesString);
+		assertTrue(Integer.parseInt(numberEntriesString) > 0);
 	}
 
 	protected static IEclipseContext getEclipseContext() {
