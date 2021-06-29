@@ -198,12 +198,16 @@ public class TraverseEnterHandler {
 				}
 			}
 
-			for (MSection section : sectionList) {
-				List<MField> tabList = section.getTabList();
+			for (MSection mSection : sectionList) {
+				List<MField> tabList = mSection.getTabList();
 				for (MField field : tabList) {
 					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
 						if (field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
 							continue;
+						}
+						Section section = field.getmSection().getSection();
+						if (!section.isExpanded()) {
+							section.setExpanded(true);
 						}
 						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
 						focussedControl.setFocus();
