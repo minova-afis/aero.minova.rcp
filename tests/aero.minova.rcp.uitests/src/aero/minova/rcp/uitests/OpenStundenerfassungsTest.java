@@ -2,6 +2,7 @@ package aero.minova.rcp.uitests;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
+import org.eclipse.swtbot.nebula.nattable.finder.widgets.Position;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -72,6 +74,51 @@ public class OpenStundenerfassungsTest {
 	}
 
 	@Test
+	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten")
+	public void deleteRowAndRevertSearch() {
+		List<SWTBotToolbarButton> toolbarButtons = searchPart.getToolbarButtons();
+
+		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue Zeile wird nicht eingefügt)
+		searchNattable.setCellDataValueByPosition(1, 3, "row1");
+		searchNattable.setCellDataValueByPosition(1, 4, "row1");
+		searchNattable.setCellDataValueByPosition(2, 3, "row2");
+		searchNattable.setCellDataValueByPosition(2, 4, "row2");
+		searchNattable.setCellDataValueByPosition(3, 3, "row3");
+		searchNattable.setCellDataValueByPosition(3, 4, "row3");
+		assertEquals(5, searchNattable.rowCount());
+
+		// Suchzeile löschen
+		searchNattable.click(2, 3);
+		toolbarButtons.get(1).click();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {}
+		assertEquals(4, searchNattable.rowCount());
+		assertEquals("\"f-~-s-row1%\"", searchNattable.getCellDataValueByPosition(1, 3));
+		assertEquals("\"f-~-s-row3%\"", searchNattable.getCellDataValueByPosition(2, 3));
+
+		// Suche zurücksetzten
+		toolbarButtons.get(0).click();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {}
+		assertEquals(2, searchNattable.rowCount());
+
+		// Sind alle Spalten leer?
+		// Es können nur sichtbare Zellen überprüft werden. Deshalb scrollen wir durch die Tabelle und überprüfen, ob wir in der nächsten Spalte sind
+		int columnToCheck = 1;
+		String prevColumn = "";
+		for (int i = 2; i < searchNattable.preferredColumnCount(); i++) {
+			searchNattable.scrollViewport(new Position(1, 1), 0, i - 1);
+			if (prevColumn.equals(searchNattable.getCellDataValueByPosition(0, columnToCheck))) {
+				columnToCheck++;
+			}
+			prevColumn = searchNattable.getCellDataValueByPosition(0, columnToCheck);
+			assertEquals("", searchNattable.getCellDataValueByPosition(1, columnToCheck));
+		}
+	}
+
+	@Test
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	public void loadIndex() {
 
@@ -87,7 +134,6 @@ public class OpenStundenerfassungsTest {
 		} while (!toolbarButtons.get(0).isEnabled());
 
 		// Überprüfen, ob Daten geladen wurden
-
 		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
 		assertNotNull(numberEntriesString);
 		assertTrue(Integer.parseInt(numberEntriesString) > 0);
