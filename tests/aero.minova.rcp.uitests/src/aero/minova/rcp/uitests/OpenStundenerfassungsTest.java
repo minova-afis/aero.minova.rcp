@@ -82,7 +82,7 @@ public class OpenStundenerfassungsTest {
 		// Warten bis Daten geladen sind
 		do {
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {}
 		} while (!toolbarButtons.get(0).isEnabled());
 
