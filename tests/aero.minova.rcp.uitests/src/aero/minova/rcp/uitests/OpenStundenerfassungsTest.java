@@ -29,11 +29,6 @@ public class OpenStundenerfassungsTest {
 	@Before
 	public void beforeClass() throws Exception {
 
-		// Wir haben auf einmal Probleme unter Ubuntu
-		if (!SWTUtils.isMac()) {
-			return;
-		}
-
 		bot = new SWTWorkbenchBot(getEclipseContext());
 		SWTBotPreferences.TIMEOUT = 30000;
 
