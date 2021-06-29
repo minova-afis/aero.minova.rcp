@@ -115,10 +115,4 @@ public class MSection {
 	public Section getSection() {
 		return section;
 	}
-
-	public void setSection(Section section) {
-		this.section = section;
-	}
-	
-	
 }
