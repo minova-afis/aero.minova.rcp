@@ -3,6 +3,7 @@ package aero.minova.rcp.uitests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 
@@ -37,6 +38,10 @@ public class OpenStundenerfassungsTest {
 	private SWTBotNatTable searchNattable;
 	private SWTBotNatTable indexNattable;
 
+	private List<SWTBotToolbarButton> searchToolbar;
+	private List<SWTBotToolbarButton> indexToolbar;
+	private List<SWTBotToolbarButton> detailToolbar;
+
 	@Before
 	public void beforeClass() {
 		bot = new SWTWorkbenchBot(getEclipseContext());
@@ -69,15 +74,18 @@ public class OpenStundenerfassungsTest {
 		indexNattable = swtNatTableBot.nattable(1);
 		assertNotNull(indexNattable);
 
-//		nattable.setCellDataValueByPosition(1, 3, "xxyy");
-//		nattable.pressShortcut(Keystrokes.LF);
+		// Toolbarbuttons finden
+		searchToolbar = searchPart.getToolbarButtons();
+		assertNotEquals(0, searchToolbar.size());
+		indexToolbar = indexPart.getToolbarButtons();
+		assertNotEquals(0, indexToolbar.size());
+		detailToolbar = detailPart.getToolbarButtons();
+		assertNotEquals(0, detailToolbar.size());
 	}
 
 	@Test
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten")
 	public void deleteRowAndRevertSearch() {
-		List<SWTBotToolbarButton> toolbarButtons = searchPart.getToolbarButtons();
-
 		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue Zeile wird nicht eingefügt)
 		searchNattable.setCellDataValueByPosition(1, 3, "row1");
 		searchNattable.setCellDataValueByPosition(1, 4, "row1");
@@ -89,7 +97,7 @@ public class OpenStundenerfassungsTest {
 
 		// Suchzeile löschen
 		searchNattable.click(2, 3);
-		toolbarButtons.get(1).click();
+		searchToolbar.get(1).click();
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {}
@@ -98,7 +106,7 @@ public class OpenStundenerfassungsTest {
 		assertEquals("\"f-~-s-row3%\"", searchNattable.getCellDataValueByPosition(2, 3));
 
 		// Suche zurücksetzten
-		toolbarButtons.get(0).click();
+		searchToolbar.get(0).click();
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {}
@@ -116,22 +124,44 @@ public class OpenStundenerfassungsTest {
 			prevColumn = searchNattable.getCellDataValueByPosition(0, columnToCheck);
 			assertEquals("", searchNattable.getCellDataValueByPosition(1, columnToCheck));
 		}
+		// Wieder an Anfang scrollen
+		searchNattable.scrollViewport(new Position(1, 1), 0, 0);
+
 	}
 
 	@Test
-	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
-	public void loadIndex() {
-
-		List<SWTBotToolbarButton> toolbarButtons = indexPart.getToolbarButtons();
-		assertTrue(!toolbarButtons.isEmpty());
-		toolbarButtons.get(0).click();
+	@DisplayName("Index mit SuchPart filtern")
+	public void filterIndex() {
+		searchNattable.setCellDataValueByPosition(1, 3, "avm");
+		indexToolbar.get(0).click();
 
 		// Warten bis Daten geladen sind
 		do {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {}
-		} while (!toolbarButtons.get(0).isEnabled());
+		} while (!indexToolbar.get(0).isEnabled());
+
+		// Ist Mitarbeiter immer AVM?
+		for (int i = 3; i < indexNattable.rowCount(); i++) {
+			assertEquals("AVM", indexNattable.getCellDataValueByPosition(i, 2));
+		}
+
+		// Suche zurücksetzten
+		searchToolbar.get(0).click();
+	}
+
+	@Test
+	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
+	public void loadIndex() {
+		indexToolbar.get(0).click();
+
+		// Warten bis Daten geladen sind
+		do {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {}
+		} while (!indexToolbar.get(0).isEnabled());
 
 		// Überprüfen, ob Daten geladen wurden
 		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
