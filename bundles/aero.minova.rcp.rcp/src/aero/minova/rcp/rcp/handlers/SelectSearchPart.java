@@ -33,7 +33,7 @@ public class SelectSearchPart {
 		NatTable natTable = searchPart.getNatTable();
 		SelectionLayer selectionLayer = searchPart.getSelectionLayer();
 		natTable.setFocus();
-		natTable.doCommand(new SelectCellCommand(selectionLayer, 1, 0, false, false));
+		natTable.doCommand(new SelectCellCommand(selectionLayer, 2, 0, false, false));
 		natTable.commitAndCloseActiveCellEditor();
 	}
 }
