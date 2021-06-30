@@ -34,5 +34,6 @@ public class SelectSearchPart {
 		SelectionLayer selectionLayer = searchPart.getSelectionLayer();
 		natTable.setFocus();
 		natTable.doCommand(new SelectCellCommand(selectionLayer, 1, 0, false, false));
+		natTable.commitAndCloseActiveCellEditor();
 	}
 }
