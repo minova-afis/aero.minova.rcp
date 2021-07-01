@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,6 +46,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.Event;
+import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
@@ -119,16 +121,32 @@ public class PerspectiveControl {
 
 		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
+		List<String> ids = new ArrayList<>();
+
 		// The perspectives currently open
 		List<MPerspective> perspectives = modelService.findElements(window, null, MPerspective.class);
 		for (MPerspective perspective : perspectives) {
 			if (perspective.isToBeRendered()) {
-				addPerspectiveShortcut(perspective, true);
+				addPerspectiveShortcut(perspective.getElementId(), true);
+				ids.add(perspective.getElementId());
 			}
 			if (perspective == modelService.getActivePerspective(window)) {
 				setSelectedElement(perspective);
 			}
 		}
+
+		try {
+			for (String key : prefs.keys()) {
+				String id = key.substring(0, key.indexOf("."));
+				if (!ids.contains(id)) {
+					addPerspectiveShortcut(id, true);
+					ids.add(id);
+				}
+			}
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+
 		translate(translationService);
 	}
 
@@ -170,13 +188,13 @@ public class PerspectiveControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	public void addPerspectiveShortcut(MPerspective perspective, boolean openAll) {
-		String keptPerspective = prefs.get(perspective.getElementId(), "");
+	public void addPerspectiveShortcut(String perspectiveId, boolean openAll) {
+		String keptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank() || openAll) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
-			shortcut.setData(perspective.getElementId());
-			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
+			shortcut.setData(perspectiveId);
+			ImageDescriptor descriptor = getIconFor(prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_ICONURI, ""));
 
 			if (descriptor != null) {
 				Image icon = descriptor.createImage();
@@ -185,25 +203,27 @@ public class PerspectiveControl {
 
 			if (descriptor == null) {
 				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
-				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : "");
+				shortcut.setText(prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, "") != null
+						? prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, "")
+						: "");
 			}
-			shortcut.setToolTipText(perspective.getLocalizedTooltip());
+			shortcut.setToolTipText(prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""));
 
 			shortcut.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Map<String, String> parameter = Map.of(//
-							Constants.FORM_NAME, perspective.getPersistedState().get(Constants.FORM_NAME), //
-							Constants.FORM_ID, perspective.getElementId(), //
-							Constants.FORM_LABEL, perspective.getLabel());
+							Constants.FORM_NAME, prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
+							Constants.FORM_ID, perspectiveId, //
+							Constants.FORM_LABEL, prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""));
 
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform", parameter);
 					handlerService.executeHandler(command);
 				}
 			});
 		} else {
-			shortcut = getToolItemFor(perspective.getElementId());
+			shortcut = getToolItemFor(perspectiveId);
 		}
 	}
 
@@ -329,7 +349,7 @@ public class PerspectiveControl {
 
 	private void addKeepItMenuItem(Menu menu, String perspectiveId, MPerspective perspective) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.CHECK);
-		String keptPerspective = prefs.get(perspectiveId, "");
+		String keptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -339,7 +359,7 @@ public class PerspectiveControl {
 				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
 
-				String newKeptPerspective = prefs.get(perspectiveId, "");
+				String newKeptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
 				if (newKeptPerspective.isBlank() && perspective == null) {
@@ -418,7 +438,7 @@ public class PerspectiveControl {
 					continue;
 				}
 
-				this.addPerspectiveShortcut(added, false);
+				this.addPerspectiveShortcut(added.getElementId(), false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
