@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
@@ -39,9 +40,7 @@ public class CustomLocale {
 	 * 
 	 * @return
 	 */
-	public static List<String> getLanguages(Locale activeLocale) {
-		Collator collator = Collator.getInstance(activeLocale);
-		Locale[] locales = getLocales();
+	public static List<String> getLanguages(Locale activeLocale, IDataService dataService) {
 		List<String> languages = new ArrayList<>();
 		for (Locale l : locales) {
 			if (!l.getDisplayLanguage(l).equals("") && !languages.contains(l.getDisplayLanguage(l))) {
