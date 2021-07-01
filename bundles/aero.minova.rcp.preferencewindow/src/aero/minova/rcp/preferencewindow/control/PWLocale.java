@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
@@ -34,7 +35,6 @@ public class PWLocale extends CustomPWWidget {
 	private Combo comboCountries;
 	private Combo comboLanguage;
 	private IEclipseContext context;
-
 	TranslationService translationService;
 
 	/**

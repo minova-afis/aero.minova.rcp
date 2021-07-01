@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.io.File;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,11 +17,9 @@ import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 /**
- * Liefert Methoden zum holen aller Sprache, aller Locales und des aktuellen
- * Locales.
+ * Liefert Methoden zum holen aller Sprache, aller Locales und des aktuellen Locales.
  * 
  * @author bauer
- *
  */
 public class CustomLocale {
 	static Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -35,8 +34,7 @@ public class CustomLocale {
 	}
 
 	/**
-	 * Liefert eine Liste mit allen Sprachen wieder. Die Sprachen werden in ihrer
-	 * eigenen Sprache dargestellt.
+	 * Liefert eine Liste mit allen Sprachen wieder. Die Sprachen werden in ihrer eigenen Sprache dargestellt.
 	 * 
 	 * @return
 	 */
@@ -53,6 +51,7 @@ public class CustomLocale {
 					}
 				}
 			}
+
 		}
 
 		Collator collator = Collator.getInstance(activeLocale);
@@ -66,11 +65,14 @@ public class CustomLocale {
 	 * @return
 	 */
 	public static Locale getLocale() {
-		
+
 		Locale[] locales = CustomLocale.getLocales();
 		Locale locale = Locale.getDefault();
-		String language = InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.LOCALE_LANGUAGE, DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(locale), locale).toString();
-		String country = InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.COUNTRY, DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(locale), locale).toString();
+		String language = InstancePreferenceAccessor
+				.getValue(preferences, ApplicationPreferences.LOCALE_LANGUAGE, DisplayType.LOCALE, Locale.getDefault().getDisplayLanguage(locale), locale)
+				.toString();
+		String country = InstancePreferenceAccessor
+				.getValue(preferences, ApplicationPreferences.COUNTRY, DisplayType.LOCALE, Locale.getDefault().getDisplayCountry(locale), locale).toString();
 
 		for (Locale l : locales) {
 			if (l.getDisplayLanguage(l).equals(language) && l.getDisplayCountry(l).equals(country))
