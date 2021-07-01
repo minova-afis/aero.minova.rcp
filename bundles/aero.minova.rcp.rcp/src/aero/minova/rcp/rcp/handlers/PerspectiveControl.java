@@ -123,7 +123,7 @@ public class PerspectiveControl {
 		List<MPerspective> perspectives = modelService.findElements(window, null, MPerspective.class);
 		for (MPerspective perspective : perspectives) {
 			if (perspective.isToBeRendered()) {
-				addPerspectiveShortcut(perspective);
+				addPerspectiveShortcut(perspective, true);
 			}
 			if (perspective == modelService.getActivePerspective(window)) {
 				setSelectedElement(perspective);
@@ -170,10 +170,10 @@ public class PerspectiveControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	public void addPerspectiveShortcut(MPerspective perspective) {
+	public void addPerspectiveShortcut(MPerspective perspective, boolean openAll) {
 		String keptPerspective = prefs.get(perspective.getElementId(), "");
 
-		if (keptPerspective.isBlank()) {
+		if (keptPerspective.isBlank() || openAll) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspective.getElementId());
 			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
@@ -341,7 +341,7 @@ public class PerspectiveControl {
 				handlerService.executeHandler(command);
 
 				String newKeptPerspective = prefs.get(perspectiveId, "");
-				
+
 				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
 				// Kennzeichen gelöscht wird.
 				if (newKeptPerspective.isBlank() && perspective == null) {
@@ -420,7 +420,7 @@ public class PerspectiveControl {
 					continue;
 				}
 
-				this.addPerspectiveShortcut(added);
+				this.addPerspectiveShortcut(added, false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
