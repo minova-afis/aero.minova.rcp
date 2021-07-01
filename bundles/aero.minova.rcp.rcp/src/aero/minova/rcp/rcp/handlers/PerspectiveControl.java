@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -44,6 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.Event;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.util.ErrorObject;
@@ -80,6 +82,8 @@ public class PerspectiveControl {
 	Composite composite;
 	ToolBar toolBar;
 	ToolItem shortcut;
+
+	Preferences prefs = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
 
 	/*
 	 * Clear the Toolbar to prevent NullPointerExceptions
@@ -167,10 +171,9 @@ public class PerspectiveControl {
 	 * Add shortcut for the perspective in the toolbar
 	 */
 	public void addPerspectiveShortcut(MPerspective perspective) {
-		@SuppressWarnings("unchecked")
-		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
+		String keptPerspective = prefs.get(perspective.getElementId(), "");
 
-		if (((keepit == null) || !keepit.contains(perspective.getElementId()))) {
+		if (keptPerspective.isBlank()) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspective.getElementId());
 			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
@@ -281,10 +284,9 @@ public class PerspectiveControl {
 	}
 
 	public void removePerspectiveShortcut(MPerspective perspective) {
-		@SuppressWarnings("unchecked")
-		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
+		String keptPerspective = prefs.get(perspective.getElementId(), "");
 
-		if (keepit == null || !keepit.contains(perspective.getElementId())) {
+		if (keptPerspective.isBlank()) {
 			ToolItem item = getToolItemFor(perspective.getElementId());
 			removeToolItem(item);
 		}
@@ -328,7 +330,7 @@ public class PerspectiveControl {
 	@SuppressWarnings("unchecked")
 	private void addKeepItMenuItem(Menu menu, String perspectiveId, MPerspective perspective) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.CHECK);
-		final List<String> keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
+		String keptPerspective = prefs.get(perspective.getElementId(), "");
 
 		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -338,15 +340,17 @@ public class PerspectiveControl {
 				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
 
+				String newKeptPerspective = prefs.get(perspectiveId, "");
+				
 				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
 				// Kennzeichen gelöscht wird.
-				if (((keepItToolitems == null) || !keepItToolitems.contains(perspectiveId)) && perspective == null) {
+				if (newKeptPerspective.isBlank() && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
 				}
 			}
 		});
-		menuItem.setSelection(keepItToolitems != null && keepItToolitems.contains(perspectiveId));
+		menuItem.setSelection(!keptPerspective.isBlank());
 	}
 
 	@Inject

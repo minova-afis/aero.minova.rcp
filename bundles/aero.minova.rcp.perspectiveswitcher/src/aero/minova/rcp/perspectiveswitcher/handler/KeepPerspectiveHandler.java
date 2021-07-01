@@ -1,18 +1,19 @@
 package aero.minova.rcp.perspectiveswitcher.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 /**
@@ -26,6 +27,8 @@ import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstant
  */
 
 public class KeepPerspectiveHandler {
+	
+	
 
 	@Inject
 	MApplication application;
@@ -35,26 +38,27 @@ public class KeepPerspectiveHandler {
 
 	@Inject
 	EPartService partService;
+	
+	Preferences prefs = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
 
 	@SuppressWarnings("unchecked")
 	@Execute
 	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
-		List<String> keepItToolitems;
 
-		keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
-		
-		if (keepItToolitems == null) {
-			keepItToolitems = new ArrayList<String>();
-			application.getContext().set("perspectivetoolbar", keepItToolitems);
-		}
+		String keptPerspective = prefs.get(perspectiveId, "");
 
-		if (keepItToolitems.contains(perspectiveId)) {
-			keepItToolitems.remove(perspectiveId);
+		if (keptPerspective.isBlank()) {
+			prefs.put(perspectiveId, perspectiveId);
 		} else {
-			keepItToolitems.add(perspectiveId);
+			prefs.remove(perspectiveId);
 		}
-
+		
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 }
