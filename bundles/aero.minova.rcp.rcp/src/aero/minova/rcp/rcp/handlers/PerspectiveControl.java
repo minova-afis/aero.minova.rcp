@@ -127,7 +127,13 @@ public class PerspectiveControl {
 		List<MPerspective> perspectives = modelService.findElements(window, null, MPerspective.class);
 		for (MPerspective perspective : perspectives) {
 			if (perspective.isToBeRendered()) {
-				addPerspectiveShortcut(perspective.getElementId(), true);
+				addPerspectiveShortcut(perspective.getElementId(), //
+						perspective.getPersistedState().get(Constants.FORM_NAME), //
+						perspective.getLabel(), //
+						perspective.getIconURI(), //
+						perspective.getLocalizedLabel(), //
+						perspective.getLocalizedTooltip(), //
+						true);
 				ids.add(perspective.getElementId());
 			}
 			if (perspective == modelService.getActivePerspective(window)) {
@@ -139,7 +145,13 @@ public class PerspectiveControl {
 			for (String key : prefs.keys()) {
 				String id = key.substring(0, key.indexOf("."));
 				if (!ids.contains(id)) {
-					addPerspectiveShortcut(id, true);
+					addPerspectiveShortcut(id, //
+							prefs.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
+							prefs.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
+							prefs.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
+							prefs.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
+							prefs.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
+							true);
 					ids.add(id);
 				}
 			}
@@ -166,9 +178,7 @@ public class PerspectiveControl {
 
 	private void translate() {
 		for (ToolItem item : toolBar.getItems()) {
-			List<MPerspective> perspectives = modelService.findElements(application, item.getData().toString(), MPerspective.class);
-			MPerspective perspective = perspectives.get(0);
-			String value = translationService.translate(perspective.getLocalizedLabel(), null);
+			String value = translationService.translate(item.getText(), null);
 			item.setText(value);
 		}
 		toolBar.pack(true);
@@ -188,13 +198,14 @@ public class PerspectiveControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	public void addPerspectiveShortcut(String perspectiveId, boolean openAll) {
+	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, String localizedLabel, String localizedTooltip,
+			boolean openAll) {
 		String keptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank() || openAll) {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspectiveId);
-			ImageDescriptor descriptor = getIconFor(prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_ICONURI, ""));
+			ImageDescriptor descriptor = getIconFor(iconURI);
 
 			if (descriptor != null) {
 				Image icon = descriptor.createImage();
@@ -203,20 +214,18 @@ public class PerspectiveControl {
 
 			if (descriptor == null) {
 				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
-				shortcut.setText(prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, "") != null
-						? prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, "")
-						: "");
+				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
-			shortcut.setToolTipText(prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""));
+			shortcut.setToolTipText(localizedTooltip);
 
 			shortcut.addSelectionListener(new SelectionAdapter() {
 
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Map<String, String> parameter = Map.of(//
-							Constants.FORM_NAME, prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
+							Constants.FORM_NAME, formName, //
 							Constants.FORM_ID, perspectiveId, //
-							Constants.FORM_LABEL, prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""));
+							Constants.FORM_LABEL, formLable);
 
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform", parameter);
 					handlerService.executeHandler(command);
@@ -304,7 +313,7 @@ public class PerspectiveControl {
 	}
 
 	public void removePerspectiveShortcut(MPerspective perspective) {
-		String keptPerspective = prefs.get(perspective.getElementId(), "");
+		String keptPerspective = prefs.get(perspective.getElementId() + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank()) {
 			ToolItem item = getToolItemFor(perspective.getElementId());
@@ -438,7 +447,13 @@ public class PerspectiveControl {
 					continue;
 				}
 
-				this.addPerspectiveShortcut(added.getElementId(), false);
+				this.addPerspectiveShortcut(added.getElementId(), //
+						added.getPersistedState().get(Constants.FORM_NAME), //
+						added.getLabel(), //
+						added.getIconURI(), //
+						added.getLocalizedLabel(), //
+						added.getLocalizedTooltip(), //
+						false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {

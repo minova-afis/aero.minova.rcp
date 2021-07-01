@@ -20,18 +20,13 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 /**
- * Dieser Handler wird im PopupMenu aufgerufen. Toolitems, die mit diesem
- * Handler makiert wurden, werden nach dem schließen der Perspektive nicht aus
- * der Toolbar entfernt. So kann man die Perspektive erneutr aus der Toolbar aus
- * öffnen.
+ * Dieser Handler wird im PopupMenu aufgerufen. Toolitems, die mit diesem Handler makiert wurden, werden nach dem schließen der Perspektive nicht aus der
+ * Toolbar entfernt. So kann man die Perspektive erneutr aus der Toolbar aus öffnen.
  * 
  * @author bauer
- *
  */
 
 public class KeepPerspectiveHandler {
-	
-	
 
 	@Inject
 	MApplication application;
@@ -41,33 +36,36 @@ public class KeepPerspectiveHandler {
 
 	@Inject
 	EPartService partService;
-	
+
 	Preferences prefs = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
 
 	@Execute
 	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
-		List<MPerspective> perspectives = modelService.findElements(window, perspectiveId, MPerspective.class);
-		MPerspective perspective = perspectives.get(0);
-
 		String keptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank()) {
-			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, perspective.getPersistedState().get(Constants.FORM_NAME));
-			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMID, perspective.getElementId());
-			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMLABEL, perspective.getLabel());
-			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_ICONURI, perspective.getIconURI());
-			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, perspective.getLocalizedLabel());
-			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, perspective.getLocalizedTooltip());
+			List<MPerspective> perspectives = modelService.findElements(window, perspectiveId, MPerspective.class);
+			MPerspective perspective = perspectives.get(0);
+
+			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMID, perspective.getElementId() == null ? "" : perspective.getElementId());
+			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME,
+					perspective.getPersistedState().get(Constants.FORM_NAME) == null ? "" : perspective.getPersistedState().get(Constants.FORM_NAME));
+			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMLABEL, perspective.getLabel() == null ? "" : perspective.getLabel());
+			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_ICONURI, perspective.getIconURI() == null ? "" : perspective.getIconURI());
+			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL,
+					perspective.getLocalizedLabel() == null ? "" : perspective.getLocalizedLabel());
+			prefs.put(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP,
+					perspective.getLocalizedTooltip() == null ? "" : perspective.getLocalizedTooltip());
 		} else {
-			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME);
 			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMID);
+			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME);
 			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMLABEL);
 			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_ICONURI);
 			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL);
 			prefs.remove(perspectiveId + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP);
 		}
-		
+
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e1) {
