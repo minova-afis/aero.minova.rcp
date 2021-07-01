@@ -42,11 +42,20 @@ public class CustomLocale {
 	 */
 	public static List<String> getLanguages(Locale activeLocale, IDataService dataService) {
 		List<String> languages = new ArrayList<>();
-		for (Locale l : locales) {
-			if (!l.getDisplayLanguage(l).equals("") && !languages.contains(l.getDisplayLanguage(l))) {
-				languages.add(l.getDisplayLanguage(l));
+		File workspace = new File(dataService.getStoragePath().toAbsolutePath().toString() + "/i18n");
+		if (workspace.isDirectory()) {
+			for (String messageProperties : workspace.list()) {
+				if (messageProperties.contains("_")) {
+					String shortcut = messageProperties.substring(messageProperties.indexOf("_") + 1, messageProperties.indexOf("_") + 3);
+					Locale l = Locale.forLanguageTag(shortcut);
+					if (l.getDisplayLanguage(l) != null && !languages.contains(l.getDisplayLanguage(l))) {
+						languages.add(l.getDisplayLanguage(l));
+					}
+				}
 			}
 		}
+
+		Collator collator = Collator.getInstance(activeLocale);
 		Collections.sort(languages, collator);
 		return languages;
 	}
