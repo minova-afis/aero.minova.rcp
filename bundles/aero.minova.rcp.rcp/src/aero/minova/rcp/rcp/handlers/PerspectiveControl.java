@@ -330,7 +330,7 @@ public class PerspectiveControl {
 	@SuppressWarnings("unchecked")
 	private void addKeepItMenuItem(Menu menu, String perspectiveId, MPerspective perspective) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.CHECK);
-		String keptPerspective = prefs.get(perspective.getElementId(), "");
+		String keptPerspective = prefs.get(perspectiveId, "");
 
 		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -342,9 +342,8 @@ public class PerspectiveControl {
 
 				String newKeptPerspective = prefs.get(perspectiveId, "");
 
-				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
-				// Kennzeichen gelöscht wird.
-				if (newKeptPerspective.isBlank() && perspective == null) {
+				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
+				if (keptPerspective.isBlank() && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
 				}
