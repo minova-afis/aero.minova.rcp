@@ -99,6 +99,10 @@ public class Constants {
 
 	public static final String FORM_LABEL = "aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel"; //$NON-NLS-1$
 
+	public static final String PERSPECTIVE_TOOLBAR = "perspectivetoolbar";
+	
+	public static final String PREFERENCES_KEPTPERSPECTIVES = "aero.minova.rcp.preferences.keptperspectives";
+
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
 	 *
