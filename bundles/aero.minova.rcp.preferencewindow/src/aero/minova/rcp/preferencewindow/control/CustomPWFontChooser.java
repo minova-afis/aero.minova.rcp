@@ -52,8 +52,8 @@ public class CustomPWFontChooser extends CustomPWChooser {
 			final FontData result = dialog.open();
 			if (result != null && result.getName() != null && !"".equals(result.getName().trim())) {
 				fontData = result;
-				text.setText(buildFontInformation());
 				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), result);
+				text.setText(buildFontInformation());
 			}
 		});
 		text.setText(buildFontInformation());
