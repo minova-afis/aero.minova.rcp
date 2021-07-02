@@ -85,7 +85,10 @@ public class PerspectiveControl {
 	ToolBar toolBar;
 	ToolItem shortcut;
 
-	Preferences prefs = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
+	Preferences prefsKeptPerspectives = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
+	Preferences prefsToolbarOrder = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_TOOLBARORDER);
+	List<String> openToolbarItems;
+	List<String> oldToolbarOrder;
 
 	/*
 	 * Clear the Toolbar to prevent NullPointerExceptions
@@ -121,6 +124,8 @@ public class PerspectiveControl {
 
 		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
+		readOldToolbarOrder();
+		openToolbarItems = new ArrayList<>();
 		List<String> ids = new ArrayList<>();
 
 		// The perspectives currently open
@@ -141,16 +146,17 @@ public class PerspectiveControl {
 			}
 		}
 
+		// Die angehefteten Perspektiven
 		try {
-			for (String key : prefs.keys()) {
+			for (String key : prefsKeptPerspectives.keys()) {
 				String id = key.substring(0, key.indexOf("."));
 				if (!ids.contains(id)) {
 					addPerspectiveShortcut(id, //
-							prefs.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
-							prefs.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
-							prefs.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
-							prefs.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
-							prefs.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
+							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
+							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
+							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
+							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
+							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
 							true);
 					ids.add(id);
 				}
@@ -158,6 +164,8 @@ public class PerspectiveControl {
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
+
+		oldToolbarOrder = new ArrayList<>();
 
 		translate(translationService);
 	}
@@ -200,10 +208,16 @@ public class PerspectiveControl {
 	 */
 	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, String localizedLabel, String localizedTooltip,
 			boolean openAll) {
-		String keptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
+		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank() || openAll) {
-			shortcut = new ToolItem(toolBar, SWT.RADIO);
+
+			int index = oldToolbarOrder.indexOf(perspectiveId);
+
+			openToolbarItems.add(index, perspectiveId);
+			saveOrderInPrefs();
+
+			shortcut = new ToolItem(toolBar, SWT.RADIO, index);
 			shortcut.setData(perspectiveId);
 			ImageDescriptor descriptor = getIconFor(iconURI);
 
@@ -313,7 +327,7 @@ public class PerspectiveControl {
 	}
 
 	public void removePerspectiveShortcut(MPerspective perspective) {
-		String keptPerspective = prefs.get(perspective.getElementId() + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
+		String keptPerspective = prefsKeptPerspectives.get(perspective.getElementId() + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank()) {
 			ToolItem item = getToolItemFor(perspective.getElementId());
@@ -328,6 +342,9 @@ public class PerspectiveControl {
 			return;
 		}
 
+		openToolbarItems.remove(item.getData());
+		saveOrderInPrefs();
+
 		Image icon = item.getImage();
 		if (icon != null) {
 			item.setImage(null);
@@ -335,6 +352,33 @@ public class PerspectiveControl {
 		}
 
 		item.dispose();
+	}
+
+	private void saveOrderInPrefs() {
+		StringBuilder list = new StringBuilder();
+
+		for (String s : openToolbarItems) {
+			list.append(s + ",");
+		}
+		list.substring(0, list.length() - 1);
+
+		prefsToolbarOrder.put("order", list.toString());
+		try {
+			prefsToolbarOrder.flush();
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void readOldToolbarOrder() {
+		oldToolbarOrder = new ArrayList<>();
+
+		String orderString = prefsToolbarOrder.get("order", "");
+
+		for (String id : orderString.split(",")) {
+			oldToolbarOrder.add(id);
+		}
 	}
 
 	//////////////////////////////////
@@ -358,7 +402,7 @@ public class PerspectiveControl {
 
 	private void addKeepItMenuItem(Menu menu, String perspectiveId, MPerspective perspective) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.CHECK);
-		String keptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
+		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -368,7 +412,7 @@ public class PerspectiveControl {
 				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
 
-				String newKeptPerspective = prefs.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
+				String newKeptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
 				if (newKeptPerspective.isBlank() && perspective == null) {

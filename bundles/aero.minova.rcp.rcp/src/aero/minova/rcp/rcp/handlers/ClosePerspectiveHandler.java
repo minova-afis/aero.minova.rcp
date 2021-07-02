@@ -9,7 +9,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -34,15 +33,12 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 	@Execute
 	public void execute(MWindow window, @Optional @Named(E4WorkbenchParameterConstants.FORM_NAME) String perspectiveId) {
 
-		List<MPerspective> perspective = modelService.findElements(application, perspectiveId, MPerspective.class);
-
 		/*
 		 * Entfernt die aktuelle Perspektive.
 		 */
-
-		MPerspectiveStack perspectiveStack = (MPerspectiveStack) modelService.find("aero.minova.rcp.rcp.perspectivestack", application);
-		// perspectiveStack.getChildren().remove(perspective.get(0));
+		List<MPerspective> perspective = modelService.findElements(application, perspectiveId, MPerspective.class);
 		modelService.deleteModelElement(perspective.get(0));
+
 		/*
 		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat.
 		 */
