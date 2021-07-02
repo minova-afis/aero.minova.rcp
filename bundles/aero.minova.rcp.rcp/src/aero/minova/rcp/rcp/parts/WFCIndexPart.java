@@ -180,7 +180,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 
-		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
+		for (Object headOrPage : form.getDetail().getHeadAndPageAndGrid()) {
 			if (headOrPage instanceof Page) {
 				Page page = (Page) headOrPage;
 				for (Object fieldOrGrid : page.getFieldOrGrid()) {

@@ -108,7 +108,7 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public List<Field> getFieldsFromForm(Form form) {
 		List<Field> allFields = new ArrayList<>();
-		for (Object o : form.getDetail().getHeadAndPage()) {
+		for (Object o : form.getDetail().getHeadAndPageAndGrid()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
 				List<Object> fields = head.getFieldOrGrid();
