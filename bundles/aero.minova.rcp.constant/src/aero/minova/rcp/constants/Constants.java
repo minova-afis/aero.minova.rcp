@@ -21,6 +21,7 @@ public class Constants {
 	public static final String CONTROL_VALUE = "value";
 	public static final String CONTROL_ID = "id";
 	public static final String CONTROL_WIZARD = "wizard";
+	public static final String CONTROL_BUTTON = "button";
 	public static final String CONTROL_MDETAIL = "mDetail";
 
 	// Trenner für Serializer/Deserialiser
