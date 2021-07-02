@@ -37,35 +37,6 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
-import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
-import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
-import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
-import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
-import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
-import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
-import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
-import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultColumnHeaderDataLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
-import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
-import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
-import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -96,8 +67,6 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Wizard;
-import aero.minova.rcp.model.Row;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -110,7 +79,6 @@ import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
-import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
@@ -119,20 +87,16 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.GlazedLists;
-import ca.odell.glazedlists.SortedList;
+import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
 	private static final int MARGIN_SECTION = 8;
-	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
+	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
@@ -297,7 +261,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Button erstellen, falls vorhanden
 		createButton(headOrPage, section);
 		// Erstellen der Field des Section.
-		createFields(composite, headOrPage, mSection);
+		createFields(composite, headOrPage, mSection, section);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections.
@@ -310,6 +274,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
+
+
 	/**
 	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
 	 *
@@ -319,7 +285,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param section
 	 */
 	private void createButton(HeadOrPageOrGridWrapper headOPOGWrapper, Section section) {
-		if (headOPOGWrapper.isHead || headOPOGWrapper.headOrPage instanceof Grid) {
+		if (headOPOGWrapper.isHead || (headOPOGWrapper.headOrPage instanceof Grid)) {
 			return;
 		}
 
@@ -516,14 +482,17 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param page
 	 *            die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection page) {
+	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection page, Section section) {
 		int row = 0;
 		int column = 0;
 		int width;
+		IEclipseContext context = perspective.getContext();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
-					createNatTableGrid((Grid) fieldOrGrid, composite);
+					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
+					ContextInjectionFactory.inject(sg, context); // In Context injected, damit TranslationService genutzt werden kann
+					sg.createGrid();
 				}
 				continue;
 			}
@@ -549,98 +518,6 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 		}
 		addBottonMargin(composite, row + 1, column);
-	}
-
-	/**
-	 * Diese Methode erstellt eine NatTable als Grid im Detail.
-	 *
-	 * @param grid
-	 * @param composite
-	 *            - Section auf die wir die NatTable erstellen
-	 */
-	private void createNatTableGrid(Grid grid, Composite composite) {
-		// Button erstellen, abhängig von Grid
-
-		Table dataTable = dataFormService.getTableFromGrid(grid);
-		NatTable natTable = createNatTable(composite, grid, dataTable);
-
-
-	}
-
-	public NatTable createNatTable(Composite parent, Grid grid, Table table) {
-		NatTable natTable;
-		// Datenmodel für die Eingaben
-		ConfigRegistry configRegistry = new ConfigRegistry();
-
-		// create the body stack
-		EventList<Row> eventList = GlazedLists.eventList(table.getRows());
-		SortedList<Row> sortedList = new SortedList<>(eventList, null);
-		MinovaColumnPropertyAccessor columnPropertyAccessor = new MinovaColumnPropertyAccessor(table, grid);
-		columnPropertyAccessor.initPropertyNames(translationService);
-
-		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
-
-		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
-
-		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
-
-		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
-
-		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
-		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
-		SelectionLayer selectionLayer = new SelectionLayer(columnHideShowLayer);
-		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
-
-		// as the selection mouse bindings are registered for the region label GridRegion.BODY we need to set that region label to the viewport so the selection
-		// via mouse is working correctly
-		viewportLayer.setRegionName(GridRegion.BODY);
-
-		// build the column header layer
-		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
-				columnPropertyAccessor.getTableHeadersMap());
-		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
-
-		// build the row header layer
-		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
-		DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
-		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
-
-		// build the corner layer
-		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
-		DataLayer cornerDataLayer = new DataLayer(cornerDataProvider);
-		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
-
-		// build the grid layer
-		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
-
-		natTable = new NatTable(parent, gridLayer, false);
-
-		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
-		natTable.setConfigRegistry(configRegistry);
-		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
-		natTable.addConfiguration(new SingleClickSortConfiguration());
-
-		natTable.addConfiguration(new MinovaGridConfiguration(table.getColumns(), translationService, grid));
-
-		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
-		natTable.addConfiguration(new DefaultEditBindings() {
-			@Override
-			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
-				MouseEditAction mouseEditAction = new MouseEditAction();
-				super.configureUiBindings(uiBindingRegistry);
-				uiBindingRegistry.registerFirstSingleClickBinding(
-						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
-			}
-		});
-
-		FormData fd = new FormData();
-		fd.width = SECTION_WIDTH;
-		fd.height = COLUMN_HEIGHT * 3;
-
-		natTable.setLayoutData(fd);
-		natTable.configure();
-		return natTable;
 	}
 
 	private int getExtraHeight(Field field) {
