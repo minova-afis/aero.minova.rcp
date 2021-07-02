@@ -400,4 +400,12 @@ public class WFCSearchPart extends WFCFormPart {
 		sortedList.clear();
 		sortedList.addAll(getData().getRows());
 	}
+	
+	public NatTable getNatTable() {
+		return natTable;
+	}
+	
+	public SelectionLayer getSelectionLayer() {
+		return selectionLayer;
+	}
 }
