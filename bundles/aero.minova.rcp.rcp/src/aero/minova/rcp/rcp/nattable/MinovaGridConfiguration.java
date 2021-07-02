@@ -1,0 +1,228 @@
+package aero.minova.rcp.rcp.nattable;
+
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
+import org.eclipse.nebula.widgets.nattable.data.convert.DefaultBooleanDisplayConverter;
+import org.eclipse.nebula.widgets.nattable.data.convert.DefaultDoubleDisplayConverter;
+import org.eclipse.nebula.widgets.nattable.data.convert.DefaultIntegerDisplayConverter;
+import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.painter.cell.CheckBoxPainter;
+import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
+import org.eclipse.nebula.widgets.nattable.style.Style;
+
+import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
+
+public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
+
+	private List<Column> columns;
+	private Locale locale;
+	private TranslationService translationService;
+	private Grid grid;
+	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
+
+	public MinovaGridConfiguration(List<Column> columns, TranslationService translationService, Grid grid) {
+		this.columns = columns;
+		this.translationService = translationService;
+		this.grid = grid;
+		initGridFields();
+	}
+
+	public void initGridFields() {
+		gridFields = new HashMap<>();
+		for (aero.minova.rcp.form.model.xsd.Field field : grid.getField()) {
+			gridFields.put(field.getName(), field);
+		}
+	}
+
+	@Override
+	public void configureRegistry(IConfigRegistry configRegistry) {
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.NEVER_EDITABLE);
+		configureCells(configRegistry);
+	}
+
+	private void configureCells(IConfigRegistry configRegistry) {
+		int i = 0;
+		for (Column column : columns) {
+
+			if (column.getType().equals(DataType.BOOLEAN)) {
+				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortDate() != null) {
+				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortTime() != null) {
+				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTime() != null) {
+				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			} else if (column.getType().equals(DataType.DOUBLE)) {
+				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()),
+						ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			} else if (column.getType().equals(DataType.INTEGER)) {
+				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			} else {
+				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+			}
+		}
+	}
+
+
+	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+
+		NumberFormat nf = NumberFormat.getInstance();
+		DefaultIntegerDisplayConverter defaultIntegerDisplayConverter = new DefaultIntegerDisplayConverter(true);
+		defaultIntegerDisplayConverter.setNumberFormat(nf);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultIntegerDisplayConverter, DisplayMode.NORMAL,
+				configLabel + columnIndex);
+
+	}
+
+	private void configureDateTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+		ShortDateTimeDisplayConverter shortDateTimeDisplayConverter = new ShortDateTimeDisplayConverter(locale);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortDateTimeDisplayConverter, DisplayMode.NORMAL,
+				configLabel + columnIndex);
+
+	}
+
+	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+		ShortTimeDisplayConverter shortTimeDisplayConverter = new ShortTimeDisplayConverter(locale);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortTimeDisplayConverter, DisplayMode.NORMAL,
+				configLabel + columnIndex);
+
+	}
+
+	private void configureShortDateCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+		ShortDateDisplayConverter shortDateDisplayConverter = new ShortDateDisplayConverter(locale);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortDateDisplayConverter, DisplayMode.NORMAL,
+				configLabel + columnIndex);
+	}
+
+	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		// visuelle anpassung [x] oder [_] oder [-]
+		//
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL, configLabel + columnIndex);
+
+		// using a CheckBoxCellEditor also needs a Boolean conversion to work
+		// correctly
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new BooleanDisplayConverter(), DisplayMode.NORMAL,
+				configLabel + columnIndex);
+	}
+
+	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Field field, String configLabel) {
+
+
+		int decimals = 0;
+		if (field.getNumber() != null) {
+			decimals = field.getNumber().getDecimals();
+		}
+
+		if (field.getPercentage() != null) {
+			decimals = field.getPercentage().getDecimals();
+
+		}
+		if (field.getMoney() != null) {
+			decimals = field.getMoney().getDecimals();
+		}
+
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+		NumberFormat numberFormat = NumberFormat.getInstance(locale);
+		numberFormat.setMinimumFractionDigits(decimals);
+		numberFormat.setMaximumFractionDigits(decimals);
+
+		DefaultDoubleDisplayConverter defaultDoubleDisplayConverter = new DefaultDoubleDisplayConverter(true);
+		defaultDoubleDisplayConverter.setNumberFormat(numberFormat);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
+				configLabel + columnIndex);
+
+	}
+
+	private void configureInstantCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+
+	}
+
+	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+	}
+
+	private void registerDoubleEditor(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+		// register a TextCellEditor for column two that commits on key up/down
+		// moves the selection after commit by enter
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TextCellEditor(true, true), DisplayMode.NORMAL, configLabel + columnIndex);
+
+		// configure to open the adjacent editor after commit
+		// default behavior - enter - down, tab - right, shift+tab - left, arrows -
+		// arrow direction
+		configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE, DisplayMode.EDIT, configLabel + columnIndex);
+
+		// TODO get the number format of the user
+		NumberFormat nf = NumberFormat.getInstance();
+//		NumberFormat nf = NumberFormat.getInstance(new Locale("en", "EN"));
+		DefaultDoubleDisplayConverter defaultDoubleDisplayConverter = new DefaultDoubleDisplayConverter(true);
+		defaultDoubleDisplayConverter.setNumberFormat(nf);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
+				configLabel + columnIndex);
+	}
+
+	private void registerBooleanEditor(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
+
+		// Das hier würde einen kundenspezifischen Checkbox editor nutzen
+		// configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new
+		// ExampleCheckBoxPainter(),
+		// DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX +
+		// columnIndex);
+
+		// The CheckBoxCellEditor can also be visualized like a check button
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(), DisplayMode.NORMAL, configLabel + columnIndex);
+
+		// using a CheckBoxCellEditor also needs a Boolean conversion to work
+		// correctly
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new DefaultBooleanDisplayConverter(), DisplayMode.NORMAL,
+				configLabel + columnIndex);
+	}
+
+}

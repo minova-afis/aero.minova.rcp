@@ -24,6 +24,7 @@ import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.DataType;
@@ -258,6 +259,23 @@ public class DataFormService implements IDataFormService {
 		data.put(IEventBroker.DATA, message);
 		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
 		eventAdmin.postEvent(event);
+	}
+
+	@Override
+	/**
+	 * Erstellt eine Table aus dem übergenen Grid
+	 */
+	public Table getTableFromGrid(Grid grid) {
+		Table dataTable = new Table();
+		String prefix = "Read";
+		String tablename = grid.getProcedurePrefix() + prefix + grid.getProcedureSuffix();
+
+		dataTable.setName(tablename);
+
+		for (Field f : grid.getField()) {
+			dataTable.addColumn(createColumnFromField(f, prefix));
+		}
+		return dataTable;
 	}
 
 }
