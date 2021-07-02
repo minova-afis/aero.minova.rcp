@@ -204,7 +204,16 @@ public class WFCDetailCASRequestsUtil {
 				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
 			}));
+
+			/**
+			 * for (MGrid g : detail.getGrids()) { SectionGrid sectionGrid = ((GridAccessor) g.getValueAccessor()).getSectionGrid(); Table requestTable =
+			 * TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create(); Grid grid = g.getGrid(); // TODO korrekten Key
+			 * auslesen. for (Field f : grid.getField()) { if (f.getKeyType().equalsIgnoreCase(KeyType.PRIMARY.toString())) { aero.minova.rcp.model.Column
+			 * column = dataFormService.createColumnFromField(f, "Read"); requestTable.addColumn(column); } } }
+			 */
+			// Grids einlesen und aufrufen mit entsprechenden Keys?!
 		}
+
 	}
 
 	/**

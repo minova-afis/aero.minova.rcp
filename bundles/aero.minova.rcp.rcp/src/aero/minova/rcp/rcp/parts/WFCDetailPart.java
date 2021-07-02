@@ -71,6 +71,7 @@ import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MSection;
@@ -80,6 +81,7 @@ import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -472,6 +474,27 @@ public class WFCDetailPart extends WFCFormPart {
 		return listToArray(tabList);
 	}
 
+
+	public MGrid createMGrid(Grid grid, MSection section) {
+		MGrid mgrid = new MGrid(grid.getProcedureSuffix());
+		mgrid.setTitle(grid.getTitle());
+		mgrid.setFill(grid.getFill());
+		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
+		mgrid.setmSection(section);
+		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(grid.getIcon());
+		Image gridImage = resManager.createImage(gridImageDescriptor);
+		mgrid.setIcon(gridImage);
+		mgrid.setHelperClass(grid.getHelperClass());
+		List<MField> mFields = new ArrayList<>();
+		for (Field f : grid.getField()) {
+			MField mF = ModelToViewModel.convert(f);
+			mFields.add(mF);
+		}
+		mgrid.setGrid(grid);
+		mgrid.setFields(mFields);
+		return mgrid;
+	}
+
 	/**
 	 * Erstellt die Field einer Section.
 	 *
@@ -479,10 +502,10 @@ public class WFCDetailPart extends WFCFormPart {
 	 *            der parent des Fields
 	 * @param headOrPage
 	 *            bestimmt ob die Fields nach den Regeln des Heads erstellt werden oder der einer Page.
-	 * @param page
+	 * @param mSection
 	 *            die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection page, Section section) {
+	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, Section section) {
 		int row = 0;
 		int column = 0;
 		int width;
@@ -491,6 +514,12 @@ public class WFCDetailPart extends WFCFormPart {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
 					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
+					MGrid createMGrid = createMGrid((Grid) fieldOrGrid, mSection);
+					GridAccessor gA = new GridAccessor();
+					gA.setSectionGrid(sg);
+					createMGrid.setValueAccessor(gA);
+					mSection.getmDetail().putGrid(createMGrid);
+
 					ContextInjectionFactory.inject(sg, context); // In Context injected, damit TranslationService genutzt werden kann
 					sg.createGrid();
 				}
@@ -509,8 +538,8 @@ public class WFCDetailPart extends WFCFormPart {
 				row++;
 			}
 			createField(composite, f, row, column);
-			f.setmPage(page);
-			page.addTabField(f);
+			f.setmPage(mSection);
+			mSection.addTabField(f);
 
 			column += width;
 			if (!headOrPage.isHead) {

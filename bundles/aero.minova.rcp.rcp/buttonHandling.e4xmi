@@ -7,6 +7,7 @@
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_b1dVUNsWEeuRe68NbHdf4w" elementId="aero.minova.rcp.rcp.command.gridbuttoncommand" commandName="GridButtonCommand">
       <parameters xmi:id="_gMbVkNsWEeuRe68NbHdf4w" elementId="button" name="button"/>
+      <parameters xmi:id="_d9bAANsZEeu3XJVyDl36Ig" elementId="grid_procedure_suffix" name="grid_procedure_suffix"/>
     </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_PrpWIL4SEeuQC6-nmD0NNA" featurename="handlers" parentElementId="xpath:/">

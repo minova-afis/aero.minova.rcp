@@ -17,11 +17,12 @@ import aero.minova.rcp.model.helper.IHelper;
 public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
+	private HashMap<String, MGrid> grids = new HashMap<>();
 
-	private List<MSection> pageList = new ArrayList<MSection>();
+	private List<MSection> pageList = new ArrayList<>();
 
 	private IHelper helper;
-	
+
 	private Control selectedField;
 
 	/**
@@ -37,10 +38,42 @@ public class MDetail {
 	 *            das eigentliche Feld
 	 */
 	public void putField(MField field) {
-		if (field == null)
+		if (field == null) {
 			return;
+		}
 		fields.put(field.getName(), field);
 		field.setDetail(this);
+	}
+
+	/**
+	 * Ein neues MGrid dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B. Um diese Einigkeit zu erreichen wird der
+	 * Procedure-Suffix des Grid-Knoten verwendet. Dies ist ein Pflichtfeld!
+	 *
+	 * @param name
+	 *            Name / ID des Feldes
+	 * @param MGrid
+	 *            das eigentliche MGrid
+	 */
+	public void putGrid(MGrid g) {
+		if (g == null) {
+			return;
+		}
+		grids.put(g.getProcedureSuffix(), g);
+	}
+
+	public Collection<MGrid> getGrids() {
+		return grids.values();
+	}
+
+	/**
+	 * Liefert das MGrid mit dem Procedure-Suffix.
+	 *
+	 * @param name
+	 *            Name des Grids
+	 * @return Das MGrid
+	 */
+	public MGrid getGrid(String name) {
+		return grids.get(name);
 	}
 
 	/**
@@ -91,7 +124,7 @@ public class MDetail {
 		}
 		return true;
 	}
-	
+
 	public Control getSelectedField() {
 		return selectedField;
 	}
@@ -99,4 +132,5 @@ public class MDetail {
 	public void setSelectedField(Control selectedField) {
 		this.selectedField = selectedField;
 	}
+
 }

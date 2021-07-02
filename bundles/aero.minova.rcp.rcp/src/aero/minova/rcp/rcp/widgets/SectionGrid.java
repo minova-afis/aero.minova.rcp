@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.widgets;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -116,7 +117,7 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-		// create, delete, revert, optimizeWith, optimizeHigh
+		// create, delete, optimizeWith, optimizeHigh
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
 			btnInsert.setIcon("NewRecord.Command");
@@ -133,6 +134,7 @@ public class SectionGrid {
 			createButton(bar, btnDel);
 		}
 
+		// hier muss
 		for (Button btn : grid.getButton()) {
 			createButton(bar, btn);
 		}
@@ -173,7 +175,9 @@ public class SectionGrid {
 				// TODO: Andere procedures/bindings/instances auswerten
 				System.out.println("Button pushed: " + item.getText());
 
-				Map<String, String> parameter = Map.of(Constants.CONTROL_BUTTON, btn.getId());
+				Map<String, String> parameter = new HashMap<>();
+				parameter.put(Constants.CONTROL_BUTTON, btn.getId());
+				parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
 				ParameterizedCommand command = commandService.createCommand(commandName, parameter);
 				handlerService.executeHandler(command);
 

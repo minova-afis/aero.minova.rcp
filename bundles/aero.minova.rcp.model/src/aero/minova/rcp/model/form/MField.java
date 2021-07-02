@@ -45,6 +45,7 @@ public abstract class MField {
 	private String cssClass = Constants.CSS_STANDARD;
 	// Wenn canBeValid = false, dann ist das Feld aufgrund einer Berechnung auf falsch gesetzt
 	private boolean canBeValid = true;
+	private boolean primary = false;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -383,5 +384,13 @@ public abstract class MField {
 
 	public void setCanBeValid(boolean canBeValid) {
 		this.canBeValid = canBeValid;
+	}
+
+	public boolean isPrimary() {
+		return primary;
+	}
+
+	public void setPrimary(boolean primary) {
+		this.primary = primary;
 	}
 }
