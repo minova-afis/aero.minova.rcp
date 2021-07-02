@@ -33,27 +33,37 @@ public class CustomLocale {
 		return SimpleDateFormat.getAvailableLocales();
 	}
 
-	/**
-	 * Liefert eine Liste mit allen Sprachen wieder. Die Sprachen werden in ihrer eigenen Sprache dargestellt.
-	 * 
-	 * @return
-	 */
-	public static List<String> getLanguages(Locale activeLocale, IDataService dataService) {
-		List<String> languages = new ArrayList<>();
+	public static List<String> getLanguageTagListOfi18n(IDataService dataService) {
+		List<String> languagesTags = new ArrayList<>();
 		File workspace = new File(dataService.getStoragePath().toAbsolutePath().toString() + "/i18n");
 		if (workspace.isDirectory()) {
 			for (String messageProperties : workspace.list()) {
 				if (messageProperties.contains("_")) {
 					String shortcut = messageProperties.substring(messageProperties.indexOf("_") + 1, messageProperties.indexOf("_") + 3);
-					Locale l = Locale.forLanguageTag(shortcut);
-					if (l.getDisplayLanguage(l) != null && !languages.contains(l.getDisplayLanguage(l))) {
-						languages.add(l.getDisplayLanguage(l));
+					if (!shortcut.isBlank() && !languagesTags.contains(shortcut)) {
+						languagesTags.add(shortcut);
 					}
 				}
 			}
-
 		}
+		return languagesTags;
+	}
 
+	/**
+	 * Liefert eine Liste mit allen Sprachen wieder. Die Sprachen werden in ihrer eigenen Sprache dargestellt.
+	 * 
+	 * @return
+	 */
+	public static List<String> getLanguages(Locale activeLocale, List<String> languageTags) {
+		List<String> languages = new ArrayList<>();
+		for (String shortcut : languageTags) {
+			Locale l = Locale.forLanguageTag(shortcut);
+			if (l.getDisplayLanguage(l) != null && !languages.contains(l.getDisplayLanguage(l))) {
+				languages.add(l.getDisplayLanguage(l));
+			}
+			
+		}
+		
 		Collator collator = Collator.getInstance(activeLocale);
 		Collections.sort(languages, collator);
 		return languages;
