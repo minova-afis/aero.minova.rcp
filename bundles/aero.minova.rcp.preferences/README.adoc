@@ -8,5 +8,5 @@
 
 == TraverseListener Verhalten
 
-* xref:doc/adoc/traverselistener.adoc[TraverseListener Verhalten]
+* xref:doc/adoc/traversehandling.adoc[TraverseListener Verhalten]
 
