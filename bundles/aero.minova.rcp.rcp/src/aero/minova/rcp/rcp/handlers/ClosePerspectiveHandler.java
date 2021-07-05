@@ -37,14 +37,17 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		 * Entfernt die aktuelle Perspektive.
 		 */
 		List<MPerspective> perspective = modelService.findElements(application, perspectiveId, MPerspective.class);
+		boolean activePerspective = perspective.get(0) == modelService.getActivePerspective(window);
 		modelService.deleteModelElement(perspective.get(0));
 
 		/*
-		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat.
+		 * Wechselt zur Perspektive, die in der PerspektiveList den Index 0 hat, wenn geschlossene Perspektive die aktive war
 		 */
-		List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
-		if (!perspectiveList.isEmpty()) {
-			switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
+		if (activePerspective) {
+			List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
+			if (!perspectiveList.isEmpty()) {
+				switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
+			}
 		}
 	}
 
