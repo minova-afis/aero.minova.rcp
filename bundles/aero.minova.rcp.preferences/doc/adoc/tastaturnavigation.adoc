@@ -10,7 +10,7 @@ Wir haben uns aus folgenden Gründen gegen den TraverseListener entschieden:
 - Die Funktionalität des Verhaltens ist vielseitiger einsetzbar, da sie nicht an eine Klasse gebunden ist. Zum Beispiel, durch die Umsetzung des
 Enter Verhaltens in einem Handler, können wir diesen von verschiedenen Stellen in der Anwendung aufrufen.
 
-==== Preferences die das Tab- und Enter-Verhalten beeinflussen
+=== Preferences die das Tab- und Enter-Verhalten beeinflussen
 
 EnterSelectsFirstRequired (ESFR) = Genau Beschreibung hier: xref:application.adoc#Nach dem Betätigen von ENTER wird das erste erforderliche Feld selektiert[EnterSelectsFirstRequired]
 
@@ -18,7 +18,7 @@ LookupEnterSelectsNextRequired (LESNR) = Genau Beschreibung hier: xref:applicati
 
 SelectAllControls (SAC) = Genau Beschreibung hier: xref:application.adoc#Aktiviert die Selektion aller möglichen Felder inkl. Registerkarte und Schaltflächen[SelectAllControls]
 
-==== Tab-Verhalten
+=== Tab-Verhalten
 
 Da das Tab-Verhalten durch Eclipse vorgegeben ist, müssen wir nur noch die Tab-Reihenfolge bestimmen. Folgende Bedingungen gelten für die Tab-Reihenfolge:
 
@@ -37,6 +37,8 @@ Verhalten für die Eingabe von Tab:
 
 ==== Enter-Verhalten
 
+=== Enter-Verhalten
+
 Die Eingabe von Enter wird mit einem Key-Binding im DetailPart erkannt und führt daraufhin die entsprechenden Handler aus. Dabei wir wie anschließend beschrieben vorgegangen:
 
 - In der execute Methode des TraverseEnterHandlers holen wir uns zuerst das selektierte Feld. Bei einem LookupField schließen wir, falls offen, das PopupMenu.
@@ -54,7 +56,7 @@ Festgelegtes Verhalten für die Eingabe von Enter:
 | Enter + ESFR = false | Der benutzer springt ins nächste Pflichtfeld.
 |===
 
-==== Spezifisches Verhalten bei Mac
+=== Spezifisches Verhalten bei Mac
 
 Für Mac gilt folgendes spezifisches Verhalten:
 
@@ -79,7 +81,7 @@ image::images/mac_activate_button_selection.png[Aktivierung der Button Selektion
 |Cmd + Enter | Benutzer bleibt im Feld es wird kein Zeilenumbruch erstellt, es kommt ein Fehlersound
 |===
 
-==== Spezifisches Verhalten bei Windows
+=== Spezifisches Verhalten bei Windows
 
 Für Windows gilt folgendes spezifisches Verhalten:
 
@@ -103,7 +105,7 @@ Für Windows gilt folgendes spezifisches Verhalten:
 
 == Navigation zwischen Parts
 
-==== Key-Bindings
+=== Key-Bindings
 
 *Key-Bindings Perspektiven*
 |===
