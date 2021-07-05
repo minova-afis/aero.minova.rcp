@@ -283,4 +283,11 @@ public class SectionGrid {
 		this.natTable = natTable;
 	}
 
+	public void updateNatTable() {
+		sortedList.clear();
+		sortedList.addAll(dataTable.getRows());
+		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
+
+	}
+
 }
