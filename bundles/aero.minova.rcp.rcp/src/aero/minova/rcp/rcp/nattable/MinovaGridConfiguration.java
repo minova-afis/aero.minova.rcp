@@ -25,6 +25,7 @@ import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -38,9 +39,6 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private TranslationService translationService;
 	private Grid grid;
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
-	private static final String REQUIRED_CELL_LABEL = "requiredCell";
-
-	Style requiredCellStyle = new Style();
 
 	public MinovaGridConfiguration(List<Column> columns, TranslationService translationService, Grid grid) {
 		this.columns = columns;
@@ -58,13 +56,14 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	@Override
 	public void configureRegistry(IConfigRegistry configRegistry) {
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.NEVER_EDITABLE);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.ALWAYS_EDITABLE);
 		configureCells(configRegistry);
 	}
 
 	private void configureCells(IConfigRegistry configRegistry) {
+		Style requiredCellStyle = new Style();
 		requiredCellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, requiredCellStyle, DisplayMode.NORMAL, REQUIRED_CELL_LABEL);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, requiredCellStyle, DisplayMode.NORMAL, Constants.REQUIRED_CELL_LABEL);
 
 		int i = 0;
 		for (Column column : columns) {
@@ -251,7 +250,6 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 		// TODO get the number format of the user
 		NumberFormat nf = NumberFormat.getInstance();
-//		NumberFormat nf = NumberFormat.getInstance(new Locale("en", "EN"));
 		DefaultDoubleDisplayConverter defaultDoubleDisplayConverter = new DefaultDoubleDisplayConverter(true);
 		defaultDoubleDisplayConverter.setNumberFormat(nf);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
@@ -260,17 +258,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	private void registerBooleanEditor(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
 
-		// Das hier würde einen kundenspezifischen Checkbox editor nutzen
-		// configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new
-		// ExampleCheckBoxPainter(),
-		// DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX +
-		// columnIndex);
-
 		// The CheckBoxCellEditor can also be visualized like a check button
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new CheckBoxPainter(), DisplayMode.NORMAL, configLabel + columnIndex);
 
-		// using a CheckBoxCellEditor also needs a Boolean conversion to work
-		// correctly
+		// using a CheckBoxCellEditor also needs a Boolean conversion to work correctly
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new DefaultBooleanDisplayConverter(), DisplayMode.NORMAL,
 				configLabel + columnIndex);
 	}

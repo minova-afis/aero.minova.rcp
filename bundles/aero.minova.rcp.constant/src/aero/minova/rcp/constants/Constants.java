@@ -84,6 +84,7 @@ public class Constants {
 
 	// Column Label für eigene Sortierung
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL";
+	public static final String REQUIRED_CELL_LABEL = "requiredCell";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";

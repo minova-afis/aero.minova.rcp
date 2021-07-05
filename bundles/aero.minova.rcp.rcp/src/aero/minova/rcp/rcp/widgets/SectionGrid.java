@@ -15,11 +15,16 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.blink.BlinkConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.blink.BlinkingCellResolver;
+import org.eclipse.nebula.widgets.nattable.blink.IBlinkingCellResolver;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -36,9 +41,11 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
@@ -210,6 +217,19 @@ public class SectionGrid {
 
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
+		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
+		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
+			@Override
+			protected boolean doCommand(UpdateDataCommand command) {
+				if (super.doCommand(command)) {
+					ILayerCell cell = bodyDataLayer.getCellByPosition(command.getColumnPosition(), command.getRowPosition());
+					cell.getConfigLabels().addLabel(Constants.REQUIRED_CELL_LABEL);
+					return true;
+				}
+				return false;
+			}
+		});
+
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
@@ -242,6 +262,8 @@ public class SectionGrid {
 
 		setNatTable(new NatTable(composite, gridLayer, false));
 
+		configRegistry.registerConfigAttribute(BlinkConfigAttributes.BLINK_RESOLVER, getBlinkResolver(), DisplayMode.NORMAL);
+
 		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
@@ -263,10 +285,23 @@ public class SectionGrid {
 		FormData fd = new FormData();
 		fd.width = WFCDetailPart.SECTION_WIDTH;
 		fd.height = COLUMN_HEIGHT * 3;
-
 		getNatTable().setLayoutData(fd);
+
 		getNatTable().configure();
 		return getNatTable();
+	}
+
+	private IBlinkingCellResolver getBlinkResolver() {
+		return new BlinkingCellResolver() {
+			private final String[] configLabels = new String[1];
+
+			@Override
+			public String[] resolve(Object oldValue, Object newValue) {
+				this.configLabels[0] = newValue == null ? Constants.REQUIRED_CELL_LABEL : "";
+				System.out.println(this.configLabels[0]);
+				return this.configLabels;
+			}
+		};
 	}
 
 	public Table getDataTable() {
