@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
 Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
-Bundle-Version: 12.0.14.qualifier
+Bundle-Version: 12.0.22.qualifier
 Export-Package: aero.minova.rcp.rcp.accessor,
  aero.minova.rcp.rcp.util,
  aero.minova.rcp.rcp.widgets
@@ -11,7 +11,6 @@ Require-Bundle: aero.minova.rcp.form.model,
  aero.minova.rcp.preferencewindow,
  aero.minova.rcp.model,
  aero.minova.rcp.constant,
- javax.inject;bundle-version="1.0.0",
  org.eclipse.core.runtime;bundle-version="0.0.0",
  org.eclipse.swt;bundle-version="0.0.0",
  org.eclipse.e4.ui.model.workbench;bundle-version="0.0.0",
@@ -32,7 +31,6 @@ Require-Bundle: aero.minova.rcp.form.model,
  org.eclipse.equinox.preferences,
  org.eclipse.e4.core.services,
  org.eclipse.e4.ui.workbench.renderers.swt,
- javax.xml.bind;bundle-version="2.2.0",
  aero.minova.rcp.dataservice;bundle-version="1.2.0",
  org.eclipse.ui.forms;bundle-version="3.9.100",
  org.eclipse.core.databinding.observable,
@@ -41,8 +39,6 @@ Require-Bundle: aero.minova.rcp.form.model,
  org.eclipse.emf.common,
  org.eclipse.e4.core.commands,
  org.eclipse.core.commands,
- org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0",
- org.eclipse.e4.ui.workbench.perspectiveswitcher;bundle-version="1.0.0",
  org.eclipse.nebula.widgets.opal.preferencewindow,
  org.eclipse.jface.notifications,
  ca.odell.glazedlists;bundle-version="1.9.0",
@@ -50,7 +46,8 @@ Require-Bundle: aero.minova.rcp.form.model,
  org.eclipse.nebula.widgets.opal.textassist;bundle-version="1.0.0",
  aero.minova.rcp.preferences;bundle-version="1.2.0",
  aero.minova.libs.fop,
- org.eclipse.osgi.services;bundle-version="3.10.0"
+ org.eclipse.osgi.services;bundle-version="3.10.0",
+ jakarta.xml.bind;bundle-version="2.3.3"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: aero.minova.rcp.rcp
 Import-Package: aero.minova.rcp.constants,

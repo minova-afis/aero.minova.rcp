@@ -1,10 +1,12 @@
 package aero.minova.rcp.rcp.processor;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -12,8 +14,13 @@ import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
@@ -23,33 +30,47 @@ import aero.minova.rcp.form.menu.mdi.MenuType;
 
 public class MenuProcessor {
 
-	public static String mdiFileName = "application.mdi";
-	public static String xbsFileName = "application.xbs";
-	private MMenu menu;
+	public static final String MDI_FILE_NAME = "application.mdi";
+	public static final String XBS_FILE_NAME = "application.xbs";
 	private EModelService modelService;
 	private MApplication mApplication;
 
-	@Inject
-	public MenuProcessor(@Named("org.eclipse.ui.main.menu") MMenu menu, EModelService modelService,
-			IDataService dataService, MApplication mApplication) {
+	private String usingLocalMenu = "There was no response from the server. Application data may be out of date. Consider checking your connection and restarting the application.";
+	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
+	private int menuId = 0;
 
-		this.menu = menu;
+	@Inject
+	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication) {
+
 		this.modelService = modelService;
 		this.mApplication = mApplication;
-		dataService.getHashedFile(mdiFileName).thenAccept(fileContent -> processXML(fileContent));
-		
+
+		try {
+			CompletableFuture<String> exceptionally = dataService.getHashedFile(MDI_FILE_NAME);
+			String void1 = exceptionally.get();
+			processXML(void1);
+		} catch (Exception e) {
+			handleNoMDI(dataService);
+		}
+
+		File application = new File(dataService.getStoragePath() + "/" + MDI_FILE_NAME);
+		if (!application.exists()) {
+			handleNoMDI(dataService);
+		}
 	}
 
 	private void processXML(String fileContent) {
-		XmlProcessor xmlProcessor = new XmlProcessor();
 		Main mainMDI = null;
-		try {
-			mainMDI = xmlProcessor.get(fileContent, Main.class);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
 
-		if (mainMDI != null) {
+		MMenuContribution menuContribution = modelService.createModelElement(MMenuContribution.class);
+		menuContribution.setParentId("org.eclipse.ui.main.menu");
+		menuContribution.setPositionInParent("after=additions");
+		menuContribution.setElementId("generated" + menuId++);
+		menuContribution.getPersistedState().put("persistState", "false");
+		mApplication.getMenuContributions().add(menuContribution);
+		try {
+			mainMDI = XmlProcessor.get(fileContent, Main.class);
+
 			List<Object> menuOrEntry = mainMDI.getMenu().getMenuOrEntry();
 			if (!menuOrEntry.isEmpty()) {
 
@@ -62,10 +83,14 @@ public class MenuProcessor {
 
 				for (Object object : menuOrEntry) {
 					if (object instanceof MenuType) {
-						createMenu((MenuType) object, menu, actionsMDI, modelService, mApplication);
+						MMenu createMenu = createMenu((MenuType) object, actionsMDI, modelService, mApplication);
+						menuContribution.getChildren().add(createMenu);
 					}
 				}
 			}
+
+		} catch (JAXBException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -78,10 +103,11 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private void createMenu(MenuType menu_MDI, MMenu menu, HashMap<String, Action> actions_MDI,
-			EModelService modelService, MApplication mApplication) {
+	private MMenu createMenu(MenuType menu_MDI, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
+
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
-		// TODO Übersetzung einbauen
+		menuGen.getPersistedState().put("persistState", String.valueOf(false));
+		menuGen.setElementId("generated" + menuId++);
 		menuGen.setLabel(menu_MDI.getText());
 
 		// TODO Sortierung des MENUS aus der MDI beachten!!!
@@ -89,46 +115,80 @@ public class MenuProcessor {
 			for (Object object : menu_MDI.getEntryOrMenu()) {
 				if (object instanceof Entry) {
 					Entry entryMDI = (Entry) object;
-					String id2 = ((Action) entryMDI.getId()).getId();
-					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService,
-							mApplication);
-					menuGen.getChildren().add(handledMenuItem);
-					menu.getChildren().add(menuGen);
+					if (!entryMDI.getType().equals("separator")) {
+						String id2 = ((Action) entryMDI.getId()).getId();
+						MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
+						menuGen.getChildren().add(handledMenuItem);
+					}
+
 				}
 			}
 		}
+		return menuGen;
+
 	}
 
 	/**
 	 * Diese Methode erstellt einen Eintrag für ein MMenu aus dem übergebenen MDI-Eintrag
 	 *
-	 * @param entry_MDI
-	 * @param action_MDI
+	 * @param entryMDI
+	 * @param actionMDI
 	 * @param modelService
 	 * @param mApplication
 	 * @return
 	 */
-	private MHandledMenuItem createMenuEntry(Entry entry_MDI, Action action_MDI, EModelService modelService,
-			MApplication mApplication) {
+	private MHandledMenuItem createMenuEntry(Entry entryMDI, Action actionMDI, EModelService modelService, MApplication mApplication) {
 
 		MHandledMenuItem handledMenuItem = modelService.createModelElement(MHandledMenuItem.class);
-		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.openform");
-		MParameter mParameter = modelService.createModelElement(MParameter.class);
-		handledMenuItem.setCommand(command);
-		mParameter.setElementId("org.eclipse.e4.ui.perspectives.parameters.perspectiveId" + entry_MDI.getId());
-		mParameter.setName("aero.minova.rcp.perspectiveswitcher.parameters.formName");
-		mParameter.setValue(action_MDI.getAction());
-
-		handledMenuItem.getParameters().add(mParameter);
-		handledMenuItem.setElementId(action_MDI.getId());
-
-		handledMenuItem.setLabel(action_MDI.getText());
-		// TODO Icon setzen
-		handledMenuItem.setIconURI(action_MDI.getIcon());
-
 		handledMenuItem.getPersistedState().put("persistState", String.valueOf(false));
-		return handledMenuItem;
 
+		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.openform");
+		handledMenuItem.setCommand(command);
+
+		// set the form name as parameter
+		MParameter mParameterForm = modelService.createModelElement(MParameter.class);
+		mParameterForm.setElementId("parameter.formName." + entryMDI.getId()); // not used
+		mParameterForm.setName(Constants.FORM_NAME);
+		mParameterForm.setValue(actionMDI.getAction());
+		handledMenuItem.getParameters().add(mParameterForm);
+
+		// set the perspective id as parameter
+		MParameter mParameterId = modelService.createModelElement(MParameter.class);
+		mParameterId.setElementId("parameter.formId." + entryMDI.getId()); // not used
+		mParameterId.setName(Constants.FORM_ID);
+		mParameterId.setValue(actionMDI.getId());
+
+		handledMenuItem.getParameters().add(mParameterId);
+
+		// set the perspective name as parameter
+		MParameter mParameterPerspectiveName = modelService.createModelElement(MParameter.class);
+		mParameterPerspectiveName.setElementId("parameter.PerspectiveLabel." + entryMDI.getId()); // not used
+		mParameterPerspectiveName.setName(Constants.FORM_LABEL);
+		mParameterPerspectiveName.setValue(actionMDI.getText());
+
+		handledMenuItem.getParameters().add(mParameterPerspectiveName);
+
+		handledMenuItem.setElementId("menuItemFor." + actionMDI.getId());
+
+		handledMenuItem.setLabel(actionMDI.getText());
+
+		handledMenuItem.setIconURI(actionMDI.getIcon());
+
+		return handledMenuItem;
 	}
 
+	private void handleNoMDI(IDataService dataService) {
+		// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
+		try {
+			processXML(dataService.getCachedFileContent(MDI_FILE_NAME).get());
+			showConnectionErrorMessage(usingLocalMenu);
+		} catch (InterruptedException | ExecutionException e1) {
+			showConnectionErrorMessage(couldntLoadMenu);
+		}
+	}
+
+	public void showConnectionErrorMessage(String message) {
+		Shell shell = new Shell(Display.getCurrent());
+		MessageDialog.openError(shell, "Error", message);
+	}
 }

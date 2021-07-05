@@ -62,7 +62,7 @@ public class XmlProcessor {
         return rootElement;
 	}
 
-	public <T> T get(String content, Class<T> expectedRootClass) throws JAXBException {
+	public static <T> T get(String content, Class<T> expectedRootClass) throws JAXBException {
 		JAXBContext jc = JAXBContext.newInstance(expectedRootClass.getPackageName(),
 				expectedRootClass.getClassLoader());
 		Unmarshaller unmarshaller = jc.createUnmarshaller();

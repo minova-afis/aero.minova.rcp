@@ -26,14 +26,10 @@ public abstract class WFCFormPart {
 	@Inject
 	Logger logger;
 
-
 	public Form getForm(Composite parent) {
 		// form = perspective.getContext().get(Form.class);
 		if (form == null) {
 			String formName = perspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
-			// TODO CLIENT SHOULD NOT DOWNLOAD HERE THE FORM NAME!!!!!!
-			// LAYER BREAKAGE FIX FOR
-			// https://github.com/minova-afis/aero.minova.rcp/issues/236
 
 			form = dataFormService.getForm(formName);
 			if (form == null) {
@@ -42,7 +38,6 @@ public abstract class WFCFormPart {
 				return null;
 			}
 		}
-		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
 		return form;
 	}
 

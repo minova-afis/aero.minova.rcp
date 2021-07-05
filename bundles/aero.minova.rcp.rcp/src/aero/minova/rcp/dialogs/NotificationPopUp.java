@@ -10,18 +10,20 @@ import org.eclipse.swt.widgets.Shell;
 public class NotificationPopUp extends AbstractNotificationPopup {
 
 	private String fText;
+	private String title;
 
-	public NotificationPopUp(Display display, String text, Shell shell) {
+	public NotificationPopUp(Display display, String text, String title, Shell shell) {
 		super(display);
 		this.fText = text;
 		setParentShell(shell);
 		// TODO: Einstellung in die Preferences übernehmen?
 		setDelayClose(2000);
+		this.title = title;
 	}
 
 	@Override
 	protected String getPopupShellTitle() {
-		return "Notification";
+		return title;
 	}
 
 	@Override

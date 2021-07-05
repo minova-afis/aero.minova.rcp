@@ -1,7 +1,9 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.Platform;
@@ -26,28 +28,33 @@ public class LookupContentProvider {
 	 */
 	public List<LookupValue> getContent(final String entry) {
 		MLookupField mField = (MLookupField) lookup.getData(Constants.CONTROL_FIELD);
-		if (entry != null && entry.startsWith("#") && entry.length() > 1) {
-			// Setzen des Textes, welcher manuell eingetragen wurde
-			mField.setWrittenText(entry);
-		} else {
-			mField.setWrittenText(null);
-		}
+		mField.setWrittenText(entry);
 		if (LOG) {
 			System.out.println("Entry:[" + entry + "]");
 		}
 
 		String regex = buildRegex(entry);
-
-		return values.stream().filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
+		List<LookupValue> result = values.stream()
+				.filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
 				.collect(Collectors.toList());
+
+		// Groß- und Kleinschreibung ignorieren
+		result.sort(new SortIgnoreCase());
+		return result;
 	}
 
 	private String buildRegex(String entry) {
-		String regex = entry;
+		String regex = "";
 
-		regex = regex.replaceAll("%", ".*");
-		regex = regex.replaceAll("_", ".");
-		regex += ".*";
+		for (String s : entry.split("%", -1)) {
+			for (String s2 : s.split("_", -1)) {
+				regex += Pattern.quote(s2) + ".";
+			}
+			if (regex.length() > 0) {
+				regex = regex.substring(0, regex.length() - 1);
+			}
+			regex += ".*";
+		}
 
 		return regex;
 	}
@@ -82,12 +89,16 @@ public class LookupContentProvider {
 		lookup.valuesUpdated();
 	}
 
-	public boolean isEmpty() {
-		return values.isEmpty();
-	}
-
 	public int getValuesSize() {
 		return values.size();
 	}
 
+	public class SortIgnoreCase implements Comparator<Object> {
+		@Override
+		public int compare(Object o1, Object o2) {
+			String s1 = ((LookupValue) o1).keyText;
+			String s2 = ((LookupValue) o2).keyText;
+			return s1.toLowerCase().compareTo(s2.toLowerCase());
+		}
+	}
 }

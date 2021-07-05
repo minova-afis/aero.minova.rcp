@@ -24,7 +24,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 
 	@Inject
 	Logger logger;
-	
+
 	TranslationService translationService;
 
 	/**
@@ -39,7 +39,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		super(label, propertyKey, 2, false);
 		this.translationService = translationService;
 	}
-	
+
 	/**
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#build(org.eclipse.swt.widgets.Composite)
 	 */
@@ -56,7 +56,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
-		
+
 		Composite cmp = new Composite(parent, SWT.NONE);
 		cmp.setLayout(new GridLayout(2, false));
 		addControl(cmp);
@@ -64,7 +64,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
-		textGridData.widthHint = 150;
+		textGridData.widthHint = 250;
 		text.setLayoutData(textGridData);
 
 		// Auslesen des PrimaryWorksapces

@@ -13,6 +13,11 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.Locale;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.widgets.LabelFactory;
+import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -22,19 +27,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 
 public class NumberField {
 
-	public static Control create(Composite composite, MNumberField field, int row, int column, FormToolkit formToolkit,
-			Locale locale) {
+	public static Control create(Composite composite, MNumberField field, int row, int column, Locale locale,
+			MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		Text text = formToolkit.createText(composite, "", SWT.BORDER | SWT.RIGHT);
+
+		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
+		Text text = TextFactory.newText(SWT.BORDER | SWT.RIGHT).text("").create(composite);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, text);
 
 		text.addFocusListener(new FocusAdapter() {
@@ -45,9 +51,12 @@ public class NumberField {
 		});
 		text.addVerifyListener(numberValueAccessor);
 
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		ContextInjectionFactory.inject(numberValueAccessor, context);
 		field.setValueAccessor(numberValueAccessor);
 
-		Label unit = formToolkit.createLabel(composite, unitText, SWT.LEFT);
+		Label unit = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
@@ -77,9 +86,10 @@ public class NumberField {
 		text.setData(FIELD_DECIMALS, decimals);
 		text.setData(FIELD_MAX_VALUE, maximum);
 		text.setData(FIELD_MIN_VALUE, minimum);
+		text.setData(Constants.CONTROL_FIELD, field);
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
-		
+
 		// TODO SAW_ERC korrigieren NumberFieldVerifier
 		// text.addVerifyListener(new NumberFieldVerifier(text));
 

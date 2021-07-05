@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
 import org.eclipse.swt.SWT;
@@ -27,8 +31,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.ShortTimeValueAccessor;
@@ -40,11 +44,11 @@ public class ShortTimeField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit,
-			Locale locale, String timezone) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone,
+			MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
+		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
 		label.setData(TRANSLATE_PROPERTY, labelText);
 
 		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
@@ -57,8 +61,7 @@ public class ShortTimeField {
 					field.setValue(null, true);
 				} else {
 					LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
-					result.add(
-							localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+					result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 					field.setValue(new Value(time), true);
 				}
 				return result;
@@ -66,8 +69,7 @@ public class ShortTimeField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		text.setMessage(
-				LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+		text.setMessage(LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {
@@ -76,8 +78,13 @@ public class ShortTimeField {
 				text.selectAll();
 			}
 		});
+		text.setData(Constants.CONTROL_FIELD, field);
 
-		field.setValueAccessor(new ShortTimeValueAccessor(field, text));
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		ShortTimeValueAccessor valueAccessor = new ShortTimeValueAccessor(field, text);
+		ContextInjectionFactory.inject(valueAccessor, context);
+		field.setValueAccessor(valueAccessor);
 
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();

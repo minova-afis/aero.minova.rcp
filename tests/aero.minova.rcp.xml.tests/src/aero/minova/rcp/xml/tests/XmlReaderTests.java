@@ -43,8 +43,7 @@ class XmlReaderTests {
 		Form form = null;
 		String content = Files.readString(path);
 		try {
-			XmlProcessor xmlProcessor = new XmlProcessor();
-			form = xmlProcessor.get(content, Form.class);
+			form = XmlProcessor.get(content, Form.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

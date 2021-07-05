@@ -1,5 +1,9 @@
 package aero.minova.rcp.rcp.accessor;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.ui.services.IStylingEngine;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
@@ -18,6 +22,9 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 	protected boolean focussed = false;
 	private Value displayValue;
 
+	@Inject
+	IStylingEngine engine;
+
 	public AbstractValueAccessor(MField field, Control control) {
 		super();
 		this.field = field;
@@ -26,26 +33,18 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 			return;
 		}
 		control.addFocusListener(new FocusListener() {
-
-			private int time;
-
 			@Override
 			public void focusLost(FocusEvent e) {
 				setFocussed(false);
-				time = e.time;
 				// Überprüfung ob der eingetragenen Wert in der Liste ist und ebenfalls gültig!
 				field.setValue(field.getValue(), false);
+				field.getDetail().setSelectedField(null);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				// Zur gleichen zeit können nicht 2 Elemente fokusiert werden!
-				// Problem existiert nur auf dem Mac
-				if (e.time == time) {
-					return;
-				}
-				time = e.time;
 				setFocussed(true);
+				field.getDetail().setSelectedField(control);
 			}
 		});
 	}
@@ -61,10 +60,16 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	@Override
 	public void setEditable(boolean editable) {
+		if (field.isReadOnly()) {
+			editable = false;
+		}
+
 		if (control instanceof Lookup) {
 			((Lookup) control).setEditable(editable);
 		} else if (control instanceof Text) {
 			((Text) control).setEditable(editable);
+		} else if (control instanceof TextAssist) {
+			((TextAssist) control).setEditable(editable);
 		}
 	}
 
@@ -72,7 +77,6 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	@Override
 	public Value setValue(Value value, boolean user) {
-
 		// Wenn der Focus auf dem Control liegt, setzen wir keinen Wert
 		if (isFocussed()) {
 			return getDisplayValue();
@@ -107,6 +111,17 @@ public abstract class AbstractValueAccessor implements ValueAccessor {
 
 	protected void setDisplayValue(Value displayValue) {
 		this.displayValue = displayValue;
+	}
+
+	public Control getControl() {
+		return control;
+	}
+
+	@Override
+	public void setCSSClass(String classname) {
+		if (engine != null) {
+			engine.setClassname(control, classname);
+		}
 	}
 
 }

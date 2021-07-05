@@ -15,11 +15,11 @@ public class FieldUtil {
 		Text text = new Text(shell, SWT.NONE);
 		shell.setLayout(new GridLayout());
 
-		text.setText("000.000.000.000");
+		text.setText("000.000.000");
 		shell.layout();
 		Point size = text.getSize();
 		COLUMN_HEIGHT = size.y + 20;
-		COLUMN_WIDTH = size.x + 40;
+		COLUMN_WIDTH = size.x + 80;
 
 		text.setText("00:00");
 		shell.layout();
@@ -50,13 +50,13 @@ public class FieldUtil {
 	 * Wert des Feldes analog der Definition des Feldes
 	 */
 	public static final String FIELD_VALUE = "aero.minova.rcp.field.value";
-	public static int COLUMN_HEIGHT;
-	public static int COLUMN_WIDTH; // war 140
+	public static final int COLUMN_HEIGHT;
+	public static final int COLUMN_WIDTH; // war 140
 	public static final int TEXT_WIDTH = COLUMN_WIDTH;
-	public static final int NUMBER_WIDTH = COLUMN_WIDTH - 40; // war 104
-	public static int SHORT_DATE_WIDTH; // war 88
-	public static int DATE_TIME_WIDTH; //
-	public static int SHORT_TIME_WIDTH; // war 52
+	public static final int NUMBER_WIDTH = COLUMN_WIDTH - 75; // war 104
+	public static final int SHORT_DATE_WIDTH; // war 88
+	public static final int DATE_TIME_WIDTH; //
+	public static final int SHORT_TIME_WIDTH; // war 52
 	public static final int MARGIN_LEFT = 5;
 	public static final int MARGIN_TOP = 5;
 	public static final int MARGIN_BORDER = 2;

@@ -80,9 +80,9 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 				configureDateTimeCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
 				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.DOUBLE)) {
-				configureDoubleCell(configRegistry, i, formColumns.get(column.getName()).getNumber().getDecimals(),
+				configureDoubleCell(configRegistry, i, formColumns.get(column.getName()),
 						SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
-				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()).getNumber().getDecimals(),
+				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()),
 						ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INTEGER)) {
 				configureIntegerCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
@@ -280,7 +280,22 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 				configLabel + columnIndex);
 	}
 
-	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, int decimals, String configLabel) {
+	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Column column, String configLabel) {
+		
+		
+		int decimals = 0;
+		if (column.getNumber() !=null) {
+			decimals = column.getNumber().getDecimals();
+		}
+
+		if (column.getPercentage() !=null) {
+			decimals = column.getPercentage().getDecimals();
+		
+		}
+		if (column.getMoney()!=null) {
+			decimals = column.getMoney().getDecimals();
+		}
+		
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);

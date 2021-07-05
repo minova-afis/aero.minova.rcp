@@ -10,6 +10,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
@@ -20,7 +21,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -42,21 +42,23 @@ public class LookupField {
 
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, MPerspective perspective, Locale locale) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
-		LookupContentProvider lookUpContentProvider = new LookupContentProvider();
-		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT, lookUpContentProvider);
-		// TODO übersetzen
+		Label label = LabelFactory.newLabel(SWT.RIGHT).create(composite);
+
+		IEclipseContext context = perspective.getContext();
+
+		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT);
 		lookupControl.setMessage("...");
 		lookupControl.setLabel(label);
+		ContextInjectionFactory.inject(lookupControl, context); // In Context injected, damit TranslationService genutzt werden kann
 
-		Label descriptionLabel = formToolkit.createLabel(composite, "", SWT.LEFT);
+		Label descriptionLabel = LabelFactory.newLabel(SWT.LEFT).create(composite);
+
 		FormData lookupFormData = new FormData();
 		FormData labelFormData = new FormData();
 		FormData descriptionLabelFormData = new FormData();
 
-		IEclipseContext context = perspective.getContext();
 		LookupValueAccessor lookupValueAccessor = new LookupValueAccessor(field, lookupControl);
 		ContextInjectionFactory.inject(lookupValueAccessor, context);
 		field.setValueAccessor(lookupValueAccessor);
@@ -93,28 +95,16 @@ public class LookupField {
 			public void keyTraversed(TraverseEvent e) {
 				Text text = ((Text) e.getSource());
 				Lookup t = (Lookup) text.getParent();
-				System.out.println("Pressed key: " + e.keyCode);
 				switch (e.detail) {
 				case SWT.TRAVERSE_TAB_PREVIOUS:
-					t.fillSelectedValue();
-					e.doit = true;
-					// entfernen des Details, damit niemand mehr dieses TRAVERSE_RETURN Event
-					// verwenden kann.
-					break;
 				case SWT.TRAVERSE_TAB_NEXT:
 				case SWT.TRAVERSE_RETURN:
-					// Hier übernehmen wir den ersten Treffer der Liste, falls es einen Eintrag gibt
-					// edit same column previous row
 					t.fillSelectedValue();
 					e.doit = true;
-					// entfernen des Details, damit niemand mehr dieses TRAVERSE_RETURN Event
-					// verwenden kann.
-					e.detail = SWT.TRAVERSE_TAB_NEXT;
 					break;
 				}
 			}
 		});
-
 		return lookupControl;
 	}
 

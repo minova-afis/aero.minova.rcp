@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -41,6 +42,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	private static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
+
+	private static final int TIMEOUT_DURATION = 15;
 
 	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
 		super(logger);
@@ -90,10 +93,12 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	@Override
 	public void open() throws WorkspaceException {
-		if (!getPassword().isEmpty() && !getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
-			// Manuell wurde hier das Psswort eingetragten / geändert
+
+		if (!getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+			// Entwender das Passwort ist null/leer oder es wurde manuell eingetragten / geändert
 			checkCredentials(getPassword());
 		}
+
 		if (!Platform.getInstanceLocation().isSet()) {
 			// 1. Auslesen aus dem Store, ggf. Setzen
 			String defaultPath = System.getProperty("user.home");
@@ -128,7 +133,6 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
 							// ausgelesendes Passwort vom Store nehmen
 							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
-
 						} else {
 							// ausgelesendes Passwort vom Dialog in den Store setzen
 							store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
@@ -150,6 +154,9 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
 							// ausgelesendes Passwort vom Store nehmen
 							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
+						} else {
+							// ausgelesendes Passwort vom Dialog in den Store setzen
+							store.put(WorkspaceAccessPreferences.PASSWORD, getPassword(), true);
 						}
 						break;
 					}
@@ -216,37 +223,30 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			}
 		};
 
-		String body = "{\n" + "  \"name\": \"tEmployee\",\n" + "  \"columns\": [\n" + "    {\n" + "      \"name\": \"KeyLong\",\n"
-				+ "      \"type\": \"INTEGER\"\n" + "    },\n" + "    {\n" + "      \"name\": \"KeyText\",\n" + "      \"type\": \"STRING\"\n" + "    },\n"
-				+ "    {\n" + "      \"name\": \"Description\",\n" + "      \"type\": \"STRING\"\n" + "    },\n" + "    {\n"
-				+ "      \"name\": \"LastAction\",\n" + "      \"type\": \"INTEGER\"\n" + "    }\n" + "  ],\n" + "  \"rows\": [\n" + "    {\n"
-				+ "      \"values\": [\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        \"f-\\u003e-s-0\"\n" + "      ]\n" + "    }\n"
-				+ "  ]\n" + "}";
 		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/data/index")) //
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/ping")) //
 					.header("Content-Type", "application/json") //
-					.method("GET", BodyPublishers.ofString(body))//
-					.build();
+					.method("GET", BodyPublishers.ofString(""))//
+					.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();
 
 			HttpClient httpClient = HttpClient.newBuilder()//
 					.sslContext(disabledSslVerificationContext())//
 					.authenticator(authentication).build();
 
-			HttpResponse<String> answer;
-			answer = httpClient.send(request, BodyHandlers.ofString());
+			HttpResponse<String> answer = httpClient.send(request, BodyHandlers.ofString());
 			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
 				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
 			}
 		} catch (ConnectException ex) {
-			throw new WorkspaceException("Server nicht bekannt!");
+			throw new WorkspaceException("ConnectException " + ex.getMessage());
 		} catch (IOException e) {
-			throw new WorkspaceException("User oder Passwort nicht korrekt" + e.getMessage());
+			throw new WorkspaceException("IOException " + e.getMessage() + "\nUser or Password incorrect?");
 		} catch (InterruptedException i) {
-			throw new WorkspaceException("Try Again!");
+			throw new WorkspaceException("InterruptedException " + i.getMessage());
 		} catch (IllegalArgumentException i) {
-			throw new WorkspaceException("Ungültige URL!");
+			throw new WorkspaceException("IllegalArgumentException " + i.getMessage() + "\ninvalid URL?");
 		} catch (NullPointerException e) {
-			throw new WorkspaceException("Bitte Passwort nochmal eintragen!!!");
+			throw new WorkspaceException("NullPointerException " + e.getMessage() + "Please enter Password again");
 		}
 	}
 

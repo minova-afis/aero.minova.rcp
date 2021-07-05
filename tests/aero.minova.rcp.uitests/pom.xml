@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>aero.minova.rcp</groupId>
+	<artifactId>aero.minova.rcp.uitests</artifactId>
+	<version>12.0.22-SNAPSHOT</version>
+	
+	<packaging>eclipse-test-plugin</packaging>
+	
+	<parent>
+		<groupId>aero.minova.rcp</groupId>
+		<artifactId>aero.minova.rcp.tests</artifactId>
+		<version>12.0.22-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+	
+	<properties>
+		<uitest.vmparams>-Xms256m -Xmx8096m</uitest.vmparams>
+	</properties>
+	
+	
+	<profiles>
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<ui.test.vmargs>${uitest.vmparams} -XstartOnFirstThread</ui.test.vmargs>
+			</properties>
+		</profile>
+		<profile>
+			<id>other-os</id>
+			<activation>
+				<os>
+					<family>!mac</family>
+				</os>
+			</activation>
+			<properties>
+				<ui.test.vmargs>${uitest.vmparams}</ui.test.vmargs>
+			</properties>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<argLine>${ui.test.vmargs}</argLine>
+					<appArgLine>-nl de -clearPersistedState -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas</appArgLine>
+					<useUIHarness>true</useUIHarness>
+					<useUIThread>false</useUIThread>
+					<product>aero.minova.rcp.rcp.product</product>
+					<application>org.eclipse.e4.ui.workbench.swt.E4Application</application>
+					
+					<!--
+					<testSuite>org.eclipse.swtbot.e4.finder.test</testSuite>
+					<testClass>org.eclipse.swtbot.e4.finder.test.AllTests</testClass>
+					-->
+					<trimStackTrace>false</trimStackTrace>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

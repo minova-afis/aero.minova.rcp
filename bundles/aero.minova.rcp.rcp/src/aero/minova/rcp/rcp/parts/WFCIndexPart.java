@@ -26,6 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
@@ -59,16 +60,16 @@ import org.eclipse.nebula.widgets.nattable.layer.AbstractLayerTransform;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
+import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
@@ -93,6 +94,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -131,6 +133,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_LOAD_INDEX)
 	boolean autoLoadIndex;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
+	int tableSelectionBuffer;
+
 	private Table data;
 
 	private NatTable natTable;
@@ -156,6 +162,10 @@ public class WFCIndexPart extends WFCFormPart {
 	private boolean expandGroups = false;
 
 	private FixedSummaryRowLayer summaryRowLayer;
+
+	private DefaultColumnHeaderDataLayer columnHeaderDataLayer;
+
+	private SelectionThread selectionThread;
 
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
@@ -184,12 +194,7 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 
 		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
-		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
-
-		if (autoLoadIndex) {
-			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
-			handlerService.executeHandler(cmd);
-		}
+		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);
 	}
 
 	@Inject
@@ -240,6 +245,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
+		loadPrefs(name, true);
+	}
+
+	public void loadPrefs(String name, boolean loadIndex) {
 		// Spaltenanordung und -breite
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".index.size", null);
@@ -297,6 +306,11 @@ public class WFCIndexPart extends WFCFormPart {
 				expandGroups("");
 			}
 		}
+
+		if (loadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+			handlerService.executeHandler(cmd);
+		}
 	}
 
 	/**
@@ -324,6 +338,11 @@ public class WFCIndexPart extends WFCFormPart {
 			bodyLayerStack.getBodyDataLayer().clearCache();
 			Table table = map.get(perspective);
 			updateData(table.getRows());
+
+			if (table.getRows().isEmpty()) {
+				MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
+						translationService.translate("@msg.NoRecordsLoaded", null));
+			}
 		}
 	}
 
@@ -369,15 +388,15 @@ public class WFCIndexPart extends WFCFormPart {
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
 				columnPropertyAccessor.getTableHeadersMap());
-		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayerStack, bodyLayerStack.getSelectionLayer());
+		columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
+		columnHeaderLayer = new ColumnHeaderLayer(getColumnHeaderDataLayer(), bodyLayerStack, bodyLayerStack.getSelectionLayer());
 
 		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
-				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+				new GlazedListsSortModel<>(bodyLayerStack.getSortedList(), columnPropertyAccessor, configRegistry, getColumnHeaderDataLayer()), false);
 		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Zeilen, die keinen von- oder bis-Wert haben)
-		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
-		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
-		for (int i = 0; i < columnHeaderDataLayer.getColumnCount(); i++) {
+		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(getColumnHeaderDataLayer());
+		getColumnHeaderDataLayer().setConfigLabelAccumulator(labelAccumulator);
+		for (int i = 0; i < getColumnHeaderDataLayer().getColumnCount(); i++) {
 			labelAccumulator.registerColumnOverrides(i, Constants.COMPARATOR_LABEL);
 		}
 		configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new CustomComparator(), DisplayMode.NORMAL, Constants.COMPARATOR_LABEL);
@@ -419,7 +438,7 @@ public class WFCIndexPart extends WFCFormPart {
 		SelectionLayer selectionLayer = bodyLayerStack.getSelectionLayer();
 		selectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
-		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, columnHeaderDataLayer, rowHeaderDataLayer);
+		CopyDataCommandHandler copyHandler = new CopyDataCommandHandler(selectionLayer, getColumnHeaderDataLayer(), rowHeaderDataLayer);
 		copyHandler.setCopyFormattedText(true);
 		gridLayer.registerCommandHandler(copyHandler);
 
@@ -557,7 +576,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private final SortedList<T> sortedList;
 
-		private final IDataProvider bodyDataProvider;
+		private final IRowDataProvider<Row> bodyDataProvider;
 
 		private final SelectionLayer selectionLayer;
 
@@ -579,37 +598,13 @@ public class WFCIndexPart extends WFCFormPart {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
 
-			// use the SortedList constructor with 'null' for the Comparator
-			// because the Comparator
-			// will be set by configuration
+			// use the SortedList constructor with 'null' for the Comparator because the Comparator will be set by configuration
 			this.sortedList = new SortedList<>(rowObjectsGlazedList, null);
 
 			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor, configRegistry);
 
-			// we register a custom UpdateDataCommandHandler so that we could add a new
-			// value if desired
-			// alternative we could add a new line during line selection
-//			this.bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
-//			this.bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(this.bodyDataLayer) {
-//				@SuppressWarnings("unchecked")
-//				@Override
-//				protected boolean doCommand(UpdateDataCommand command) {
-//					if (super.doCommand(command)) {
-//						System.out.println("Custom update handler called");
-//						return true;
-//					}
-//					return false;
-//				}
-//			});
-
 			// get the IDataProvider that was created by the GroupByDataLayer
-			this.bodyDataProvider = bodyDataLayer.getDataProvider();
-
-			// Apply a ColumnLabelAccumulator to address the columns in the
-			// EditConfiguration class
-			// first colum starts at 0, etc
-//			ColumnLabelAccumulator columnLabelAccumulator = new ColumnLabelAccumulator(bodyDataProvider);
-//			bodyDataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
+			this.bodyDataProvider = (IRowDataProvider<Row>) bodyDataLayer.getDataProvider();
 
 			// layer for event handling of GlazedLists and PropertyChanges
 			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
@@ -617,14 +612,15 @@ public class WFCIndexPart extends WFCFormPart {
 			columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
 			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
 
-			selectionLayer.addLayerListener(new ILayerListener() {
-				@Override
-				public void handleLayerEvent(ILayerEvent event) {
-					List c = SelectionUtils.getSelectedRowObjects(selectionLayer, (IRowDataProvider<T>) bodyDataProvider, false);
-					List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
-					if (!collection.isEmpty()) {
-						context.set(Constants.BROKER_ACTIVEROWS, collection);
+			selectionLayer.addLayerListener(event -> {
+				if (event instanceof RowSelectionEvent) {
+					if (selectionThread != null) {
+						selectionThread.interrupt();
 					}
+					selectionThread = new SelectionThread(tableSelectionBuffer);
+					selectionThread.start();
+				} else if (event instanceof RowStructuralRefreshEvent) {
+					NatTableUtil.resizeRows(natTable);
 				}
 			});
 
@@ -659,7 +655,7 @@ public class WFCIndexPart extends WFCFormPart {
 			return this.treeLayer;
 		}
 
-		public IDataProvider getBodyDataProvider() {
+		public IRowDataProvider<Row> getBodyDataProvider() {
 			return this.bodyDataProvider;
 		}
 
@@ -673,6 +669,32 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public ColumnReorderLayer getColumnReorderLayer() {
 			return columnReorderLayer;
+		}
+	}
+
+	class SelectionThread extends Thread {
+		private int sleepMillis;
+
+		/*
+		 * Thread, der für sleepMillis Millisekunden schläft und danach die Daten ins Detail lädt, wenn er nicht unterbrochen wurde
+		 */
+		public SelectionThread(int sleepMillis) {
+			this.sleepMillis = sleepMillis;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(sleepMillis);
+			} catch (InterruptedException e) {
+				return;
+			}
+
+			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			if (!collection.isEmpty()) {
+				context.set(Constants.BROKER_ACTIVEROWS, collection);
+			}
 		}
 	}
 
@@ -821,5 +843,9 @@ public class WFCIndexPart extends WFCFormPart {
 
 	public FixedSummaryRowLayer getSummaryRowLayer() {
 		return summaryRowLayer;
+	}
+
+	public DefaultColumnHeaderDataLayer getColumnHeaderDataLayer() {
+		return columnHeaderDataLayer;
 	}
 }

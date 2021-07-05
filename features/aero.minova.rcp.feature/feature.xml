@@ -2,7 +2,7 @@
 <feature
       id="aero.minova.rcp.feature"
       label="Feature aero.minova.rcp.feature"
-      version="12.0.14.qualifier"
+      version="12.0.22.qualifier"
       provider-name="SAAK">
 
    <description url="http://www.example.com/description">
@@ -140,13 +140,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.e4.ui.workbench.perspectiveswitcher"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.nebula.widgets.opal.preferencewindow"
          download-size="0"
          install-size="0"
@@ -253,6 +246,13 @@
 
    <plugin
          id="aero.minova.rcp.constant"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+   
+   <plugin
+         id="aero.minova.workingtime.wizard"
          download-size="0"
          install-size="0"
          version="0.0.0"

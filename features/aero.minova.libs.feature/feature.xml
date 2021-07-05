@@ -2,7 +2,7 @@
 <feature
       id="aero.minova.libs.feature"
       label="Feature"
-      version="12.0.14.qualifier"
+      version="12.0.22.qualifier"
       provider-name="MINOVA Information Services GmbH">
 
    <description url="http://www.example.com/description">
@@ -25,14 +25,27 @@
          unpack="false"/>
 
    <plugin
-         id="javax.xml.bind"
+         id="aero.minova.libs.fop"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="javax.activation"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="javax.activation"
+         id="com.sun.xml.bind"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="jakarta.xml.bind"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -44,32 +57,5 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
-   <plugin
-         id="javax.xml.stream"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.moxy"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="aero.minova.libs.fop"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
 
 </feature>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_3V4sML4REeuQC6-nmD0NNA">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_4t2ksL4REeuQC6-nmD0NNA" featurename="commands" parentElementId="xpath:/">
+    <elements xsi:type="commands:Command" xmi:id="_9LplsL4REeuQC6-nmD0NNA" elementId="aero.minova.rcp.rcp.command.dynamicbuttoncommand" commandName="DynamicButtonCommand">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_KDWpML4YEeuQC6-nmD0NNA" elementId="wizard" name="wizard"/>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_PrpWIL4SEeuQC6-nmD0NNA" featurename="handlers" parentElementId="xpath:/">
+    <elements xsi:type="commands:Handler" xmi:id="_RrMzEL4SEeuQC6-nmD0NNA" elementId="aero.minova.rcp.rcp.handler.dynamicbuttonhandler" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DynamicButtonHandler" command="_9LplsL4REeuQC6-nmD0NNA"/>
+  </fragments>
+</fragment:ModelFragments>

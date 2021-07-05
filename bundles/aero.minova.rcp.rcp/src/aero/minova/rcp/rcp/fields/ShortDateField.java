@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
 import org.eclipse.swt.SWT;
@@ -27,8 +31,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.ShortDateValueAccessor;
@@ -40,10 +44,12 @@ public class ShortDateField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit, Locale locale, String timezone) {
+
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone,
+			MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
+		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
 		label.setData(TRANSLATE_PROPERTY, labelText);
 
 		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
@@ -73,8 +79,13 @@ public class ShortDateField {
 				text.selectAll();
 			}
 		});
+		text.setData(Constants.CONTROL_FIELD, field);
 
-		field.setValueAccessor(new ShortDateValueAccessor(field, text));
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		ShortDateValueAccessor valueAccessor = new ShortDateValueAccessor(field, text);
+		ContextInjectionFactory.inject(valueAccessor, context);
+		field.setValueAccessor(valueAccessor);
 
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();

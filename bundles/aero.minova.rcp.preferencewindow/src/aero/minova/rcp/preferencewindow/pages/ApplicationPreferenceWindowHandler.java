@@ -10,7 +10,6 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
@@ -22,6 +21,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
@@ -55,6 +56,8 @@ import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
 import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
+import aero.minova.rcp.preferencewindow.control.SendLogsButton;
+import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
 
@@ -65,9 +68,6 @@ public class ApplicationPreferenceWindowHandler {
 
 	// Widget Builder Impelentierung
 	private PreferenceWindowModel pwm;
-
-	@Inject
-	IEclipseContext context;
 
 	@Inject
 	ILocaleChangeService lcs;
@@ -82,6 +82,9 @@ public class ApplicationPreferenceWindowHandler {
 	@Inject
 	TranslationService translationService;
 
+	@Inject
+	IDataService dataService;
+
 	@SuppressWarnings("restriction")
 	@Inject
 	EHandlerService handlerService;
@@ -89,9 +92,12 @@ public class ApplicationPreferenceWindowHandler {
 	@Inject
 	EModelService modelService;
 
+	IWorkbench workbench;
+
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
 		pwm = new PreferenceWindowModel(s);
+		this.workbench = workbench;
 
 		// Shell des Windows der Application finden
 		MWindow appWindow = application.getChildren().get(0);
@@ -100,6 +106,8 @@ public class ApplicationPreferenceWindowHandler {
 		shell.setEnabled(false);
 
 		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
+		boolean curentSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS,
+				DisplayType.CHECK, true, s);
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
 		Map<String, Object> data = fillData(preferenceTabs);
 		PreferenceWindow window = PreferenceWindow.create(shell, data);
@@ -153,23 +161,30 @@ public class ApplicationPreferenceWindowHandler {
 			} catch (BackingStoreException | NullPointerException e) {
 				e.printStackTrace();
 			}
-			// Die Shell des Windows aktivieren
-			shell.setEnabled(true);
-			// Preference Handler wieder aktivieren
-			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
-		} else {
+		}
+
+		if (Util.isValid(shell)) {
 			// Die Shell des Windows aktivieren
 			shell.setEnabled(true);
 			// Preference Handler wieder aktivieren
 			handlerService.activateHandler("org.eclipse.ui.window.preferences", preferenceHandler.getObject());
 		}
 
+		boolean newSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
+				true, s);
 		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
-		if (!currentTheme.equals(newTheme)) {
+		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
-			boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", "Soll das Theme geändert werden und die Applikation neu gestarted werden");
+
+			boolean openConfirm = MessageDialog.openConfirm(activeShell, translationService.translate("@Action.Restart", null),
+					translationService.translate("@Preferences.RestartMessage", null));
+
 			if (openConfirm) {
-				updateTheme(newTheme, themeEngine, workbench);
+				if (!currentTheme.equals(newTheme)) {
+					updateTheme(newTheme, themeEngine, workbench);
+				} else {
+					workbench.restart();
+				}
 			}
 		}
 
@@ -252,10 +267,16 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new CustomPWFontChooser(pref.getLabel(), key, translationService);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), ApplicationPreferences.LOCALE_LANGUAGE, context, translationService).setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), ApplicationPreferences.LOCALE_LANGUAGE, application.getContext(), translationService, dataService)
+					.setAlignment(GridData.FILL);
 			break;
 		case CUSTOMCHECK:
-			widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+			if (pref.getKey().equals("DefaultWorkspace")) {
+				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+			} else {
+				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), key, translationService, dataService, application.getContext(), workbench)
+						.setIndent(25);
+			}
 			break;
 		case DATE_UTIL:
 			widget = new DateFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
@@ -265,6 +286,9 @@ public class ApplicationPreferenceWindowHandler {
 			break;
 		case CHECKEXPLANATION:
 			widget = new ExplanationLabelForPWCheckbox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
+			break;
+		case SENDLOGSBUTTON:
+			widget = new SendLogsButton(pref.getLabel(), key, translationService, dataService);
 			break;
 		default:
 			break;

@@ -19,6 +19,9 @@ public class Constants {
 	public static final String CONTROL_DATATYPE = "dataType";
 	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
+	public static final String CONTROL_ID = "id";
+	public static final String CONTROL_WIZARD = "wizard";
+	public static final String CONTROL_MDETAIL = "mDetail";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
@@ -42,8 +45,9 @@ public class Constants {
 	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
 	public static final String EMPLOYEEKEY = "EmployeeKey";
 
-// Liste an Broker-Konstanten
+	// Liste an Broker-Konstanten
 	public static final String BROKER_SAVEENTRY = "aero/minova/rcp/SaveEntry";
+	public static final String BROKER_SAVECOMPLETE = "aero/minova/rcp/SaveComplete";
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
 	public static final String BROKER_NEWENTRY = "aero/minova/rcp/NewFields";
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
@@ -61,9 +65,11 @@ public class Constants {
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
+	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
 	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
 	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
+	public static final String BROKER_SHOWCONNECTIONERRORMESSAGE = "aero/minova/rcp/ShowConnectionErrorMessage";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
@@ -76,6 +82,22 @@ public class Constants {
 
 	// Column Label für eigene Sortierung
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL";
+
+	// CSS Klassennamen
+	public static final String CSS_STANDARD = "Standard";
+	public static final String CSS_REQUIRED = "ValueRequired";
+	public static final String CSS_INVALID = "InvalidValue";
+	public static final String CSS_READONLY = "ReadOnly";
+
+	/**
+	 * Id for command parameter "Perspective ID" (value is <code>"org.eclipse.e4.ui.perspectives.parameters.perspectiveId"</code>).
+	 */
+
+	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
+
+	public static final String FORM_ID = "aero.minova.rcp.perspectiveswitcher.parameters.formId"; //$NON-NLS-1$
+
+	public static final String FORM_LABEL = "aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel"; //$NON-NLS-1$
 
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
@@ -169,5 +191,4 @@ public class Constants {
 			this.defaultValue = defaultValue;
 		}
 	}
-
 }

@@ -9,25 +9,39 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -37,20 +51,28 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Twistie;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
+import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
@@ -64,24 +86,25 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.widgets.Lookup;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
 	private static final int MARGIN_SECTION = 8;
-	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5
-																											// Zwischenräume
-
-	@Inject
-	private IEventBroker broker;
-
+	private static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
+	boolean selectAllControls;
 
 	@Inject
 	@Service
@@ -99,16 +122,25 @@ public class WFCDetailPart extends WFCFormPart {
 	private TranslationService translationService;
 	private Locale locale;
 
+	@Inject
+	EPartService partService;
+
+	@Inject
+	private ECommandService commandService;
+
+	@Inject
+	private EHandlerService handlerService;
+	private LocalResourceManager resManager;
+
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
+		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		if (getForm(parent) == null) {
 			return;
 		}
-		layoutForm(parent);
-		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
-		// steuert
+		layoutForm(parent, partContext);
 
 		// erzeuge die util Methoden mit DI
 		IEclipseContext localContext = EclipseContextFactory.create();
@@ -116,8 +148,10 @@ public class WFCDetailPart extends WFCFormPart {
 
 		localContext.setParent(partContext);
 
+		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.setDetail(getDetail(), perspective);
+		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
+		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 	}
 
@@ -148,16 +182,23 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private void layoutForm(Composite parent) {
+	private void layoutForm(Composite parent, IEclipseContext context) {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
-			if (headOrPage instanceof Head) {
-				layoutHead(parent, wrapper);
-			} else if (headOrPage instanceof Page) {
-				layoutPage(parent, wrapper);
-			}
+			layoutSection(parent, wrapper, context);
 		}
+
+		// Setzen der TabListe der Sections.
+		parent.setTabList(parent.getChildren());
+		// Holen des Parts
+		Composite part = parent.getParent();
+		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
+		part.setTabList(getTabListForPart(part));
+		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
+		List<Control> tabList = new ArrayList<Control>();
+		part.getParent().setTabList(listToArray(tabList));
+
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
@@ -172,54 +213,265 @@ public class WFCDetailPart extends WFCFormPart {
 
 	}
 
-	private void layoutHead(Composite parent, HeadOrPageWrapper head) {
+	/**
+	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten) oder
+	 * eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
+	 * festlegt.
+	 *
+	 * @param parent
+	 * @param headOrPage
+	 * @param traverseListener
+	 */
+
+	private void layoutSection(Composite parent, HeadOrPageWrapper headOrPage, IEclipseContext context) {
 		RowData headLayoutData = new RowData();
-		Section headSection;
-		if (head.isHead) {
-			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		Section section;
+		Control sectionControl = null;
+		if (headOrPage.isHead) {
+			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			headSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			sectionControl = section.getChildren()[0];
 		}
 
 		headLayoutData.width = SECTION_WIDTH;
 
-		headSection.setLayoutData(headLayoutData);
-		headSection.setText(head.getTranslationText());
-		headSection.setData(TRANSLATE_PROPERTY, "@Head");
+		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
+		section.setLayoutData(headLayoutData);
+		section.setText(headOrPage.getTranslationText());
 
 		// Client Area
-		Composite composite = formToolkit.createComposite(headSection);
+		Composite composite = formToolkit.createComposite(section);
 		composite.setLayout(new FormLayout());
 		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
 		formToolkit.paintBordersFor(composite);
-		headSection.setClient(composite);
+		section.setClient(composite);
 
-		// Fields
-		createFields(composite, head);
+		// Wir erstellen die HEAD Section des Details.
+		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl, section);
+		// Button erstellen, falls vorhanden
+		createButton(headOrPage, section);
+		// Erstellen der Field des Section.
+		createFields(composite, headOrPage, mSection);
+		// Sortieren der Fields nach Tab-Index.
+		sortTabList(mSection);
+		// Setzen der TabListe für die einzelnen Sections.
+		composite.setTabList(getTabListForSectionComposite(mSection, composite));
+		// Setzen der TabListe der Sections im Part.
+		composite.getParent().setTabList(getTabListForSection((Section) composite.getParent()));
+
+		// Section wird zum Detail hinzugefügt.
+		detail.addPage(mSection);
+
 	}
 
-	private void layoutPage(Composite parent, HeadOrPageWrapper page) {
-		RowData pageLayoutData = new RowData();
-		Section pageSection = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+	/**
+	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
+	 *
+	 * @param composite2
+	 * @param headOrPage
+	 * @param mSection
+	 * @param section
+	 */
+	private void createButton(HeadOrPageWrapper headOrPage, Section section) {
+		if (headOrPage.isHead) {
+			return;
+		}
 
-		pageLayoutData.width = SECTION_WIDTH;
+		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
-		pageSection.setLayoutData(pageLayoutData);
-		pageSection.setText(page.getTranslationText());
-		pageSection.setData(TRANSLATE_PROPERTY, page.getTranslationText());
+		Page page = (Page) headOrPage.headOrPage;
+		for (aero.minova.rcp.form.model.xsd.Button btn : page.getButton()) {
+			final ToolItem item = new ToolItem(bar, SWT.PUSH);
+			item.setData(btn);
+			item.setEnabled(btn.isEnabled());
+			if (btn.getText() != null) {
+				item.setText(translationService.translate(btn.getText(), null));
+				item.setToolTipText(translationService.translate(btn.getText(), null));
+			}
 
-		// Client Area
-		Composite composite = formToolkit.createComposite(pageSection);
-		composite.setLayout(new FormLayout());
-		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
-		formToolkit.paintBordersFor(composite);
-		pageSection.setClient(composite);
+			Object event = findEventForID(btn.getId());
+			if (event instanceof Onclick) {
+				Onclick onclick = (Onclick) event;
+				item.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						// TODO: Andere procedures/bindings/instances auswerten
 
-		// Fields
-		createFields(composite, page);
+						Wizard wizard = getWizard(onclick);
+						if (wizard != null) {
+							Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, wizard.getWizardname());
+							ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+							handlerService.executeHandler(command);
+						}
+					}
+				});
+			}
+
+			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon());
+				Image buttonImage = resManager.createImage(buttonImageDescriptor);
+				item.setImage(buttonImage);
+			}
+		}
+		section.setTextClient(bar);
+
 	}
 
-	private void createFields(Composite composite, HeadOrPageWrapper headOrPage) {
+	private Object findEventForID(String id) {
+		for (Onclick onclick : form.getEvents().getOnclick()) {
+			if (onclick.getRefid().equals(id)) {
+				return onclick;
+			}
+		}
+		// TODO: Onbinder und ValueChange implementieren
+		return null;
+	}
+
+	private Wizard getWizard(Onclick onclick) {
+		for (Object o : onclick.getBinderOrProcedureOrInstance()) {
+			if (o instanceof Wizard) {
+				return (Wizard) o;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
+	 *
+	 * @param mSection
+	 *            die Section in der die Fields sortiert werden müssen
+	 * @param traverseListener
+	 *            der zuzuweisende TraverseListener für die Fields
+	 */
+	private void sortTabList(MSection mSection) {
+		List<MField> tabList = mSection.getTabList();
+		Collections.sort(tabList, new Comparator<>() {
+
+			@Override
+			public int compare(MField f1, MField f2) {
+				if (f1.getTabIndex() == f2.getTabIndex()) {
+					return 0;
+				} else if (f1.getTabIndex() < f2.getTabIndex()) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+		});
+		mSection.setTabList(tabList);
+
+	}
+
+	/**
+	 * Setzt alle Elemente aus der übergebenen Liste in einen Array
+	 * 
+	 * @param tabList
+	 * @return Array mit Controls
+	 */
+	private Control[] listToArray(List<Control> tabList) {
+		Control[] tabArray = new Control[tabList.size()];
+		int i = 0;
+		while (i < tabList.size()) {
+			tabArray[i] = tabList.get(i);
+			i++;
+		}
+		return tabArray;
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe der Section zurück. Wenn SelectAllControls gesetzt ist, wird das SectionControl(der Twistie) mit in
+	 * den Array gesetzt.
+	 * 
+	 * @param composite
+	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForSection(Composite composite) {
+		List<Control> tabList = new ArrayList<Control>();
+
+		if (selectAllControls && composite.getChildren()[0] instanceof Twistie) {
+			for (Control child : composite.getChildren()) {
+				if (child instanceof ToolBar) {
+					tabList.add(1, child);
+				} else if (child instanceof Label) {
+					continue;
+				} else {
+					tabList.add(child);
+				}
+			}
+		} else {
+			for (Control child : composite.getChildren()) {
+				if (child instanceof ToolBar) {
+					tabList.add(1, child);
+				} else if (child instanceof Twistie || child instanceof Label) {
+					continue;
+				} else {
+					tabList.add(child);
+				}
+			}
+		}
+		return listToArray(tabList);
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe des Parts zurück. Wenn SelectAllControls gesetzt ist, wird die Toolbar mit in den Array gesetzt.
+	 * 
+	 * @param composite
+	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForPart(Composite composite) {
+		List<Control> tabList = new ArrayList<Control>();
+
+		if (selectAllControls) {
+			int i = 0;
+			while (i < composite.getChildren().length) {
+				tabList.add(composite.getChildren()[i]);
+				i++;
+			}
+		}
+		return listToArray(tabList);
+	}
+
+	/**
+	 * Gibt einen Array mit den Controls für die TabListe des Composites der Section zurück.
+	 * 
+	 * @param mSection
+	 *            der Section
+	 * @param composite
+	 *            der Section
+	 * @return Array mit Controls
+	 */
+	private Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
+
+		List<Control> tabList = new ArrayList<Control>();
+
+		Control[] compositeChilds = composite.getChildren();
+		for (Control control : compositeChilds) {
+			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text) {
+				MField field = (MField)control.getData(Constants.CONTROL_FIELD);
+				if(!field.isReadOnly()) {
+					tabList.add(control);
+				}
+			}
+		}
+
+		return listToArray(tabList);
+	}
+
+	/**
+	 * Erstellt die Field einer Section.
+	 *
+	 * @param composite
+	 *            der parent des Fields
+	 * @param headOrPage
+	 *            bestimmt ob die Fields nach den Regeln des Heads erstellt werden oder der einer Page.
+	 * @param page
+	 *            die Section deren Fields erstellt werden.
+	 */
+	private void createFields(Composite composite, HeadOrPageWrapper headOrPage, MSection page) {
 		int row = 0;
 		int column = 0;
 		int width;
@@ -240,6 +492,9 @@ public class WFCDetailPart extends WFCFormPart {
 				row++;
 			}
 			createField(composite, f, row, column);
+			f.setmPage(page);
+			page.addTabField(f);
+
 			column += width;
 			if (!headOrPage.isHead) {
 				row += getExtraHeight(field);
@@ -268,19 +523,19 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void createField(Composite composite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
-			BooleanField.create(composite, field, row, column, formToolkit, locale);
+			BooleanField.create(composite, field, row, column, locale, perspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, formToolkit, locale);
+			NumberField.create(composite, (MNumberField) field, row, column, locale, perspective);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
+			DateTimeField.create(composite, field, row, column, locale, timezone, perspective);
 		} else if (field instanceof MShortDateField) {
-			ShortDateField.create(composite, field, row, column, formToolkit, locale, timezone);
+			ShortDateField.create(composite, field, row, column, locale, timezone, perspective);
 		} else if (field instanceof MShortTimeField) {
-			ShortTimeField.create(composite, field, row, column, formToolkit, locale, timezone);
+			ShortTimeField.create(composite, field, row, column, locale, timezone, perspective);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, formToolkit, perspective, locale);
+			LookupField.create(composite, field, row, column, locale, perspective);
 		} else if (field instanceof MTextField) {
-			TextField.create(composite, field, row, column, formToolkit);
+			TextField.create(composite, field, row, column, perspective);
 		}
 	}
 

@@ -32,7 +32,7 @@ public class ExplanationLabelForPWCheckbox extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 
-		Label explanation = new Label(parent, SWT.NONE);
+		Label explanation = new Label(parent, SWT.NONE | SWT.WRAP);
 		explanation.setText(getLabel());
 		GridData explanationGridData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		explanationGridData.horizontalSpan = 2;

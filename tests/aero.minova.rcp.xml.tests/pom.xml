@@ -9,7 +9,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.tests</artifactId>
-		<version>12.0.14-SNAPSHOT</version>
+		<version>12.0.22-SNAPSHOT</version>
 	</parent>
 	<build>
 		<plugins>
@@ -23,7 +23,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
           			<!-- Tests trying to access the server-->
           			<exclude>ReadDetailFromMaskTest</exclude>
           			<exclude>CasCommunicationTest</exclude>
-          			<exclude>XmlReaderTests</exclude>
 				</excludes>
 			</configuration>
 		</plugin>

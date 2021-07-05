@@ -1,9 +1,10 @@
 package aero.minova.rcp.rcp.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -24,23 +25,15 @@ import org.xml.sax.SAXException;
  */
 public class PDFGenerator {
 
-	private final Map<String, String> configuration;
+	public PDFGenerator() {}
 
-	public PDFGenerator(Map<String, String> configuration) {
-        this.configuration = configuration;
-    }
-
-	public void createPdfFile(String xmlDataFile, String templateFile, OutputStream pdfOutputStream) throws IOException, SAXException, TransformerException {
+	public void createPdfFile(String xmlDataString, String templateString, OutputStream pdfOutputStream)
+			throws IOException, SAXException, TransformerException {
 		System.out.println("Create pdf file ...");
 		File tempFile = File.createTempFile("fop-" + System.currentTimeMillis(), ".pdf");
 
-		// holds references to configuration information and cached data
-		// reuse this instance if you plan to render multiple documents
-
 		FopFactory fopFactory = FopFactory.newInstance();
-
 		fopFactory.setBaseURL(new File(".").toURI().toURL().toString());
-
 		FOUserAgent userAgent = fopFactory.newFOUserAgent();
 
 		try {
@@ -49,13 +42,14 @@ public class PDFGenerator {
 
 			// Load template
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer(new StreamSource(new File(templateFile)));
+			Transformer transformer = transformerFactory
+					.newTransformer(new StreamSource(new ByteArrayInputStream(templateString.getBytes(StandardCharsets.UTF_8))));
 
 			// Set value of parameters in stylesheet
 			transformer.setParameter("version", "1.0");
 
 			// Input for XSLT transformations
-			Source xmlSource = new StreamSource(new File(xmlDataFile));
+			Source xmlSource = new StreamSource(new ByteArrayInputStream(xmlDataString.getBytes(StandardCharsets.UTF_8)));
 
 			Result result = new SAXResult(fop.getDefaultHandler());
 

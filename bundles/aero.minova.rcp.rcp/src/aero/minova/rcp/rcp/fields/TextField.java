@@ -8,17 +8,24 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.widgets.LabelFactory;
+import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
@@ -29,18 +36,19 @@ public class TextField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, FormToolkit formToolkit) {
+	public static Control create(Composite composite, MField field, int row, int column, MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = formToolkit.createLabel(composite, labelText, SWT.RIGHT);
+		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
 		label.setData(TRANSLATE_PROPERTY, labelText);
 
 		int style = SWT.BORDER;
 		if (field.getNumberRowsSpanned() > 1) {
 			// Maskenentwickler hat mehrzeilige Eingabe definiert
-			style |= SWT.MULTI;
+			style |= SWT.MULTI | SWT.WRAP;
 		}
-		Text text = formToolkit.createText(composite, "", style);
+
+		Text text = TextFactory.newText(style).text("").create(composite);
 		text.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -58,8 +66,30 @@ public class TextField {
 				}
 			}
 		});
+		
+		text.addTraverseListener(new TraverseListener() {
 
-		field.setValueAccessor(new TextValueAccessor(field, text));
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
+					e.doit = true;
+				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
+					e.doit = false;
+					text.setText(text.getText() + "\t");
+					text.setSelection(text.getText().length());
+				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
+					e.doit = true;
+				}
+			}
+			
+		});
+		text.setData(Constants.CONTROL_FIELD, field);
+
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		TextValueAccessor valueAccessor = new TextValueAccessor(field, text);
+		ContextInjectionFactory.inject(valueAccessor, context);
+		field.setValueAccessor(valueAccessor);
 
 		FormData labelFormData = new FormData();
 		FormData textFormData = new FormData();

@@ -12,21 +12,32 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
@@ -45,9 +56,11 @@ import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 
@@ -70,6 +83,18 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	private EHandlerService handlerService;
+
+	@Inject
+	IEclipseContext partContext;
+
+	@Inject
+	EModelService model;
+
+	@Inject
+	EPartService partService;
+
+	@Inject
+	IEventBroker broker;
 
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
@@ -100,15 +125,31 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	private Form form;
 
+	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	 *
 	 * @param rows
 	 */
 
-	public void setDetail(MDetail detail, MPerspective perspective) {
+	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
+
+		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
+		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
+		dataService.setTimeoutOpenNotification(preferences.getInt(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION, 1));
+		preferences.addPreferenceChangeListener(new IPreferenceChangeListener() {
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (event.getKey().equals(ApplicationPreferences.TIMEOUT_CAS)) {
+					dataService.setTimeout(Integer.parseInt((String) event.getNewValue()));
+				} else if (event.getKey().equals(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION)) {
+					dataService.setTimeoutOpenNotification(Integer.parseInt((String) event.getNewValue()));
+				}
+			}
+		});
 	}
 
 	@Inject
@@ -151,9 +192,7 @@ public class WFCDetailCASRequestsUtil {
 
 			}
 
-			if (newKeys.equals(keys)) {
-				return;
-			} else {
+			if (!newKeys.equals(keys)) {
 				setKeys(newKeys);
 			}
 
@@ -246,19 +285,24 @@ public class WFCDetailCASRequestsUtil {
 	private void sendSaveRequest(Table t) {
 		if (t.getRows() != null) {
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-			if (Objects.isNull(getKeys())) {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+
+			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				// Speichern wieder aktivieren
+				broker.post(Constants.BROKER_SAVECOMPLETE, true);
+				if (Objects.isNull(getKeys())) {
 					checkNewEntryInsert(tr);
-				}));
-			} else {
-				tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
+				} else {
 					checkEntryUpdate(tr);
-				}));
-			}
+				}
+			}));
+
+			// Auch bei Fehler Speichern wieder aktivieren
+			tableFuture.exceptionally(ex -> {
+				broker.post(Constants.BROKER_SAVECOMPLETE, true);
+				return null;
+			});
 		} else {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), "Entry not possible, check for wrong inputs in your messured Time",
-					shell);
-			notificationPopUp.open();
+			openNotificationPopup(getTranslation("msg.ActionAborted"));
 		}
 	}
 
@@ -278,6 +322,11 @@ public class WFCDetailCASRequestsUtil {
 		} else {
 			openNotificationPopup(getTranslation("msg.DataUpdated"));
 			handleUserAction(Constants.UPDATE_REQUEST);
+
+			if (autoReloadIndex) {
+				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+				handlerService.executeHandler(cmd);
+			}
 		}
 	}
 
@@ -293,6 +342,7 @@ public class WFCDetailCASRequestsUtil {
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.SAVE);
 		}
+		focusFirstEmptyField();
 	}
 
 	/**
@@ -326,39 +376,61 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private String getTranslation(String translate) {
 		String messageproperty = "@" + translate;
-		String value = translationService.translate(messageproperty, null);
-		return value;
+		return translationService.translate(messageproperty, null);
 	}
 
 	@Inject
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
-		MessageDialog.openError(shell, "Error", message);
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
+			List<MPart> findElements = model.findElements(activePerspective, PartsID.SEARCH_PART, MPart.class);
+			partService.activate(findElements.get(0));
+
+			MessageDialog.openError(shell, "Error", getTranslation(message));
+		}
 	}
 
 	@Inject
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
-		Table errorTable = et.getErrorTable();
-		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
-		String messageproperty = "@" + vMessageProperty.getStringValue();
-		String value = translationService.translate(messageproperty, null);
-		// Ticket number {0} is not numeric
-		if (errorTable.getColumnCount() > 1) {
-			List<String> params = new ArrayList<>();
-			for (int i = 1; i < errorTable.getColumnCount(); i++) {
-				Value v = errorTable.getRows().get(0).getValue(i);
-				params.add(v.getStringValue());
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			Table errorTable = et.getErrorTable();
+			Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
+			String messageproperty = "@" + vMessageProperty.getStringValue();
+			String value = translationService.translate(messageproperty, null);
+			// Ticket number {0} is not numeric
+			if (errorTable.getColumnCount() > 1) {
+				List<String> params = new ArrayList<>();
+				for (int i = 1; i < errorTable.getColumnCount(); i++) {
+					Value v = errorTable.getRows().get(0).getValue(i);
+					params.add(v.getStringValue());
+				}
+				value = MessageFormat.format(value, params.toArray(new String[0]));
 			}
-			value = MessageFormat.format(value, params.toArray(new String[0]));
-		}
-		value += "\n\nUser : " + et.getUser();
-		value += "\nProcedure/View: " + et.getProcedureOrView();
+			value += "\n\nUser : " + et.getUser();
+			value += "\nProcedure/View: " + et.getProcedureOrView();
 
-		if (et.getT() == null) {
-			MessageDialog.openError(shell, "Error", value);
-		} else {
-			ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
+			// Fokus auf den Search Part legen, damit Fehlermeldungen von Lookups nicht mehrmals angezeigt werden
+			List<MPart> findElements = model.findElements(activePerspective, PartsID.SEARCH_PART, MPart.class);
+			partService.activate(findElements.get(0));
+
+			if (et.getT() == null) {
+				MessageDialog.openError(shell, "Error", value);
+			} else {
+				ShowErrorDialogHandler.execute(shell, "Error", value, et.getT());
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	public void showNotification(@UIEventTopic(Constants.BROKER_SHOWNOTIFICATION) String message) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			openNotificationPopup(getTranslation(message));
 		}
 	}
 
@@ -370,29 +442,29 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
-		if (perspective == this.perspective) {
-			if (getKeys() != null) {
-				String tablename = form.getIndexView() != null ? "sp" : "op";
-				if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-					tablename = form.getDetail().getProcedurePrefix();
-				}
-				tablename += "Delete";
-				tablename += form.getDetail().getProcedureSuffix();
-				TableBuilder tb = TableBuilder.newTable(tablename);
-				RowBuilder rb = RowBuilder.newRow();
-				for (ArrayList key : getKeys()) {
-					tb.withColumn((String) key.get(0), (DataType) key.get(2));
-					rb.withValue(key.get(1));
-				}
-				Table t = tb.create();
-				Row r = rb.create();
-				t.addRow(r);
-				if (t.getRows() != null) {
-					CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
-					tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+		if (perspective == this.perspective && getKeys() != null) {
+			String tablename = form.getIndexView() != null ? "sp" : "op";
+			if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+				tablename = form.getDetail().getProcedurePrefix();
+			}
+			tablename += "Delete";
+			tablename += form.getDetail().getProcedureSuffix();
+			TableBuilder tb = TableBuilder.newTable(tablename);
+			RowBuilder rb = RowBuilder.newRow();
+			for (ArrayList key : getKeys()) {
+				tb.withColumn((String) key.get(0), (DataType) key.get(2));
+				rb.withValue(key.get(1));
+			}
+			Table t = tb.create();
+			Row r = rb.create();
+			t.addRow(r);
+			if (t.getRows() != null) {
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
+					if (ta != null) {
 						deleteEntry(ta);
-					}));
-				}
+					}
+				}));
 			}
 		}
 	}
@@ -405,7 +477,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
-		if (ticketvalue.getValue() != null) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective) && ticketvalue.getValue() != null) {
 			System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
 			Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
 			Row r = RowBuilder.newRow().withValue(ticketvalue).create();
@@ -414,16 +487,26 @@ public class WFCDetailCASRequestsUtil {
 			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
 
-			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die
-			// Detailfelder vor
+			// Fehler abfangen, Felder wieder freigeben
+			tableFuture.exceptionally(ex -> {
+				// Im Display Thread ausführen
+				Display.getDefault().syncExec(() -> ticketFieldsUpdate("...", true));
+				return null;
+			});
+
+			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-				ticketFieldsUpdate("", true);
-				if (ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
+				ticketFieldsUpdate("...", true);
+				if (ta != null && ta.getResultSet() != null && "Error".equals(ta.getResultSet().getName())) {
 					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
 					showErrorMessage(e);
-				} else {
+				} else if (ta != null) {
 					selectedTable = ta.getResultSet();
-					updateSelectedEntry();
+					if (!selectedTable.getRows().isEmpty()) {
+						updateSelectedEntry();
+					} else {
+						showErrorMessage("msg.TicketNotFound");
+					}
 				}
 				updatePossibleLookupEntries();
 			}));
@@ -438,11 +521,12 @@ public class WFCDetailCASRequestsUtil {
 		MField field = detail.getField("Description");
 		field.getValueAccessor().setEditable(editable);
 		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
-		((TextValueAccessor) field.getValueAccessor()).setText(messageText);
 		if (editable) {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+			((TextValueAccessor) field.getValueAccessor()).setText("");
 		} else {
 			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+			((TextValueAccessor) field.getValueAccessor()).setText(messageText);
 		}
 
 		field = detail.getField("OrderReceiverKey");
@@ -509,6 +593,7 @@ public class WFCDetailCASRequestsUtil {
 			if (detail.getHelper() != null) {
 				detail.getHelper().handleDetailAction(ActionCode.DEL);
 			}
+			focusFirstEmptyField();
 		}
 	}
 
@@ -518,13 +603,13 @@ public class WFCDetailCASRequestsUtil {
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
-		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, shell);
+		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, getTranslation("Notification"), shell);
 		notificationPopUp.open();
 	}
 
 	@Optional
 	@Inject
-	public void newFields(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
+	public void notifyUser(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
 		openNotificationPopup(message);
 	}
 
@@ -541,6 +626,7 @@ public class WFCDetailCASRequestsUtil {
 		if (detail.getHelper() != null) {
 			detail.getHelper().handleDetailAction(ActionCode.NEW);
 		}
+		focusFirstEmptyField();
 	}
 
 	/**
@@ -559,55 +645,6 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 	}
-
-//	/**
-//	 * Antworten des CAS für Ticketnummern werden hier ausgelesen, so das sie wie bei einem Aufruf in der Index-Tabelle ausgewertet werden können
-//	 *
-//	 * @param recievedTable
-//	 */
-//	@Optional
-//	@Inject
-//	public void getTicket(@UIEventTopic(Constants.RECEIVED_TICKET) Table recievedTable) {
-//
-//		for (Control c : controls.values()) {
-//			if (c instanceof LookupControl) {
-//				LookupControl lc = (LookupControl) c;
-//				if (lc != controls.get(Constants.EMPLOYEEKEY)) {
-//					lc.setText("");
-//					lc.setData(Constants.CONTROL_KEYLONG, null);
-//					lc.getDescription().setText("");
-//				}
-//			}
-//		}
-//		Row recievedRow = recievedTable.getRows().get(0);
-//		if (selectedTable == null) {
-//			selectedTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
-//			selectedTable.addRow();
-//		} else if (selectedTable.getRows() == null) {
-//			selectedTable.addRow();
-//		}
-//		Row r = selectedTable.getRows().get(0);
-//		for (int i = 0; i < r.size(); i++) {
-//			if ((recievedTable.getColumnIndex(selectedTable.getColumnName(i))) >= 0) {
-//				r.setValue(recievedRow.getValue(recievedTable.getColumnIndex(selectedTable.getColumnName(i))), i);
-//			} else {
-//				Control c = controls.get(selectedTable.getColumnName(i));
-//				if (c instanceof LookupControl) {
-//					LookupControl lc = (LookupControl) c;
-//					r.setValue(new Value(lc.getData(Constants.CONTROL_KEYLONG), DataType.INTEGER), i);
-//				} else if (c instanceof Text) {
-//					Text t = (Text) c;
-//					if (t.getText() != null) {
-//						r.setValue(new Value(t.getText(), DataType.STRING), i);
-//					} else {
-//						r.setValue(new Value("", DataType.STRING), i);
-//					}
-//				}
-//			}
-//		}
-//
-//		updateSelectedEntry();
-//	}
 
 	/**
 	 * Setzt die Detail-Felder wieder auf den Usprungszustand des Ausgewählten Eintrags zurück
@@ -628,5 +665,19 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setKeys(ArrayList<ArrayList> arrayList) {
 		this.keys = arrayList;
+	}
+
+	private void focusFirstEmptyField() {
+		for (MSection section : detail.getPageList()) {
+			for (MField field : section.getTabList()) {
+				if (field.getValue() == null) {
+					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
+					return;
+				}
+			}
+		}
+
+		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
+		((AbstractValueAccessor) detail.getPageList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
 	}
 }

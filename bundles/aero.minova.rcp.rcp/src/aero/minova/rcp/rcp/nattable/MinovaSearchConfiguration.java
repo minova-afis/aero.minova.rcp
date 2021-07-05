@@ -74,7 +74,7 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getDateTime() != null) {
 				configureDateTimeCell(configRegistry, i++);
 			} else if (column.getType().equals(DataType.DOUBLE)) {
-				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()).getNumber().getDecimals());
+				configureDoubleCell(configRegistry, i++);
 			} else if (column.getType().equals(DataType.INTEGER)) {
 				configureIntegerCell(configRegistry, i++);
 			} else {
@@ -185,7 +185,7 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		}
 	}
 
-	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, int decimals) {
+	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex) {
 		MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
 		attributeValue.setSelectionMode(EditorSelectionEnum.START);
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,

@@ -1,17 +1,23 @@
 package aero.minova.rcp.dataservice.internal;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.XmlProcessor;
@@ -21,14 +27,29 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.util.ErrorObject;
 
 @Component
 public class DataFormService implements IDataFormService {
 
 	@Reference
 	IDataService dataService;
+
+	EventAdmin eventAdmin;
+
+	private List<String> requestedForms = new ArrayList<>();
+
+	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
+	void registerEventAdmin(EventAdmin admin) {
+		this.eventAdmin = admin;
+	}
+
+	void unregisterEventAdmin(EventAdmin admin) {
+		this.eventAdmin = null;
+	}
 
 	@Override
 	public Table getTableFromFormIndex(Form form) {
@@ -37,6 +58,26 @@ public class DataFormService implements IDataFormService {
 		for (Column c : form.getIndexView().getColumn()) {
 			aero.minova.rcp.model.Column tableColumn = new aero.minova.rcp.model.Column(c.getName(), getDataType(c), OutputType.OUTPUT);
 			tableColumn.setLabel(c.getLabel());
+
+			Integer decimals = null;
+			if (c.getNumber() != null) {
+				decimals = c.getNumber().getDecimals();
+			} else if (c.getMoney() != null) {
+				decimals = c.getMoney().getDecimals();
+			} else if (c.getPercentage() != null) {
+				decimals = c.getPercentage().getDecimals();
+			}
+			tableColumn.setDecimals(decimals);
+
+			DateTimeType dateTimeType = null;
+			if (c.getDateTime() != null) {
+				dateTimeType = DateTimeType.DATETIME;
+			} else if (c.getShortDate() != null) {
+				dateTimeType = DateTimeType.DATE;
+			} else if (c.getShortTime() != null) {
+				dateTimeType = DateTimeType.TIME;
+			}
+			tableColumn.setDateTimeType(dateTimeType);
 
 			dataTable.addColumn(tableColumn);
 		}
@@ -47,7 +88,7 @@ public class DataFormService implements IDataFormService {
 	public Table getTableFromFormDetail(Form form, String prefix) {
 		Table dataTable = new Table();
 		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if (!("sp".equals(form.getDetail().getProcedurePrefix()) || "op".equals(form.getDetail().getProcedurePrefix()))) {
+		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
 			tablename = form.getDetail().getProcedurePrefix();
 		}
 		if (prefix != null) {
@@ -66,7 +107,7 @@ public class DataFormService implements IDataFormService {
 
 	@Override
 	public List<Field> getFieldsFromForm(Form form) {
-		List<Field> allFields = new ArrayList<Field>();
+		List<Field> allFields = new ArrayList<>();
 		for (Object o : form.getDetail().getHeadAndPage()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
@@ -83,8 +124,8 @@ public class DataFormService implements IDataFormService {
 
 	@Override
 	public List<Field> getAllPrimaryFieldsFromForm(Form form) {
-		List<Field> keyFields = new ArrayList<Field>();
-		List<Field> allFields = new ArrayList<Field>();
+		List<Field> keyFields = new ArrayList<>();
+		List<Field> allFields = new ArrayList<>();
 		allFields = getFieldsFromForm(form);
 		for (Field f : allFields) {
 			if ("primary".equals(f.getKeyType())) {
@@ -95,7 +136,7 @@ public class DataFormService implements IDataFormService {
 	}
 
 	public List<Field> filterFields(List<Object> objects) {
-		List<Field> fields = new ArrayList<Field>();
+		List<Field> fields = new ArrayList<>();
 		for (Object o : objects) {
 			if (o instanceof Field) {
 				Field f = (Field) o;
@@ -109,8 +150,17 @@ public class DataFormService implements IDataFormService {
 
 	public aero.minova.rcp.model.Column createColumnFromField(Field f, String prefix) {
 		DataType type = null;
+		DateTimeType dateTimeType = null;
+		Integer decimals = null;
 		if (f.getPercentage() != null || f.getMoney() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
+			if (f.getNumber() != null) {
+				decimals = f.getNumber().getDecimals();
+			} else if (f.getMoney() != null) {
+				decimals = f.getMoney().getDecimals();
+			} else if (f.getPercentage() != null) {
+				decimals = f.getPercentage().getDecimals();
+			}
 		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
 		} else if (f.getBoolean() != null) {
@@ -119,6 +169,13 @@ public class DataFormService implements IDataFormService {
 			type = DataType.STRING;
 		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
 			type = DataType.INSTANT;
+			if (f.getDateTime() != null) {
+				dateTimeType = DateTimeType.DATETIME;
+			} else if (f.getShortDate() != null) {
+				dateTimeType = DateTimeType.DATE;
+			} else if (f.getShortTime() != null) {
+				dateTimeType = DateTimeType.TIME;
+			}
 		}
 
 		aero.minova.rcp.model.Column c;
@@ -129,6 +186,8 @@ public class DataFormService implements IDataFormService {
 		}
 
 		c.setLabel(f.getLabel());
+		c.setDecimals(decimals);
+		c.setDateTimeType(dateTimeType);
 
 		return c;
 
@@ -163,23 +222,42 @@ public class DataFormService implements IDataFormService {
 	public Form getForm(String name) {
 
 		Form form = null;
-		CompletableFuture<String> hashedFile = dataService.getHashedFile(name); // Datei ggf. vom Server holen
-		// form wird synchron geladen, das sollte später auch asynchron werden
-		String formContent = hashedFile.join();
+		String formContent = "";
 
-		XmlProcessor xmlProcessor = new XmlProcessor();
 		try {
-			String localpath = Platform.getInstanceLocation().getURL().toURI().toString();
-			File formFile = new File(localpath + name);
-			if (!formFile.exists()) {
-				// Datei vom Server holen
+			// Datei ggf. vom Server holen, form wird synchron geladen, das sollte später auch asynchron werden
+			formContent = dataService.getHashedFile(name).join();
+		} catch (Exception e) {
+			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
+			try {
+				formContent = dataService.getCachedFileContent(name).get();
+				// Fehlermeldung nur einmal pro Form zeigen
+				if (!requestedForms.contains(name)) {
+					postError(new ErrorObject("msg.WFCUsingLocalMask", dataService.getUserName(), e));
+				}
+			} catch (InterruptedException | ExecutionException e1) {
+				if (!requestedForms.contains(name)) {
+					postError(new ErrorObject("msg.WFCCouldntLoadMask", dataService.getUserName(), e1));
+				}
 			}
-			form = xmlProcessor.get(formContent, Form.class);
-		} catch (URISyntaxException | JAXBException ex) {
+		}
+
+		try {
+			form = XmlProcessor.get(formContent, Form.class);
+		} catch (JAXBException ex) {
 			throw new RuntimeException(ex);
 		}
 
+		requestedForms.add(name);
 		return form;
+	}
+
+	public void postError(ErrorObject message) {
+		Dictionary<String, Object> data = new Hashtable<>(2);
+		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
+		data.put(IEventBroker.DATA, message);
+		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
+		eventAdmin.postEvent(event);
 	}
 
 }

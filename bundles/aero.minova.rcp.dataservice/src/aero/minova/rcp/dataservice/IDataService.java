@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.e4.core.services.log.Logger;
+
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
@@ -16,8 +18,7 @@ public interface IDataService {
 	void setCredentials(String username, String password, String server, URI uri);
 
 	/**
-	 * Anfrage an den Server ein Table object zu bekommen, mit den Suchkriterium
-	 * definiert über den searchTab
+	 * Anfrage an den Server ein Table object zu bekommen, mit den Suchkriterium definiert über den searchTab
 	 *
 	 * @param tableName
 	 * @param seachTable
@@ -62,7 +63,6 @@ public interface IDataService {
 
 	Path getStoragePath();
 
-
 	CompletableFuture<String> getHashedFile(String filename);
 
 	boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException;
@@ -70,9 +70,10 @@ public interface IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch
-	 *                  mit angehängt.
-	 * @param filename  relativer Pfad und Dateiname auf dem Server
+	 * @param localPath
+	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
+	 * @param filename
+	 *            relativer Pfad und Dateiname auf dem Server
 	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -81,4 +82,16 @@ public interface IDataService {
 	void downloadFile(String serverFileName) throws IOException, InterruptedException;
 
 	String getUserName();
+
+	void setLogger(Logger logger);
+
+	CompletableFuture<String> getCachedFileContent(String filename);
+
+	boolean getHashedZip(String zipname);
+
+	void setTimeout(int timeout);
+
+	void setTimeoutOpenNotification(int timeoutOpenNotification);
+
+	void sendLogs();
 }
