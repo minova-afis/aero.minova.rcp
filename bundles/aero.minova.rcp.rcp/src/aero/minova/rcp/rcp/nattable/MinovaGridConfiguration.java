@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.nattable;
 
+import static org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes.CELL_PAINTER;
+
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.painter.cell.CheckBoxPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.ICellPainter;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -36,6 +39,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
 	private Locale locale;
+	private ICellPainter cellPainter;
 	private TranslationService translationService;
 	private Grid grid;
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
@@ -69,24 +73,25 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		for (Column column : columns) {
 
 			if (column.getType().equals(DataType.BOOLEAN)) {
-				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),column.isRequired());
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortDate() != null) {
-				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),column.isRequired());
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortTime() != null) {
-				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),column.isRequired());
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTime() != null) {
-				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),column.isRequired());
 			} else if (column.getType().equals(DataType.DOUBLE)) {
-				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),
+						column.isRequired());
 			} else if (column.getType().equals(DataType.INTEGER)) {
-				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),column.isRequired());
 			} else {
-				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly());
+				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
 			}
 		}
 	}
 
-	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly) {
+	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
@@ -102,10 +107,14 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
 
 	}
 
-	private void configureDateTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly) {
+	private void configureDateTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
@@ -121,10 +130,14 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
 
 	}
 
-	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly) {
+	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
@@ -140,10 +153,14 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
 
 	}
 
-	private void configureShortDateCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly) {
+	private void configureShortDateCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
@@ -159,9 +176,13 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
 	}
 
-	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly) {
+	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
 		// visuelle anpassung [x] oder [_] oder [-]
 		//
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL, configLabel + columnIndex);
@@ -174,11 +195,15 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TriStateCheckBoxCellEditor(), DisplayMode.EDIT,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
 
 	}
 
 	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Field field, String configLabel,
-			boolean isReadOnly) {
+			boolean isReadOnly, boolean isRequired) {
 
 		int decimals = 0;
 		if (field.getNumber() != null) {
@@ -215,6 +240,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
 
 	}
 
@@ -225,7 +254,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	}
 
-	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly) {
+	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
@@ -234,6 +263,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		}
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredStringPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 	}

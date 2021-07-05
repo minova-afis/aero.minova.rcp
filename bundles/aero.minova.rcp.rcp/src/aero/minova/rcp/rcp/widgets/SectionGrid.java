@@ -40,6 +40,7 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
@@ -223,6 +224,10 @@ public class SectionGrid {
 			protected boolean doCommand(UpdateDataCommand command) {
 				if (super.doCommand(command)) {
 					ILayerCell cell = bodyDataLayer.getCellByPosition(command.getColumnPosition(), command.getRowPosition());
+					LabelStack lbStack = cell.getConfigLabels();
+					for (String l : lbStack.getLabels()) {
+						lbStack.removeLabel(l);
+					}
 					cell.getConfigLabels().addLabel(Constants.REQUIRED_CELL_LABEL);
 					return true;
 				}
