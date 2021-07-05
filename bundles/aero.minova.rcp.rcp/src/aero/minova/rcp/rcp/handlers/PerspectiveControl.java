@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,7 +89,6 @@ public class PerspectiveControl {
 	Preferences prefsKeptPerspectives = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
 	Preferences prefsToolbarOrder = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_TOOLBARORDER);
 	List<String> openToolbarItems;
-	List<String> oldToolbarOrder;
 
 	/*
 	 * Clear the Toolbar to prevent NullPointerExceptions
@@ -124,48 +124,42 @@ public class PerspectiveControl {
 
 		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
-		readOldToolbarOrder();
+		List<String> oldToolbarOrder = readOldToolbarOrder();
 		openToolbarItems = new ArrayList<>();
-		List<String> ids = new ArrayList<>();
 
-		// The perspectives currently open
-		List<MPerspective> perspectives = modelService.findElements(window, null, MPerspective.class);
-		for (MPerspective perspective : perspectives) {
-			if (perspective.isToBeRendered()) {
-				addPerspectiveShortcut(perspective.getElementId(), //
-						perspective.getPersistedState().get(Constants.FORM_NAME), //
-						perspective.getLabel(), //
-						perspective.getIconURI(), //
-						perspective.getLocalizedLabel(), //
-						perspective.getLocalizedTooltip(), //
-						true);
-				ids.add(perspective.getElementId());
+		// Perspektiven der vorherigen Session wiederherstellen
+		for (String id : oldToolbarOrder) {
+			if (id.isBlank()) {
+				continue;
 			}
-			if (perspective == modelService.getActivePerspective(window)) {
-				setSelectedElement(perspective);
-			}
-		}
 
-		// Die angehefteten Perspektiven
-		try {
-			for (String key : prefsKeptPerspectives.keys()) {
-				String id = key.substring(0, key.indexOf("."));
-				if (!ids.contains(id)) {
-					addPerspectiveShortcut(id, //
-							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
-							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
-							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
-							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
-							prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
+			// Perspektive war geöffnet
+			List<MPerspective> perspectives = modelService.findElements(window, id, MPerspective.class);
+			if (!perspectives.isEmpty()) {
+				MPerspective perspective = perspectives.get(0);
+				if (perspective.isToBeRendered()) {
+					addPerspectiveShortcut(perspective.getElementId(), //
+							perspective.getPersistedState().get(Constants.FORM_NAME), //
+							perspective.getLabel(), //
+							perspective.getIconURI(), //
+							perspective.getLocalizedLabel(), //
+							perspective.getLocalizedTooltip(), //
 							true);
-					ids.add(id);
 				}
-			}
-		} catch (BackingStoreException e) {
-			e.printStackTrace();
-		}
+				if (perspective == modelService.getActivePerspective(window)) {
+					setSelectedElement(perspective);
+				}
 
-		oldToolbarOrder = new ArrayList<>();
+			} else { // Perspektive war angeheftet
+				addPerspectiveShortcut(id, //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
+						true);
+			}
+		}
 
 		translate(translationService);
 	}
@@ -211,13 +205,10 @@ public class PerspectiveControl {
 		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		if (keptPerspective.isBlank() || openAll) {
+			openToolbarItems.add(perspectiveId);
+			saveToolbarOrder();
 
-			int index = oldToolbarOrder.indexOf(perspectiveId);
-
-			openToolbarItems.add(index, perspectiveId);
-			saveOrderInPrefs();
-
-			shortcut = new ToolItem(toolBar, SWT.RADIO, index);
+			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspectiveId);
 			ImageDescriptor descriptor = getIconFor(iconURI);
 
@@ -231,9 +222,7 @@ public class PerspectiveControl {
 				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
 			shortcut.setToolTipText(localizedTooltip);
-
 			shortcut.addSelectionListener(new SelectionAdapter() {
-
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Map<String, String> parameter = Map.of(//
@@ -266,7 +255,6 @@ public class PerspectiveControl {
 		}
 
 		new MenuItem(menu, SWT.SEPARATOR);
-
 		addKeepItMenuItem(menu, perspectiveId, perspective);
 
 		Rectangle bounds = item.getBounds();
@@ -285,7 +273,6 @@ public class PerspectiveControl {
 				toolBar.getDisplay().asyncExec(menu::dispose);
 			}
 		});
-
 	}
 
 	ToolItem getToolItemFor(String perspectiveId) {
@@ -300,7 +287,6 @@ public class PerspectiveControl {
 		}
 
 		return toolItem;
-
 	}
 
 	private void disposeToolBarImages() {
@@ -328,13 +314,10 @@ public class PerspectiveControl {
 
 	public void removePerspectiveShortcut(MPerspective perspective) {
 		String keptPerspective = prefsKeptPerspectives.get(perspective.getElementId() + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
-
 		if (keptPerspective.isBlank()) {
 			ToolItem item = getToolItemFor(perspective.getElementId());
 			removeToolItem(item);
 		}
-		// update the layout
-
 	}
 
 	private void removeToolItem(ToolItem item) {
@@ -343,7 +326,7 @@ public class PerspectiveControl {
 		}
 
 		openToolbarItems.remove(item.getData());
-		saveOrderInPrefs();
+		saveToolbarOrder();
 
 		Image icon = item.getImage();
 		if (icon != null) {
@@ -354,31 +337,28 @@ public class PerspectiveControl {
 		item.dispose();
 	}
 
-	private void saveOrderInPrefs() {
+	private void saveToolbarOrder() {
 		StringBuilder list = new StringBuilder();
 
 		for (String s : openToolbarItems) {
-			list.append(s + ",");
+			if (!s.isBlank()) {
+				list.append(s + ",");
+			}
 		}
-		list.substring(0, list.length() - 1);
 
 		prefsToolbarOrder.put("order", list.toString());
 		try {
 			prefsToolbarOrder.flush();
 		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void readOldToolbarOrder() {
-		oldToolbarOrder = new ArrayList<>();
-
+	private List<String> readOldToolbarOrder() {
+		ArrayList<String> oldToolbarOrder = new ArrayList<>();
 		String orderString = prefsToolbarOrder.get("order", "");
-
-		for (String id : orderString.split(",")) {
-			oldToolbarOrder.add(id);
-		}
+		oldToolbarOrder.addAll(Arrays.asList(orderString.split(",")));
+		return oldToolbarOrder;
 	}
 
 	//////////////////////////////////
