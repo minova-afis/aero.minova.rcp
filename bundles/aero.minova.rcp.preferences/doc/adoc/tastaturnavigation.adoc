@@ -35,7 +35,8 @@ Verhalten für die Eingabe von Tab:
 | Tab + SAC/ Shift + Tab + SAC  = false | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page nicht selektiert
 |===
 
-==== Enter-Verhalten
+Mit Tab verlässt man nie den ausgewählten Part. Wenn der Benutzer im letzten Feld Tab betätigt und SAC = false ist, wird das erste Feld im Part selektiert. Bei SAC = true wird das Label des Parts selektiert. Umgekehrt gilt das selbe. Wenn sich der Benutzer im erste Feld befindet und Shift + Tab 
+betätigt, wird bei SAC = false das letzte Feld selektiert und bei SAC = true die Toolbar des Parts. Nach der Toolbar folgt das Label und danach wird das letzte Feld selektiert.
 
 === Enter-Verhalten
 
