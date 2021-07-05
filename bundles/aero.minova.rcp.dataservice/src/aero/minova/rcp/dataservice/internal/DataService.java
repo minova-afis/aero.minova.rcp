@@ -335,7 +335,60 @@ public class DataService implements IDataService {
 			}
 			return fromJson;
 		});
+	}
 
+	@Override
+	public CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable) {
+		return getGridDataAsync(tableName, detailTable, true);
+	}
+
+	public CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable, boolean showErrorMessage) {
+		String body = gson.toJson(detailTable);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+
+		log("CAS Request Grid Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "Grid Data", showErrorMessage);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer Grid Data:\n" + t.body());
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			if (fromJson.getReturnCode() == null) {
+				String errorMessage = null;
+				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Matcher m = fullError.matcher(t.body());
+				if (m.find()) {
+					errorMessage = m.group(0);
+				}
+				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				errorMessage = cutError.matcher(errorMessage).replaceAll("");
+				errorMessage = errorMessage.replaceAll("\"", "");
+				Table error = new Table();
+				error.setName("Error");
+				error.addColumn(new Column("Message", DataType.STRING));
+				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
+				fromJson = new SqlProcedureResult();
+				fromJson.setResultSet(error);
+				// FehlerCode
+				fromJson.setReturnCode(-1);
+			}
+			if (fromJson.getReturnCode() == -1) {
+				if (fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName())) {
+					ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, tableName);
+					postError(e);
+					return null;
+				}
+			}
+			return fromJson;
+		});
 	}
 
 	private static SSLContext disabledSslVerificationContext() {

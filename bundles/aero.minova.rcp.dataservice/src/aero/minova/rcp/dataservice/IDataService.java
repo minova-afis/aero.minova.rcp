@@ -28,6 +28,8 @@ public interface IDataService {
 
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
 
+	CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable);
+
 	CompletableFuture<Path> getPDFAsync(String tableName, Table detailTable);
 
 	/**
@@ -94,4 +96,5 @@ public interface IDataService {
 	void setTimeoutOpenNotification(int timeoutOpenNotification);
 
 	void sendLogs();
+
 }

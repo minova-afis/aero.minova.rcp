@@ -44,7 +44,9 @@ import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -55,6 +57,7 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
@@ -205,13 +208,39 @@ public class WFCDetailCASRequestsUtil {
 				updateSelectedEntry();
 			}));
 
-			/**
-			 * for (MGrid g : detail.getGrids()) { SectionGrid sectionGrid = ((GridAccessor) g.getValueAccessor()).getSectionGrid(); Table requestTable =
-			 * TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create(); Grid grid = g.getGrid(); // TODO korrekten Key
-			 * auslesen. for (Field f : grid.getField()) { if (f.getKeyType().equalsIgnoreCase(KeyType.PRIMARY.toString())) { aero.minova.rcp.model.Column
-			 * column = dataFormService.createColumnFromField(f, "Read"); requestTable.addColumn(column); } } }
-			 */
-			// Grids einlesen und aufrufen mit entsprechenden Keys?!
+			for (MGrid g : detail.getGrids()) {
+				Table requestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
+				RowBuilder rowBuilder = RowBuilder.newRow();
+				Grid grid = g.getGrid(); // TODO korrekten Key auslesen.
+				for (Field f : grid.getField()) {
+					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+						aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
+						requestTable.addColumn(column);
+
+						// Entsprechenden Wert im Index finden
+						boolean found = false;
+						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+							if (indexColumns.get(i).getName().equals(f.getName())
+									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+								found = true;
+								rowBuilder.withValue(row.getValue(i).getValue());
+							}
+						}
+						if (!found) {
+							rowBuilder.withValue(null);
+						}
+					}
+				}
+				Row gridRow = rowBuilder.create();
+				requestTable.addRow(gridRow);
+
+				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(requestTable.getName(), requestTable);
+				gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+					// TODO: Antwort im Grid darstellen
+					System.out.println(t);
+				}));
+			}
+
 		}
 
 	}
@@ -233,9 +262,7 @@ public class WFCDetailCASRequestsUtil {
 					}
 				}
 			}
-
 		}
-
 	}
 
 	/**
