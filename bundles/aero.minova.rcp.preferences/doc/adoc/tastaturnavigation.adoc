@@ -105,5 +105,33 @@ Für Windows gilt folgendes spezifisches Verhalten:
 
 ==== Key-Bindings
 
+*Key-Bindings Perspektiven*
+|===
+| *Eingabe* | *Verhalten*
+| F1 | Help
+| F3 | Load Data with MatchCode
+| F4 | Die erste Zelle im SearchPart wird selektiert
+| F5 | Der IndexPart wird aktualisiert
+| F6 | Das erste Feld im DetailPart wird selektiert
+|===
+
+*Key-Bindings DetailPart*
+|===
+| *Eingabe* | *Verhalten*
+| CR | Nächstes Pflichtfeld wird selektiert oder es wird gespeichert
+| M1 + S | Speichern des aktuellen Datensatzes
+| M1 + N | Detail leeren
+| M1 + Z | Letzte Änderungen zurücksetzen
+| M1 + Q | Bearbeitung beenden
+|===
+
+*Key-Bindings SearchPart*
+|===
+| *Eingabe* | *Verhalten*
+|	|
+|	|
+|	|
+|===
+
 
 
