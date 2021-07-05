@@ -64,8 +64,10 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
+import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
+import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -237,6 +239,18 @@ public class WFCDetailCASRequestsUtil {
 				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(requestTable.getName(), requestTable);
 				gridFuture.thenAccept(t -> sync.asyncExec(() -> {
 					// TODO: Antwort im Grid darstellen
+					for (MGrid mgrid : detail.getGrids()) {
+						String tableName = mgrid.getProcedurePrefix() + "Read" + mgrid.getProcedureSuffix();
+						SqlProcedureResult s = t;
+						Table result = s.getResultSet();
+						// if (result.getName().equals(tableName)) {
+						GridAccessor gVA = (GridAccessor) mgrid.getValueAccessor();
+						SectionGrid sectionGrid = gVA.getSectionGrid();
+						sectionGrid.setDataTable(result);
+						sectionGrid.updateNatTable();
+
+						// }
+					}
 					System.out.println(t);
 				}));
 			}
