@@ -1,7 +1,6 @@
+= Tastur Navigation
 
-= Tab- und Enter-Verhalten
-
-Diese Dokumentation beschreibt das Verhalten bei der Eingabe von Tab und Enter im DetailPart.
+== Tab- und Enter-Verhalten
 
 Bei der Umsetzung des Tab-Verhaltens verwenden wir das Verhalten, dass Eclipse schon standardmäßig implementiert hat. Das Enter-Verhalten wird in einem Handler mit Key Binding umgesetzt. 
 Wir haben uns aus folgenden Gründen gegen den TraverseListener entschieden:
@@ -40,7 +39,11 @@ Verhalten für die Eingabe von Tab:
 
 Die Eingabe von Enter wird mit einem Key-Binding im DetailPart erkannt und führt daraufhin die entsprechenden Handler aus. Dabei wir wie anschließend beschrieben vorgegangen:
 
-- In der execute Methode des TraverseEnterHandlers suchen wir nach einem leeren Pflichtfeld, dessen writtentext == null ist
+- In der execute Methode des TraverseEnterHandlers holen wir uns zuerst das selektierte Feld. Bei einem LookupField schließen wir, falls offen, das PopupMenu.
+- Danach wird das nächste leere Pflichtfeld, mit leeren WrittenText, ermittelt.
+- Wenn ein Feld gefunden wurde wird es fokussiert. Falls kein gefunden wurde, beleibt der Benutzer im gleichen Feld.
+- Nach der Ermittlung wird geprüft, ob der SaveDetailHandler enabled ist.
+- Bei True wird dieser direkt ausgeführt. Bei False wird nichts gemacht.
 
 Festgelegtes Verhalten für die Eingabe von Enter:
 
@@ -59,12 +62,12 @@ Für Mac gilt folgendes spezifisches Verhalten:
 
 image::images/mac_activate_button_selection.png[Aktivierung der Button Selektion unter Mac,550,300]
 
-- Standardverhalten für die Eingaben von Tab und Enter mit Modifier:
+- Standardverhalten für die Eingaben von Tab und Enter mit Modifier im Text Feld:
 
 *Tab + Modifier:*
 |===
-|Ctrl + Tab | Benutzer bleibt im Feld und es wird keine Tab erstellt
-|Alt + Tab | Benutzer bleibt im Feld und es wird eine Tab erstellt
+|Ctrl + Tab | Benutzer bleibt im Feld und es wird ein Tab erstellt
+|Alt + Tab | Benutzer springt ins nächste Feld. Es wird kein Tab erstellt.
 |Cmd + Tab | Unter den geöffneten Apps zur zuletzt verwendeten wechseln.
 |===
 
@@ -80,12 +83,12 @@ image::images/mac_activate_button_selection.png[Aktivierung der Button Selektion
 
 Für Windows gilt folgendes spezifisches Verhalten:
 
-- Standardverhalten für die Eingaben von Tab und Enter mit Modifier in Text Feld:
+- Standardverhalten für die Eingaben von Tab und Enter mit Modifier im Text Feld:
 
 *Tab + Modifier:*
 |===
 | *Eingabe* | *Verhalten*
-|Strg + Tab | Benutzer bleibt im Feld und es wird keine Tab erstellt.
+|Strg + Tab | Benutzer bleibt im Feld und es wird ein Tab erstellt.
 |Alt + Tab | Windows spezifisches Verhalten wechseln zur letzten Anwendung.
 |Win + Tab | Windows spezifisches Verhalten Übersicht aller offenen Fenster.
 |===
@@ -97,3 +100,10 @@ Für Windows gilt folgendes spezifisches Verhalten:
 |Alt + Enter | Benutzer bleibt im Feld und es wird kein Zeilenumbruch erstellt
 |Win + Enter | Benutzer bleibt im Feld und es wird kein Zeilenumbruch erstellt
 |===
+
+== Navigation zwischen Parts
+
+==== Key-Bindings
+
+
+
