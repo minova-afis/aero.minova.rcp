@@ -243,15 +243,14 @@ public class WFCDetailCASRequestsUtil {
 						String tableName = mgrid.getProcedurePrefix() + "Read" + mgrid.getProcedureSuffix();
 						SqlProcedureResult s = t;
 						Table result = s.getResultSet();
-						// if (result.getName().equals(tableName)) {
-						GridAccessor gVA = (GridAccessor) mgrid.getValueAccessor();
-						SectionGrid sectionGrid = gVA.getSectionGrid();
-						sectionGrid.setDataTable(result);
-						sectionGrid.updateNatTable();
+						if (result.getName().equals(tableName)) {
+							GridAccessor gVA = (GridAccessor) mgrid.getValueAccessor();
+							SectionGrid sectionGrid = gVA.getSectionGrid();
+							sectionGrid.setDataTable(result);
+							sectionGrid.updateNatTable();
+						}
 
-						// }
 					}
-					System.out.println(t);
 				}));
 			}
 

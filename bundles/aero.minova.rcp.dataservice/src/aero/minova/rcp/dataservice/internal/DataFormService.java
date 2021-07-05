@@ -190,6 +190,8 @@ public class DataFormService implements IDataFormService {
 		c.setLabel(f.getLabel());
 		c.setDecimals(decimals);
 		c.setDateTimeType(dateTimeType);
+		c.setReadOnly(f.isReadOnly());
+		c.setRequired(f.isRequired());
 
 		return c;
 

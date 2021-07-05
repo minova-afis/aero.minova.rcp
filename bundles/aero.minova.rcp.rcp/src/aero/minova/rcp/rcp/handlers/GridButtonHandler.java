@@ -41,15 +41,11 @@ public class GridButtonHandler {
 			NatTableUtil.resizeColumns(sectionGrid.getNatTable());
 		}
 		if (buttonId.equals("OptimizeHigh")) {
-
-			int natTableHeight = sectionGrid.getNatTable().getHeight();
-			sectionGrid.getNatTable().setSize(200, 50);
-			sectionGrid.getNatTable().redraw();
-			sectionGrid.setSectionHigh(500 + 50);
-
-			// Wir gehen erstmal davin aus, das keine Felder über dem Grid stehen! desshalb nur 50 Pixel dazu!
-			// Hier sollte die Höhe der Section angepasst werden!
 			NatTableUtil.resizeRows(sectionGrid.getNatTable());
+			sectionGrid.AjustCorrectHigh();
+		}
+		if (buttonId.equals("Insert")) {
+			sectionGrid.addNewRow();
 		}
 	}
 }

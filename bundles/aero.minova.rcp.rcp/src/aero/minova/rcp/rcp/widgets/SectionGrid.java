@@ -47,6 +47,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
@@ -63,6 +64,7 @@ import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.ImageUtil;
+import aero.minova.rcp.rcp.util.NatTableUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -271,7 +273,6 @@ public class SectionGrid {
 		return dataTable;
 	}
 
-
 	public void setDataTable(Table dataTable) {
 		this.dataTable = dataTable;
 	}
@@ -284,21 +285,38 @@ public class SectionGrid {
 		this.natTable = natTable;
 	}
 
+	public int getNatTableHigh() {
+		return natTable.getPreferredHeight();
+	}
+
 	public void updateNatTable() {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
 		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
 	}
 
-	public void setSectionHigh(int newHigh) {
-		org.eclipse.swt.graphics.Point size = section.getSize();
-		size.x = newHigh;
-		section.setSize(size);
-		section.requestLayout();
+	public int getSectionHigh() {
+		return this.section.getBounds().height;
 	}
 
-	public int getSectionHigh() {
-		return this.section.getSize().x;
+	public void AjustCorrectHigh() {
+		int natTableHigh = getNatTableHigh();
+		int sectionhigh = getSectionHigh();
+		Rectangle bounds = section.getBounds();
+		bounds.height = natTableHigh + 100;
+		section.setBounds(bounds);
+		section.redraw();
+		section.requestLayout();
+		section.layout();
+		NatTableUtil.refresh(natTable);
+
+	}
+
+	public void addNewRow() {
+		Table dummy = dataTable;
+		dummy.addRow();
+		// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
+		sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 	}
 
 }

@@ -18,6 +18,8 @@ public class Column {
 	String label;
 	Integer decimals;
 	DateTimeType dateTimeType;
+	boolean readOnly;
+	boolean required;
 
 	@Override
 	public String toString() {
@@ -54,6 +56,22 @@ public class Column {
 
 	public void setDateTimeType(DateTimeType dateTimeType) {
 		this.dateTimeType = dateTimeType;
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 
 }
