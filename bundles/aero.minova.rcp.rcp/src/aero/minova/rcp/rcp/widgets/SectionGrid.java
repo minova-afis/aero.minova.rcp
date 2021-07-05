@@ -271,6 +271,7 @@ public class SectionGrid {
 		return dataTable;
 	}
 
+
 	public void setDataTable(Table dataTable) {
 		this.dataTable = dataTable;
 	}
@@ -287,7 +288,17 @@ public class SectionGrid {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
 		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
+	}
 
+	public void setSectionHigh(int newHigh) {
+		org.eclipse.swt.graphics.Point size = section.getSize();
+		size.x = newHigh;
+		section.setSize(size);
+		section.requestLayout();
+	}
+
+	public int getSectionHigh() {
+		return this.section.getSize().x;
 	}
 
 }
