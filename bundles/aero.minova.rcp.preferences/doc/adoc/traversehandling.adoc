@@ -38,13 +38,9 @@ Verhalten für die Eingabe von Tab:
 
 ==== Enter-Verhalten
 
-Die Eingabe von Enter wird mit einem Key-Binding im DetailPart erkannt und führt darauhin die entsprechenden Handler aus. Dabei wir wie anschließend beschrieben vorgegangen:
- 
-- Zuerst wird die CanExecute Methode des GetNextRequiredHandlers ausgeführt. Die CanExecute Methode prüft den DetailPart nach nicht ausgefüllten Pflichtfeldern. Wenn sie keine findet wird false zurückgeliefert. Wenn sie ein Pflichtfeld findet wird true zurückgegeben.
-- Wenn CanExecute true zurückliefert wird die Execute Methode des Handlers ausgeführt. Diese ermittelt das nächste zu selektierende leere Pflichtfeld.
-- Falls die CanExecute Methode des Handlers false zurückliefert, wird die CanExecute Methode des SaveHandlers ausgeführt. Dieser prüft die eingegebenen Werte der Pflichtfelder auf Richtigkeit. Wenn alle Werte richtig sind wird true zurückgegeben. 
-Falls ein Wert nicht stimmt wird false zurück geliefert und das entsprechende Feld selektiert.
-- Bei true wird darufhin die Execute Methode des SaveHandlers ausgeführt, der dann den Datensatz speichert.
+Die Eingabe von Enter wird mit einem Key-Binding im DetailPart erkannt und führt daraufhin die entsprechenden Handler aus. Dabei wir wie anschließend beschrieben vorgegangen:
+
+- In der execute Methode des TraverseEnterHandlers suchen wir nach einem leeren Pflichtfeld, dessen writtentext == null ist
 
 Festgelegtes Verhalten für die Eingabe von Enter:
 
