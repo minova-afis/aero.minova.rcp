@@ -2,7 +2,9 @@ package aero.minova.rcp.rcp.widgets;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -103,12 +105,19 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
+	private List<Row> rowsToInsert;
+	private List<Row> rowsToUpdate;
+	private List<Row> rowsToDelete;
+
 	public SectionGrid(Composite composite, Section section, Grid grid) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
 		resManager = new LocalResourceManager(JFaceResources.getResources(), composite);
 
+		rowsToInsert = new ArrayList<>();
+		rowsToUpdate = new ArrayList<>();
+		rowsToDelete = new ArrayList<>();
 	}
 
 	public void createGrid() {
@@ -221,6 +230,10 @@ public class SectionGrid {
 			protected boolean doCommand(UpdateDataCommand command) {
 				if (super.doCommand(command)) {
 					gridAccessor.getMGrid().dataTableChanged();
+					Row r = sortedList.get(command.getRowPosition());
+					if (!rowsToUpdate.contains(r) && !rowsToInsert.contains(r)) {
+						rowsToUpdate.add(r);
+					}
 					return true;
 				}
 				return false;
@@ -296,10 +309,29 @@ public class SectionGrid {
 		for (Row r : dataTable.getRows()) {
 			this.dataTable.addRow(r);
 		}
+		updateNatTable();
 	}
 
 	public NatTable getNatTable() {
 		return natTable;
+	}
+
+	public List<Row> getRowsToInsert() {
+		return rowsToInsert;
+	}
+
+	public List<Row> getRowsToUpdate() {
+		return rowsToUpdate;
+	}
+
+	public List<Row> getRowsToDelete() {
+		return rowsToDelete;
+	}
+
+	public void clearDataChanges() {
+		rowsToInsert.clear();
+		rowsToUpdate.clear();
+		rowsToDelete.clear();
 	}
 
 	public void setNatTable(NatTable natTable) {
@@ -325,7 +357,8 @@ public class SectionGrid {
 	}
 
 	public void addNewRow() {
-		dataTable.addRow();
+		Row newRow = dataTable.addRow();
+		rowsToInsert.add(newRow);
 		updateNatTable();
 		gridAccessor.getMGrid().dataTableChanged();
 	}
@@ -333,11 +366,13 @@ public class SectionGrid {
 	public void clearGrid() {
 		dataTable.getRows().clear();
 		updateNatTable();
+		clearDataChanges();
 	}
 
 	public void deleteCurrentRows() {
 		for (int i : selectionLayer.getFullySelectedRowPositions()) {
 			dataTable.deleteRow(sortedList.get(i));
+			rowsToDelete.add(sortedList.get(i));
 		}
 		updateNatTable();
 	}

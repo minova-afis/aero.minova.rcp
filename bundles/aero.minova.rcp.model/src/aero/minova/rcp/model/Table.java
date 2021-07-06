@@ -63,7 +63,7 @@ public class Table {
 		return rows;
 	}
 
-	public void addRow() {
+	public Row addRow() {
 		Row row = new Row();
 		for (Column c : columns) {
 			if (c.getType().equals(DataType.STRING)) {
@@ -81,6 +81,7 @@ public class Table {
 			}
 		}
 		rows.add(row);
+		return row;
 	}
 
 	public void deleteRow(Row row) {

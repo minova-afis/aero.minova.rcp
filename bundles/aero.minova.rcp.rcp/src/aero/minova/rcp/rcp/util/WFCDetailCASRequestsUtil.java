@@ -276,7 +276,7 @@ public class WFCDetailCASRequestsUtil {
 					GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
 					SectionGrid sectionGrid = gVA.getSectionGrid();
 					sectionGrid.setDataTable(gridEntry.getValue());
-					sectionGrid.updateNatTable();
+					sectionGrid.clearDataChanges();
 				}
 			}
 		}
@@ -293,11 +293,13 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			Table formTable = null;
 			RowBuilder rb = RowBuilder.newRow();
-
+			String requestType;
 			if (getKeys() != null) {
 				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
+				requestType = Constants.UPDATE_REQUEST;
 			} else {
 				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
+				requestType = Constants.INSERT_REQUEST;
 			}
 			int valuePosition = 0;
 			if (getKeys() != null) {
@@ -311,7 +313,6 @@ public class WFCDetailCASRequestsUtil {
 					rb.withValue(null);
 					valuePosition++;
 				}
-
 			}
 			while (valuePosition < formTable.getColumnCount()) {
 				MField field = detail.getField(formTable.getColumnName(valuePosition));
@@ -325,6 +326,52 @@ public class WFCDetailCASRequestsUtil {
 			Row r = rb.create();
 			formTable.addRow(r);
 			sendSaveRequest(formTable);
+
+			// Zeilen in Grids löschen, speichern und updaten
+			for (MGrid g : detail.getGrids()) {
+				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+
+				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+				Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
+				Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.UPDATE_REQUEST + g.getProcedureSuffix()).create();
+
+				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+					gridDeleteTable.addColumn(gridColumn);
+					gridInsertTable.addColumn(gridColumn);
+					gridUpdateTable.addColumn(gridColumn);
+				}
+
+				for (Row row : sg.getRowsToDelete()) {
+					gridDeleteTable.addRow(row);
+				}
+				for (Row row : sg.getRowsToInsert()) {
+					gridInsertTable.addRow(row);
+				}
+				for (Row row : sg.getRowsToUpdate()) {
+					gridUpdateTable.addRow(row);
+				}
+
+				if (!gridDeleteTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+
+				if (!gridInsertTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridInsertTable.getName(), gridInsertTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+
+				if (!gridUpdateTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridUpdateTable.getName(), gridUpdateTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+			}
 		}
 	}
 
