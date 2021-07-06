@@ -41,7 +41,7 @@ public class GridButtonHandler {
 		if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_INSERT)) {
 			sectionGrid.addNewRow();
 		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
-			// TODO: Delete Row
+			sectionGrid.deleteCurrentRows();
 		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH)) {
 			NatTableUtil.resizeColumns(sectionGrid.getNatTable());
 		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT)) {

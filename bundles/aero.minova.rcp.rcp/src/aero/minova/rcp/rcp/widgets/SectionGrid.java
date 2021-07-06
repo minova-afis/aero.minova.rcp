@@ -96,6 +96,8 @@ public class SectionGrid {
 
 	private LocalResourceManager resManager;
 
+	private ToolItem deleteToolItem;
+
 	public SectionGrid(Composite composite, Section section, Grid grid) {
 		this.section = section;
 		this.grid = grid;
@@ -133,7 +135,7 @@ public class SectionGrid {
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
 			btnDel.setEnabled(false);
-			createButton(bar, btnDel);
+			deleteToolItem = createButton(bar, btnDel);
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
@@ -159,11 +161,11 @@ public class SectionGrid {
 		section.setTextClient(bar);
 	}
 
-	public void createButton(ToolBar bar, Button btn) {
-		createButton(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
+	public ToolItem createButton(ToolBar bar, Button btn) {
+		return createButton(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
 	}
 
-	public void createButton(ToolBar bar, Button btn, String commandName) {
+	public ToolItem createButton(ToolBar bar, Button btn, String commandName) {
 		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 		item.setData(btn);
 		item.setEnabled(btn.isEnabled());
@@ -190,6 +192,7 @@ public class SectionGrid {
 			Image buttonImage = resManager.createImage(buttonImageDescriptor);
 			item.setImage(buttonImage);
 		}
+		return item;
 	}
 
 	public NatTable createNatTable() {
@@ -212,6 +215,10 @@ public class SectionGrid {
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
+
+		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
+		selectionLayer.addLayerListener(event -> deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0));
+
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);
 
@@ -307,6 +314,13 @@ public class SectionGrid {
 
 	public void clearGrid() {
 		dataTable.getRows().clear();
+		updateNatTable();
+	}
+
+	public void deleteCurrentRows() {
+		for (int i : selectionLayer.getFullySelectedRowPositions()) {
+			dataTable.deleteRow(sortedList.get(i));
+		}
 		updateNatTable();
 	}
 }
