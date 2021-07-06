@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -119,13 +120,12 @@ public class WFCDetailCASRequestsUtil {
 
 	private MDetail detail;
 
-	private MPerspective perspective = null;
-
-	private Map<String, Integer> lookups = new HashMap<>();
+	private MPerspective perspective;
 
 	private List<ArrayList> keys = null;
 
-	private Table selectedTable = null;
+	private Table selectedTable;
+	private HashMap<String, Table> selectedGrids;
 
 	@Inject
 	private Form form;
@@ -141,6 +141,7 @@ public class WFCDetailCASRequestsUtil {
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
+		this.selectedGrids = new HashMap<>();
 
 		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
 		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
@@ -238,14 +239,10 @@ public class WFCDetailCASRequestsUtil {
 
 				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
 				gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-					String tableName = g.getProcedurePrefix() + "Read" + g.getProcedureSuffix();
-					SqlProcedureResult s = t;
-					Table result = s.getResultSet();
-					if (result.getName().equals(tableName)) {
-						GridAccessor gVA = (GridAccessor) g.getGridAccessor();
-						SectionGrid sectionGrid = gVA.getSectionGrid();
-						sectionGrid.setDataTable(result);
-						sectionGrid.updateNatTable();
+					Table result = t.getResultSet();
+					if (result.getName().equals(g.getDataTable().getName())) {
+						selectedGrids.put(result.getName(), result);
+						updateSelectedGrids();
 					}
 				}));
 			}
@@ -267,6 +264,19 @@ public class WFCDetailCASRequestsUtil {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				}
+			}
+		}
+	}
+
+	public void updateSelectedGrids() {
+		for (Entry<String, Table> gridEntry : selectedGrids.entrySet()) {
+			for (MGrid mGrid : detail.getGrids()) {
+				if (mGrid.getDataTable().getName().equals(gridEntry.getKey())) {
+					GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
+					SectionGrid sectionGrid = gVA.getSectionGrid();
+					sectionGrid.setDataTable(gridEntry.getValue());
+					sectionGrid.updateNatTable();
 				}
 			}
 		}
@@ -305,20 +315,13 @@ public class WFCDetailCASRequestsUtil {
 			}
 			while (valuePosition < formTable.getColumnCount()) {
 				MField field = detail.getField(formTable.getColumnName(valuePosition));
-//				if (field instanceof MLookupField) {
-//					MLookupField mlookup = (MLookupField) field;
-//					Value lookupValue = new Value(mlookup.getKeyLong());
-//					rb.withValue(lookupValue);
-//				}else {
 				if (field != null) {
 					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
 				}
-//				}
 				valuePosition++;
 			}
 
-			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
-			// Row-Wertes ermittelt und der Row angefügt
+			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden Row-Wertes ermittelt und der Row angefügt
 			Row r = rb.create();
 			formTable.addRow(r);
 			sendSaveRequest(formTable);
@@ -513,7 +516,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Versnedet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
+	 * Versendet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
 	 *
 	 * @param ticketvalue
 	 */
@@ -687,6 +690,13 @@ public class WFCDetailCASRequestsUtil {
 				((MLookupField) f).setOptions(null);
 			}
 		}
+
+		for (MGrid g : detail.getGrids()) {
+			((GridAccessor) g.getGridAccessor()).getSectionGrid().clearGrid();
+		}
+
+		selectedTable = null;
+		selectedGrids.clear();
 	}
 
 	/**
@@ -699,6 +709,7 @@ public class WFCDetailCASRequestsUtil {
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			updateSelectedEntry();
+			updateSelectedGrids();
 		}
 	}
 

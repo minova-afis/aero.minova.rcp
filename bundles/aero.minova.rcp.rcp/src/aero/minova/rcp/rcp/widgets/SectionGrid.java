@@ -122,6 +122,7 @@ public class SectionGrid {
 			Button btnInsert = new Button();
 			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
+			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(true);
 			createButton(bar, btnInsert);
 		}
@@ -130,6 +131,7 @@ public class SectionGrid {
 			Button btnDel = new Button();
 			btnDel.setId(Constants.CONTROL_GRID_BUTTON_DELETE);
 			btnDel.setIcon("DeleteRecord.Command");
+			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
 			btnDel.setEnabled(false);
 			createButton(bar, btnDel);
 		}
@@ -143,12 +145,14 @@ public class SectionGrid {
 		Button btnOptimizeHigh = new Button();
 		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
+		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
 		createButton(bar, btnOptimizeHigh);
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
+		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
 		createButton(bar, btnOptimizeWidth);
 
@@ -164,7 +168,6 @@ public class SectionGrid {
 		item.setData(btn);
 		item.setEnabled(btn.isEnabled());
 		if (btn.getText() != null) {
-			item.setText(translationService.translate(btn.getText(), null));
 			item.setToolTipText(translationService.translate(btn.getText(), null));
 		}
 
@@ -264,7 +267,11 @@ public class SectionGrid {
 	}
 
 	public void setDataTable(Table dataTable) {
-		this.dataTable = dataTable;
+		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
+		this.dataTable.getRows().clear();
+		for (Row r : dataTable.getRows()) {
+			this.dataTable.addRow(r);
+		}
 	}
 
 	public NatTable getNatTable() {
@@ -294,9 +301,12 @@ public class SectionGrid {
 	}
 
 	public void addNewRow() {
-		Table dummy = dataTable;
-		dummy.addRow();
-		// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
-		sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
+		dataTable.addRow();
+		updateNatTable();
+	}
+
+	public void clearGrid() {
+		dataTable.getRows().clear();
+		updateNatTable();
 	}
 }

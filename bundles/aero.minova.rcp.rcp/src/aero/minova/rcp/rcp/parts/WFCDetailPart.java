@@ -456,7 +456,7 @@ public class WFCDetailPart extends WFCFormPart {
 		return listToArray(tabList);
 	}
 
-	public MGrid createMGrid(Grid grid, MSection section) {
+	private MGrid createMGrid(Grid grid, MSection section) {
 		MGrid mgrid = new MGrid(grid.getProcedureSuffix());
 		mgrid.setTitle(grid.getTitle());
 		mgrid.setFill(grid.getFill());
@@ -503,6 +503,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 					sg.createGrid();
+					mGrid.setDataTable(sg.getDataTable());
 				}
 				continue;
 			}
