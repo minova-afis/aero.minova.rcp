@@ -112,13 +112,17 @@ public class MDetail {
 		this.helper = helper;
 	}
 
-	public boolean allFieldsValid() {
+	public boolean allFieldsAndGridsValid() {
 		for (MField field : fields.values()) {
 			if (!field.isValid()) {
 				return false;
 			}
 		}
-		// TODO: Grids auf Validität prüfen
+		for (MGrid grid : grids.values()) {
+			if (!grid.isValid()) {
+				return false;
+			}
+		}
 		return true;
 	}
 

@@ -20,6 +20,8 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfigurat
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
+import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -60,6 +62,7 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.ImageUtil;
@@ -97,6 +100,8 @@ public class SectionGrid {
 	private LocalResourceManager resManager;
 
 	private ToolItem deleteToolItem;
+
+	private GridAccessor gridAccessor;
 
 	public SectionGrid(Composite composite, Section section, Grid grid) {
 		this.section = section;
@@ -210,6 +215,18 @@ public class SectionGrid {
 		bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
+		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
+		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
+			@Override
+			protected boolean doCommand(UpdateDataCommand command) {
+				if (super.doCommand(command)) {
+					gridAccessor.getMGrid().dataTableChanged();
+					return true;
+				}
+				return false;
+			}
+		});
+
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
@@ -310,6 +327,7 @@ public class SectionGrid {
 	public void addNewRow() {
 		dataTable.addRow();
 		updateNatTable();
+		gridAccessor.getMGrid().dataTableChanged();
 	}
 
 	public void clearGrid() {
@@ -322,5 +340,9 @@ public class SectionGrid {
 			dataTable.deleteRow(sortedList.get(i));
 		}
 		updateNatTable();
+	}
+
+	public void setGridAccessor(GridAccessor gridAccessor) {
+		this.gridAccessor = gridAccessor;
 	}
 }

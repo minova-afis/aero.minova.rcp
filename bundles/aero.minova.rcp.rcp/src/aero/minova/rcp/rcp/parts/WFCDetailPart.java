@@ -496,7 +496,7 @@ public class WFCDetailPart extends WFCFormPart {
 				if (fieldOrGrid instanceof Grid) {
 					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
 					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
-					GridAccessor gA = new GridAccessor();
+					GridAccessor gA = new GridAccessor(mGrid);
 					gA.setSectionGrid(sg);
 					mGrid.setGridAccessor(gA);
 					mSection.getmDetail().putGrid(mGrid);

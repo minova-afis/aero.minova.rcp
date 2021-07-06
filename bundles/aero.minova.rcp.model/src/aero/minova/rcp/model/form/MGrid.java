@@ -1,11 +1,16 @@
 package aero.minova.rcp.model.form;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 
 import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.event.GridChangeEvent;
+import aero.minova.rcp.model.event.GridChangeListener;
 
 public class MGrid {
 
@@ -26,6 +31,7 @@ public class MGrid {
 	private List<MField> fields;
 	private MSection mSection;
 	private Table dataTable;
+	private ArrayList<GridChangeListener> listeners;
 
 	public String getTitle() {
 		return title;
@@ -121,5 +127,69 @@ public class MGrid {
 
 	public Grid getGrid() {
 		return this.grid;
+	}
+
+	public boolean isValid() {
+		for (Column c : dataTable.getColumns()) {
+			if (c.isRequired()) {
+				// TODO: Weitere Eigenschaften prüfen? (Textlänge, ...)
+				for (Row r : dataTable.getRows()) {
+					if (r.getValue(dataTable.getColumns().indexOf(c)).getValue() == null) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	/*
+	 * Diese Methode muss aufgerufen werden, wenn sich an der unterliegenden Tabelle etwas geändert hat, damit die GridChangedEvents verschickt werden
+	 */
+	public void dataTableChanged() {
+		fire(new GridChangeEvent(this, dataTable));
+	}
+
+	/**
+	 * Mit dieser Methode kann man einen Listener für Wertänderungen anhängen.
+	 *
+	 * @param listener
+	 */
+	public void addGridChangeListener(GridChangeListener listener) {
+		if (listener == null) {
+			return;
+		}
+		if (listeners == null) {
+			listeners = new ArrayList<>();
+		}
+		if (!listeners.contains(listener)) {
+			listeners.add(listener);
+		}
+	}
+
+	/**
+	 * Mit dieser Methode kann man einen Listener für Wertänderungen entfernen.
+	 *
+	 * @param listener
+	 */
+	public void removeGridChangeListener(GridChangeListener listener) {
+		if (listener == null) {
+			return;
+		}
+		if (listeners == null) {
+			return;
+		}
+		if (listeners.contains(listener)) {
+			listeners.remove(listener);
+		}
+	}
+
+	protected void fire(GridChangeEvent event) {
+		if (listeners == null) {
+			return;
+		}
+		for (GridChangeListener listener : listeners) {
+			listener.gridChange(event);
+		}
 	}
 }

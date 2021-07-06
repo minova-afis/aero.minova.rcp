@@ -14,13 +14,16 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.model.event.GridChangeEvent;
+import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
-public class SaveDetailHandler implements ValueChangeListener {
+public class SaveDetailHandler implements ValueChangeListener, GridChangeListener {
 
 	@Inject
 	IEventBroker broker;
@@ -51,10 +54,13 @@ public class SaveDetailHandler implements ValueChangeListener {
 				for (MField f : detail.getFields()) {
 					f.addValueChangeListener(this);
 				}
+				for (MGrid g : detail.getGrids()) {
+					g.addGridChangeListener(this);
+				}
 			}
 			firstCall = false;
 
-			return detail.allFieldsValid();
+			return detail.allFieldsAndGridsValid();
 		}
 		return false;
 	}
@@ -65,10 +71,17 @@ public class SaveDetailHandler implements ValueChangeListener {
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
 	}
 
+	@Override
+	public void gridChange(GridChangeEvent evt) {
+		// canExecute() Methode wird aufgerufen
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
+	}
+
 	// Speichern wieder aktivieren
 	@Inject
 	@Optional
 	public void saveComplete(@UIEventTopic(Constants.BROKER_SAVECOMPLETE) boolean complete) {
 		saving = false;
 	}
+
 }
