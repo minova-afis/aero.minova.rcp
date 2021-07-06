@@ -255,7 +255,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		}
 
 		if (isRequired) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredStringPainter(), DisplayMode.NORMAL,
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 	}
