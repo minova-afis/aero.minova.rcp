@@ -293,13 +293,10 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			Table formTable = null;
 			RowBuilder rb = RowBuilder.newRow();
-			String requestType;
 			if (getKeys() != null) {
 				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
-				requestType = Constants.UPDATE_REQUEST;
 			} else {
 				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
-				requestType = Constants.INSERT_REQUEST;
 			}
 			int valuePosition = 0;
 			if (getKeys() != null) {
