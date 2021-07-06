@@ -11,8 +11,8 @@ import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.IValueAccessor;
+import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
 public abstract class AbstractValueAccessor implements IValueAccessor {
@@ -77,11 +77,6 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public Value setValue(Value value, boolean user) {
-		// Wenn der Focus auf dem Control liegt, setzen wir keinen Wert
-		if (isFocussed()) {
-			return getDisplayValue();
-		}
-
 		updateControlFromValue(control, value);
 		setDisplayValue(value);
 		return value;
