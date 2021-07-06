@@ -11,7 +11,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -31,7 +30,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -120,8 +118,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private MDetail detail = new MDetail();
 
-	private WFCDetailCASRequestsUtil casRequestsUtil = null;
-
 	@Inject
 	private TranslationService translationService;
 	private Locale locale;
@@ -144,7 +140,7 @@ public class WFCDetailPart extends WFCFormPart {
 		if (getForm(parent) == null) {
 			return;
 		}
-		layoutForm(parent, partContext);
+		layoutForm(parent);
 
 		// erzeuge die util Methoden mit DI
 		IEclipseContext localContext = EclipseContextFactory.create();
@@ -153,19 +149,19 @@ public class WFCDetailPart extends WFCFormPart {
 		localContext.setParent(partContext);
 
 		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
-		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
+		WFCDetailCASRequestsUtil casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
 		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 	}
 
 	private static class HeadOrPageOrGridWrapper {
-		private Object headOrPage;
+		private Object headOrPageOrGrid;
 		public boolean isHead = false;
 
-		public HeadOrPageOrGridWrapper(Object headOrPage) {
-			this.headOrPage = headOrPage;
-			if (headOrPage instanceof Head) {
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
+			this.headOrPageOrGrid = headOrPageOrGrid;
+			if (headOrPageOrGrid instanceof Head) {
 				isHead = true;
 			}
 		}
@@ -173,31 +169,33 @@ public class WFCDetailPart extends WFCFormPart {
 		public String getTranslationText() {
 			if (isHead) {
 				return "@Head";
-			} else if (headOrPage instanceof Grid) {
-				return ((Grid) headOrPage).getTitle();
+			} else if (headOrPageOrGrid instanceof Grid) {
+				return ((Grid) headOrPageOrGrid).getTitle();
+			} else if (headOrPageOrGrid instanceof Page) {
+				return ((Page) headOrPageOrGrid).getText();
 			}
-			return ((Page) headOrPage).getText();
+			return "";
 		}
 
 		public List<Object> getFieldOrGrid() {
 			if (isHead) {
-				return ((Head) headOrPage).getFieldOrGrid();
-			} else if (headOrPage instanceof Grid) {
+				return ((Head) headOrPageOrGrid).getFieldOrGrid();
+			} else if (headOrPageOrGrid instanceof Grid) {
 				// es existieren keine Felder, nur eine Table
 				List<Object> mylistList = new ArrayList<>();
-				mylistList.add(headOrPage);
+				mylistList.add(headOrPageOrGrid);
 				return mylistList;
 			}
-			return ((Page) headOrPage).getFieldOrGrid();
+			return ((Page) headOrPageOrGrid).getFieldOrGrid();
 		}
 
 	}
 
-	private void layoutForm(Composite parent, IEclipseContext context) {
+	private void layoutForm(Composite parent) {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 		for (Object headOrPage : form.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
-			layoutSection(parent, wrapper, context);
+			layoutSection(parent, wrapper);
 		}
 
 		// Setzen der TabListe der Sections.
@@ -221,7 +219,6 @@ public class WFCDetailPart extends WFCFormPart {
 			iHelper.setControls(getDetail());
 			getDetail().setHelper(iHelper);
 		}
-
 	}
 
 	/**
@@ -230,15 +227,14 @@ public class WFCDetailPart extends WFCFormPart {
 	 * festlegt.
 	 *
 	 * @param parent
-	 * @param headOrPage
-	 * @param traverseListener
+	 * @param headOrPageOrGrid
 	 */
 
-	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPage, IEclipseContext context) {
+	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPageOrGrid) {
 		RowData headLayoutData = new RowData();
 		Section section;
 		Control sectionControl = null;
-		if (headOrPage.isHead) {
+		if (headOrPageOrGrid.isHead) {
 			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
 			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
@@ -247,23 +243,22 @@ public class WFCDetailPart extends WFCFormPart {
 
 		headLayoutData.width = SECTION_WIDTH;
 
-		section.setData(TRANSLATE_PROPERTY, headOrPage.getTranslationText());
+		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 		section.setLayoutData(headLayoutData);
-		section.setText(headOrPage.getTranslationText());
+		section.setText(headOrPageOrGrid.getTranslationText());
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(section);
 		composite.setLayout(new FormLayout());
-		composite.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "TEST");
 		formToolkit.paintBordersFor(composite);
 		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
 		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
-		createButton(headOrPage, section);
+		createButton(headOrPageOrGrid, section);
 		// Erstellen der Field des Section.
-		createFields(composite, headOrPage, mSection, section);
+		createFields(composite, headOrPageOrGrid, mSection, section);
 		// Sortieren der Fields nach Tab-Index.
 		sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections.
@@ -273,10 +268,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// MSection wird zum MDetail hinzugefügt.
 		detail.addPage(mSection);
-
 	}
-
-
 
 	/**
 	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
@@ -287,13 +279,13 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param section
 	 */
 	private void createButton(HeadOrPageOrGridWrapper headOPOGWrapper, Section section) {
-		if (headOPOGWrapper.isHead || (headOPOGWrapper.headOrPage instanceof Grid)) {
+		if (headOPOGWrapper.isHead || (headOPOGWrapper.headOrPageOrGrid instanceof Grid)) {
 			return;
 		}
 
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
-		Page page = (Page) headOPOGWrapper.headOrPage;
+		Page page = (Page) headOPOGWrapper.headOrPageOrGrid;
 		for (aero.minova.rcp.form.model.xsd.Button btn : page.getButton()) {
 			final ToolItem item = new ToolItem(bar, SWT.PUSH);
 			item.setData(btn);
@@ -328,7 +320,6 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 		}
 		section.setTextClient(bar);
-
 	}
 
 	private Object findEventForID(String id) {
@@ -360,21 +351,16 @@ public class WFCDetailPart extends WFCFormPart {
 	 */
 	private void sortTabList(MSection mSection) {
 		List<MField> tabList = mSection.getTabList();
-		Collections.sort(tabList, new Comparator<>() {
-
-			@Override
-			public int compare(MField f1, MField f2) {
-				if (f1.getTabIndex() == f2.getTabIndex()) {
-					return 0;
-				} else if (f1.getTabIndex() < f2.getTabIndex()) {
-					return -1;
-				} else {
-					return 1;
-				}
+		Collections.sort(tabList, (f1, f2) -> {
+			if (f1.getTabIndex() == f2.getTabIndex()) {
+				return 0;
+			} else if (f1.getTabIndex() < f2.getTabIndex()) {
+				return -1;
+			} else {
+				return 1;
 			}
 		});
 		mSection.setTabList(tabList);
-
 	}
 
 	/**
@@ -408,9 +394,7 @@ public class WFCDetailPart extends WFCFormPart {
 			for (Control child : composite.getChildren()) {
 				if (child instanceof ToolBar) {
 					tabList.add(1, child);
-				} else if (child instanceof Label) {
-					continue;
-				} else {
+				} else if (child instanceof Label) {} else {
 					tabList.add(child);
 				}
 			}
@@ -418,9 +402,7 @@ public class WFCDetailPart extends WFCFormPart {
 			for (Control child : composite.getChildren()) {
 				if (child instanceof ToolBar) {
 					tabList.add(1, child);
-				} else if (child instanceof Twistie || child instanceof Label) {
-					continue;
-				} else {
+				} else if (child instanceof Twistie || child instanceof Label) {} else {
 					tabList.add(child);
 				}
 			}
@@ -474,7 +456,6 @@ public class WFCDetailPart extends WFCFormPart {
 		return listToArray(tabList);
 	}
 
-
 	public MGrid createMGrid(Grid grid, MSection section) {
 		MGrid mgrid = new MGrid(grid.getProcedureSuffix());
 		mgrid.setTitle(grid.getTitle());
@@ -514,13 +495,13 @@ public class WFCDetailPart extends WFCFormPart {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
 					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
-					MGrid createMGrid = createMGrid((Grid) fieldOrGrid, mSection);
+					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 					GridAccessor gA = new GridAccessor();
 					gA.setSectionGrid(sg);
-					createMGrid.setValueAccessor(gA);
-					mSection.getmDetail().putGrid(createMGrid);
+					mGrid.setGridAccessor(gA);
+					mSection.getmDetail().putGrid(mGrid);
 
-					ContextInjectionFactory.inject(sg, context); // In Context injected, damit TranslationService genutzt werden kann
+					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 					sg.createGrid();
 				}
 				continue;
@@ -633,5 +614,4 @@ public class WFCDetailPart extends WFCFormPart {
 	public MDetail getDetail() {
 		return detail;
 	}
-
 }

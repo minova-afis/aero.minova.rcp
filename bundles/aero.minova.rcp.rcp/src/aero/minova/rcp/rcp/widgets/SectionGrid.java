@@ -15,16 +15,11 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.blink.BlinkConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.blink.BlinkingCellResolver;
-import org.eclipse.nebula.widgets.nattable.blink.IBlinkingCellResolver;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
-import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
-import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
@@ -40,13 +35,10 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
@@ -55,7 +47,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
@@ -72,7 +63,6 @@ import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.ImageUtil;
-import aero.minova.rcp.rcp.util.NatTableUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -127,43 +117,42 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-		// create, delete, optimizeWith, optimizeHigh
+
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
+			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setEnabled(true);
-			btnInsert.setId("Insert");
 			createButton(bar, btnInsert);
 		}
 
 		if (grid.isButtonDeleteVisible()) {
 			Button btnDel = new Button();
-			btnDel.setId("Delete");
+			btnDel.setId(Constants.CONTROL_GRID_BUTTON_DELETE);
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setEnabled(false);
 			createButton(bar, btnDel);
 		}
 
-		// hier muss
+		// hier müssen die in der Maske definierten Buttons erstellt werden
 		for (Button btn : grid.getButton()) {
 			createButton(bar, btn);
 		}
 
 		// Standard
 		Button btnOptimizeHigh = new Button();
+		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
 		btnOptimizeHigh.setEnabled(true);
-		btnOptimizeHigh.setId("OptimizeHigh");
 		createButton(bar, btnOptimizeHigh);
 
 		Button btnOptimizeWidth = new Button();
+		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
 		btnOptimizeWidth.setEnabled(true);
-		btnOptimizeWidth.setId("OptimizeWidth");
 		createButton(bar, btnOptimizeWidth);
 
 		section.setTextClient(bar);
-
 	}
 
 	public void createButton(ToolBar bar, Button btn) {
@@ -186,11 +175,10 @@ public class SectionGrid {
 				System.out.println("Button pushed: " + item.getText());
 
 				Map<String, String> parameter = new HashMap<>();
-				parameter.put(Constants.CONTROL_BUTTON, btn.getId());
+				parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btn.getId());
 				parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
 				ParameterizedCommand command = commandService.createCommand(commandName, parameter);
 				handlerService.executeHandler(command);
-
 			}
 		});
 
@@ -213,27 +201,8 @@ public class SectionGrid {
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
-
 		bodyDataLayer = new DataLayer(bodyDataProvider);
-
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
-
-		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
-		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
-			@Override
-			protected boolean doCommand(UpdateDataCommand command) {
-				if (super.doCommand(command)) {
-					ILayerCell cell = bodyDataLayer.getCellByPosition(command.getColumnPosition(), command.getRowPosition());
-					LabelStack lbStack = cell.getConfigLabels();
-					for (String l : lbStack.getLabels()) {
-						lbStack.removeLabel(l);
-					}
-					cell.getConfigLabels().addLabel(Constants.REQUIRED_CELL_LABEL);
-					return true;
-				}
-				return false;
-			}
-		});
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
@@ -241,9 +210,6 @@ public class SectionGrid {
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
-
-		// as the selection mouse bindings are registered for the region label GridRegion.BODY we need to set that region label to the viewport so the selection
-		// via mouse is working correctly
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
@@ -267,14 +233,11 @@ public class SectionGrid {
 
 		setNatTable(new NatTable(composite, gridLayer, false));
 
-		configRegistry.registerConfigAttribute(BlinkConfigAttributes.BLINK_RESOLVER, getBlinkResolver(), DisplayMode.NORMAL);
-
 		// as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration and the ConfigRegistry manually
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-
-		getNatTable().addConfiguration(new MinovaGridConfiguration(dataTable.getColumns(), translationService, grid));
+		getNatTable().addConfiguration(new MinovaGridConfiguration(dataTable.getColumns(), grid));
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		getNatTable().addConfiguration(new DefaultEditBindings() {
@@ -294,19 +257,6 @@ public class SectionGrid {
 
 		getNatTable().configure();
 		return getNatTable();
-	}
-
-	private IBlinkingCellResolver getBlinkResolver() {
-		return new BlinkingCellResolver() {
-			private final String[] configLabels = new String[1];
-
-			@Override
-			public String[] resolve(Object oldValue, Object newValue) {
-				this.configLabels[0] = newValue == null ? Constants.REQUIRED_CELL_LABEL : "";
-				System.out.println(this.configLabels[0]);
-				return this.configLabels;
-			}
-		};
 	}
 
 	public Table getDataTable() {
@@ -339,17 +289,8 @@ public class SectionGrid {
 		return this.section.getBounds().height;
 	}
 
-	public void AjustCorrectHigh() {
-		int natTableHigh = getNatTableHigh();
-		int sectionhigh = getSectionHigh();
-		Rectangle bounds = section.getBounds();
-		bounds.height = natTableHigh + 100;
-		section.setBounds(bounds);
-		section.redraw();
-		section.requestLayout();
-		section.layout();
-		NatTableUtil.refresh(natTable);
-
+	public void adjustHeight() {
+		// TODO: Höhe anpassen
 	}
 
 	public void addNewRow() {
@@ -358,5 +299,4 @@ public class SectionGrid {
 		// Datentablle muss angepasst weden, weil die beiden Listen sonst divergieren
 		sortedList.add(dummy.getRows().get(dummy.getRows().size() - 1));
 	}
-
 }

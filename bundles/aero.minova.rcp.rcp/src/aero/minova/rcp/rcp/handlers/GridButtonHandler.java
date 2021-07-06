@@ -24,28 +24,29 @@ public class GridButtonHandler {
 	protected TranslationService translationService;
 
 	@Execute
-	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CONTROL_BUTTON) String buttonId,
+	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CONTROL_GRID_BUTTON_ID) String buttonId,
 			@Optional @Named(Constants.CONTROL_GRID_PROCEDURE_SUFFIX) String gridPS, MPart part) {
-		SectionGrid sectionGrid = null;
 
+		SectionGrid sectionGrid = null;
 		WFCDetailPart wfcdetailpart = (WFCDetailPart) part.getObject();
 		if (wfcdetailpart != null) {
 			MGrid mGrid = wfcdetailpart.getDetail().getGrid(gridPS);
-			GridAccessor valueAccessor = (GridAccessor) mGrid.getValueAccessor();
+			GridAccessor valueAccessor = (GridAccessor) mGrid.getGridAccessor();
 			sectionGrid = valueAccessor.getSectionGrid();
+			if (sectionGrid == null) {
+				return;
+			}
 		}
-		if (sectionGrid == null) {
-			return;
-		}
-		if (buttonId.equals("OptimizeWidth")) {
-			NatTableUtil.resizeColumns(sectionGrid.getNatTable());
-		}
-		if (buttonId.equals("OptimizeHigh")) {
-			NatTableUtil.resizeRows(sectionGrid.getNatTable());
-			sectionGrid.AjustCorrectHigh();
-		}
-		if (buttonId.equals("Insert")) {
+
+		if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_INSERT)) {
 			sectionGrid.addNewRow();
+		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
+			// TODO: Delete Row
+		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH)) {
+			NatTableUtil.resizeColumns(sectionGrid.getNatTable());
+		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT)) {
+			NatTableUtil.resizeRows(sectionGrid.getNatTable());
+			sectionGrid.adjustHeight();
 		}
 	}
 }

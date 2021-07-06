@@ -19,15 +19,12 @@ public class MGrid {
 	private String procedurePrefix;
 	private String helperClass;
 	private Image icon;
-	private GridAccessor valueAccessor;
+	private IGridAccessor gridAccessor;
 	private boolean delReqAllParams;
 	private String fill;
 	private Grid grid;
-
 	private List<MField> fields;
-
 	private MSection mSection;
-
 	private Table dataTable;
 
 	public String getTitle() {
@@ -70,12 +67,12 @@ public class MGrid {
 		this.icon = icon;
 	}
 
-	public GridAccessor getValueAccessor() {
-		return valueAccessor;
+	public IGridAccessor getGridAccessor() {
+		return gridAccessor;
 	}
 
-	public void setValueAccessor(GridAccessor valueAccessor) {
-		this.valueAccessor = valueAccessor;
+	public void setGridAccessor(IGridAccessor gridAccessor) {
+		this.gridAccessor = gridAccessor;
 	}
 
 	public boolean isDelReqAllParams() {
@@ -120,11 +117,9 @@ public class MGrid {
 
 	public void setGrid(Grid grid) {
 		this.grid = grid;
-
 	}
 
 	public Grid getGrid() {
 		return this.grid;
-
 	}
 }

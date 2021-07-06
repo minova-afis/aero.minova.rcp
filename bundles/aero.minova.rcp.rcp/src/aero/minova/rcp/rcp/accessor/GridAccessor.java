@@ -2,7 +2,7 @@ package aero.minova.rcp.rcp.accessor;
 
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
-public class GridAccessor implements aero.minova.rcp.model.form.GridAccessor {
+public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 
 	public GridAccessor() {
 		super();
@@ -17,5 +17,4 @@ public class GridAccessor implements aero.minova.rcp.model.form.GridAccessor {
 	public SectionGrid getSectionGrid() {
 		return sg;
 	}
-
 }

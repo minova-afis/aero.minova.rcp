@@ -126,9 +126,7 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public List<Field> getAllPrimaryFieldsFromForm(Form form) {
 		List<Field> keyFields = new ArrayList<>();
-		List<Field> allFields = new ArrayList<>();
-		allFields = getFieldsFromForm(form);
-		for (Field f : allFields) {
+		for (Field f : getFieldsFromForm(form)) {
 			if ("primary".equals(f.getKeyType())) {
 				keyFields.add(f);
 			}
@@ -197,6 +195,21 @@ public class DataFormService implements IDataFormService {
 
 	}
 
+	@Override
+	/**
+	 * Erstellt eine Table aus dem übergenen Grid
+	 */
+	public Table getTableFromGrid(Grid grid) {
+		Table dataTable = new Table();
+		String prefix = "Read";
+		String tablename = grid.getProcedurePrefix() + prefix + grid.getProcedureSuffix();
+		dataTable.setName(tablename);
+		for (Field f : grid.getField()) {
+			dataTable.addColumn(createColumnFromField(f, prefix));
+		}
+		return dataTable;
+	}
+
 	/**
 	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element zurück
 	 *
@@ -263,22 +276,4 @@ public class DataFormService implements IDataFormService {
 		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
 		eventAdmin.postEvent(event);
 	}
-
-	@Override
-	/**
-	 * Erstellt eine Table aus dem übergenen Grid
-	 */
-	public Table getTableFromGrid(Grid grid) {
-		Table dataTable = new Table();
-		String prefix = "Read";
-		String tablename = grid.getProcedurePrefix() + prefix + grid.getProcedureSuffix();
-
-		dataTable.setName(tablename);
-
-		for (Field f : grid.getField()) {
-			dataTable.addColumn(createColumnFromField(f, prefix));
-		}
-		return dataTable;
-	}
-
 }

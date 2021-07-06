@@ -211,13 +211,13 @@ public class WFCDetailCASRequestsUtil {
 			}));
 
 			for (MGrid g : detail.getGrids()) {
-				Table requestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
-				RowBuilder rowBuilder = RowBuilder.newRow();
-				Grid grid = g.getGrid(); // TODO korrekten Key auslesen.
+				Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
+				RowBuilder gridRowBuilder = RowBuilder.newRow();
+				Grid grid = g.getGrid();
 				for (Field f : grid.getField()) {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
-						requestTable.addColumn(column);
+						gridRequestTable.addColumn(column);
 
 						// Entsprechenden Wert im Index finden
 						boolean found = false;
@@ -225,37 +225,31 @@ public class WFCDetailCASRequestsUtil {
 							if (indexColumns.get(i).getName().equals(f.getName())
 									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
 								found = true;
-								rowBuilder.withValue(row.getValue(i).getValue());
+								gridRowBuilder.withValue(row.getValue(i).getValue());
 							}
 						}
 						if (!found) {
-							rowBuilder.withValue(null);
+							gridRowBuilder.withValue(null);
 						}
 					}
 				}
-				Row gridRow = rowBuilder.create();
-				requestTable.addRow(gridRow);
+				Row gridRow = gridRowBuilder.create();
+				gridRequestTable.addRow(gridRow);
 
-				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(requestTable.getName(), requestTable);
+				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
 				gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-					// TODO: Antwort im Grid darstellen
-					for (MGrid mgrid : detail.getGrids()) {
-						String tableName = mgrid.getProcedurePrefix() + "Read" + mgrid.getProcedureSuffix();
-						SqlProcedureResult s = t;
-						Table result = s.getResultSet();
-						if (result.getName().equals(tableName)) {
-							GridAccessor gVA = (GridAccessor) mgrid.getValueAccessor();
-							SectionGrid sectionGrid = gVA.getSectionGrid();
-							sectionGrid.setDataTable(result);
-							sectionGrid.updateNatTable();
-						}
-
+					String tableName = g.getProcedurePrefix() + "Read" + g.getProcedureSuffix();
+					SqlProcedureResult s = t;
+					Table result = s.getResultSet();
+					if (result.getName().equals(tableName)) {
+						GridAccessor gVA = (GridAccessor) g.getGridAccessor();
+						SectionGrid sectionGrid = gVA.getSectionGrid();
+						sectionGrid.setDataTable(result);
+						sectionGrid.updateNatTable();
 					}
 				}));
 			}
-
 		}
-
 	}
 
 	/**

@@ -21,7 +21,7 @@ public abstract class MField {
 	private ArrayList<ValueChangeListener> listeners;
 	private Value fieldValue;
 	private Value displayValue;
-	private ValueAccessor valueAccessor;
+	private IValueAccessor valueAccessor;
 	private String name;
 	private String label;
 	private String unitText;
@@ -273,11 +273,11 @@ public abstract class MField {
 		return table -> setValue(table.getRows().get(0).getValue(sqlIndex), false);
 	}
 
-	public ValueAccessor getValueAccessor() {
+	public IValueAccessor getValueAccessor() {
 		return valueAccessor;
 	}
 
-	public void setValueAccessor(ValueAccessor valueAccessor) {
+	public void setValueAccessor(IValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
 		updateCssClass(cssClass);
 		valueAccessor.setEditable(!readOnly);

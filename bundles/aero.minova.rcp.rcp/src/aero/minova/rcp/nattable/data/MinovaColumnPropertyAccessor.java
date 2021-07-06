@@ -23,10 +23,6 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	private Map<String, String> tableHeadersMap;
 	private String[] propertyNames;
 
-	/**
-	 * @param propertyNames
-	 *            of the members of the row bean
-	 */
 	public MinovaColumnPropertyAccessor(Table table, Form form) {
 		this.table = table;
 		this.form = form;
@@ -34,10 +30,6 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		tableHeadersMap = new HashMap<>();
 	}
 
-	/**
-	 * @param propertyNames
-	 *            of the members of the row bean
-	 */
 	public MinovaColumnPropertyAccessor(Table table, Grid grid) {
 		this.table = table;
 		this.grid = grid;
@@ -66,7 +58,6 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	}
 
 	public void initPropertyNames(TranslationService translationService) {
-
 		if (form != null) {
 			initPropertyNamesForm(translationService);
 		} else if (grid != null) {
@@ -143,5 +134,4 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 	public Map<String, String> getTableHeadersMap() {
 		return tableHeadersMap;
 	}
-
 }

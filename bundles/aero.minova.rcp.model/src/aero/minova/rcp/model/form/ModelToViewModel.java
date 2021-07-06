@@ -9,8 +9,6 @@ public class ModelToViewModel {
 	public static MField convert(Field field) {
 		MField f = initializeModelField(field);
 
-
-
 		f.setName(field.getName());
 		f.setLabel(field.getLabel());
 		f.setUnitText(field.getUnitText());
@@ -27,11 +25,7 @@ public class ModelToViewModel {
 			f.setTabIndex(field.getTabIndex().intValue());
 		}
 
-		if (field.getKeyType() != null && field.getKeyType().equalsIgnoreCase(KeyType.PRIMARY.toString())) {
-			f.setPrimary(true);
-		} else {
-			f.setPrimary(false);
-		}
+		f.setPrimary(KeyType.PRIMARY.toString().equalsIgnoreCase(field.getKeyType()));
 
 		return f;
 	}

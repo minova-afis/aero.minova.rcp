@@ -1,5 +1,5 @@
 package aero.minova.rcp.model.form;
 
-public interface GridAccessor {
+public interface IGridAccessor {
 
 }

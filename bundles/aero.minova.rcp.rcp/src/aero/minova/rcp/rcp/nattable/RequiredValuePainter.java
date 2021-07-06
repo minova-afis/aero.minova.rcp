@@ -15,8 +15,7 @@ public class RequiredValuePainter extends TextPainter {
 		try {
 			Object dataValue = cell.getDataValue();
 			if (dataValue == null || dataValue.equals("")) {
-				// #FCD267 pflichtfeld
-				// RGB = 252,210,103)
+				// #FCD267 Pflichtfeld, RGB = 252,210,103
 				return GUIHelper.getColor(252, 210, 103);
 			}
 		} catch (Exception e) {

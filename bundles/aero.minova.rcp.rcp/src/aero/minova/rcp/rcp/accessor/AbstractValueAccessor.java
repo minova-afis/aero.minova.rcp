@@ -12,10 +12,10 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.model.form.ValueAccessor;
+import aero.minova.rcp.model.form.IValueAccessor;
 import aero.minova.rcp.rcp.widgets.Lookup;
 
-public abstract class AbstractValueAccessor implements ValueAccessor {
+public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	protected final MField field;
 	protected final Control control;
