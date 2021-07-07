@@ -12,11 +12,14 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -31,17 +34,20 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.DateTimeValueAccessor;
 import aero.minova.rcp.util.DateTimeUtil;
 
 public class DateTimeField {
 
-	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone,
-			MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 
@@ -57,7 +63,19 @@ public class DateTimeField {
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
-					result.add(DateTimeUtil.getDateTimeString(date, locale));
+					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
+							locale);
+					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
+							locale);
+					LocalDateTime localeDateTime = LocalDateTime.ofInstant(date, ZoneId.of("UTC"));
+					String pattern = dateUtil + " " + timeUtil;
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
+					if (dateUtil.isBlank() || timeUtil.isBlank()) {
+						result.add(DateTimeUtil.getDateTimeString(date, locale));
+					} else {
+						result.add(localeDateTime.format(dtf));
+					}
 					field.setValue(new Value(date), true);
 				}
 				return result;
