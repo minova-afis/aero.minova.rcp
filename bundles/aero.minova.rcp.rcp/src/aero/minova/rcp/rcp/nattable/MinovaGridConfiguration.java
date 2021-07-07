@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.nattable;
 import static org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes.CELL_PAINTER;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +23,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 
+import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -52,6 +54,17 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	public void configureRegistry(IConfigRegistry configRegistry) {
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.ALWAYS_EDITABLE);
 		configureCells(configRegistry);
+	}
+
+	public List<Integer> getHiddenColumns() {
+		List<Integer> hiddenCols = new ArrayList<>();
+		for (int i = 0; i < grid.getField().size(); i++) {
+			Field f = grid.getField().get(i);
+			if (!f.isVisible()) {
+				hiddenCols.add(i);
+			}
+		}
+		return hiddenCols;
 	}
 
 	private void configureCells(IConfigRegistry configRegistry) {

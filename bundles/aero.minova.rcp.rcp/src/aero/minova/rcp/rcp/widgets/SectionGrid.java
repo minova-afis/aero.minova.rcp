@@ -95,10 +95,7 @@ public class SectionGrid {
 
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
-	private MinovaColumnPropertyAccessor columnPropertyAccessor;
-	private ColumnHeaderLayer columnHeaderLayer;
-	private ColumnReorderLayer columnReorderLayer;
-	private DataLayer bodyDataLayer;
+	private ColumnHideShowLayer columnHideShowLayer;
 
 	private LocalResourceManager resManager;
 
@@ -221,11 +218,11 @@ public class SectionGrid {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(dataTable.getRows());
 		sortedList = new SortedList<>(eventList, null);
-		columnPropertyAccessor = new MinovaColumnPropertyAccessor(dataTable, grid);
+		MinovaColumnPropertyAccessor columnPropertyAccessor = new MinovaColumnPropertyAccessor(dataTable, grid);
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
-		bodyDataLayer = new DataLayer(bodyDataProvider);
+		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
@@ -246,8 +243,8 @@ public class SectionGrid {
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
-		columnReorderLayer = new ColumnReorderLayer(eventLayer);
-		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
+		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
+		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
 		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
@@ -260,7 +257,7 @@ public class SectionGrid {
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
 				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -281,7 +278,9 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		getNatTable().addConfiguration(new MinovaGridConfiguration(dataTable.getColumns(), grid));
+		MinovaGridConfiguration mgc = new MinovaGridConfiguration(dataTable.getColumns(), grid);
+		getNatTable().addConfiguration(mgc);
+		columnHideShowLayer.hideColumnPositions(mgc.getHiddenColumns());
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		getNatTable().addConfiguration(new DefaultEditBindings() {
@@ -375,14 +374,22 @@ public class SectionGrid {
 
 	public void adjustWidth() {
 		FormData fd = (FormData) natTable.getLayoutData();
+
+		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
+		int optimalWidth = natTable.getPreferredWidth();
+		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
+			optimalWidth -= natTable.getColumnWidthByPosition(i);
+		}
+
 		// Toggel zwischen Default-Breite und kompletter Nattable
-		int newWidth = fd.width == DEFAULT_WIDTH ? natTable.getPreferredWidth() : DEFAULT_WIDTH;
+		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
 
 		fd.width = newWidth;
 		natTable.requestLayout();
 
 		RowData rd = (RowData) section.getLayoutData();
-		rd.width = newWidth + BUFFER;
+		// Section soll nicht kleiner als Default sein
+		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
 		section.requestLayout();
 	}
 
