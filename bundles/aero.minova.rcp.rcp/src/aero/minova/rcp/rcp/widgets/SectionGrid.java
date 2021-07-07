@@ -109,6 +109,8 @@ public class SectionGrid {
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
 
+	private ToolItem insertToolItem;
+
 	public SectionGrid(Composite composite, Section section, Grid grid) {
 		this.section = section;
 		this.grid = grid;
@@ -140,7 +142,7 @@ public class SectionGrid {
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(true);
-			createButton(bar, btnInsert);
+			insertToolItem = createButton(bar, btnInsert);
 		}
 
 		if (grid.isButtonDeleteVisible()) {
@@ -379,5 +381,9 @@ public class SectionGrid {
 
 	public void setGridAccessor(GridAccessor gridAccessor) {
 		this.gridAccessor = gridAccessor;
+	}
+
+	public void closeEditor() {
+		natTable.commitAndCloseActiveCellEditor();
 	}
 }

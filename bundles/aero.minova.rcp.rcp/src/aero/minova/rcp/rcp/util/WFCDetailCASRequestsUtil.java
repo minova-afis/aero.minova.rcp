@@ -327,15 +327,17 @@ public class WFCDetailCASRequestsUtil {
 			// Zeilen in Grids löschen, speichern und updaten
 			for (MGrid g : detail.getGrids()) {
 				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+				sg.closeEditor();
 
 				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
 				Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
 				Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.UPDATE_REQUEST + g.getProcedureSuffix()).create();
 
 				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
-					gridDeleteTable.addColumn(gridColumn);
-					gridInsertTable.addColumn(gridColumn);
-					gridUpdateTable.addColumn(gridColumn);
+					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+					gridDeleteTable.addColumn(c);
+					gridInsertTable.addColumn(c);
+					gridUpdateTable.addColumn(c);
 				}
 
 				for (Row row : sg.getRowsToDelete()) {
