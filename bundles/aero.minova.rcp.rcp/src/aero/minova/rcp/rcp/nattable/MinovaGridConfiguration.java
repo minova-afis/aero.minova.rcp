@@ -66,7 +66,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configureShortTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getDateTime() != null) {
 				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
-			} else if (column.getType().equals(DataType.DOUBLE)) {
+			} else if (column.getType().equals(DataType.DOUBLE) || column.getType().equals(DataType.BIGDECIMAL)) {
 				configureDoubleCell(configRegistry, i++, gridFields.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(),
 						column.isRequired());
 			} else if (column.getType().equals(DataType.INTEGER)) {

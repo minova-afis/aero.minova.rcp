@@ -16,7 +16,7 @@ public class ValueSerializer implements JsonSerializer<Value> {
 	public ValueSerializer() {
 		this(false);
 	}
-	
+
 	public ValueSerializer(boolean useUserValues) {
 		this.useUserValues = useUserValues;
 	}
@@ -29,7 +29,7 @@ public class ValueSerializer implements JsonSerializer<Value> {
 	public static JsonElement serialize(Value value) {
 		return serialize(value, false);
 	}
-	
+
 	public static JsonElement serialize(Value value, boolean useUserValues) {
 		if (value == null || value.getValue() == null) {
 			return null;
@@ -47,15 +47,19 @@ public class ValueSerializer implements JsonSerializer<Value> {
 			return new JsonPrimitive("z-" + value.getZonedDateTimeValue().toString());
 		case BOOLEAN:
 			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
+		case BIGDECIMAL:
+			return new JsonPrimitive("m-" + value.getBigDecimalValue().toString());
 		case FILTER:
 			if (useUserValues) {
-				return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString() + Constants.SOH +((FilterValue)value).getUserInput());
+				return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString() + Constants.SOH
+						+ ((FilterValue) value).getUserInput());
 			} else {
 				if (((FilterValue) value).getFilterValue() == null)
 					return new JsonPrimitive("f-" + value.getOperatorValue());
 				return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString());
 			}
 		default:
+			System.err.println("Value " + value.getType() + " nicht bekannt");
 			return null;
 		}
 	}

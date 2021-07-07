@@ -43,6 +43,7 @@ public class Value implements Serializable {
 		case STRING:
 		case BOOLEAN:
 		case INTEGER:
+		case BIGDECIMAL:
 			returnValue += value;
 			break;
 		case ZONED:
@@ -169,6 +170,10 @@ public class Value implements Serializable {
 
 	public Double getDoubleValue() {
 		return type == DataType.DOUBLE ? (Double) value : null;
+	}
+
+	public Object getBigDecimalValue() {
+		return type == DataType.BIGDECIMAL ? (Double) value : null;
 	}
 
 	public Instant getInstantValue() {

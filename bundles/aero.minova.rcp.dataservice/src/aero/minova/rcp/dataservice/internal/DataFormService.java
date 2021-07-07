@@ -152,7 +152,7 @@ public class DataFormService implements IDataFormService {
 		DataType type = null;
 		DateTimeType dateTimeType = null;
 		Integer decimals = null;
-		if (f.getPercentage() != null || f.getMoney() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
+		if (f.getPercentage() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
 			if (f.getNumber() != null) {
 				decimals = f.getNumber().getDecimals();
@@ -163,6 +163,8 @@ public class DataFormService implements IDataFormService {
 			}
 		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
+		} else if (f.getMoney() != null) {
+			type = DataType.BIGDECIMAL;
 		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
 		} else if (f.getText() != null) {

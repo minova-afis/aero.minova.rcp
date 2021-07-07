@@ -78,6 +78,10 @@ public class Table {
 				row.addValue(new Value((Double) null));
 			} else if (c.getType().equals(DataType.BOOLEAN)) {
 				row.addValue(new Value((Boolean) null));
+			} else if (c.getType().equals(DataType.BIGDECIMAL)) {
+				row.addValue(new Value(null, DataType.BIGDECIMAL));
+			} else {
+				System.err.println("Typ " + c.getType() + " noch nicht definiert! (aero.minova.rcp.model.Table");
 			}
 		}
 		rows.add(row);

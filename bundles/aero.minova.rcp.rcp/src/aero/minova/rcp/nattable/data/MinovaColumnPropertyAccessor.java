@@ -53,7 +53,7 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		} else if (newValue instanceof FilterValue) {
 			rowObject.setValue((FilterValue) newValue, columnIndex);
 		} else {
-			rowObject.setValue(new Value(newValue), columnIndex);
+			rowObject.setValue(new Value(newValue, table.getColumns().get(columnIndex).getType()), columnIndex);
 		}
 	}
 
