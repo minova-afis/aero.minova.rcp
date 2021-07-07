@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -31,10 +32,14 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.ShortTimeValueAccessor;
 import aero.minova.rcp.util.TimeUtil;
 
@@ -44,8 +49,7 @@ public class ShortTimeField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone,
-			MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
@@ -60,8 +64,16 @@ public class ShortTimeField {
 					result.add("!Error converting");
 					field.setValue(null, true);
 				} else {
+					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
+							locale);
 					LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
-					result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtil, locale);
+					if (timeUtil.isBlank()) {
+						result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+					} else {
+						result.add(localTime.format(dtf));
+					}
 					field.setValue(new Value(time), true);
 				}
 				return result;

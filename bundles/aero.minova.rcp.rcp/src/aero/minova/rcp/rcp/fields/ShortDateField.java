@@ -46,15 +46,12 @@ import aero.minova.rcp.util.DateUtil;
 
 public class ShortDateField {
 
-
 	private ShortDateField() {
 		throw new IllegalStateException("Utility class");
 	}
 
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
 
-		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
 		label.setData(TRANSLATE_PROPERTY, labelText);
@@ -64,13 +61,20 @@ public class ShortDateField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateUtil.getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), entry, locale, dateUtil);
+				Instant date = DateUtil.getDate(entry, locale);
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
+					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
+							locale);
 					LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
 					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
-					result.add(localDate.format(dtf));
+					if (dateUtil.isBlank()) {
+						result.add(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+					} else {
+						result.add(localDate.format(dtf));
+					}
 					field.setValue(new Value(date), true);
 				}
 				return result;
@@ -88,7 +92,7 @@ public class ShortDateField {
 			}
 		});
 		text.setData(Constants.CONTROL_FIELD, field);
-		
+
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
 		ShortDateValueAccessor valueAccessor = new ShortDateValueAccessor(field, text);
