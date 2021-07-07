@@ -102,14 +102,13 @@ public class SectionGrid {
 	private LocalResourceManager resManager;
 
 	private ToolItem deleteToolItem;
+	private ToolItem insertToolItem;
 
 	private GridAccessor gridAccessor;
 
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
-
-	private ToolItem insertToolItem;
 
 	public SectionGrid(Composite composite, Section section, Grid grid) {
 		this.section = section;
@@ -141,7 +140,7 @@ public class SectionGrid {
 			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
-			btnInsert.setEnabled(true);
+			btnInsert.setEnabled(false);
 			insertToolItem = createButton(bar, btnInsert);
 		}
 
@@ -385,5 +384,9 @@ public class SectionGrid {
 
 	public void closeEditor() {
 		natTable.commitAndCloseActiveCellEditor();
+	}
+
+	public void enableInsert(boolean enable) {
+		insertToolItem.setEnabled(enable);
 	}
 }

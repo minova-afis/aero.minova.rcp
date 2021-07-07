@@ -277,6 +277,7 @@ public class WFCDetailCASRequestsUtil {
 					SectionGrid sectionGrid = gVA.getSectionGrid();
 					sectionGrid.setDataTable(gridEntry.getValue());
 					sectionGrid.clearDataChanges();
+					sectionGrid.enableInsert(true);
 				}
 			}
 		}
@@ -738,7 +739,9 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		for (MGrid g : detail.getGrids()) {
-			((GridAccessor) g.getGridAccessor()).getSectionGrid().clearGrid();
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.clearGrid();
+			sg.enableInsert(false);
 		}
 
 		selectedTable = null;
