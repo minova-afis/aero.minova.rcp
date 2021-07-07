@@ -44,6 +44,7 @@ public class GridButtonHandler {
 			sectionGrid.deleteCurrentRows();
 		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH)) {
 			NatTableUtil.resizeColumns(sectionGrid.getNatTable());
+			sectionGrid.adjustWidth();
 		} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT)) {
 			NatTableUtil.resizeRows(sectionGrid.getNatTable());
 			sectionGrid.adjustHeight();

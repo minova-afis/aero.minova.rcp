@@ -52,6 +52,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -192,8 +193,6 @@ public class SectionGrid {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// TODO: Andere procedures/bindings/instances auswerten
-				System.out.println("Button pushed: " + item.getText());
-
 				Map<String, String> parameter = new HashMap<>();
 				parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btn.getId());
 				parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
@@ -292,7 +291,7 @@ public class SectionGrid {
 		});
 
 		FormData fd = new FormData();
-		fd.width = WFCDetailPart.SECTION_WIDTH;
+		fd.width = WFCDetailPart.SECTION_WIDTH - 31;
 		fd.height = COLUMN_HEIGHT * 3;
 		getNatTable().setLayoutData(fd);
 
@@ -354,7 +353,27 @@ public class SectionGrid {
 	}
 
 	public void adjustHeight() {
-		// TODO: Höhe anpassen
+		FormData fd = (FormData) natTable.getLayoutData();
+
+		// Maximal 10 Zeilen anzeigen
+		int newHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
+		// Minimal 2 Zeilen anzeigen
+		newHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, newHeight);
+
+		fd.height = newHeight;
+		natTable.requestLayout();
+	}
+
+	public void adjustWidth() {
+
+		FormData fd = (FormData) natTable.getLayoutData();
+		int newWidth = natTable.getPreferredWidth();
+		fd.width = newWidth;
+		natTable.requestLayout();
+
+		RowData rd = (RowData) section.getLayoutData();
+		rd.width = newWidth + 31;
+		section.requestLayout();
 	}
 
 	public void addNewRow() {
