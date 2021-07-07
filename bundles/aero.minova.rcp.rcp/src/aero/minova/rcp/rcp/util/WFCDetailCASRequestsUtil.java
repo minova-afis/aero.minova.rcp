@@ -267,6 +267,7 @@ public class WFCDetailCASRequestsUtil {
 				}
 			}
 		}
+		updateSelectedGrids();
 	}
 
 	public void updateSelectedGrids() {
@@ -758,7 +759,6 @@ public class WFCDetailCASRequestsUtil {
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			updateSelectedEntry();
-			updateSelectedGrids();
 		}
 	}
 
