@@ -11,12 +11,14 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -31,23 +33,28 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.ShortDateValueAccessor;
 import aero.minova.rcp.util.DateUtil;
 
 public class ShortDateField {
 
+
 	private ShortDateField() {
 		throw new IllegalStateException("Utility class");
 	}
 
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
 
-	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone,
-			MPerspective perspective) {
-
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
 		label.setData(TRANSLATE_PROPERTY, labelText);
@@ -57,12 +64,13 @@ public class ShortDateField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateUtil.getDate(entry, locale);
+				Instant date = DateUtil.getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), entry, locale, dateUtil);
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
 					LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
-					result.add(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
+					result.add(localDate.format(dtf));
 					field.setValue(new Value(date), true);
 				}
 				return result;
@@ -80,7 +88,7 @@ public class ShortDateField {
 			}
 		});
 		text.setData(Constants.CONTROL_FIELD, field);
-
+		
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
 		ShortDateValueAccessor valueAccessor = new ShortDateValueAccessor(field, text);
