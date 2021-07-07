@@ -161,6 +161,9 @@ public class Value implements Serializable {
 	}
 
 	public Integer getIntegerValue() {
+		if (value instanceof LookupValue) {
+			return ((LookupValue) value).getKeyLong();
+		}
 		return type == DataType.INTEGER ? (Integer) value : null;
 	}
 

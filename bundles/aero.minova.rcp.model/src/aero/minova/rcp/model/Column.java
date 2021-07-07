@@ -20,6 +20,8 @@ public class Column {
 	DateTimeType dateTimeType;
 	boolean readOnly;
 	boolean required;
+	boolean isLookup;
+	String lookupTable;
 
 	@Override
 	public String toString() {
@@ -72,6 +74,22 @@ public class Column {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	public boolean isLookup() {
+		return isLookup;
+	}
+
+	public void setLookup(boolean isLookup) {
+		this.isLookup = isLookup;
+	}
+
+	public String getLookupTable() {
+		return lookupTable;
+	}
+
+	public void setLookupTable(String lookupTable) {
+		this.lookupTable = lookupTable;
 	}
 
 }

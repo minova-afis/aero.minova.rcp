@@ -60,6 +60,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Button;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Row;
@@ -86,6 +87,9 @@ public class SectionGrid {
 
 	@Inject
 	private EHandlerService handlerService;
+
+	@Inject
+	private IDataService dataService;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -278,7 +282,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		MinovaGridConfiguration mgc = new MinovaGridConfiguration(dataTable.getColumns(), grid);
+		MinovaGridConfiguration mgc = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
 		getNatTable().addConfiguration(mgc);
 		columnHideShowLayer.hideColumnPositions(mgc.getHiddenColumns());
 

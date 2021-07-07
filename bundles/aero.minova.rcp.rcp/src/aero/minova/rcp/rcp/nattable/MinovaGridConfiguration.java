@@ -16,13 +16,16 @@ import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultDoubleDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultIntegerDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.painter.cell.ComboBoxPainter;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
@@ -36,10 +39,12 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private Locale locale;
 	private Grid grid;
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
+	private IDataService dataService;
 
-	public MinovaGridConfiguration(List<Column> columns, Grid grid) {
+	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService) {
 		this.columns = columns;
 		this.grid = grid;
+		this.dataService = dataService;
 		initGridFields();
 	}
 
@@ -71,7 +76,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		int i = 0;
 		for (Column column : columns) {
 
-			if (column.getType().equals(DataType.BOOLEAN)) {
+			if (column.isLookup()) {
+				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired(),
+						column.getLookupTable());
+			} else if (column.getType().equals(DataType.BOOLEAN)) {
 				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
 			} else if (column.getType().equals(DataType.INSTANT) && gridFields.get(column.getName()).getShortDate() != null) {
 				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
@@ -87,9 +95,26 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			} else {
 				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
 			}
-
-			// TODO: Lookup Field in Tabelle
 		}
+	}
+
+	private void configureLookupCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired,
+			String lookupTable) {
+
+		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable);
+		ComboBoxPainter comboBoxCellPainter = new ComboBoxPainter();
+		ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(contentProvider.getValues());
+
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, comboBoxCellPainter, DisplayMode.NORMAL, configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.NORMAL, configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT, configLabel + columnIndex);
+
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new LookupDisplayConverter(contentProvider), DisplayMode.NORMAL,
+				configLabel + columnIndex);
+
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 	}
 
 	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {

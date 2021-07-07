@@ -724,6 +724,53 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache) {
+		ArrayList<LookupValue> list = new ArrayList<>();
+		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
+		if (useCache && !map.isEmpty()) {
+			System.out.println("UseCache: " + tableName);
+			list.addAll(map.values());
+			return CompletableFuture.supplyAsync(() -> list);
+		}
+		Table t = TableBuilder.newTable(tableName) //
+				.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+				.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+				.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
+				.create();
+		Row row = RowBuilder.newRow() //
+				.withValue(null) //
+				.withValue(null) //
+				.withValue(null) //
+				.withValue(fv) //
+				.create();
+		t.addRow(row);
+
+		CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t, false);
+		Table ta = null;
+		try {
+			ta = tableFuture.get();
+		} catch (Exception e) {
+			System.out.println("Error, using cache: " + tableName);
+			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+			list.addAll(map.values());
+			return CompletableFuture.supplyAsync(() -> list);
+		}
+		if (ta != null) {
+			for (Row r : ta.getRows()) {
+				LookupValue lv = new LookupValue(//
+						r.getValue(0).getIntegerValue(), //
+						r.getValue(1).getStringValue(), //
+						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+
+				map.put(lv.keyLong, lv);
+				list.add(lv);
+			}
+		}
+		return CompletableFuture.supplyAsync(() -> list);
+	}
+
+	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText) {
 		useCache = false;
 		ArrayList<LookupValue> list = new ArrayList<>();

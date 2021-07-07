@@ -192,6 +192,10 @@ public class DataFormService implements IDataFormService {
 		c.setDateTimeType(dateTimeType);
 		c.setReadOnly(f.isReadOnly());
 		c.setRequired(f.isRequired());
+		c.setLookup(f.getLookup() != null);
+		if (f.getLookup() != null) {
+			c.setLookupTable(f.getLookup().getTable());
+		}
 
 		return c;
 
