@@ -111,6 +111,10 @@ public class SectionGrid {
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
 
+	private static final int BUFFER = 31;
+	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
+	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
+
 	public SectionGrid(Composite composite, Section section, Grid grid) {
 		this.section = section;
 		this.grid = grid;
@@ -291,8 +295,8 @@ public class SectionGrid {
 		});
 
 		FormData fd = new FormData();
-		fd.width = WFCDetailPart.SECTION_WIDTH - 31;
-		fd.height = COLUMN_HEIGHT * 3;
+		fd.width = DEFAULT_WIDTH;
+		fd.height = DEFAULT_HEIGHT;
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
@@ -355,24 +359,30 @@ public class SectionGrid {
 	public void adjustHeight() {
 		FormData fd = (FormData) natTable.getLayoutData();
 
-		// Maximal 10 Zeilen anzeigen
-		int newHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
-		// Minimal 2 Zeilen anzeigen
-		newHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, newHeight);
+		int newHeight;
+		if (fd.height == DEFAULT_HEIGHT) {
+			// Maximal 10 Zeilen anzeigen
+			newHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
+			// Minimal 2 Zeilen anzeigen
+			newHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, newHeight);
+		} else {
+			newHeight = DEFAULT_HEIGHT;
+		}
 
 		fd.height = newHeight;
 		natTable.requestLayout();
 	}
 
 	public void adjustWidth() {
-
 		FormData fd = (FormData) natTable.getLayoutData();
-		int newWidth = natTable.getPreferredWidth();
+		// Toggel zwischen Default-Breite und kompletter Nattable
+		int newWidth = fd.width == DEFAULT_WIDTH ? natTable.getPreferredWidth() : DEFAULT_WIDTH;
+
 		fd.width = newWidth;
 		natTable.requestLayout();
 
 		RowData rd = (RowData) section.getLayoutData();
-		rd.width = newWidth + 31;
+		rd.width = newWidth + BUFFER;
 		section.requestLayout();
 	}
 
