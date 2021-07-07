@@ -124,16 +124,18 @@ Für Windows gilt folgendes spezifisches Verhalten:
 | CR | Nächstes Pflichtfeld wird selektiert oder es wird gespeichert
 | M1 + S | Speichern des aktuellen Datensatzes
 | M1 + N | Detail leeren
-| M1 + Z | Letzte Änderungen zurücksetzen
+| M1 + R | Letzte Änderungen zurücksetzen
 | M1 + Q | Bearbeitung beenden
 |===
 
 *Key-Bindings SearchPart*
 |===
 | *Eingabe* | *Verhalten*
-|	|
-|	|
-|	|
+| M1 + R | Zurücksetzen (Reset)
+| M1 + D | Zeile löschen (Delete)
+| M1 + S | Suchkriterien speichern (Save)
+| M1 + L | Suchkriterien laden (Load)
+| SHIFT + M1 + R | Optimieren (Resize)
 |===
 
 
