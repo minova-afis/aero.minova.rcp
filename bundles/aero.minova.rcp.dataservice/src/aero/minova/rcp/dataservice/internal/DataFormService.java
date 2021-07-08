@@ -1,6 +1,7 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -29,6 +30,7 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
+import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.util.ErrorObject;
@@ -192,6 +194,7 @@ public class DataFormService implements IDataFormService {
 		c.setDateTimeType(dateTimeType);
 		c.setReadOnly(f.isReadOnly());
 		c.setRequired(f.isRequired());
+		c.setKeyType(Arrays.stream(KeyType.values()).filter(e -> e.name().equalsIgnoreCase(f.getKeyType())).findAny().orElse(null));
 		c.setLookup(f.getLookup() != null);
 		if (f.getLookup() != null) {
 			c.setLookupTable(f.getLookup().getTable());

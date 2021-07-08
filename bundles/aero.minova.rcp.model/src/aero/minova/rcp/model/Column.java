@@ -22,6 +22,7 @@ public class Column {
 	boolean required;
 	boolean isLookup;
 	String lookupTable;
+	KeyType keyType;
 
 	@Override
 	public String toString() {
@@ -90,6 +91,14 @@ public class Column {
 
 	public void setLookupTable(String lookupTable) {
 		this.lookupTable = lookupTable;
+	}
+
+	public KeyType getKeyType() {
+		return keyType;
+	}
+
+	public void setKeyType(KeyType keyType) {
+		this.keyType = keyType;
 	}
 
 }

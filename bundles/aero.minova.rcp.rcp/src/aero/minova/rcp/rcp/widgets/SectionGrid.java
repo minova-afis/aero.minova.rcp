@@ -13,6 +13,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -62,9 +63,14 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Button;
+import aero.minova.rcp.form.model.xsd.Column;
+import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
@@ -78,18 +84,18 @@ public class SectionGrid {
 
 	@Inject
 	private TranslationService translationService;
-
 	@Inject
 	private IDataFormService dataFormService;
-
 	@Inject
 	private ECommandService commandService;
-
 	@Inject
 	private EHandlerService handlerService;
-
 	@Inject
 	private IDataService dataService;
+	@Inject
+	private MPerspective perspective;
+	@Inject
+	private Form form;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -399,9 +405,31 @@ public class SectionGrid {
 
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
+		preallocatePrimaryKeys(newRow);
 		rowsToInsert.add(newRow);
 		updateNatTable();
 		gridAccessor.getMGrid().dataTableChanged();
+	}
+
+	private void preallocatePrimaryKeys(Row r) {
+		List<Column> indexColumns = form.getIndexView().getColumn();
+		Row indexRow = ((List<Row>) perspective.getContext().get(Constants.BROKER_ACTIVEROWS)).get(0);
+		for (Field f : grid.getField()) {
+			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+				int index = grid.getField().indexOf(f);
+
+				// Entsprechenden Wert im Index finden
+				boolean found = false;
+				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+					// Name muss übereinstimmen oder Feld muss SQL-Index 0 haben und Column ist KeyLong
+					if (indexColumns.get(i).getName().equals(f.getName())
+							|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+						found = true;
+						r.setValue(new Value(indexRow.getValue(i).getValue()), index);
+					}
+				}
+			}
+		}
 	}
 
 	public void clearGrid() {
