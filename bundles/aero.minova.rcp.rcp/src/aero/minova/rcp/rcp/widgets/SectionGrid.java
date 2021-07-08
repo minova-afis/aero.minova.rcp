@@ -380,6 +380,7 @@ public class SectionGrid {
 
 		fd.height = newHeight;
 		natTable.requestLayout();
+		section.requestLayout();
 	}
 
 	public void adjustWidth() {
