@@ -100,21 +100,27 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	private void configureLookupCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired,
 			String lookupTable) {
-
-		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable);
-		ComboBoxPainter comboBoxCellPainter = new ComboBoxPainter();
-		ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(contentProvider.getValues());
-
-		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, comboBoxCellPainter, DisplayMode.NORMAL, configLabel + columnIndex);
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.NORMAL, configLabel + columnIndex);
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT, configLabel + columnIndex);
-
-		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new LookupDisplayConverter(contentProvider), DisplayMode.NORMAL,
-				configLabel + columnIndex);
-
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+
+		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new LookupDisplayConverter(contentProvider), DisplayMode.NORMAL,
+				configLabel + columnIndex);
+
+		if (!isReadOnly) {
+			ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(contentProvider.getValues());
+			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.NORMAL, configLabel + columnIndex);
+			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT, configLabel + columnIndex);
+		}
+
+		if (isRequired) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredLookupPainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+		} else {
+			ComboBoxPainter comboBoxCellPainter = new ComboBoxPainter();
+			configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, comboBoxCellPainter, DisplayMode.NORMAL, configLabel + columnIndex);
+		}
 	}
 
 	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
