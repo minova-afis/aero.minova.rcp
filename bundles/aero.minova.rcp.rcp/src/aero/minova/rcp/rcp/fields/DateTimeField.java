@@ -70,10 +70,18 @@ public class DateTimeField {
 							locale);
 					LocalDateTime localeDateTime = LocalDateTime.ofInstant(date, ZoneId.of("UTC"));
 					String pattern = dateUtil + " " + timeUtil;
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
-					if (dateUtil.isBlank() || timeUtil.isBlank()) {
+					if (dateUtil.isBlank() && timeUtil.isBlank()) {
 						result.add(DateTimeUtil.getDateTimeString(date, locale));
+					} else if (dateUtil.isBlank()) {
+						String datePattern = "dd.MM.yyyy" + pattern;
+						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern);
+						result.add(localeDateTime.format(dtf));
+					} else if (timeUtil.isBlank()) {
+						String timePattern = pattern + "HH:mm";
+						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timePattern);
+						result.add(localeDateTime.format(dtf));
 					} else {
+						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
 						result.add(localeDateTime.format(dtf));
 					}
 					field.setValue(new Value(date), true);

@@ -32,7 +32,6 @@ public class DateTimeValueAccessor extends AbstractValueAccessor {
 		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 
-		
 		if (value == null) {
 			((TextAssist) control).setText("");
 		} else {
@@ -40,9 +39,15 @@ public class DateTimeValueAccessor extends AbstractValueAccessor {
 			LocalDateTime localDateTime = LocalDateTime.ofInstant(date, ZoneId.of("UTC"));
 			String pattern = dateUtil + " " + timeUtil;
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
-			if(dateUtil.isBlank() || timeUtil.isBlank()) {
+			if (dateUtil.isBlank() && timeUtil.isBlank()) {
 				// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
 				((TextAssist) control).setText(localDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").withLocale(locale)));
+			} else if (timeUtil.isBlank()) {
+				((TextAssist) control).setText(localDateTime.format(DateTimeFormatter.ofPattern(pattern + "HH:mm").withLocale(locale)));
+			} else if (dateUtil.isBlank()) {
+				((TextAssist) control).setText(localDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy" + pattern).withLocale(locale)));
+				String test = ((TextAssist) control).getText();
+				System.out.println(test);
 			} else {
 				((TextAssist) control).setText(localDateTime.format(dtf));
 			}
