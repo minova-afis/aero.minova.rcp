@@ -560,6 +560,29 @@ public class WFCDetailCASRequestsUtil {
 					}
 				}));
 			}
+
+			// In allen Grids alle Zeilen löschen
+			for (MGrid g : detail.getGrids()) {
+				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+				sg.closeEditor();
+
+				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+					gridDeleteTable.addColumn(c);
+				}
+
+				for (Row row : sg.getDataTable().getRows()) {
+					gridDeleteTable.addRow(row);
+				}
+
+				if (!gridDeleteTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+					gridFuture.thenAccept(resTable -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+			}
 		}
 	}
 
