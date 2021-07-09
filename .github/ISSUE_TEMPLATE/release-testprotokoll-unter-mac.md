@@ -91,3 +91,9 @@ Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktio
 - [ ] F4: Search Part auswählen -> Erstes Feld wird ausgewählt
 - [ ] F5: Index neu laden
 - [ ] F6: Detail Part auswählen -> Erste Zelle wird selektiert
+
+## Preferences
+- [ ] Die Sprachauswahl zeigt nur unterstützte Sprachen an
+- [ ] Das angegebene Pattern für das Datum formatiert die Date- und DateTimeFields
+- [ ] Das angegebene Pattern für die Zeit formatiert die Time- und DateTimeFields
+- [ ] Wenn kein Pattern angegeben ist, wird der Standard verwendet (Test: Vorschlagsliste ist nicht leer)

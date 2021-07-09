@@ -79,6 +79,8 @@ Getestet mit Server xxxxxx
 - [ ] Es wird unterstützt, dass Masken in der application.mdi unterschiedliche Dateinamen und IDs haben (siehe #487)
 - [ ] Perspektiven können angeheftet werden und bleiben in der Leiste, wenn man sie schließt
 - [ ] Angeheftete und dann geschlossene Perspektiven können wieder geöffnet werden
+- [ ] Angeheftete Perspektiven werden persistiert
+- [ ] Die Reihenfolge der Perspektiven ist nach einem Neustart wieder gleich (zum Testen z.B.: normale, angeheftete und geschlossene, normale)
 
 ## Keybindings
 Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktionieren.
@@ -90,38 +92,8 @@ Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktio
 - [ ] F5: Index neu laden
 - [ ] F6: Detail Part auswählen
 
-
-# Tests für CTS VG Eibelstadt
-
-## Maske Anruf
-<img width="609" alt="Bildschirmfoto 2021-04-20 um 22 28 43" src="https://user-images.githubusercontent.com/20420898/115459842-cf48a180-a227-11eb-9e53-b3019d4a49d2.png">
-
-- [ ] Erfassung eines Anrufs mittels Eingabe einer neuen Testperson
-- [ ] Erfassung eines Anrufs mittels bereits existierender Testperson
-- [ ] Gleichzeitiges erfassen von Terminen, wenn es 2 Slots gibt (Keiner vorher belegt)
-- [ ] Gleichzeitiges erfassen von Terminen, wenn es 2 Slots gibt (Einer vorher belegt) -> Einer funktioniert, eine Fehlermeldung
-
-<img width="521" alt="Bildschirmfoto 2021-04-20 um 22 30 38" src="https://user-images.githubusercontent.com/20420898/115460118-28b0d080-a228-11eb-8a5e-cbffd428f36f.png">
-
-- [ ] Testtermin der einer Person zugeordnet wurde, darf keiner anderen Person zugeordnet werden (überschreiben) 
-(Zuordnung nehmen, und einer anderen Person zuordnen (Lookup))
-- [ ]  Daten einer zugeordneten Testperson sollen geändert werden.  Zugeordneter Termin bleibt bestehen
-(Die Angaben der Testperson werden aktualisiert, aber der Termin bleibt bestehen)
-
-## Maske Testperson
-- [ ] Passwort wird nicht im Klartext angezeigt
-- [ ] Passwort der Testperson kann nicht geändert werden
-- [ ] Passwort der Testperson kann zurückgesetzt werden
-
-## Maske Anmeldung
-<img width="550" alt="Bildschirmfoto 2021-04-20 um 21 02 17" src="https://user-images.githubusercontent.com/20420898/115450043-b803b700-a21b-11eb-91e9-8eca8d5a3ee8.png">
-
-### E-Mail Versand 
-- [ ] positives Testergebnis an Testperson
-- [ ] positives Testergebnis an Teststrecke
-- [ ] negatives Testergebnis an Testperson
-- [ ] negatives Testergebnis an Teststrecke
-
-### Detaildruck (Maske Anmeldung)
-- [ ] Funktioniert mit positiv
-- [ ] Funktioniert mit negativ
+## Preferences
+- [ ] Die Sprachauswahl zeigt nur unterstützte Sprachen an
+- [ ] Das angegebene Pattern für das Datum formatiert die Date- und DateTimeFields
+- [ ] Das angegebene Pattern für die Zeit formatiert die Time- und DateTimeFields
+- [ ] Wenn kein Pattern angegeben ist, wird der Standard verwendet (Test: Vorschlagsliste ist nicht leer)
