@@ -184,10 +184,8 @@
     <elements xsi:type="commands:KeyBinding" xmi:id="_YuQUQL_BEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.keybinding.detail.cr" keySequence="CR" command="__iku8L_AEeuboN5m_phYZw"/>
     <elements xsi:type="commands:KeyBinding" xmi:id="_Wxs5oN_OEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.m1d" keySequence="M1+D" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
     <elements xsi:type="commands:KeyBinding" xmi:id="_b7Z-YN_OEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.m1r" keySequence="M1+R" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
-    <elements xsi:type="commands:KeyBinding" xmi:id="_gG7IIN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1s" keySequence="SHIFT+M1+S" command="_laMxx7bdEeuZF8ZS2_h9rA"/>
-    <elements xsi:type="commands:KeyBinding" xmi:id="_W_JoUN_lEeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.keybinding.m1l" keySequence="M1+L" command="_laMxx7bdEeuZF8ZS2_h9rA">
-      <parameters xmi:id="_dapsIN_lEeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.parameter.loadsearchcriteria" value="LOAD_DEFAULT"/>
-    </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_gG7IIN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1s" keySequence="SHIFT+M1+S" command="_laMxr7bdEeuZF8ZS2_h9rA"/>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_W_JoUN_lEeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.keybinding.m1l" keySequence="M1+L" command="_laMxrrbdEeuZF8ZS2_h9rA"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_6zWJYLbxEeuZF8ZS2_h9rA" featurename="snippets" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="advanced:Perspective" xmi:id="_AjQSgLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.perspective.main" selectedElement="_CeFngLbyEeuZF8ZS2_h9rA" label="Snippet">
