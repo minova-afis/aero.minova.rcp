@@ -52,6 +52,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
@@ -118,6 +119,7 @@ public class SectionGrid {
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
 
+	private int prevHeight;
 	private static final int BUFFER = 31;
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
 	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
@@ -306,6 +308,7 @@ public class SectionGrid {
 		FormData fd = new FormData();
 		fd.width = DEFAULT_WIDTH;
 		fd.height = DEFAULT_HEIGHT;
+		prevHeight = fd.height;
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
@@ -368,18 +371,22 @@ public class SectionGrid {
 	public void adjustHeight() {
 		FormData fd = (FormData) natTable.getLayoutData();
 
-		int newHeight;
-		if (fd.height == DEFAULT_HEIGHT) {
-			// Maximal 10 Zeilen anzeigen
-			newHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
-			// Minimal 2 Zeilen anzeigen
-			newHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, newHeight);
-		} else {
-			newHeight = DEFAULT_HEIGHT;
+		// Maximal 10 Zeilen anzeigen
+		int optimalHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
+		// Minimal 2 Zeilen anzeigen
+		optimalHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, optimalHeight);
+
+		if (optimalHeight == prevHeight) {
+			optimalHeight = DEFAULT_HEIGHT;
 		}
 
-		fd.height = newHeight;
+		prevHeight = optimalHeight;
+		fd.height = optimalHeight;
 		natTable.requestLayout();
+
+		Point p = section.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		RowData rd = (RowData) section.getLayoutData();
+		rd.height = p.y;
 		section.requestLayout();
 	}
 
@@ -420,12 +427,10 @@ public class SectionGrid {
 				int index = grid.getField().indexOf(f);
 
 				// Entsprechenden Wert im Index finden
-				boolean found = false;
 				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
 					// Name muss übereinstimmen oder Feld muss SQL-Index 0 haben und Column ist KeyLong
 					if (indexColumns.get(i).getName().equals(f.getName())
 							|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
-						found = true;
 						r.setValue(new Value(indexRow.getValue(i).getValue()), index);
 					}
 				}
