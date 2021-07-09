@@ -46,9 +46,8 @@ public class CustomLocale {
 				}
 			}
 		}
-		Locale l = Locale.forLanguageTag("en");
-		if (l.getDisplayLanguage(l) != null && !languagesTags.contains(l.getDisplayLanguage(l))) {
-			languagesTags.add(l.getDisplayLanguage(l));
+		if (!languagesTags.contains("en")) {
+			languagesTags.add("en");
 		}
 		return languagesTags;
 	}
