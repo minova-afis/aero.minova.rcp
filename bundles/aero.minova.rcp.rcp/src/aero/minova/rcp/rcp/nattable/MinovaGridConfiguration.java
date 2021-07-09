@@ -20,6 +20,7 @@ import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ComboBoxPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -126,8 +127,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredLookupPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		} else {
-			ComboBoxPainter comboBoxCellPainter = new ComboBoxPainter();
-			configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, comboBoxCellPainter, DisplayMode.NORMAL, configLabel + columnIndex);
+			// Der ComboBoxPainter wird in einen PaddingDecorator gewrapped, damit links padding hinzugefügt werden kann
+			PaddingDecorator wrappedComboBoxCellPainter = new PaddingDecorator(new ComboBoxPainter(), 0, 0, 0, 2);
+			configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, wrappedComboBoxCellPainter, DisplayMode.NORMAL,
+					configLabel + columnIndex);
 		}
 	}
 
