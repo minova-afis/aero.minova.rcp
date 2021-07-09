@@ -46,6 +46,10 @@ public class CustomLocale {
 				}
 			}
 		}
+		Locale l = Locale.forLanguageTag("en");
+		if (l.getDisplayLanguage(l) != null && !languagesTags.contains(l.getDisplayLanguage(l))) {
+			languagesTags.add(l.getDisplayLanguage(l));
+		}
 		return languagesTags;
 	}
 
@@ -61,9 +65,9 @@ public class CustomLocale {
 			if (l.getDisplayLanguage(l) != null && !languages.contains(l.getDisplayLanguage(l))) {
 				languages.add(l.getDisplayLanguage(l));
 			}
-			
+
 		}
-		
+
 		Collator collator = Collator.getInstance(activeLocale);
 		Collections.sort(languages, collator);
 		return languages;
