@@ -81,6 +81,13 @@ public class OpenStundenerfassungsTest {
 		assertNotEquals(0, indexToolbar.size());
 		detailToolbar = detailPart.getToolbarButtons();
 		assertNotEquals(0, detailToolbar.size());
+
+//		try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	@Test
@@ -99,7 +106,7 @@ public class OpenStundenerfassungsTest {
 		searchNattable.click(2, 3);
 		searchToolbar.get(1).click();
 		try {
-			Thread.sleep(200);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {}
 		assertEquals(4, searchNattable.rowCount());
 		assertEquals("\"f-~-s-row1%\"", searchNattable.getCellDataValueByPosition(1, 3));
@@ -108,7 +115,7 @@ public class OpenStundenerfassungsTest {
 		// Suche zurücksetzten
 		searchToolbar.get(0).click();
 		try {
-			Thread.sleep(200);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {}
 		assertEquals(2, searchNattable.rowCount());
 
