@@ -1,26 +1,22 @@
 package aero.minova.rcp.rcp.nattable;
 
-import java.text.MessageFormat;
-
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
-import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
+
+import aero.minova.rcp.constants.Constants;
 
 public class RequiredValuePainter extends TextPainter {
 
 	@Override
-	protected Color getBackgroundColour(ILayerCell cell, IConfigRegistry configRegistry) {
-		try {
-			Object dataValue = cell.getDataValue();
-			if (dataValue == null || dataValue.equals("")) {
-				// #FCD267 Pflichtfeld, RGB = 252,210,103
-				return GUIHelper.getColor(252, 210, 103);
-			}
-		} catch (Exception e) {
-			System.out.println(MessageFormat.format("getBackgroundColour meldet: {0}", e.getMessage()));
+	public void paintCell(ILayerCell cell, GC gc, Rectangle bounds, IConfigRegistry configRegistry) {
+		Object dataValue = cell.getDataValue();
+		if (dataValue == null || dataValue.equals("")) {
+			// #FCD267 Pflichtfeld, RGB = 252,210,103
+			cell.getConfigLabels().addLabelOnTop(Constants.REQUIRED_CELL_LABEL);
 		}
-		return super.getBackgroundColour(cell, configRegistry);
+		super.paintCell(cell, gc, bounds, configRegistry);
 	}
 }

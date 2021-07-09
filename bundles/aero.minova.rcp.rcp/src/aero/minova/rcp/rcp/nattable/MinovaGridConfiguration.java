@@ -24,7 +24,9 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
@@ -58,6 +60,12 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	@Override
 	public void configureRegistry(IConfigRegistry configRegistry) {
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.ALWAYS_EDITABLE);
+
+		// RequiredValue Style
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.getColor(252, 210, 103));
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, Constants.REQUIRED_CELL_LABEL);
+
 		configureCells(configRegistry);
 	}
 

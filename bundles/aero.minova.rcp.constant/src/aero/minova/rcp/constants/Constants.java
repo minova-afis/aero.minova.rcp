@@ -86,9 +86,9 @@ public class Constants {
 	// SeachCriteria
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
-	// Column Label für eigene Sortierung
-	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL";
-	public static final String REQUIRED_CELL_LABEL = "requiredCell";
+	// NatTable Label
+	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
+	public static final String REQUIRED_CELL_LABEL = "REQUIRED_CELL";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";
