@@ -63,13 +63,17 @@ Getestet mit Server xxxxxx
 - [ ] Änderungen können verworfen werden
 - [ ] Die Breite der Anwendung kann optimiert werden
 
-## Traverselistener
+## Traverse Verhalten
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
 - [ ] Tab selektiert alle Controls (Toolbar, Section usw.) (Wenn SelectAllControls gesetzt ist)
+- [ ] Ctrl + Tab in einem Beschreibung-/ Textfeld bewirken ein Tabstop
+- [ ] Tab verlässt nie den Part
 - [ ] Enter selektiert das **nächste leere** Pflichtfeld (Wenn EnterSelectsFirstRequired **nicht** gesetzt ist)
 - [ ] Enter selektiert das **erste leere** Pflichtfeld (Wenn EnterSelectsFirstRequired gesetzt ist)
 - [ ] Bei Enter in einer Auswahlbox bleibt man im **selben** Feld (Wenn LookupEnterSelectsNextRequired **nicht** gesetzt ist)
 - [ ] Enter in einer Auswahlbox selektiert das **nächste leere**  Pflichtfeld (Wenn LookupEnterSelectsNextRequired gesetzt ist, EnterSelectsFirstRequired ist egal)
+- [ ] Enter öffnet geschlossene Section, wenn ein Pflichtfeld darin selektiert wird
+- [ ] Ctrl + Enter in einem Beschreibung- / TextFeld bewirkt einen Zeilenumbruch
 
 ## PerspectiveSwitcher
 - [ ] Die Perspektive kann über das Menü oben geändert werden
