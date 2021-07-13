@@ -106,7 +106,7 @@ Für Windows gilt folgendes spezifisches Verhalten:
 
 == Key-Bindings
 
-*Key-Bindings Perspektiven*
+*Key-Bindings Window*
 |===
 | *Eingabe* | *Verhalten*
 | F1 | Help
@@ -114,6 +114,7 @@ Für Windows gilt folgendes spezifisches Verhalten:
 | F4 | Die erste Zelle im SearchPart wird selektiert
 | F5 | Der IndexPart wird aktualisiert
 | F6 | Das erste Feld im DetailPart wird selektiert
+| M1 + Q | Anwendung schließen
 |===
 
 *Key-Bindings DetailPart*
@@ -123,29 +124,26 @@ Für Windows gilt folgendes spezifisches Verhalten:
 | M1 + S | Speichern des aktuellen Datensatzes
 | M1 + N | Detail leeren
 | M1 + Z | Setzt die letzte Änderung im TexFeld zurück
-| M1 + Q | Bearbeitung beenden
+| M1 + R | Optimieren (Resize)
+|===
+
+*Key-Bindings Grid im DetailPart*
+|===
+| *Eingabe* | *Verhalten*
+| CTRL + M1 + N | Neue Zeile
+| CTRL + M1 + D | Zeile löschen
+| CTRL + M1 + H | Optimieren horizontal
+| CTRL + M1 + V | Optimieren vertical
 |===
 
 *Key-Bindings SearchPart*
 |===
 | *Eingabe* | *Verhalten*
-| M1 + R | Zurücksetzen (Reset)
+| M1 + N | Zurücksetzen der Suche (Reset)
 | M1 + D | Zeile löschen (Delete)
 | M1 + S | Suchkriterien speichern (Save)
 | M1 + L | Suchkriterien laden (Load)
-| SHIFT + M1 + R | Optimieren (Resize)
+| M1 + R | Optimieren (Resize)
 |===
 
-=== Key-Bindings Part spezifisch machen
-
-Folgendes muss beachtet werden, um Key-Bindings einem oder mehreren bestimmten Parts zuzuweisen:
-
-*Ein Part*
-
-- Der Handler soll in der Liste der Handler im jeweiligen Part sein.
-- Der Handler muss eine CanExecute Methode enthalten, die true zurückliefert, wenn man sich im gewünschten Part befindet.
-
-*Mehrere Parts*
-
-- Der Handler muss eine CanExecute Methode enthalten, die true zurückliefert, wenn man sich in einem der gewünschten Parts befindet.
 
