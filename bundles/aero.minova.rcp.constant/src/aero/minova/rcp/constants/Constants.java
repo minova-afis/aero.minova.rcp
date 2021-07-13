@@ -94,10 +94,19 @@ public class Constants {
 	 */
 
 	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
-
 	public static final String FORM_ID = "aero.minova.rcp.perspectiveswitcher.parameters.formId"; //$NON-NLS-1$
-
 	public static final String FORM_LABEL = "aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel"; //$NON-NLS-1$
+
+	public static final String PERSPECTIVE_TOOLBAR = "perspectivetoolbar";
+	public static final String PREFERENCES_KEPTPERSPECTIVES = "aero.minova.rcp.preferences.keptperspectives";
+	public static final String PREFERENCES_TOOLBARORDER = "aero.minova.rcp.preferences.toolbarorder";
+
+	public static final String KEPT_PERSPECTIVE_FORMNAME = ".FormName";
+	public static final String KEPT_PERSPECTIVE_FORMID = ".FormId";
+	public static final String KEPT_PERSPECTIVE_FORMLABEL = ".FormLabel";
+	public static final String KEPT_PERSPECTIVE_ICONURI = ".IconURI";
+	public static final String KEPT_PERSPECTIVE_LOCALIZEDLABEL = ".LocalizedLabel";
+	public static final String KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP = ".LocalizedToolTip";
 
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden

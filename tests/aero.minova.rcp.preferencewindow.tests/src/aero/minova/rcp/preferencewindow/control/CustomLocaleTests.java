@@ -4,6 +4,7 @@ import static aero.minova.rcp.preferencewindow.control.CustomLocale.getLocales;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 public class CustomLocaleTests {
 
+	
 	@Test
 	public void testGetLocales() {
 		Locale list[] = getLocales();
@@ -20,8 +22,13 @@ public class CustomLocaleTests {
 
 	@Test
 	public void testGetLanguageForCountry() {
-		List<String> languages = CustomLocale.getLanguages(Locale.GERMAN);
+		List<String> languageTags = new ArrayList<>();
+		languageTags.add("de");
+		languageTags.add("fr");
+		languageTags.add("it");
+		List<String> languages = CustomLocale.getLanguages(Locale.GERMAN, languageTags );
 		assertNotNull(languages);
 	}
+	
 
 }
