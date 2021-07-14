@@ -24,6 +24,7 @@ Da das Tab-Verhalten durch Eclipse vorgegeben ist, müssen wir nur noch die Tab-
 
 - Dabei werden in den Sections nur die Felder in die Tab Liste hinzugefügt, die nicht Read Only sind.
 - Wenn die Preference SelectAllControls gesetzt ist werden die Controls des Detail Parts ebenfalls der Tab-Reihenfolge hinzugefügt. Dies ermöglicht die Selektion der Toolbar und der Sections.
+- Bei einem Grid selektiert Tab nur das erste Feld und springt danach ins nächste Element (Control/Field). Tab selektiert nicht die nächste Zelle aus der Tabelle. Innerhalb der Tabelle muss mit den Pfeiltasten navigiert werden.
 
 Verhalten für die Eingabe von Tab:
 
@@ -47,6 +48,7 @@ Die Eingabe von Enter wird mit einem Key-Binding im DetailPart erkannt und führ
 - Wenn ein Feld gefunden wurde wird es fokussiert. Falls kein gefunden wurde, beleibt der Benutzer im gleichen Feld.
 - Nach der Ermittlung wird geprüft, ob der SaveDetailHandler enabled ist.
 - Bei True wird dieser direkt ausgeführt. Bei False wird nichts gemacht.
+- Bei einem Grid selektiert Enter das erste leere Pflichtfeld. Für Lookupvalues innerhalb der Tabelle gilt das Standardverhalten bei Lookups. 
 
 Festgelegtes Verhalten für die Eingabe von Enter:
 
@@ -106,7 +108,9 @@ Für Windows gilt folgendes spezifisches Verhalten:
 
 == Key-Bindings
 
-*Key-Bindings Window*
+Die KeyBindings sind so gelegt, dass das selbe Verhalten gewährleistet ist, wie bei der Bedienung der Toolbar mit Maus.
+
+=== Key-Bindings Window
 |===
 | *Eingabe* | *Verhalten*
 | F1 | Help
@@ -115,19 +119,19 @@ Für Windows gilt folgendes spezifisches Verhalten:
 | F5 | Der IndexPart wird aktualisiert
 | F6 | Das erste Feld im DetailPart wird selektiert
 | M1 + Q | Anwendung schließen
-|===
-
-*Key-Bindings DetailPart*
-|===
-| *Eingabe* | *Verhalten*
-| CR | Nächstes Pflichtfeld wird selektiert oder es wird gespeichert
-| M1 + S | Speichern des aktuellen Datensatzes
-| M1 + N | Detail leeren
-| M1 + Z | Setzt die letzte Änderung im TexFeld zurück
 | M1 + R | Optimieren (Resize)
 |===
 
-*Key-Bindings Grid im DetailPart*
+=== Key-Bindings DetailPart
+|===
+| *Eingabe* | *Verhalten*
+| CR | Nächstes leeres Pflichtfeld wird selektiert oder es wird gespeichert
+| M1 + S | Speichern des aktuellen Datensatzes
+| M1 + N | Detail leeren
+| M1 + Z | Setzt die letzte Änderung im TexFeld zurück
+|===
+
+==== Key-Bindings Grid im DetailPart
 |===
 | *Eingabe* | *Verhalten*
 | CTRL + M1 + N | Neue Zeile
@@ -136,14 +140,33 @@ Für Windows gilt folgendes spezifisches Verhalten:
 | CTRL + M1 + V | Optimieren vertical
 |===
 
-*Key-Bindings SearchPart*
+=== Key-Bindings SearchPart
 |===
 | *Eingabe* | *Verhalten*
-| M1 + N | Zurücksetzen der Suche (Reset)
-| M1 + D | Zeile löschen (Delete)
-| M1 + S | Suchkriterien speichern (Save)
-| M1 + L | Suchkriterien laden (Load)
-| M1 + R | Optimieren (Resize)
+| M1 + N | Alle Einträge aus den Suchzeilen werden gelöscht. Es werden alle Zeilen bis auf eine entfernt.
+| M1 + D | Selektierte Zeile löschen (Delete)
+| M1 + S | Default Suchkriterien speichern (Save)
+| SHIFT + M1 + S | Suchkriterien speichern unter <Bezeichnung>
+| SHIFT + M1 + D | Löschen von gespeicherten Suchkriterien
+| M1 + L | Default Suchkriterien laden (Load)
+| SHIFT + M1 + H | Optimieren (Resize Horizontal)
 |===
 
+Beim Speichern der Suchkriterien im SearchPart wird zwischen Speichern und Speichern unter unterschieden. Dabei speichert das normale Speichern nur 
+das Default und überschreibt dieses und Speichern unter ermöglicht das speichern unter einer anderen Bezeichnung.
+
+*Beispiel für KeyBinding M1+S und SHIFT+M1+S:*
+
+Benutzer gibt Suchkriterien ein, betätigt SHIFT+M1+S und speichert diese unter der Bezeichnung "Wochenstunden".
+
+Später lädt er diese Suchkriterien und bearbeitet Sie. Dabei speichert er sie diesmal mit M1+S. Dabei überschreibt er nicht die Suchkriterien mit der
+Bezeichnung "Wochenstunden", sondern die Default Suchkriterien.
+
+Um die bearbeiteten Suchkriterien wieder unter "Wochenstunden" zu speichern, betätigt der Benutzer SHIFT+M1+S und gibt "Wochenstunden" wieder als Bezeichnung an.
+Über der Eingabe ändert sich der Text zu "Sucheinstellung besteht und wird überschrieben". Dies weist daraufhin, dass es schon ein Suchkriterium mit der Bezichnung 
+exestiert und dieses überschrieben wird.
+
+image::images/searchcriteriaexists.png[Aktivierung der Button Selektion unter Mac,550,300]
+
+Sobald der Benutzer die Eingabe bstätigt, werden die neuen Suchkriterien unter "Wochenstunden" überschrieben.
 
