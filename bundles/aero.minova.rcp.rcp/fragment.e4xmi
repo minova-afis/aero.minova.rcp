@@ -356,7 +356,7 @@
       <bindings xmi:id="_y3XggOPDEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1s" keySequence="SHIFT+M1+S" command="_iXCk8OPHEeuITvUQkIW3uw"/>
       <bindings xmi:id="_Gg2hMOPHEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1d" keySequence="SHIFT+M1+D" command="_IrhzUORnEeut7PgjqycMIw"/>
       <bindings xmi:id="_W_JoUN_lEeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.keybinding.m1l" keySequence="M1+L" command="_laMxrrbdEeuZF8ZS2_h9rA"/>
-      <bindings xmi:id="_0fxQkN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.shiftm1r" keySequence="M1+R" command="_laMxubbdEeuZF8ZS2_h9rA"/>
+      <bindings xmi:id="_0fxQkN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.shiftm1r" keySequence="SHIFT+M1+H" command="_laMxubbdEeuZF8ZS2_h9rA"/>
     </elements>
     <elements xsi:type="commands:BindingTable" xmi:id="_WdJbEOOhEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.bindingtable.parts.indexpart" bindingContext="_uvkSkOOgEeuITvUQkIW3uw"/>
   </fragments>
