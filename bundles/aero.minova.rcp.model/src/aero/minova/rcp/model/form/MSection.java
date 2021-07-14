@@ -22,6 +22,7 @@ public class MSection {
 	private String label;
 	// Symbol für diese Page
 	private Image icon;
+
 	private Section section;
 
 	private Control control;
@@ -116,7 +117,7 @@ public class MSection {
 
 	/**
 	 * Liefert das org.eclipse.ui.forms.widgets.Section Element zurück.
-	 * 
+	 *
 	 * @return section
 	 */
 	public Section getSection() {

@@ -18,6 +18,11 @@ public class Column {
 	String label;
 	Integer decimals;
 	DateTimeType dateTimeType;
+	boolean readOnly;
+	boolean required;
+	boolean isLookup;
+	String lookupTable;
+	KeyType keyType;
 
 	@Override
 	public String toString() {
@@ -54,6 +59,46 @@ public class Column {
 
 	public void setDateTimeType(DateTimeType dateTimeType) {
 		this.dateTimeType = dateTimeType;
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	public boolean isLookup() {
+		return isLookup;
+	}
+
+	public void setLookup(boolean isLookup) {
+		this.isLookup = isLookup;
+	}
+
+	public String getLookupTable() {
+		return lookupTable;
+	}
+
+	public void setLookupTable(String lookupTable) {
+		this.lookupTable = lookupTable;
+	}
+
+	public KeyType getKeyType() {
+		return keyType;
+	}
+
+	public void setKeyType(KeyType keyType) {
+		this.keyType = keyType;
 	}
 
 }

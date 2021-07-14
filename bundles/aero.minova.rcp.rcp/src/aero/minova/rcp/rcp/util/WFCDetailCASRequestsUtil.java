@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -44,7 +45,9 @@ import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -55,14 +58,17 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
+import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
+import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -114,13 +120,12 @@ public class WFCDetailCASRequestsUtil {
 
 	private MDetail detail;
 
-	private MPerspective perspective = null;
-
-	private Map<String, Integer> lookups = new HashMap<>();
+	private MPerspective perspective;
 
 	private List<ArrayList> keys = null;
 
-	private Table selectedTable = null;
+	private Table selectedTable;
+	private HashMap<String, Table> selectedGrids;
 
 	@Inject
 	private Form form;
@@ -136,6 +141,7 @@ public class WFCDetailCASRequestsUtil {
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
 		this.detail = detail;
 		this.perspective = perspective;
+		this.selectedGrids = new HashMap<>();
 
 		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
 		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
@@ -204,6 +210,44 @@ public class WFCDetailCASRequestsUtil {
 				selectedTable = t.getOutputParameters();
 				updateSelectedEntry();
 			}));
+
+			for (MGrid g : detail.getGrids()) {
+				Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
+				RowBuilder gridRowBuilder = RowBuilder.newRow();
+				Grid grid = g.getGrid();
+				for (Field f : grid.getField()) {
+					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+						aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
+						gridRequestTable.addColumn(column);
+
+						// Entsprechenden Wert im Index finden
+						boolean found = false;
+						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+							if (indexColumns.get(i).getName().equals(f.getName())
+									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+								found = true;
+								gridRowBuilder.withValue(row.getValue(i).getValue());
+							}
+						}
+						if (!found) {
+							gridRowBuilder.withValue(null);
+						}
+					}
+				}
+				Row gridRow = gridRowBuilder.create();
+				gridRequestTable.addRow(gridRow);
+
+				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
+				gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+					if (t != null) {
+						Table result = t.getResultSet();
+						if (result.getName().equals(g.getDataTable().getName())) {
+							selectedGrids.put(result.getName(), result);
+							updateSelectedGrids();
+						}
+					}
+				}));
+			}
 		}
 	}
 
@@ -224,9 +268,22 @@ public class WFCDetailCASRequestsUtil {
 					}
 				}
 			}
-
 		}
+		updateSelectedGrids();
+	}
 
+	public void updateSelectedGrids() {
+		for (Entry<String, Table> gridEntry : selectedGrids.entrySet()) {
+			for (MGrid mGrid : detail.getGrids()) {
+				if (mGrid.getDataTable().getName().equals(gridEntry.getKey())) {
+					GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
+					SectionGrid sectionGrid = gVA.getSectionGrid();
+					sectionGrid.setDataTable(gridEntry.getValue());
+					sectionGrid.clearDataChanges();
+					sectionGrid.enableInsert(true);
+				}
+			}
+		}
 	}
 
 	/**
@@ -240,7 +297,6 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			Table formTable = null;
 			RowBuilder rb = RowBuilder.newRow();
-
 			if (getKeys() != null) {
 				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
 			} else {
@@ -258,27 +314,67 @@ public class WFCDetailCASRequestsUtil {
 					rb.withValue(null);
 					valuePosition++;
 				}
-
 			}
 			while (valuePosition < formTable.getColumnCount()) {
 				MField field = detail.getField(formTable.getColumnName(valuePosition));
-//				if (field instanceof MLookupField) {
-//					MLookupField mlookup = (MLookupField) field;
-//					Value lookupValue = new Value(mlookup.getKeyLong());
-//					rb.withValue(lookupValue);
-//				}else {
 				if (field != null) {
 					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
 				}
-//				}
 				valuePosition++;
 			}
 
-			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden
-			// Row-Wertes ermittelt und der Row angefügt
+			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden Row-Wertes ermittelt und der Row angefügt
 			Row r = rb.create();
 			formTable.addRow(r);
 			sendSaveRequest(formTable);
+
+			// Zeilen in Grids löschen, speichern und updaten
+			for (MGrid g : detail.getGrids()) {
+				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+				sg.closeEditor();
+
+				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+				Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
+				Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.UPDATE_REQUEST + g.getProcedureSuffix()).create();
+
+				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+					gridDeleteTable.addColumn(c);
+					gridInsertTable.addColumn(c);
+					gridUpdateTable.addColumn(c);
+				}
+
+				for (Row row : sg.getRowsToDelete()) {
+					gridDeleteTable.addRow(row);
+				}
+				for (Row row : sg.getRowsToInsert()) {
+					gridInsertTable.addRow(row);
+				}
+				for (Row row : sg.getRowsToUpdate()) {
+					gridUpdateTable.addRow(row);
+				}
+
+				if (!gridDeleteTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+
+				if (!gridInsertTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridInsertTable.getName(), gridInsertTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+
+				if (!gridUpdateTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridUpdateTable.getName(), gridUpdateTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+			}
 		}
 	}
 
@@ -466,11 +562,34 @@ public class WFCDetailCASRequestsUtil {
 					}
 				}));
 			}
+
+			// In allen Grids alle Zeilen löschen
+			for (MGrid g : detail.getGrids()) {
+				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+				sg.closeEditor();
+
+				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+					gridDeleteTable.addColumn(c);
+				}
+
+				for (Row row : sg.getDataTable().getRows()) {
+					gridDeleteTable.addRow(row);
+				}
+
+				if (!gridDeleteTable.getRows().isEmpty()) {
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+					gridFuture.thenAccept(resTable -> sync.asyncExec(() -> {
+						// TODO: entsprechend reagieren
+					}));
+				}
+			}
 		}
 	}
 
 	/**
-	 * Versnedet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
+	 * Versendet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
 	 *
 	 * @param ticketvalue
 	 */
@@ -644,6 +763,15 @@ public class WFCDetailCASRequestsUtil {
 				((MLookupField) f).setOptions(null);
 			}
 		}
+
+		for (MGrid g : detail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.clearGrid();
+			sg.enableInsert(false);
+		}
+
+		selectedTable = null;
+		selectedGrids.clear();
 	}
 
 	/**

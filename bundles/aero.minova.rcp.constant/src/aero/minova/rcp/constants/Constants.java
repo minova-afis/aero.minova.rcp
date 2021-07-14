@@ -20,8 +20,14 @@ public class Constants {
 	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
 	public static final String CONTROL_ID = "id";
-	public static final String CONTROL_WIZARD = "wizard";
 	public static final String CONTROL_MDETAIL = "mDetail";
+	public static final String CONTROL_WIZARD = "wizard";
+	public static final String CONTROL_GRID_BUTTON_ID = "grid_button_id";
+	public static final String CONTROL_GRID_BUTTON_INSERT = "grid_button_insert";
+	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
+	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
+	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
+	public static final String CONTROL_GRID_PROCEDURE_SUFFIX = "grid_procedure_suffix";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
@@ -80,8 +86,9 @@ public class Constants {
 	// SeachCriteria
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 
-	// Column Label für eigene Sortierung
-	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL";
+	// NatTable Label
+	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
+	public static final String REQUIRED_CELL_LABEL = "REQUIRED_CELL";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";
