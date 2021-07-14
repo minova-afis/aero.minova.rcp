@@ -24,8 +24,7 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 	}
 
 	@Override
-	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context)
-			throws JsonParseException {
+	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
 		return deserialize(json.getAsString(), useUserValues);
 	}
 
@@ -41,6 +40,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			return new Value(Integer.parseInt(value));
 		case "d":
 			return new Value(Double.parseDouble(value));
+		case "m":
+			return new Value(Double.parseDouble(value), DataType.BIGDECIMAL);
 		case "s":
 			return new Value(value);
 		case "i":
@@ -60,6 +61,7 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 				return new FilterValue(operator, deserialize(v).getValue(), "");
 			}
 		default:
+			System.err.println("Value mit prefix " + typeString + " nicht bekannt");
 			break;
 		}
 		return null;

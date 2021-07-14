@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -44,6 +47,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.Event;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.util.ErrorObject;
@@ -81,6 +86,10 @@ public class PerspectiveControl {
 	ToolBar toolBar;
 	ToolItem shortcut;
 
+	Preferences prefsKeptPerspectives = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
+	Preferences prefsToolbarOrder = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_TOOLBARORDER);
+	List<String> openToolbarItems;
+
 	/*
 	 * Clear the Toolbar to prevent NullPointerExceptions
 	 */
@@ -115,16 +124,43 @@ public class PerspectiveControl {
 
 		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
-		// The perspectives currently open
-		List<MPerspective> perspectives = modelService.findElements(window, null, MPerspective.class);
-		for (MPerspective perspective : perspectives) {
-			if (perspective.isToBeRendered()) {
-				addPerspectiveShortcut(perspective);
+		List<String> oldToolbarOrder = readOldToolbarOrder();
+		openToolbarItems = new ArrayList<>();
+
+		// Perspektiven der vorherigen Session wiederherstellen
+		for (String id : oldToolbarOrder) {
+			if (id.isBlank()) {
+				continue;
 			}
-			if (perspective == modelService.getActivePerspective(window)) {
-				setSelectedElement(perspective);
+
+			// Perspektive war geöffnet
+			List<MPerspective> perspectives = modelService.findElements(window, id, MPerspective.class);
+			if (!perspectives.isEmpty()) {
+				MPerspective perspective = perspectives.get(0);
+				if (perspective.isToBeRendered()) {
+					addPerspectiveShortcut(perspective.getElementId(), //
+							perspective.getPersistedState().get(Constants.FORM_NAME), //
+							perspective.getLabel(), //
+							perspective.getIconURI(), //
+							perspective.getLocalizedLabel(), //
+							perspective.getLocalizedTooltip(), //
+							true);
+				}
+				if (perspective == modelService.getActivePerspective(window)) {
+					setSelectedElement(perspective);
+				}
+
+			} else { // Perspektive war angeheftet
+				addPerspectiveShortcut(id, //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
+						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
+						true);
 			}
 		}
+
 		translate(translationService);
 	}
 
@@ -144,9 +180,7 @@ public class PerspectiveControl {
 
 	private void translate() {
 		for (ToolItem item : toolBar.getItems()) {
-			List<MPerspective> perspectives = modelService.findElements(application, item.getData().toString(), MPerspective.class);
-			MPerspective perspective = perspectives.get(0);
-			String value = translationService.translate(perspective.getLocalizedLabel(), null);
+			String value = translationService.translate(item.getText(), null);
 			item.setText(value);
 		}
 		toolBar.pack(true);
@@ -166,14 +200,17 @@ public class PerspectiveControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	public void addPerspectiveShortcut(MPerspective perspective) {
-		@SuppressWarnings("unchecked")
-		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
+	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, String localizedLabel, String localizedTooltip,
+			boolean openAll) {
+		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
-		if (((keepit == null) || !keepit.contains(perspective.getElementId()))) {
+		if (keptPerspective.isBlank() || openAll) {
+			openToolbarItems.add(perspectiveId);
+			saveToolbarOrder();
+
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
-			shortcut.setData(perspective.getElementId());
-			ImageDescriptor descriptor = getIconFor(perspective.getIconURI());
+			shortcut.setData(perspectiveId);
+			ImageDescriptor descriptor = getIconFor(iconURI);
 
 			if (descriptor != null) {
 				Image icon = descriptor.createImage();
@@ -182,25 +219,23 @@ public class PerspectiveControl {
 
 			if (descriptor == null) {
 				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
-				shortcut.setText(perspective.getLocalizedLabel() != null ? perspective.getLocalizedLabel() : "");
+				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
-			shortcut.setToolTipText(perspective.getLocalizedTooltip());
-
+			shortcut.setToolTipText(localizedTooltip);
 			shortcut.addSelectionListener(new SelectionAdapter() {
-
 				@Override
 				public void widgetSelected(SelectionEvent event) {
 					Map<String, String> parameter = Map.of(//
-							Constants.FORM_NAME, perspective.getPersistedState().get(Constants.FORM_NAME), //
-							Constants.FORM_ID, perspective.getElementId(), //
-							Constants.FORM_LABEL, perspective.getLabel());
+							Constants.FORM_NAME, formName, //
+							Constants.FORM_ID, perspectiveId, //
+							Constants.FORM_LABEL, formLable);
 
 					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.openform", parameter);
 					handlerService.executeHandler(command);
 				}
 			});
 		} else {
-			shortcut = getToolItemFor(perspective.getElementId());
+			shortcut = getToolItemFor(perspectiveId);
 		}
 	}
 
@@ -220,7 +255,6 @@ public class PerspectiveControl {
 		}
 
 		new MenuItem(menu, SWT.SEPARATOR);
-
 		addKeepItMenuItem(menu, perspectiveId, perspective);
 
 		Rectangle bounds = item.getBounds();
@@ -239,7 +273,6 @@ public class PerspectiveControl {
 				toolBar.getDisplay().asyncExec(menu::dispose);
 			}
 		});
-
 	}
 
 	ToolItem getToolItemFor(String perspectiveId) {
@@ -254,7 +287,6 @@ public class PerspectiveControl {
 		}
 
 		return toolItem;
-
 	}
 
 	private void disposeToolBarImages() {
@@ -281,21 +313,20 @@ public class PerspectiveControl {
 	}
 
 	public void removePerspectiveShortcut(MPerspective perspective) {
-		@SuppressWarnings("unchecked")
-		List<String> keepit = (List<String>) application.getContext().get("perspectivetoolbar");
-
-		if (keepit == null || !keepit.contains(perspective.getElementId())) {
+		String keptPerspective = prefsKeptPerspectives.get(perspective.getElementId() + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
+		if (keptPerspective.isBlank()) {
 			ToolItem item = getToolItemFor(perspective.getElementId());
 			removeToolItem(item);
 		}
-		// update the layout
-
 	}
 
 	private void removeToolItem(ToolItem item) {
 		if (item == null || item.isDisposed()) {
 			return;
 		}
+
+		openToolbarItems.remove(item.getData());
+		saveToolbarOrder();
 
 		Image icon = item.getImage();
 		if (icon != null) {
@@ -304,6 +335,30 @@ public class PerspectiveControl {
 		}
 
 		item.dispose();
+	}
+
+	private void saveToolbarOrder() {
+		StringBuilder list = new StringBuilder();
+
+		for (String s : openToolbarItems) {
+			if (!s.isBlank()) {
+				list.append(s + ",");
+			}
+		}
+
+		prefsToolbarOrder.put("order", list.toString());
+		try {
+			prefsToolbarOrder.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private List<String> readOldToolbarOrder() {
+		ArrayList<String> oldToolbarOrder = new ArrayList<>();
+		String orderString = prefsToolbarOrder.get("order", "");
+		oldToolbarOrder.addAll(Arrays.asList(orderString.split(",")));
+		return oldToolbarOrder;
 	}
 
 	//////////////////////////////////
@@ -325,10 +380,9 @@ public class PerspectiveControl {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addKeepItMenuItem(Menu menu, String perspectiveId, MPerspective perspective) {
 		final MenuItem menuItem = new MenuItem(menu, SWT.CHECK);
-		final List<String> keepItToolitems = (List<String>) application.getContext().get("perspectivetoolbar");
+		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		menuItem.setText(translationService.translate("@Action.KeepIt", null));
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -338,15 +392,16 @@ public class PerspectiveControl {
 				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.keepperspectivecommand", parameter);
 				handlerService.executeHandler(command);
 
-				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt
-				// Kennzeichen gelöscht wird.
-				if (((keepItToolitems == null) || !keepItToolitems.contains(perspectiveId)) && perspective == null) {
+				String newKeptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
+
+				// Entfernt das Toolitem wenn die Perspektive geschlossen ist und das KeepIt Kennzeichen gelöscht wird.
+				if (newKeptPerspective.isBlank() && perspective == null) {
 					ToolItem toolitem = getToolItemFor(perspectiveId);
 					removeToolItem(toolitem);
 				}
 			}
 		});
-		menuItem.setSelection(keepItToolitems != null && keepItToolitems.contains(perspectiveId));
+		menuItem.setSelection(!keptPerspective.isBlank());
 	}
 
 	@Inject
@@ -416,7 +471,13 @@ public class PerspectiveControl {
 					continue;
 				}
 
-				this.addPerspectiveShortcut(added);
+				this.addPerspectiveShortcut(added.getElementId(), //
+						added.getPersistedState().get(Constants.FORM_NAME), //
+						added.getLabel(), //
+						added.getIconURI(), //
+						added.getLocalizedLabel(), //
+						added.getLocalizedTooltip(), //
+						false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {

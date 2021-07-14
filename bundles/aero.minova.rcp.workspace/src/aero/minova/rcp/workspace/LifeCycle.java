@@ -52,6 +52,7 @@ public class LifeCycle {
 		String argPW = null;// "rqgzxTf71EAx8chvchMi";
 		String argURL = null;// "http://publictest.minova.com:17280/cas";
 
+		boolean deletePrefs = false;
 		for (String string : applicationArgs) {
 			if (string.startsWith("-user")) {
 				argUser = string.substring(string.indexOf("=") + 1);
@@ -61,6 +62,9 @@ public class LifeCycle {
 			}
 			if (string.startsWith("-url")) {
 				argURL = string.substring(string.indexOf("=") + 1);
+			}
+			if (string.startsWith("-clearPersistedState")) {
+				deletePrefs = true;
 			}
 		}
 
@@ -102,6 +106,9 @@ public class LifeCycle {
 				workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 			}
 			checkModelVersion(workspaceLocation);
+			if (deletePrefs) {
+				deleteCustomPrefs(workspaceLocation);
+			}
 		}
 
 		Manager manager = new Manager();
@@ -130,10 +137,28 @@ public class LifeCycle {
 				// neue Versionsnummer schreiben
 				Files.writeString(resolve, modelVersionPlugin);
 				Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
+				deleteCustomPrefs(workspaceLocation);
 				showUserDialog();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	/**
+	 * Wir löschen auch die Einstellungen, die für das persistieren der angehefteten Toolbars zuständig sind, da es sonst bei -clearPersistedState und einer
+	 * Änderung der ModelVersion Probleme gibt (Siehe Issue #703)
+	 * 
+	 * @param workspaceLocation
+	 */
+	private void deleteCustomPrefs(URI workspaceLocation) {
+		try {
+			Files.deleteIfExists(Path.of(workspaceLocation)
+					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.keptperspectives.prefs"));
+			Files.deleteIfExists(
+					Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.toolbarorder.prefs"));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

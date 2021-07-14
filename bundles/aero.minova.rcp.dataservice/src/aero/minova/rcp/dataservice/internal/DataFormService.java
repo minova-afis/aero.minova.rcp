@@ -1,6 +1,7 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -24,10 +25,12 @@ import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
+import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.util.ErrorObject;
@@ -108,7 +111,7 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public List<Field> getFieldsFromForm(Form form) {
 		List<Field> allFields = new ArrayList<>();
-		for (Object o : form.getDetail().getHeadAndPage()) {
+		for (Object o : form.getDetail().getHeadAndPageAndGrid()) {
 			if (o instanceof Head) {
 				Head head = (Head) o;
 				List<Object> fields = head.getFieldOrGrid();
@@ -125,9 +128,7 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public List<Field> getAllPrimaryFieldsFromForm(Form form) {
 		List<Field> keyFields = new ArrayList<>();
-		List<Field> allFields = new ArrayList<>();
-		allFields = getFieldsFromForm(form);
-		for (Field f : allFields) {
+		for (Field f : getFieldsFromForm(form)) {
 			if ("primary".equals(f.getKeyType())) {
 				keyFields.add(f);
 			}
@@ -148,11 +149,12 @@ public class DataFormService implements IDataFormService {
 		return fields;
 	}
 
+	@Override
 	public aero.minova.rcp.model.Column createColumnFromField(Field f, String prefix) {
 		DataType type = null;
 		DateTimeType dateTimeType = null;
 		Integer decimals = null;
-		if (f.getPercentage() != null || f.getMoney() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
+		if (f.getPercentage() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
 			if (f.getNumber() != null) {
 				decimals = f.getNumber().getDecimals();
@@ -163,6 +165,8 @@ public class DataFormService implements IDataFormService {
 			}
 		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
+		} else if (f.getMoney() != null) {
+			type = DataType.BIGDECIMAL;
 		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
 		} else if (f.getText() != null) {
@@ -188,9 +192,31 @@ public class DataFormService implements IDataFormService {
 		c.setLabel(f.getLabel());
 		c.setDecimals(decimals);
 		c.setDateTimeType(dateTimeType);
+		c.setReadOnly(f.isReadOnly());
+		c.setRequired(f.isRequired());
+		c.setKeyType(Arrays.stream(KeyType.values()).filter(e -> e.name().equalsIgnoreCase(f.getKeyType())).findAny().orElse(null));
+		c.setLookup(f.getLookup() != null);
+		if (f.getLookup() != null) {
+			c.setLookupTable(f.getLookup().getTable());
+		}
 
 		return c;
 
+	}
+
+	@Override
+	/**
+	 * Erstellt eine Table aus dem übergenen Grid
+	 */
+	public Table getTableFromGrid(Grid grid) {
+		Table dataTable = new Table();
+		String prefix = "Read";
+		String tablename = grid.getProcedurePrefix() + prefix + grid.getProcedureSuffix();
+		dataTable.setName(tablename);
+		for (Field f : grid.getField()) {
+			dataTable.addColumn(createColumnFromField(f, prefix));
+		}
+		return dataTable;
 	}
 
 	/**
@@ -259,5 +285,4 @@ public class DataFormService implements IDataFormService {
 		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
 		eventAdmin.postEvent(event);
 	}
-
 }

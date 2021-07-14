@@ -37,6 +37,9 @@ public abstract class WFCFormPart {
 				logger.error("Server konnte " + formName + " nicht laden!");
 				return null;
 			}
+
+			// Form in den Context injected, damit überall darauf zugegriffen werden kann
+			perspective.getContext().set(Form.class, form);
 		}
 		return form;
 	}

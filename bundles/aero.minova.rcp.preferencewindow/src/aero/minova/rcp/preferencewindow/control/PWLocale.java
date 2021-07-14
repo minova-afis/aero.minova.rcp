@@ -51,7 +51,7 @@ public class PWLocale extends CustomPWWidget {
 		this.translationService = translationService;
 		Locale l = context.get(Locale.class);
 		if (l == null) l = Locale.getDefault();
-		dataL = CustomLocale.getLanguages(l, dataService);
+		dataL = CustomLocale.getLanguages(l, CustomLocale.getLanguageTagListOfi18n(dataService));
 	}
 
 	/**

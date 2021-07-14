@@ -45,6 +45,9 @@ public class MenuTest {
 
 	@Before
 	public void beforeClass() throws Exception {
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
 		bot = new SWTWorkbenchBot(getEclipseContext());
 		SWTBotPreferences.TIMEOUT = 30000;
 		this.translationService = getEclipseContext().get(TranslationService.class);
@@ -52,6 +55,9 @@ public class MenuTest {
 
 	@Test
 	public void openPreferencesAndTestMenu() {
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
 
 		// Einstellungen über Command öffnen
 		Display.getDefault().asyncExec(() -> {
@@ -131,8 +137,7 @@ public class MenuTest {
 	}
 
 	protected static IEclipseContext getEclipseContext() {
-		final IEclipseContext serviceContext = EclipseContextFactory
-				.getServiceContext(FrameworkUtil.getBundle(OpenStundenerfassungsTest.class).getBundleContext());
+		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(MenuTest.class).getBundleContext());
 		return serviceContext.get(IWorkbench.class).getApplication().getContext();
 	}
 

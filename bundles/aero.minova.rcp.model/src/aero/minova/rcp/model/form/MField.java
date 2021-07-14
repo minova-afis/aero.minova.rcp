@@ -21,7 +21,7 @@ public abstract class MField {
 	private ArrayList<ValueChangeListener> listeners;
 	private Value fieldValue;
 	private Value displayValue;
-	private ValueAccessor valueAccessor;
+	private IValueAccessor valueAccessor;
 	private String name;
 	private String label;
 	private String unitText;
@@ -45,6 +45,7 @@ public abstract class MField {
 	private String cssClass = Constants.CSS_STANDARD;
 	// Wenn canBeValid = false, dann ist das Feld aufgrund einer Berechnung auf falsch gesetzt
 	private boolean canBeValid = true;
+	private boolean primary = false;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -272,11 +273,11 @@ public abstract class MField {
 		return table -> setValue(table.getRows().get(0).getValue(sqlIndex), false);
 	}
 
-	public ValueAccessor getValueAccessor() {
+	public IValueAccessor getValueAccessor() {
 		return valueAccessor;
 	}
 
-	public void setValueAccessor(ValueAccessor valueAccessor) {
+	public void setValueAccessor(IValueAccessor valueAccessor) {
 		this.valueAccessor = valueAccessor;
 		updateCssClass(cssClass);
 		valueAccessor.setEditable(!readOnly);
@@ -383,5 +384,13 @@ public abstract class MField {
 
 	public void setCanBeValid(boolean canBeValid) {
 		this.canBeValid = canBeValid;
+	}
+
+	public boolean isPrimary() {
+		return primary;
+	}
+
+	public void setPrimary(boolean primary) {
+		this.primary = primary;
 	}
 }

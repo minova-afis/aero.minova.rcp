@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;sequence maxOccurs="unbounded"&gt;
  *         &lt;element name="head" type="{}head" minOccurs="0"/&gt;
  *         &lt;element name="page" type="{}page" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}grid" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="procedure-suffix" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="sp" /&gt;
@@ -70,15 +71,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "detail", propOrder = {
-    "headAndPage"
+    "headAndPageAndGrid"
 })
 public class Detail {
 
     @XmlElements({
         @XmlElement(name = "head", type = Head.class),
-        @XmlElement(name = "page", type = Page.class)
+        @XmlElement(name = "page", type = Page.class),
+        @XmlElement(name = "grid", type = Grid.class)
     })
-    protected List<Object> headAndPage;
+    protected List<Object> headAndPageAndGrid;
     @XmlAttribute(name = "procedure-suffix")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
@@ -129,18 +131,18 @@ public class Detail {
     protected java.lang.Boolean offline;
 
     /**
-     * Gets the value of the headAndPage property.
+     * Gets the value of the headAndPageAndGrid property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the headAndPage property.
+     * This is why there is not a <CODE>set</CODE> method for the headAndPageAndGrid property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getHeadAndPage().add(newItem);
+     *    getHeadAndPageAndGrid().add(newItem);
      * </pre>
      * 
      * 
@@ -148,14 +150,15 @@ public class Detail {
      * Objects of the following type(s) are allowed in the list
      * {@link Head }
      * {@link Page }
+     * {@link Grid }
      * 
      * 
      */
-    public List<Object> getHeadAndPage() {
-        if (headAndPage == null) {
-            headAndPage = new ArrayList<Object>();
+    public List<Object> getHeadAndPageAndGrid() {
+        if (headAndPageAndGrid == null) {
+            headAndPageAndGrid = new ArrayList<Object>();
         }
-        return this.headAndPage;
+        return this.headAndPageAndGrid;
     }
 
     /**

@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.parts;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,9 +99,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
-import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -143,8 +140,6 @@ public class WFCIndexPart extends WFCFormPart {
 	private BodyLayerStack<Row> bodyLayerStack;
 	private IEclipseContext context;
 
-	private Map<String, Field> fields = new HashMap<>();
-
 	@Inject
 	TranslationService translationService;
 
@@ -174,24 +169,9 @@ public class WFCIndexPart extends WFCFormPart {
 			return;
 		}
 
-		// perspective.getContext().set(Form.class, form); // Wir merken es uns im Context; so können andere es nutzen
-
 		data = dataFormService.getTableFromFormIndex(form);
 
 		parent.setLayout(new GridLayout());
-
-		for (Object headOrPage : form.getDetail().getHeadAndPage()) {
-			if (headOrPage instanceof Page) {
-				Page page = (Page) headOrPage;
-				for (Object fieldOrGrid : page.getFieldOrGrid()) {
-					if (fieldOrGrid instanceof Field) {
-						Field field = (Field) fieldOrGrid;
-						fields.put(field.getName(), field);
-					}
-				}
-
-			}
-		}
 
 		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);

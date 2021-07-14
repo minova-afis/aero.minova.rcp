@@ -4,6 +4,8 @@ import java.util.List;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
 
 public interface IDataFormService {
@@ -14,8 +16,12 @@ public interface IDataFormService {
 
 	Table getTableFromFormDetail(Form form, String prefix);
 
+	Table getTableFromGrid(Grid grid);
+
 	List<Field> getFieldsFromForm(Form form);
 
 	List<Field> getAllPrimaryFieldsFromForm(Form form);
+
+	Column createColumnFromField(Field f, String prefix);
 
 }
