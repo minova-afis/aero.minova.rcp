@@ -9,17 +9,8 @@ import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 public class NatTableUtil {
 
 	public static void resize(NatTable natTable) {
-		for (int i = 0; i < natTable.getColumnCount(); i++) {
-			InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(natTable, i, natTable.getConfigRegistry(),
-					new GCFactory(natTable));
-			natTable.doCommand(columnCommand);
-		}
-
-		for (int i = 0; i < natTable.getRowCount(); i++) {
-			InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable, i, natTable.getConfigRegistry(),
-					new GCFactory(natTable));
-			natTable.doCommand(rowCommand);
-		}
+		resizeColumns(natTable);
+		resizeRows(natTable);
 	}
 
 	public static void resizeRows(NatTable natTable) {
@@ -27,6 +18,14 @@ public class NatTableUtil {
 			InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable, i, natTable.getConfigRegistry(),
 					new GCFactory(natTable));
 			natTable.doCommand(rowCommand);
+		}
+	}
+
+	public static void resizeColumns(NatTable natTable) {
+		for (int i = 0; i < natTable.getColumnCount(); i++) {
+			InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(natTable, i, natTable.getConfigRegistry(),
+					new GCFactory(natTable));
+			natTable.doCommand(columnCommand);
 		}
 	}
 

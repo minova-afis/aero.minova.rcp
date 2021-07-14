@@ -22,9 +22,20 @@ public class LookupValue extends Value {
 		return keyText.compareTo(lv2.keyText);
 	}
 
+	public Integer getKeyLong() {
+		return keyLong;
+	}
+
+	public String getKeyText() {
+		return keyText;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
 	@Override
 	public String toString() {
 		return MessageFormat.format("LookupValue [type=INTEGER, value={0},{1},{2}]", keyLong, keyText, description);
 	}
 }
-

@@ -28,6 +28,8 @@ public interface IDataService {
 
 	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
 
+	CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable);
+
 	CompletableFuture<Path> getPDFAsync(String tableName, Table detailTable);
 
 	/**
@@ -45,6 +47,8 @@ public interface IDataService {
 	 * @return
 	 */
 	CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText);
+
+	CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache);
 
 	/**
 	 * Diese Methode liefert alle möglichen Werte für den angegebenen Filtertext.
@@ -94,4 +98,5 @@ public interface IDataService {
 	void setTimeoutOpenNotification(int timeoutOpenNotification);
 
 	void sendLogs();
+
 }

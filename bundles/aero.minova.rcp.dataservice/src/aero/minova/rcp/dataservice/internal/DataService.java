@@ -335,7 +335,60 @@ public class DataService implements IDataService {
 			}
 			return fromJson;
 		});
+	}
 
+	@Override
+	public CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable) {
+		return getGridDataAsync(tableName, detailTable, true);
+	}
+
+	public CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable, boolean showErrorMessage) {
+		String body = gson.toJson(detailTable);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+
+		log("CAS Request Grid Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "Grid Data", showErrorMessage);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer Grid Data:\n" + t.body());
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			if (fromJson.getReturnCode() == null) {
+				String errorMessage = null;
+				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+				Matcher m = fullError.matcher(t.body());
+				if (m.find()) {
+					errorMessage = m.group(0);
+				}
+				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+				errorMessage = cutError.matcher(errorMessage).replaceAll("");
+				errorMessage = errorMessage.replaceAll("\"", "");
+				Table error = new Table();
+				error.setName("Error");
+				error.addColumn(new Column("Message", DataType.STRING));
+				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
+				fromJson = new SqlProcedureResult();
+				fromJson.setResultSet(error);
+				// FehlerCode
+				fromJson.setReturnCode(-1);
+			}
+			if (fromJson.getReturnCode() == -1) {
+				if (fromJson.getResultSet() != null && "Error".equals(fromJson.getResultSet().getName())) {
+					ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, tableName);
+					postError(e);
+					return null;
+				}
+			}
+			return fromJson;
+		});
 	}
 
 	private static SSLContext disabledSslVerificationContext() {
@@ -668,6 +721,53 @@ public class DataService implements IDataService {
 			}
 			return CompletableFuture.supplyAsync(() -> list);
 		}
+	}
+
+	@Override
+	public CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache) {
+		ArrayList<LookupValue> list = new ArrayList<>();
+		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
+		if (useCache && !map.isEmpty()) {
+			System.out.println("UseCache: " + tableName);
+			list.addAll(map.values());
+			return CompletableFuture.supplyAsync(() -> list);
+		}
+		Table t = TableBuilder.newTable(tableName) //
+				.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
+				.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+				.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
+				.create();
+		Row row = RowBuilder.newRow() //
+				.withValue(null) //
+				.withValue(null) //
+				.withValue(null) //
+				.withValue(fv) //
+				.create();
+		t.addRow(row);
+
+		CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t, false);
+		Table ta = null;
+		try {
+			ta = tableFuture.get();
+		} catch (Exception e) {
+			System.out.println("Error, using cache: " + tableName);
+			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+			list.addAll(map.values());
+			return CompletableFuture.supplyAsync(() -> list);
+		}
+		if (ta != null) {
+			for (Row r : ta.getRows()) {
+				LookupValue lv = new LookupValue(//
+						r.getValue(0).getIntegerValue(), //
+						r.getValue(1).getStringValue(), //
+						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+
+				map.put(lv.keyLong, lv);
+				list.add(lv);
+			}
+		}
+		return CompletableFuture.supplyAsync(() -> list);
 	}
 
 	@Override

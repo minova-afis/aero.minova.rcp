@@ -2,6 +2,7 @@ package aero.minova.rcp.model.form;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.TypeParam;
+import aero.minova.rcp.model.KeyType;
 
 public class ModelToViewModel {
 
@@ -23,6 +24,8 @@ public class ModelToViewModel {
 		if (field.getTabIndex() != null) {
 			f.setTabIndex(field.getTabIndex().intValue());
 		}
+
+		f.setPrimary(KeyType.PRIMARY.toString().equalsIgnoreCase(field.getKeyType()));
 
 		return f;
 	}

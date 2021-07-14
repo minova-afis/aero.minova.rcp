@@ -63,7 +63,7 @@ public class Table {
 		return rows;
 	}
 
-	public void addRow() {
+	public Row addRow() {
 		Row row = new Row();
 		for (Column c : columns) {
 			if (c.getType().equals(DataType.STRING)) {
@@ -78,9 +78,14 @@ public class Table {
 				row.addValue(new Value((Double) null));
 			} else if (c.getType().equals(DataType.BOOLEAN)) {
 				row.addValue(new Value((Boolean) null));
+			} else if (c.getType().equals(DataType.BIGDECIMAL)) {
+				row.addValue(new Value(null, DataType.BIGDECIMAL));
+			} else {
+				System.err.println("Typ " + c.getType() + " noch nicht definiert! (aero.minova.rcp.model.Table");
 			}
 		}
 		rows.add(row);
+		return row;
 	}
 
 	public void deleteRow(Row row) {

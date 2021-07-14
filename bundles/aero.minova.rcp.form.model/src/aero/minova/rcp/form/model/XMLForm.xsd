@@ -573,6 +573,7 @@
 			<xs:element maxOccurs="1" minOccurs="0" name="head" type="head" />
 			<!-- Kein Head mehr, deshalb mindestens 1 Page -->
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="page" type="page" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid"/>
 		</xs:sequence>
 		<!-- Entweder oder -->
 		<xs:attribute name="procedure-suffix" type="xs:NCName" />
@@ -1247,7 +1248,6 @@
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="wizard">
 		<xs:annotation>
 			<xs:documentation>Öffnet einen Assistent (Wizard)</xs:documentation>
@@ -1258,7 +1258,6 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-	
 	<!-- Form -->
 	<xs:element name="form">
 		<xs:complexType>

@@ -151,7 +151,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		Map<String, Field> fieldMap = new HashMap<>();
 		WFCDetailPart wfcDetailPart = (WFCDetailPart) mPart.getObject();
 		Detail detail = wfcDetailPart.getForm(null).getDetail();
-		List<Object> headAndPageList = detail.getHeadAndPage();
+		List<Object> headAndPageList = detail.getHeadAndPageAndGrid();
 		for (Object headOrPage : headAndPageList) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);
 			for (Object fieldOrGrid : wrapper.getFieldOrGrid()) {
