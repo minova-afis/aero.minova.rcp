@@ -329,7 +329,7 @@
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.PrintDetail" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Print.Command/32x32.png" tooltip="@Action.PrintDetail" command="_laMxwbbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxsLbdEeuZF8ZS2_h9rA">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ResizeLayout.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxsLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
     </elements>
