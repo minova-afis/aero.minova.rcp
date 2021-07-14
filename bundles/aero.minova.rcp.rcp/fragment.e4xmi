@@ -149,6 +149,7 @@
     </elements>
     <elements xsi:type="commands:Command" xmi:id="__iku8L_AEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.command.traverseenter" commandName="Traverse Enter"/>
     <elements xsi:type="commands:Command" xmi:id="_iXCk8OPHEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.command.saveassearchcriteria" commandName="SaveAsSearchCriteria"/>
+    <elements xsi:type="commands:Command" xmi:id="_IrhzUORnEeut7PgjqycMIw" elementId="aero.minova.rcp.rcp.command.deletesavedsearchcriteria" commandName="Delete Saved SearchCriteria"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Le0doLbxEeuZF8ZS2_h9rA" featurename="trimBars" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="basic:TrimBar" xmi:id="_Le0dobbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.trimbar.top"/>
@@ -190,6 +191,7 @@
               <handlers xmi:id="_CeFnhLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.revertsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertSearchHandler" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnhbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.clearsearch" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClearSearchHandler" command="_laMxrbbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_qGbA4N_1EeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.handler.savesearchcriteriahandler" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveSearchCriteriaHandler" command="_laMxr7bdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_SPmxoORnEeut7PgjqycMIw" elementId="aero.minova.rcp.rcp.handler.deletesavedsearchcriteria" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteSavedSearchCriteriaHandler" command="_IrhzUORnEeut7PgjqycMIw"/>
               <toolbar xmi:id="_1hkzoMH7EeuXx4JvJ_IjeA" elementId="aero.minova.rcp.rcp.part.search.toolbar"/>
             </children>
           </children>
@@ -352,7 +354,7 @@
       <bindings xmi:id="_b7Z-YN_OEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.search.m1n" keySequence="M1+N" command="_laMxrLbdEeuZF8ZS2_h9rA"/>
       <bindings xmi:id="_gG7IIN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.search.m1s" keySequence="M1+S" command="_laMxr7bdEeuZF8ZS2_h9rA"/>
       <bindings xmi:id="_y3XggOPDEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1s" keySequence="SHIFT+M1+S" command="_iXCk8OPHEeuITvUQkIW3uw"/>
-      <bindings xmi:id="_Gg2hMOPHEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1d" keySequence="SHIFT+M1+D"/>
+      <bindings xmi:id="_Gg2hMOPHEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.search.shiftm1d" keySequence="SHIFT+M1+D" command="_IrhzUORnEeut7PgjqycMIw"/>
       <bindings xmi:id="_W_JoUN_lEeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.keybinding.m1l" keySequence="M1+L" command="_laMxrrbdEeuZF8ZS2_h9rA"/>
       <bindings xmi:id="_0fxQkN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.shiftm1r" keySequence="M1+R" command="_laMxubbdEeuZF8ZS2_h9rA"/>
     </elements>
