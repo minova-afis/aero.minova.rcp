@@ -358,6 +358,8 @@
       <bindings xmi:id="_W_JoUN_lEeuJsOIRj3XIxg" elementId="aero.minova.rcp.rcp.keybinding.m1l" keySequence="M1+L" command="_laMxrrbdEeuZF8ZS2_h9rA"/>
       <bindings xmi:id="_0fxQkN_EEeuKEIELlq_spA" elementId="aero.minova.rcp.rcp.keybinding.shiftm1r" keySequence="SHIFT+M1+H" command="_laMxubbdEeuZF8ZS2_h9rA"/>
     </elements>
-    <elements xsi:type="commands:BindingTable" xmi:id="_WdJbEOOhEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.bindingtable.parts.indexpart" bindingContext="_uvkSkOOgEeuITvUQkIW3uw"/>
+    <elements xsi:type="commands:BindingTable" xmi:id="_WdJbEOOhEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.bindingtable.parts.indexpart" bindingContext="_uvkSkOOgEeuITvUQkIW3uw">
+      <bindings xmi:id="_mFNekORxEeut7PgjqycMIw" elementId="aero.minova.rcp.rcp.keybinding.index.m1n" keySequence="M1+N" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
+    </elements>
   </fragments>
 </fragment:ModelFragments>
