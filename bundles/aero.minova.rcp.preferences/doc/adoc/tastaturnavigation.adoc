@@ -65,7 +65,7 @@ Für Mac gilt folgendes spezifisches Verhalten:
 
 - Beim Mac kann die Selektion von Schaltflächen in den Systemeinstellungen aktiviert werden. Dafür muss unter Kurzbefehle in den Tastatureinstellungen der Haken bei "Bewege den Fokus mittels Tastaturnavigation zu Steuerelementen" gesetzt sein.
 
-image::images/mac_activate_button_selection.png[Aktivierung der Button Selektion unter Mac,550,300]
+image::images/mac_activate_button_selection.png[Aktivierung der Button Selektion unter Mac,550,400]
 
 - Standardverhalten für die Eingaben von Tab und Enter mit Modifier im Text Feld:
 
@@ -166,7 +166,7 @@ Um die bearbeiteten Suchkriterien wieder unter "Wochenstunden" zu speichern, bet
 Über der Eingabe ändert sich der Text zu "Sucheinstellung besteht und wird überschrieben". Dies weist daraufhin, dass es schon ein Suchkriterium mit der Bezichnung 
 exestiert und dieses überschrieben wird.
 
-image::images/searchcriteriaexists.png[Aktivierung der Button Selektion unter Mac,550,300]
+image::images/searchcriteriaexists.png[Aktivierung der Button Selektion unter Mac,400,200]
 
 Sobald der Benutzer die Eingabe bstätigt, werden die neuen Suchkriterien unter "Wochenstunden" überschrieben.
 
