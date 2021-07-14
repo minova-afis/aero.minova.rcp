@@ -239,7 +239,7 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gkjAEMH7EeuXx4JvJ_IjeA" featurename="toolBarContributions" parentElementId="xpath:/">
     <elements xsi:type="menu:ToolBarContribution" xmi:id="_p3EUUMH7EeuXx4JvJ_IjeA" elementId="aero.minova.rcp.rcp.toolbarcontribution.0" parentId="aero.minova.rcp.rcp.part.search.toolbar">
-      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFniLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.Reset" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DiscardSearchCriteria.Command/32x32.png" tooltip="@Action.Reset" command="_laMxrLbdEeuZF8ZS2_h9rA">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFniLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.revert" label="@Action.New" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/NewRecord.Command/32x32.png" tooltip="@Action.New" command="_laMxrLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnibbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.clear" label="@Action.DeleteLine" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/DeleteSearchRow.Command/32x32.png" tooltip="@Action.DeleteLine" command="_laMxrbbdEeuZF8ZS2_h9rA">
