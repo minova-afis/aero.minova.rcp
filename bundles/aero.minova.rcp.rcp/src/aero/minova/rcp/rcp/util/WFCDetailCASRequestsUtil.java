@@ -30,6 +30,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -270,6 +271,8 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 		updateSelectedGrids();
+		// Revert Button updaten
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 	}
 
 	public void updateSelectedGrids() {
@@ -772,6 +775,8 @@ public class WFCDetailCASRequestsUtil {
 
 		selectedTable = null;
 		selectedGrids.clear();
+		// Revert Button updaten
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 	}
 
 	/**
@@ -807,5 +812,9 @@ public class WFCDetailCASRequestsUtil {
 
 		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
 		((AbstractValueAccessor) detail.getPageList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
+	}
+
+	public Table getSelectedTable() {
+		return selectedTable;
 	}
 }
