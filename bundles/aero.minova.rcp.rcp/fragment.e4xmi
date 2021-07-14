@@ -176,6 +176,7 @@
     <elements xsi:type="commands:KeyBinding" xmi:id="_1jziaLbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.loadindexpart" keySequence="F5" command="_laMxsrbdEeuZF8ZS2_h9rA">
       <tags>type:user</tags>
     </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_HIKb0OOmEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.detail.m1r" keySequence="M1+R" command="_laMxsLbdEeuZF8ZS2_h9rA"/>
     <elements xsi:type="commands:KeyBinding" xmi:id="_1jziabbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_laMxxbbdEeuZF8ZS2_h9rA">
       <tags>type:user</tags>
     </elements>
@@ -346,7 +347,6 @@
     <elements xsi:type="commands:BindingTable" xmi:id="_RF7ewOOhEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.bindingtable.parts.detailpart" bindingContext="_p68tAOOgEeuITvUQkIW3uw">
       <bindings xmi:id="_7O5Q4L-MEeurHOCQHTszDA" elementId="aero.minova.rcp.rcp.keybinding.detail.m1s" keySequence="M1+S" command="_laMxurbdEeuZF8ZS2_h9rA"/>
       <bindings xmi:id="_YuQUQL_BEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.keybinding.detail.cr" keySequence="CR" command="__iku8L_AEeuboN5m_phYZw"/>
-      <bindings xmi:id="_HIKb0OOmEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.keybinding.detail.m1r" keySequence="M1+R" command="_laMxsLbdEeuZF8ZS2_h9rA"/>
       <bindings xmi:id="_C5OfUL-NEeurHOCQHTszDA" elementId="aero.minova.rcp.rcp.keybinding.m1n" keySequence="M1+N" command="_laMxu7bdEeuZF8ZS2_h9rA"/>
     </elements>
     <elements xsi:type="commands:BindingTable" xmi:id="_VzFxcOOhEeuITvUQkIW3uw" elementId="aero.minova.rcp.rcp.bindingtable.parts.searchpart" bindingContext="_uFTNkOOgEeuITvUQkIW3uw">
