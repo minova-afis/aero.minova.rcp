@@ -12,11 +12,11 @@ Enter Verhaltens in einem Handler, können wir diesen von verschiedenen Stellen 
 
 === Preferences die das Tab- und Enter-Verhalten beeinflussen
 
-EnterSelectsFirstRequired (ESFR) = Genau Beschreibung hier: xref:application.adoc#Nach dem Betätigen von ENTER wird das erste erforderliche Feld selektiert[EnterSelectsFirstRequired]
+EnterSelectsFirstRequired (ESFR) - Genau Beschreibung hier: xref:application.adoc#Nach dem Betätigen von ENTER wird das erste erforderliche Feld selektiert[EnterSelectsFirstRequired]
 
-LookupEnterSelectsNextRequired (LESNR) = Genau Beschreibung hier: xref:application.adoc#Das Betätigen von Enter in einer Auswahlbox bewirkt die Übernahme des ausgewählten Wertes. Nach der Übernahme wird das nächste erforderliche Feld selektiert[LookupEnterSelectsNextRequired]
+LookupEnterSelectsNextRequired (LESNR) - Genau Beschreibung hier: xref:application.adoc#Das Betätigen von Enter in einer Auswahlbox bewirkt die Übernahme des ausgewählten Wertes. Nach der Übernahme wird das nächste erforderliche Feld selektiert[LookupEnterSelectsNextRequired]
 
-SelectAllControls (SAC) = Genau Beschreibung hier: xref:application.adoc#Aktiviert die Selektion aller möglichen Felder inkl. Registerkarte und Schaltflächen[SelectAllControls]
+SelectAllControls (SAC) - Genau Beschreibung hier: xref:application.adoc#Aktiviert die Selektion aller möglichen Felder inkl. Registerkarte und Schaltflächen[SelectAllControls]
 
 === Tab-Verhalten
 
@@ -33,7 +33,7 @@ Verhalten für die Eingabe von Tab:
 | Tab | Benutzer springt ins nächste Feld.
 | Shift + Tab | Benutzer springt ins vorherige Feld.
 | Tab + SAC / Shift + Tab + SAC   = true | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page selektiert
-| Tab + SAC/ Shift + Tab + SAC  = false | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page nicht selektiert
+| Tab + SAC/ Shift + Tab + SAC  = false | Beim Wechseln der Section/Page wird die Registerkarte der Section/Page *nicht* selektiert
 |===
 
 Mit Tab verlässt man nie den ausgewählten Part. Wenn der Benutzer im letzten Feld Tab betätigt und SAC = false ist, wird das erste Feld im Part selektiert. Bei SAC = true wird das Label des Parts selektiert. Umgekehrt gilt das selbe. Wenn sich der Benutzer im erste Feld befindet und Shift + Tab 
@@ -137,7 +137,7 @@ Die KeyBindings sind so gelegt, dass das selbe Verhalten gewährleistet ist, wie
 | CTRL + M1 + N | Neue Zeile
 | CTRL + M1 + D | Zeile löschen
 | CTRL + M1 + H | Optimieren horizontal
-| CTRL + M1 + V | Optimieren vertical
+| CTRL + M1 + V | Optimieren vertikal
 |===
 
 === Key-Bindings SearchPart
@@ -152,14 +152,14 @@ Die KeyBindings sind so gelegt, dass das selbe Verhalten gewährleistet ist, wie
 | SHIFT + M1 + H | Optimieren (Resize Horizontal)
 |===
 
-Beim Speichern der Suchkriterien im SearchPart wird zwischen Speichern und Speichern unter unterschieden. Dabei speichert das normale Speichern nur 
-das Default und überschreibt dieses und Speichern unter ermöglicht das speichern unter einer anderen Bezeichnung.
+Beim Speichern der Suchkriterien im SearchPart wird zwischen "Speichern" und "Speichern unter" unterschieden. Dabei speichert das normale "Speichern" nur 
+das Default und überschreibt dieses und "Speichern unter" ermöglicht das Speichern unter einer anderen Bezeichnung.
 
 *Beispiel für KeyBinding M1+S und SHIFT+M1+S:*
 
 Benutzer gibt Suchkriterien ein, betätigt SHIFT+M1+S und speichert diese unter der Bezeichnung "Wochenstunden".
 
-Später lädt er diese Suchkriterien und bearbeitet Sie. Dabei speichert er sie diesmal mit M1+S. Dabei überschreibt er nicht die Suchkriterien mit der
+Später lädt er diese Suchkriterien und bearbeitet sie. Dabei speichert er diesmal mit M1+S. Dabei überschreibt er nicht die Suchkriterien mit der
 Bezeichnung "Wochenstunden", sondern die Default Suchkriterien.
 
 Um die bearbeiteten Suchkriterien wieder unter "Wochenstunden" zu speichern, betätigt der Benutzer SHIFT+M1+S und gibt "Wochenstunden" wieder als Bezeichnung an.
@@ -168,5 +168,5 @@ exestiert und dieses überschrieben wird.
 
 image::images/searchcriteriaexists.png[Aktivierung der Button Selektion unter Mac,400,200]
 
-Sobald der Benutzer die Eingabe bstätigt, werden die neuen Suchkriterien unter "Wochenstunden" überschrieben.
+Sobald der Benutzer die Eingabe bestätigt, werden die neuen Suchkriterien unter "Wochenstunden" überschrieben.
 
