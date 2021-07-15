@@ -1,4 +1,4 @@
-= Tastur Navigation
+= Tastatur Navigation
 
 == Tab- und Enter-Verhalten
 
