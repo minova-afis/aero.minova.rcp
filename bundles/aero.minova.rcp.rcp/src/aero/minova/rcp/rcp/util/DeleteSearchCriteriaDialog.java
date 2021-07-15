@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -76,6 +77,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		});
 
 		criterias = getCriteriaNames();
+		Collections.sort(criterias);
 
 		// Input setzen
 		viewer.setInput(criterias);

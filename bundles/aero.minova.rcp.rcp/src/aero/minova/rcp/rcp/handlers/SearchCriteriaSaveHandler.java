@@ -1,7 +1,10 @@
 
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -39,7 +42,12 @@ public class SearchCriteriaSaveHandler {
 		if (data != null) {
 			try {
 				String[] keys = prefs.keys();
-				for (String s : keys) {
+				List<String> keyList = new ArrayList<>();
+				for (String string : keys) {
+					keyList.add(string);
+				}
+				Collections.sort(keyList);
+				for (String s : keyList) {
 					if (s.endsWith(".table") && s.startsWith(data.getName() + ".")) {
 						MHandledMenuItem md = createMenuItem(service, s);
 						items.add(md);
