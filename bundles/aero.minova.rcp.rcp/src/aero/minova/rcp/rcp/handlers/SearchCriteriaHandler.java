@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -19,6 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Table;
@@ -57,6 +59,8 @@ public class SearchCriteriaHandler {
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
+	
+	Preferences loadedTablePrefs = InstanceScope.INSTANCE.getNode(Constants.LAST_LOADED_SEARCHCRITERIA);
 
 	@Execute
 	public void execute(@Named(COMMAND_ACTION) final String action, @Optional @Named(COMMAND_NAME) String name, final MPart part,
@@ -79,6 +83,7 @@ public class SearchCriteriaHandler {
 					context.set("ConfigName", name);// setzen der Konfiguration, verfügbar auch später.
 					ContextInjectionFactory.invoke(part.getObject(), LoadTableSelection.class, context);
 					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
+					loadedTablePrefs.put(Constants.LAST_SEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
 					MessageDialog md = new MessageDialog(shell, translationService.translate("@Command.Warning", null), null,
@@ -109,6 +114,7 @@ public class SearchCriteriaHandler {
 					if (saveColumnWidth) {
 						broker.send(Constants.BROKER_SAVESEARCHCRITERIA, criteriaName);
 					}
+					loadedTablePrefs.put(Constants.LAST_SEARCHCRITERIA, criteriaName);
 					break;
 				case DELETE:
 					final DeleteSearchCriteriaDialog dscd = new DeleteSearchCriteriaDialog(shell, translationService, prefs, tableName);
