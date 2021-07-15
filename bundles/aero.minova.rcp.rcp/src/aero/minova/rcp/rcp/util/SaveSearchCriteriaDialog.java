@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.widgets.ButtonFactory;
@@ -17,13 +18,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.service.prefs.Preferences;
+
+import aero.minova.rcp.constants.Constants;
 
 /**
  * Dieser Dialog zeigt die bestehenden (Such-)Kriterien an und bietet die Möglichkeit, welche zu speichern
  */
 public class SaveSearchCriteriaDialog extends Dialog {
 
-	private String criteriaName = "DEFAULT";
+	Preferences lastSearchCriteriaPrefs = InstanceScope.INSTANCE.getNode(Constants.LAST_LOADED_SEARCHCRITERIA);
+	private String criteriaName = lastSearchCriteriaPrefs.get(Constants.LAST_SEARCHCRITERIA, "DEFAULT");
 
 	private boolean saveWidths = true;
 
