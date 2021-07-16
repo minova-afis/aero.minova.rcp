@@ -850,8 +850,6 @@ public class WFCDetailCASRequestsUtil {
 			MField c = mDetail.getField(name);
 			Value sV = selectedTable.getRows().get(0).getValue(i);
 			if (c != null && c.getConsumer() != null) {
-				System.out.println("Value C:" + c.getValue());
-				System.out.println("Value sV:" + sV);
 				if (c instanceof MLookupField) {
 					if (c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
 						return true;

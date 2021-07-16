@@ -684,24 +684,32 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 			if (!pList.contains(mperspective)) {
 				pList.add(mperspective);
-				mperspective.setLabel(mperspective.getLabel() + "*");
-				refreshToolbar();
+				refreshToolbar(true);
 			}
 		} else {
 			if (pList != null) {
-				mperspective.setLabel(mperspective.getLabel().replace("*", ""));
 				pList.remove(mperspective);
-				refreshToolbar();
+				refreshToolbar(false);
 			}
 		}
 	}
 
-	public void refreshToolbar() {
+	public void refreshToolbar(boolean addFlag) {
 		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
 		MTrimBar tBar = findElements.get(0);
-		Object o = (tBar.getChildren().get(0));
 		Composite p = (Composite) (tBar.getChildren().get(0)).getWidget();
-		System.out.println(p.getChildren());
+		ToolBar tb = (ToolBar) p.getChildren()[0];
+
+		for (ToolItem item : tb.getItems()) {
+			if (item.getText().contains(perspective.getLabel().replace("@", ""))) {
+				if (addFlag) {
+					item.setText("*" + perspective.getLabel().replace("@", ""));
+				} else {
+					item.setText(perspective.getLabel().replace("@", ""));
+				}
+			}
+		}
+		tb.requestLayout();
 	}
 
 	@Override
@@ -717,7 +725,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void checkDirtyFlag() {
 		boolean setDirty = casRequestsUtil.checkDirty();
-		// System.out.println(evt.getSource() + " isDirty: " + setDirty);
 		if (this.dirtyFlag != setDirty) {
 			setDirtyFlag(setDirty);
 		}
