@@ -56,12 +56,24 @@ Getestet mit Server xxxxxx
 - [ ] Suchkriterien können angezeigt werden 
 - [ ] Interne Vorschau kann aktiviert werden 
 
-## Details (Knöpfe in der Toolbar)
+## Detail (Knöpfe in der Toolbar)
 - [ ] Einträge können gespeichert werden
 - [ ] Ein neues Detail kann erstellt werden
 - [ ] Ein Datensatz kann gelöscht werden
 - [ ] Änderungen können verworfen werden
 - [ ] Die Breite der Anwendung kann optimiert werden
+
+## Detail Grid
+- [ ] Daten werden geladen (Bei Auswahl eines Datensatzes im Index)
+- [ ] Pflichtfelder sind orangenmarkiert
+- [ ] Detail kann erst gespeichert werden, wenn alle Pflichtfelder ausgefüllt sind
+- [ ] Lookups sind als Kombobox ausfüllbar
+
+## Detail Grid (Knöpfe in der Toolbar)
+- [ ] Neue Zeile wird hinzugefügt
+- [ ] Ausgewählte Zeilen werden gelöscht (nur aktiv wenn mindestens eine Zeile komplett ausgewählt wird)
+- [ ] Toggle zwischen allen Zeilen werden angezeigt und ~5 Zeilen angezeigt (min 2, max 10). Außerdem werden Zeilenhöhen optimiert
+- [ ] Toggle zwischen kompletter Nattable wird angezeigt und Section hat "Standard" Breite. Außerdem werden Spaltenbreiten optimiert
 
 ## Traverse Verhalten
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
@@ -86,20 +98,23 @@ Getestet mit Server xxxxxx
 - [ ] Angeheftete Perspektiven werden persistiert
 - [ ] Die Reihenfolge der Perspektiven ist nach einem Neustart wieder gleich (zum Testen z.B.: normale, angeheftete und geschlossene, normale)
 
-## Keybindings Anwendung
+## Keybindings Perspektive
+KeyBIndings die in der ganzen Perspektive ansprechbar sind:
 - [ ] M1+Q: Anwendung beenden
 - [ ] M1+R: Resize Parts
 - [ ] F4: Search Part auswählen -> Erstes Feld wird ausgewählt
 - [ ] F5: Index neu laden
 - [ ] F6: Detail Part auswählen -> Erste Zelle wird selektiert
 
-## Key-Bindings im Detail
+## Key-Bindings im DetailPart
+KeyBIndings die nur im DetailPart ansprechbar sind:
 - [ ] M1+Z: Undo (in Textfeldern)
 - [ ] M1+S: Detail speichern (nur wenn Detailpart im Fokus ist)
 - [ ] M1+N: neues Detail
 - [ ] CR: Nächstes leeres Pflichtfeld wird selektiert oder es wird gespeichert
 
 ## Key-Bindings im SearchPart
+KeyBIndings die nur im SearchPart ansprechbar sind:
 - [ ] M1+N : Alle Einträge aus den Suchzeilen werden gelöscht. Es werden alle Zeilen bis auf eine entfernt.
 - [ ] M1+D : Selektierte Zeile wird gelöscht
 - [ ] M1+S : Suchkriterien speichern (nur wenn SearchPart im Fokus ist)
@@ -107,6 +122,10 @@ Getestet mit Server xxxxxx
 - [ ] SHIFT+M1+D : Löschen von gespeicherten Suchkriterien
 - [ ] M1+L : Default Suchkriterien laden
 - [ ] SHIFT+M1+H : Optimieren (Resize Horizontal)
+
+## Key-Bindings im IndexPart
+KeyBIndings die nur im IndexPart ansprechbar sind:
+- [ ] M1+N: Neues Detail
 
 ## Preferences
 - [ ] Die Sprachauswahl zeigt nur unterstützte Sprachen an
