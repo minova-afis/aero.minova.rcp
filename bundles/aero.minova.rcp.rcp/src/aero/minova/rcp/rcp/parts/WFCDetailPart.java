@@ -191,8 +191,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				for (MPerspective mPerspective : pList) {
 					listString += " - " + mPerspective.getLabel() + "\n";
 				}
-				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@Action.Close.ChangesDialog", null),
-						translationService.translate("@Action.Close.DirtyMessage", null) + listString);
+				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
+						translationService.translate("@msg.Close.DirtyMessage", null)
+								+ listString);
 			} else {
 				return true;
 			}
