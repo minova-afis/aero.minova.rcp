@@ -34,7 +34,9 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -153,6 +155,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private WFCDetailCASRequestsUtil casRequestsUtil;
 
 	private IEclipseContext appContext;
+
+	@Inject
+	MWindow mwindow;
+
+	@Inject
+	EModelService eModelService;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, IEclipseContext partContext, MApplication mApp) {
@@ -676,12 +684,24 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 			if (!pList.contains(mperspective)) {
 				pList.add(mperspective);
+				mperspective.setLabel(mperspective.getLabel() + "*");
+				refreshToolbar();
 			}
 		} else {
 			if (pList != null) {
+				mperspective.setLabel(mperspective.getLabel().replace("*", ""));
 				pList.remove(mperspective);
+				refreshToolbar();
 			}
 		}
+	}
+
+	public void refreshToolbar() {
+		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
+		MTrimBar tBar = findElements.get(0);
+		Object o = (tBar.getChildren().get(0));
+		Composite p = (Composite) (tBar.getChildren().get(0)).getWidget();
+		System.out.println(p.getChildren());
 	}
 
 	@Override
