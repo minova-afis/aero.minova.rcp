@@ -131,7 +131,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	public void updatePossibleValues() {
 		Lookup up = ((Lookup) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> {
+			up.getContentProvider().setValuesOnly(l);
+			if (l.size() == 1) {
+				field.setValue(l.get(0), false);
+			}
+		}));
 	}
 
 	/**
