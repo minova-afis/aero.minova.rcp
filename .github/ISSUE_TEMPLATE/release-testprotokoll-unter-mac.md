@@ -86,18 +86,30 @@ Getestet mit Server xxxxxx
 - [ ] Angeheftete Perspektiven werden persistiert
 - [ ] Die Reihenfolge der Perspektiven ist nach einem Neustart wieder gleich (zum Testen z.B.: normale, angeheftete und geschlossene, normale)
 
-## Keybindings
-Wenn nicht anders vermerkt, sollen die Shortcuts in der ganzen Anwendung funktionieren.
-- [ ] cmd+Q: Anwendung beenden
-- [ ] cmd+Z: Undo (in Textfeldern)
-- [ ] cmd+S: Detail speichern (nur wenn Detailpart im Fokus ist)
-- [ ] cmd+N: neues Detail
+## Keybindings Anwendung
+- [ ] M1+Q: Anwendung beenden
+- [ ] M1+R: Resize Parts
 - [ ] F4: Search Part auswählen -> Erstes Feld wird ausgewählt
 - [ ] F5: Index neu laden
 - [ ] F6: Detail Part auswählen -> Erste Zelle wird selektiert
 
+## Key-Bindings im Detail
+- [ ] M1+Z: Undo (in Textfeldern)
+- [ ] M1+S: Detail speichern (nur wenn Detailpart im Fokus ist)
+- [ ] M1+N: neues Detail
+- [ ] CR: Nächstes leeres Pflichtfeld wird selektiert oder es wird gespeichert
+
+## Key-Bindings im SearchPart
+- [ ] M1+N : Alle Einträge aus den Suchzeilen werden gelöscht. Es werden alle Zeilen bis auf eine entfernt.
+- [ ] M1+D : Selektierte Zeile wird gelöscht
+- [ ] M1+S : Suchkriterien speichern (nur wenn SearchPart im Fokus ist)
+- [ ] SHIFT+M1+S : Suchkriterien speichern unter <Bezeichnung>
+- [ ] SHIFT+M1+D : Löschen von gespeicherten Suchkriterien
+- [ ] M1+L : Default Suchkriterien laden
+- [ ] SHIFT+M1+H : Optimieren (Resize Horizontal)
+
 ## Preferences
-- [ ] Die Sprachauswahl zeigt nur unterstützte Sprachen an
-- [ ] Das angegebene Pattern für das Datum formatiert die Date- und DateTimeFields
-- [ ] Das angegebene Pattern für die Zeit formatiert die Time- und DateTimeFields
-- [ ] Wenn kein Pattern angegeben ist, wird der Standard verwendet (Test: Vorschlagsliste ist nicht leer)
+- [ ] Die Sprachauswahl zeigt nur unterstützte Sprachen an
+- [ ] Das angegebene Pattern für das Datum formatiert die Date- und DateTimeFields
+- [ ] Das angegebene Pattern für die Zeit formatiert die Time- und DateTimeFields
+- [ ] Wenn kein Pattern angegeben ist, wird der Standard verwendet (Test: Vorschlagsliste ist nicht leer)
