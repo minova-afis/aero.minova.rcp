@@ -34,7 +34,9 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -153,6 +155,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private WFCDetailCASRequestsUtil casRequestsUtil;
 
 	private IEclipseContext appContext;
+
+	@Inject
+	MWindow mwindow;
+
+	@Inject
+	EModelService eModelService;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, IEclipseContext partContext, MApplication mApp) {
@@ -676,12 +684,32 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 			if (!pList.contains(mperspective)) {
 				pList.add(mperspective);
+				refreshToolbar(true);
 			}
 		} else {
 			if (pList != null) {
 				pList.remove(mperspective);
+				refreshToolbar(false);
 			}
 		}
+	}
+
+	public void refreshToolbar(boolean addFlag) {
+		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
+		MTrimBar tBar = findElements.get(0);
+		Composite p = (Composite) (tBar.getChildren().get(0)).getWidget();
+		ToolBar tb = (ToolBar) p.getChildren()[0];
+
+		for (ToolItem item : tb.getItems()) {
+			if (item.getText().contains(perspective.getLabel().replace("@", ""))) {
+				if (addFlag) {
+					item.setText("*" + perspective.getLabel().replace("@", ""));
+				} else {
+					item.setText(perspective.getLabel().replace("@", ""));
+				}
+			}
+		}
+		tb.requestLayout();
 	}
 
 	@Override
@@ -697,7 +725,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void checkDirtyFlag() {
 		boolean setDirty = casRequestsUtil.checkDirty();
-		// System.out.println(evt.getSource() + " isDirty: " + setDirty);
 		if (this.dirtyFlag != setDirty) {
 			setDirtyFlag(setDirty);
 		}
