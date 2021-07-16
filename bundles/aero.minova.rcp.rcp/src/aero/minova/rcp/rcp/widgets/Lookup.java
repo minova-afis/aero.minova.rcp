@@ -20,7 +20,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -285,23 +284,15 @@ public class Lookup extends Composite {
 	 * @return a listener for the FocusOut event
 	 */
 	private Listener createFocusOutListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
-				/*
-				 * Async is needed to wait until focus reaches its new Control
-				 */
-				Lookup.this.getDisplay().asyncExec(() -> {
-					if (Lookup.this.isDisposed() || Lookup.this.getDisplay().isDisposed()) {
-						return;
-					}
-					final Control control = Lookup.this.getDisplay().getFocusControl();
-					if (control == null || (control != text && control != table && control != popup)) {
-						popup.setVisible(false);
-					}
-				});
+		return event -> Lookup.this.getDisplay().asyncExec(() -> {
+			if (Lookup.this.isDisposed() || Lookup.this.getDisplay().isDisposed()) {
+				return;
 			}
-		};
+			final Control control = Lookup.this.getDisplay().getFocusControl();
+			if (control == null || (control != text && control != table && control != popup)) {
+				popup.setVisible(false);
+			}
+		});
 	}
 
 	/**
@@ -476,13 +467,7 @@ public class Lookup extends Composite {
 
 	public void fillSelectedValue() {
 		MField field = (MField) getData(Constants.CONTROL_FIELD);
-		if (text.getText().equals("") && contentProvider.getValuesSize() == 1) {
-			// simuliert die Eingabe und refresht die popupValues
-			popupValues = contentProvider.getContent("");
-			LookupValue lv = popupValues.get(0);
-			text.setText(lv.keyText);
-			field.setValue(lv, true);
-		} else if (popup.isVisible() && table.getSelectionIndex() != -1) {
+		if (popup.isVisible() && table.getSelectionIndex() != -1) {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			text.setText(lv.keyText);
 			field.setValue(lv, true);

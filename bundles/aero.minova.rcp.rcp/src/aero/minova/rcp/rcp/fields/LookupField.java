@@ -12,8 +12,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -89,20 +87,16 @@ public class LookupField {
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
 
-		lookupControl.addTraverseListener(new TraverseListener() {
-
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				Text text = ((Text) e.getSource());
-				Lookup t = (Lookup) text.getParent();
-				switch (e.detail) {
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-				case SWT.TRAVERSE_TAB_NEXT:
-				case SWT.TRAVERSE_RETURN:
-					t.fillSelectedValue();
-					e.doit = true;
-					break;
-				}
+		lookupControl.addTraverseListener(e -> {
+			Text text = ((Text) e.getSource());
+			Lookup t = (Lookup) text.getParent();
+			switch (e.detail) {
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+			case SWT.TRAVERSE_TAB_NEXT:
+			case SWT.TRAVERSE_RETURN:
+				t.fillSelectedValue();
+				e.doit = true;
+				break;
 			}
 		});
 		return lookupControl;
