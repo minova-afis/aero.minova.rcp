@@ -31,6 +31,7 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -65,6 +66,10 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Wizard;
+import aero.minova.rcp.model.event.GridChangeEvent;
+import aero.minova.rcp.model.event.GridChangeListener;
+import aero.minova.rcp.model.event.ValueChangeEvent;
+import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -93,7 +98,7 @@ import aero.minova.rcp.rcp.widgets.Lookup;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 @SuppressWarnings("restriction")
-public class WFCDetailPart extends WFCFormPart {
+public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
 	private static final int MARGIN_SECTION = 8;
 	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
@@ -116,7 +121,12 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private Composite composite;
 
-	private MDetail detail = new MDetail();
+	private MDetail mDetail = new MDetail();
+
+	private boolean dirtyFlag;
+
+	@Inject
+	private MPart mpart;
 
 	@Inject
 	private TranslationService translationService;
@@ -255,7 +265,7 @@ public class WFCDetailPart extends WFCFormPart {
 		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
-		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl, section);
+		MSection mSection = new MSection(true, "open", mDetail, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
 		// Erstellen der Field des Section.
@@ -268,7 +278,7 @@ public class WFCDetailPart extends WFCFormPart {
 		composite.getParent().setTabList(getTabListForSection(composite.getParent()));
 
 		// MSection wird zum MDetail hinzugefügt.
-		detail.addPage(mSection);
+		mDetail.addPage(mSection);
 	}
 
 	/**
@@ -497,6 +507,7 @@ public class WFCDetailPart extends WFCFormPart {
 				if (fieldOrGrid instanceof Grid) {
 					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
 					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
+					mGrid.addGridChangeListener(this);
 					GridAccessor gA = new GridAccessor(mGrid);
 					gA.setSectionGrid(sg);
 					mGrid.setGridAccessor(gA);
@@ -510,6 +521,7 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 			Field field = (Field) fieldOrGrid;
 			MField f = ModelToViewModel.convert(field);
+			f.addValueChangeListener(this);
 			getDetail().putField(f);
 
 			if (!field.isVisible()) {
@@ -614,10 +626,38 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	public MDetail getDetail() {
-		return detail;
+		return mDetail;
 	}
 
 	public WFCDetailCASRequestsUtil getRequestUtil() {
 		return casRequestsUtil;
+	}
+
+	private void setDirtyFlag(boolean b) {
+		this.dirtyFlag = b;
+		loadDirtyFlagintoPart();
+	}
+
+	private void loadDirtyFlagintoPart() {
+		mpart.setDirty(dirtyFlag);
+	}
+
+	@Override
+	public void gridChange(GridChangeEvent evt) {
+		checkDirtyFlag();
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		checkDirtyFlag();
+
+	}
+
+	private void checkDirtyFlag() {
+		boolean setDirty = casRequestsUtil.checkDirty();
+		// System.out.println(evt.getSource() + " isDirty: " + setDirty);
+		if (this.dirtyFlag != setDirty) {
+			setDirtyFlag(setDirty);
+		}
 	}
 }

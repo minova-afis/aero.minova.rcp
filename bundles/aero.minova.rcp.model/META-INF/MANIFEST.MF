@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.osgi,
  org.eclipse.core.runtime,
  org.eclipse.swt,
  aero.minova.rcp.constant,
- org.eclipse.ui.forms
+ org.eclipse.ui.forms,
+ org.eclipse.e4.ui.model.workbench
 Bundle-ActivationPolicy: lazy
 Import-Package: aero.minova.rcp.form.model.xsd,
  org.eclipse.swt.events
