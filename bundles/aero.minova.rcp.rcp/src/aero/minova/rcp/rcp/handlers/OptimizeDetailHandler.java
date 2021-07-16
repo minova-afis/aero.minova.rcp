@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.List;
+
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -10,12 +12,15 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 public class OptimizeDetailHandler {
 
 	@Execute
-	public void execute(EModelService emservice, MWindow mwindow, MPart mpart) {
+	public void execute(EModelService emservice, MWindow mwindow) {
 		MPartSashContainer element = (MPartSashContainer) emservice.find("aero.minova.rcp.rcp.partsashcontainer.main",
 				mwindow);
 		element.getChildren();
+		
+		List<MPart> partStack = emservice.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.part.details", MPart.class);
+		MPart detail = partStack.get(0);
 
-		Integer detailWidth = (Integer) mpart.getContext().get("Detail_Width");
+		Integer detailWidth = (Integer) detail.getContext().get("Detail_Width");
 
 		int size = 10000;
 
