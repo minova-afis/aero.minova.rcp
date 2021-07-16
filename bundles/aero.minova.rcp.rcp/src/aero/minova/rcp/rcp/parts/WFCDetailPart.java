@@ -180,7 +180,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
+		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective, this);
 		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 
@@ -672,6 +672,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void setDirtyFlag(boolean b) {
 		this.dirtyFlag = b;
 		loadDirtyFlagintoPart();
+	}
+
+	public boolean getDirtyFlag() {
+		return dirtyFlag;
 	}
 
 	private void loadDirtyFlagintoPart() {

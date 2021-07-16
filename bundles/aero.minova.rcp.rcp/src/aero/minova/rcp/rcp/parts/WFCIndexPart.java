@@ -307,6 +307,15 @@ public class WFCIndexPart extends WFCFormPart {
 		NatTableUtil.resize(natTable);
 	}
 
+	@Inject
+	@Optional
+	public void clearSelection(@UIEventTopic(Constants.BROKER_CLEARSELECTION) MPerspective perspective) {
+		if (!perspective.equals(this.perspective)) {
+			return;
+		}
+		bodyLayerStack.getSelectionLayer().clear(false);
+	}
+
 	/**
 	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table, diese wird dann an den CAS als Anfrage übergeben.
 	 */

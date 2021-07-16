@@ -70,6 +70,7 @@ import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
+import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 public class WFCDetailCASRequestsUtil {
@@ -134,6 +135,8 @@ public class WFCDetailCASRequestsUtil {
 
 	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
+	private WFCDetailPart wfcDetailPart;
+
 	/**
 	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
 	 *
@@ -145,9 +148,10 @@ public class WFCDetailCASRequestsUtil {
 		System.out.println("Check nochmal das Dirtyflag");
 	}
 
-	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
+	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective, WFCDetailPart wfcDetailPart) {
 		this.mDetail = detail;
 		this.perspective = perspective;
+		this.wfcDetailPart = wfcDetailPart;
 		this.selectedGrids = new HashMap<>();
 
 		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
@@ -171,91 +175,98 @@ public class WFCDetailCASRequestsUtil {
 			return;
 		}
 
-		Row row = rows.get(0);
-		if (row.getValue(0).getValue() != null) {
-			Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
-
-			RowBuilder builder = RowBuilder.newRow();
-			List<Field> allFields = dataFormService.getFieldsFromForm(form);
-
-			// Hauptmaske
-
-			List<Column> indexColumns = form.getIndexView().getColumn();
-			ArrayList<ArrayList> newKeys = new ArrayList<>();
-			for (Field f : allFields) {
-				boolean found = false;
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					if (indexColumns.get(i).getName().equals(f.getName())) {
-						found = true;
-						if ("primary".equals(f.getKeyType())) {
-							builder.withValue(row.getValue(i).getValue());
-							ArrayList<Object> al = new ArrayList<>();
-							al.add(indexColumns.get(i).getName());
-							al.add(row.getValue(i).getValue());
-							al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-							newKeys.add(al);
-						} else {
-							builder.withValue(null);
-						}
-					}
-				}
-				if (!found) {
-					builder.withValue(null);
-				}
-
+		Display.getDefault().asyncExec(() -> {
+			if (!discardChanges()) {
+				broker.send(Constants.BROKER_CLEARSELECTION, perspective);
+				return;
 			}
 
-			if (!newKeys.equals(keys)) {
-				setKeys(newKeys);
-			}
+			Row row = rows.get(0);
+			if (row.getValue(0).getValue() != null) {
+				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
 
-			Row r = builder.create();
-			rowIndexTable.addRow(r);
+				RowBuilder builder = RowBuilder.newRow();
+				List<Field> allFields = dataFormService.getFieldsFromForm(form);
 
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
-			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-				selectedTable = t.getOutputParameters();
-				updateSelectedEntry();
-			}));
+				// Hauptmaske
 
-			for (MGrid g : mDetail.getGrids()) {
-				Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
-				RowBuilder gridRowBuilder = RowBuilder.newRow();
-				Grid grid = g.getGrid();
-				for (Field f : grid.getField()) {
-					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
-						aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
-						gridRequestTable.addColumn(column);
-
-						// Entsprechenden Wert im Index finden
-						boolean found = false;
-						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-							if (indexColumns.get(i).getName().equals(f.getName())
-									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
-								found = true;
-								gridRowBuilder.withValue(row.getValue(i).getValue());
+				List<Column> indexColumns = form.getIndexView().getColumn();
+				ArrayList<ArrayList> newKeys = new ArrayList<>();
+				for (Field f : allFields) {
+					boolean found = false;
+					for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+						if (indexColumns.get(i).getName().equals(f.getName())) {
+							found = true;
+							if ("primary".equals(f.getKeyType())) {
+								builder.withValue(row.getValue(i).getValue());
+								ArrayList<Object> al = new ArrayList<>();
+								al.add(indexColumns.get(i).getName());
+								al.add(row.getValue(i).getValue());
+								al.add(ValueBuilder.value(row.getValue(i)).getDataType());
+								newKeys.add(al);
+							} else {
+								builder.withValue(null);
 							}
 						}
-						if (!found) {
-							gridRowBuilder.withValue(null);
-						}
 					}
-				}
-				Row gridRow = gridRowBuilder.create();
-				gridRequestTable.addRow(gridRow);
+					if (!found) {
+						builder.withValue(null);
+					}
 
-				CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
-				gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-					if (t != null) {
-						Table result = t.getResultSet();
-						if (result.getName().equals(g.getDataTable().getName())) {
-							selectedGrids.put(result.getName(), result);
-							updateSelectedGrids();
+				}
+
+				if (!newKeys.equals(keys)) {
+					setKeys(newKeys);
+				}
+
+				Row r = builder.create();
+				rowIndexTable.addRow(r);
+
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+					selectedTable = t.getOutputParameters();
+					updateSelectedEntry();
+				}));
+
+				for (MGrid g : mDetail.getGrids()) {
+					Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
+					RowBuilder gridRowBuilder = RowBuilder.newRow();
+					Grid grid = g.getGrid();
+					for (Field f : grid.getField()) {
+						if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+							aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
+							gridRequestTable.addColumn(column);
+
+							// Entsprechenden Wert im Index finden
+							boolean found = false;
+							for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+								if (indexColumns.get(i).getName().equals(f.getName())
+										|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+									found = true;
+									gridRowBuilder.withValue(row.getValue(i).getValue());
+								}
+							}
+							if (!found) {
+								gridRowBuilder.withValue(null);
+							}
 						}
 					}
-				}));
+					Row gridRow = gridRowBuilder.create();
+					gridRequestTable.addRow(gridRow);
+
+					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
+					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+						if (t != null) {
+							Table result = t.getResultSet();
+							if (result.getName().equals(g.getDataTable().getName())) {
+								selectedGrids.put(result.getName(), result);
+								updateSelectedGrids();
+							}
+						}
+					}));
+				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -749,12 +760,29 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	@Inject
 	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
+
+		if (!discardChanges()) {
+			return;
+		}
+
 		clearFields(map);
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().handleDetailAction(ActionCode.NEW);
 		}
 		focusFirstEmptyField();
+	}
+
+	/**
+	 * Fragt den Nutzer ob ungespeicherte Änderungen verworfen werden sollen
+	 * 
+	 * @return
+	 */
+	private boolean discardChanges() {
+		if (wfcDetailPart.getDirtyFlag()) {
+			return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Lose changes?", "Änderungen verwerfen?");
+		}
+		return true;
 	}
 
 	/**
