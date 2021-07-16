@@ -780,7 +780,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private boolean discardChanges() {
 		if (wfcDetailPart.getDirtyFlag()) {
-			return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Lose changes?", "Änderungen verwerfen?");
+			return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), translationService.translate("@msg.New.DirtyMessage", null));
 		}
 		return true;
 	}
