@@ -183,8 +183,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				for (MPerspective mPerspective : pList) {
 					listString += " - " + mPerspective.getLabel() + "\n";
 				}
-				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Lose changes?",
-						"Closing this window will lose any unsaved changes in editors. Are you sure you want to do that? \n\n Open perspectives: \n"
+				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@Action.Close.ChangesDialog", null),
+						translationService.translate("@Action.Close.DirtyMessage", null)
 								+ listString);
 			} else {
 				return true;
