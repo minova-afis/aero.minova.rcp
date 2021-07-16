@@ -131,6 +131,7 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	private EHandlerService handlerService;
 	private LocalResourceManager resManager;
+	private WFCDetailCASRequestsUtil casRequestsUtil;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEclipseContext partContext) {
@@ -148,8 +149,8 @@ public class WFCDetailPart extends WFCFormPart {
 
 		localContext.setParent(partContext);
 
-		// erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
-		WFCDetailCASRequestsUtil casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
+		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
+		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
 		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
@@ -614,5 +615,9 @@ public class WFCDetailPart extends WFCFormPart {
 
 	public MDetail getDetail() {
 		return detail;
+	}
+
+	public WFCDetailCASRequestsUtil getRequestUtil() {
+		return casRequestsUtil;
 	}
 }
