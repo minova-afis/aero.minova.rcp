@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -138,6 +139,11 @@ public class WFCDetailCASRequestsUtil {
 	 *
 	 * @param rows
 	 */
+
+	@PreDestroy
+	public void predestroy() {
+		System.out.println("Check nochmal das Dirtyflag");
+	}
 
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective) {
 		this.mDetail = detail;
@@ -819,7 +825,6 @@ public class WFCDetailCASRequestsUtil {
 		return selectedTable;
 	}
 
-
 	/**
 	 * Prüfung ob eine Wertänderung stattgefunden hat.
 	 *
@@ -845,7 +850,13 @@ public class WFCDetailCASRequestsUtil {
 			MField c = mDetail.getField(name);
 			Value sV = selectedTable.getRows().get(0).getValue(i);
 			if (c != null && c.getConsumer() != null) {
-				if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
+				System.out.println("Value C:" + c.getValue());
+				System.out.println("Value sV:" + sV);
+				if (c instanceof MLookupField) {
+					if (c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
+						return true;
+					}
+				} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
 					return true;
 				}
 			}

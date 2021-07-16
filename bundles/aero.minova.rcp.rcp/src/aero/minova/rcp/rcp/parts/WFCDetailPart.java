@@ -31,8 +31,13 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -49,6 +54,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -129,6 +135,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private MPart mpart;
 
 	@Inject
+	private MPerspective mperspective;
+
+	@Inject
 	private TranslationService translationService;
 	private Locale locale;
 
@@ -143,8 +152,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private LocalResourceManager resManager;
 	private WFCDetailCASRequestsUtil casRequestsUtil;
 
+	private IEclipseContext appContext;
+
 	@PostConstruct
-	public void postConstruct(Composite parent, IEclipseContext partContext) {
+	public void postConstruct(Composite parent, MWindow window, IEclipseContext partContext, MApplication mApp) {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
@@ -164,6 +175,22 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
 		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
+
+		IWindowCloseHandler handler = window1 -> {
+			List<MPerspective> pList = (List<MPerspective>) appContext.get("DirtyPerspectives");
+			if (!pList.isEmpty()) {
+				String listString = "";
+				for (MPerspective mPerspective : pList) {
+					listString += mPerspective.getLabel() + "\n";
+				}
+				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Lose changes?",
+						"Closing this window will lose any unsaved changes in editors:\n" + listString + "Are you sure you want to do that?");
+			} else {
+				return true;
+			}
+		};
+		window.getContext().set(IWindowCloseHandler.class, handler);
+		appContext = mApp.getContext();
 	}
 
 	private static class HeadOrPageOrGridWrapper {
@@ -640,6 +667,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void loadDirtyFlagintoPart() {
 		mpart.setDirty(dirtyFlag);
+		List<MPerspective> pList = (List<MPerspective>) appContext.get("DirtyPerspectives");
+		if (dirtyFlag) {
+			if (pList == null) {
+				pList = new ArrayList<>();
+				appContext.set("DirtyPerspectives", pList);
+			}
+			if (!pList.contains(mperspective)) {
+				pList.add(mperspective);
+			}
+		} else {
+			if (pList != null) {
+				pList.remove(mperspective);
+			}
+		}
 	}
 
 	@Override
@@ -660,4 +701,5 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			setDirtyFlag(setDirty);
 		}
 	}
+
 }
