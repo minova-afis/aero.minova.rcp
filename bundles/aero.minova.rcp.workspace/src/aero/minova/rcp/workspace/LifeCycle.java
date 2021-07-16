@@ -54,16 +54,16 @@ public class LifeCycle {
 
 		boolean deletePrefs = false;
 		for (String string : applicationArgs) {
-			if (string.startsWith("-user")) {
+			if (string.startsWith("-user=")) {
 				argUser = string.substring(string.indexOf("=") + 1);
 			}
-			if (string.startsWith("-pw")) {
+			if (string.startsWith("-pw=")) {
 				argPW = string.substring(string.indexOf("=") + 1);
 			}
-			if (string.startsWith("-url")) {
+			if (string.startsWith("-url=")) {
 				argURL = string.substring(string.indexOf("=") + 1);
 			}
-			if (string.startsWith("-clearPersistedState")) {
+			if (string.equals("-clearPersistedState")) {
 				deletePrefs = true;
 			}
 		}
