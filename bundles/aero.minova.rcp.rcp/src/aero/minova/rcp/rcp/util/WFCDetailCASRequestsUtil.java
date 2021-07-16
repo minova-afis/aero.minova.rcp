@@ -121,6 +121,10 @@ public class WFCDetailCASRequestsUtil {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_RELOAD_INDEX)
 	boolean autoReloadIndex;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX)
+	boolean showDiscardDialogIndex;
+
 	private MDetail mDetail;
 
 	private MPerspective perspective;
@@ -176,7 +180,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		Display.getDefault().asyncExec(() -> {
-			if (!discardChanges()) {
+			if (showDiscardDialogIndex && !discardChanges()) {
 				broker.send(Constants.BROKER_CLEARSELECTION, perspective);
 				return;
 			}

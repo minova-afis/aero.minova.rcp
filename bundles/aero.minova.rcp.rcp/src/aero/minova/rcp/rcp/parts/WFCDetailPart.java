@@ -192,8 +192,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					listString += " - " + mPerspective.getLabel() + "\n";
 				}
 				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@Action.Close.ChangesDialog", null),
-						translationService.translate("@Action.Close.DirtyMessage", null)
-								+ listString);
+						translationService.translate("@Action.Close.DirtyMessage", null) + listString);
 			} else {
 				return true;
 			}
@@ -704,12 +703,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		Composite p = (Composite) (tBar.getChildren().get(0)).getWidget();
 		ToolBar tb = (ToolBar) p.getChildren()[0];
 
+		String perspectiveLabel = translationService.translate(perspective.getLabel(), null);
 		for (ToolItem item : tb.getItems()) {
-			if (item.getText().contains(perspective.getLabel().replace("@", ""))) {
+			if (item.getText().contains(perspectiveLabel)) {
 				if (addFlag) {
-					item.setText("*" + perspective.getLabel().replace("@", ""));
+					item.setText("*" + perspectiveLabel);
 				} else {
-					item.setText(perspective.getLabel().replace("@", ""));
+					item.setText(perspectiveLabel);
 				}
 			}
 		}
@@ -728,9 +728,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void checkDirtyFlag() {
-		boolean setDirty = casRequestsUtil.checkDirty();
-		if (this.dirtyFlag != setDirty) {
-			setDirtyFlag(setDirty);
+		if (casRequestsUtil != null) {
+			boolean setDirty = casRequestsUtil.checkDirty();
+			if (this.dirtyFlag != setDirty) {
+				setDirtyFlag(setDirty);
+			}
 		}
 	}
 
