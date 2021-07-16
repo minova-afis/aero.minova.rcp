@@ -31,10 +31,6 @@ public class ClearSearchHandler {
 
 	@CanExecute
 	public boolean canExecute(MPart part) {
-		boolean state = false;
-		if (part.getObject() instanceof WFCSearchPart) {
-			state = true;
-		}
-		return state;
+		return part.getObject() instanceof WFCSearchPart;
 	}
 }
