@@ -180,22 +180,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			mDetail.getHelper().setControls(mDetail);
 		}
 
-		if (window.getContext().get(IWindowCloseHandler.class) == null) {
-			IWindowCloseHandler handler = mWindow -> {
-				@SuppressWarnings("unchecked")
-				List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
-				if (!pList.isEmpty()) {
-					StringBuilder listString = new StringBuilder();
-					for (MPerspective mPerspective : pList) {
-						listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
-					}
-					return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
-							translationService.translate("@msg.Close.DirtyMessage", null) + listString);
+		IWindowCloseHandler handler = mWindow -> {
+			@SuppressWarnings("unchecked")
+			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
+			if (!pList.isEmpty()) {
+				StringBuilder listString = new StringBuilder();
+				for (MPerspective mPerspective : pList) {
+					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
 				}
-				return true;
-			};
-			window.getContext().set(IWindowCloseHandler.class, handler);
-		}
+				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
+						translationService.translate("@msg.Close.DirtyMessage", null) + listString);
+			}
+			return true;
+		};
+		window.getContext().set(IWindowCloseHandler.class, handler);
 	}
 
 	private static class HeadOrPageOrGridWrapper {
@@ -697,6 +695,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
 		MTrimBar tBar = findElements.get(0);
 		Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
+		if (c == null) {
+			return;
+		}
 		ToolBar tb = (ToolBar) c.getChildren()[0];
 
 		String perspectiveLabel = translationService.translate(mPerspective.getLabel(), null);

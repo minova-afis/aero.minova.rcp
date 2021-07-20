@@ -749,6 +749,9 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	@Inject
 	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
+		if (map.keySet().iterator().next() != perspective) {
+			return;
+		}
 
 		if (!discardChanges()) {
 			return;
@@ -783,6 +786,10 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	@Inject
 	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
+		if (map.keySet().iterator().next() != perspective) {
+			return;
+		}
+
 		selectedTable = null;
 
 		for (MField f : mDetail.getFields()) {
