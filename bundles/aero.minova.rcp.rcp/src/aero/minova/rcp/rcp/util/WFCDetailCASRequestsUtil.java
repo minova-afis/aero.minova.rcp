@@ -866,21 +866,30 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// vergleicht Feld-Wert mit Wert aus ausgeleser Tabelle (vom CAS)
+		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < selectedTable.getColumnCount(); i++) {
 			MField c = mDetail.getField(selectedTable.getColumnName(i));
+			checkedFields.add(c);
 			Value sV = selectedTable.getRows().get(0).getValue(i);
 			if (c == null) {
 				continue;
 			}
 			if (c instanceof MLookupField) {
-				if (c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
+				if (sV == null && c.getValue() != null || c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
 					return true;
 				}
 			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
 				return true;
 			}
-
 		}
+
+		// Sind die Felder, die nicht in der ausgelesenen Tabelle sind, leer?
+		for (MField mfield : mDetail.getFields()) {
+			if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -903,5 +912,9 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		return false;
+	}
+
+	public void setSelectedTable(Table table) {
+		this.selectedTable = table;
 	}
 }

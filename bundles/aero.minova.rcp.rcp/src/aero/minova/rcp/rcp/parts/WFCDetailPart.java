@@ -24,7 +24,6 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -68,7 +67,6 @@ import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
@@ -160,7 +158,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	EModelService eModelService;
 
 	@PostConstruct
-	public void postConstruct(Composite parent, MWindow window, IEclipseContext partContext, MApplication mApp) {
+	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
@@ -170,17 +168,17 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 		layoutForm(parent);
 
-		// erzeuge die util Methoden mit DI
-		IEclipseContext localContext = EclipseContextFactory.create();
-		localContext.set(Form.class, form);
-
-		localContext.setParent(partContext);
-
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
-		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
+		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
-		partContext.set("Detail_Width", SECTION_WIDTH);
+		mPerspective.getContext().set("WFCDetailCASRequestsUtil", casRequestsUtil);
+		mPerspective.getContext().set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
+
+		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
+		if (mDetail.getHelper() != null) {
+			mDetail.getHelper().setControls(mDetail);
+		}
 
 		if (window.getContext().get(IWindowCloseHandler.class) == null) {
 			IWindowCloseHandler handler = mWindow -> {
@@ -261,8 +259,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
 			IHelper iHelper = helperlist.get(0);
-			iHelper.setControls(getDetail());
 			getDetail().setHelper(iHelper);
+			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
 
@@ -717,9 +715,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
-		if (evt.getOldValue() != null && !evt.getOldValue().equals(evt.getNewValue()) || evt.getOldValue() == null && evt.getNewValue() != null) {
-			checkDirtyFlag();
-		}
+		checkDirtyFlag();
 	}
 
 	private void checkDirtyFlag() {
