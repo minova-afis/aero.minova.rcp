@@ -717,8 +717,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
-		checkDirtyFlag();
-
+		if (evt.getOldValue() != null && !evt.getOldValue().equals(evt.getNewValue()) || evt.getOldValue() == null && evt.getNewValue() != null) {
+			checkDirtyFlag();
+		}
 	}
 
 	private void checkDirtyFlag() {

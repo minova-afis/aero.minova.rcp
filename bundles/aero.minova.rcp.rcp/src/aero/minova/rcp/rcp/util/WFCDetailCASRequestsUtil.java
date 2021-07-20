@@ -251,7 +251,7 @@ public class WFCDetailCASRequestsUtil {
 						if (t != null) {
 							Table result = t.getResultSet();
 							if (result.getName().equals(g.getDataTable().getName())) {
-								selectedGrids.put(result.getName(), result);
+								selectedGrids.put(g.getProcedureSuffix(), result.copy());
 								updateSelectedGrids();
 							}
 						}
@@ -286,15 +286,12 @@ public class WFCDetailCASRequestsUtil {
 
 	public void updateSelectedGrids() {
 		for (Entry<String, Table> gridEntry : selectedGrids.entrySet()) {
-			for (MGrid mGrid : mDetail.getGrids()) {
-				if (mGrid.getDataTable().getName().equals(gridEntry.getKey())) {
-					GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
-					SectionGrid sectionGrid = gVA.getSectionGrid();
-					sectionGrid.setDataTable(gridEntry.getValue());
-					sectionGrid.clearDataChanges();
-					sectionGrid.enableInsert(true);
-				}
-			}
+			MGrid mGrid = mDetail.getGrid(gridEntry.getKey());
+			GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
+			SectionGrid sectionGrid = gVA.getSectionGrid();
+			sectionGrid.setDataTable(gridEntry.getValue().copy());
+			sectionGrid.clearDataChanges();
+			sectionGrid.enableInsert(true);
 		}
 	}
 
@@ -766,7 +763,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Fragt den Nutzer ob ungespeicherte Änderungen verworfen werden sollen
+	 * Fragt den Nutzer ob ungespeicherte Änderungen verworfen werden sollen. Wenn es keine Änderungen gibt wird true zurückgegeben
 	 * 
 	 * @return
 	 */
@@ -787,7 +784,6 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
 		selectedTable = null;
-		selectedGrids.clear();
 
 		for (MField f : mDetail.getFields()) {
 			setKeys(null);
@@ -803,8 +799,11 @@ public class WFCDetailCASRequestsUtil {
 			sg.enableInsert(false);
 		}
 
+		selectedGrids.clear();
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
+		// Auswahl im Index entfernen
+		broker.send(Constants.BROKER_CLEARSELECTION, perspective);
 	}
 
 	/**
@@ -847,14 +846,15 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Prüfung ob eine Wertänderung stattgefunden hat.
+	 * Prüfung ob eine Wertänderung in Feldern oder Grids stattgefunden hat.
 	 *
 	 * @return
 	 */
 	public boolean checkDirty() {
+		return checkFields() || checkGrids();
+	}
 
-		// TODO Prüfe Grids
-
+	private boolean checkFields() {
 		// Prüfung der mFields ob es einen Value ≠ null gibt
 		if (getSelectedTable() == null) {
 			for (MField mfield : mDetail.getFields()) {
@@ -881,6 +881,27 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 		}
+		return false;
+	}
+
+	private boolean checkGrids() {
+		// Prüfen, ob die MGrids Zeilen haben
+		if (selectedGrids.isEmpty()) {
+			for (MGrid grid : mDetail.getGrids()) {
+				if (!grid.getDataTable().getRows().isEmpty()) {
+					return true;
+				}
+			}
+		}
+
+		// Aktuellen Grids mit Werten der CAS-Zurückgabe vergleichen
+		for (Entry<String, Table> entry : selectedGrids.entrySet()) {
+			MGrid mGrid = mDetail.getGrid(entry.getKey());
+			if (!entry.getValue().equals(mGrid.getDataTable())) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 }
