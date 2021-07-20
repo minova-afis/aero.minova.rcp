@@ -39,8 +39,11 @@ public class Row {
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj, boolean exact) {
+		if (exact) {
+			return this.equals(obj);
+		}
+
 		if (this == obj)
 			return true;
 		if (obj == null)

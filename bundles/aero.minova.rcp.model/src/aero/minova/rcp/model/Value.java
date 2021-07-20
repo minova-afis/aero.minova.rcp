@@ -219,6 +219,8 @@ public class Value implements Serializable {
 
 		if (value == null && v.value != null) {
 			return false;
+		} else if (value == null && v.value == null) {
+			return this.type == v.type && this.getClass().equals(v.getClass());
 		}
 
 		return (this.type == v.type && this.value.equals(v.value) && this.getClass().equals(v.getClass()));
