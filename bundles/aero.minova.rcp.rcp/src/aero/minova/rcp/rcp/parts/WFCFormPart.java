@@ -16,7 +16,7 @@ import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstant
 public abstract class WFCFormPart {
 
 	@Inject
-	protected MPerspective perspective;
+	protected MPerspective mPerspective;
 	@Inject
 	protected IDataFormService dataFormService;
 	@Inject
@@ -29,7 +29,7 @@ public abstract class WFCFormPart {
 	public Form getForm(Composite parent) {
 		// form = perspective.getContext().get(Form.class);
 		if (form == null) {
-			String formName = perspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
+			String formName = mPerspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
 
 			form = dataFormService.getForm(formName);
 			if (form == null) {
@@ -39,7 +39,7 @@ public abstract class WFCFormPart {
 			}
 
 			// Form in den Context injected, damit überall darauf zugegriffen werden kann
-			perspective.getContext().set(Form.class, form);
+			mPerspective.getContext().set(Form.class, form);
 		}
 		return form;
 	}

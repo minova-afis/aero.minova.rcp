@@ -173,7 +173,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 
-		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
+		natTable = createNatTable(parent, form, getData(), selectionService, mPerspective.getContext());
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);
 	}
 
@@ -310,7 +310,7 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	public void clearSelection(@UIEventTopic(Constants.BROKER_CLEARSELECTION) MPerspective perspective) {
-		if (!perspective.equals(this.perspective)) {
+		if (!perspective.equals(this.mPerspective)) {
 			return;
 		}
 		bodyLayerStack.getSelectionLayer().clear(false);
@@ -322,10 +322,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	@Optional
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
-		if (map.get(perspective) != null) {
+		if (map.get(mPerspective) != null) {
 			// clear the group by summary cache so the new summary calculation gets triggered
 			bodyLayerStack.getBodyDataLayer().clearCache();
-			Table table = map.get(perspective);
+			Table table = map.get(mPerspective);
 			updateData(table.getRows());
 
 			if (table.getRows().isEmpty()) {

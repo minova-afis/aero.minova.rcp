@@ -137,9 +137,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private MPart mpart;
 
 	@Inject
-	private MPerspective mperspective;
-
-	@Inject
 	private TranslationService translationService;
 	private Locale locale;
 
@@ -167,6 +164,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
+		appContext = mApp.getContext();
 		if (getForm(parent) == null) {
 			return;
 		}
@@ -180,25 +178,26 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective, this);
+		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 
-		IWindowCloseHandler handler = window1 -> {
-			List<MPerspective> pList = (List<MPerspective>) appContext.get("DirtyPerspectives");
-			if (!pList.isEmpty()) {
-				String listString = "";
-				for (MPerspective mPerspective : pList) {
-					listString += " - " + translationService.translate(mPerspective.getLabel(), null) + "\n";
+		if (window.getContext().get(IWindowCloseHandler.class) == null) {
+			IWindowCloseHandler handler = mWindow -> {
+				@SuppressWarnings("unchecked")
+				List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
+				if (!pList.isEmpty()) {
+					StringBuilder listString = new StringBuilder();
+					for (MPerspective mPerspective : pList) {
+						listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
+					}
+					return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
+							translationService.translate("@msg.Close.DirtyMessage", null) + listString);
 				}
-				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
-						translationService.translate("@msg.Close.DirtyMessage", null) + listString);
-			} else {
 				return true;
-			}
-		};
-		window.getContext().set(IWindowCloseHandler.class, handler);
-		appContext = mApp.getContext();
+			};
+			window.getContext().set(IWindowCloseHandler.class, handler);
+		}
 	}
 
 	private static class HeadOrPageOrGridWrapper {
@@ -536,7 +535,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		int row = 0;
 		int column = 0;
 		int width;
-		IEclipseContext context = perspective.getContext();
+		IEclipseContext context = mPerspective.getContext();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
@@ -598,19 +597,19 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void createField(Composite composite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
-			BooleanField.create(composite, field, row, column, locale, perspective);
+			BooleanField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, locale, perspective);
+			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, locale, timezone, perspective);
+			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MShortDateField) {
-			ShortDateField.create(composite, field, row, column, locale, timezone, perspective);
+			ShortDateField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MShortTimeField) {
-			ShortTimeField.create(composite, field, row, column, locale, timezone, perspective);
+			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, locale, perspective);
+			LookupField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField) {
-			TextField.create(composite, field, row, column, perspective);
+			TextField.create(composite, field, row, column, mPerspective);
 		}
 	}
 
@@ -668,49 +667,44 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return casRequestsUtil;
 	}
 
-	private void setDirtyFlag(boolean b) {
-		this.dirtyFlag = b;
-		loadDirtyFlagintoPart();
+	private void setDirtyFlag(boolean dirtyFlag) {
+		this.dirtyFlag = dirtyFlag;
+
+		mpart.setDirty(dirtyFlag);
+		@SuppressWarnings("unchecked")
+		List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
+
+		if (dirtyFlag) {
+			if (pList == null) {
+				pList = new ArrayList<>();
+				appContext.set(Constants.DIRTY_PERSPECTIVES, pList);
+			}
+			if (!pList.contains(mPerspective)) {
+				pList.add(mPerspective);
+				refreshToolbar();
+			}
+		} else {
+			if (pList != null) {
+				pList.remove(mPerspective);
+				refreshToolbar();
+			}
+		}
 	}
 
 	public boolean getDirtyFlag() {
 		return dirtyFlag;
 	}
 
-	private void loadDirtyFlagintoPart() {
-		mpart.setDirty(dirtyFlag);
-		List<MPerspective> pList = (List<MPerspective>) appContext.get("DirtyPerspectives");
-		if (dirtyFlag) {
-			if (pList == null) {
-				pList = new ArrayList<>();
-				appContext.set("DirtyPerspectives", pList);
-			}
-			if (!pList.contains(mperspective)) {
-				pList.add(mperspective);
-				refreshToolbar(true);
-			}
-		} else {
-			if (pList != null) {
-				pList.remove(mperspective);
-				refreshToolbar(false);
-			}
-		}
-	}
-
-	public void refreshToolbar(boolean addFlag) {
+	public void refreshToolbar() {
 		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
 		MTrimBar tBar = findElements.get(0);
-		Composite p = (Composite) (tBar.getChildren().get(0)).getWidget();
-		ToolBar tb = (ToolBar) p.getChildren()[0];
+		Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
+		ToolBar tb = (ToolBar) c.getChildren()[0];
 
-		String perspectiveLabel = translationService.translate(perspective.getLabel(), null);
+		String perspectiveLabel = translationService.translate(mPerspective.getLabel(), null);
 		for (ToolItem item : tb.getItems()) {
 			if (item.getText().contains(perspectiveLabel)) {
-				if (addFlag) {
-					item.setText("*" + perspectiveLabel);
-				} else {
-					item.setText(perspectiveLabel);
-				}
+				item.setText((dirtyFlag ? "*" : "") + perspectiveLabel);
 			}
 		}
 		tb.requestLayout();

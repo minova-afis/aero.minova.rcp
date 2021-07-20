@@ -9,14 +9,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -141,17 +138,6 @@ public class WFCDetailCASRequestsUtil {
 
 	private WFCDetailPart wfcDetailPart;
 
-	/**
-	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
-	 *
-	 * @param rows
-	 */
-
-	@PreDestroy
-	public void predestroy() {
-		System.out.println("Check nochmal das Dirtyflag");
-	}
-
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective, WFCDetailPart wfcDetailPart) {
 		this.mDetail = detail;
 		this.perspective = perspective;
@@ -161,18 +147,20 @@ public class WFCDetailCASRequestsUtil {
 		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
 		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
 		dataService.setTimeoutOpenNotification(preferences.getInt(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION, 1));
-		preferences.addPreferenceChangeListener(new IPreferenceChangeListener() {
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event) {
-				if (event.getKey().equals(ApplicationPreferences.TIMEOUT_CAS)) {
-					dataService.setTimeout(Integer.parseInt((String) event.getNewValue()));
-				} else if (event.getKey().equals(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION)) {
-					dataService.setTimeoutOpenNotification(Integer.parseInt((String) event.getNewValue()));
-				}
+		preferences.addPreferenceChangeListener(event -> {
+			if (event.getKey().equals(ApplicationPreferences.TIMEOUT_CAS)) {
+				dataService.setTimeout(Integer.parseInt((String) event.getNewValue()));
+			} else if (event.getKey().equals(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION)) {
+				dataService.setTimeoutOpenNotification(Integer.parseInt((String) event.getNewValue()));
 			}
 		});
 	}
 
+	/**
+	 * Bei Auswahl eines Indexes wird anhand der in der Row vorhandenen Daten eine Anfrage an den CAS versendet, um sämltiche Informationen zu erhalten
+	 *
+	 * @param rows
+	 */
 	@Inject
 	public void changeSelectedEntry(@Optional @Named(Constants.BROKER_ACTIVEROWS) List<Row> rows) {
 		if (rows == null || rows.isEmpty()) {
@@ -784,7 +772,8 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private boolean discardChanges() {
 		if (wfcDetailPart.getDirtyFlag()) {
-			return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), translationService.translate("@msg.New.DirtyMessage", null));
+			return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
+					translationService.translate("@msg.New.DirtyMessage", null));
 		}
 		return true;
 	}
@@ -878,18 +867,19 @@ public class WFCDetailCASRequestsUtil {
 
 		// vergleicht Feld-Wert mit Wert aus ausgeleser Tabelle (vom CAS)
 		for (int i = 0; i < selectedTable.getColumnCount(); i++) {
-			String name = selectedTable.getColumnName(i);
-			MField c = mDetail.getField(name);
+			MField c = mDetail.getField(selectedTable.getColumnName(i));
 			Value sV = selectedTable.getRows().get(0).getValue(i);
-			if (c != null && c.getConsumer() != null) {
-				if (c instanceof MLookupField) {
-					if (c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
-						return true;
-					}
-				} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
+			if (c == null) {
+				continue;
+			}
+			if (c instanceof MLookupField) {
+				if (c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
 					return true;
 				}
+			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
+				return true;
 			}
+
 		}
 		return false;
 	}
