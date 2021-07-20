@@ -101,4 +101,43 @@ public class Column {
 		this.keyType = keyType;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dateTimeType == null) ? 0 : dateTimeType.hashCode());
+		result = prime * result + ((decimals == null) ? 0 : decimals.hashCode());
+		result = prime * result + (isLookup ? 1231 : 1237);
+		result = prime * result + ((keyType == null) ? 0 : keyType.hashCode());
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + ((lookupTable == null) ? 0 : lookupTable.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((outputType == null) ? 0 : outputType.hashCode());
+		result = prime * result + (readOnly ? 1231 : 1237);
+		result = prime * result + (required ? 1231 : 1237);
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Column other = (Column) obj;
+
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equalsIgnoreCase(other.name))
+			return false;
+
+		if (type != other.type)
+			return false;
+		return true;
+	}
+
 }
