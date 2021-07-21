@@ -40,6 +40,7 @@ import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.util.DateUtil;
 
+@SuppressWarnings("restriction")
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
@@ -64,7 +65,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	EventAdmin eventAdmin;
 
-	@SuppressWarnings("restriction")
 	@Inject
 	MPerspective mPerspective;
 
@@ -283,7 +283,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	 * @param t
 	 * @param r
 	 */
-	@SuppressWarnings("restriction")
 	private void setTable(Table t, Row r) {
 		WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
 
