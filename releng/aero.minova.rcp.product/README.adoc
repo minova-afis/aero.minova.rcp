@@ -50,6 +50,19 @@ image::doc/images/github-draft-new-release.png[]
 
 Hier wird der erstellte Tag aus Eclipse ausgewählt und in Tag version eingetragen. Zusätzlich werden die Felder mit sinnvollen Werten gefüllt.
 
+=== JRE Versionen bereit stellen
+
+Damit wir nicht ständig die JRE Versionen in das Anwednungsverzeichnis kopieren müssen, legen wird unmittelbar nach dem erstellen der Anwendungen die passenden Versionen in die ".zip" Dateien. Dieser Prozess wird für macOS und Windows durchgeführt. Verwendet wird die Version: *Java Runntime 11.0.7+10-LTS*
+
+== JRE für macOS
+Mittels rechtsklick wird auf das gebaute Anwednungsfragment geklickt. Paketinhalt öffnen.
+Danach kopiert man den JRE Ordner parallel in das geöffnete Verzeichnis. Man sollte darauf achten, dass der jre Ordner kleingeschrieben ist und die Struktur aufweist die in dem unteren Bild dargestellt wird. 
+image::doc/images/product-zipfiles_jre.png[]
+
+image::doc/images/product-zipfiles_jre1.png[]
+
+Danach kann der Name der "Eclispe.app" geändert werden. Zum Schluss wir noch eine komprimierte Datei aus der "xxx.app" erstellt. 
+
 === Hochladen auf ACode
 Wir haben uns vorerst darauf geeinigt, die 3 verschiedenen Anwendngen auf den ACode zu stellen.
 (Verzeichnis: _/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/_)
