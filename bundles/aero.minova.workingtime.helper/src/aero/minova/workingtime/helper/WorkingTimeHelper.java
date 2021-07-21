@@ -64,6 +64,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
 	EventAdmin eventAdmin;
 
+	@SuppressWarnings("restriction")
 	@Inject
 	MPerspective mPerspective;
 
@@ -115,7 +116,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		service.addValueChangeListener(ticketHelper);
 
 		// Vorbelegte Werte werden für das DirtyFlag ans WFCDetailCASRequestUtil geliefert
-		WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
 		Table table = new Table();
 		table.setName("WorkingTime");
 		Row r = new Row();
@@ -130,10 +130,17 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 				if (!l.isEmpty()) {
 					employeeValue = l.get(0);
 					employee.setValue(employeeValue, false);
-					table.addColumn(new Column(employee.getName(), employee.getDataType()));
-					r.addValue(employeeValue);
-				} else {
-					employee.setValue(null, false);
+
+					// Da das Auflösen etwas dauern kann muss die Tabelle evtl vor dem hinzufügen der Spalte geleert werden
+					if (!table.getRows().isEmpty()) {
+						table.getRows().clear();
+						table.addColumn(new Column(employee.getName(), employee.getDataType()));
+						r.addValue(employeeValue);
+						setTable(table, r);
+					} else {
+						table.addColumn(new Column(employee.getName(), employee.getDataType()));
+						r.addValue(employeeValue);
+					}
 				}
 			}));
 		}
@@ -143,10 +150,7 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 		table.addColumn(new Column(bookingDate.getName(), bookingDate.getDataType()));
 		r.addValue(bookingDateValue);
 
-		table.addRow(r);
-		casUtil.setSelectedTable(table);
-		Value val = employee.getValue() != null ? new Value(employee.getValue().getValue()) : null;
-		employee.setValue(val, false); // Check triggern
+		setTable(table, r);
 	}
 
 	protected void calculateTime() {
@@ -215,7 +219,6 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 	public void handleDetailAction(ActionCode code) {
 
 		// Vorbelegte Werte werden für das DirtyFlag ans WFCDetailCASRequestUtil geliefert
-		WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
 		Table table = new Table();
 		table.setName("WorkingTime");
 		Row r = new Row();
@@ -271,8 +274,21 @@ public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 			break;
 		}
 
-		table.addRow(r);
-		casUtil.setSelectedTable(table);
+		setTable(table, r);
+	}
+
+	/**
+	 * Setzt die übergebene Zeile in die Tabelle, setzt die Tabelle als selectedTable ins WFCDetailCASRequestsUtil, und checkt das DirtyFlag
+	 * 
+	 * @param t
+	 * @param r
+	 */
+	@SuppressWarnings("restriction")
+	private void setTable(Table t, Row r) {
+		WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
+
+		t.addRow(r);
+		casUtil.setSelectedTable(t);
 		Value val = employee.getValue() != null ? new Value(employee.getValue().getValue()) : null;
 		employee.setValue(val, false); // Check triggern
 	}
