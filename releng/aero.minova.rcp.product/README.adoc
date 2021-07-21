@@ -57,11 +57,23 @@ Damit wir nicht ständig die JRE Versionen in das Anwednungsverzeichnis kopieren
 == JRE für macOS
 Mittels rechtsklick wird auf das gebaute Anwednungsfragment geklickt. Paketinhalt öffnen.
 Danach kopiert man den JRE Ordner parallel in das geöffnete Verzeichnis. Man sollte darauf achten, dass der jre Ordner kleingeschrieben ist und die Struktur aufweist die in dem unteren Bild dargestellt wird. 
+
 image::doc/images/product-zipfiles_jre.png[]
 
 image::doc/images/product-zipfiles_jre1.png[]
 
 Danach kann der Name der "Eclispe.app" geändert werden. Zum Schluss wir noch eine komprimierte Datei aus der "xxx.app" erstellt. 
+
+== JRE für Windows
+Das erstellte ".zip" File wird unter einem Windows-File-System entpackt. Anschlißend kopiert man das Passende JRE direkt in das Anwendungsverzeichnis.
+
+image::doc/images/product-zipfiles_jre_windows.png[]
+
+image::doc/images/product-zipfiles_jre_windows1.png[]
+
+Danach wird das gesamte Verzeichnis wieder komprimiert. 
+
+
 
 === Hochladen auf ACode
 Wir haben uns vorerst darauf geeinigt, die 3 verschiedenen Anwendngen auf den ACode zu stellen.
