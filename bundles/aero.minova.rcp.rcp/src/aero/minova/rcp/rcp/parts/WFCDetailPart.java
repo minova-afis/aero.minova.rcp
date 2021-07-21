@@ -180,6 +180,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			mDetail.getHelper().setControls(mDetail);
 		}
 
+		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen
 		IWindowCloseHandler handler = mWindow -> {
 			@SuppressWarnings("unchecked")
 			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
@@ -188,8 +189,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				for (MPerspective mPerspective : pList) {
 					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
 				}
-				return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
-						translationService.translate("@msg.Close.DirtyMessage", null) + listString);
+				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
+						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
+						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
+
+				return dialog.open() == 0;
 			}
 			return true;
 		};

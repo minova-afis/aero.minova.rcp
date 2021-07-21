@@ -772,8 +772,10 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private boolean discardChanges() {
 		if (wfcDetailPart.getDirtyFlag()) {
-			return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
-					translationService.translate("@msg.New.DirtyMessage", null));
+			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
+					translationService.translate("@msg.New.DirtyMessage", null), MessageDialog.CONFIRM,
+					new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
+			return dialog.open() == 0;
 		}
 		return true;
 	}

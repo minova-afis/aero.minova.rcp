@@ -44,8 +44,11 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		List<MPerspective> changedPerspectives = ((List<MPerspective>) application.getContext().get(Constants.DIRTY_PERSPECTIVES));
 		changedPerspectives = changedPerspectives == null ? new ArrayList<>() : changedPerspectives;
 		if (changedPerspectives.contains(perspective)) {
-			discard = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null),
-					translationService.translate("@msg.New.DirtyMessage", null));
+			// customized MessageDialog with configured buttons
+			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
+					translationService.translate("@msg.New.DirtyMessage", null), MessageDialog.CONFIRM,
+					new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
+			discard = dialog.open() == 0;
 		}
 		if (!discard) {
 			return;
@@ -56,18 +59,17 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 			List<MTrimBar> findElements = modelService.findElements(window, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
 			MTrimBar tBar = findElements.get(0);
 			Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
-			if (c == null) {
-				return;
-			}
-			ToolBar tb = (ToolBar) c.getChildren()[0];
+			if (c != null) {
+				ToolBar tb = (ToolBar) c.getChildren()[0];
 
-			String perspectiveLabel = translationService.translate(perspective.getLabel(), null);
-			for (ToolItem item : tb.getItems()) {
-				if (item.getText().contains(perspectiveLabel)) {
-					item.setText(perspectiveLabel);
+				String perspectiveLabel = translationService.translate(perspective.getLabel(), null);
+				for (ToolItem item : tb.getItems()) {
+					if (item.getText().contains(perspectiveLabel)) {
+						item.setText(perspectiveLabel);
+					}
 				}
+				tb.requestLayout();
 			}
-			tb.requestLayout();
 		}
 
 		// Entfernt die Perspektive
