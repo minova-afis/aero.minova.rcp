@@ -40,7 +40,6 @@ import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.util.DateUtil;
 
-@SuppressWarnings("restriction")
 @Component
 public class WorkingTimeHelper implements IHelper, ValueChangeListener {
 
