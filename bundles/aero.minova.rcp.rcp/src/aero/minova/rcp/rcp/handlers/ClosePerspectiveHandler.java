@@ -44,7 +44,6 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		List<MPerspective> changedPerspectives = ((List<MPerspective>) application.getContext().get(Constants.DIRTY_PERSPECTIVES));
 		changedPerspectives = changedPerspectives == null ? new ArrayList<>() : changedPerspectives;
 		if (changedPerspectives.contains(perspective)) {
-			// customized MessageDialog with configured buttons
 			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
 					translationService.translate("@msg.New.DirtyMessage", null), MessageDialog.CONFIRM,
 					new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
@@ -61,7 +60,6 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 			Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
 			if (c != null) {
 				ToolBar tb = (ToolBar) c.getChildren()[0];
-
 				String perspectiveLabel = translationService.translate(perspective.getLabel(), null);
 				for (ToolItem item : tb.getItems()) {
 					if (item.getText().contains(perspectiveLabel)) {
