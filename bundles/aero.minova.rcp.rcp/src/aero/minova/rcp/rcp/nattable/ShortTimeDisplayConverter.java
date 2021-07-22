@@ -25,6 +25,14 @@ public class ShortTimeDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
+		if (displayValue instanceof String) {
+			Instant res = TimeUtil.getTime((String) displayValue);
+			if (res != null) {
+				return res;
+			} else {
+				throw new RuntimeException("Invalid input " + displayValue + " for datatype Instant");
+			}
+		}
 		return null;
 	}
 

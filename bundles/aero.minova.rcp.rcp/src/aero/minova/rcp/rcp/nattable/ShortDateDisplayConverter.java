@@ -25,6 +25,14 @@ public class ShortDateDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
+		if (displayValue instanceof String) {
+			Instant res = DateUtil.getDate((String) displayValue);
+			if (res != null) {
+				return res;
+			} else {
+				throw new RuntimeException("Invalid input " + displayValue + " for datatype Instant");
+			}
+		}
 		return null;
 	}
 

@@ -8,13 +8,14 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 
+import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
 
-public class ShortDateTimeDisplayConverter extends DisplayConverter {
+public class DateTimeDisplayConverter extends DisplayConverter {
 
 	private Locale locale;
 
-	public ShortDateTimeDisplayConverter(Locale locale) {
+	public DateTimeDisplayConverter(Locale locale) {
 		this.locale = locale;
 	}
 
@@ -31,7 +32,14 @@ public class ShortDateTimeDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
+		if (displayValue instanceof String) {
+			Instant res = DateTimeUtil.getDateTime((String) displayValue);
+			if (res != null) {
+				return res;
+			} else {
+				throw new RuntimeException("Invalid input " + displayValue + " for datatype Instant");
+			}
+		}
 		return null;
 	}
-
 }
