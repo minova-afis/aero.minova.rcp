@@ -326,7 +326,7 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon());
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon().replace(".ico", ""));
 				Image buttonImage = resManager.createImage(buttonImageDescriptor);
 				item.setImage(buttonImage);
 			}
