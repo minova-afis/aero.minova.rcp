@@ -54,7 +54,7 @@ Getestet mit Server xxxxxx
 - [ ] Leere Spalten können verborgen werden
 - [ ] Gruppenspalten können verborgen werden
 - [ ] Suchkriterien können angezeigt werden 
-- [ ] Interne Vorschau kann aktiviert werden 
+- [ ] Interne Vorschau kann aktiviert nicht werden 
 
 ## Details (Knöpfe in der Toolbar)
 - [ ] Einträge können gespeichert werden
