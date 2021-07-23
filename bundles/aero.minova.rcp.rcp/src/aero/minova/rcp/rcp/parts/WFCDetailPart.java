@@ -152,7 +152,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
-		partContext.set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
+		partContext.set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
 	}
 

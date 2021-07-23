@@ -117,8 +117,6 @@ public class Constants {
 	public static final String KEPT_PERSPECTIVE_LOCALIZEDLABEL = ".LocalizedLabel";
 	public static final String KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP = ".LocalizedToolTip";
 
-	public static final String DETAIL_WIDTH = "Detail_Width";
-
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
 	 *
