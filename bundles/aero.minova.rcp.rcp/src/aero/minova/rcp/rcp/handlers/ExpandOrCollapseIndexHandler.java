@@ -16,7 +16,7 @@ public class ExpandOrCollapseIndexHandler {
 	IEventBroker broker;
 
 	@Execute
-	public void execute(MPart mpart, @Optional @Named("aero.minova.rcp.rcp.commandparameter.expandorcollapse") String name) {
+	public void execute(MPart mpart, @Optional @Named("aero.minova.rcp.rcp.commandparameter.expandorcollapseindex") String name) {
 		if (name.equals("EXPAND")) {
 			broker.post(Constants.BROKER_EXPANDINDEX, "Expand Index");
 		} else if (name.equals("COLLAPSE")) {
