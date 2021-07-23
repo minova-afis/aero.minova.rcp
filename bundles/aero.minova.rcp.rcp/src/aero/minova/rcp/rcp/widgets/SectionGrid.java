@@ -14,6 +14,8 @@ import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -95,6 +97,8 @@ public class SectionGrid {
 	private IDataService dataService;
 	@Inject
 	private MPerspective perspective;
+	@Inject
+	private EModelService emservice;
 	@Inject
 	private Form form;
 
@@ -409,6 +413,10 @@ public class SectionGrid {
 		// Section soll nicht kleiner als Default sein
 		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
 		section.requestLayout();
+
+		// Width in den Context setzten, damit wir überall darauf zugreifen können
+		MPart detail = emservice.findElements(perspective, "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
+		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
 	}
 
 	public void addNewRow() {
