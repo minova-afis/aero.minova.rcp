@@ -1,9 +1,4 @@
-Version 2.4
-
-## Version 2.4 ##
-## 23.07.2021 ##
-## 12.0.24 ##
-Fragment aufräumen, unnötige Handler und Commands entfernen
+Version 2.3
 
 ## Version 2.3 ##
 ## 16.07.2021 ##
