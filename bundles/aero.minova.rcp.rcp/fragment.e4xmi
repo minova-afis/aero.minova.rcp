@@ -79,11 +79,9 @@
     <elements xsi:type="commands:Command" xmi:id="_laMxsrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.loadindex" commandName="LoadIndex">
       <persistedState key="persistState" value="false"/>
     </elements>
-    <elements xsi:type="commands:Command" xmi:id="_laMxtLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.expandindex" commandName="ExpandIndex">
+    <elements xsi:type="commands:Command" xmi:id="_laMxtLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.expandorcollapseindex" commandName="ExpandOrCollapseIndex">
       <persistedState key="persistState" value="false"/>
-    </elements>
-    <elements xsi:type="commands:Command" xmi:id="_laMxtbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.collapseindex" commandName="Collapse Index">
-      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_9FsgAOu2Eeud9_htROD_Kw" elementId="aero.minova.rcp.rcp.commandparameter.expandorcollapse" name="ExpandOrCollapse"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_laMxtrbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.exportto" commandName="ExportTo">
       <persistedState key="persistState" value="false"/>
@@ -146,8 +144,7 @@
           <children xsi:type="basic:PartStack" xmi:id="_CeFnmrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_CeFnm7byEeuZF8ZS2_h9rA">
             <children xsi:type="basic:Part" xmi:id="_CeFnm7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPart" label="@Form.Index" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Index/32x32.png" bindingContexts="_uvkSkOOgEeuITvUQkIW3uw">
               <handlers xmi:id="_CeFnnLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_laMxsrbdEeuZF8ZS2_h9rA"/>
-              <handlers xmi:id="_CeFnnbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.expandindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
-              <handlers xmi:id="_CeFnnrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.collapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.CollapseIndexHandler" command="_laMxtbbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_CeFnnbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.expandorcollapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandOrCollapseIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnn7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_laMxtrbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnoLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
               <toolbar xmi:id="_CeFnobbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.index.toolbar"/>
@@ -230,9 +227,11 @@
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFno7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="@Action.NodesExpand" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExpandTree.Command/32x32.png" tooltip="@Action.NodesExpand" command="_laMxtLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
+        <parameters xmi:id="_Rb15wOu3Eeud9_htROD_Kw" elementId="aero.minova.rcp.rcp.parameter.expandindex" name="aero.minova.rcp.rcp.commandparameter.expandorcollapse" value="EXPAND"/>
       </children>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnpLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="@Action.NodesCollapse" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/CollapseTree.Command/32x32.png" tooltip="@Action.NodesCollapse" command="_laMxtbbdEeuZF8ZS2_h9rA">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnpLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="@Action.NodesCollapse" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/CollapseTree.Command/32x32.png" tooltip="@Action.NodesCollapse" command="_laMxtLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
+        <parameters xmi:id="_dnwdAOu3Eeud9_htROD_Kw" elementId="aero.minova.rcp.rcp.parameter.collapseindex" name="aero.minova.rcp.rcp.commandparameter.expandorcollapse" value="COLLAPSE"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnpbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.export" label="@Action.ExportAll" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/ExportTable.Command/32x32.png" tooltip="@Action.ExportAll" command="_laMxtrbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
