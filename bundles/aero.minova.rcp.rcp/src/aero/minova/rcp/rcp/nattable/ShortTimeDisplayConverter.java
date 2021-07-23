@@ -25,7 +25,7 @@ public class ShortTimeDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
-		if (displayValue instanceof String) {
+		if (displayValue instanceof String && !((String) displayValue).isBlank()) {
 			Instant res = TimeUtil.getTime((String) displayValue);
 			if (res != null) {
 				return res;
