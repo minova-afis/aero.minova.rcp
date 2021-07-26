@@ -281,7 +281,7 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param section
 	 */
 	private void createButton(HeadOrPageOrGridWrapper headOPOGWrapper, Section section) {
-		if ((headOPOGWrapper.headOrPageOrGrid instanceof Grid)) {
+		if (headOPOGWrapper.headOrPageOrGrid instanceof Grid) {
 			return;
 		}
 
@@ -319,6 +319,8 @@ public class WFCDetailPart extends WFCFormPart {
 								handlerService.executeHandler(command);
 							} else if (o instanceof Procedure) {
 								casRequestsUtil.callProcedure((Procedure) o);
+							} else {
+								System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 							}
 						}
 					}
