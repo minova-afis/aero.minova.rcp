@@ -44,9 +44,11 @@ import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
+import aero.minova.rcp.form.model.xsd.EventParam;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
@@ -816,5 +818,23 @@ public class WFCDetailCASRequestsUtil {
 
 	public Table getSelectedTable() {
 		return selectedTable;
+	}
+
+	/**
+	 * Die übergebene Procedur wird aufgerufen. Als Parameter werden die Werte des aktuell geladenen Datensatzes übergeben
+	 * 
+	 * @param p
+	 */
+	public void callProcedure(Procedure p) {
+		Table t = new Table();
+		t.setName(p.getName());
+		Row r = new Row();
+		for (EventParam ep : p.getParam()) {
+			MField f = detail.getField(ep.getFieldName());
+			t.addColumn(new aero.minova.rcp.model.Column(ep.getFieldName(), f.getDataType(), OutputType.valueOf(ep.getType())));
+			r.addValue(f.getValue());
+		}
+		t.addRow(r);
+		dataService.getDetailDataAsync(t.getName(), t);
 	}
 }

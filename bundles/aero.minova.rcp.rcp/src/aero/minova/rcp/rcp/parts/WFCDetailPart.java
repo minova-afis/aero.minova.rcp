@@ -64,6 +64,7 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
+import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
@@ -280,14 +281,20 @@ public class WFCDetailPart extends WFCFormPart {
 	 * @param section
 	 */
 	private void createButton(HeadOrPageOrGridWrapper headOPOGWrapper, Section section) {
-		if (headOPOGWrapper.isHead || (headOPOGWrapper.headOrPageOrGrid instanceof Grid)) {
+		if (headOPOGWrapper.headOrPageOrGrid instanceof Grid) {
 			return;
 		}
 
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
-		Page page = (Page) headOPOGWrapper.headOrPageOrGrid;
-		for (aero.minova.rcp.form.model.xsd.Button btn : page.getButton()) {
+		List<aero.minova.rcp.form.model.xsd.Button> buttons = new ArrayList<>();
+		if (headOPOGWrapper.headOrPageOrGrid instanceof Page) {
+			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
+		} else if (headOPOGWrapper.headOrPageOrGrid instanceof Head) {
+			buttons = ((Head) headOPOGWrapper.headOrPageOrGrid).getButton();
+		}
+
+		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
 			final ToolItem item = new ToolItem(bar, SWT.PUSH);
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
@@ -303,19 +310,25 @@ public class WFCDetailPart extends WFCFormPart {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
 						// TODO: Andere procedures/bindings/instances auswerten
+						List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
 
-						Wizard wizard = getWizard(onclick);
-						if (wizard != null) {
-							Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, wizard.getWizardname());
-							ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
-							handlerService.executeHandler(command);
+						for (Object o : binderOrProcedureOrInstances) {
+							if (o instanceof Wizard) {
+								Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, ((Wizard) o).getWizardname());
+								ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+								handlerService.executeHandler(command);
+							} else if (o instanceof Procedure) {
+								casRequestsUtil.callProcedure((Procedure) o);
+							} else {
+								System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
+							}
 						}
 					}
 				});
 			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon());
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon().replace(".ico", ""));
 				Image buttonImage = resManager.createImage(buttonImageDescriptor);
 				item.setImage(buttonImage);
 			}
@@ -330,15 +343,6 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 		}
 		// TODO: Onbinder und ValueChange implementieren
-		return null;
-	}
-
-	private Wizard getWizard(Onclick onclick) {
-		for (Object o : onclick.getBinderOrProcedureOrInstance()) {
-			if (o instanceof Wizard) {
-				return (Wizard) o;
-			}
-		}
 		return null;
 	}
 
