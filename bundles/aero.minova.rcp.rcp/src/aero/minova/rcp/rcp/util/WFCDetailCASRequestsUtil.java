@@ -927,10 +927,10 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setSelectedTable(Table table) {
 		this.selectedTable = table;
-  }
-	 
-   /* Die übergebene Procedur wird aufgerufen. Als Parameter werden die Werte des aktuell geladenen Datensatzes übergeben
-	 * 
+	}
+
+	/*
+	 * Die übergebene Procedur wird aufgerufen. Als Parameter werden die Werte des aktuell geladenen Datensatzes übergeben
 	 * @param p
 	 */
 	public void callProcedure(Procedure p) {
@@ -938,7 +938,7 @@ public class WFCDetailCASRequestsUtil {
 		t.setName(p.getName());
 		Row r = new Row();
 		for (EventParam ep : p.getParam()) {
-			MField f = detail.getField(ep.getFieldName());
+			MField f = mDetail.getField(ep.getFieldName());
 			t.addColumn(new aero.minova.rcp.model.Column(ep.getFieldName(), f.getDataType(), OutputType.valueOf(ep.getType())));
 			r.addValue(f.getValue());
 		}
