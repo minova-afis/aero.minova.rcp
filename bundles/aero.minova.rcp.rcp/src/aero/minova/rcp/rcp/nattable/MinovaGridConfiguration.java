@@ -166,9 +166,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
-		ShortDateTimeDisplayConverter shortDateTimeDisplayConverter = new ShortDateTimeDisplayConverter(locale);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortDateTimeDisplayConverter, DisplayMode.NORMAL,
-				configLabel + columnIndex);
+		DateTimeDisplayConverter dateTimeDisplayConverter = new DateTimeDisplayConverter(locale);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, dateTimeDisplayConverter, DisplayMode.NORMAL, configLabel + columnIndex);
 
 		if (!isReadOnly) {
 			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
