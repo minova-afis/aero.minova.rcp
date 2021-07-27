@@ -32,8 +32,7 @@ public class Constants {
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
 
-	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
-	// textfieldVerifier zuzugreifen
+	// dient dazu, um auf die aus den preferences übernommene Zeitzone im textfieldVerifier zuzugreifen
 	public static final String FOCUSED_ORIGIN = "XMLDetailPart";
 
 	public static final String CLEAR_REQUEST = "Clear";
@@ -42,8 +41,7 @@ public class Constants {
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
 
-	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden
-	// müssen
+	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden müssen
 	public static final String FORM_BOOKINGDATE = "BookingDate";
 	public static final String FORM_STARTDATE = "StartDate";
 	public static final String FORM_ENDDATE = "EndDate";
@@ -57,6 +55,7 @@ public class Constants {
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
 	public static final String BROKER_NEWENTRY = "aero/minova/rcp/NewFields";
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
+	public static final String BROKER_CLEARSELECTION = "aero/minova/rcp/ClearSelection";
 	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
@@ -116,6 +115,8 @@ public class Constants {
 	public static final String KEPT_PERSPECTIVE_ICONURI = ".IconURI";
 	public static final String KEPT_PERSPECTIVE_LOCALIZEDLABEL = ".LocalizedLabel";
 	public static final String KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP = ".LocalizedToolTip";
+
+	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden

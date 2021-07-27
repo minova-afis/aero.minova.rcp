@@ -31,7 +31,7 @@ public class MDetail {
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
 	 * <li>"CustomerUserCode.UserCode" = Das Feld UserCode in der Maske CustomerUserCode.op.xml</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param field
 	 *            das eigentliche Feld
 	 */
@@ -46,7 +46,7 @@ public class MDetail {
 	/**
 	 * Ein neues MGrid dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B. Um diese Einigkeit zu erreichen wird der
 	 * Procedure-Suffix des Grid-Knoten verwendet. Dies ist ein Pflichtfeld!
-	 * 
+	 *
 	 * @param g
 	 *            das MGrid
 	 */

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
@@ -132,10 +133,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		Lookup up = ((Lookup) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
 		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> {
-			up.getContentProvider().setValuesOnly(l);
-			if (l.size() == 1) {
-				field.setValue(l.get(0), false);
-			}
+			try {
+				up.getContentProvider().setValuesOnly(l);
+				if (l.size() == 1) {
+					field.setValue(l.get(0), false);
+				}
+			} catch (SWTException e) {}
 		}));
 	}
 

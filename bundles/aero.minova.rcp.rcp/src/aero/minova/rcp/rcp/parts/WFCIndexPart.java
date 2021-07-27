@@ -173,7 +173,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 
-		natTable = createNatTable(parent, form, getData(), selectionService, perspective.getContext());
+		natTable = createNatTable(parent, form, getData(), selectionService, mPerspective.getContext());
 		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);
 	}
 
@@ -307,16 +307,25 @@ public class WFCIndexPart extends WFCFormPart {
 		NatTableUtil.resize(natTable);
 	}
 
+	@Inject
+	@Optional
+	public void clearSelection(@UIEventTopic(Constants.BROKER_CLEARSELECTION) MPerspective perspective) {
+		if (!perspective.equals(this.mPerspective)) {
+			return;
+		}
+		bodyLayerStack.getSelectionLayer().clear(false);
+	}
+
 	/**
 	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table, diese wird dann an den CAS als Anfrage übergeben.
 	 */
 	@Inject
 	@Optional
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
-		if (map.get(perspective) != null) {
+		if (map.get(mPerspective) != null) {
 			// clear the group by summary cache so the new summary calculation gets triggered
 			bodyLayerStack.getBodyDataLayer().clearCache();
-			Table table = map.get(perspective);
+			Table table = map.get(mPerspective);
 			updateData(table.getRows());
 
 			if (table.getRows().isEmpty()) {

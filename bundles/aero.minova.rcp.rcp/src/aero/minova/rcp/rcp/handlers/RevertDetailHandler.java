@@ -20,7 +20,8 @@ public class RevertDetailHandler {
 	@CanExecute
 	public boolean canExecute(MPart part) {
 		if (part.getObject() instanceof WFCDetailPart) {
-			return ((WFCDetailPart) part.getObject()).getRequestUtil().getSelectedTable() != null;
+			WFCDetailPart detail = (WFCDetailPart) part.getObject();
+			return detail.getRequestUtil().getSelectedTable() != null && detail.getDirtyFlag();
 		}
 		return false;
 	}

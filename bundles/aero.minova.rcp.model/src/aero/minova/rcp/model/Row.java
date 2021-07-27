@@ -27,4 +27,44 @@ public class Row {
 		return "Row [values=" + values + "]";
 	}
 
+	public List<Value> getValues() {
+		return values;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((values == null) ? 0 : values.hashCode());
+		return result;
+	}
+
+	public boolean equals(Object obj, boolean exact) {
+		if (exact) {
+			return this.equals(obj);
+		}
+
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+
+		Row other = (Row) obj;
+		if (values == null) {
+			if (other.values != null)
+				return false;
+		} else if (values.size() != other.values.size()) {
+			return false;
+		} else {
+			for (int i = 0; i < values.size(); i++) {
+				if (!values.get(i).equals(other.values.get(i))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 }

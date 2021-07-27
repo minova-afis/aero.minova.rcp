@@ -24,14 +24,21 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -48,6 +55,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -59,13 +67,16 @@ import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
+import aero.minova.rcp.model.event.GridChangeEvent;
+import aero.minova.rcp.model.event.GridChangeListener;
+import aero.minova.rcp.model.event.ValueChangeEvent;
+import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -94,7 +105,7 @@ import aero.minova.rcp.rcp.widgets.Lookup;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 @SuppressWarnings("restriction")
-public class WFCDetailPart extends WFCFormPart {
+public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
 	private static final int MARGIN_SECTION = 8;
 	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
@@ -117,7 +128,12 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private Composite composite;
 
-	private MDetail detail = new MDetail();
+	private MDetail mDetail = new MDetail();
+
+	private boolean dirtyFlag;
+
+	@Inject
+	private MPart mpart;
 
 	@Inject
 	private TranslationService translationService;
@@ -134,27 +150,55 @@ public class WFCDetailPart extends WFCFormPart {
 	private LocalResourceManager resManager;
 	private WFCDetailCASRequestsUtil casRequestsUtil;
 
+	private IEclipseContext appContext;
+
+	@Inject
+	MWindow mwindow;
+
+	@Inject
+	EModelService eModelService;
+
 	@PostConstruct
-	public void postConstruct(Composite parent, IEclipseContext partContext) {
+	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
+		appContext = mApp.getContext();
 		if (getForm(parent) == null) {
 			return;
 		}
 		layoutForm(parent);
 
-		// erzeuge die util Methoden mit DI
-		IEclipseContext localContext = EclipseContextFactory.create();
-		localContext.set(Form.class, form);
-
-		localContext.setParent(partContext);
-
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
-		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, localContext);
-		casRequestsUtil.initializeCasRequestUtil(getDetail(), perspective);
-		partContext.set("Detail_Width", SECTION_WIDTH);
+		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
+		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
+		mPerspective.getContext().set("WFCDetailCASRequestsUtil", casRequestsUtil);
+		mPerspective.getContext().set("Detail_Width", SECTION_WIDTH);
 		translate(composite);
+
+		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
+		if (mDetail.getHelper() != null) {
+			mDetail.getHelper().setControls(mDetail);
+		}
+
+		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen
+		IWindowCloseHandler handler = mWindow -> {
+			@SuppressWarnings("unchecked")
+			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
+			if (!pList.isEmpty()) {
+				StringBuilder listString = new StringBuilder();
+				for (MPerspective mPerspective : pList) {
+					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
+				}
+				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
+						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
+						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
+
+				return dialog.open() == 0;
+			}
+			return true;
+		};
+		window.getContext().set(IWindowCloseHandler.class, handler);
 	}
 
 	private static class HeadOrPageOrGridWrapper {
@@ -218,8 +262,8 @@ public class WFCDetailPart extends WFCFormPart {
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
 			IHelper iHelper = helperlist.get(0);
-			iHelper.setControls(getDetail());
 			getDetail().setHelper(iHelper);
+			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
 
@@ -256,7 +300,7 @@ public class WFCDetailPart extends WFCFormPart {
 		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
-		MSection mSection = new MSection(true, "open", detail, section.getText(), sectionControl, section);
+		MSection mSection = new MSection(true, "open", mDetail, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
 		// Erstellen der Field des Section.
@@ -269,7 +313,7 @@ public class WFCDetailPart extends WFCFormPart {
 		composite.getParent().setTabList(getTabListForSection(composite.getParent()));
 
 		// MSection wird zum MDetail hinzugefügt.
-		detail.addPage(mSection);
+		mDetail.addPage(mSection);
 	}
 
 	/**
@@ -495,12 +539,13 @@ public class WFCDetailPart extends WFCFormPart {
 		int row = 0;
 		int column = 0;
 		int width;
-		IEclipseContext context = perspective.getContext();
+		IEclipseContext context = mPerspective.getContext();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
 					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
 					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
+					mGrid.addGridChangeListener(this);
 					GridAccessor gA = new GridAccessor(mGrid);
 					gA.setSectionGrid(sg);
 					mGrid.setGridAccessor(gA);
@@ -514,6 +559,7 @@ public class WFCDetailPart extends WFCFormPart {
 			}
 			Field field = (Field) fieldOrGrid;
 			MField f = ModelToViewModel.convert(field);
+			f.addValueChangeListener(this);
 			getDetail().putField(f);
 
 			if (!field.isVisible()) {
@@ -555,19 +601,19 @@ public class WFCDetailPart extends WFCFormPart {
 
 	private void createField(Composite composite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
-			BooleanField.create(composite, field, row, column, locale, perspective);
+			BooleanField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, locale, perspective);
+			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, locale, timezone, perspective);
+			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MShortDateField) {
-			ShortDateField.create(composite, field, row, column, locale, timezone, perspective);
+			ShortDateField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MShortTimeField) {
-			ShortTimeField.create(composite, field, row, column, locale, timezone, perspective);
+			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, locale, perspective);
+			LookupField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField) {
-			TextField.create(composite, field, row, column, perspective);
+			TextField.create(composite, field, row, column, mPerspective);
 		}
 	}
 
@@ -618,10 +664,76 @@ public class WFCDetailPart extends WFCFormPart {
 	}
 
 	public MDetail getDetail() {
-		return detail;
+		return mDetail;
 	}
 
 	public WFCDetailCASRequestsUtil getRequestUtil() {
 		return casRequestsUtil;
 	}
+
+	private void setDirtyFlag(boolean dirtyFlag) {
+		this.dirtyFlag = dirtyFlag;
+
+		mpart.setDirty(dirtyFlag);
+		@SuppressWarnings("unchecked")
+		List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
+
+		if (dirtyFlag) {
+			if (pList == null) {
+				pList = new ArrayList<>();
+				appContext.set(Constants.DIRTY_PERSPECTIVES, pList);
+			}
+			if (!pList.contains(mPerspective)) {
+				pList.add(mPerspective);
+				refreshToolbar();
+			}
+		} else {
+			if (pList != null) {
+				pList.remove(mPerspective);
+				refreshToolbar();
+			}
+		}
+	}
+
+	public boolean getDirtyFlag() {
+		return dirtyFlag;
+	}
+
+	public void refreshToolbar() {
+		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
+		MTrimBar tBar = findElements.get(0);
+		Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
+		if (c == null) {
+			return;
+		}
+		ToolBar tb = (ToolBar) c.getChildren()[0];
+
+		String perspectiveLabel = translationService.translate(mPerspective.getLabel(), null);
+		for (ToolItem item : tb.getItems()) {
+			if (item.getText().contains(perspectiveLabel)) {
+				item.setText((dirtyFlag ? "*" : "") + perspectiveLabel);
+			}
+		}
+		tb.requestLayout();
+	}
+
+	@Override
+	public void gridChange(GridChangeEvent evt) {
+		checkDirtyFlag();
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		checkDirtyFlag();
+	}
+
+	private void checkDirtyFlag() {
+		if (casRequestsUtil != null) {
+			boolean setDirty = casRequestsUtil.checkDirty();
+			if (this.dirtyFlag != setDirty) {
+				setDirtyFlag(setDirty);
+			}
+		}
+	}
+
 }

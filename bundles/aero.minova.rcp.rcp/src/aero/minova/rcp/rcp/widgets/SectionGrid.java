@@ -361,6 +361,7 @@ public class SectionGrid {
 	public void updateNatTable() {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
+		gridAccessor.getMGrid().dataTableChanged();
 		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
 	}
 
@@ -416,7 +417,6 @@ public class SectionGrid {
 		preallocatePrimaryKeys(newRow);
 		rowsToInsert.add(newRow);
 		updateNatTable();
-		gridAccessor.getMGrid().dataTableChanged();
 	}
 
 	private void preallocatePrimaryKeys(Row r) {

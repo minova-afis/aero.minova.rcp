@@ -24,18 +24,18 @@ import aero.minova.rcp.constants.Constants;
 public class SwitchPerspectiveHandler {
 
 	@Inject
-	MApplication application;
+	protected MApplication application;
 
 	@Inject
 	EPartService partService;
 
 	@Inject
-	EModelService model;
+	EModelService modelService;
 
 	@Execute
-	public void execute(IEclipseContext context,
-			@Optional @Named(Constants.FORM_NAME) String formName,
-			@Optional @Named(Constants.FORM_ID) String perspectiveId,
+	public void execute(IEclipseContext context, //
+			@Optional @Named(Constants.FORM_NAME) String formName, //
+			@Optional @Named(Constants.FORM_ID) String perspectiveId, //
 			@Optional @Named(Constants.FORM_LABEL) String perspectiveName, MWindow window) {
 
 		Objects.requireNonNull(formName);
@@ -48,15 +48,12 @@ public class SwitchPerspectiveHandler {
 	/**
 	 * Opens the perspective with the given identifier.
 	 * 
-	 * @param perspectiveId The perspective to open; must not be <code>null</code>
-	 * @throws ExecutionException If the perspective could not be opened.
+	 * @param perspectiveId
+	 *            The perspective to open; must not be <code>null</code>
+	 * @throws ExecutionException
+	 *             If the perspective could not be opened.
 	 */
-	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName,
-			String perspectiveName) {
-		MApplication application = context.get(MApplication.class);
-		EModelService modelService = context.get(EModelService.class);
-
-
+	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName, String perspectiveName) {
 		MUIElement element = modelService.find(perspectiveID, application);
 		if (element == null) {
 			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID, formName, perspectiveName);
@@ -66,23 +63,18 @@ public class SwitchPerspectiveHandler {
 	}
 
 	/**
-	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt
-	 * sofort zur neuen Perspektive.
+	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt sofort zur neuen Perspektive.
 	 * 
 	 * @param window
 	 * @param perspectiveStack
 	 * @param perspectiveID
 	 * @return die neue Perspektive
 	 */
-	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID, String formName,
-			String perspectiveName) {
+	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID, String formName, String perspectiveName) {
 		MWindow window = context.get(MWindow.class);
-		EModelService modelService = context.get(EModelService.class);
-
 
 		@SuppressWarnings("unchecked")
-		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService
-				.find("aero.minova.rcp.rcp.perspectivestack", application);
+		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
 		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
@@ -102,14 +94,11 @@ public class SwitchPerspectiveHandler {
 	}
 
 	/**
-	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist
-	 * O
+	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist 
 	 * 
 	 * @param element
 	 */
-	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID,
-			MWindow window) {
-
+	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
 		if (element instanceof MPerspective) {
 			partService.switchPerspective(element.getElementId());
 		} else {

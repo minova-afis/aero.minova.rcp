@@ -209,6 +209,20 @@ public class Value implements Serializable {
 		if (v == null) {
 			return false; // wir sind gesetzt und vergleichen mit null -> false
 		}
+
+		if (v.getValue() instanceof LookupValue && value instanceof Integer) {
+			return ((LookupValue) v.getValue()).getKeyLong().equals(value);
+		}
+		if (value instanceof LookupValue && v.getValue() instanceof Integer) {
+			return ((LookupValue) value).getKeyLong().equals(v.getValue());
+		}
+
+		if (value == null && v.value != null) {
+			return false;
+		} else if (value == null && v.value == null) {
+			return this.type == v.type && this.getClass().equals(v.getClass());
+		}
+
 		return (this.type == v.type && this.value.equals(v.value) && this.getClass().equals(v.getClass()));
 	}
 }
