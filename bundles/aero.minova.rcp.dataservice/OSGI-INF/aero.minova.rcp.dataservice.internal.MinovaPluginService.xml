@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="aero.minova.rcp.dataservice.internal.MinovaPluginService">
+   <service>
+      <provide interface="aero.minova.rcp.dataservice.IMinovaPluginService"/>
+   </service>
+   <reference bind="getDataService" interface="aero.minova.rcp.dataservice.IDataService" name="getDataService"/>
+   <reference bind="getDummyService" interface="aero.minova.rcp.dataservice.IDummyService" name="getDummyService"/>
+   <implementation class="aero.minova.rcp.dataservice.internal.MinovaPluginService"/>
+</scr:component>

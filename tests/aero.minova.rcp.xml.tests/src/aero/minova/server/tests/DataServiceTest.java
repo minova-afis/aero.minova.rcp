@@ -105,4 +105,15 @@ class DataServiceTest {
 			e.printStackTrace();
 		}
 	}
+
+	@Test
+	@DisplayName("Split String from class to plugin name")
+	void validateThatPluginForHelperClassIsNamedCorretly() {
+		String className = "aero.minova.workingtime.helper.WorkingTimeHelper";
+		int lastIndexOf = className.lastIndexOf('.');
+		String pluginName = className.substring(0, lastIndexOf);
+
+		assertEquals("aero.minova.workingtime.helper", pluginName,
+				"Hey looks like we do not know how to split strings");
+	}
 }
