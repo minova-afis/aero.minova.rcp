@@ -161,9 +161,15 @@ public class DataService implements IDataService {
 		this.server = server;
 		this.workspacePath = workspacePath;
 		init();
-		BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
-		// allow to trigger components after the service has been initialized, see
-		bundleContext.registerService(IDummyService.class.getName(), new IDummyService(), null);
+
+		// im Falle der Unit tests haben wir keinen bundle context
+		if (FrameworkUtil.getBundle(this.getClass()) != null) {
+			BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
+			// allow to trigger components after the service has been initialized, see
+			// WFCTranslationDownloadService#getDummyService
+			bundleContext.registerService(IDummyService.class.getName(), new IDummyService(), null);
+
+		}
 	}
 
 	/**
@@ -425,7 +431,9 @@ public class DataService implements IDataService {
 	}
 
 	private void log(String body) {
-		logger.info(body);
+		if (logger != null) {
+			logger.info(body);
+		}
 	}
 
 	@Override
