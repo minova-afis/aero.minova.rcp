@@ -10,6 +10,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 
 import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.helper.IMinovaWizard;
 
 /**
  * Basisklasse für alle Minova-Assistenten (Wizards)
@@ -17,7 +18,7 @@ import aero.minova.rcp.model.form.MDetail;
  * @author erlanger
  * @since 12.0.0
  */
-public class MinovaWizard extends Wizard {
+public class MinovaWizard extends Wizard implements IMinovaWizard {
 	private IMinovaWizardFinishAction finishAction;
 	private Object opener;
 
@@ -111,6 +112,7 @@ public class MinovaWizard extends Wizard {
 		this.opener = opener;
 	}
 
+	@Override
 	public void setOriginalMDetail(MDetail originalMDetail) {
 		this.originalMDetail = originalMDetail;
 	}

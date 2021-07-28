@@ -256,7 +256,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
 			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
-				// TODO Übersetzung!
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
 			IHelper iHelper = helperlist.get(0);

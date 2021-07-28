@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -16,6 +16,8 @@ public class PluginInformation {
 	private int patchLevel;
 	private String buildnumber;
 
+	Pattern pattern = Pattern.compile("^(.+)[_-](\\d+)\\.(\\d+)\\.(\\d+)[\\.-]?(.*)\\.jar$");
+
 	public int getMajorRelease() {
 		return majorRelease;
 	}
@@ -26,7 +28,6 @@ public class PluginInformation {
 		this.jarFile = jarFile;
 		String filename = jarFile.getName();
 
-		Pattern pattern = Pattern.compile("^(.+)[_-](\\d+)\\.(\\d+)\\.(\\d+)[\\.-]?(.*)\\.jar$");
 
 		Matcher matcher = pattern.matcher(filename);
 		if (matcher.find(0)) {

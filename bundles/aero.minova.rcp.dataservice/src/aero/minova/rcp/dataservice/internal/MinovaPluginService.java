@@ -22,6 +22,7 @@ import aero.minova.rcp.dataservice.IMinovaPluginService;
 public class MinovaPluginService implements IMinovaPluginService {
 
 	private IDataService dataService;
+	private boolean downloadPlugins = true;
 
 	@Reference
 	void getDummyService(IDummyService dummyService) {
@@ -33,11 +34,15 @@ public class MinovaPluginService implements IMinovaPluginService {
 	@Reference
 	void getDataService(IDataService dataService) {
 		this.dataService = dataService;
-		dataService.getHashedZip("plugins.zip");
 	}
 
 	@Override
 	public void activatePlugin(String helperClass) {
+		if (downloadPlugins) {
+			dataService.getHashedZip("plugins.zip");
+			downloadPlugins = false;
+		}
+
 		int lastIndexOf = helperClass.lastIndexOf('.');
 		String pluginName = helperClass.substring(0, lastIndexOf);
 		Path storagePath = dataService.getStoragePath();

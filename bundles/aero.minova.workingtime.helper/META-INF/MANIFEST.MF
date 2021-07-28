@@ -16,7 +16,8 @@ Import-Package: aero.minova.rcp.dataservice,
  org.eclipse.swt.widgets,
  org.osgi.service.prefs;version="1.1.1"
 Export-Package: aero.minova.workingtime.helper
-Service-Component: OSGI-INF/aero.minova.workingtime.helper.WorkingTimeHelper.xml
+Service-Component: OSGI-INF/aero.minova.workingtime.helper.WorkingTimeHelper.xml,
+ OSGI-INF/aero.minova.workingtime.wizard.FillWorkingtimeWizard.xml
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.swt;bundle-version="3.115.0",
  aero.minova.rcp.model,

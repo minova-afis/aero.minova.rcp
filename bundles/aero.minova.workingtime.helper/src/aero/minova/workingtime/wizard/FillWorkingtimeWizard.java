@@ -14,18 +14,21 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.osgi.service.component.annotations.Component;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.helper.IMinovaWizard;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.widgets.MinovaWizard;
 
 /**
  * Mit diesem Assistent (Wizard) kann man Arbeitszeiten über mehrere Tage auffüllen
  */
-public class FillWorkingtimeWizard extends MinovaWizard {
+@Component
+public class FillWorkingtimeWizard extends MinovaWizard implements IMinovaWizard {
 
 	@Inject
 	protected TranslationService translationService;
