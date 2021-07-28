@@ -24,5 +24,6 @@ Import-Package: aero.minova.rcp.constants,
 Service-Component: OSGI-INF/aero.minova.rcp.dataservice.XmlProcessor.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.DataFormService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
- OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml
+ OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml,
+ OSGI-INF/aero.minova.rcp.dataservice.internal.PluginDownloadService.xml
 Bundle-ActivationPolicy: lazy
