@@ -11,6 +11,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -49,22 +50,28 @@ public class MinovaPluginService implements IMinovaPluginService {
 		Path pluginPath = Paths.get(storagePath.toString(), "plugins");
 		List<Path> plugins = null;
 		try {
-			plugins = Files.list(pluginPath).filter(f -> f.toString().contains(pluginName))
-					.filter(f -> f.toString().toLowerCase().endsWith("jar")).collect(Collectors.toList());
+			plugins = Files.list(pluginPath).filter(f -> f.toString().contains(pluginName)).filter(f -> f.toString().toLowerCase().endsWith("jar"))
+					.collect(Collectors.toList());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		BundleContext bundleContext = FrameworkUtil.getBundle(MinovaPluginService.class).getBundleContext();
 		try {
 			Bundle[] bundles = bundleContext.getBundles();
+
 			for (Bundle bundle : bundles) {
+				Version bundleVersion = bundle.getVersion();
 				if (bundle.getSymbolicName().equals(pluginName)) {
+					PluginInformation pI = new PluginInformation(plugins.get(0).toFile());
+					if (!pI.isDifferent(bundleVersion)) {
+						return;
+					}
 					bundle.uninstall();
 				}
 			}
 
 			Bundle installBundle = bundleContext.installBundle(plugins.get(0).toUri().toString());
-			installBundle.start(Bundle.START_TRANSIENT);
+			installBundle.start(Bundle.START_ACTIVATION_POLICY);
 		} catch (BundleException e) {
 			e.printStackTrace();
 		}

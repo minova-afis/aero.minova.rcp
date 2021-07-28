@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.osgi.framework.Version;
+
 /**
  * @author saak
  * @since 10.3.0
@@ -91,5 +93,28 @@ public class PluginInformation {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Prüft, überprüft die Versionsnummern und die Buildnumber
+	 *
+	 * @param Version
+	 *            pluginInformation
+	 * @return true, wenn diese PluginInformation das aktuellere Plugin beschreibt
+	 */
+	public boolean isDifferent(Version pluginInformation) {
+		if (majorRelease != pluginInformation.getMajor()) {
+			return true;
+		}
+		if (minorRelease != pluginInformation.getMinor()) {
+			return true;
+		}
+		if (patchLevel != pluginInformation.getMicro()) {
+			return true;
+		}
+		if (buildnumber != null && pluginInformation.getQualifier() != null && buildnumber.compareTo(pluginInformation.getQualifier()) < 0) {
+			return true;
+		}
+		return false;
 	}
 }
