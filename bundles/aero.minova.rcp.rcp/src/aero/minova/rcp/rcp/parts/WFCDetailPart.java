@@ -164,9 +164,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		appContext = mApp.getContext();
-		if (getForm(parent) == null) {
-			return;
-		}
+		getForm();
 		layoutForm(parent);
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert

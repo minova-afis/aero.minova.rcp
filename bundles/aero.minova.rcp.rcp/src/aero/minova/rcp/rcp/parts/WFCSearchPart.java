@@ -98,9 +98,7 @@ public class WFCSearchPart extends WFCFormPart {
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
 		new FormToolkit(parent.getDisplay());
-		if (getForm(parent) == null) {
-			return;
-		}
+		getForm();
 
 		// "&" Spalte erstellen
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();

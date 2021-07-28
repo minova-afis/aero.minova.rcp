@@ -150,7 +150,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 		// Fields aus der form-XML erstellen
 		Map<String, Field> fieldMap = new HashMap<>();
 		WFCDetailPart wfcDetailPart = (WFCDetailPart) mPart.getObject();
-		Detail detail = wfcDetailPart.getForm(null).getDetail();
+		Detail detail = wfcDetailPart.getForm().getDetail();
 		List<Object> headAndPageList = detail.getHeadAndPageAndGrid();
 		for (Object headOrPage : headAndPageList) {
 			HeadOrPageWrapper wrapper = new HeadOrPageWrapper(headOrPage);

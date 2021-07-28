@@ -165,10 +165,7 @@ public class WFCIndexPart extends WFCFormPart {
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
-		if (getForm(parent) == null) {
-			return;
-		}
-
+		getForm();
 		data = dataFormService.getTableFromFormIndex(form);
 
 		parent.setLayout(new GridLayout());
