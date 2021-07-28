@@ -118,6 +118,8 @@ public class Constants {
 
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
+	public static final String DETAIL_WIDTH = "Detail_Width";
+
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
 	 *
