@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -23,11 +22,10 @@ import aero.minova.rcp.dataservice.ZipService;
 public class WFCTranslationDownloadService {
 
 	private IDataService dataService;
-	private TranslationService translationService;
 	private EventAdmin admin;
 
 	@Reference
-	void getDummyService(IDummyService translationService) {
+	void getDummyService(IDummyService dummyService) {
 		// this method prevents the immediate component to be actived before the
 		// workspace location in the dataservice has been set
 		// maybe move that to a service property dependency?
