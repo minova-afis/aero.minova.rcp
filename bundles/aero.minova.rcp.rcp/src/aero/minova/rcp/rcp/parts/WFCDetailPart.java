@@ -185,7 +185,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		IWindowCloseHandler handler = mWindow -> {
 			@SuppressWarnings("unchecked")
 			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
-			if (!pList.isEmpty()) {
+			if (pList != null && !pList.isEmpty()) {
 				StringBuilder listString = new StringBuilder();
 				for (MPerspective mPerspective : pList) {
 					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
