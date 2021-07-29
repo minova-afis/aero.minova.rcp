@@ -114,6 +114,8 @@ public class PreferenceWindowModel {
 				DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX,
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndex", null), 0.6, DisplayType.CHECK, false));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX,
+				translationService.translate("@Preferences.ShowDiscardChangesDialogIndexExplanation", null), 0.7, DisplayType.CHECKEXPLANATION, false));
 
 		psd = new PreferenceSectionDescriptor("Buffer", translationService.translate("@Preferences.Buffer", null), 0.2);
 		ptd.add(psd);
