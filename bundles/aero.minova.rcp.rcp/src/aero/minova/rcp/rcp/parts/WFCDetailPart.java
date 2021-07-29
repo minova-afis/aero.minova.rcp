@@ -173,7 +173,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set("WFCDetailCASRequestsUtil", casRequestsUtil);
-		mPerspective.getContext().set("Detail_Width", SECTION_WIDTH);
+		mPerspective.getContext().set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
 		translate(composite);
 
 		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
@@ -185,7 +185,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		IWindowCloseHandler handler = mWindow -> {
 			@SuppressWarnings("unchecked")
 			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
-			if (!pList.isEmpty()) {
+			if (pList != null && !pList.isEmpty()) {
 				StringBuilder listString = new StringBuilder();
 				for (MPerspective mPerspective : pList) {
 					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
