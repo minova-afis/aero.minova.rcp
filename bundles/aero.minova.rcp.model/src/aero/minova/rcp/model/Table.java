@@ -167,7 +167,11 @@ public class Table {
 		for (Row r : getRows()) {
 			Row newRow = new Row();
 			for (Value v : r.getValues()) {
-				newRow.addValue(new Value(v.getValue()));
+				if (v == null) {
+					newRow.addValue(null);
+				} else {
+					newRow.addValue(new Value(v.getValue()));
+				}
 			}
 			table.addRow(newRow);
 		}
