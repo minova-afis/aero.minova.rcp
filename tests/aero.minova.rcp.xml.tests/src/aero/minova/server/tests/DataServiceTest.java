@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,6 @@ import aero.minova.rcp.dataservice.internal.DataService;
  * Integration test for the data service
  * 
  * @author Lars
- *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DataServiceTest {
@@ -44,8 +44,7 @@ class DataServiceTest {
 		URI uri = path.toUri();
 		String stringUri = uri.toString();
 		dataService = new DataService();
-		dataService.setCredentials(username, password, server, 
-				URI.create(stringUri));
+		dataService.setCredentials(username, password, server, URI.create(stringUri));
 	}
 
 	@Test
@@ -62,17 +61,17 @@ class DataServiceTest {
 	@DisplayName("Ensures the server returns not 200 for files that do not exit")
 	void ensureThatWeThrowAnExceptionForMissingFiles() {
 		assertThrows(RuntimeException.class, () -> {
-			dataService.getServerHashForFile("test").join();	
+			dataService.getServerHashForFile("test").join();
 		});
 	}
-	
+
 	@Test
 	@DisplayName("Ensures that the server can hash application.mdi")
 	void hashApplicationMdi() {
 		String join = dataService.getServerHashForFile("application.mdi").join();
 		assertNotNull(join);
 	}
-	
+
 	@Test
 	@DisplayName("Get application.mdi twice should load from cache")
 	void receiveTwiceTheSameFileShouldLoadFromCache() {
@@ -85,8 +84,7 @@ class DataServiceTest {
 		// to wrap the data service?
 		assertEquals(firstVersion, secondVersion);
 	}
-	
-	
+
 	@Test
 	@DisplayName("Ensure we can download aero.minova.workingtime.helper")
 	void ensureDownloadOfPlugin() {
@@ -98,8 +96,8 @@ class DataServiceTest {
 		Path path = Paths.get(storagePath.toString(), "plugins");
 		boolean exists = Files.exists(path, LinkOption.NOFOLLOW_LINKS);
 		assertTrue(exists, "Unzipped directory not available on the local file system");
-		try {
-			long count = Files.list(path).filter(f -> f.toString().contains("aero.minova.workingtime.helper")).count();
+		try (Stream<Path> list = Files.list(path)) {
+			long count = list.filter(f -> f.toString().contains("aero.minova.workingtime.helper")).count();
 			assertEquals(1, count, "Jar file nicht oder mehrfach vorhanden");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,7 +111,6 @@ class DataServiceTest {
 		int lastIndexOf = className.lastIndexOf('.');
 		String pluginName = className.substring(0, lastIndexOf);
 
-		assertEquals("aero.minova.workingtime.helper", pluginName,
-				"Hey looks like we do not know how to split strings");
+		assertEquals("aero.minova.workingtime.helper", pluginName, "Hey looks like we do not know how to split strings");
 	}
 }
