@@ -173,7 +173,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set("WFCDetailCASRequestsUtil", casRequestsUtil);
-		mPerspective.getContext().set("Detail_Width", SECTION_WIDTH);
+		mPerspective.getContext().set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
 		translate(composite);
 
 		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
