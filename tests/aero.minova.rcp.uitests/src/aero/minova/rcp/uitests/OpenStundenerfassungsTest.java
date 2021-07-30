@@ -104,6 +104,9 @@ public class OpenStundenerfassungsTest {
 
 		// Suchzeile löschen
 		searchNattable.click(2, 3);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {}
 		searchToolbar.get(1).click();
 		try {
 			Thread.sleep(5000);
