@@ -52,9 +52,16 @@ public class MinovaPluginService implements IMinovaPluginService {
 		try {
 			plugins = Files.list(pluginPath).filter(f -> f.toString().contains(pluginName)).filter(f -> f.toString().toLowerCase().endsWith("jar"))
 					.collect(Collectors.toList());
+
+			if (plugins.isEmpty()) {
+				System.err.println("Plugin für Klasse " + helperClass + " konnte nicht geladen werden");
+				return;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			return;
 		}
+
 		BundleContext bundleContext = FrameworkUtil.getBundle(MinovaPluginService.class).getBundleContext();
 		try {
 			Bundle[] bundles = bundleContext.getBundles();
