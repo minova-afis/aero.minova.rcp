@@ -886,9 +886,6 @@ public class WFCDetailCASRequestsUtil {
 				continue;
 			}
 			if (c instanceof MLookupField) {
-				if (c.getValue() == null) {
-					System.out.println("asda");
-				}
 				if (sV == null && c.getValue() != null || //
 						sV != null && c.getValue() == null || //
 						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
