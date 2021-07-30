@@ -75,6 +75,13 @@ Getestet mit Server xxxxxx
 - [ ] Toggle zwischen allen Zeilen werden angezeigt und ~5 Zeilen angezeigt (min 2, max 10). Außerdem werden Zeilenhöhen optimiert
 - [ ] Toggle zwischen kompletter Nattable wird angezeigt und Section hat "Standard" Breite. Außerdem werden Spaltenbreiten optimiert
 
+## Dirty Flag
+- [ ] Dirty Flag wird beim Detail gesetzt, sobald dieser bearbeitet wird
+- [ ] Dirty Flag wird bei der Perspektive gesetzt, sobald ein Part darin das Dirty Flag hat
+- [ ] Dirty Flag wird sofort überall entfernt, wenn die Änderungen rückgängig gemacht wurden
+- [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn ein neuer Datensatz im Index selektiert wird. (Nur wenn ShowDiscardChangesDialogIndex gesetzt ist)
+- [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn die Anwendung geschlossen wird.
+
 ## Traverse Verhalten
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
 - [ ] Tab selektiert alle Controls (Toolbar, Section usw.) (Wenn SelectAllControls gesetzt ist)
