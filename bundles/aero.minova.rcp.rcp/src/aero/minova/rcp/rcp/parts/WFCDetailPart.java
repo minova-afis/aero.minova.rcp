@@ -378,9 +378,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private Object findEventForID(String id) {
-		for (Onclick onclick : form.getEvents().getOnclick()) {
-			if (onclick.getRefid().equals(id)) {
-				return onclick;
+		if (form.getEvents() != null) {
+			for (Onclick onclick : form.getEvents().getOnclick()) {
+				if (onclick.getRefid().equals(id)) {
+					return onclick;
+				}
 			}
 		}
 		// TODO: Onbinder und ValueChange implementieren

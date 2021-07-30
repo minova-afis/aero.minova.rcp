@@ -264,7 +264,11 @@ public class SectionGrid {
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
 		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
-		selectionLayer.addLayerListener(event -> deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0));
+		selectionLayer.addLayerListener(event -> {
+			if (deleteToolItem != null) {
+				deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0);
+			}
+		});
 
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);

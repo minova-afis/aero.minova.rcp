@@ -1379,7 +1379,7 @@
 					<xs:documentation>Definiert die Schlüsselspalten</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="title" type="xs:string" use="optional">
+			<xs:attribute default="" name="title" type="xs:string" use="optional">
 				<xs:annotation>
 					<xs:documentation>Grid-Überschrift vom Grid. Erscheint über dem
 						Grid oder in der TabPage, wenn es sich ein
