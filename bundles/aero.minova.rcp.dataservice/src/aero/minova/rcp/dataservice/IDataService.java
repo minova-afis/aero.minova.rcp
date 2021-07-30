@@ -91,6 +91,9 @@ public interface IDataService {
 
 	CompletableFuture<String> getCachedFileContent(String filename);
 
+	/*
+	 * returns true if zip file could be downloaded
+	 */
 	boolean getHashedZip(String zipname);
 
 	void setTimeout(int timeout);

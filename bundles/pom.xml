@@ -27,7 +27,6 @@
 		<module>aero.minova.rcp.preferencewindow</module>
 		<module>aero.minova.rcp.images</module>
 		<module>aero.minova.workingtime.helper</module>
-		<module>aero.minova.workingtime.wizard</module>
 		<module>jakarta.xml.bind-api</module>
 	</modules>
 	<build>

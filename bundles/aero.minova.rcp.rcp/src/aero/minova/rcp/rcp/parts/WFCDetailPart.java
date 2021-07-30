@@ -164,9 +164,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		appContext = mApp.getContext();
-		if (getForm(parent) == null) {
-			return;
-		}
+		getForm();
 		layoutForm(parent);
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
@@ -258,7 +256,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
 			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
-				// TODO Übersetzung!
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
 			IHelper iHelper = helperlist.get(0);
