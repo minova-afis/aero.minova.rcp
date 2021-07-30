@@ -139,3 +139,9 @@ KeyBIndings die nur im IndexPart ansprechbar sind:
 - [ ] Das angegebene Pattern für das Datum formatiert die Date- und DateTimeFields
 - [ ] Das angegebene Pattern für die Zeit formatiert die Time- und DateTimeFields
 - [ ] Wenn kein Pattern angegeben ist, wird der Standard verwendet (Test: Vorschlagsliste ist nicht leer)
+
+## Plugin laden (Nur Stundenerfassung)
+- [ ] Mitarbeiter im Detail ist vorbelegt (Nur wenn in den Preferences hinterlegt)
+- [ ] Datum im Detail ist vorbelegt
+- [ ] Arbeitszeit wird automatisch ausgerechnet
+- [ ] Beim Betätigen von "Arbeitszeit füllen" öffnet sich ein Wizard
