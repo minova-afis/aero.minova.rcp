@@ -80,7 +80,8 @@ Getestet mit Server xxxxxx
 - [ ] Dirty Flag wird bei der Perspektive gesetzt, sobald ein Part darin das Dirty Flag hat
 - [ ] Dirty Flag wird sofort überall entfernt, wenn die Änderungen rückgängig gemacht wurden
 - [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn ein neuer Datensatz im Index selektiert wird. (Nur wenn ShowDiscardChangesDialogIndex gesetzt ist)
-- [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn die Anwendung geschlossen wird.
+- [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn die Anwendung geschlossen wird. Die geänderten Perspektiven werden aufgelistet
+- [ ] Nachricht wird angezeigt, wenn eine geänderte Perspektive geschlossen werden soll
 
 ## Traverse Verhalten
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
