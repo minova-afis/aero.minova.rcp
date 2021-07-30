@@ -80,8 +80,7 @@ Getestet mit Server xxxxxx
 - [ ] Dirty Flag wird bei der Perspektive gesetzt, sobald ein Part darin das Dirty Flag hat
 - [ ] Dirty Flag wird sofort überall entfernt, wenn die Änderungen rückgängig gemacht wurden
 - [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn ein neuer Datensatz im Index selektiert wird. (Nur wenn ShowDiscardChangesDialogIndex gesetzt ist)
-- [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn die Anwendung geschlossen wird. Die geänderten Perspektiven werden aufgelistet
-- [ ] Nachricht wird angezeigt, wenn eine geänderte Perspektive geschlossen werden soll
+- [ ] Nachricht wird angezeigt, dass alle Änderungen verworfen werden, wenn die Anwendung geschlossen wird.
 
 ## Traverse Verhalten
 - [ ] Tab selektiert das nächste Feld (Wenn SelectAllControls **nicht** gesetzt ist)
@@ -107,7 +106,7 @@ Getestet mit Server xxxxxx
 - [ ] Die Reihenfolge der Perspektiven ist nach einem Neustart wieder gleich (zum Testen z.B.: normale, angeheftete und geschlossene, normale)
 
 ## Keybindings Perspektive
-KeyBindings die in der ganzen Perspektive ansprechbar sind:
+KeyBIndings die in der ganzen Perspektive ansprechbar sind:
 - [ ] M1+Q: Anwendung beenden
 - [ ] M1+R: Resize Parts
 - [ ] F4: Search Part auswählen -> Erstes Feld wird ausgewählt
@@ -122,7 +121,7 @@ KeyBIndings die nur im DetailPart ansprechbar sind:
 - [ ] CR: Nächstes leeres Pflichtfeld wird selektiert oder es wird gespeichert
 
 ## Key-Bindings im SearchPart
-KeyBindings die nur im SearchPart ansprechbar sind:
+KeyBIndings die nur im SearchPart ansprechbar sind:
 - [ ] M1+N : Alle Einträge aus den Suchzeilen werden gelöscht. Es werden alle Zeilen bis auf eine entfernt.
 - [ ] M1+D : Selektierte Zeile wird gelöscht
 - [ ] M1+S : Suchkriterien speichern (nur wenn SearchPart im Fokus ist)
@@ -132,7 +131,7 @@ KeyBindings die nur im SearchPart ansprechbar sind:
 - [ ] SHIFT+M1+H : Optimieren (Resize Horizontal)
 
 ## Key-Bindings im IndexPart
-KeyBindings die nur im IndexPart ansprechbar sind:
+KeyBIndings die nur im IndexPart ansprechbar sind:
 - [ ] M1+N: Neues Detail
 
 ## Preferences
