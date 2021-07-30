@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ASCII"?>
 <fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_ZOhUYLbcEeuZF8ZS2_h9rA">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ZOhUYrbcEeuZF8ZS2_h9rA" featurename="handlers" parentElementId="xpath:/">
+    <elements xsi:type="commands:Handler" xmi:id="_CeFnuLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.optimizedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeDetailHandler" command="_laMxsLbdEeuZF8ZS2_h9rA"/>
     <elements xsi:type="commands:Handler" xmi:id="_ZOhUY7bcEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.exitCommand" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.QuitHandler" command="_laMxobbdEeuZF8ZS2_h9rA">
       <persistedState key="persistState" value="false"/>
     </elements>
@@ -13,6 +14,7 @@
     <elements xsi:type="commands:Handler" xmi:id="_ciLBArbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.openform" contributionURI="bundleclass://aero.minova.rcp.perspectiveswitcher/aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler" command="_laMxpLbdEeuZF8ZS2_h9rA">
       <persistedState key="persistState" value="false"/>
     </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_CeFnnLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_laMxsrbdEeuZF8ZS2_h9rA"/>
     <elements xsi:type="commands:Handler" xmi:id="_ciLBA7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.closeperspective" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ClosePerspectiveHandler" command="_laMxqLbdEeuZF8ZS2_h9rA">
       <persistedState key="persistState" value="false"/>
     </elements>
@@ -169,7 +171,6 @@
           </children>
           <children xsi:type="basic:PartStack" xmi:id="_CeFnmrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_CeFnm7byEeuZF8ZS2_h9rA">
             <children xsi:type="basic:Part" xmi:id="_CeFnm7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPart" label="@Form.Index" iconURI="platform:/plugin/aero.minova.rcp.images/images/icons/Index/32x32.png" bindingContexts="_uvkSkOOgEeuITvUQkIW3uw">
-              <handlers xmi:id="_CeFnnLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.loadindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadIndexHandler" command="_laMxsrbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnnbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.expandorcollapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandOrCollapseIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnn7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_laMxtrbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnoLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
@@ -185,7 +186,6 @@
             <handlers xmi:id="_CeFntbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_laMxv7bdEeuZF8ZS2_h9rA"/>
             <handlers xmi:id="_CeFntrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_laMxwLbdEeuZF8ZS2_h9rA"/>
             <handlers xmi:id="_CeFnt7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_laMxwbbdEeuZF8ZS2_h9rA"/>
-            <handlers xmi:id="_CeFnuLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.optimizedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.OptimizeDetailHandler" command="_laMxsLbdEeuZF8ZS2_h9rA"/>
             <handlers xmi:id="_7D6yUL_AEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.handler.traverseenter" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.TraverseEnterHandler" command="__iku8L_AEeuboN5m_phYZw"/>
             <toolbar xmi:id="_CeFnubbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.details.toolbar"/>
           </children>
