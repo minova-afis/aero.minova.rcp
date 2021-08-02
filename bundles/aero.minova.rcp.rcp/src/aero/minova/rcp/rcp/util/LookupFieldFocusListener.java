@@ -19,7 +19,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public class LookupFieldFocusListener implements FocusListener {
 
@@ -41,7 +41,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	 *
 	 * @param lc
 	 */
-	private void getTicketFromCAS(Lookup lc) {
+	private void getTicketFromCAS(LookupComposite lc) {
 		Table ticketTable = new Table();
 		// das Pattern ist eine unbegrenzte Menge an Zahlen hinter einer Raute
 		Pattern ticketnumber = Pattern.compile("#(\\d*)");
@@ -78,7 +78,7 @@ public class LookupFieldFocusListener implements FocusListener {
 	@Override
 	public void focusLost(FocusEvent e) {
 		Text t = (Text) e.getSource();
-		Lookup lc = (Lookup) t.getParent();
+		LookupComposite lc = (LookupComposite) t.getParent();
 		if (lc.getText().startsWith("#")) {
 			getTicketFromCAS(lc);
 		} else {

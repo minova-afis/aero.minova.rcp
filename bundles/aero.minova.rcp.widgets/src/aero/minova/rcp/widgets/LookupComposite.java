@@ -38,7 +38,7 @@ import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 
-public class Lookup extends Composite {
+public class LookupComposite extends Composite {
 
 	private static final String SETTEXT_KEY = "org.eclipse.nebula.widgets.opal.textassist.TextAssist.settext";
 	private final Text text;
@@ -67,7 +67,7 @@ public class Lookup extends Composite {
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
 	 */
-	public Lookup(Composite parent, int style) {
+	public LookupComposite(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new FillLayout());
 
@@ -88,7 +88,6 @@ public class Lookup extends Composite {
 		final int[] events = new int[] { SWT.Move, SWT.FocusOut };
 		for (final int event : events) {
 			getShell().addListener(event, e -> {
-				System.out.println("Mouse!");
 				popup.setVisible(false);
 			});
 		}
@@ -284,11 +283,11 @@ public class Lookup extends Composite {
 	 * @return a listener for the FocusOut event
 	 */
 	private Listener createFocusOutListener() {
-		return event -> Lookup.this.getDisplay().asyncExec(() -> {
-			if (Lookup.this.isDisposed() || Lookup.this.getDisplay().isDisposed()) {
+		return event -> LookupComposite.this.getDisplay().asyncExec(() -> {
+			if (LookupComposite.this.isDisposed() || LookupComposite.this.getDisplay().isDisposed()) {
 				return;
 			}
-			final Control control = Lookup.this.getDisplay().getFocusControl();
+			final Control control = LookupComposite.this.getDisplay().getFocusControl();
 			if (control == null || (control != text && control != table && control != popup)) {
 				popup.setVisible(false);
 			}

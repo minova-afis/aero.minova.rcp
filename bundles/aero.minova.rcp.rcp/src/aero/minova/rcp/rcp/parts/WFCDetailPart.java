@@ -102,8 +102,8 @@ import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.widgets.Lookup;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.widgets.LookupComposite;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
@@ -494,7 +494,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		Control[] compositeChilds = composite.getChildren();
 		for (Control control : compositeChilds) {
-			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text) {
+			if (control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text) {
 				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
 				if (!field.isReadOnly()) {
 					tabList.add(control);
