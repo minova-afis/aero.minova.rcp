@@ -17,12 +17,12 @@ import org.eclipse.swt.widgets.Display;
 import org.osgi.service.component.annotations.Component;
 
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.helper.IMinovaWizard;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.widgets.MinovaWizard;
+import aero.minova.rcp.widgets.MinovaNotifier;
 
 /**
  * Mit diesem Assistent (Wizard) kann man Arbeitszeiten über mehrere Tage auffüllen
@@ -98,10 +98,9 @@ public class FillWorkingtimeWizard extends MinovaWizard implements IMinovaWizard
 				Display.getDefault().syncExec(() -> {
 					((WizardDialog) getContainer()).close();
 
-					NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(),
-							translationService.translate("@msg.FillWorkingtimeSaved", null), translationService.translate("@Notification", null),
-							Display.getCurrent().getActiveShell());
-					notificationPopUp.open();
+					MinovaNotifier.show(Display.getCurrent().getActiveShell(),
+							translationService.translate("@msg.FillWorkingtimeSaved", null),
+							translationService.translate("@Notification", null));
 
 					if (autoLoadIndex) {
 						ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);

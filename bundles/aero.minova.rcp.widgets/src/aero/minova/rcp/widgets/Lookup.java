@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.widgets;
+package aero.minova.rcp.widgets;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +37,6 @@ import aero.minova.rcp.dataservice.internal.CacheUtil;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.widgets.MinovaNotifier;
 
 public class Lookup extends Composite {
 
@@ -204,7 +203,7 @@ public class Lookup extends Composite {
 			if (contentProvider.getValuesSize() == 0) {
 				MinovaNotifier.show(Display.getCurrent().getActiveShell(),
 						translationService.translate("@msg.NoLookupEntries", null),
-						translationService.translate("@Notification", null));
+						translationService.translate("@Notification", null) );
 			}
 			return;
 		}
