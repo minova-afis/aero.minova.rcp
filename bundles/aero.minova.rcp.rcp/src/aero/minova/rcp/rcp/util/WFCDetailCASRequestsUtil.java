@@ -40,7 +40,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.EventParam;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -71,6 +70,7 @@ import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.widgets.MinovaNotifier;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -733,11 +733,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
-		if (!shell.getDisplay().isDisposed()) {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message,
-					getTranslation("Notification"), shell);
-			notificationPopUp.open();
-		}
+		MinovaNotifier.show(shell, message, getTranslation("Notification"));
 	}
 
 	@Optional
