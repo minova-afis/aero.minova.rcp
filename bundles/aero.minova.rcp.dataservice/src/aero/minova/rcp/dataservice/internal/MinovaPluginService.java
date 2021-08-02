@@ -1,5 +1,6 @@
 package aero.minova.rcp.dataservice.internal;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +23,8 @@ import aero.minova.rcp.dataservice.IMinovaPluginService;
 @Component(immediate = true)
 public class MinovaPluginService implements IMinovaPluginService {
 
+	boolean DEBUG = true;
+
 	private IDataService dataService;
 	private boolean downloadPlugins = true;
 
@@ -39,6 +42,9 @@ public class MinovaPluginService implements IMinovaPluginService {
 
 	@Override
 	public void activatePlugin(String helperClass) {
+		if (DEBUG) {
+			return;
+		}
 		if (downloadPlugins) {
 			dataService.getHashedZip("plugins.zip");
 			downloadPlugins = false;

@@ -41,7 +41,7 @@ import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 /**
  * Wizard-Page mit allen Daten zum Arbeitszeit auffüllen
@@ -210,7 +210,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 		setPageComplete(false);
 		translate(composite);
-		composite.layout();
+		composite.requestLayout();
 		super.setControl(composite);
 	}
 
@@ -228,8 +228,8 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 	public boolean popupIsOpen() {
 		Control focussedControl = mDetail.getSelectedField();
-		if (focussedControl instanceof Lookup) {
-			return ((Lookup) focussedControl).popupIsOpen();
+		if (focussedControl instanceof LookupComposite) {
+			return ((LookupComposite) focussedControl).popupIsOpen();
 		} else if (focussedControl instanceof TextAssist) {
 			return true;
 		}
