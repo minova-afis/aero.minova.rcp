@@ -10,15 +10,17 @@
 		<tycho.version>2.4.0</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
-	</properties>
+		
 	
-	<!-- Required properties for releasing -->
-	<github-update-repo>git@github.com:minova-afis/aero.minova.rcp</github-update-repo>
-	<github-local-clone>${project.build.directory}/checkout</github-local-clone>
-	<releases-directory>${github-local-clone}/releases</releases-directory>
-	<current-release-directory>${releases-directory}/${qualifiedVersion}</current-release-directory>
-	<!-- The label for the Composite sites -->
-	<site.label>Core RCP</site.label>
+		<!-- Required properties for releasing -->
+		<github-update-repo>git@github.com:minova-afis/aero.minova.rcp</github-update-repo>
+		<github-local-clone>${project.build.directory}/checkout</github-local-clone>
+		<releases-directory>${github-local-clone}/releases</releases-directory>
+		<current-release-directory>${releases-directory}/${qualifiedVersion}</current-release-directory>
+		<!-- The label for the Composite sites -->
+		<site.label>Core RCP</site.label>
+	</properties>
+
 
 	<build>
 		<pluginManagement>
@@ -310,6 +312,7 @@
 		</plugins>
 	</build>
 	
+	<profiles>
 	<profile>
 	  <!-- Activate this profile to perform the release to GitHub Pages -->
 	  <id>release-composite</id>
@@ -335,6 +338,7 @@
 	    </pluginManagement>
 	  </build>
 	</profile>
+	</profiles>
 
 
 	<distributionManagement>
