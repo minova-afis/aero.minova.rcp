@@ -316,6 +316,35 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'd'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'h'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'v'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
+			}
+		});
+
 		return getNatTable();
 	}
 
