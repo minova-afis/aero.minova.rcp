@@ -155,6 +155,7 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
+		// bar.setData("org.eclipse.swtbot.widget.key", "GridToolBar");
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
@@ -162,7 +163,7 @@ public class SectionGrid {
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(false);
-			insertToolItem = createButton(bar, btnInsert);
+			insertToolItem = createToolItem(bar, btnInsert);
 		}
 
 		if (grid.isButtonDeleteVisible()) {
@@ -171,12 +172,12 @@ public class SectionGrid {
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
 			btnDel.setEnabled(false);
-			deleteToolItem = createButton(bar, btnDel);
+			deleteToolItem = createToolItem(bar, btnDel);
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
 		for (Button btn : grid.getButton()) {
-			createButton(bar, btn);
+			createToolItem(bar, btn);
 		}
 
 		// Standard
@@ -185,25 +186,26 @@ public class SectionGrid {
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
 		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
-		createButton(bar, btnOptimizeHigh);
+		createToolItem(bar, btnOptimizeHigh);
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
 		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
-		createButton(bar, btnOptimizeWidth);
+		createToolItem(bar, btnOptimizeWidth);
 
 		section.setTextClient(bar);
 	}
 
-	public ToolItem createButton(ToolBar bar, Button btn) {
-		return createButton(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
+	public ToolItem createToolItem(ToolBar bar, Button btn) {
+		return createToolItem(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
 	}
 
-	public ToolItem createButton(ToolBar bar, Button btn, String commandName) {
+	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
 		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 		item.setData(btn);
+		item.setData("org.eclipse.swtbot.widget.key", btn.getId());
 		item.setEnabled(btn.isEnabled());
 		if (btn.getText() != null) {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
