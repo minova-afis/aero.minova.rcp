@@ -19,6 +19,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -88,6 +89,7 @@ public class ServiceContractTest {
 		assertNotEquals(0, detailToolbar.size());
 	}
 
+	@Ignore
 	@Test
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten")
 	public void deleteRowAndRevertSearch() {
