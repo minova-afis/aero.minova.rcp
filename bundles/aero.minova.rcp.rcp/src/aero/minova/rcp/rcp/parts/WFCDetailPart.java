@@ -709,7 +709,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		String perspectiveLabel = translationService.translate(mPerspective.getLabel(), null);
 		for (ToolItem item : tb.getItems()) {
-			if (item.getText().contains(perspectiveLabel)) {
+			if (item.getText().replace("*", "").equals(perspectiveLabel)) {
 				item.setText((dirtyFlag ? "*" : "") + perspectiveLabel);
 			}
 		}
