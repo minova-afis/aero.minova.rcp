@@ -154,7 +154,7 @@ public class OpenServiceContract {
 		MGrid grid = wfcPart.getDetail().getGrid("ServicePrice");
 		int size = grid.getDataTable().getRows().size();
 		assertEquals(size, 5);
-		gridNattable.click(5, 0);
+		gridNattable.click(4, 0);
 
 		Control textClient = grid.getmSection().getSection().getTextClient();
 		assertTrue(textClient instanceof ToolBar);

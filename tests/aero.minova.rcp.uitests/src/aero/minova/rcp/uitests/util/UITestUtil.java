@@ -39,5 +39,4 @@ public class UITestUtil {
 	public static void maximizeShell(SWTWorkbenchBot bot) {
 		UIThreadRunnable.syncExec(bot.getDisplay(), () -> bot.getDisplay().getActiveShell().setSize(2000, 1500));
 	}
-
 }
