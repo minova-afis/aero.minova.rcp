@@ -347,6 +347,14 @@ public class SectionGrid {
 
 		return getNatTable();
 	}
+	
+	public void execButtonHandler(String btnId, String commandName) {
+		Map<String, String> parameter = new HashMap<>();
+		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
+		parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+		ParameterizedCommand command = commandService.createCommand(commandName, parameter);
+		handlerService.executeHandler(command);
+	}
 
 	public Table getDataTable() {
 		return dataTable;
