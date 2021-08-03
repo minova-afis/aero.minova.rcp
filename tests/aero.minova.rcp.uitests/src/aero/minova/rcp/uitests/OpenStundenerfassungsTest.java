@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
@@ -25,7 +22,8 @@ import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
-import org.osgi.framework.FrameworkUtil;
+
+import aero.minova.rcp.uitests.util.UITestUtil;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class OpenStundenerfassungsTest {
@@ -45,7 +43,7 @@ public class OpenStundenerfassungsTest {
 
 	@Before
 	public void beforeClass() {
-		bot = new SWTWorkbenchBot(getEclipseContext());
+		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
 
 		openStundenerfassung();
@@ -82,13 +80,6 @@ public class OpenStundenerfassungsTest {
 		assertNotEquals(0, indexToolbar.size());
 		detailToolbar = detailPart.getToolbarButtons();
 		assertNotEquals(0, detailToolbar.size());
-
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
 
 	@Ignore
@@ -106,22 +97,16 @@ public class OpenStundenerfassungsTest {
 
 		// Suchzeile löschen
 		searchNattable.click(2, 3);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {}
+		UITestUtil.sleep();
 		searchToolbar.get(1).click();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {}
+		UITestUtil.sleep(5000);
 		assertEquals(4, searchNattable.rowCount());
 		assertEquals("\"f-~-s-row1%\"", searchNattable.getCellDataValueByPosition(1, 3));
 		assertEquals("\"f-~-s-row3%\"", searchNattable.getCellDataValueByPosition(2, 3));
 
 		// Suche zurücksetzten
 		searchToolbar.get(0).click();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {}
+		UITestUtil.sleep(5000);
 		assertEquals(2, searchNattable.rowCount());
 
 		// Sind alle Spalten leer?
@@ -138,21 +123,13 @@ public class OpenStundenerfassungsTest {
 		}
 		// Wieder an Anfang scrollen
 		searchNattable.scrollViewport(new Position(1, 1), 0, 0);
-
 	}
 
 	@Test
 	@DisplayName("Index mit SuchPart filtern")
 	public void filterIndex() {
 		searchNattable.setCellDataValueByPosition(1, 3, "avm");
-		indexToolbar.get(0).click();
-
-		// Warten bis Daten geladen sind
-		do {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {}
-		} while (!indexToolbar.get(0).isEnabled());
+		UITestUtil.loadIndex(indexToolbar);
 
 		// Ist Mitarbeiter immer AVM?
 		for (int i = 3; i < indexNattable.rowCount(); i++) {
@@ -166,25 +143,12 @@ public class OpenStundenerfassungsTest {
 	@Test
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	public void loadIndex() {
-		indexToolbar.get(0).click();
-
-		// Warten bis Daten geladen sind
-		do {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {}
-		} while (!indexToolbar.get(0).isEnabled());
+		UITestUtil.loadIndex(indexToolbar);
 
 		// Überprüfen, ob Daten geladen wurden
 		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
 		assertNotNull(numberEntriesString);
 		assertTrue(Integer.parseInt(numberEntriesString) > 0);
-	}
-
-	protected static IEclipseContext getEclipseContext() {
-		final IEclipseContext serviceContext = EclipseContextFactory
-				.getServiceContext(FrameworkUtil.getBundle(OpenStundenerfassungsTest.class).getBundleContext());
-		return serviceContext.get(IWorkbench.class).getApplication().getContext();
 	}
 
 	@AfterEach

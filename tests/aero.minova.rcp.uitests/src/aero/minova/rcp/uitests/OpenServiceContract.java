@@ -7,17 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -27,13 +23,13 @@ import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
-import org.osgi.framework.FrameworkUtil;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.uitests.util.UITestUtil;
 
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class OpenServiceContract {
@@ -46,7 +42,7 @@ public class OpenServiceContract {
 
 	private SWTBotNatTable searchNattable;
 	private SWTBotNatTable indexNattable;
-	private SWTBotNatTable gridDetailNattable;
+	private SWTBotNatTable gridNattable;
 
 	private List<SWTBotToolbarButton> searchToolbar;
 	private List<SWTBotToolbarButton> indexToolbar;
@@ -54,20 +50,14 @@ public class OpenServiceContract {
 
 	@Before
 	public void beforeClass() {
-		bot = new SWTWorkbenchBot(getEclipseContext());
+		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
-		openStundenerfassung();
+		openServiceContract();
 	}
 
-	public void maximizeShell() {
-		UIThreadRunnable.syncExec(bot.getDisplay(), () -> {
-			bot.getDisplay().getActiveShell().setSize(2000, 1500);
-		});
-	}
+	public void openServiceContract() {
 
-	public void openStundenerfassung() {
-
-		// Stundenerfassung über das Menü öffnen
+		// ServiceContract über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Manuelle Abwicklung");
 		assertNotNull(adminMenu);
 		SWTBotMenu stundenErfassung = adminMenu.menu("tServiceContract");
@@ -88,8 +78,8 @@ public class OpenServiceContract {
 		assertNotNull(searchNattable);
 		indexNattable = swtNatTableBot.nattable(1);
 		assertNotNull(indexNattable);
-		gridDetailNattable = swtNatTableBot.nattable(2);
-		assertNotNull(gridDetailNattable);
+		gridNattable = swtNatTableBot.nattable(2);
+		assertNotNull(gridNattable);
 
 		// Toolbarbuttons finden
 		searchToolbar = searchPart.getToolbarButtons();
@@ -108,7 +98,7 @@ public class OpenServiceContract {
 
 		// Warten bis Daten geladen sind
 		do {
-			sleep(500);
+			UITestUtil.sleep(500);
 		} while (!indexToolbar.get(0).isEnabled());
 
 		// Ist Mitarbeiter immer AVM?
@@ -123,32 +113,22 @@ public class OpenServiceContract {
 	@Test
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden!")
 	public void loadIndex() {
-		loadIndexFull();
+		UITestUtil.loadIndex(indexToolbar);
 
 		// Überprüfen, ob Daten geladen wurden
-
 		assertTrue(indexNattable.rowCount() > 3);
-	}
-
-	private void loadIndexFull() {
-		indexToolbar.get(0).click();
-
-		// Warten bis Daten geladen sind
-		do {
-			sleep(500);
-		} while (!indexToolbar.get(0).isEnabled());
 	}
 
 	@Test
 	@DisplayName("Detail Laden und Überprüfen, ob Daten geladen wurden!")
 	public void loadDetail() {
 
-		loadIndexFull();
+		UITestUtil.loadIndex(indexToolbar);
 		indexNattable.click(4, 1);
 
-		// Überprüfen, ob Daten geladen wurden
-		sleep(1000);
+		UITestUtil.sleep();
 
+		// Überprüfen, ob Daten geladen wurden
 		MPart part = detailPart.getPart();
 		WFCDetailPart wfcPart = (WFCDetailPart) part.getObject();
 		MField keyText = wfcPart.getDetail().getField("KeyText");
@@ -163,21 +143,18 @@ public class OpenServiceContract {
 	@DisplayName("Detail Laden, eine Zeile aus dem Grid löschen, 2 Neue hinzufügen!")
 	public void loadDetailGrid() {
 
-		// maximizeShell();
-		sleep(500);
-
-		loadIndexFull();
+		UITestUtil.loadIndex(indexToolbar);
 		indexNattable.click(4, 1);
 
-		// Überprüfen, ob Daten geladen wurden
-		sleep(1000);
+		UITestUtil.sleep();
 
+		// Überprüfen, ob Daten geladen wurden
 		MPart part = detailPart.getPart();
 		WFCDetailPart wfcPart = (WFCDetailPart) part.getObject();
 		MGrid grid = wfcPart.getDetail().getGrid("ServicePrice");
 		int size = grid.getDataTable().getRows().size();
 		assertEquals(size, 5);
-		gridDetailNattable.click(5, 0);
+		gridNattable.click(5, 0);
 
 		Control textClient = grid.getmSection().getSection().getTextClient();
 		assertTrue(textClient instanceof ToolBar);
@@ -187,31 +164,16 @@ public class OpenServiceContract {
 
 		btnDelete.click();
 
-		sleep(250);
+		UITestUtil.sleep(250);
 		int sizeAfterDelete = grid.getDataTable().getRows().size();
 		assertEquals(sizeAfterDelete, 4);
 
 		btnInsert.click();
-		sleep(250);
+		UITestUtil.sleep(250);
 		btnInsert.click();
-		sleep(250);
+		UITestUtil.sleep(250);
 
 		assertEquals(grid.getDataTable().getRows().size(), 6);
-	}
-
-	private void sleep(Integer milliseconds) {
-		Integer mil = milliseconds;
-		if (milliseconds == null) {
-			mil = 1000;
-		}
-		try {
-			Thread.sleep(mil);
-		} catch (InterruptedException e) {}
-	}
-
-	protected static IEclipseContext getEclipseContext() {
-		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(OpenServiceContract.class).getBundleContext());
-		return serviceContext.get(IWorkbench.class).getApplication().getContext();
 	}
 
 	@AfterEach
