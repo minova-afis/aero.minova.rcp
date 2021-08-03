@@ -886,7 +886,9 @@ public class WFCDetailCASRequestsUtil {
 				continue;
 			}
 			if (c instanceof MLookupField) {
-				if (sV == null && c.getValue() != null || c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
+				if (sV == null && c.getValue() != null || //
+						sV != null && c.getValue() == null || //
+						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
 					return true;
 				}
 			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
