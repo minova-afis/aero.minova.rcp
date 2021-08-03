@@ -46,11 +46,14 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -320,7 +323,44 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'd'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'h'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'v'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
+			}
+		});
+
 		return getNatTable();
+	}
+	
+	public void execButtonHandler(String btnId, String commandName) {
+		Map<String, String> parameter = new HashMap<>();
+		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
+		parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+		ParameterizedCommand command = commandService.createCommand(commandName, parameter);
+		handlerService.executeHandler(command);
 	}
 
 	public Table getDataTable() {
