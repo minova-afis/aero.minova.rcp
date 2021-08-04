@@ -64,19 +64,9 @@ public class MenuProcessor {
 		try {
 			CompletableFuture<String> xbsFuture = dataService.getHashedFile(XBS_FILE_NAME);
 			String xbsContent = xbsFuture.get();
-			processXML(xbsContent);
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	// TODO: Verschieben?
-	private void processXBS(String xbsContent) {
-		try {
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
 			mApplication.getContext().set(Preferences.class, preferences);
-		} catch (JAXBException e) {
+		} catch (InterruptedException | ExecutionException | JAXBException e) {
 			e.printStackTrace();
 		}
 	}
