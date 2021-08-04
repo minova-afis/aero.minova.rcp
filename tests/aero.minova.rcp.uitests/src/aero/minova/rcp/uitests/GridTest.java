@@ -212,6 +212,8 @@ public class GridTest {
 		bot.text().setFocus();
 		SWTBotToolbarButton btnDelete = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_DELETE);
 
+		UITestUtil.sleep();
+
 		// Löscht Zeile mit Werten 11, 12
 		gridNattable.click(1, 0);
 		btnDelete.click();
@@ -231,6 +233,7 @@ public class GridTest {
 		gridNattable.setCellDataValueByPosition(2, 1, "1");
 
 		bot.text().setFocus();
+		UITestUtil.sleep();
 	}
 
 	@AfterEach
