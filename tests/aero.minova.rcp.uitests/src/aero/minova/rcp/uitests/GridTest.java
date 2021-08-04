@@ -182,10 +182,12 @@ public class GridTest {
 		bot.text().setFocus();
 		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);
 
+		UITestUtil.sleep();
 		btnInsert.click();
 		btnInsert.click();
 		btnInsert.click();
 		btnInsert.click();
+		UITestUtil.sleep();
 
 		gridNattable.setCellDataValueByPosition(1, 1, "11");
 		gridNattable.setCellDataValueByPosition(1, 2, "12");
@@ -200,6 +202,7 @@ public class GridTest {
 		gridNattable.setCellDataValueByPosition(4, 2, "42");
 
 		bot.text().setFocus();
+		UITestUtil.sleep();
 	}
 
 	/**
