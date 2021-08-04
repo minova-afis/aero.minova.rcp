@@ -91,10 +91,15 @@ public class ModelToViewModel {
 		}
 
 		if (field.getEditor() != null) {
-			throw new RuntimeException("Field " + field.getName() + " is of Type Editor, which isn't implemented yet");
+			System.err.println("Field " + field.getName() + " is of Type Editor, which isn't implemented yet");
+		} else if (field.getParamString() != null) {
+			System.err.println("Field " + field.getName() + " is of Type Param-String, which isn't implemented yet");
+		} else {
+			throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
 		}
 
-		throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
+		// Filler Feld zurückgeben, damit restliche Maske gebaut werden kann
+		return new MTextField();
 	}
 
 }

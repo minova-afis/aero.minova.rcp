@@ -47,13 +47,16 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
@@ -157,6 +160,7 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
+		// bar.setData("org.eclipse.swtbot.widget.key", "GridToolBar");
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
@@ -164,7 +168,7 @@ public class SectionGrid {
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(false);
-			insertToolItem = createButton(bar, btnInsert);
+			insertToolItem = createToolItem(bar, btnInsert);
 		}
 
 		if (grid.isButtonDeleteVisible()) {
@@ -173,12 +177,12 @@ public class SectionGrid {
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
 			btnDel.setEnabled(false);
-			deleteToolItem = createButton(bar, btnDel);
+			deleteToolItem = createToolItem(bar, btnDel);
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
 		for (Button btn : grid.getButton()) {
-			createButton(bar, btn);
+			createToolItem(bar, btn);
 		}
 
 		// Standard
@@ -187,25 +191,26 @@ public class SectionGrid {
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
 		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
-		createButton(bar, btnOptimizeHigh);
+		createToolItem(bar, btnOptimizeHigh);
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
 		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
-		createButton(bar, btnOptimizeWidth);
+		createToolItem(bar, btnOptimizeWidth);
 
 		section.setTextClient(bar);
 	}
 
-	public ToolItem createButton(ToolBar bar, Button btn) {
-		return createButton(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
+	public ToolItem createToolItem(ToolBar bar, Button btn) {
+		return createToolItem(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
 	}
 
-	public ToolItem createButton(ToolBar bar, Button btn, String commandName) {
+	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
 		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 		item.setData(btn);
+		item.setData("org.eclipse.swtbot.widget.key", btn.getId());
 		item.setEnabled(btn.isEnabled());
 		if (btn.getText() != null) {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
@@ -269,7 +274,11 @@ public class SectionGrid {
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
 		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
-		selectionLayer.addLayerListener(event -> deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0));
+		selectionLayer.addLayerListener(event -> {
+			if (deleteToolItem != null) {
+				deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0);
+			}
+		});
 
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);
@@ -353,7 +362,44 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'd'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'h'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
+			}
+		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'v'), new IKeyAction() {
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
+			}
+		});
+
 		return getNatTable();
+	}
+	
+	public void execButtonHandler(String btnId, String commandName) {
+		Map<String, String> parameter = new HashMap<>();
+		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
+		parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+		ParameterizedCommand command = commandService.createCommand(commandName, parameter);
+		handlerService.executeHandler(command);
 	}
 
 	public Table getDataTable() {
