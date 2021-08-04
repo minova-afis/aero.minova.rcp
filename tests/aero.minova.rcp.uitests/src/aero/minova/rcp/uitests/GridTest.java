@@ -135,7 +135,6 @@ public class GridTest {
 		UITestUtil.sleep();
 		UITestUtil.loadIndex(indexToolbar);
 		assertEquals(numberEntries, indexNattable.rowCount(), "Löschen des Eintrages fehlgeschlagen");
-		UITestUtil.sleep(10000);
 	}
 
 	/**
