@@ -94,7 +94,7 @@ public class GridTest {
 	}
 
 	@Test
-	@DisplayName("Zeilen in Grids einfügen, ändern und löschen testen und das Speichern überprüfen!")
+	@DisplayName("Zeilen in Grids einfügen, ändern und löschen testen und das Speichern überprüfen (nicht Ubuntu)!")
 	public void testGridFunctions() {
 		System.out.println(System.getProperty("os.name"));
 		// Auf Ubuntu nicht testen

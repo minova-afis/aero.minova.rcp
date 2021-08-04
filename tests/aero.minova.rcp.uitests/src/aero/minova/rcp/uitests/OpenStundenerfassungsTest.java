@@ -17,7 +17,6 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,10 +81,13 @@ public class OpenStundenerfassungsTest {
 		assertNotEquals(0, detailToolbar.size());
 	}
 
-	@Ignore
 	@Test
-	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten")
+	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten (Nicht Ubuntu)")
 	public void deleteRowAndRevertSearch() {
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
+
 		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue Zeile wird nicht eingefügt)
 		searchNattable.setCellDataValueByPosition(1, 3, "row1");
 		searchNattable.setCellDataValueByPosition(1, 4, "row1");
