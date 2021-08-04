@@ -47,6 +47,10 @@ public class GridTest {
 
 	@Before
 	public void beforeClass() {
+		// Auf Ubuntu nicht testen
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
 		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
 		openMask();
@@ -118,7 +122,7 @@ public class GridTest {
 		assertEquals(2, table.getRows().size(), "Löschen von Zeilen fehlgeschlagen");
 
 		// Unter Mac werden die Werte die in Nattables geschrieben werden angehängt
-		if (System.getProperty("os.name").startsWith("MacOS")) {
+		if (System.getProperty("os.name").startsWith("Mac OS")) {
 			assertEquals(211, table.getRows().get(0).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
 			assertEquals(411, table.getRows().get(1).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
 		} else {
