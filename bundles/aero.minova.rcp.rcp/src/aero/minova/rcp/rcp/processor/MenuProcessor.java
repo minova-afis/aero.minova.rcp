@@ -51,6 +51,7 @@ public class MenuProcessor {
 			String void1 = exceptionally.get();
 			processXML(void1);
 		} catch (Exception e) {
+			e.printStackTrace();
 			handleNoMDI(dataService);
 		}
 

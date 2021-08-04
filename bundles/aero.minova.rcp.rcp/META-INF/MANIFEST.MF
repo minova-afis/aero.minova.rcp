@@ -11,6 +11,7 @@ Export-Package: aero.minova.rcp.dialogs,
  aero.minova.rcp.rcp.widgets
 Require-Bundle: aero.minova.rcp.form.model,
  aero.minova.rcp.form.menu,
+ aero.minova.rcp.form.setup,
  aero.minova.rcp.preferencewindow,
  aero.minova.rcp.model,
  aero.minova.rcp.constant,
@@ -50,8 +51,7 @@ Require-Bundle: aero.minova.rcp.form.model,
  aero.minova.rcp.preferences;bundle-version="1.2.0",
  aero.minova.libs.fop,
  org.eclipse.osgi.services;bundle-version="3.10.0",
- jakarta.xml.bind;bundle-version="2.3.3",
- aero.minova.rcp.form.setup;bundle-version="12.0.24"
+ jakarta.xml.bind;bundle-version="2.3.3"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: aero.minova.rcp.rcp
 Import-Package: aero.minova.rcp.constants,
