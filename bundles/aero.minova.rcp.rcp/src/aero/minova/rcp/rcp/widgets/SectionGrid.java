@@ -353,6 +353,9 @@ public class SectionGrid {
 				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 			}
 		});
+		
+		getNatTable().setData("Section", section);
+		getNatTable().setData("SelectionLayer", selectionLayer);
 
 		return getNatTable();
 	}
