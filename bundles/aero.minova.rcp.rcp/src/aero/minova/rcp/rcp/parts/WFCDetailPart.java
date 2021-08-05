@@ -42,6 +42,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -498,6 +499,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				if (!field.isReadOnly()) {
 					tabList.add(control);
 				}
+			} else if (control instanceof NatTable) {
+				tabList.add(control);
 			}
 		}
 
