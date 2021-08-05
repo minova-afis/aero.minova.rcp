@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.forms.widgets.Section;
 
 import aero.minova.rcp.model.helper.IHelper;
 
@@ -19,7 +20,8 @@ public class MDetail {
 	private HashMap<String, MField> fields = new HashMap<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
 
-	private List<MSection> pageList = new ArrayList<>();
+	private List<Section> sectionList = new ArrayList<>();
+	private List<MSection> mSectionList = new ArrayList<>();
 
 	private IHelper helper;
 
@@ -91,16 +93,29 @@ public class MDetail {
 		return fields.values();
 	}
 
-	public List<MSection> getPageList() {
-		return pageList;
+	public List<Section> getSectionList() {
+		return sectionList;
 	}
 
-	public void setPageList(List<MSection> pageList) {
-		this.pageList = pageList;
+	public void setSectionList(List<Section> sectionList) {
+		this.sectionList = sectionList;
 	}
 
-	public void addPage(MSection page) {
-		this.pageList.add(page);
+	public void addSection(Section section) {
+		this.sectionList.add(section);
+
+	}
+	
+	public List<MSection> getMSectionList() {
+		return mSectionList;
+	}
+
+	public void setMSectionList(List<MSection> mSectionList) {
+		this.mSectionList = mSectionList;
+	}
+
+	public void addMSection(MSection mSection) {
+		this.mSectionList.add(mSection);
 
 	}
 

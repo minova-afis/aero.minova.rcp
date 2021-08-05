@@ -310,7 +310,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		composite.getParent().setTabList(getTabListForSection(composite.getParent()));
 
 		// MSection wird zum MDetail hinzugefügt.
-		mDetail.addPage(mSection);
+		mDetail.addSection(section);
 	}
 
 	/**

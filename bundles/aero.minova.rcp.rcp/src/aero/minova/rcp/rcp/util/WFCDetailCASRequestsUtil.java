@@ -839,7 +839,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private void focusFirstEmptyField() {
-		for (MSection section : mDetail.getPageList()) {
+		for (MSection section : mDetail.getMSectionList()) {
 			for (MField field : section.getTabList()) {
 				if (field.getValue() == null) {
 					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
@@ -849,7 +849,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
-		((AbstractValueAccessor) mDetail.getPageList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
+		((AbstractValueAccessor) mDetail.getMSectionList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
 	}
 
 	public Table getSelectedTable() {

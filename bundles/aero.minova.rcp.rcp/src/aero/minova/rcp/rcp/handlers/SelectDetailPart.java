@@ -29,7 +29,7 @@ public class SelectDetailPart {
 		MPart part = findElements.get(0);
 		partService.activate(part);
 		WFCDetailPart detailPart = (WFCDetailPart) part.getObject();
-		MField field = detailPart.getDetail().getPageList().get(0).getTabList().get(0);
+		MField field = detailPart.getDetail().getMSectionList().get(0).getTabList().get(0);
 		((AbstractValueAccessor)field.getValueAccessor()).getControl().setFocus();
 	}
 }
