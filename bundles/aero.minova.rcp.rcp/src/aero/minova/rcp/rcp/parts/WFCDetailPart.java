@@ -8,6 +8,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,10 +16,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -66,13 +69,17 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
+import aero.minova.rcp.form.setup.xbs.Node;
+import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
@@ -99,6 +106,7 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
@@ -157,6 +165,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Inject
 	EModelService eModelService;
+	MApplication mApplication;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -164,6 +173,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		appContext = mApp.getContext();
+		mApplication = mApp;
 		getForm();
 		layoutForm(parent);
 
@@ -242,6 +252,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			layoutSection(parent, wrapper);
 		}
 
+		loadOptionPages(parent);
+
 		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
 		// Holen des Parts
@@ -262,6 +274,54 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			getDetail().setHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
+	}
+
+	private void loadOptionPages(Composite parent) {
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+		// TODO: Nodes auf Namen prüfen?
+		List<Node> nodes = preferences.getRoot().getNode().get(0).getNode().get(0).getNode();
+		for (Node mask : nodes) {
+			if (mask.getName().equals(mPerspective.getPersistedState().get(Constants.FORM_NAME))) {
+				for (Node settingsForMask : mask.getNode()) {
+					if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
+						for (Node op : settingsForMask.getNode()) {
+							try {
+								dataService.downloadFile(op.getName());
+								String opContent = dataService.getHashedFile(op.getName()).get();
+
+								try {
+									Form opForm = XmlProcessor.get(opContent, Form.class);
+									addOPFromForm(opForm, parent);
+								} catch (JAXBException | IllegalArgumentException e) {
+									try {
+										Grid opGrid = XmlProcessor.get(opContent, Grid.class);
+										addOPFromGrid(opGrid, parent);
+									} catch (JAXBException e1) {
+										e1.printStackTrace();
+									}
+								}
+
+							} catch (IOException | InterruptedException | ExecutionException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void addOPFromForm(Form opForm, Composite parent) {
+		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
+			layoutSection(parent, wrapper);
+		}
+
+	}
+
+	private void addOPFromGrid(Grid opGrid, Composite parent) {
+		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
+		layoutSection(parent, wrapper);
 	}
 
 	/**

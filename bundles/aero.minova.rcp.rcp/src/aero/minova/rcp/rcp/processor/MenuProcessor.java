@@ -65,7 +65,7 @@ public class MenuProcessor {
 			CompletableFuture<String> xbsFuture = dataService.getHashedFile(XBS_FILE_NAME);
 			String xbsContent = xbsFuture.get();
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
-			mApplication.getContext().set(Preferences.class, preferences);
+			mApplication.getTransientData().put(XBS_FILE_NAME, preferences);
 		} catch (InterruptedException | ExecutionException | JAXBException e) {
 			e.printStackTrace();
 		}
