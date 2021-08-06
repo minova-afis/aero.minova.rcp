@@ -143,8 +143,9 @@ public class Column {
 		} else if (!name.equalsIgnoreCase(other.name))
 			return false;
 
-		if (type != other.type)
-			return false;
+		// TODO: Typ überprüfen?
+//		if (type != other.type)
+//			return false;
 		return true;
 	}
 

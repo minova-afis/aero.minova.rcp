@@ -290,6 +290,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 								dataService.downloadFile(op.getName());
 								String opContent = dataService.getHashedFile(op.getName()).get();
 
+								// TODO: Gibt es OPs mit anderen Rootklassen?
 								try {
 									Form opForm = XmlProcessor.get(opContent, Form.class);
 									addOPFromForm(opForm, parent);

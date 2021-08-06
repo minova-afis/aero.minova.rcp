@@ -26,7 +26,7 @@ public class MDetail {
 
 	private Control selectedField;
 
-	private List<Form> optionPages = new ArrayList<>();
+	private HashMap<String, Form> optionPages = new HashMap<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -107,11 +107,15 @@ public class MDetail {
 	}
 
 	public void addOptionPage(Form op) {
-		this.optionPages.add(op);
+		this.optionPages.put(op.getTitle(), op);
 	}
 
-	public List<Form> getOptionPages() {
-		return optionPages;
+	public Form getOptionPage(String name) {
+		return optionPages.get(name);
+	}
+
+	public Collection<Form> getOptionPages() {
+		return optionPages.values();
 	}
 
 	public IHelper getHelper() {

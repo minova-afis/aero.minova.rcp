@@ -131,7 +131,7 @@ public class WFCDetailCASRequestsUtil {
 	private Map<String, Value> keys = null;
 
 	private Table selectedTable;
-	private List<Table> selectedOptionPages;
+	private HashMap<String, Table> selectedOptionPages;
 	private HashMap<String, Table> selectedGrids;
 
 	@Inject
@@ -145,7 +145,7 @@ public class WFCDetailCASRequestsUtil {
 		this.mDetail = detail;
 		this.perspective = perspective;
 		this.wfcDetailPart = wfcDetailPart;
-		this.selectedOptionPages = new ArrayList<>();
+		this.selectedOptionPages = new HashMap<>();
 		this.selectedGrids = new HashMap<>();
 
 		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
@@ -196,7 +196,7 @@ public class WFCDetailCASRequestsUtil {
 					Table opFormTable = createReadTableFromForm(opForm, row);
 					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
 					opFuture.thenAccept(t -> sync.asyncExec(() -> {
-						selectedOptionPages.add(t.getOutputParameters());
+						selectedOptionPages.put(opForm.getTitle(), t.getOutputParameters());
 						updateSelectedEntry();
 					}));
 				}
@@ -290,7 +290,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Option Pages
-		for (Table t : selectedOptionPages) {
+		for (Table t : selectedOptionPages.values()) {
 			setFieldsFromTable(t);
 		}
 
@@ -903,6 +903,7 @@ public class WFCDetailCASRequestsUtil {
 
 		// Felder leeren
 		selectedTable = null;
+		selectedOptionPages.clear();
 		for (MField f : mDetail.getFields()) {
 			setKeys(null);
 			f.setValue(null, false);
@@ -969,7 +970,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @return
 	 */
 	public boolean checkDirty() {
-		return checkFields() || checkGrids();
+		return checkFields() || checkOPs() || checkGrids();
 	}
 
 	private boolean checkFields() {
@@ -983,16 +984,25 @@ public class WFCDetailCASRequestsUtil {
 			return false;
 		}
 
+		return checkFieldsWithTable(selectedTable, form);
+	}
+
+	private boolean checkFieldsWithTable(Table t, Form f) {
 		// vergleicht Feld-Wert mit Wert aus ausgeleser Tabelle (vom CAS)
 		List<MField> checkedFields = new ArrayList<>();
-		for (int i = 0; i < selectedTable.getColumnCount(); i++) {
-			MField c = mDetail.getField(selectedTable.getColumnName(i));
+		for (int i = 0; i < t.getColumnCount(); i++) {
+			MField c = mDetail.getField(t.getColumnName(i));
 			checkedFields.add(c);
-			Value sV = selectedTable.getRows().get(0).getValue(i);
+			Value sV = t.getRows().get(0).getValue(i);
 			if (c == null) {
 				continue;
 			}
 			if (c instanceof MLookupField) {
+				// LU mit index 0 gibt es nie
+				if (c.getValue() == null && sV != null && sV.getIntegerValue() == 0) {
+					continue;
+				}
+
 				if (sV == null && c.getValue() != null || //
 						sV != null && c.getValue() == null || //
 						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
@@ -1003,13 +1013,38 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 
-		// Sind die Felder, die nicht in der ausgelesenen Tabelle sind, leer?
-		for (MField mfield : mDetail.getFields()) {
+		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
+		for (Field field : dataFormService.getFieldsFromForm(f)) {
+			MField mfield = mDetail.getField(field.getName());
 			if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
 				return true;
 			}
 		}
 
+		return false;
+	}
+
+	private boolean checkOPs() {
+
+		// Sind die OP Felder leer?
+		if (selectedOptionPages.isEmpty()) {
+			for (Form opform : mDetail.getOptionPages()) {
+				for (Field field : dataFormService.getFieldsFromForm(opform)) {
+					if (mDetail.getField(field.getName()).getValue() != null) {
+						return true;
+					}
+				}
+			}
+		}
+
+		// Felder der OPs mit Werten vom CAS vergleichen
+		for (Entry<String, Table> entry : selectedOptionPages.entrySet()) {
+			Form opform = mDetail.getOptionPage(entry.getKey());
+			Table table = entry.getValue();
+			if (checkFieldsWithTable(table, opform)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
