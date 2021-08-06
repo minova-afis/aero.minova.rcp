@@ -213,6 +213,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private static class HeadOrPageOrGridWrapper {
 		private Object headOrPageOrGrid;
 		public boolean isHead = false;
+		public boolean isOP = false;
+		private String formTitle;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -221,9 +223,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formTitle) {
+			this.headOrPageOrGrid = headOrPageOrGrid;
+			this.formTitle = formTitle;
+			this.isOP = isOP;
+			if (headOrPageOrGrid instanceof Head && !isOP) {
+				isHead = true;
+			}
+		}
+
 		public String getTranslationText() {
 			if (isHead) {
 				return "@Head";
+			} else if (headOrPageOrGrid instanceof Head && isOP) {
+				return formTitle;
 			} else if (headOrPageOrGrid instanceof Grid) {
 				return ((Grid) headOrPageOrGrid).getTitle();
 			} else if (headOrPageOrGrid instanceof Page) {
@@ -233,7 +246,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		public List<Object> getFieldOrGrid() {
-			if (isHead) {
+			if (headOrPageOrGrid instanceof Head) {
 				return ((Head) headOrPageOrGrid).getFieldOrGrid();
 			} else if (headOrPageOrGrid instanceof Grid) {
 				// es existieren keine Felder, nur eine Table
@@ -314,7 +327,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void addOPFromForm(Form opForm, Composite parent) {
 		mDetail.addOptionPage(opForm);
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
-			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getTitle());
 			layoutSection(parent, wrapper);
 		}
 	}
