@@ -312,6 +312,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// MSection wird zum MDetail hinzugefügt.
 		mDetail.addSection(section);
+		mDetail.addMSection(mSection);
 	}
 
 	/**

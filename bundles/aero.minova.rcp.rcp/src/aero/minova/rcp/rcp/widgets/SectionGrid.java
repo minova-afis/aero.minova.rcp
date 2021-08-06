@@ -45,7 +45,6 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
@@ -54,13 +53,9 @@ import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormData;
@@ -322,38 +317,6 @@ public class SectionGrid {
 						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
 			}
 		});
-		
-		getNatTable().addFocusListener(new FocusListener() {
-			
-			@Override
-			public void focusLost(FocusEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void focusGained(FocusEvent e) {
-				getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
-			}
-		});
-		
-		getNatTable().addTraverseListener(new TraverseListener() {
-			
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				switch (e.detail) {
-				case SWT.TRAVERSE_TAB_NEXT:
-					e.doit = true;
-					break;
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-					e.doit = true;
-					break;
-				default:
-					break;
-				}
-				
-			}
-		});
 
 		FormData fd = new FormData();
 		fd.width = DEFAULT_WIDTH;
@@ -393,7 +356,7 @@ public class SectionGrid {
 		
 		getNatTable().setData("Section", section);
 		getNatTable().setData("SelectionLayer", selectionLayer);
-
+		getNatTable().setData("DataTable", this.dataTable);
 		return getNatTable();
 	}
 	
