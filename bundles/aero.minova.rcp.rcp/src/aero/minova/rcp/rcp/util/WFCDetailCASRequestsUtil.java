@@ -901,8 +901,8 @@ public class WFCDetailCASRequestsUtil {
 			return;
 		}
 
+		// Felder leeren
 		selectedTable = null;
-
 		for (MField f : mDetail.getFields()) {
 			setKeys(null);
 			f.setValue(null, false);
@@ -911,12 +911,13 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 
+		// Grids leeren
+		selectedGrids.clear();
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.clearGrid();
 		}
 
-		selectedGrids.clear();
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 		// Auswahl im Index entfernen
@@ -973,7 +974,7 @@ public class WFCDetailCASRequestsUtil {
 
 	private boolean checkFields() {
 		// Prüfung der mFields ob es einen Value ≠ null gibt
-		if (getSelectedTable() == null) {
+		if (getSelectedTable() == null || getSelectedTable().getRows().isEmpty()) {
 			for (MField mfield : mDetail.getFields()) {
 				if (mfield.getValue() != null) {
 					return true;
