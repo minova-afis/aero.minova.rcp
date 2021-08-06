@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -56,7 +55,6 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
-import aero.minova.rcp.model.builder.ValueBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
@@ -128,9 +126,10 @@ public class WFCDetailCASRequestsUtil {
 
 	private MPerspective perspective;
 
-	private List<ArrayList> keys = null;
+	private Map<String, Value> keys = null;
 
 	private Table selectedTable;
+	private List<Table> selectedOptionPages;
 	private HashMap<String, Table> selectedGrids;
 
 	@Inject
@@ -144,6 +143,7 @@ public class WFCDetailCASRequestsUtil {
 		this.mDetail = detail;
 		this.perspective = perspective;
 		this.wfcDetailPart = wfcDetailPart;
+		this.selectedOptionPages = new ArrayList<>();
 		this.selectedGrids = new HashMap<>();
 
 		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
@@ -177,51 +177,29 @@ public class WFCDetailCASRequestsUtil {
 
 			Row row = rows.get(0);
 			if (row.getValue(0).getValue() != null) {
-				Table rowIndexTable = dataFormService.getTableFromFormDetail(form, Constants.READ_REQUEST);
 
-				RowBuilder builder = RowBuilder.newRow();
-				List<Field> allFields = dataFormService.getFieldsFromForm(form);
-
-				// Hauptmaske
-
+				// Hauptfelder
+				Table rowIndexTable = createReadTableFromForm(form, row);
 				List<Column> indexColumns = form.getIndexView().getColumn();
-				ArrayList<ArrayList> newKeys = new ArrayList<>();
-				for (Field f : allFields) {
-					boolean found = false;
-					for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-						if (indexColumns.get(i).getName().equals(f.getName())) {
-							found = true;
-							if ("primary".equals(f.getKeyType())) {
-								builder.withValue(row.getValue(i).getValue());
-								ArrayList<Object> al = new ArrayList<>();
-								al.add(indexColumns.get(i).getName());
-								al.add(row.getValue(i).getValue());
-								al.add(ValueBuilder.value(row.getValue(i)).getDataType());
-								newKeys.add(al);
-							} else {
-								builder.withValue(null);
-							}
-						}
-					}
-					if (!found) {
-						builder.withValue(null);
-					}
-
-				}
-
-				if (!newKeys.equals(keys)) {
-					setKeys(newKeys);
-				}
-
-				Row r = builder.create();
-				rowIndexTable.addRow(r);
-
 				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 					selectedTable = t.getOutputParameters();
 					updateSelectedEntry();
 				}));
 
+				// Option Pages
+				selectedOptionPages.clear();
+				for (Form opForm : mDetail.getOptionPages()) {
+					// TODO: Methode geht davon aus, dass Keys in gleicher Reihenfolge eingetragen sind
+					Table opFormTable = createReadTableFromForm(opForm, row);
+					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+					opFuture.thenAccept(t -> sync.asyncExec(() -> {
+						selectedOptionPages.add(t.getOutputParameters());
+						updateSelectedEntry();
+					}));
+				}
+
+				// Grids
 				for (MGrid g : mDetail.getGrids()) {
 					Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
 					RowBuilder gridRowBuilder = RowBuilder.newRow();
@@ -263,27 +241,73 @@ public class WFCDetailCASRequestsUtil {
 		});
 	}
 
+	private Table createReadTableFromForm(Form tableForm, Row row) {
+
+		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
+
+		RowBuilder builder = RowBuilder.newRow();
+		List<Field> allFields = dataFormService.getFieldsFromForm(tableForm);
+
+		List<Column> indexColumns = form.getIndexView().getColumn();
+		Map<String, Value> newKeys = new HashMap<>();
+		for (Field f : allFields) {
+			boolean found = false;
+			for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+				if (indexColumns.get(i).getName().equals(f.getName())) {
+					found = true;
+					if ("primary".equals(f.getKeyType())) {
+						builder.withValue(row.getValue(i).getValue());
+						newKeys.put(indexColumns.get(i).getName(), row.getValue(i));
+					} else {
+						builder.withValue(null);
+					}
+				}
+			}
+			if (!found) {
+				builder.withValue(null);
+			}
+
+		}
+
+		if (!newKeys.equals(keys)) {
+			setKeys(newKeys);
+		}
+
+		Row r = builder.create();
+		rowIndexTable.addRow(r);
+		return rowIndexTable;
+	}
+
 	/**
 	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den daraus erhaltenen Daten, dies erfolgt durch die Consume-Methode
 	 */
 	public void updateSelectedEntry() {
 		if (selectedTable != null) {
-			for (int i = 0; i < selectedTable.getColumnCount(); i++) {
-				String name = selectedTable.getColumnName(i);
-				MField c = mDetail.getField(name);
-				if (c != null && c.getConsumer() != null) {
-					try {
-						c.indicateWaiting();
-						c.setValue(selectedTable.getRows().get(0).getValue(i), false);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			setFieldsFromTable(selectedTable);
 		}
+
+		for (Table t : selectedOptionPages) {
+			setFieldsFromTable(t);
+		}
+
 		updateSelectedGrids();
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
+	}
+
+	private void setFieldsFromTable(Table table) {
+		for (int i = 0; i < table.getColumnCount(); i++) {
+			String name = table.getColumnName(i);
+			MField c = mDetail.getField(name);
+			if (c != null && c.getConsumer() != null) {
+				try {
+					c.indicateWaiting();
+					c.setValue(table.getRows().get(0).getValue(i), false);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public void updateSelectedGrids() {
@@ -306,85 +330,127 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
-			Table formTable = null;
-			RowBuilder rb = RowBuilder.newRow();
 			if (getKeys() != null) {
-				formTable = dataFormService.getTableFromFormDetail(form, Constants.UPDATE_REQUEST);
+				updateDetail();
 			} else {
-				formTable = dataFormService.getTableFromFormDetail(form, Constants.INSERT_REQUEST);
+				insertDetail();
 			}
-			int valuePosition = 0;
+		}
+	}
+
+	private void insertDetail() {
+		// Hauptfelder
+		Table formTable = createInsertUpdateTableFromForm(form);
+		sendSaveRequest(formTable);
+	}
+
+	/*
+	 * OPs und Grids werden erst eingefügt, wenn das Einfügen des Haupteintrages erfolgreich war und wir die primary Keys zur Verfügung haben
+	 */
+	private void insertOPsAndGrids() {
+		// Option Pages
+		for (Form opForm : mDetail.getOptionPages()) {
+			// TODO: Methode geht davon aus, dass Keys in gleicher Reihenfolge eingetragen sind
+			Table opFormTable = createInsertUpdateTableFromForm(opForm);
+			dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+		}
+
+		// Grids
+		updateGrids();
+	}
+
+	private void updateDetail() {
+		// Hauptfelder
+		Table formTable = createInsertUpdateTableFromForm(form);
+		sendSaveRequest(formTable);
+
+		// Option Pages
+		for (Form opForm : mDetail.getOptionPages()) {
+			// TODO: Methode geht davon aus, dass Keys in gleicher Reihenfolge eingetragen sind
+			Table opFormTable = createInsertUpdateTableFromForm(opForm);
+			dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+		}
+
+		// Grids
+		updateGrids();
+	}
+
+	private Table createInsertUpdateTableFromForm(Form buildForm) {
+		Table formTable = null;
+		RowBuilder rb = RowBuilder.newRow();
+		if (getKeys() != null) {
+			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.UPDATE_REQUEST);
+		} else {
+			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
+			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
+				if (mDetail.getField(c.getName()).isPrimary()) {
+					c.setOutputType(OutputType.OUTPUT);
+				}
+			}
+		}
+		int valuePosition = 0;
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
 			if (getKeys() != null) {
-				for (ArrayList key : getKeys()) {
-					rb.withValue(key.get(1));
-					valuePosition++;
-				}
+				rb.withValue(keys.get(f.getName()));
 			} else {
-				List<Field> keyList = dataFormService.getAllPrimaryFieldsFromForm(form);
-				for (Field f : keyList) {
-					rb.withValue(null);
-					valuePosition++;
-				}
+				rb.withValue(null);
 			}
-			while (valuePosition < formTable.getColumnCount()) {
-				MField field = mDetail.getField(formTable.getColumnName(valuePosition));
-				if (field != null) {
-					rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
-				}
-				valuePosition++;
+			valuePosition++;
+		}
+
+		while (valuePosition < formTable.getColumnCount()) {
+			MField field = mDetail.getField(formTable.getColumnName(valuePosition));
+			if (field != null) {
+				rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
+			}
+			valuePosition++;
+		}
+
+		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden Row-Wertes ermittelt und der Row angefügt
+		Row r = rb.create();
+		formTable.addRow(r);
+		return formTable;
+	}
+
+	/*
+	 * Führt Update, Insert und Delete Anfragen auf Zeilen in Grids aus
+	 */
+	private void updateGrids() {
+		for (MGrid g : mDetail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.closeEditor();
+
+			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+			Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
+			Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.UPDATE_REQUEST + g.getProcedureSuffix()).create();
+
+			for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+				aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+				gridDeleteTable.addColumn(c);
+				gridInsertTable.addColumn(c);
+				gridUpdateTable.addColumn(c);
 			}
 
-			// anhand der Maske wird der Defaultwert und der DataType des Fehlenden Row-Wertes ermittelt und der Row angefügt
-			Row r = rb.create();
-			formTable.addRow(r);
-			sendSaveRequest(formTable);
+			for (Row row : sg.getRowsToDelete()) {
+				gridDeleteTable.addRow(row);
+			}
+			for (Row row : sg.getRowsToInsert()) {
+				gridInsertTable.addRow(row);
+			}
+			for (Row row : sg.getRowsToUpdate()) {
+				gridUpdateTable.addRow(row);
+			}
 
-			// Zeilen in Grids löschen, speichern und updaten
-			for (MGrid g : mDetail.getGrids()) {
-				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
-				sg.closeEditor();
+			if (!gridDeleteTable.getRows().isEmpty()) {
+				dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+			}
 
-				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
-				Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
-				Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.UPDATE_REQUEST + g.getProcedureSuffix()).create();
+			if (!gridInsertTable.getRows().isEmpty()) {
+				dataService.getGridDataAsync(gridInsertTable.getName(), gridInsertTable);
+			}
 
-				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
-					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
-					gridDeleteTable.addColumn(c);
-					gridInsertTable.addColumn(c);
-					gridUpdateTable.addColumn(c);
-				}
-
-				for (Row row : sg.getRowsToDelete()) {
-					gridDeleteTable.addRow(row);
-				}
-				for (Row row : sg.getRowsToInsert()) {
-					gridInsertTable.addRow(row);
-				}
-				for (Row row : sg.getRowsToUpdate()) {
-					gridUpdateTable.addRow(row);
-				}
-
-				if (!gridDeleteTable.getRows().isEmpty()) {
-					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
-					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-						// TODO: entsprechend reagieren
-					}));
-				}
-
-				if (!gridInsertTable.getRows().isEmpty()) {
-					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridInsertTable.getName(), gridInsertTable);
-					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-						// TODO: entsprechend reagieren
-					}));
-				}
-
-				if (!gridUpdateTable.getRows().isEmpty()) {
-					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridUpdateTable.getName(), gridUpdateTable);
-					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-						// TODO: entsprechend reagieren
-					}));
-				}
+			if (!gridUpdateTable.getRows().isEmpty()) {
+				dataService.getGridDataAsync(gridUpdateTable.getName(), gridUpdateTable);
 			}
 		}
 	}
@@ -396,7 +462,7 @@ public class WFCDetailCASRequestsUtil {
 			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 				// Speichern wieder aktivieren
 				broker.post(Constants.BROKER_SAVECOMPLETE, true);
-				if (Objects.isNull(getKeys())) {
+				if (getKeys() == null) {
 					checkNewEntryInsert(tr);
 				} else {
 					checkEntryUpdate(tr);
@@ -411,6 +477,40 @@ public class WFCDetailCASRequestsUtil {
 		} else {
 			openNotificationPopup(getTranslation("msg.ActionAborted"));
 		}
+	}
+
+	/**
+	 * Überprüft, ob der neue Eintrag erstellt wurde
+	 *
+	 * @param response
+	 */
+	private void checkNewEntryInsert(SqlProcedureResult response) {
+		if (response == null) {
+			return;
+		}
+		if (response.getReturnCode() == -1) {
+			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
+			showErrorMessage(e);
+		} else {
+			setKeysFromTable(response.getOutputParameters());
+			insertOPsAndGrids();
+			openNotificationPopup(getTranslation("msg.DataSaved"));
+			handleUserAction(Constants.INSERT_REQUEST);
+
+			if (autoReloadIndex) {
+				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
+				handlerService.executeHandler(cmd);
+			}
+		}
+	}
+
+	private void setKeysFromTable(Table t) {
+		Map<String, Value> newKeys = new HashMap<>();
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
+			int index = t.getColumnIndex(f.getName());
+			newKeys.put(f.getName(), t.getRows().get(0).getValue(index));
+		}
+		setKeys(newKeys);
 	}
 
 	/**
@@ -450,29 +550,6 @@ public class WFCDetailCASRequestsUtil {
 			mDetail.getHelper().handleDetailAction(ActionCode.SAVE);
 		}
 		focusFirstEmptyField();
-	}
-
-	/**
-	 * Überprüft, ob der neue Eintrag erstellt wurde
-	 *
-	 * @param response
-	 */
-	private void checkNewEntryInsert(SqlProcedureResult response) {
-		if (response == null) {
-			return;
-		}
-		if (response.getReturnCode() == -1) {
-			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
-			showErrorMessage(e);
-		} else {
-			openNotificationPopup(getTranslation("msg.DataSaved"));
-			handleUserAction(Constants.INSERT_REQUEST);
-
-			if (autoReloadIndex) {
-				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
-				handlerService.executeHandler(cmd);
-			}
-		}
 	}
 
 	/**
@@ -550,21 +627,9 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective && getKeys() != null) {
-			String tablename = form.getIndexView() != null ? "sp" : "op";
-			if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-				tablename = form.getDetail().getProcedurePrefix();
-			}
-			tablename += "Delete";
-			tablename += form.getDetail().getProcedureSuffix();
-			TableBuilder tb = TableBuilder.newTable(tablename);
-			RowBuilder rb = RowBuilder.newRow();
-			for (ArrayList key : getKeys()) {
-				tb.withColumn((String) key.get(0), (DataType) key.get(2));
-				rb.withValue(key.get(1));
-			}
-			Table t = tb.create();
-			Row r = rb.create();
-			t.addRow(r);
+
+			// Hauptmaske
+			Table t = createDeleteTableFromForm(form);
 			if (t.getRows() != null) {
 				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
 				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
@@ -573,30 +638,60 @@ public class WFCDetailCASRequestsUtil {
 					}
 				}));
 			}
+		}
+	}
 
-			// In allen Grids alle Zeilen löschen
-			for (MGrid g : mDetail.getGrids()) {
-				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
-				sg.closeEditor();
+	/**
+	 * OPs und Grids sollen erst gelöscht werden, wenn der Hauptlöschaufruf erfolgreich war
+	 */
+	private void deleteOPsAndGrids() {
 
-				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
-				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
-					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
-					gridDeleteTable.addColumn(c);
-				}
+		// Option Pages
+		for (Form opForm : mDetail.getOptionPages()) {
+			Table opFormTable = createDeleteTableFromForm(opForm);
+			dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+		}
 
-				for (Row row : sg.getDataTable().getRows()) {
-					gridDeleteTable.addRow(row);
-				}
+		// In allen Grids alle Zeilen löschen
+		for (MGrid g : mDetail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.closeEditor();
 
-				if (!gridDeleteTable.getRows().isEmpty()) {
-					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
-					gridFuture.thenAccept(resTable -> sync.asyncExec(() -> {
-						// TODO: entsprechend reagieren
-					}));
-				}
+			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+			for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+				aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+				gridDeleteTable.addColumn(c);
+			}
+
+			for (Row row : sg.getDataTable().getRows()) {
+				gridDeleteTable.addRow(row);
+			}
+
+			if (!gridDeleteTable.getRows().isEmpty()) {
+				dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
 			}
 		}
+
+	}
+
+	private Table createDeleteTableFromForm(Form form) {
+		String tablename = form.getIndexView() != null ? "sp" : "op";
+		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
+			tablename = form.getDetail().getProcedurePrefix();
+		}
+		tablename += "Delete";
+		tablename += form.getDetail().getProcedureSuffix();
+		TableBuilder tb = TableBuilder.newTable(tablename);
+		RowBuilder rb = RowBuilder.newRow();
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
+
+			tb.withColumn(f.getName(), mDetail.getField(f.getName()).getDataType());
+			rb.withValue(mDetail.getField(f.getName()).getValue());
+		}
+		Table t = tb.create();
+		Row r = rb.create();
+		t.addRow(r);
+		return t;
 	}
 
 	/**
@@ -715,6 +810,7 @@ public class WFCDetailCASRequestsUtil {
 				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
 				handlerService.executeHandler(cmd);
 			}
+			deleteOPsAndGrids();
 			openNotificationPopup(getTranslation("msg.DataDeleted"));
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
@@ -830,12 +926,12 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
-	public List<ArrayList> getKeys() {
+	public Map<String, Value> getKeys() {
 		return keys;
 	}
 
-	public void setKeys(ArrayList<ArrayList> arrayList) {
-		this.keys = arrayList;
+	public void setKeys(Map<String, Value> map) {
+		this.keys = map;
 	}
 
 	private void focusFirstEmptyField() {
