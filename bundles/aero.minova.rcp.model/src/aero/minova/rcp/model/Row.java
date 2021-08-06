@@ -59,7 +59,11 @@ public class Row {
 			return false;
 		} else {
 			for (int i = 0; i < values.size(); i++) {
-				if (!values.get(i).equals(other.values.get(i))) {
+				if (values.get(i) == null) {
+					if (other.values.get(i) != null) {
+						return false;
+					}
+				} else if (!values.get(i).equals(other.values.get(i))) {
 					return false;
 				}
 			}
