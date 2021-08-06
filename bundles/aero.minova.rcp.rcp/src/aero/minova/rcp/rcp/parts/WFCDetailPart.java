@@ -310,7 +310,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 						} catch (JAXBException | IllegalArgumentException e) {
 							try {
 								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
-								addOPFromGrid(opGrid, parent);
+								addOPFromGrid(opGrid, parent, op);
 							} catch (JAXBException e1) {
 								e1.printStackTrace();
 							}
@@ -332,9 +332,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
-	private void addOPFromGrid(Grid opGrid, Composite parent) {
+	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) {
 		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
 		layoutSection(parent, wrapper);
+
+		//SQL-Index zu Feldnamen Map aus .xbs setzten
+		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
+		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
+		sg.setSqlIndexToKeys(XBSUtil.getSqlIndexToKeysMap(opNode));
 	}
 
 	/**
@@ -617,7 +622,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
-					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
+					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 					mGrid.addGridChangeListener(this);
 					GridAccessor gA = new GridAccessor(mGrid);

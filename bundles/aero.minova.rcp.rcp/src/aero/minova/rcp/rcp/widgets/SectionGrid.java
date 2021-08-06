@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -77,6 +78,7 @@ import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
@@ -110,6 +112,7 @@ public class SectionGrid {
 	private Grid grid;
 	private Composite composite;
 	private Section section;
+	private MDetail mDetail;
 
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
@@ -122,6 +125,8 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
+	private Map<Integer, String> sqlIndexToKeys;
+
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
@@ -131,15 +136,18 @@ public class SectionGrid {
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
 	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
 
-	public SectionGrid(Composite composite, Section section, Grid grid) {
+	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
+		this.mDetail = mDetail;
 		resManager = new LocalResourceManager(JFaceResources.getResources(), composite);
 
 		rowsToInsert = new ArrayList<>();
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
+
+		setSqlIndexToKeys(new HashMap<>());
 	}
 
 	public void createGrid() {
@@ -482,17 +490,37 @@ public class SectionGrid {
 		updateNatTable();
 	}
 
+	public Map<Integer, String> getSqlIndexToKeys() {
+		return sqlIndexToKeys;
+	}
+
+	public void setSqlIndexToKeys(Map<Integer, String> sqlIndexToKeys) {
+		this.sqlIndexToKeys = sqlIndexToKeys;
+	}
+
 	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
 		for (Row r : dataTable.getRows()) {
-			for (Field f : grid.getField()) {
-				if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
-					int index = grid.getField().indexOf(f);
 
-					// TODO: Stimmen die Namen überein? Mapping aus .xbs auslesen?
-					if (primaryKeys.containsKey(f.getName())) {
-						r.setValue(primaryKeys.get(f.getName()), index);
-					} else if (f.getSqlIndex().intValue() == 0) { // Feld mit SQL-Index 0 bekommt Wert von KeyLong
-						r.setValue(primaryKeys.get("KeyLong"), index);
+			if (!getSqlIndexToKeys().isEmpty()) { // Zuordnung aus .xbs nutzen
+				for (Entry<Integer, String> entry : getSqlIndexToKeys().entrySet()) {
+					Value v = mDetail.getFieldBySQLIndex(entry.getKey()).getValue();
+					for (Field f : grid.getField()) {
+						if (f.getName().equals(entry.getValue())) {
+							r.setValue(v, grid.getField().indexOf(f));
+						}
+					}
+				}
+
+			} else { // Default: Name stimmt überein oder SQL-Index 0 in OP bekommt Wert von KeyLong in Hauptmaske
+				for (Field f : grid.getField()) {
+					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+						int index = grid.getField().indexOf(f);
+						
+						if (primaryKeys.containsKey(f.getName())) { //Übereinstimmende Namen nutzen
+							r.setValue(primaryKeys.get(f.getName()), index);
+						} else if (f.getSqlIndex().intValue() == 0) { // Default: Feld mit SQL-Index 0 bekommt Wert von KeyLong
+							r.setValue(primaryKeys.get("KeyLong"), index);
+						}
 					}
 				}
 			}

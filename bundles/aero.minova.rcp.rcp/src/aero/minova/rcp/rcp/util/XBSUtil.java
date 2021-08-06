@@ -1,5 +1,9 @@
 package aero.minova.rcp.rcp.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import aero.minova.rcp.form.setup.xbs.Map.Entry;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 
@@ -38,5 +42,22 @@ public class XBSUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Liefert eine Map von SQL-Index zu Feldname für die gegebene Node
+	 */
+	public static Map<Integer, String> getSqlIndexToKeysMap(Node node) {
+		Map<Integer, String> sqlToKeys = new HashMap<>();
+
+		for (Entry entry : node.getMap().getEntry()) {
+			String uppercaseString = entry.getKey().toUpperCase();
+			if (uppercaseString.startsWith("KEY")) {
+				int sqlIndex = Integer.parseInt(uppercaseString.replace("KEY", ""));
+				sqlToKeys.put(sqlIndex, entry.getValue());
+			}
+		}
+
+		return sqlToKeys;
 	}
 }

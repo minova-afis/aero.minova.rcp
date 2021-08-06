@@ -76,6 +76,7 @@ public class MDetail {
 	}
 
 	/**
+	 * ACHTUNG: Felder aus OPs haben aktuell noch kein Präfix! <br>
 	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in einer OptionPage haben das Präfix aus der XBS. z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
@@ -88,6 +89,22 @@ public class MDetail {
 	 */
 	public MField getField(String name) {
 		return fields.get(name);
+	}
+
+	/**
+	 * Liefert das ERSTE Feld (nach Erstellreihenfolge) mit dem gegebenen SQL-Index. Durch OPs kann es doppelte SQL-Indices geben.
+	 * 
+	 * @param index
+	 *            der SQL-Index
+	 * @return
+	 */
+	public MField getFieldBySQLIndex(int index) {
+		for (MField f : fields.values()) {
+			if (f.getSqlIndex().equals(index)) {
+				return f;
+			}
+		}
+		return null;
 	}
 
 	public Collection<MField> getFields() {

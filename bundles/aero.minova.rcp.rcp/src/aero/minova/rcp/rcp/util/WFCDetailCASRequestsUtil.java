@@ -182,17 +182,17 @@ public class WFCDetailCASRequestsUtil {
 
 				// Hauptfelder
 				Table rowIndexTable = createReadTableFromForm(form, row);
-				List<Column> indexColumns = form.getIndexView().getColumn();
 				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 					selectedTable = t.getOutputParameters();
 					updateSelectedEntry();
+					// Grids auslesen, wenn Daten der Hauptmaske geladen sind
+					readGrids(row);
 				}));
 
 				// Option Pages
 				selectedOptionPages.clear();
 				for (Form opForm : mDetail.getOptionPages()) {
-					// TODO: Methode geht davon aus, dass Keys in gleicher Reihenfolge eingetragen sind
 					Table opFormTable = createReadTableFromForm(opForm, row);
 					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
 					opFuture.thenAccept(t -> sync.asyncExec(() -> {
@@ -200,47 +200,64 @@ public class WFCDetailCASRequestsUtil {
 						updateSelectedEntry();
 					}));
 				}
-
-				// Grids
-				for (MGrid g : mDetail.getGrids()) {
-					Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
-					RowBuilder gridRowBuilder = RowBuilder.newRow();
-					Grid grid = g.getGrid();
-					for (Field f : grid.getField()) {
-						if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
-							aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
-							gridRequestTable.addColumn(column);
-
-							// Entsprechenden Wert im Index finden
-							boolean found = false;
-							for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-								if (indexColumns.get(i).getName().equals(f.getName())
-										|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
-									found = true;
-									gridRowBuilder.withValue(row.getValue(i).getValue());
-								}
-							}
-							if (!found) {
-								gridRowBuilder.withValue(null);
-							}
-						}
-					}
-					Row gridRow = gridRowBuilder.create();
-					gridRequestTable.addRow(gridRow);
-
-					CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
-					gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-						if (t != null) {
-							Table result = t.getResultSet();
-							if (result.getName().equals(g.getDataTable().getName())) {
-								selectedGrids.put(g.getProcedureSuffix(), result.copy());
-								updateSelectedGrids();
-							}
-						}
-					}));
-				}
 			}
 		});
+	}
+
+	private void readGrids(Row row) {
+		List<Column> indexColumns = form.getIndexView().getColumn();
+		for (MGrid g : mDetail.getGrids()) {
+			Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
+			RowBuilder gridRowBuilder = RowBuilder.newRow();
+			Grid grid = g.getGrid();
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			for (Field f : grid.getField()) {
+				if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+					aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
+					gridRequestTable.addColumn(column);
+
+					boolean found = false;
+					if (!sg.getSqlIndexToKeys().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
+
+						for (Entry<Integer, String> e : sg.getSqlIndexToKeys().entrySet()) {
+							if (e.getValue().equals(f.getName())) {
+
+								mDetail.getFieldBySQLIndex(e.getKey());
+								found = true;
+								gridRowBuilder.withValue(mDetail.getFieldBySQLIndex(e.getKey()).getValue());
+
+							}
+						}
+
+					} else { // Default Verhalten, entsprechenden Wert im Index finden
+						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+							if (indexColumns.get(i).getName().equals(f.getName())
+									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+								found = true;
+								gridRowBuilder.withValue(row.getValue(i).getValue());
+							}
+						}
+
+					}
+					if (!found) {
+						gridRowBuilder.withValue(null);
+					}
+				}
+			}
+			Row gridRow = gridRowBuilder.create();
+			gridRequestTable.addRow(gridRow);
+
+			CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
+			gridFuture.thenAccept(t -> sync.asyncExec(() -> {
+				if (t != null) {
+					Table result = t.getResultSet();
+					if (result.getName().equals(g.getDataTable().getName())) {
+						selectedGrids.put(g.getProcedureSuffix(), result.copy());
+						updateSelectedGrids();
+					}
+				}
+			}));
+		}
 	}
 
 	private Table createReadTableFromForm(Form tableForm, Row row) {
@@ -258,6 +275,7 @@ public class WFCDetailCASRequestsUtil {
 				if (indexColumns.get(i).getName().equals(f.getName())) {
 					found = true;
 					if ("primary".equals(f.getKeyType())) {
+						// TODO: Für OPS benötigte Spalte aus der .xbs auslesen
 						builder.withValue(row.getValue(i).getValue());
 						newKeys.put(indexColumns.get(i).getName(), row.getValue(i));
 					} else {
@@ -377,7 +395,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 		int valuePosition = 0;
 
-		// TODO: für OPs sollten aus der .xbs ausgelesen werden, welche Keys der Hauptmaske an welcher Stelle verwendet werden müssen
+		// TODO: für OPs sollte aus der .xbs ausgelesen werden, welche Keys der Hauptmaske an welcher Stelle verwendet werden müssen
 		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
 			rb.withValue(getKeys() == null ? null : getKeys().get(f.getName()));
 			valuePosition++;
