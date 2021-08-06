@@ -338,31 +338,10 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
-			if (getKeys() != null) {
-				updateDetail();
-			} else {
-				insertDetail();
-			}
+			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
+			Table formTable = createInsertUpdateTableFromForm(form);
+			sendSaveRequest(formTable);
 		}
-	}
-
-	/*
-	 * Zuerst nur den Einfügebefehl für die Hauptmaske schicken. OPs und Grids werden erst eingefügt, wenn das Einfügen des Haupteintrages erfolgreich war und
-	 * die primary Keys zur Verfügung stehen
-	 */
-	private void insertDetail() {
-		// Hauptfelder
-		Table formTable = createInsertUpdateTableFromForm(form);
-		sendSaveRequest(formTable);
-	}
-
-	private void updateDetail() {
-		// Hauptfelder
-		Table formTable = createInsertUpdateTableFromForm(form);
-		sendSaveRequest(formTable);
-
-		// Grids und OPs können gleich geupdatet werden, da Keys zur Verfügung stehen
-		updateOPsAndGrids();
 	}
 
 	private void updateOPsAndGrids() {
@@ -524,7 +503,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Überprüft, ob das Update erfolgreich war
+	 * Überprüft, ob das Update erfolgreich war. Wenn ja können OPs und Grids geupdated werden
 	 *
 	 * @param response
 	 */
@@ -536,6 +515,7 @@ public class WFCDetailCASRequestsUtil {
 			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
 			showErrorMessage(e);
 		} else {
+			updateOPsAndGrids();
 			openNotificationPopup(getTranslation("msg.DataUpdated"));
 			handleUserAction(Constants.UPDATE_REQUEST);
 

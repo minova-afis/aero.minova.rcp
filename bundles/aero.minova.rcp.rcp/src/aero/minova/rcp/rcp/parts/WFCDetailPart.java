@@ -8,7 +8,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -277,8 +276,15 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
+	/**
+	 * Wir gehen davon aus, dass nach dem Root-Knoten ein Knoten mit "minova" kommt, der dann als Kind als erstes den Knoten hat, dessen Kinder die Masken
+	 * behinhalten
+	 * 
+	 * @param parent
+	 */
 	private void loadOptionPages(Composite parent) {
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+
 		// TODO: Nodes auf Namen prüfen?
 		List<Node> nodes = preferences.getRoot().getNode().get(0).getNode().get(0).getNode();
 		for (Node mask : nodes) {
@@ -287,10 +293,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
 						for (Node op : settingsForMask.getNode()) {
 							try {
-								dataService.downloadFile(op.getName());
 								String opContent = dataService.getHashedFile(op.getName()).get();
 
-								// TODO: Gibt es OPs mit anderen Rootklassen?
 								try {
 									Form opForm = XmlProcessor.get(opContent, Form.class);
 									addOPFromForm(opForm, parent);
@@ -302,8 +306,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 										e1.printStackTrace();
 									}
 								}
-
-							} catch (IOException | InterruptedException | ExecutionException e) {
+							} catch (InterruptedException | ExecutionException e) {
 								e.printStackTrace();
 							}
 						}
