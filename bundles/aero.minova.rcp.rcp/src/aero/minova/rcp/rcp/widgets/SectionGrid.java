@@ -46,14 +46,12 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
-import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -69,7 +67,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Button;
-import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
@@ -155,14 +152,13 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-		// bar.setData("org.eclipse.swtbot.widget.key", "GridToolBar");
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
 			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
-			btnInsert.setEnabled(false);
+			btnInsert.setEnabled(true);
 			insertToolItem = createToolItem(bar, btnInsert);
 		}
 
@@ -199,7 +195,7 @@ public class SectionGrid {
 	}
 
 	public ToolItem createToolItem(ToolBar bar, Button btn) {
-		return createToolItem(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
+		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND);
 	}
 
 	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
@@ -325,38 +321,26 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'n'), (natTable, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'd'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'd'), (natTable, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'h'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'h'), (natTable, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'v'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'v'), (natTable, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 		});
 
 		return getNatTable();
 	}
-	
+
 	public void execButtonHandler(String btnId, String commandName) {
 		Map<String, String> parameter = new HashMap<>();
 		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
@@ -468,24 +452,21 @@ public class SectionGrid {
 
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
-		preallocatePrimaryKeys(newRow);
 		rowsToInsert.add(newRow);
 		updateNatTable();
 	}
 
-	private void preallocatePrimaryKeys(Row r) {
-		List<Column> indexColumns = form.getIndexView().getColumn();
-		Row indexRow = ((List<Row>) perspective.getContext().get(Constants.BROKER_ACTIVEROWS)).get(0);
-		for (Field f : grid.getField()) {
-			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
-				int index = grid.getField().indexOf(f);
+	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
+		for (Row r : dataTable.getRows()) {
+			for (Field f : grid.getField()) {
+				if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+					int index = grid.getField().indexOf(f);
 
-				// Entsprechenden Wert im Index finden
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					// Name muss übereinstimmen oder Feld muss SQL-Index 0 haben und Column ist KeyLong
-					if (indexColumns.get(i).getName().equals(f.getName())
-							|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
-						r.setValue(new Value(indexRow.getValue(i).getValue()), index);
+					// TODO: Stimmen die Namen überein? Mapping aus .xbs auslesen?
+					if (primaryKeys.containsKey(f.getName())) {
+						r.setValue(primaryKeys.get(f.getName()), index);
+					} else if (f.getSqlIndex().intValue() == 0) { // Feld mit SQL-Index 0 bekommt Wert von KeyLong
+						r.setValue(primaryKeys.get("KeyLong"), index);
 					}
 				}
 			}
@@ -512,9 +493,5 @@ public class SectionGrid {
 
 	public void closeEditor() {
 		natTable.commitAndCloseActiveCellEditor();
-	}
-
-	public void enableInsert(boolean enable) {
-		insertToolItem.setEnabled(enable);
 	}
 }

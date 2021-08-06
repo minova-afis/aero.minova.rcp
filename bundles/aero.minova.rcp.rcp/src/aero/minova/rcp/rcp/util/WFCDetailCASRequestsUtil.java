@@ -74,8 +74,6 @@ public class WFCDetailCASRequestsUtil {
 
 	private static final String ERROR = "Error";
 
-	private static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
-
 	@Inject
 	protected UISynchronize sync;
 
@@ -273,7 +271,7 @@ public class WFCDetailCASRequestsUtil {
 
 		}
 
-		if (!newKeys.equals(keys)) {
+		if (!newKeys.equals(getKeys())) {
 			setKeys(newKeys);
 		}
 
@@ -328,7 +326,6 @@ public class WFCDetailCASRequestsUtil {
 			SectionGrid sectionGrid = gVA.getSectionGrid();
 			sectionGrid.setDataTable(gridEntry.getValue().copy());
 			sectionGrid.clearDataChanges();
-			sectionGrid.enableInsert(true);
 		}
 	}
 
@@ -403,7 +400,7 @@ public class WFCDetailCASRequestsUtil {
 
 		// TODO: für OPs sollten aus der .xbs ausgelesen werden, welche Keys der Hauptmaske an welcher Stelle verwendet werden müssen
 		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
-			rb.withValue(getKeys() == null ? null : keys.get(f.getName()));
+			rb.withValue(getKeys() == null ? null : getKeys().get(f.getName()));
 			valuePosition++;
 		}
 
@@ -426,6 +423,7 @@ public class WFCDetailCASRequestsUtil {
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.closeEditor();
+			sg.setPrimaryKeys(getKeys());
 
 			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
 			Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
@@ -505,7 +503,7 @@ public class WFCDetailCASRequestsUtil {
 			handleUserAction(Constants.INSERT_REQUEST);
 
 			if (autoReloadIndex) {
-				ParameterizedCommand cmd = commandService.createCommand(AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
 				handlerService.executeHandler(cmd);
 			}
 		}
@@ -542,7 +540,7 @@ public class WFCDetailCASRequestsUtil {
 			handleUserAction(Constants.UPDATE_REQUEST);
 
 			if (autoReloadIndex) {
-				ParameterizedCommand cmd = commandService.createCommand(AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
 				handlerService.executeHandler(cmd);
 			}
 		}
@@ -686,7 +684,7 @@ public class WFCDetailCASRequestsUtil {
 			showErrorMessage(e);
 		} else {
 			if (autoReloadIndex) {
-				ParameterizedCommand cmd = commandService.createCommand(AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
 				handlerService.executeHandler(cmd);
 			}
 			deleteOPsAndGrids();
@@ -916,7 +914,6 @@ public class WFCDetailCASRequestsUtil {
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.clearGrid();
-			sg.enableInsert(false);
 		}
 
 		selectedGrids.clear();
