@@ -72,8 +72,14 @@ Getestet mit Server xxxxxx
 ## Detail Grid (Knöpfe in der Toolbar)
 - [ ] Neue Zeile wird hinzugefügt
 - [ ] Ausgewählte Zeilen werden gelöscht (nur aktiv wenn mindestens eine Zeile komplett ausgewählt wird)
-- [ ] Toggle zwischen allen Zeilen werden angezeigt und ~5 Zeilen angezeigt (min 2, max 10). Außerdem werden Zeilenhöhen optimiert
-- [ ] Toggle zwischen kompletter Nattable wird angezeigt und Section hat "Standard" Breite. Außerdem werden Spaltenbreiten optimiert
+- [ ] Toggle zwischen allen Zeilen werden angezeigt und ~5 Zeilen angezeigt (min 2, max 10). Außerdem werden Zeilenhöhen optimiert *2
+- [ ] Toggle zwischen kompletter Nattable wird angezeigt und Section hat "Standard" Breite. Außerdem werden Spaltenbreiten optimiert *1
+
+## Detail Grid (KeyBindings)
+- [ ] SHIFT + M1 + N: neue Zeile wird hinzugefügt
+- [ ] SHIFT + M1 + D: markierte Zeile/-n löschen (nur aktive wenn eine ganze Zeile markiert ist)
+- [ ] SHIFT + M1 + H: breiten Optimierung (siehe *1 bei Detail Grid (Knöpfe in der Toolbar))
+- [ ] SHIFT + M1 + V: höhen Optimierung (siehe *2 bei Detail Grid (Knöpfe in der Toolbar))
 
 ## Dirty Flag
 - [ ] Dirty Flag wird beim Detail gesetzt, sobald dieser bearbeitet wird
@@ -88,6 +94,7 @@ Getestet mit Server xxxxxx
 - [ ] Tab selektiert alle Controls (Toolbar, Section usw.) (Wenn SelectAllControls gesetzt ist)
 - [ ] Ctrl + Tab in einem Beschreibung-/ Textfeld bewirken ein Tabstop
 - [ ] Tab verlässt nie den Part
+- [ ] Tab selektiert beim Grid nur das erste Feld (zweiter Tab in der NatTable verlässt die NatTable)
 - [ ] Enter selektiert das **nächste leere** Pflichtfeld (Wenn EnterSelectsFirstRequired **nicht** gesetzt ist)
 - [ ] Enter selektiert das **erste leere** Pflichtfeld (Wenn EnterSelectsFirstRequired gesetzt ist)
 - [ ] Bei Enter in einer Auswahlbox bleibt man im **selben** Feld (Wenn LookupEnterSelectsNextRequired **nicht** gesetzt ist)
