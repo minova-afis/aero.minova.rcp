@@ -312,11 +312,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void addOPFromForm(Form opForm, Composite parent) {
+		mDetail.addOptionPage(opForm);
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
 			layoutSection(parent, wrapper);
 		}
-
 	}
 
 	private void addOPFromGrid(Grid opGrid, Composite parent) {

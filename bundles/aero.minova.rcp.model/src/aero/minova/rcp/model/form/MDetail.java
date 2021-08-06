@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Control;
 
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.helper.IHelper;
 
 /**
@@ -24,6 +25,8 @@ public class MDetail {
 	private IHelper helper;
 
 	private Control selectedField;
+
+	private List<Form> optionPages = new ArrayList<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -101,7 +104,14 @@ public class MDetail {
 
 	public void addPage(MSection page) {
 		this.pageList.add(page);
+	}
 
+	public void addOptionPage(Form op) {
+		this.optionPages.add(op);
+	}
+
+	public List<Form> getOptionPages() {
+		return optionPages;
 	}
 
 	public IHelper getHelper() {
