@@ -109,6 +109,7 @@ import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.util.XBSUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
@@ -276,44 +277,38 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
-	/**
-	 * Wir gehen davon aus, dass nach dem Root-Knoten ein Knoten mit "minova" kommt, der dann als Kind als erstes den Knoten hat, dessen Kinder die Masken
-	 * behinhalten
-	 * 
-	 * @param parent
-	 */
 	private void loadOptionPages(Composite parent) {
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
 
-		// TODO: Nodes auf Namen prüfen?
-		List<Node> nodes = preferences.getRoot().getNode().get(0).getNode().get(0).getNode();
-		for (Node mask : nodes) {
-			if (mask.getName().equals(mPerspective.getPersistedState().get(Constants.FORM_NAME))) {
-				for (Node settingsForMask : mask.getNode()) {
-					if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
-						for (Node op : settingsForMask.getNode()) {
-							try {
-								String opContent = dataService.getHashedFile(op.getName()).get();
+		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
+		if (maskNode == null) {
+			return;
+		}
 
-								try {
-									Form opForm = XmlProcessor.get(opContent, Form.class);
-									addOPFromForm(opForm, parent);
-								} catch (JAXBException | IllegalArgumentException e) {
-									try {
-										Grid opGrid = XmlProcessor.get(opContent, Grid.class);
-										addOPFromGrid(opGrid, parent);
-									} catch (JAXBException e1) {
-										e1.printStackTrace();
-									}
-								}
-							} catch (InterruptedException | ExecutionException e) {
-								e.printStackTrace();
+		for (Node settingsForMask : maskNode.getNode()) {
+			if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
+				for (Node op : settingsForMask.getNode()) {
+					try {
+						String opContent = dataService.getHashedFile(op.getName()).get();
+
+						try {
+							Form opForm = XmlProcessor.get(opContent, Form.class);
+							addOPFromForm(opForm, parent);
+						} catch (JAXBException | IllegalArgumentException e) {
+							try {
+								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
+								addOPFromGrid(opGrid, parent);
+							} catch (JAXBException e1) {
+								e1.printStackTrace();
 							}
 						}
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
 					}
 				}
 			}
 		}
+
 	}
 
 	private void addOPFromForm(Form opForm, Composite parent) {
