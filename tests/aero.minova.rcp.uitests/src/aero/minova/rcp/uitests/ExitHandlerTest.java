@@ -41,9 +41,4 @@ public class ExitHandlerTest {
 		assertTrue(button.isEnabled());
 		button.click();
 	}
-
-//  @AfterEach
-//  public void sleep() {
-//      bot.sleep(2000);
-//  }
 }
