@@ -45,6 +45,7 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
@@ -53,9 +54,13 @@ import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormData;
@@ -328,6 +333,40 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
+		
+		getNatTable().addFocusListener(new FocusListener() {
+
+ 			@Override
+ 			public void focusLost(FocusEvent e) {
+ 				// TODO Auto-generated method stub
+ 				mDetail.setSelectedControl(null);
+ 			}
+
+ 			@Override
+ 			public void focusGained(FocusEvent e) {
+ 				getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+ 				mDetail.setSelectedControl(getNatTable());
+ 			}
+ 		});
+
+ 		getNatTable().addTraverseListener(new TraverseListener() {
+
+ 			@Override
+ 			public void keyTraversed(TraverseEvent e) {
+ 				switch (e.detail) {
+ 				case SWT.TRAVERSE_TAB_NEXT:
+ 					e.doit = true;
+ 					break;
+ 				case SWT.TRAVERSE_TAB_PREVIOUS:
+ 					e.doit = true;
+ 					break;
+ 				default:
+ 					break;
+ 				}
+
+ 			}
+ 		});
+ 		
 		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
@@ -356,10 +395,19 @@ public class SectionGrid {
 				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 			}
 		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), new IKeyAction() {
+			
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				Map<String, String> parameter = new HashMap<>();
+				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
+				handlerService.executeHandler(command);
+				
+			}
+		});
 		
 		getNatTable().setData("Section", section);
 		getNatTable().setData("SelectionLayer", selectionLayer);
-		getNatTable().setData("DataTable", this.dataTable);
 		return getNatTable();
 	}
 	
