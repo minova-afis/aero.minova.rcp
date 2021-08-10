@@ -66,9 +66,9 @@ public class TraverseEnterHandler {
 
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail mDetail = ((WFCDetailPart) part.getObject()).getDetail();
-			if (mDetail.getSelectedField() != null) {
+			if (mDetail.getSelectedControl() != null) {
 				// aktuell selektiertes Feld holen
-				Control focussedControl = mDetail.getSelectedField();
+				Control focussedControl = mDetail.getSelectedControl();
 
 				// Ist ein Popup offen?
 				if (focussedControl instanceof Lookup) {
@@ -119,34 +119,39 @@ public class TraverseEnterHandler {
 		// Wir holen uns das MField des selektierten Felds.
 		List<Section> sectionList = mDetail.getSectionList();
 
+		Control fc = null;
+		Composite comp = null;
+		Section fcSection = null;
+
 		if (focussedControl instanceof NatTable) {
-			getNextRequiredNatTableCell(focussedControl);
+			fcSection = (Section) focussedControl.getData("Section");
 		} else {
+			fcSection = ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSection();
+		}
+		
+		if (fcSection.getChildren()[0] instanceof Twistie) {
+			comp = (Composite) fcSection.getChildren()[2];
+		} else {
+			comp = (Composite) fcSection.getChildren()[1];
+		}
 
-			Control fc = null;
-			Composite comp = null;
-
-			// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
-			if (!lookupEnterSelectsNextRequired && popupOpen) {
-				focussedControl.setFocus();
-				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
-					lookup.closePopup();
-					MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
-					setLookupValue(field, lookup);
-				}
-				return;
+		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
+		if (!lookupEnterSelectsNextRequired && popupOpen) {
+			focussedControl.setFocus();
+			if (focussedControl instanceof Lookup) {
+				Lookup lookup = (Lookup) focussedControl;
+				lookup.closePopup();
+				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				setLookupValue(field, lookup);
 			}
+			return;
+		}
 
-			for (Control child : ((MField) focussedControl.getData(Constants.CONTROL_FIELD)).getmSection().getSection().getChildren()) {
-				if (child instanceof Composite) {
-					comp = (Composite) child;
-					break;
-				}
-			}
-
+		if (!enterSelectsFirstRequired || popupOpen) {
+			
 			Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
 			List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
+
 			// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 			int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
 			fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(indexFocussedControl + 1, tabListFromFocussedControlSection.size()));
@@ -156,8 +161,44 @@ public class TraverseEnterHandler {
 
 			int indexFocussedControlSection = sectionList.indexOf(comp.getParent());
 			fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
-		}
+			if (fc != null) {
+				return;
+			}
 
+			fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection));
+			if (fc != null) {
+				return;
+			}
+
+			fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl));
+			if (fc != null) {
+				if (focussedControl instanceof Lookup) {
+					Lookup lookup = (Lookup) focussedControl;
+					lookup.closePopup();
+				}
+				return;
+			}
+		} else {
+			for (Section section : sectionList) {
+				Composite compo = null;
+				if (section.getChildren()[0] instanceof Twistie) {
+					compo = (Composite) section.getChildren()[2];
+				} else {
+					compo = (Composite) section.getChildren()[1];
+				}
+				List<Control> tabList = arrayToList(compo.getTabList());
+				fc = getNextRequiredControl(tabList);
+				if (fc != null) {
+					if (focussedControl instanceof Lookup) {
+						Lookup lookup = (Lookup) focussedControl;
+						lookup.closePopup();
+					}
+					return;
+				} else {
+					continue;
+				}
+			}
+		}
 	}
 
 	private Control getNextRequiredControl(List<Control> tabList) {
@@ -175,10 +216,18 @@ public class TraverseEnterHandler {
 					}
 					fc = control;
 					fc.setFocus();
+					return fc;
 				}
 			} else {
-				getNextRequiredNatTableCell(control);
-				fc = control;
+				boolean natTableSelected = getNextRequiredNatTableCell(control);
+				if (natTableSelected) {
+					Section section = (Section) control.getData("Section");
+					if (!section.isExpanded()) {
+						// Section öffnen
+						section.setExpanded(true);
+					}
+					fc = control;
+				}
 			}
 		}
 
@@ -196,22 +245,27 @@ public class TraverseEnterHandler {
 			}
 			List<Control> tabList = arrayToList(compo.getTabList());
 			fc = getNextRequiredControl(tabList);
+			if (fc == null) {
+				continue;
+			}
 		}
 
 		return fc;
 	}
 
-	private void getNextRequiredNatTableCell(Control focussedControl) {
+	private boolean getNextRequiredNatTableCell(Control focussedControl) {
 		NatTable natTable = (NatTable) focussedControl;
 		for (int ir = 1; ir < natTable.getRowCount(); ir++) {
 			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
-				if (natTable.getConfigLabelsByPosition(ic, ir).hasLabel(Constants.REQUIRED_CELL_LABEL)) {
+				if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.REQUIRED_CELL_LABEL)) {
 					SelectionLayer selectionLayer = (SelectionLayer) natTable.getData("SelectionLayer");
-					natTable.doCommand(new SelectCellCommand(selectionLayer, ic, ir, false, false));
 					natTable.setFocus();
+					natTable.doCommand(new SelectCellCommand(selectionLayer, ic, ir, false, false));
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	private List<Control> arrayToList(Control[] tabListArray) {
