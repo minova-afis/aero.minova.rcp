@@ -227,7 +227,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 	}
 
 	public boolean popupIsOpen() {
-		Control focussedControl = mDetail.getSelectedField();
+		Control focussedControl = mDetail.getSelectedControl();
 		if (focussedControl instanceof Lookup) {
 			return ((Lookup) focussedControl).popupIsOpen();
 		} else if (focussedControl instanceof TextAssist) {

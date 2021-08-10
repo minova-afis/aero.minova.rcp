@@ -25,7 +25,7 @@ public class MDetail {
 
 	private IHelper helper;
 
-	private Control selectedField;
+	private Control selectedControl;
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -141,11 +141,11 @@ public class MDetail {
 		return true;
 	}
 
-	public Control getSelectedField() {
-		return selectedField;
+	public Control getSelectedControl() {
+		return selectedControl;
 	}
 
-	public void setSelectedField(Control selectedField) {
-		this.selectedField = selectedField;
+	public void setSelectedControl(Control selectedField) {
+		this.selectedControl = selectedField;
 	}
 }
