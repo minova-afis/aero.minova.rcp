@@ -77,6 +77,7 @@ import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
@@ -110,6 +111,7 @@ public class SectionGrid {
 	private Grid grid;
 	private Composite composite;
 	private Section section;
+	private MDetail mDetail;
 
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
@@ -131,10 +133,11 @@ public class SectionGrid {
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
 	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
 
-	public SectionGrid(Composite composite, Section section, Grid grid) {
+	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
+		this.mDetail = mDetail;
 		resManager = new LocalResourceManager(JFaceResources.getResources(), composite);
 
 		rowsToInsert = new ArrayList<>();

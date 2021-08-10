@@ -546,7 +546,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
-					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
+					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 					mGrid.addGridChangeListener(this);
 					GridAccessor gA = new GridAccessor(mGrid);
