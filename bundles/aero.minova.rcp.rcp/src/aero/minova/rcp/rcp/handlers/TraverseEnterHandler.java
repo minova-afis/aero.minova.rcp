@@ -18,6 +18,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.painter.cell.ICellPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -28,7 +29,9 @@ import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.LookupValue;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
@@ -128,7 +131,7 @@ public class TraverseEnterHandler {
 		} else {
 			fcSection = ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSection();
 		}
-		
+
 		if (fcSection.getChildren()[0] instanceof Twistie) {
 			comp = (Composite) fcSection.getChildren()[2];
 		} else {
