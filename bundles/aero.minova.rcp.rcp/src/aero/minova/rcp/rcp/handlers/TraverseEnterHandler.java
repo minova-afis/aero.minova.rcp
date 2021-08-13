@@ -234,6 +234,7 @@ public class TraverseEnterHandler {
 						section.setExpanded(true);
 					}
 					fc = control;
+					return fc;
 				}
 			}
 		}
