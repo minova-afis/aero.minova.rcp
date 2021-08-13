@@ -408,6 +408,7 @@ public class SectionGrid {
 		
 		getNatTable().setData("Section", section);
 		getNatTable().setData("SelectionLayer", selectionLayer);
+		getNatTable().setData("DataTable", dataTable);
 		return getNatTable();
 	}
 	
