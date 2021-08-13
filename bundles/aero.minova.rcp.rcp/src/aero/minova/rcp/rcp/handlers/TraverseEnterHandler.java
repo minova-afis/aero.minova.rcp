@@ -148,35 +148,42 @@ public class TraverseEnterHandler {
 		}
 
 		if (!enterSelectsFirstRequired || popupOpen) {
-			
-			Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
-			List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
 
-			// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
-			int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
-			fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(indexFocussedControl + 1, tabListFromFocussedControlSection.size()));
-			if (fc != null) {
-				return;
+			boolean cellSelected = false;
+			if (focussedControl instanceof NatTable) {
+				cellSelected = getNextRequiredNatTableCell(focussedControl);
 			}
 
-			int indexFocussedControlSection = sectionList.indexOf(comp.getParent());
-			fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
-			if (fc != null) {
-				return;
-			}
+			if (!cellSelected) {
+				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
+				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
 
-			fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection));
-			if (fc != null) {
-				return;
-			}
-
-			fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl));
-			if (fc != null) {
-				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
-					lookup.closePopup();
+				// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
+				int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
+				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(indexFocussedControl + 1, tabListFromFocussedControlSection.size()));
+				if (fc != null) {
+					return;
 				}
-				return;
+
+				int indexFocussedControlSection = sectionList.indexOf(comp.getParent());
+				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
+				if (fc != null) {
+					return;
+				}
+
+				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection));
+				if (fc != null) {
+					return;
+				}
+
+				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl));
+				if (fc != null) {
+					if (focussedControl instanceof Lookup) {
+						Lookup lookup = (Lookup) focussedControl;
+						lookup.closePopup();
+					}
+					return;
+				}
 			}
 		} else {
 			for (Section section : sectionList) {
@@ -255,13 +262,47 @@ public class TraverseEnterHandler {
 
 	private boolean getNextRequiredNatTableCell(Control focussedControl) {
 		NatTable natTable = (NatTable) focussedControl;
-		for (int ir = 1; ir < natTable.getRowCount(); ir++) {
-			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
-				if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.REQUIRED_CELL_LABEL)) {
-					SelectionLayer selectionLayer = (SelectionLayer) natTable.getData("SelectionLayer");
-					natTable.setFocus();
-					natTable.doCommand(new SelectCellCommand(selectionLayer, ic, ir, false, false));
-					return true;
+		Table dataTable = (Table) natTable.getData("DataTable");
+		int irs = 1;
+		int ics = 1;
+
+		if (natTable.isFocusControl()) {
+			for (int ir = 1; ir < natTable.getRowCount(); ir++) {
+				for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
+					ICellPainter painter = natTable.getCellPainter(ic, ir, natTable.getCellByPosition(ic, ir), natTable.getConfigRegistry());
+					if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel("selectionAnchor")) {
+						if(ic == 2) {
+							if(ir == natTable.getRowCount()) {
+								irs = ir;
+								ics = ic;
+							} else {
+								irs = ir + 1;							
+							}
+						} else {
+							irs = ir;
+						}
+						break;
+					}
+
+				}
+			}
+		}
+
+		for (int ir = irs; ir < natTable.getRowCount(); ir++) {
+			for (int ic = ics; ic < natTable.getColumnCount(); ic++) {
+				for (Column column : dataTable.getColumns()) {
+					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
+						if ((dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
+								|| dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null)
+								&& !natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel("selectionAnchor")) {
+							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData("SelectionLayer");
+							natTable.setFocus();
+							int ici = ic - 1;
+							int iri = ir - 1;
+							natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
+							return true;
+						}
+					}
 				}
 			}
 		}
