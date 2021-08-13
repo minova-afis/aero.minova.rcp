@@ -253,8 +253,8 @@ public class TraverseEnterHandler {
 			}
 			List<Control> tabList = arrayToList(compo.getTabList());
 			fc = getNextRequiredControl(tabList);
-			if (fc == null) {
-				continue;
+			if (fc != null) {
+				return fc;
 			}
 		}
 
