@@ -306,30 +306,37 @@ public class TraverseEnterHandler {
 					// Wir holen uns den CellPainter, damit die ConfogLabels gesetzt werden. TO DO Weg ohne den CellPainter suchen
 					ICellPainter painter = natTable.getCellPainter(ic, ir, natTable.getCellByPosition(ic, ir), natTable.getConfigRegistry());
 					if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.SELECTED_ANCHOR_LABEL)) {
-						if (ic == natTable.getColumnCount() - 1) {
-							if (ir == natTable.getRowCount() - 1) {
-								irs = ir;
-								ics = ic;
-							} else {
-								irs = ir + 1;
-							}
-						} else {
-							irs = ir;
-						}
+						irs = ir;
+						ics = ic;
 						break;
 					}
 
 				}
 			}
-		}
 
-		for (int ir = irs; ir < natTable.getRowCount(); ir++) {
-			for (int ic = ics; ic < natTable.getColumnCount(); ic++) {
+			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
 				for (Column column : dataTable.getColumns()) {
 					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
-						if ((dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
-								|| dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null)
-								&& !natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.SELECTED_ANCHOR_LABEL)) {
+						if (dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
+								|| dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
+							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
+							natTable.setFocus();
+							int ici = ic - 1;
+							int iri = irs - 1;
+							natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		for (int ir = irs + 1; ir < natTable.getRowCount(); ir++) {
+			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
+				for (Column column : dataTable.getColumns()) {
+					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
+						if (dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
+								|| dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
 							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
 							natTable.setFocus();
 							int ici = ic - 1;
