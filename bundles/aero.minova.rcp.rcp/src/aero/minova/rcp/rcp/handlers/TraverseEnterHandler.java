@@ -148,7 +148,7 @@ public class TraverseEnterHandler {
 
 			boolean cellSelected = false;
 			if (focussedControl instanceof NatTable) {
-				cellSelected = getNextRequiredNatTableCell(focussedControl);
+				cellSelected = getNextRequiredNatTableCell(focussedControl, true);
 			}
 			
 			Lookup lookup = null;
@@ -185,7 +185,7 @@ public class TraverseEnterHandler {
 					return;
 				}
 
-				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl));
+				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
 				if (fc != null) {
 					if (focussedControl instanceof Lookup) {
 						lookup = (Lookup) focussedControl;
@@ -247,7 +247,7 @@ public class TraverseEnterHandler {
 					return fc;
 				}
 			} else {
-				boolean natTableSelected = getNextRequiredNatTableCell(control);
+				boolean natTableSelected = getNextRequiredNatTableCell(control, false);
 				if (natTableSelected) {
 					Section section = (Section) control.getData(Constants.GRID_DATA_SECTION);
 					if (!section.isExpanded()) {
@@ -282,23 +282,23 @@ public class TraverseEnterHandler {
 		return fc;
 	}
 
-	private boolean getNextRequiredNatTableCell(Control focussedControl) {
+	private boolean getNextRequiredNatTableCell(Control focussedControl, boolean countFromSelectedCell) {
 		NatTable natTable = (NatTable) focussedControl;
 		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
 		int irs = 1;
 		int ics = 1;
 
-		if (natTable.isFocusControl()) {
+		if (natTable.isFocusControl() && countFromSelectedCell) {
 			for (int ir = 1; ir < natTable.getRowCount(); ir++) {
 				for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
 					ICellPainter painter = natTable.getCellPainter(ic, ir, natTable.getCellByPosition(ic, ir), natTable.getConfigRegistry());
-					if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel("selectionAnchor")) {
-						if(ic == 2) {
-							if(ir == natTable.getRowCount()) {
+					if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.SELECTED_ANCHOR_LABEL)) {
+						if (ic == natTable.getColumnCount() - 1) {
+							if (ir == natTable.getRowCount() - 1) {
 								irs = ir;
 								ics = ic;
 							} else {
-								irs = ir + 1;							
+								irs = ir + 1;
 							}
 						} else {
 							irs = ir;
