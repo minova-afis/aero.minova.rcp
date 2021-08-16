@@ -282,15 +282,28 @@ public class TraverseEnterHandler {
 		return fc;
 	}
 
+	/**
+	 * Sucht die übergebene NatTable nach einem leeren Pflichtfeld durch. Wenn eins gefunden wird, wird es selektiert und der Fokus auf die NatTable gesetzt. Im
+	 * Fall, dass die NatTable fokussiert ist und countFromSelectedCell = true ist, wird von der Position der selektierten Zelle begonnen.
+	 * 
+	 * @param focussedControl
+	 *            die NatTable, die nach einem Pflichtfeld geprüft werden soll
+	 * @param countFromSelectedCell
+	 *            bestimmt, ob von der selektierten Zelle aus nach dem nächsten Pflichtfeld gesucht werden soll
+	 * @return true, wenn eine Zelle selektiert wurde
+	 */
 	private boolean getNextRequiredNatTableCell(Control focussedControl, boolean countFromSelectedCell) {
 		NatTable natTable = (NatTable) focussedControl;
 		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
 		int irs = 1;
 		int ics = 1;
 
+		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
 		if (natTable.isFocusControl() && countFromSelectedCell) {
+			// Selektierte Zelle suchen und die Row und Column Position setzen
 			for (int ir = 1; ir < natTable.getRowCount(); ir++) {
 				for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
+					// Wir holen uns den CellPainter, damit die ConfogLabels gesetzt werden. TO DO Weg ohne den CellPainter suchen
 					ICellPainter painter = natTable.getCellPainter(ic, ir, natTable.getCellByPosition(ic, ir), natTable.getConfigRegistry());
 					if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.SELECTED_ANCHOR_LABEL)) {
 						if (ic == natTable.getColumnCount() - 1) {
