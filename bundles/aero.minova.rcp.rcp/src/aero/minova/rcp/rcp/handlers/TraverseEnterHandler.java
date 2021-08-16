@@ -150,6 +150,18 @@ public class TraverseEnterHandler {
 			if (focussedControl instanceof NatTable) {
 				cellSelected = getNextRequiredNatTableCell(focussedControl);
 			}
+			
+			Lookup lookup = null;
+
+			if (focussedControl instanceof Lookup) {
+				lookup = (Lookup) focussedControl;
+				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				if (popupOpen) {
+					setLookupValue(selectedField, lookup);
+				} else {
+					selectedField.setValue(selectedField.getValue(), false);
+				}
+			}
 
 			if (!cellSelected) {
 				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
@@ -176,13 +188,25 @@ public class TraverseEnterHandler {
 				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl));
 				if (fc != null) {
 					if (focussedControl instanceof Lookup) {
-						Lookup lookup = (Lookup) focussedControl;
+						lookup = (Lookup) focussedControl;
 						lookup.closePopup();
 					}
 					return;
 				}
 			}
 		} else {
+			Lookup lookup = null;
+
+			if (focussedControl instanceof Lookup) {
+				lookup = (Lookup) focussedControl;
+				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				if (popupOpen) {
+					setLookupValue(selectedField, lookup);
+				} else {
+					selectedField.setValue(selectedField.getValue(), false);
+				}
+			}
+
 			for (Section section : sectionList) {
 				Composite compo = null;
 				if (section.getChildren()[0] instanceof Twistie) {
@@ -194,7 +218,7 @@ public class TraverseEnterHandler {
 				fc = getNextRequiredControl(tabList);
 				if (fc != null) {
 					if (focussedControl instanceof Lookup) {
-						Lookup lookup = (Lookup) focussedControl;
+						lookup = (Lookup) focussedControl;
 						lookup.closePopup();
 					}
 					return;
