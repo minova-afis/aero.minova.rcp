@@ -202,7 +202,7 @@ public class TraverseEnterHandler {
 				List<MField> tabList = mSection.getTabList();
 				for (MField field : tabList) {
 					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
-						if (field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
+						if (field instanceof MLookupField && !((MLookupField) field).getWrittenText().equals("")) {
 							continue;
 						}
 						Section section = field.getmSection().getSection();
