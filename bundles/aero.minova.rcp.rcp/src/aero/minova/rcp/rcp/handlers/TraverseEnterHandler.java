@@ -80,7 +80,7 @@ public class TraverseEnterHandler {
 					popupOpen = lookup.popupIsOpen();
 				}
 				// nächstes Pflichtfeld suchen und fokussieren
-				getNextRequired(focussedControl, mDetail);
+				getNextRequired(focussedControl, mDetail, popupOpen);
 			}
 		}
 
@@ -98,7 +98,7 @@ public class TraverseEnterHandler {
 		}
 	}
 
-	private void getNextRequired(Control control, MDetail mDetail) {
+	private void getNextRequired(Control control, MDetail mDetail, boolean popupOpen) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
@@ -106,15 +106,9 @@ public class TraverseEnterHandler {
 				DisplayType.CHECK, true, locale);
 
 		Control focussedControl = null;
-		boolean popupOpen = false;
 
 		if (control.getParent() instanceof TextAssist || control.getParent() instanceof Lookup) {
 			focussedControl = control.getParent();
-			if (focussedControl instanceof Lookup) {
-				Lookup lookup = (Lookup) focussedControl;
-				// Wir holen uns den Status des Popup des Lookup
-				popupOpen = lookup.popupIsOpen();
-			}
 		} else {
 			focussedControl = control;
 		}
