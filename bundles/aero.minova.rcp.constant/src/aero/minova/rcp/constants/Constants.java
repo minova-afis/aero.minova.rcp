@@ -90,6 +90,12 @@ public class Constants {
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
 	public static final String REQUIRED_CELL_LABEL = "REQUIRED_CELL";
+	public static final String SELECTED_ANCHOR_LABEL = "selectionAnchor";
+	
+	// NatTable Data
+	public static final String GRID_DATA_SECTION = "Section";
+	public static final String GRID_DATA_SELECTIONLAYER = "Selectionlayer";
+	public static final String GRID_DATA_DATATABLE = "DataTable";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";

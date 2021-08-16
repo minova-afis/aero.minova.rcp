@@ -127,7 +127,7 @@ public class TraverseEnterHandler {
 		Section fcSection = null;
 
 		if (focussedControl instanceof NatTable) {
-			fcSection = (Section) focussedControl.getData("Section");
+			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
 		} else {
 			fcSection = ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSection();
 		}
@@ -231,7 +231,7 @@ public class TraverseEnterHandler {
 			} else {
 				boolean natTableSelected = getNextRequiredNatTableCell(control);
 				if (natTableSelected) {
-					Section section = (Section) control.getData("Section");
+					Section section = (Section) control.getData(Constants.GRID_DATA_SECTION);
 					if (!section.isExpanded()) {
 						// Section öffnen
 						section.setExpanded(true);
@@ -266,7 +266,7 @@ public class TraverseEnterHandler {
 
 	private boolean getNextRequiredNatTableCell(Control focussedControl) {
 		NatTable natTable = (NatTable) focussedControl;
-		Table dataTable = (Table) natTable.getData("DataTable");
+		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
 		int irs = 1;
 		int ics = 1;
 
@@ -298,8 +298,8 @@ public class TraverseEnterHandler {
 					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
 						if ((dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
 								|| dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null)
-								&& !natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel("selectionAnchor")) {
-							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData("SelectionLayer");
+								&& !natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.SELECTED_ANCHOR_LABEL)) {
+							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
 							natTable.setFocus();
 							int ici = ic - 1;
 							int iri = ir - 1;

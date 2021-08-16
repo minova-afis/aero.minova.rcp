@@ -406,9 +406,9 @@ public class SectionGrid {
 			}
 		});
 		
-		getNatTable().setData("Section", section);
-		getNatTable().setData("SelectionLayer", selectionLayer);
-		getNatTable().setData("DataTable", dataTable);
+		getNatTable().setData(Constants.GRID_DATA_SECTION, section);
+		getNatTable().setData(Constants.GRID_DATA_SELECTIONLAYER, selectionLayer);
+		getNatTable().setData(Constants.GRID_DATA_DATATABLE, dataTable);
 		return getNatTable();
 	}
 	
