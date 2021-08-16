@@ -28,7 +28,7 @@ public class TicketHelper implements ValueChangeListener {
 			if (LOG) {
 				System.out.println("gelesener Text aus dem Lookup:" + writtenText);
 			}
-			lookupField.setWrittenText(null);
+			lookupField.setWrittenText("");
 			// das Pattern ist eine unbegrenzte Menge an Zahlen hinter einer Raute
 			Pattern ticketnumber = Pattern.compile("#(\\d*)");
 			Matcher m = ticketnumber.matcher(writtenText);
