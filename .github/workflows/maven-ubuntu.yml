@@ -1,10 +1,9 @@
 # This workflow will build the Eclipse RCP application with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: RCP build on Ubuntu
+name: Ubuntu/Linux build
 
 on:
-  push:
   pull_request:
 
 jobs:
