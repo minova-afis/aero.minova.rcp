@@ -333,9 +333,13 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		textControl.setBackground(this.cellStyle.getAttributeValue(CellStyleAttributes.BACKGROUND_COLOR));
 		textControl.setForeground(this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
 		textControl.setFont(this.cellStyle.getAttributeValue(CellStyleAttributes.FONT));
-
-		textControl.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
-
+		Cursor cursor = new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM);
+		textControl.setCursor(cursor);
+		textControl.addDisposeListener((e) -> {
+			if (cursor != null && !cursor.isDisposed()) {
+				cursor.dispose();
+			}
+		});
 		// add a key listener that will commit or close the editor for special
 		// key strokes and executes conversion/validation on input to the editor
 		textControl.addKeyListener(new KeyAdapter() {
