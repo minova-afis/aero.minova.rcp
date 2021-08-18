@@ -50,13 +50,9 @@ public class OpenServiceContractTest {
 	private List<SWTBotToolbarButton> detailToolbar;
 
 	@BeforeEach
-	public void beforeClass() {
+	public void setup() {
 		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
-		openServiceContract();
-	}
-
-	public void openServiceContract() {
 
 		// ServiceContract über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Manuelle Abwicklung");
