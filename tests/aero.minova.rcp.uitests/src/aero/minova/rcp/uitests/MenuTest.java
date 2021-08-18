@@ -45,9 +45,6 @@ public class MenuTest {
 
 	@BeforeEach
 	public void beforeClass() throws Exception {
-		if (System.getProperty("os.name").startsWith("Linux")) {
-			return;
-		}
 		bot = new SWTWorkbenchBot(getEclipseContext());
 		SWTBotPreferences.TIMEOUT = 30000;
 		this.translationService = getEclipseContext().get(TranslationService.class);
