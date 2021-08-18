@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
@@ -80,6 +81,10 @@ class GridTest {
 		gridNattable = swtNatTableBot.nattable(2);
 		assertNotNull(gridNattable);
 
+	}
+
+	@BeforeEach
+	void setup() {
 		// Ensure that the number of visible entries in the nattable is less and
 		// possible
 		while (indexNattable.preferredRowCount() >= 8) {
@@ -130,28 +135,19 @@ class GridTest {
 
 	@Test
 	public void ensureDataEntryCanBeCreated() {
-
 		// Do not start on Linux
 		Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Linux"));
 
-		SWTBotView detailPart = bot.partByTitle("@Form.Details");
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
-		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
-
-		// Testeintrag erstellen
-		SWTBotView indexPart = bot.partByTitle("@Form.Index");
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
 
-		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
-
-		int numberEntries = indexNattable.preferredRowCount();
+		int numberEntries = indexNattable.rowCount();
 
 		createEntry();
 		saveDetail();
 		reloadIndex();
-		assertEquals(numberEntries + 1, indexNattable.preferredRowCount(), "Erstellen eines Eintrags fehlgeschlagen");
+		assertEquals(numberEntries + 1, indexNattable.rowCount(), "Erstellen eines Eintrags fehlgeschlagen");
 
 	}
 
@@ -169,16 +165,8 @@ class GridTest {
 		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
 
 		// Testeintrag erstellen
-		SWTBotView indexPart = bot.partByTitle("@Form.Index");
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
 
-		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
-		int numberEntries = indexNattable.preferredRowCount();
-		createEntry();
-		saveDetail();
-		reloadIndex();
-		assertEquals(numberEntries + 1, indexNattable.preferredRowCount(), "Erstellen eines Eintrags fehlgeschlagen");
 
 		// Zeilen einfügen und prüfen ob sie gespeichert wurden
 		insertRows();
@@ -206,7 +194,6 @@ class GridTest {
 		detailPart.getToolbarButtons().get(2).click();
 		UITestUtil.sleep();
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
-		assertEquals(numberEntries, indexNattable.rowCount(), "Löschen des Eintrages fehlgeschlagen");
 	}
 
 	/**
@@ -238,7 +225,11 @@ class GridTest {
 	private void createEntry() {
 		UIThreadRunnable.syncExec(bot.getDisplay(), () -> {
 			MField f = wfcPart.getDetail().getField("KeyText");
-			f.setValue(new Value("UITEST" + (int) ((Math.random() * (999 - 100)) + 100)), false);
+			
+			UUID uuid = UUID.randomUUID();
+			String randomUUIDString = uuid.toString().substring(0, 8);
+	        
+			f.setValue(new Value(randomUUIDString), false);
 
 			f = wfcPart.getDetail().getField("Description");
 			f.setValue(new Value("Testing the UI"), false);
@@ -265,9 +256,11 @@ class GridTest {
 	 * Erstellt einige Testzeilen im Grid
 	 */
 	private void insertRows() {
+
 		bot.text().setFocus();
 		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);
 
+		assertNotNull(btnInsert, "Der Insert Button konnte nicht gefunden werden.");
 		UITestUtil.sleep();
 		btnInsert.click();
 		btnInsert.click();
