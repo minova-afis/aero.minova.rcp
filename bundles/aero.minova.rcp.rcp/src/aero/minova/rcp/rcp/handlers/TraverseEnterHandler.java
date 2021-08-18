@@ -98,6 +98,38 @@ public class TraverseEnterHandler {
 		}
 	}
 
+	/**
+	 * Diese Methode ermittelt das nächste leere Pflichtfeld nach folgendem Muster: <br>
+	 * <br>
+	 * 1. Prüfen, ob LookupEnterSelectsNextRequired gesetzt ist und ein Lookup mit offenen Popup selektiert ist:<br>
+	 * <br>
+	 * LookupEnterSelectsNextRequired ist nicht gesetzt: <br>
+	 * Bei einem Lookup mit offenen Popup wird der ausgewählte Wert festgesetzt und das Lookup bleibt selektiert. <br>
+	 * <br>
+	 * LookupEnterSelectsNextRequired ist gesetzt:<br>
+	 * Bei einem Lookup mit offenen Popup wird der ausgewählte Wert festgesetzt und das nächste leere Pflichtfeld selektiert. <br>
+	 * <br>
+	 * 2. Prüfen, ob EnterSelectsFirstRequired gesetzt ist und kein Lookup mit offenem Popup selektiert ist: <br>
+	 * <br>
+	 * EnterSelectsFirstRequired ist gesetzt: <br>
+	 * Begonnen mit der ersten Section, wird das erste leere Pflichtfeld ermittelt und selektiert. <br>
+	 * <br>
+	 * EnterSelectsFirstRequired ist nicht gesetzt und es ist kein Lookup mit offenem Popup selektiert: <br>
+	 * - Beginnend mit der Section, in der das aktuell selektierte Control sich befindet, wird das nächste leere Pflichtfeld ermittelt. Dabei werden nur die
+	 * Controls nach dem aktuell selektiertem geprüft.<br>
+	 * - Wenn kein Pflichtfeld gefunden wurde, werden die Sections, die nach der Section des selektierten Controls kommen, durchsucht.<br>
+	 * - Falls am Ende des Parts angekommen und immer noch kein Pflichtfeld selektiert wurde, wird mit den Sections vor dem des selektierten Control weiter
+	 * gemacht. Beginnend mit der ersten section <br>
+	 * - Bei der Section des aktuell selektierten Controls angekommen ohne ein Pflichtfeld selktiert zu haben, werden nun die Controls in der Section und vor
+	 * dem selktierten Control durchsucht. <br>
+	 * <br>
+	 * Wenn kein Pflichtfeld gefunden wird, bleibt das aktuelle Pflichtfeld selektiert.
+	 * 
+	 * @param control
+	 *            fokussiertes Control
+	 * @param mDetail
+	 * @param popupOpen
+	 */
 	private void getNextRequired(Control control, MDetail mDetail, boolean popupOpen) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
@@ -150,7 +182,7 @@ public class TraverseEnterHandler {
 			if (focussedControl instanceof NatTable) {
 				cellSelected = getNextRequiredNatTableCell(focussedControl, true);
 			}
-			
+
 			Lookup lookup = null;
 
 			if (focussedControl instanceof Lookup) {
@@ -229,6 +261,13 @@ public class TraverseEnterHandler {
 		}
 	}
 
+	/**
+	 * Ermittelt das erste leere Pflichtfeld aus der übergebenen Liste von Controls.
+	 * 
+	 * @param tabList
+	 *            Liste der Controls in einer Section.
+	 * @return
+	 */
 	private Control getNextRequiredControl(List<Control> tabList) {
 		Control fc = null;
 
@@ -263,6 +302,15 @@ public class TraverseEnterHandler {
 		return fc;
 	}
 
+	/**
+	 * Emittelt das erste leere Pflichtfeld in einer der Section aus der übergebenen Liste.
+	 * 
+	 * @param focussedControl
+	 *            das fokussierte Control
+	 * @param sectionList
+	 *            Liste mit Sections
+	 * @return
+	 */
 	private Control getNextRequiredControlOtherSection(Control focussedControl, List<Section> sectionList) {
 		Control fc = null;
 		Composite compo = null;
@@ -314,6 +362,7 @@ public class TraverseEnterHandler {
 				}
 			}
 
+			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
 			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
 				for (Column column : dataTable.getColumns()) {
 					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
@@ -331,6 +380,8 @@ public class TraverseEnterHandler {
 			}
 		}
 
+		// Leeres Pflichtfeld ermitteln
+		// irs kann 0 oder der Rowindex der selektierten Zelle sein
 		for (int ir = irs + 1; ir < natTable.getRowCount(); ir++) {
 			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
 				for (Column column : dataTable.getColumns()) {
