@@ -364,19 +364,8 @@ public class TraverseEnterHandler {
 
 			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
 			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
-				for (Column column : dataTable.getColumns()) {
-					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
-						if (dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
-								|| dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
-							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
-							natTable.setFocus();
-							int ici = ic - 1;
-							int iri = irs - 1;
-							natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
-							return true;
-						}
-					}
-				}
+				if (selectEmptyRequiredCell(natTable, dataTable, irs, ic))
+					return true;
 			}
 		}
 
@@ -384,18 +373,23 @@ public class TraverseEnterHandler {
 		// irs kann 0 oder der Rowindex der selektierten Zelle sein
 		for (int ir = irs + 1; ir < natTable.getRowCount(); ir++) {
 			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
-				for (Column column : dataTable.getColumns()) {
-					if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
-						if (dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
-								|| dataTable.getRows().get(ir - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
-							SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
-							natTable.setFocus();
-							int ici = ic - 1;
-							int iri = ir - 1;
-							natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
-							return true;
-						}
-					}
+				if (selectEmptyRequiredCell(natTable, dataTable, ir, ic))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean selectEmptyRequiredCell(NatTable natTable, Table dataTable, int irs, int ic) {
+		for (Column column : dataTable.getColumns()) {
+			if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
+				if (dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
+						|| dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
+					SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
+					natTable.setFocus();
+					int ici = ic - 1;
+					int iri = irs - 1;
+					return natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
 				}
 			}
 		}
