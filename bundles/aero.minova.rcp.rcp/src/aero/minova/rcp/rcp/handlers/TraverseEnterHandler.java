@@ -343,7 +343,7 @@ public class TraverseEnterHandler {
 	private boolean getNextRequiredNatTableCell(Control focussedControl, boolean countFromSelectedCell) {
 		NatTable natTable = (NatTable) focussedControl;
 		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
-		int irs = 1;
+		int irs = 0;
 		int ics = 1;
 
 		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
