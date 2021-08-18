@@ -343,25 +343,16 @@ public class TraverseEnterHandler {
 	private boolean getNextRequiredNatTableCell(Control focussedControl, boolean countFromSelectedCell) {
 		NatTable natTable = (NatTable) focussedControl;
 		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
+		SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
 		int irs = 0;
 		int ics = 1;
 
 		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
 		if (natTable.isFocusControl() && countFromSelectedCell) {
 			// Selektierte Zelle suchen und die Row und Column Position setzen
-			for (int ir = 1; ir < natTable.getRowCount(); ir++) {
-				for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
-					// Wir holen uns den CellPainter, damit die ConfogLabels gesetzt werden. TO DO Weg ohne den CellPainter suchen
-					ICellPainter painter = natTable.getCellPainter(ic, ir, natTable.getCellByPosition(ic, ir), natTable.getConfigRegistry());
-					if (natTable.getCellByPosition(ic, ir).getConfigLabels().hasLabel(Constants.SELECTED_ANCHOR_LABEL)) {
-						irs = ir;
-						ics = ic;
-						break;
-					}
-
-				}
-			}
-
+			irs = selectionLayer.getLastSelectedCellPosition().getRowPosition() + 1;
+			ics = selectionLayer.getLastSelectedCellPosition().getColumnPosition() + 1;
+			
 			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
 			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
 				if (selectEmptyRequiredCell(natTable, dataTable, irs, ic))
