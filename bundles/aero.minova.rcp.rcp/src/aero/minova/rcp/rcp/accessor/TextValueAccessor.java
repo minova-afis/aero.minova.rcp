@@ -15,6 +15,10 @@ public class TextValueAccessor extends AbstractValueAccessor {
 
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
+		// we see this control disposed in our unit tests
+		if (control.isDisposed()) {
+			return;
+		}
 		String newText = value == null ? "" : value.getStringValue();
 		String currentText = ((Text) control).getText();
 
