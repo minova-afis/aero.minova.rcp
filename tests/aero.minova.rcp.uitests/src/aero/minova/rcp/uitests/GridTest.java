@@ -61,6 +61,9 @@ class GridTest {
 
 	@BeforeEach
 	void beforeClass() {
+
+		// Do not start on Linux
+
 		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
 		// Maske über das Menü öffnen
@@ -82,10 +85,6 @@ class GridTest {
 		gridNattable = swtNatTableBot.nattable(2);
 		assertNotNull(gridNattable);
 
-	}
-
-	@BeforeEach
-	void setup() {
 		// Ensure that the number of visible entries in the nattable is less and
 		// possible
 		while (indexNattable.rowCount() >= 8) {
