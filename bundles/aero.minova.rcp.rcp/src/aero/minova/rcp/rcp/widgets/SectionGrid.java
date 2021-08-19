@@ -160,7 +160,6 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-		// bar.setData("org.eclipse.swtbot.widget.key", "GridToolBar");
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
