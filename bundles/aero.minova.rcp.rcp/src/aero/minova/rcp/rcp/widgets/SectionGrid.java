@@ -467,7 +467,9 @@ public class SectionGrid {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
 		gridAccessor.getMGrid().dataTableChanged();
-		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
+		if (!natTable.isDisposed()) {
+			natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
+		}
 	}
 
 	public int getSectionHigh() {

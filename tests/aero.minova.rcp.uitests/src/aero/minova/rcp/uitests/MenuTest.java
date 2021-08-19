@@ -1,7 +1,8 @@
 package aero.minova.rcp.uitests;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,17 +19,16 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.FrameworkUtil;
 
 import aero.minova.rcp.dataservice.XmlProcessor;
@@ -37,17 +37,14 @@ import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
 
-@RunWith(SWTBotJunit4ClassRunner.class)
+@ExtendWith(SWTBotJunit5Extension.class)
 public class MenuTest {
 
 	private static SWTWorkbenchBot bot;
 	TranslationService translationService;
 
-	@Before
+	@BeforeEach
 	public void beforeClass() throws Exception {
-		if (System.getProperty("os.name").startsWith("Linux")) {
-			return;
-		}
 		bot = new SWTWorkbenchBot(getEclipseContext());
 		SWTBotPreferences.TIMEOUT = 30000;
 		this.translationService = getEclipseContext().get(TranslationService.class);
@@ -104,7 +101,7 @@ public class MenuTest {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 	}
 
