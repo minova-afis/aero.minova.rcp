@@ -18,7 +18,6 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.painter.cell.ICellPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -352,7 +351,7 @@ public class TraverseEnterHandler {
 			// Selektierte Zelle suchen und die Row und Column Position setzen
 			irs = selectionLayer.getLastSelectedCellPosition().getRowPosition() + 1;
 			ics = selectionLayer.getLastSelectedCellPosition().getColumnPosition() + 1;
-			
+
 			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
 			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
 				if (selectEmptyRequiredCell(natTable, dataTable, irs, ic))
