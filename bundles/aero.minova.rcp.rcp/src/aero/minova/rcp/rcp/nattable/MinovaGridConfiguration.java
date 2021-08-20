@@ -118,7 +118,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(contentProvider.getValues());
+			MinovaComboBoxCellEditor comboBoxCellEditor = new MinovaComboBoxCellEditor(contentProvider.getValues());
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.NORMAL, configLabel + columnIndex);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT, configLabel + columnIndex);
 		}
