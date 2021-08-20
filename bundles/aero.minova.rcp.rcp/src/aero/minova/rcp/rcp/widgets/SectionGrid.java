@@ -326,6 +326,41 @@ public class SectionGrid {
 			}
 		});
 
+		getNatTable().addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				mDetail.setSelectedControl(null);
+			}
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (selectionLayer.getSelectedCells().isEmpty())
+					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+				mDetail.setSelectedControl(getNatTable());
+			}
+		});
+
+		getNatTable().addTraverseListener(new TraverseListener() {
+
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				switch (e.detail) {
+				case SWT.TRAVERSE_TAB_NEXT:
+					selectionLayer.clear();
+					e.doit = true;
+					break;
+				case SWT.TRAVERSE_TAB_PREVIOUS:
+					selectionLayer.clear();
+					e.doit = true;
+					break;
+				default:
+					break;
+				}
+
+			}
+		});
+
 		FormData fd = new FormData();
 		fd.width = DEFAULT_WIDTH;
 		fd.height = DEFAULT_HEIGHT;
@@ -333,62 +368,29 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
-		
-		getNatTable().addFocusListener(new FocusListener() {
 
- 			@Override
- 			public void focusLost(FocusEvent e) {
- 				// TODO Auto-generated method stub
- 				mDetail.setSelectedControl(null);
- 			}
-
- 			@Override
- 			public void focusGained(FocusEvent e) {
- 				getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
- 				mDetail.setSelectedControl(getNatTable());
- 			}
- 		});
-
- 		getNatTable().addTraverseListener(new TraverseListener() {
-
- 			@Override
- 			public void keyTraversed(TraverseEvent e) {
- 				switch (e.detail) {
- 				case SWT.TRAVERSE_TAB_NEXT:
- 					e.doit = true;
- 					break;
- 				case SWT.TRAVERSE_TAB_PREVIOUS:
- 					e.doit = true;
- 					break;
- 				default:
- 					break;
- 				}
-
- 			}
- 		});
- 		
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'n'), new IKeyAction() {
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
 				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
 			}
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'd'), new IKeyAction() {
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'd'), new IKeyAction() {
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
 				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
 			}
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'h'), new IKeyAction() {
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'h'), new IKeyAction() {
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
 				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
 			}
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'v'), new IKeyAction() {
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'v'), new IKeyAction() {
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
 				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
@@ -396,22 +398,24 @@ public class SectionGrid {
 			}
 		});
 		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), new IKeyAction() {
-			
+
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
 				Map<String, String> parameter = new HashMap<>();
 				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 				handlerService.executeHandler(command);
-				
+
 			}
 		});
-		
+
 		getNatTable().setData(Constants.GRID_DATA_SECTION, section);
 		getNatTable().setData(Constants.GRID_DATA_SELECTIONLAYER, selectionLayer);
 		getNatTable().setData(Constants.GRID_DATA_DATATABLE, dataTable);
+		getNatTable().setData("EHandlerService", handlerService);
+		getNatTable().setData("ECommandService", commandService);
 		return getNatTable();
 	}
-	
+
 	public void execButtonHandler(String btnId, String commandName) {
 		Map<String, String> parameter = new HashMap<>();
 		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
