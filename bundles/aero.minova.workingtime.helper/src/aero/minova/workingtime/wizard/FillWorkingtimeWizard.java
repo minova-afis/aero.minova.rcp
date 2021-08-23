@@ -57,6 +57,12 @@ public class FillWorkingtimeWizard extends MinovaWizard implements IMinovaWizard
 
 	@Override
 	public void addPages() {
+
+		// Die Pages sollen nur hinzugefügt werden, wenn noch keine Pages erstellt wurden
+		if (this.getPages().length != 0) {
+			return;
+		}
+
 		// wird von WizardDialog automatisch aufgerufen
 		super.setWindowTitle(translationService.translate("@Workingtime.FillWizard.Name", null));
 		periodPage = new PeriodPage("PeriodPage", translationService.translate("@Workingtime.FillWizard.Title", null),
