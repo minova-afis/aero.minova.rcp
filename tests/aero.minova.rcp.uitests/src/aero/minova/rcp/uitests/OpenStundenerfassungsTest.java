@@ -1,31 +1,33 @@
 package aero.minova.rcp.uitests;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.Position;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
-import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import aero.minova.rcp.uitests.util.UITestUtil;
 
-@RunWith(SWTBotJunit4ClassRunner.class)
-public class OpenStundenerfassungsTest {
+@ExtendWith(SWTBotJunit5Extension.class)
+class OpenStundenerfassungsTest {
 
 	private SWTWorkbenchBot bot;
 
@@ -40,15 +42,10 @@ public class OpenStundenerfassungsTest {
 	private List<SWTBotToolbarButton> indexToolbar;
 	private List<SWTBotToolbarButton> detailToolbar;
 
-	@Before
-	public void beforeClass() {
+	@BeforeEach
+	void setup() {
 		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
-
-		openStundenerfassung();
-	}
-
-	public void openStundenerfassung() {
 
 		// Stundenerfassung über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Administration");
@@ -83,10 +80,8 @@ public class OpenStundenerfassungsTest {
 
 	@Test
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten (Nicht Ubuntu)")
-	public void deleteRowAndRevertSearch() {
-		if (System.getProperty("os.name").startsWith("Linux")) {
-			return;
-		}
+	void deleteRowAndRevertSearch() {
+		Assumptions.assumeFalse(SWT.getPlatform().equals("gtk"));
 
 		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue Zeile wird nicht eingefügt)
 		searchNattable.setCellDataValueByPosition(1, 3, "row1");
@@ -144,7 +139,7 @@ public class OpenStundenerfassungsTest {
 
 	@Test
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
-	public void loadIndex() {
+	void loadIndex() {
 		UITestUtil.loadIndex(indexToolbar);
 
 		// Überprüfen, ob Daten geladen wurden
@@ -154,7 +149,7 @@ public class OpenStundenerfassungsTest {
 	}
 
 	@AfterEach
-	public void sleep() {
+	void sleep() {
 		bot.sleep(10000);
 	}
 }

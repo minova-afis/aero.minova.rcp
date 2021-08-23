@@ -5,6 +5,8 @@ name: RCP build on Ubuntu
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -27,7 +29,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Build with Maven
-      run: xvfb-run mvn clean verify surefire-report:report --fae --file pom.xml -T4
+      run: xvfb-run mvn clean verify -DskipTests=true --fae --file pom.xml -T4
 
 #    - uses: actions/upload-artifact@v2
 #      with:
