@@ -184,10 +184,12 @@ public class WFCDetailCASRequestsUtil {
 				Table rowIndexTable = createReadTableFromForm(form, row);
 				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
 				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-					selectedTable = t.getOutputParameters();
-					updateSelectedEntry();
-					// Grids auslesen, wenn Daten der Hauptmaske geladen sind
-					readGrids(row);
+					if (t != null) {
+						selectedTable = t.getOutputParameters();
+						updateSelectedEntry();
+						// Grids auslesen, wenn Daten der Hauptmaske geladen sind
+						readGrids(row);
+					}
 				}));
 
 				// Option Pages
@@ -262,25 +264,38 @@ public class WFCDetailCASRequestsUtil {
 
 	private Table createReadTableFromForm(Form tableForm, Row row) {
 
+		Map<Integer, String> sqlIndexToKey = mDetail.getOptionPageKeys(tableForm.getTitle());
+		boolean useColumnName = tableForm.equals(form) || sqlIndexToKey == null; // Hauptmaske oder keine SQL-zu-Keys in xbs gegeben
+
 		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
-
 		RowBuilder builder = RowBuilder.newRow();
-		List<Field> allFields = dataFormService.getFieldsFromForm(tableForm);
 
+		List<Field> allFields = dataFormService.getFieldsFromForm(tableForm);
 		List<Column> indexColumns = form.getIndexView().getColumn();
 		Map<String, Value> newKeys = new HashMap<>();
+
 		for (Field f : allFields) {
 			boolean found = false;
 			for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-				if (indexColumns.get(i).getName().equals(f.getName())) {
-					found = true;
+
+				// Spalte mit Feld vergleichen
+				if (useColumnName || f.getSqlIndex().intValue() == -1) {
+					found = indexColumns.get(i).getName().equals(f.getName());
+				} else {
+					// SQL-zu-Keys Map nutzen um Spalte zu finden
+					found = sqlIndexToKey.get(f.getSqlIndex().intValue()) != null
+							&& sqlIndexToKey.get(f.getSqlIndex().intValue()).equals(indexColumns.get(i).getName());
+				}
+
+				// Wert in Zeile setzten
+				if (found) {
 					if ("primary".equals(f.getKeyType())) {
-						// TODO: Für OPS benötigte Spalte aus der .xbs auslesen
 						builder.withValue(row.getValue(i).getValue());
 						newKeys.put(indexColumns.get(i).getName(), row.getValue(i));
 					} else {
 						builder.withValue(null);
 					}
+					break;
 				}
 			}
 			if (!found) {
@@ -289,7 +304,8 @@ public class WFCDetailCASRequestsUtil {
 
 		}
 
-		if (!newKeys.equals(getKeys())) {
+		// Keys nur für die Hauptmaske setzen
+		if (!newKeys.equals(getKeys()) && tableForm.equals(form)) {
 			setKeys(newKeys);
 		}
 
@@ -380,24 +396,25 @@ public class WFCDetailCASRequestsUtil {
 	 * @return
 	 */
 	private Table createInsertUpdateTableFromForm(Form buildForm) {
-		Table formTable = null;
+
+		Map<Integer, String> sqlIndexToKey = mDetail.getOptionPageKeys(buildForm.getTitle());
+		Table formTable = getInsertUpdateTable(buildForm);
 		RowBuilder rb = RowBuilder.newRow();
-		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.UPDATE_REQUEST);
-		} else {
-			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
-			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
-			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
-				if (mDetail.getField(c.getName()).isPrimary()) {
-					c.setOutputType(OutputType.OUTPUT);
-				}
-			}
-		}
+
 		int valuePosition = 0;
 
-		// TODO: für OPs sollte aus der .xbs ausgelesen werden, welche Keys der Hauptmaske an welcher Stelle verwendet werden müssen
-		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
-			rb.withValue(getKeys() == null ? null : getKeys().get(f.getName()));
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(buildForm)) {
+
+			if (getKeys() == null) {
+				rb.withValue(null);
+			} else if (sqlIndexToKey != null && sqlIndexToKey.containsKey(f.getSqlIndex().intValue())) {
+				// Für OPs Keywert aus Hauptmaske nutzen
+				rb.withValue(getKeys().get(sqlIndexToKey.get(f.getSqlIndex().intValue())));
+			} else if (getKeys().containsKey(f.getName())) {
+				rb.withValue(getKeys().get(f.getName()));
+			} else {
+				continue;
+			}
 			valuePosition++;
 		}
 
@@ -410,6 +427,22 @@ public class WFCDetailCASRequestsUtil {
 		// anhand der Maske wird der Defaultwert und der DataType des Fehlenden Row-Wertes ermittelt und der Row angefügt
 		Row r = rb.create();
 		formTable.addRow(r);
+		return formTable;
+	}
+
+	private Table getInsertUpdateTable(Form buildForm) {
+		Table formTable;
+		if (getKeys() != null) {
+			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.UPDATE_REQUEST);
+		} else {
+			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
+			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
+			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
+				if (mDetail.getField(c.getName()).isPrimary()) {
+					c.setOutputType(OutputType.OUTPUT);
+				}
+			}
+		}
 		return formTable;
 	}
 
@@ -985,8 +1018,10 @@ public class WFCDetailCASRequestsUtil {
 		return checkFieldsWithTable(selectedTable, form);
 	}
 
+	/**
+	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
+	 */
 	private boolean checkFieldsWithTable(Table t, Form f) {
-		// vergleicht Feld-Wert mit Wert aus ausgeleser Tabelle (vom CAS)
 		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < t.getColumnCount(); i++) {
 			MField c = mDetail.getField(t.getColumnName(i));
