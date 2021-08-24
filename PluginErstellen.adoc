@@ -6,6 +6,7 @@ Mit der Version 12 wird in Masken kein JavaScript mehr ausgewertet. Die entsprec
 Prinzipiell wird für jede Maske ein eigenes Plugin erstellt.
 
 Grob müssen folgende Schritte befolgt werden:
+
 1. Erstellen des Plugins
 2. Erstellen der Klasse
 3. Umsetzen der Funktionalitäten
