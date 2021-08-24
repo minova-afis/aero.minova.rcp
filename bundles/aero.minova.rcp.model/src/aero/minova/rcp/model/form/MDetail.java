@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.widgets.Control;
 
@@ -26,7 +27,8 @@ public class MDetail {
 
 	private Control selectedField;
 
-	private HashMap<String, Form> optionPages = new HashMap<>();
+	private Map<String, Form> optionPages = new HashMap<>();
+	private Map<String, Map<Integer, String>> optionPageKeys = new HashMap<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -129,6 +131,14 @@ public class MDetail {
 
 	public Form getOptionPage(String name) {
 		return optionPages.get(name);
+	}
+
+	public void addOptionPageKeys(String name, Map<Integer, String> indexToKeys) {
+		this.optionPageKeys.put(name, indexToKeys);
+	}
+
+	public Map<Integer, String> getOptionPageKeys(String name) {
+		return optionPageKeys.get(name);
 	}
 
 	public Collection<Form> getOptionPages() {

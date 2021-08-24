@@ -302,13 +302,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
 				for (Node op : settingsForMask.getNode()) {
 					try {
-						String opContent = dataService.getHashedFile(op.getName()).get();
-
 						try {
-							Form opForm = XmlProcessor.get(opContent, Form.class);
-							addOPFromForm(opForm, parent);
-						} catch (JAXBException | IllegalArgumentException e) {
+							Form opForm = dataFormService.getForm(op.getName());
+							addOPFromForm(opForm, parent, op);
+						} catch (IllegalArgumentException e) {
 							try {
+								String opContent = dataService.getHashedFile(op.getName()).get();
 								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
 								addOPFromGrid(opGrid, parent, op);
 							} catch (JAXBException e1) {
@@ -324,8 +323,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	}
 
-	private void addOPFromForm(Form opForm, Composite parent) {
+	private void addOPFromForm(Form opForm, Composite parent, Node opNode) {
 		mDetail.addOptionPage(opForm);
+		mDetail.addOptionPageKeys(opForm.getTitle(), XBSUtil.getSqlIndexToKeysMap(opNode));
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getTitle());
 			layoutSection(parent, wrapper);
@@ -336,7 +336,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
 		layoutSection(parent, wrapper);
 
-		//SQL-Index zu Feldnamen Map aus .xbs setzten
+		// SQL-Index zu Feldnamen Map aus .xbs setzten
 		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
 		sg.setSqlIndexToKeys(XBSUtil.getSqlIndexToKeysMap(opNode));
