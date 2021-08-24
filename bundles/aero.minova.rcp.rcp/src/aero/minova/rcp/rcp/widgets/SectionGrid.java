@@ -368,7 +368,6 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
-
 		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'n'), new IKeyAction() {
 			@Override
 			public void run(NatTable natTable, KeyEvent event) {
@@ -576,6 +575,8 @@ public class SectionGrid {
 	}
 
 	public void enableInsert(boolean enable) {
-		insertToolItem.setEnabled(enable);
+		if (!insertToolItem.isDisposed()) {
+			insertToolItem.setEnabled(enable);
+		}
 	}
 }

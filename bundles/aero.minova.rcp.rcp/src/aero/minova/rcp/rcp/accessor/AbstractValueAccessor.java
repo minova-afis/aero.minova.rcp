@@ -119,7 +119,7 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public void setCSSClass(String classname) {
-		if (engine != null) {
+		if (engine != null && !control.isDisposed()) {
 			engine.setClassname(control, classname);
 		}
 	}
