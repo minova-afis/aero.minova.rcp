@@ -871,8 +871,11 @@ public class WFCDetailCASRequestsUtil {
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
-		NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, getTranslation("Notification"), shell);
-		notificationPopUp.open();
+		if (!shell.getDisplay().isDisposed()) {
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message,
+					getTranslation("Notification"), shell);
+			notificationPopUp.open();
+		}
 	}
 
 	@Optional

@@ -1,10 +1,12 @@
 # This workflow will build the Eclipse RCP application with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java CI with Maven
+name: RCP build on Ubuntu
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -27,7 +29,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Build with Maven
-      run: xvfb-run mvn clean verify surefire-report:report --fae --file pom.xml -T4
+      run: xvfb-run mvn clean verify -DskipTests=true --fae --file pom.xml -T4
 
 #    - uses: actions/upload-artifact@v2
 #      with:
