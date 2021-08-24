@@ -180,3 +180,9 @@ Aktuell können die Plugins einfach mit der RCP-Anwendung gebaut werden, da sie 
 == Ausliefern/Hochladen aufs CAS
 
 Das gebaute .jar muss vom CAS zur Verfügung gestellt werden.
+
+Zuerst verbindet man sich mit dem System, auf welchem der CAS läuft.
+Dort sucht man das Verzeichnis Minova bzw. Minova Systems und wählt in diesem das gewünschte Projekt aus.
+Von dort aus navigiert man zu Shared Data\Program Files\SIS\plugins.
+Im Plugins Ordner legt man dann einfach die .jar ab.
+Zum Schluss muss nur noch das CAS neu gestartet werden, damit ein neues ZIP erzeugt wird, in welchem das neue Plugin vorhanden ist.
