@@ -19,6 +19,7 @@ import aero.minova.rcp.model.helper.IHelper;
 public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
+	private List<MField> primaryFields = new ArrayList<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
 
 	private List<MSection> pageList = new ArrayList<>();
@@ -28,7 +29,7 @@ public class MDetail {
 	private Control selectedField;
 
 	private Map<String, Form> optionPages = new HashMap<>();
-	private Map<String, Map<Integer, String>> optionPageKeys = new HashMap<>();
+	private Map<String, Map<String, Integer>> optionPageKeys = new HashMap<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -46,6 +47,10 @@ public class MDetail {
 		}
 		fields.put(field.getName(), field);
 		field.setDetail(this);
+
+		if (field.isPrimary()) {
+			primaryFields.add(field);
+		}
 	}
 
 	/**
@@ -93,22 +98,6 @@ public class MDetail {
 		return fields.get(name);
 	}
 
-	/**
-	 * Liefert das ERSTE Feld (nach Erstellreihenfolge) mit dem gegebenen SQL-Index. Durch OPs kann es doppelte SQL-Indices geben.
-	 * 
-	 * @param index
-	 *            der SQL-Index
-	 * @return
-	 */
-	public MField getFieldBySQLIndex(int index) {
-		for (MField f : fields.values()) {
-			if (f.getSqlIndex().equals(index)) {
-				return f;
-			}
-		}
-		return null;
-	}
-
 	public Collection<MField> getFields() {
 		return fields.values();
 	}
@@ -133,11 +122,11 @@ public class MDetail {
 		return optionPages.get(name);
 	}
 
-	public void addOptionPageKeys(String name, Map<Integer, String> indexToKeys) {
-		this.optionPageKeys.put(name, indexToKeys);
+	public void addOptionPageKeys(String name, Map<String, Integer> keysToIndex) {
+		this.optionPageKeys.put(name, keysToIndex);
 	}
 
-	public Map<Integer, String> getOptionPageKeys(String name) {
+	public Map<String, Integer> getOptionPageKeys(String name) {
 		return optionPageKeys.get(name);
 	}
 
@@ -173,5 +162,9 @@ public class MDetail {
 
 	public void setSelectedField(Control selectedField) {
 		this.selectedField = selectedField;
+	}
+
+	public List<MField> getPrimaryFields() {
+		return primaryFields;
 	}
 }

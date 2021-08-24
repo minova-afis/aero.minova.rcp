@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -125,7 +124,7 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
-	private Map<Integer, String> sqlIndexToKeys;
+	private Map<String, Integer> keynameToIndex;
 
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
@@ -147,7 +146,7 @@ public class SectionGrid {
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
 
-		setSqlIndexToKeys(new HashMap<>());
+		setKeysToIndex(new HashMap<>());
 	}
 
 	public void createGrid() {
@@ -490,24 +489,24 @@ public class SectionGrid {
 		updateNatTable();
 	}
 
-	public Map<Integer, String> getSqlIndexToKeys() {
-		return sqlIndexToKeys;
+	public Map<String, Integer> getKeysToIndex() {
+		return keynameToIndex;
 	}
 
-	public void setSqlIndexToKeys(Map<Integer, String> sqlIndexToKeys) {
-		this.sqlIndexToKeys = sqlIndexToKeys;
+	public void setKeysToIndex(Map<String, Integer> keynameToIndex) {
+		this.keynameToIndex = keynameToIndex;
 	}
 
 	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
 		for (Row r : dataTable.getRows()) {
 
-			if (!getSqlIndexToKeys().isEmpty()) { // Zuordnung aus .xbs nutzen
-				for (Entry<Integer, String> entry : getSqlIndexToKeys().entrySet()) {
-					Value v = mDetail.getFieldBySQLIndex(entry.getKey()).getValue();
-					for (Field f : grid.getField()) {
-						if (f.getName().equals(entry.getValue())) {
-							r.setValue(v, grid.getField().indexOf(f));
-						}
+			if (!getKeysToIndex().isEmpty()) { // Zuordnung aus .xbs nutzen
+
+				for (Field f : grid.getField()) {
+					if (getKeysToIndex().containsKey(f.getName())) {
+						int index = getKeysToIndex().get(f.getName());
+						Value v = mDetail.getPrimaryFields().get(index).getValue();
+						r.setValue(v, grid.getField().indexOf(f));
 					}
 				}
 
@@ -515,8 +514,8 @@ public class SectionGrid {
 				for (Field f : grid.getField()) {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
-						
-						if (primaryKeys.containsKey(f.getName())) { //Übereinstimmende Namen nutzen
+
+						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
 							r.setValue(primaryKeys.get(f.getName()), index);
 						} else if (f.getSqlIndex().intValue() == 0) { // Default: Feld mit SQL-Index 0 bekommt Wert von KeyLong
 							r.setValue(primaryKeys.get("KeyLong"), index);

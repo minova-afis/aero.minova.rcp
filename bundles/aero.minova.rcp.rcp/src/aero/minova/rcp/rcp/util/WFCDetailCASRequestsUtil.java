@@ -219,16 +219,12 @@ public class WFCDetailCASRequestsUtil {
 					gridRequestTable.addColumn(column);
 
 					boolean found = false;
-					if (!sg.getSqlIndexToKeys().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
-
-						for (Entry<Integer, String> e : sg.getSqlIndexToKeys().entrySet()) {
-							if (e.getValue().equals(f.getName())) {
-
-								mDetail.getFieldBySQLIndex(e.getKey());
-								found = true;
-								gridRowBuilder.withValue(mDetail.getFieldBySQLIndex(e.getKey()).getValue());
-
-							}
+					if (!sg.getKeysToIndex().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
+						if (sg.getKeysToIndex().containsKey(f.getName())) {
+							found = true;
+							int index = sg.getKeysToIndex().get(f.getName());
+							Value v = mDetail.getPrimaryFields().get(index).getValue();
+							gridRowBuilder.withValue(v);
 						}
 
 					} else { // Default Verhalten, entsprechenden Wert im Index finden
@@ -263,9 +259,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private Table createReadTableFromForm(Form tableForm, Row row) {
-
-		Map<Integer, String> sqlIndexToKey = mDetail.getOptionPageKeys(tableForm.getTitle());
-		boolean useColumnName = tableForm.equals(form) || sqlIndexToKey == null; // Hauptmaske oder keine SQL-zu-Keys in xbs gegeben
+		Map<String, Integer> keysToIndex = mDetail.getOptionPageKeys(tableForm.getTitle());
+		boolean useColumnName = tableForm.equals(form) || keysToIndex == null; // Hauptmaske oder keine key-zu-Index Map in xbs gegeben
 
 		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
 		RowBuilder builder = RowBuilder.newRow();
@@ -279,12 +274,11 @@ public class WFCDetailCASRequestsUtil {
 			for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
 
 				// Spalte mit Feld vergleichen
-				if (useColumnName || f.getSqlIndex().intValue() == -1) {
+				if (useColumnName) {
 					found = indexColumns.get(i).getName().equals(f.getName());
-				} else {
-					// SQL-zu-Keys Map nutzen um Spalte zu finden
-					found = sqlIndexToKey.get(f.getSqlIndex().intValue()) != null
-							&& sqlIndexToKey.get(f.getSqlIndex().intValue()).equals(indexColumns.get(i).getName());
+				} else if (keysToIndex.containsKey(f.getName())) {
+					MField correspondingField = mDetail.getPrimaryFields().get(keysToIndex.get(f.getName()));
+					found = correspondingField.getName().equals(indexColumns.get(i).getName());
 				}
 
 				// Wert in Zeile setzten
@@ -397,7 +391,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private Table createInsertUpdateTableFromForm(Form buildForm) {
 
-		Map<Integer, String> sqlIndexToKey = mDetail.getOptionPageKeys(buildForm.getTitle());
+		Map<String, Integer> keysToIndex = mDetail.getOptionPageKeys(buildForm.getTitle());
 		Table formTable = getInsertUpdateTable(buildForm);
 		RowBuilder rb = RowBuilder.newRow();
 
@@ -407,9 +401,10 @@ public class WFCDetailCASRequestsUtil {
 
 			if (getKeys() == null) {
 				rb.withValue(null);
-			} else if (sqlIndexToKey != null && sqlIndexToKey.containsKey(f.getSqlIndex().intValue())) {
+			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) {
 				// Für OPs Keywert aus Hauptmaske nutzen
-				rb.withValue(getKeys().get(sqlIndexToKey.get(f.getSqlIndex().intValue())));
+				MField correspondingField = mDetail.getPrimaryFields().get(keysToIndex.get(f.getName()));
+				rb.withValue(getKeys().get(correspondingField.getName()));
 			} else if (getKeys().containsKey(f.getName())) {
 				rb.withValue(getKeys().get(f.getName()));
 			} else {
@@ -872,8 +867,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void openNotificationPopup(String message) {
 		if (!shell.getDisplay().isDisposed()) {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message,
-					getTranslation("Notification"), shell);
+			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, getTranslation("Notification"), shell);
 			notificationPopUp.open();
 		}
 	}

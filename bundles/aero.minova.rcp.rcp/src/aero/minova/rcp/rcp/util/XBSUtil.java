@@ -45,19 +45,20 @@ public class XBSUtil {
 	}
 
 	/**
-	 * Liefert eine Map von SQL-Index zu Feldname für die gegebene Node
+	 * Liefert eine Map von Feldnamen in der OP zu "Index" des primary Keys in der Hauptmaske. "Index" 0 bedeutet erstes primary-Feld, es können nicht-primary
+	 * Felder davorstehen.
 	 */
-	public static Map<Integer, String> getSqlIndexToKeysMap(Node node) {
-		Map<Integer, String> sqlToKeys = new HashMap<>();
+	public static Map<String, Integer> getKeynamesToIndex(Node node) {
+		Map<String, Integer> namesToIndex = new HashMap<>();
 
 		for (Entry entry : node.getMap().getEntry()) {
 			String uppercaseString = entry.getKey().toUpperCase();
 			if (uppercaseString.startsWith("KEY")) {
-				int sqlIndex = Integer.parseInt(uppercaseString.replace("KEY", ""));
-				sqlToKeys.put(sqlIndex, entry.getValue());
+				int index = Integer.parseInt(uppercaseString.replace("KEY", ""));
+				namesToIndex.put(entry.getValue(), index);
 			}
 		}
 
-		return sqlToKeys;
+		return namesToIndex;
 	}
 }
