@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.widgets;
+package aero.minova.rcp.widgets;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,7 +14,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MLookupField;
 
 public class LookupContentProvider {
-	private Lookup lookup;
+	private LookupComposite lookup;
 	protected List<LookupValue> values = new ArrayList<>();
 
 	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupcontentprovider"));
@@ -63,7 +63,7 @@ public class LookupContentProvider {
 	 * @param lookup
 	 *            the textAssist to set
 	 */
-	protected void setLookup(final Lookup lookup) {
+	protected void setLookup(final LookupComposite lookup) {
 		this.lookup = lookup;
 	}
 
