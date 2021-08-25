@@ -1,5 +1,4 @@
-package aero.minova.rcp.xml.tests;
-
+package aero.minova.workingtime.helper.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,9 +15,10 @@ class CalculateDateTest {
 	private WorkingTimeHelper w;
 
 	@BeforeEach
-	public void init() {
+	void init() {
 		w = new WorkingTimeHelper();
 	}
+
 	@Test
 	void testCalculateDuration2Hours() {
 		Instant now = Instant.now();

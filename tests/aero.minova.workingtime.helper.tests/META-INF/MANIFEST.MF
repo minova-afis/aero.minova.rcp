@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: aero.minova.workingtime.helper.tests
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: aero.minova.workingtime.helper.tests
+Bundle-RequiredExecutionEnvironment: JavaSE-15
+Require-Bundle: org.junit.jupiter.api;bundle-version="5.7.1",
+ aero.minova.workingtime.helper;bundle-version="12.0.24",
+ aero.minova.rcp.model;bundle-version="12.0.24"
