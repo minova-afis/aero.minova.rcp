@@ -330,7 +330,6 @@ public class SectionGrid {
 				// TODO Auto-generated method stub
 			}
 
-
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (selectionLayer.getSelectedCells().isEmpty())
@@ -339,20 +338,19 @@ public class SectionGrid {
 		});
 
 		getNatTable().addTraverseListener(e -> {
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				switch (e.detail) {
-				case SWT.TRAVERSE_TAB_NEXT:
-					selectionLayer.clear();
-					e.doit = true;
-					break;
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-					selectionLayer.clear();
-					e.doit = true;
-					break;
-				default:
-					break;
-				}
+
+			switch (e.detail) {
+			case SWT.TRAVERSE_TAB_NEXT:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
+			default:
+				break;
+			}
 		});
 
 		FormData fd = new FormData();
