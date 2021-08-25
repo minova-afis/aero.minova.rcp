@@ -109,11 +109,7 @@ import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-<<<<<<< Upstream, based on origin/master
 import aero.minova.rcp.rcp.util.XBSUtil;
-import aero.minova.rcp.rcp.widgets.Lookup;
-=======
->>>>>>> ce95c94 Moving the Loopup field to separate plug-in
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.LookupComposite;
 
