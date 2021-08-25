@@ -1,6 +1,5 @@
 CTabItem, LayoutComposite, ExpandableComposite,
-	ScrolledComposite, Canvas, DetailComposite, ToolBar,
-	LookupControl, NatTable, Section  {
+	ScrolledComposite, Canvas, DetailComposite, ToolBar, NatTable, Section  {
 	background-color: COLOR-WIDGET-BACKGROUND;
 }
 Label, Button, Section  {
@@ -62,9 +61,7 @@ Text#Console {
 	color: white;
 	background-color: black;
 }
-LookupControl Label {
-	color: black;
-}
+
 /*
 
 Label.UnitText {
