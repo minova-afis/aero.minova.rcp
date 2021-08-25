@@ -23,10 +23,10 @@ import aero.minova.rcp.dataservice.IMinovaPluginService;
 @Component(immediate = true)
 public class MinovaPluginService implements IMinovaPluginService {
 
-	boolean DEBUG = true;
+	boolean DEBUG = false;
 
 	private IDataService dataService;
-	private boolean downloadPlugins = true;
+	private boolean downloadPlugins = true;	
 
 	@Reference
 	void getDummyService(IDummyService dummyService) {
@@ -43,6 +43,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 	@Override
 	public void activatePlugin(String helperClass) {
 		if (DEBUG) {
+			System.out.println("DEBUG - Using the local versions of the helpers plug-ins requires that you add them to the launch configuration");
 			return;
 		}
 		if (downloadPlugins) {
