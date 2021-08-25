@@ -27,6 +27,7 @@ import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
+import aero.minova.rcp.form.setup.xbs.Preferences;
 
 public class MenuProcessor {
 
@@ -50,12 +51,23 @@ public class MenuProcessor {
 			String void1 = exceptionally.get();
 			processXML(void1);
 		} catch (Exception e) {
+			e.printStackTrace();
 			handleNoMDI(dataService);
 		}
 
 		File application = new File(dataService.getStoragePath() + "/" + MDI_FILE_NAME);
 		if (!application.exists()) {
 			handleNoMDI(dataService);
+		}
+
+		// TODO: Verschieben?
+		try {
+			CompletableFuture<String> xbsFuture = dataService.getHashedFile(XBS_FILE_NAME);
+			String xbsContent = xbsFuture.get();
+			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
+			mApplication.getTransientData().put(XBS_FILE_NAME, preferences);
+		} catch (InterruptedException | ExecutionException | JAXBException e) {
+			e.printStackTrace();
 		}
 	}
 

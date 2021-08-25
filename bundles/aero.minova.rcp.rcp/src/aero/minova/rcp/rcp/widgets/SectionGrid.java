@@ -59,8 +59,6 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormData;
@@ -74,7 +72,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Button;
-import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
@@ -129,6 +126,8 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
+	private Map<String, Integer> keynameToIndex;
+
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
@@ -148,6 +147,8 @@ public class SectionGrid {
 		rowsToInsert = new ArrayList<>();
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
+
+		setKeysToIndex(new HashMap<>());
 	}
 
 	public void createGrid() {
@@ -163,14 +164,13 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-		// bar.setData("org.eclipse.swtbot.widget.key", "GridToolBar");
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
 			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
-			btnInsert.setEnabled(false);
+			btnInsert.setEnabled(true);
 			insertToolItem = createToolItem(bar, btnInsert);
 		}
 
@@ -207,7 +207,7 @@ public class SectionGrid {
 	}
 
 	public ToolItem createToolItem(ToolBar bar, Button btn) {
-		return createToolItem(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
+		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND);
 	}
 
 	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
@@ -327,7 +327,6 @@ public class SectionGrid {
 		});
 
 		getNatTable().addFocusListener(new FocusListener() {
-
 			@Override
 			public void focusLost(FocusEvent e) {
 				mDetail.setSelectedControl(null);
@@ -341,23 +340,18 @@ public class SectionGrid {
 			}
 		});
 
-		getNatTable().addTraverseListener(new TraverseListener() {
-
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				switch (e.detail) {
-				case SWT.TRAVERSE_TAB_NEXT:
-					selectionLayer.clear();
-					e.doit = true;
-					break;
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-					selectionLayer.clear();
-					e.doit = true;
-					break;
-				default:
-					break;
-				}
-
+		getNatTable().addTraverseListener(e -> {
+			switch (e.detail) {
+			case SWT.TRAVERSE_TAB_NEXT:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
+			default:
+				break;
 			}
 		});
 
@@ -368,33 +362,21 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'n'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'n'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'd'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'd'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'h'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'h'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'v'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'v'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 		});
 		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), new IKeyAction() {
 
@@ -470,9 +452,7 @@ public class SectionGrid {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
 		gridAccessor.getMGrid().dataTableChanged();
-		if (!natTable.isDisposed()) {
-			natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
-		}
+		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
 	}
 
 	public int getSectionHigh() {
@@ -528,24 +508,41 @@ public class SectionGrid {
 
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
-		preallocatePrimaryKeys(newRow);
 		rowsToInsert.add(newRow);
 		updateNatTable();
 	}
 
-	private void preallocatePrimaryKeys(Row r) {
-		List<Column> indexColumns = form.getIndexView().getColumn();
-		Row indexRow = ((List<Row>) perspective.getContext().get(Constants.BROKER_ACTIVEROWS)).get(0);
-		for (Field f : grid.getField()) {
-			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
-				int index = grid.getField().indexOf(f);
+	public Map<String, Integer> getKeysToIndex() {
+		return keynameToIndex;
+	}
 
-				// Entsprechenden Wert im Index finden
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					// Name muss übereinstimmen oder Feld muss SQL-Index 0 haben und Column ist KeyLong
-					if (indexColumns.get(i).getName().equals(f.getName())
-							|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
-						r.setValue(new Value(indexRow.getValue(i).getValue()), index);
+	public void setKeysToIndex(Map<String, Integer> keynameToIndex) {
+		this.keynameToIndex = keynameToIndex;
+	}
+
+	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
+		for (Row r : dataTable.getRows()) {
+
+			if (!getKeysToIndex().isEmpty()) { // Zuordnung aus .xbs nutzen
+
+				for (Field f : grid.getField()) {
+					if (getKeysToIndex().containsKey(f.getName())) {
+						int index = getKeysToIndex().get(f.getName());
+						Value v = mDetail.getPrimaryFields().get(index).getValue();
+						r.setValue(v, grid.getField().indexOf(f));
+					}
+				}
+
+			} else { // Default: Name stimmt überein oder SQL-Index 0 in OP bekommt Wert von KeyLong in Hauptmaske
+				for (Field f : grid.getField()) {
+					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+						int index = grid.getField().indexOf(f);
+
+						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
+							r.setValue(primaryKeys.get(f.getName()), index);
+						} else if (f.getSqlIndex().intValue() == 0) { // Default: Feld mit SQL-Index 0 bekommt Wert von KeyLong
+							r.setValue(primaryKeys.get("KeyLong"), index);
+						}
 					}
 				}
 			}
@@ -572,11 +569,5 @@ public class SectionGrid {
 
 	public void closeEditor() {
 		natTable.commitAndCloseActiveCellEditor();
-	}
-
-	public void enableInsert(boolean enable) {
-		if (!insertToolItem.isDisposed()) {
-			insertToolItem.setEnabled(enable);
-		}
 	}
 }

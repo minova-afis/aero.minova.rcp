@@ -103,10 +103,6 @@ public class Constants {
 	public static final String CSS_INVALID = "InvalidValue";
 	public static final String CSS_READONLY = "ReadOnly";
 
-	/**
-	 * Id for command parameter "Perspective ID" (value is <code>"org.eclipse.e4.ui.perspectives.parameters.perspectiveId"</code>).
-	 */
-
 	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
 	public static final String FORM_ID = "aero.minova.rcp.perspectiveswitcher.parameters.formId"; //$NON-NLS-1$
 	public static final String FORM_LABEL = "aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel"; //$NON-NLS-1$
@@ -125,6 +121,11 @@ public class Constants {
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
 	public static final String DETAIL_WIDTH = "Detail_Width";
+	public static final String OPTION_PAGES = "OptionPages";
+
+	// Commands
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
 
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden

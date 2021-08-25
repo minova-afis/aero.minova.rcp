@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -67,13 +69,17 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
+import aero.minova.rcp.form.setup.xbs.Node;
+import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
@@ -100,8 +106,10 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.util.XBSUtil;
 import aero.minova.rcp.rcp.widgets.Lookup;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
@@ -158,6 +166,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Inject
 	EModelService eModelService;
+	MApplication mApplication;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -165,6 +174,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		appContext = mApp.getContext();
+		mApplication = mApp;
 		getForm();
 		layoutForm(parent);
 
@@ -203,6 +213,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private static class HeadOrPageOrGridWrapper {
 		private Object headOrPageOrGrid;
 		public boolean isHead = false;
+		public boolean isOP = false;
+		private String formTitle;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -211,9 +223,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formTitle) {
+			this.headOrPageOrGrid = headOrPageOrGrid;
+			this.formTitle = formTitle;
+			this.isOP = isOP;
+			if (headOrPageOrGrid instanceof Head && !isOP) {
+				isHead = true;
+			}
+		}
+
 		public String getTranslationText() {
 			if (isHead) {
 				return "@Head";
+			} else if (headOrPageOrGrid instanceof Head && isOP) {
+				return formTitle;
 			} else if (headOrPageOrGrid instanceof Grid) {
 				return ((Grid) headOrPageOrGrid).getTitle();
 			} else if (headOrPageOrGrid instanceof Page) {
@@ -223,7 +246,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		public List<Object> getFieldOrGrid() {
-			if (isHead) {
+			if (headOrPageOrGrid instanceof Head) {
 				return ((Head) headOrPageOrGrid).getFieldOrGrid();
 			} else if (headOrPageOrGrid instanceof Grid) {
 				// es existieren keine Felder, nur eine Table
@@ -242,6 +265,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
 			layoutSection(parent, wrapper);
 		}
+
+		loadOptionPages(parent);
 
 		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
@@ -263,6 +288,58 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			getDetail().setHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
+	}
+
+	private void loadOptionPages(Composite parent) {
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+
+		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
+		if (maskNode == null) {
+			return;
+		}
+
+		for (Node settingsForMask : maskNode.getNode()) {
+			if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
+				for (Node op : settingsForMask.getNode()) {
+					try {
+						try {
+							Form opForm = dataFormService.getForm(op.getName());
+							addOPFromForm(opForm, parent, op);
+						} catch (IllegalArgumentException e) {
+							try {
+								String opContent = dataService.getHashedFile(op.getName()).get();
+								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
+								addOPFromGrid(opGrid, parent, op);
+							} catch (JAXBException e1) {
+								e1.printStackTrace();
+							}
+						}
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+	}
+
+	private void addOPFromForm(Form opForm, Composite parent, Node opNode) {
+		mDetail.addOptionPage(opForm);
+		mDetail.addOptionPageKeys(opForm.getTitle(), XBSUtil.getKeynamesToIndex(opNode));
+		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getTitle());
+			layoutSection(parent, wrapper);
+		}
+	}
+
+	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) {
+		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
+		layoutSection(parent, wrapper);
+
+		// OP-Feldname zu Index Map aus .xbs setzten
+		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
+		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
+		sg.setKeysToIndex(XBSUtil.getKeynamesToIndex(opNode));
 	}
 
 	/**

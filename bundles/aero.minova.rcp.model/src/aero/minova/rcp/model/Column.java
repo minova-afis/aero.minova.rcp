@@ -4,7 +4,7 @@ public class Column {
 
 	public Column(String name, DataType type, OutputType outputType) {
 		this(name, type);
-		this.outputType = outputType;
+		this.setOutputType(outputType);
 	}
 
 	public Column(String name, DataType type) {
@@ -26,7 +26,7 @@ public class Column {
 
 	@Override
 	public String toString() {
-		return "Column [name=" + getName() + ", type=" + getType() + ", outputType=" + outputType + "]";
+		return "Column [name=" + getName() + ", type=" + getType() + ", outputType=" + getOutputType() + "]";
 	}
 
 	public DataType getType() {
@@ -43,6 +43,14 @@ public class Column {
 
 	public String getLabel() {
 		return label;
+	}
+
+	public OutputType getOutputType() {
+		return outputType;
+	}
+
+	public void setOutputType(OutputType outputType) {
+		this.outputType = outputType;
 	}
 
 	public Integer getDecimals() {
@@ -112,7 +120,7 @@ public class Column {
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
 		result = prime * result + ((lookupTable == null) ? 0 : lookupTable.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((outputType == null) ? 0 : outputType.hashCode());
+		result = prime * result + ((getOutputType() == null) ? 0 : getOutputType().hashCode());
 		result = prime * result + (readOnly ? 1231 : 1237);
 		result = prime * result + (required ? 1231 : 1237);
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -135,8 +143,9 @@ public class Column {
 		} else if (!name.equalsIgnoreCase(other.name))
 			return false;
 
-		if (type != other.type)
-			return false;
+		// TODO: Typ überprüfen?
+//		if (type != other.type)
+//			return false;
 		return true;
 	}
 
