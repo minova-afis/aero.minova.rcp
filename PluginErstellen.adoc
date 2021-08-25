@@ -169,6 +169,7 @@ public class TicketHelper implements ValueChangeListener {
 === TODO, muss noch implementiert und dokumentiert werden
 
 * Felder ein-/ausblenden -> Wie werden Werte ans CAS geschickt? Werden ausgeblendete Felder komplett ignoriert?
+* Ganze Sections ein-/ausblenden
 * Buttons aktivieren/deaktivieren
 * Anwendungsspezifische Einstellungen
 * Umwandeln von JavaScript zu Code im Helper
