@@ -34,7 +34,6 @@ hs_err_pid*
 **/.polyglot.build.properties
 
 #Eclipse Settings
-**/.settings/*
 **/.log
 **/.metadata/
 
