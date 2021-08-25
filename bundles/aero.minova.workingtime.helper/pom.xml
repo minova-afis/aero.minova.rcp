@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova.rcp</groupId>
-	<artifactId>aero.minova.rcp.root</artifactId>
+	<artifactId>aero.minova.workingtime.helper</artifactId>
 	<version>12.0.24-SNAPSHOT</version>
 	<name>[mvn] Root</name>
 	<packaging>eclipse-plugin</packaging>
@@ -61,7 +61,7 @@
 				<version>${tycho.version}</version>
 				<configuration>
 					<target>
-						<file>${project.basedir}/minova.target</file>
+						<file>minova.target</file>
 					</target>
 					<environments>
 						<environment>
