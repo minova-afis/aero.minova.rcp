@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.widgets;
+package aero.minova.rcp.widgets;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,12 +34,11 @@ import org.osgi.framework.ServiceReference;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.internal.CacheUtil;
-import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 
-public class Lookup extends Composite {
+public class LookupComposite extends Composite {
 
 	private static final String SETTEXT_KEY = "org.eclipse.nebula.widgets.opal.textassist.TextAssist.settext";
 	private final Text text;
@@ -68,7 +67,7 @@ public class Lookup extends Composite {
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
 	 */
-	public Lookup(Composite parent, int style) {
+	public LookupComposite(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new FillLayout());
 
@@ -201,9 +200,9 @@ public class Lookup extends Composite {
 			popup.setVisible(false);
 			firstValue = null;
 			if (contentProvider.getValuesSize() == 0) {
-				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.NoLookupEntries", null),
-						translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
-				notificationPopUp.open();
+				MinovaNotifier.show(Display.getCurrent().getActiveShell(),
+						translationService.translate("@msg.NoLookupEntries", null),
+						translationService.translate("@Notification", null) );
 			}
 			return;
 		}
@@ -284,11 +283,11 @@ public class Lookup extends Composite {
 	 * @return a listener for the FocusOut event
 	 */
 	private Listener createFocusOutListener() {
-		return event -> Lookup.this.getDisplay().asyncExec(() -> {
-			if (Lookup.this.isDisposed() || Lookup.this.getDisplay().isDisposed()) {
+		return event -> LookupComposite.this.getDisplay().asyncExec(() -> {
+			if (LookupComposite.this.isDisposed() || LookupComposite.this.getDisplay().isDisposed()) {
 				return;
 			}
-			final Control control = Lookup.this.getDisplay().getFocusControl();
+			final Control control = LookupComposite.this.getDisplay().getFocusControl();
 			if (control == null || (control != text && control != table && control != popup)) {
 				popup.setVisible(false);
 			}
@@ -528,9 +527,9 @@ public class Lookup extends Composite {
 					gettingData = false;
 				});
 			} else {
-				NotificationPopUp notificationPopUp = new NotificationPopUp(Display.getCurrent(), translationService.translate("@msg.ActiveRequest", null),
-						translationService.translate("@Notification", null), Display.getCurrent().getActiveShell());
-				notificationPopUp.open();
+				MinovaNotifier.show(Display.getCurrent().getActiveShell(),
+						translationService.translate("@msg.ActiveRequest", null),
+						translationService.translate("@Notification", null));
 			}
 		} else {
 			showAllElements(text.getText());

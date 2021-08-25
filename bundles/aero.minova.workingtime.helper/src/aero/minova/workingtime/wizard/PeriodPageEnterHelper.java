@@ -5,7 +5,7 @@ import java.util.List;
 
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public class PeriodPageEnterHelper {
 
@@ -45,8 +45,8 @@ public class PeriodPageEnterHelper {
 		}
 
 		// Wenn als letztes ein Popup Fenster offen war, dieses schließen und noch nicht speichern
-		if (((AbstractValueAccessor) currentField.getValueAccessor()).getControl() instanceof Lookup) {
-			Lookup l = (Lookup) ((AbstractValueAccessor) currentField.getValueAccessor()).getControl();
+		if (((AbstractValueAccessor) currentField.getValueAccessor()).getControl() instanceof LookupComposite) {
+			LookupComposite l = (LookupComposite) ((AbstractValueAccessor) currentField.getValueAccessor()).getControl();
 			l.closePopup();
 			return;
 		}
