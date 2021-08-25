@@ -386,7 +386,7 @@
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute default="false" name="total" type="xs:boolean" />
-		<xs:attribute default="0" name="sql-index" type="xs:integer" use="optional" />
+		<xs:attribute default="-1" name="sql-index" type="xs:integer" use="optional" />
 		<xs:attribute name="validation-order" type="xs:integer" use="optional" />
 		<xs:attribute default="2" name="number-columns-spanned" use="optional">
 			<xs:simpleType>

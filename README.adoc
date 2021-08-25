@@ -279,6 +279,8 @@ Die Configuration habe ich auch standalone erstellt / released.
 
 = Weitere Dokumentationen
 
+* link:PluginErstellen.adoc[Erstellen von neuen Plugins (für Helper, Ersatz von JavaScript in Masken)]
 * link:bundles/aero.minova.rcp.preferences/README.adoc[Einstellungen]
 * link:bundles/aero.minova.rcp.dataservice/README.adoc[Verhalten wenn CAS nicht erreichbar ist]
+
 

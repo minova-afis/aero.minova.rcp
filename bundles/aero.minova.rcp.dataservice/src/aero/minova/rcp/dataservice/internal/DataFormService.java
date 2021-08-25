@@ -180,6 +180,8 @@ public class DataFormService implements IDataFormService {
 			} else if (f.getShortTime() != null) {
 				dateTimeType = DateTimeType.TIME;
 			}
+		} else { // Default fall für noch nicht implementierte Typen
+			type = DataType.STRING;
 		}
 
 		aero.minova.rcp.model.Column c;

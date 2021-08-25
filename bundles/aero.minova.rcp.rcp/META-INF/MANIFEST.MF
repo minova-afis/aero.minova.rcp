@@ -10,6 +10,7 @@ Export-Package: aero.minova.rcp.rcp.accessor,
  aero.minova.rcp.rcp.widgets
 Require-Bundle: aero.minova.rcp.form.model,
  aero.minova.rcp.form.menu,
+ aero.minova.rcp.form.setup,
  aero.minova.rcp.preferencewindow,
  aero.minova.rcp.model,
  aero.minova.rcp.constant,
