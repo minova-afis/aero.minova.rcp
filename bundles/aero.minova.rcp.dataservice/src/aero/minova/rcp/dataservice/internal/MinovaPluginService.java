@@ -1,6 +1,5 @@
 package aero.minova.rcp.dataservice.internal;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +25,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 	boolean DEBUG = false;
 
 	private IDataService dataService;
-	private boolean downloadPlugins = true;	
+	private boolean downloadPlugins = true;
 
 	@Reference
 	void getDummyService(IDummyService dummyService) {
@@ -43,7 +42,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 	@Override
 	public void activatePlugin(String helperClass) {
 		if (DEBUG) {
-			System.out.println("DEBUG - Using the local versions of the helpers plug-ins requires that you add them to the launch configuration");
+			System.out.println("\n\nDEBUG - Using the local versions of the helpers plug-ins requires that you add them to the launch configuration\n\n");
 			return;
 		}
 		if (downloadPlugins) {
