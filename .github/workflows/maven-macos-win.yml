@@ -20,6 +20,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         echo ${{ secrets.GITHUB_TOKEN }}
-        git clone https://user:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite # This works
+        echo $GITHUB_TOKEN
+        git clone https://$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite # This works
         git config user janiak-minova 
         git config user.email 
