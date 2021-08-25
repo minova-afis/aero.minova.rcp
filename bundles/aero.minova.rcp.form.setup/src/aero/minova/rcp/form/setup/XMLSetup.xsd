@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="setup">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="required-modules" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="required-service" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="sql-code" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="mdi-code" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="xbs-code" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="static-code" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="copy-file" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="schema" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="execute-java" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="required-modules">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="1">
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:element minOccurs="0" ref="module"/>
+                        <xs:element minOccurs="0" ref="one-of"/>
+                    </xs:choice>
+                </xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" ref="min-required"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="required-service">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element minOccurs="0" ref="service"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="schema">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element minOccurs="0" ref="tableschema"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="execute-java">
+        <xs:annotation>
+            <xs:documentation> mit diesem Tag kann man definieren, dass bestimmte Klassen ausgeführt werden. Diese Klassen müssen das Interface...
+                implementieren. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded" minOccurs="0">
+                <xs:element name="parameter" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="name" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="classname" type="xs:Name" use="required"/>
+            <xs:attribute name="execute-after" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="copy-files"/>
+                        <xs:enumeration value="write-mdi"/>
+                        <xs:enumeration value="write-xbs"/>
+                        <xs:enumeration value="install-service"/>
+                        <xs:enumeration value="update-database"/>
+                        <xs:enumeration value="update-schema"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="one-of">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="module"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="min-required">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="module"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="static-code">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="static"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sql-code">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="script"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="copy-file">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element ref="filecopy" maxOccurs="unbounded"/>
+                    <xs:element ref="dircopy" maxOccurs="unbounded"/>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="static">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="version"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="mode" use="required" type="xs:integer"/>
+            <xs:attribute name="country" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ch"/>
+                        <xs:enumeration value="co"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="lang" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="fr"/>
+                        <xs:enumeration value="en"/>
+                        <xs:enumeration value="de"/>
+                        <xs:enumeration value="es"/>
+                        <xs:enumeration value="it"/>
+                        <xs:enumeration value="nl"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="script">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="version"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="script"/>
+                        <xs:enumeration value="procedure"/>
+                        <xs:enumeration value="view"/>
+                        <xs:enumeration value="function"/>
+                        <xs:enumeration value="table"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="mdi-code">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="action"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="menu"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="toolbar"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="filecopy">
+        <xs:complexType>
+            <xs:attribute name="os">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="win"/>
+                        <xs:enumeration value="linux"/>
+                        <xs:enumeration value="osx"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="arch">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="x86"/>
+                        <xs:enumeration value="x64"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="fromdir" type="xs:string"/>
+            <xs:attribute name="filename" type="xs:NCName" use="required"/>
+            <xs:attribute name="todir" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="dircopy">
+        <xs:complexType>
+            <xs:attribute name="fromdir" type="xs:string" use="required"/>
+            <xs:attribute name="todir" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="action">
+        <xs:complexType>
+            <xs:attribute name="action" use="required" type="xs:NCName"/>
+            <xs:attribute name="generic" type="xs:boolean"/>
+            <xs:attribute name="icon" use="required" type="xs:NCName"/>
+            <xs:attribute name="id" use="required" type="xs:ID"/>
+            <xs:attribute name="text" use="required" type="xs:string"/>
+            <xs:attribute name="autostart" type="xs:NCName"/>
+            <xs:attribute name="detail-visible" type="xs:NCName"/>
+            <xs:attribute name="dialog" type="xs:NCName"/>
+            <xs:attribute name="documentation" type="xs:NCName"/>
+            <xs:attribute name="param" type="xs:NCName"/>
+            <xs:attribute name="shortcut" type="xs:NCName"/>
+            <xs:attribute name="supress-print" type="xs:NCName"/>
+            <xs:attribute name="visible" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="menu">
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded" minOccurs="1">
+                <xs:element ref="menu"/>
+                <xs:element name="entry">
+                    <xs:complexType>
+                        <xs:attribute name="id" type="xs:IDREF"/>
+                        <xs:attribute name="position" use="required" type="xs:float"/>
+                        <xs:attribute name="override" type="xs:NCName" default="false"/>
+                        <xs:attribute name="separator-after" type="xs:boolean"/>
+                        <xs:attribute name="separator-before" type="xs:boolean"/>
+                        <xs:attribute name="type" type="xs:NCName" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="position" type="xs:float" use="required"/>
+            <xs:attribute name="id" type="xs:ID"/>
+            <xs:attribute name="text" type="xs:string"/>
+            <xs:attribute name="override" type="xs:NCName" default="false"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="toolbar">
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded" minOccurs="1">
+                <xs:element ref="entry"/>
+            </xs:sequence>
+            <xs:attribute name="flat" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="wrapper-conf">
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded" minOccurs="1">
+                <xs:element name="entry">
+                    <xs:complexType>
+                        <xs:attribute name="key" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="flat" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="log4j-conf">
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded" minOccurs="1">
+                <xs:element name="entry">
+                    <xs:complexType>
+                        <xs:attribute name="key" type="xs:string" use="required"/>
+                        <xs:attribute name="value" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="flat" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="xbs-code">
+        <xs:complexType>
+            <xs:sequence minOccurs="0">
+                <xs:element minOccurs="0" maxOccurs="1" name="map" type="map"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="node"/>
+            </xs:sequence>
+            <xs:attribute name="language" use="optional" default="de">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="de"/>
+                        <xs:enumeration value="fr"/>
+                        <xs:enumeration value="en"/>
+                        <xs:enumeration value="it"/>
+                        <xs:enumeration value="it"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tableschema">
+        <xs:complexType>
+            <xs:sequence minOccurs="0">
+                <xs:element name="table" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="optional" default="table">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="script"/>
+                        <xs:enumeration value="table"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="execute" use="optional" default="after">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="after"/>
+                        <xs:enumeration value="before"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="module">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="version"/>
+            </xs:sequence>
+            <xs:attribute name="major" type="xs:integer" default="10"/>
+            <xs:attribute name="minor" type="xs:integer"/>
+            <xs:attribute name="patch" type="xs:integer"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="buildnumber" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="service">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="wrapper-conf" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="log4j-conf" minOccurs="0" maxOccurs="1"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="version"/>
+            </xs:sequence>
+            <xs:attribute name="major" type="xs:integer" default="10"/>
+            <xs:attribute name="minor" type="xs:integer"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="service-name" use="required" type="xs:NCName"/>
+            <xs:attribute name="patch" type="xs:integer"/>
+            <xs:attribute name="buildnumber" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="version">
+        <xs:complexType>
+            <xs:attribute name="major" use="required" type="xs:integer"/>
+            <xs:attribute name="minor" use="optional" type="xs:integer" default="0"/>
+            <xs:attribute name="patch" use="optional" type="xs:integer" default="0"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="entry">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:NCName" use="required"/>
+            <xs:attribute name="position" type="xs:float" use="required"/>
+            <xs:attribute name="separator-after" type="xs:boolean"/>
+            <xs:attribute name="separator-before" type="xs:boolean"/>
+            <xs:attribute name="type" type="xs:NCName" use="required"/>
+            <xs:attribute name="override" type="xs:NCName" default="false"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="map">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="entry">
+                <xs:complexType>
+                    <xs:attribute name="key" type="xs:string" use="required"/>
+                    <xs:attribute name="value" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="node">
+        <xs:complexType>
+            <xs:sequence minOccurs="0">
+                <xs:element minOccurs="0" maxOccurs="1" name="map" type="map"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="node"/>
+            </xs:sequence>
+            <xs:attribute name="language" use="optional" default="de">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="de"/>
+                        <xs:enumeration value="fr"/>
+                        <xs:enumeration value="en"/>
+                        <xs:enumeration value="it"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="name" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="preferences">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="root" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="map" type="map" minOccurs="1" maxOccurs="1"/>
+                            <xs:element ref="node" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="main">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="action"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="menu"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="toolbar"/>
+            </xs:sequence>
+            <xs:attribute name="icon" type="xs:NCName"/>
+            <xs:attribute name="titel" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
