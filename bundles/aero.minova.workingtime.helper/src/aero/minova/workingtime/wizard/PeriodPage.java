@@ -210,7 +210,7 @@ public class PeriodPage extends WizardPage implements ValueChangeListener {
 
 		setPageComplete(false);
 		translate(composite);
-		composite.requestLayout();
+		composite.layout();
 		super.setControl(composite);
 	}
 
