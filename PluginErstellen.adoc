@@ -1,0 +1,189 @@
+= Erstellen von neuen Plugins
+
+Hier wird das Erstellen von neuen Plugins für Masken der WFC Anwendung dokumentiert. Alle Funktionen, die nicht zu der Core-Anwendung gehören, werden in Plugins ausgelagert. 
+Mit der Version 12 wird in Masken kein JavaScript mehr ausgewertet. Die entsprechenden Funktionen müssen ebenfalls in einen Helper ausgelagert werden.
+
+Prinzipiell wird für jede Maske ein eigenes Plugin erstellt.
+
+Grob müssen folgende Schritte befolgt werden:
+
+1. Erstellen des Plugins
+2. Erstellen der Klasse
+3. Umsetzen der Funktionalitäten
+4. Bauen des Plugins
+5. Ausliefern/Hochladen aufs CAS
+
+Diese Schritte sind im Folgenden genauer beschrieben.
+
+== Erstellen des Plugins
+
+Zuerst wird ein neues Plug-In Project erstellt.
+
+image::images/pluginErstellen.png[,300,]
+
+Das Namesschema ist `aero.minova.<Klassenname>.helper`.
+
+image:images/pluginDialog1.png[,300,]
+image:images/pluginDialog2.png[,300,]
+
+Aktuell werden alle Plugins in das link:https://github.com/minova-afis/aero.minova.rcp[aero.minova.rcp] Projekt gelegt. In Zukunft soll es eigene Repositories für die Erweiterungen geben (siehe auch link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+
+== Erstellen der Klasse
+
+Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein:
+
+[source,xml]
+----
+<form icon="JobDefinition" title="@tJobDefinition.Administration" 
+  helper-class="aero.minova.jobdefinition.helper.JobDefinitionHelper" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+  ....
+</form>
+----
+
+Die Helperklassen müssen die Klasse ``IHelper`` implementieren. Dafür muss das Package ``aero.minova.rcp.model`` zu den benötigten Plug-Ins hinzugefügt werden.
+
+[source,java]
+----
+package aero.minova.jobdefinition.helper;
+
+import aero.minova.rcp.model.form.MDetail;
+import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.model.helper.IHelper;
+
+public class JobDefinitionHelper implements IHelper {
+
+	@Override
+	public void setControls(MDetail mDetail) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void handleDetailAction(ActionCode code) {
+		// TODO Auto-generated method stub
+	}
+}
+----
+
+In der ``setControls`` Methode wird das MDetail übergeben, dass unter anderem alle Felder und Grids enthält. Dieses sollte als lokale Variable gespeichert werden.
+
+Die ``handleDetailAction`` Methode wird aufgerufen, wenn von dem/der Nutzer:in eine Aktion ausgefürt wird. Diese sind im nächsten Abschnitt erklärt.
+
+
+== Umsetzen von Funktionalitäten
+
+Alle Helper liegen im Kontext, es ist also möglich Injection zu nutzen.
+
+Über das MDetail kann auf die Felder und Grids zugegriffen werden. Dies funktioniert jeweils über den Feldnamen (Achtung bei OPs, evtl heißen die Felder hier ``<opTitel>.<Feldname>``):
+
+[source,java]
+----
+MField startDate = mDetail.getField("StartDate");
+----
+
+=== Reagieren auf Detail-Aktionen
+
+Beim Betätigen einer Aktion im Detail wird automatisch die Methode ``handleDetailAction`` aufgerufen. Mögliche Aktionen sind:
+
+* DEL: Löschen eines Eintrages
+* NEW: Neuer Eintrag
+* SAVE: Speichern/Updaten eines Eintrages, nachdem die Anfrage erfolgreich funktioniert hat
+* BEFORESAVE: Speichern/Updaten, bevor die Anfrage verschickt wird
+* REVERT: Zurücksetzten des Eintrages
+
+Hier können dann z.B. Werte vorbelegt werden.
+
+=== Belegen von Werten
+
+Einzelne Felder können aus dem ``MDetail`` geholt und über die ``setValue`` Methode mit Werten belegt werden. Dabei ist darauf zu achten, dass als Wert ein ``Value``-Objekt zu verwenden ist, und der Datentyp zu dem Feld passen muss. Das ist besonders wichtig für ``Lookup``-Values. Als Nutzer wird ``false`` angegeben.
+
+[source,java]
+----
+// Feld "startDate" mit aktuellem Datum belegen
+MField startDate = mDetail.getField("StartDate");
+startDate.setValue(new Value(DateUtil.getDate("0")), false);
+
+// Versuchen, das Feld employee mit dem Lookup-Value für "janiak" vorzubelegen
+MLookupField employee = (MLookupField) mDetail.getField("EmployeeKey");
+LookupValueAccessor va = (LookupValueAccessor) employee.getValueAccessor();
+CompletableFuture<List<LookupValue>> valueFromAsync = va.getValueFromAsync(null, "janiak");
+valueFromAsync.thenAccept(l -> Display.getDefault().asyncExec(() -> {
+  if (!l.isEmpty()) {
+    LookupValue employeeValue = l.get(0);
+    employee.setValue(employeeValue, false);
+  }
+}));
+----
+
+==== Dirty-Flag
+
+Damit das Dirty-Flag richtig funktioniert müssen die vorbelegten Werte ans WFCDetailCASRequestsUtil geliefert werden. Dies funktioniert in Form einer Tabelle:
+
+[source,java]
+----
+// Vorbelegte Werte werden für das DirtyFlag ans WFCDetailCASRequestUtil geliefert
+Table table = new Table();
+table.setName("WorkingTime");
+Row r = new Row();
+
+employee.setValue(employeeValue, false);
+table.addColumn(new Column(employee.getName(), employee.getDataType()));
+r.addValue(employeeValue);
+
+bookingDate.setValue(new Value(DateUtil.getDate("0")), false);
+table.addColumn(new Column(bookingDate.getName(), bookingDate.getDataType()));
+r.addValue(bookingDateValue);
+
+t.addRow(r);
+WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
+casUtil.setSelectedTable(t);
+----
+
+
+=== Reagieren auf Wert-Änderungen 
+
+Um auf Wertänderungen reagieren zu können muss eine Klasse den ``ValueChangeListener`` bzw. den ``GridChangeListener`` implementieren.
+Diese Klasse kann dann als Listener zu einem Feld oder Grid hinzugefügt werden um auf Wertänderungen zu reagieren.
+
+[source,java]
+----
+
+TicketHelper ticketHelper = new TicketHelper(this);
+mDetail.getField("OrderReceiverKey").addValueChangeListener(ticketHelper);
+
+public class TicketHelper implements ValueChangeListener {
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		MLookupField lookupField = (MLookupField) evt.getField();
+		String writtenText = lookupField.getWrittenText();
+		if (writtenText != null && writtenText.startsWith("#")) {
+				System.out.println("Eingegbenes Ticket: " + writtenText);
+		}
+	}
+}
+----
+
+
+
+=== TODO, muss noch implementiert und dokumentiert werden
+
+* Felder ein-/ausblenden -> Wie werden Werte ans CAS geschickt? Werden ausgeblendete Felder komplett ignoriert?
+* Ganze Sections ein-/ausblenden
+* Buttons aktivieren/deaktivieren
+* Anwendungsspezifische Einstellungen
+* Umwandeln von JavaScript zu Code im Helper
+
+== Bauen des Plugins
+
+Aktuell können die Plugins einfach mit der RCP-Anwendung gebaut werden, da sie im gleichen Repository liegen. In Zukunft wird der Bauprozess anders funktionieren müssen (siehe  link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+
+== Ausliefern/Hochladen aufs CAS
+
+Das gebaute .jar muss vom CAS zur Verfügung gestellt werden.
+
+Zuerst verbindet man sich mit dem System, auf welchem der CAS läuft.
+Dort sucht man das Verzeichnis Minova bzw. Minova Systems und wählt in diesem das gewünschte Projekt aus.
+Von dort aus navigiert man zu Shared Data\Program Files\SIS\plugins.
+Im Plugins Ordner legt man dann einfach die .jar ab.
+Zum Schluss muss nur noch das CAS neu gestartet werden, damit ein neues ZIP erzeugt wird, in welchem das neue Plugin vorhanden ist.
