@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release (major.minor.patch)'
+        description: 'major.minor.patch'
         required: true
       description:
-        description: 'Beschreibung'
+        description: 'Beschreibung (Keine Sonderzeichen!)'
         required: true
 
 jobs:
