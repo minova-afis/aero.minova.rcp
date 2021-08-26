@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="aero.minova.workingtime.helper.WorkingTimeHelper">
-   <service>
-      <provide interface="aero.minova.rcp.model.helper.IHelper"/>
-      <provide interface="aero.minova.rcp.model.event.ValueChangeListener"/>
-   </service>
-   <implementation class="aero.minova.workingtime.helper.WorkingTimeHelper"/>
-   <reference bind="registerEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="registerEventAdmin" policy="dynamic" unbind="unregisterEventAdmin"/>
-</scr:component>
