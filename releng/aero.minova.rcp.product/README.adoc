@@ -11,7 +11,7 @@ Je nach Änderung und Erweiterungen wir die Versionsnummer der Anwendung angepas
 In dem Verzeichnis: aero.minova.rcp wird folgendes auf der Konsole ausgeführt:
 
 ----
-mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="12.0.2.qualifier" -Dtycho.mode=maven
+mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="12.0.2.qualifier"
 ----
 
 Nach der Ausführung des Statements werden alle PlugIns mit der Version 12.0.2 upgedated. 
