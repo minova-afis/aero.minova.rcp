@@ -1,4 +1,4 @@
-name: Tag WFC-Application
+name: Tag and Release WFC-Application
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
         required: true
 
 jobs:
-  tagWFC:
+  tagAndReleaseWFC:
   
     # The type of runner that the job will run on
     runs-on: windows-latest
@@ -46,6 +46,7 @@ jobs:
         git tag -a "v${{ github.event.inputs.version }}" -m "${{ github.event.inputs.description }}"
         git push --tags
         
+    # Maven Cachen
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
@@ -82,10 +83,6 @@ jobs:
           - Second Change
         draft: false
         prerelease: false
-        
-    - run: |
-        cd staging/
-        ls
       
     # .zips zum Release hinzufügen  
     - name: Upload windows zip as Release Asset
