@@ -1,4 +1,4 @@
-name: Tag and Release WFC-Application
+name: Tag WFC-Application
 
 on:
   workflow_dispatch:
