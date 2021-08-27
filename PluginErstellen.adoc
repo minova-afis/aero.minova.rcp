@@ -3,21 +3,76 @@
 Hier wird das Erstellen von neuen Plugins für Masken der WFC Anwendung dokumentiert. Alle Funktionen, die nicht zu der Core-Anwendung gehören, werden in Plugins ausgelagert. 
 Mit der Version 12 wird in Masken kein JavaScript mehr ausgewertet. Die entsprechenden Funktionen müssen ebenfalls in einen Helper ausgelagert werden.
 
-Prinzipiell wird für jede Maske ein eigenes Plugin erstellt.
+Prinzipiell wird für jede Maske ein eigenes Repository und Plugin erstellt.
 
 Grob müssen folgende Schritte befolgt werden:
 
-1. Erstellen des Plugins
-2. Erstellen der Klasse
-3. Umsetzen der Funktionalitäten
-4. Bauen des Plugins
-5. Ausliefern/Hochladen aufs CAS
+1. Erstellen des Projekts
+2. Erstellen des Plugins
+3. Erstellen der Klasse
+4. Umsetzen der Funktionalitäten
+5. Bauen des Plugins
+6. Ausliefern/Hochladen aufs CAS
 
 Diese Schritte sind im Folgenden genauer beschrieben.
 
+== Erstellen des Projekts
+
+In dem Repository für die Erweiterung muss es einen Ordner `client` geben. In diesem werden die Resourcen für die WFC-Anwendung abgelegt.
+Neben den eigentlichen Plugins müssen noch folgende Dateien erstellt werden:
+
+* `.mvn/extensions.xml`
+* `minova.target`
+* `pom.xml`
+
+Die `.mvn/extensions.xml` Dateil sollte folgenden Inhalt haben:
+
+[source,xml]
+----
+<extensions>
+  <extension>
+    <groupId>org.eclipse.tycho.extras</groupId>
+    <artifactId>tycho-pomless</artifactId>
+    <version>2.4.0</version>
+  </extension>
+</extensions>
+----
+
+Damit braucht nicht jeder Unterordner eine eigene `pom.xml` um mit Maven gebaut werden zu können.
+
+`minova.target` ist die Targetplatform für das Plugin. Um auf Klassen der Core-WFC-Anwendung zugreifen zu können ist folgender Eintrag wichtig:
+
+[source,xml]
+----
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+	<repository location="https://minova-afis.github.io/aero.minova.rcp.updatesite/"/>
+	<unit id="aero.minova.libs.feature.feature.group" version="12.0.24.202108251158"/>
+	<unit id="aero.minova.rcp.feature.feature.group" version="12.0.24.202108251158"/>
+</location>
+----
+
+Die komplette Target-Platform des Workingtime-Plugins findet sich link:https://github.com/minova-afis/aero.minova.workingtime/blob/main/client/minova.target[hier].
+
+In der `pom.xml` müssen alle Module vermerkt sein, die gebaut werden sollen. Komplette Datei für Workingtime link:https://github.com/minova-afis/aero.minova.workingtime/blob/main/client/pom.xml[hier].
+
+[source,xml]
+----
+<modules>
+	<module>aero.minova.workingtime.helper</module>
+	<module>aero.minova.workingtime.helper.tests</module>
+</modules>
+----
+
+Beispiel für ein baubares Plugin-Repository:
+
+image:images/projectExample.png[]
+
+Prinzipiell soll es ein eigenes Repositorie für jede Erweiterungen geben (siehe auch link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+In diesem sind dann neben den Plugins für die WFC-Anwendung auch die Masken, OPs, Übersetzungen, Prozeduren, ... enthalten. Als Beispiel kann man link:https://github.com/minova-afis/aero.minova.workingtime[aero.minova.workingtime] anschauen.
+
 == Erstellen des Plugins
 
-Zuerst wird ein neues Plug-In Project erstellt.
+In dem Repository wird ein neues Plug-In Project erstellt.
 
 image::images/pluginErstellen.png[,300,]
 
@@ -26,7 +81,9 @@ Das Namesschema ist `aero.minova.<Klassenname>.helper`.
 image:images/pluginDialog1.png[,300,]
 image:images/pluginDialog2.png[,300,]
 
-Aktuell werden alle Plugins in das link:https://github.com/minova-afis/aero.minova.rcp[aero.minova.rcp] Projekt gelegt. In Zukunft soll es eigene Repositories für die Erweiterungen geben (siehe auch link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+
+TODO: Plugin für Tests + automatisches Ausführen dieser beim Bauen
+
 
 == Erstellen der Klasse
 
@@ -176,7 +233,18 @@ public class TicketHelper implements ValueChangeListener {
 
 == Bauen des Plugins
 
-Aktuell können die Plugins einfach mit der RCP-Anwendung gebaut werden, da sie im gleichen Repository liegen. In Zukunft wird der Bauprozess anders funktionieren müssen (siehe  link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+Das Plugin kann gebaut werden, indem der `mvn clean verify` Befehl in dem `client` Ordner des entsprechenden Repositories ausgeführt wird. Das gebaute .jar File liegt dann im `target`-Ordner des jeweiligen Plugins.
+
+image:images/jarExample.png[]
+
+Alternativ kann auch ein Github-Workflow angelegt werden, der zusätzlich zum Bauen einen Tag und Release erstellt. Beispiel für Workingtime link:https://github.com/minova-afis/aero.minova.workingtime/blob/main/.github/workflows/tagAndRelease.yml[hier].
+
+Dieser kann dann über ``Actions -> Tag and Release Workingtime - PlugIn`` automatisch ausgeführt werden.
+
+image::images/automaticRelease.png[]
+
+Das .jar File ist dann im Release als Asset verfügbar.
+
 
 == Ausliefern/Hochladen aufs CAS
 
