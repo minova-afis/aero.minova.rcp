@@ -3,58 +3,22 @@
 Um die Anwedung in der Version 12.0.0 intern in den Umlauf zu bringen wurde der Release Prozess intern umgeändert. 
 Ausgegangen wird von einem Stand des Repositories, von dem die WFC - Anwendung fehlerfrei gebaut werden kann und alle Tests durchlaufen. 
 
-== Tag erstellen
-Um den Stand, von dem die Anwendung gebaut wurde, zu Sichern erstellen wird einen Tag. Im Folgenden werde die eizelnen Schritte beschrieben. 
+Mit dem automatisierten Workflow von Github kann die Anwendung gebaut, getagged, und released werden.
 
-=== Version inkrementieren
-Je nach Änderung und Erweiterungen wir die Versionsnummer der Anwendung angepasst. Bis zur ersten Auslieferung wollen wir zunächst nur das Patch-Level inkrementieren. Um auf dem aktuellen Repository die Version in allen PLugIns automatisch zu setzen kann folegnder Befehl verwendet werder. 
-In dem Verzeichnis: aero.minova.rcp wird folgendes auf der Konsole ausgeführt:
+Hierfür einfach unter ``Actions -> Tag and Release Workingtime - PlugIn`` den Workflow mit der neuen Versionsnummer anstoßen.
 
-----
-mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="12.0.2.qualifier"
-----
+image::doc/images/automaticRelease.png[]
 
-Nach der Ausführung des Statements werden alle PlugIns mit der Version 12.0.2 upgedated. 
-Danach wird die Anwendung nochmals gebaut.
+In dem Release sind die gezippten Anwendungen für Windows, Mac und Linux enthalten.
+Anschließend muss der neue Release nur noch mit entsprechenden Updatenotes versehen werden.
 
-In dem Verzeichnis _aero.minova.rcp/_ wird folgendes auf der Konsole ausgeführt:
-----
-mvn clean verify
-----
-
-
-*Danach das Einchecken nicht vergessen!*
-
-=== Tag im Eclipse erstellen
-
-Ein Tag des aktuellen Standes kann ganz einfach über das Eclipse erstellt werden. Dafür wechselt man in die GIT Perspektive.
-Mit einem rechtsklick auf Tags öffnet sich ein Menu in dem "create Tag" ausgewählt wird.
-
-image::doc/images/eclipse-create-tag.png[]
-
-Die Namensgebung folgt dann einer bestimmten Konvention: *vMajor.Minor.Patch*
-So kann der Tag gut sortiert und wiedergefunden werden.
-
-Die Tag Message sollte einen Überblick über die Änderungen / Erweiterungen geben. 
-
-image::doc/images/eclipse-create-new-tag-window.png[]
-
-Das Ganze wird mit '''Create Tag and Start Push...''' abgeschlossen.
-
-=== GitHub Release anlegen
-
-Nachdem der Tag angelegt und gepushed wurde kann man diesen auch über GitHub ansehen. link:https://github.com/minova-afis/aero.minova.rcp/tags[aero.minova.rcp Tags]. 
-Dort wählen wir Releases aus und erstellen einen neuen Release "Draft a new Release" 
-
-image::doc/images/github-draft-new-release.png[]
-
-Hier wird der erstellte Tag aus Eclipse ausgewählt und in Tag version eingetragen. Zusätzlich werden die Felder mit sinnvollen Werten gefüllt.
 
 === JRE Versionen bereit stellen
 
 Damit wir nicht ständig die JRE Versionen in das Anwednungsverzeichnis kopieren müssen, legen wird unmittelbar nach dem erstellen der Anwendungen die passenden Versionen in die ".zip" Dateien. Dieser Prozess wird für macOS und Windows durchgeführt. Verwendet wird die Version: *Java Runntime 11.0.7+10-LTS*
 
-== JRE für macOS
+==== JRE für macOS
+Hier muss eine lokal gebaute Version genutzt werden, da MacOS es nicht erlaubt, aus dem Internet geladene Anwendungen auszuführen. 
 Mittels rechtsklick wird auf das gebaute Anwednungsfragment geklickt. Paketinhalt öffnen.
 Danach kopiert man den JRE Ordner parallel in das geöffnete Verzeichnis. Man sollte darauf achten, dass der jre Ordner kleingeschrieben ist und die Struktur aufweist die in dem unteren Bild dargestellt wird. 
 
@@ -64,8 +28,8 @@ image::doc/images/product-zipfiles_jre1.png[]
 
 Danach kann der Name der "Eclispe.app" geändert werden. Zum Schluss wir noch eine komprimierte Datei aus der "xxx.app" erstellt. 
 
-== JRE für Windows
-Das erstellte ".zip" File wird unter einem Windows-File-System entpackt. Anschlißend kopiert man das Passende JRE direkt in das Anwendungsverzeichnis.
+==== JRE für Windows
+Das ".zip" File aus dem Release wird unter einem Windows-File-System entpackt. Anschlißend kopiert man das Passende JRE direkt in das Anwendungsverzeichnis.
 
 image::doc/images/product-zipfiles_jre_windows.png[]
 
