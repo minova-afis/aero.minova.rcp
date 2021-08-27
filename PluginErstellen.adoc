@@ -7,16 +7,17 @@ Prinzipiell wird für jede Maske ein eigenes Repository und Plugin erstellt.
 
 Grob müssen folgende Schritte befolgt werden:
 
-1. Erstellen des Projekts
-2. Erstellen des Plugins
-3. Erstellen der Klasse
-4. Umsetzen der Funktionalitäten
-5. Bauen des Plugins
-6. Ausliefern/Hochladen aufs CAS
+1. <<Projekt_erstellen,Erstellen des Projekts>>
+2. <<Plugin_erstellen,Erstellen des Plugins>>
+3. <<Klasse_erstellen,Erstellen der Klasse>>
+4. <<Funktionalitäten,Umsetzen der Funktionalitäten>>
+5. <<Bauen,Bauen des Plugins>>
+6. <<Ausliefern,Ausliefern/Hochladen aufs CAS>>
 
 Diese Schritte sind im Folgenden genauer beschrieben.
 
-== Erstellen des Projekts
+[[Projekt_erstellen]]
+== Erstellen des Projekts 
 
 In dem Repository für die Erweiterung muss es einen Ordner `client` geben. In diesem werden die Resourcen für die WFC-Anwendung abgelegt.
 Neben den eigentlichen Plugins müssen noch folgende Dateien erstellt werden:
@@ -70,6 +71,7 @@ image:images/projectExample.png[]
 Prinzipiell soll es ein eigenes Repositorie für jede Erweiterungen geben (siehe auch link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
 In diesem sind dann neben den Plugins für die WFC-Anwendung auch die Masken, OPs, Übersetzungen, Prozeduren, ... enthalten. Als Beispiel kann man link:https://github.com/minova-afis/aero.minova.workingtime[aero.minova.workingtime] anschauen.
 
+[[Plugin_erstellen]]
 == Erstellen des Plugins
 
 In dem Repository wird ein neues Plug-In Project erstellt.
@@ -84,7 +86,7 @@ image:images/pluginDialog2.png[,300,]
 
 TODO: Plugin für Tests + automatisches Ausführen dieser beim Bauen
 
-
+[[Klasse_erstellen]]
 == Erstellen der Klasse
 
 Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein:
@@ -127,7 +129,7 @@ In der ``setControls`` Methode wird das MDetail übergeben, dass unter anderem a
 
 Die ``handleDetailAction`` Methode wird aufgerufen, wenn von dem/der Nutzer:in eine Aktion ausgefürt wird. Diese sind im nächsten Abschnitt erklärt.
 
-
+[[Funktionalitäten]]
 == Umsetzen von Funktionalitäten
 
 Alle Helper liegen im Kontext, es ist also möglich Injection zu nutzen.
@@ -231,6 +233,7 @@ public class TicketHelper implements ValueChangeListener {
 * Anwendungsspezifische Einstellungen
 * Umwandeln von JavaScript zu Code im Helper
 
+[[Bauen]]
 == Bauen des Plugins
 
 Das Plugin kann gebaut werden, indem der `mvn clean verify` Befehl in dem `client` Ordner des entsprechenden Repositories ausgeführt wird. Das gebaute .jar File liegt dann im `target`-Ordner des jeweiligen Plugins.
@@ -245,7 +248,7 @@ image::images/automaticRelease.png[]
 
 Das .jar File ist dann im Release als Asset verfügbar.
 
-
+[[Ausliefern]]
 == Ausliefern/Hochladen aufs CAS
 
 Das gebaute .jar muss vom CAS zur Verfügung gestellt werden.
