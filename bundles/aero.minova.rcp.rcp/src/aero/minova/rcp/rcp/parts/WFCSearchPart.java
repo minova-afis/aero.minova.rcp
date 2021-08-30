@@ -207,7 +207,9 @@ public class WFCSearchPart extends WFCFormPart {
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 		natTable.addConfiguration(new SingleClickSortConfiguration());
 
-		natTable.addConfiguration(new MinovaSearchConfiguration(table.getColumns(), translationService, searchForm));
+		MinovaSearchConfiguration msc = new MinovaSearchConfiguration(table.getColumns(), searchForm);
+		natTable.addConfiguration(msc);
+		columnHideShowLayer.hideColumnPositions(msc.getHiddenColumns());
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		natTable.addConfiguration(new DefaultEditBindings() {
@@ -398,11 +400,11 @@ public class WFCSearchPart extends WFCFormPart {
 		sortedList.clear();
 		sortedList.addAll(getData().getRows());
 	}
-	
+
 	public NatTable getNatTable() {
 		return natTable;
 	}
-	
+
 	public SelectionLayer getSelectionLayer() {
 		return selectionLayer;
 	}

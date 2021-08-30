@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -8,7 +9,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -38,7 +38,7 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 	private Form form;
 	private Map<String, aero.minova.rcp.form.model.xsd.Column> formColumns;
 
-	public MinovaSearchConfiguration(List<Column> columns, TranslationService translationService, Form form) {
+	public MinovaSearchConfiguration(List<Column> columns, Form form) {
 		this.columns = columns;
 		this.form = form;
 		initFormFields();
@@ -50,6 +50,16 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		for (aero.minova.rcp.form.model.xsd.Column column2 : column) {
 			formColumns.put(column2.getName(), column2);
 		}
+	}
+
+	public List<Integer> getHiddenColumns() {
+		List<Integer> hiddenCols = new ArrayList<>();
+		for (Column c : columns) {
+			if (!c.isVisible()) {
+				hiddenCols.add(columns.indexOf(c));
+			}
+		}
+		return hiddenCols;
 	}
 
 	@Override
