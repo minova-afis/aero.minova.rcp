@@ -9,9 +9,10 @@ Label, Section  {
 }
 
 
+/* Für Winows wäre es gut, die Farbe der Buttons auf weiß setzten zu können #768*/
 Button {
 	color: #222222;
-	background-color: white;
+	background-color: inherit;
 }
 
 Label.DescriptionLabel {
