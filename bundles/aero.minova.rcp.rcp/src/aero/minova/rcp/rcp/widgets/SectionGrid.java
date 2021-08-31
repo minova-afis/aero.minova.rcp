@@ -15,6 +15,8 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -105,6 +107,8 @@ public class SectionGrid {
 	private EModelService emservice;
 	@Inject
 	private Form form;
+	@Inject
+	private MWindow mwindow;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -465,6 +469,11 @@ public class SectionGrid {
 	}
 
 	public void adjustWidth() {
+
+		int detailWidthPercentage = Integer.parseInt(emservice
+				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.details", MPartStack.class).get(0).getContainerData());
+		int detailWidthUI = (int) (mwindow.getWidth() * (detailWidthPercentage / 10000.0)) - 50;
+
 		FormData fd = (FormData) natTable.getLayoutData();
 
 		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
@@ -472,6 +481,9 @@ public class SectionGrid {
 		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
 			optimalWidth -= natTable.getColumnWidthByPosition(i);
 		}
+
+		// Maximal aktuelle Detailbreite ausfüllen
+		optimalWidth = Math.min(detailWidthUI, optimalWidth);
 
 		// Toggel zwischen Default-Breite und kompletter Nattable
 		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
