@@ -217,6 +217,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		public boolean isHead = false;
 		public boolean isOP = false;
 		private String formTitle;
+		public String formSuffix;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -225,9 +226,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
-		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formTitle) {
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
 			this.formTitle = formTitle;
+			this.formSuffix = formSuffix;
 			this.isOP = isOP;
 			if (headOrPageOrGrid instanceof Head && !isOP) {
 				isHead = true;
@@ -332,7 +334,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), keynamesToValues);
 
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
-			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix());
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle());
 			layoutSection(parent, wrapper);
 		}
 
@@ -694,7 +696,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				Field field = (Field) fieldOrGrid;
 				MField f = ModelToViewModel.convert(field);
 				f.addValueChangeListener(this);
-				String fieldName = (headOrPage.isOP ? headOrPage.formTitle + "." : "") + f.getName();
+				String fieldName = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + f.getName();
 				f.setName(fieldName);
 
 				getDetail().putField(f);
