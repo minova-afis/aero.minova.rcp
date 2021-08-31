@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -64,10 +66,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
+import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.XmlProcessor;
@@ -130,6 +135,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
 	boolean selectAllControls;
+
+	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
 
 	@Inject
 	@Service
@@ -411,11 +418,32 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			sectionControl = section.getChildren()[0];
 		}
 
-		headLayoutData.width = SECTION_WIDTH;
+		// Alten Zustand wiederherstellen
+		String prefsWidthKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".width";
+		String widthString = prefsDetailSections.get(prefsWidthKey, SECTION_WIDTH + "");
+		headLayoutData.width = Integer.parseInt(widthString);
+		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
+		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
+		section.setExpanded(Boolean.parseBoolean(expandedString));
 
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 		section.setLayoutData(headLayoutData);
 		section.setText(headOrPageOrGrid.getTranslationText());
+
+		section.addExpansionListener(new IExpansionListener() {
+			@Override
+			public void expansionStateChanging(ExpansionEvent e) {}
+
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				prefsDetailSections.put(prefsExpandedString, e.getState() + "");
+				try {
+					prefsDetailSections.flush();
+				} catch (BackingStoreException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(section);
