@@ -954,7 +954,6 @@ public class WFCDetailCASRequestsUtil {
 	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
 	 */
 	private boolean checkFieldsWithTable(Table t, Form f) {
-
 		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
 		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < t.getColumnCount(); i++) {
@@ -992,7 +991,6 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private boolean checkOPs() {
-
 		// Sind die OP Felder leer?
 		if (selectedOptionPages.isEmpty()) {
 			for (Form opform : mDetail.getOptionPages()) {

@@ -31,7 +31,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -170,8 +169,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Inject
 	EModelService eModelService;
 	MApplication mApplication;
-	@Inject
-	IEventBroker broker;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -319,7 +316,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 								e1.printStackTrace();
 							}
 						}
-
 					} catch (InterruptedException | ExecutionException e) {
 						e.printStackTrace();
 					} catch (NoSuchFieldException e) {
