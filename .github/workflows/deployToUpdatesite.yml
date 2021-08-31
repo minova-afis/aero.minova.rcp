@@ -20,5 +20,5 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }}
         echo $GITHUB_TOKEN
         git clone https://janiak-minova:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite # This works
-        git config user janiak-minova 
-        git config user.email 
+        git config user.email "erlanger@minova.com"
+        git config user.name "CE7"
