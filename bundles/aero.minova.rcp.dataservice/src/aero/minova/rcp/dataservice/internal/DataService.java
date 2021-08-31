@@ -440,7 +440,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
-			if (checkIfUpdateIsRequired(filename) && false) {
+			if (checkIfUpdateIsRequired(filename)) {
 				logCache(filename + " need to download / update the file ");
 				// File löschen, damit es komplett aktualisiert wird
 				getStoragePath().resolve(filename).toFile().delete();
