@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -30,6 +31,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -80,6 +82,7 @@ import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
@@ -167,6 +170,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Inject
 	EModelService eModelService;
 	MApplication mApplication;
+	@Inject
+	IEventBroker broker;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -314,8 +319,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 								e1.printStackTrace();
 							}
 						}
+
 					} catch (InterruptedException | ExecutionException e) {
 						e.printStackTrace();
+					} catch (NoSuchFieldException e) {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 					}
 				}
 			}
@@ -323,25 +331,55 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	}
 
-	private void addOPFromForm(Form opForm, Composite parent, Node opNode) {
-		// TODO: Gibt es die Keys -> Fehlermeldung
+	private void addOPFromForm(Form opForm, Composite parent, Node opNode) throws NoSuchFieldException {
 		mDetail.addOptionPage(opForm);
-		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), XBSUtil.getKeynamesToValues(opNode));
+		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(opNode);
+		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), keynamesToValues);
+
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix());
 			layoutSection(parent, wrapper);
 		}
+
+		// Keyzuordnung aus .xbs prüfen, gibt es alle Felder?
+		for (Entry<String, String> e : keynamesToValues.entrySet()) {
+			String opFieldName = opForm.getDetail().getProcedureSuffix() + "." + e.getKey();
+			String mainFieldName = e.getValue();
+			if (mDetail.getField(opFieldName) == null) {
+				throw new NoSuchFieldException(
+						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"!");
+			}
+			if (mDetail.getField(mainFieldName) == null) {
+				throw new NoSuchFieldException(
+						"Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \"" + opForm.getDetail().getProcedureSuffix() + "\"!");
+			}
+		}
 	}
 
-	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) {
-		// TODO: Gibt es die Keys -> Fehlermeldung
+	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) throws NoSuchFieldException {
 		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
 		layoutSection(parent, wrapper);
 
 		// OP-Feldname zu Index Map aus .xbs setzten
 		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
-		sg.setFieldnameToValue(XBSUtil.getKeynamesToValues(opNode));
+		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(opNode);
+		sg.setFieldnameToValue(keynamesToValues);
+
+		// Keyzuordnung aus .xbs prüfen, gibt es alle Felder?
+		List<String> sgColumnNames = new ArrayList<>();
+		for (Column c : sg.getDataTable().getColumns()) {
+			sgColumnNames.add(c.getName());
+		}
+		for (Entry<String, String> e : keynamesToValues.entrySet()) {
+			if (!sgColumnNames.contains(e.getKey())) {
+				throw new NoSuchFieldException("Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"!");
+			}
+			if (mDetail.getField(e.getValue()) == null) {
+				throw new NoSuchFieldException(
+						"Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \"" + sg.getDataTable().getName() + "\"!");
+			}
+		}
 	}
 
 	/**
