@@ -21,6 +21,7 @@ public class Column {
 	boolean readOnly;
 	boolean required;
 	boolean isLookup;
+	boolean visible;
 	String lookupTable;
 	KeyType keyType;
 
@@ -91,6 +92,14 @@ public class Column {
 
 	public void setLookup(boolean isLookup) {
 		this.isLookup = isLookup;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 
 	public String getLookupTable() {
