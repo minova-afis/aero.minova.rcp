@@ -60,7 +60,6 @@ public class MenuProcessor {
 			handleNoMDI(dataService);
 		}
 
-		// TODO: Verschieben?
 		try {
 			CompletableFuture<String> xbsFuture = dataService.getHashedFile(XBS_FILE_NAME);
 			String xbsContent = xbsFuture.get();

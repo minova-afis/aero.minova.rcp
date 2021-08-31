@@ -325,7 +325,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void addOPFromForm(Form opForm, Composite parent, Node opNode) {
 		mDetail.addOptionPage(opForm);
-		mDetail.addOptionPageKeys(opForm.getTitle(), XBSUtil.getKeynamesToIndex(opNode));
+		mDetail.addOptionPageKeys(opForm.getTitle(), XBSUtil.getKeynamesToValues(opNode));
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getTitle());
 			layoutSection(parent, wrapper);
@@ -339,7 +339,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// OP-Feldname zu Index Map aus .xbs setzten
 		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
-		sg.setKeysToIndex(XBSUtil.getKeynamesToIndex(opNode));
+		sg.setKeysToIndex(XBSUtil.getKeynamesToValues(opNode));
 	}
 
 	/**
