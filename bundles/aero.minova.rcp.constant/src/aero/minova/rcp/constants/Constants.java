@@ -71,10 +71,14 @@ public class Constants {
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
 	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
-	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
 	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
 	public static final String BROKER_SHOWCONNECTIONERRORMESSAGE = "aero/minova/rcp/ShowConnectionErrorMessage";
+	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
+	public static final String BROKER_PROCEDUREWITHTABLEERROR = "aero/minova/rcp/ProcedureWithTableError";
+	public static final String BROKER_PROCEDUREWITHTABLESUCCESS = "aero/minova/rcp/ProcedureWithTableSuccess";
+	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
+	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
