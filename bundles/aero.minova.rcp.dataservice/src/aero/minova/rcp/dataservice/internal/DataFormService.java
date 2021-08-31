@@ -82,6 +82,9 @@ public class DataFormService implements IDataFormService {
 			}
 			tableColumn.setDateTimeType(dateTimeType);
 
+			boolean visibleBasedOnSize = c.getSize() == null || c.getSize().intValue() > 0;
+			tableColumn.setVisible(c.isVisible() && visibleBasedOnSize);
+
 			dataTable.addColumn(tableColumn);
 		}
 		return dataTable;
@@ -201,6 +204,7 @@ public class DataFormService implements IDataFormService {
 		if (f.getLookup() != null) {
 			c.setLookupTable(f.getLookup().getTable());
 		}
+		c.setVisible(f.isVisible());
 
 		return c;
 

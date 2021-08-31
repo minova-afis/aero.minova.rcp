@@ -9,7 +9,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
 public class OptimizeDetailHandler {
 
@@ -19,7 +18,7 @@ public class OptimizeDetailHandler {
 		Integer detailWidth = (Integer) detail.getContext().get(Constants.DETAIL_WIDTH);
 
 		// Standardbreite min 2x Detailbereich + 10Pixel
-		if (mwindow.getWidth() < (detailWidth * 2) + 25 && detailWidth == WFCDetailPart.SECTION_WIDTH) {
+		if (mwindow.getWidth() < (detailWidth * 2) + 25) {
 			mwindow.setWidth((detailWidth * 2) + 25);
 		}
 

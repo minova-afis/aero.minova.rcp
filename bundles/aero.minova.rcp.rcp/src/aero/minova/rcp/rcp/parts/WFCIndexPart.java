@@ -55,6 +55,7 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultColumnHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
+import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.AbstractLayerTransform;
 import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
@@ -449,7 +450,9 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		});
 
-		natTable.addConfiguration(new MinovaDisplayConfiguration(table.getColumns(), translationService, form));
+		MinovaDisplayConfiguration mdc = new MinovaDisplayConfiguration(table.getColumns(), form);
+		natTable.addConfiguration(mdc);
+		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mdc.getHiddenColumns());
 
 		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
@@ -580,6 +583,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private ColumnReorderLayer columnReorderLayer;
 
+		private ColumnHideShowLayer columnHideShowLayer;
+
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
@@ -596,7 +601,8 @@ public class WFCIndexPart extends WFCFormPart {
 			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
 
 			columnReorderLayer = new ColumnReorderLayer(glazedListsEventLayer);
-			this.selectionLayer = new SelectionLayer(getColumnReorderLayer());
+			columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
+			this.selectionLayer = new SelectionLayer(getColumnHideShowLayer());
 
 			selectionLayer.addLayerListener(event -> {
 				if (event instanceof RowSelectionEvent) {
@@ -655,6 +661,10 @@ public class WFCIndexPart extends WFCFormPart {
 
 		public ColumnReorderLayer getColumnReorderLayer() {
 			return columnReorderLayer;
+		}
+
+		public ColumnHideShowLayer getColumnHideShowLayer() {
+			return columnHideShowLayer;
 		}
 	}
 

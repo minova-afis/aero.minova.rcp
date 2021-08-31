@@ -1,27 +1,24 @@
 CTabItem, LayoutComposite, ExpandableComposite,
 	ScrolledComposite, Canvas, DetailComposite, ToolBar, NatTable, Section  {
 	background-color: COLOR-WIDGET-BACKGROUND;
+	color: #222222;
 }
-Label, Button, Section  {
-	color: #666666;
+Label, Section  {
+	color: #222222;
 	background-color: inherit;
-	/*
-	background-color: #eeee88;
-	*/
 }
-/*
-Composite.TEST {
-	background-color: #ee8888;
+
+
+/* Für Winows wäre es gut, die Farbe der Buttons auf weiß setzten zu können #768*/
+Button {
+	color: #222222;
+	background-color: inherit;
 }
-*/
+
 Label.DescriptionLabel {
 	color: black;
 }
-/* 
-Composite, Label {
-	background-color: #e8e8e8;
-}
-*/
+
 
 Composite {
 	background-color: COLOR-WIDGET-BACKGROUND;

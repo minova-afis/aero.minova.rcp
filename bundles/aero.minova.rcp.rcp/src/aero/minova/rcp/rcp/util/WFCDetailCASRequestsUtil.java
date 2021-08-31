@@ -31,7 +31,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -45,7 +44,6 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Procedure;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
@@ -64,8 +62,6 @@ import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
-import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.MinovaNotifier;
@@ -213,6 +209,7 @@ public class WFCDetailCASRequestsUtil {
 			RowBuilder gridRowBuilder = RowBuilder.newRow();
 			Grid grid = g.getGrid();
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			boolean firstPrimary = true;
 			for (Field f : grid.getField()) {
 				if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 					aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
@@ -229,8 +226,7 @@ public class WFCDetailCASRequestsUtil {
 
 					} else { // Default Verhalten, entsprechenden Wert im Index finden
 						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-							if (indexColumns.get(i).getName().equals(f.getName())
-									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+							if (indexColumns.get(i).getName().equals(f.getName()) || (firstPrimary && indexColumns.get(i).getName().equals("KeyLong"))) {
 								found = true;
 								gridRowBuilder.withValue(row.getValue(i).getValue());
 							}
@@ -240,6 +236,7 @@ public class WFCDetailCASRequestsUtil {
 					if (!found) {
 						gridRowBuilder.withValue(null);
 					}
+					firstPrimary = false;
 				}
 			}
 			Row gridRow = gridRowBuilder.create();
@@ -759,33 +756,27 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Versendet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
-	 *
-	 * @param ticketvalue
+	 * Ruft eine Prozedur mit der übergebenen Tabelle auf. Über den Broker kann auf die Ergebnisse gehört werden
+	 * 
+	 * @param table
 	 */
 	@Inject
 	@Optional
-	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
+	public void callProcedureWithTable(@UIEventTopic(Constants.BROKER_PROCEDUREWITHTABLE) Table table) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-		if (activePerspective.equals(perspective) && ticketvalue.getValue() != null) {
-			System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
-			Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
-			Row r = RowBuilder.newRow().withValue(ticketvalue).create();
-			ticketTable.addRow(r);
+		if (activePerspective.equals(perspective) && table != null) {
 
-			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(table.getName(), table);
 
-			// Fehler abfangen, Felder wieder freigeben
+			// Fehler abfangen
 			tableFuture.exceptionally(ex -> {
-				// Im Display Thread ausführen
-				Display.getDefault().syncExec(() -> ticketFieldsUpdate("...", true));
+				broker.send(Constants.BROKER_PROCEDUREWITHTABLEERROR, ex);
 				return null;
 			});
 
 			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-				ticketFieldsUpdate("...", true);
+				broker.send(Constants.BROKER_PROCEDUREWITHTABLESUCCESS, ta);
 				if (ta != null && ta.getResultSet() != null && ERROR.equals(ta.getResultSet().getName())) {
 					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
 					showErrorMessage(e);
@@ -794,69 +785,11 @@ public class WFCDetailCASRequestsUtil {
 					if (!selectedTable.getRows().isEmpty()) {
 						updateSelectedEntry();
 					} else {
-						showErrorMessage("msg.TicketNotFound");
+						broker.send(Constants.BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE, ta);
 					}
 				}
-				updatePossibleLookupEntries();
+				broker.send(Constants.BROKER_PROCEDUREWITHTABLESUCCESSFINISHED, ta);
 			}));
-		}
-	}
-
-	/**
-	 * Für die Felder, die von einem Ticket gefüllt werden können (Service, ServiceObject, OrderReciever, ServiceContract, Description), wird die Message und
-	 * Editability gesetzt
-	 */
-	private void ticketFieldsUpdate(String messageText, boolean editable) {
-		MField field = mDetail.getField("Description");
-		field.getValueAccessor().setEditable(editable);
-		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
-		if (editable) {
-			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-			((TextValueAccessor) field.getValueAccessor()).setText("");
-		} else {
-			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
-			((TextValueAccessor) field.getValueAccessor()).setText(messageText);
-		}
-
-		field = mDetail.getField("OrderReceiverKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-
-		field = mDetail.getField("ServiceKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-
-		field = mDetail.getField("ServiceContractKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-
-		field = mDetail.getField("ServiceObjectKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-	}
-
-	/**
-	 * Wenn ein Lookup keinen Wert enthält, nachdem das Ticket aufgelöst wurde, werden die möglichen Werte aktualisiert
-	 */
-	private void updatePossibleLookupEntries() {
-		MField field = mDetail.getField("OrderReceiverKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
-		}
-
-		field = mDetail.getField("ServiceKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
-		}
-
-		field = mDetail.getField("ServiceContractKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
-		}
-
-		field = mDetail.getField("ServiceObjectKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
 		}
 	}
 

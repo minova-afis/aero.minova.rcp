@@ -15,6 +15,8 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -105,6 +107,8 @@ public class SectionGrid {
 	private EModelService emservice;
 	@Inject
 	private Form form;
+	@Inject
+	private MWindow mwindow;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -465,6 +469,11 @@ public class SectionGrid {
 	}
 
 	public void adjustWidth() {
+
+		int detailWidthPercentage = Integer.parseInt(emservice
+				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.details", MPartStack.class).get(0).getContainerData());
+		int detailWidthUI = (int) (mwindow.getWidth() * (detailWidthPercentage / 10000.0)) - 50;
+
 		FormData fd = (FormData) natTable.getLayoutData();
 
 		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
@@ -472,6 +481,9 @@ public class SectionGrid {
 		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
 			optimalWidth -= natTable.getColumnWidthByPosition(i);
 		}
+
+		// Maximal aktuelle Detailbreite ausfüllen
+		optimalWidth = Math.min(detailWidthUI, optimalWidth);
 
 		// Toggel zwischen Default-Breite und kompletter Nattable
 		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
@@ -515,16 +527,18 @@ public class SectionGrid {
 					}
 				}
 
-			} else { // Default: Name stimmt überein oder SQL-Index 0 in OP bekommt Wert von KeyLong in Hauptmaske
+			} else { // Default: Name stimmt überein oder erstes Primary-Feld bekommt Wert von KeyLong in Hauptmaske
+				boolean firstPrimary = true;
 				for (Field f : grid.getField()) {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
 						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
 							r.setValue(primaryKeys.get(f.getName()), index);
-						} else if (f.getSqlIndex().intValue() == 0) { // Default: Feld mit SQL-Index 0 bekommt Wert von KeyLong
+						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
 							r.setValue(primaryKeys.get("KeyLong"), index);
 						}
+						firstPrimary = false;
 					}
 				}
 			}

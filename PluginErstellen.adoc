@@ -47,8 +47,8 @@ Damit braucht nicht jeder Unterordner eine eigene `pom.xml` um mit Maven gebaut 
 ----
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 	<repository location="https://minova-afis.github.io/aero.minova.rcp.updatesite/"/>
-	<unit id="aero.minova.libs.feature.feature.group" version="12.0.24.202108251158"/>
-	<unit id="aero.minova.rcp.feature.feature.group" version="12.0.24.202108251158"/>
+	<unit id="aero.minova.libs.feature.feature.group" version="0.0.0"/>
+	<unit id="aero.minova.rcp.feature.feature.group" version="0.0.0"/>
 </location>
 ----
 
