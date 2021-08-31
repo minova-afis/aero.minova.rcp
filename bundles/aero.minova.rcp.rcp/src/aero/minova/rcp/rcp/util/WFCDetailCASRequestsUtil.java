@@ -209,6 +209,7 @@ public class WFCDetailCASRequestsUtil {
 			RowBuilder gridRowBuilder = RowBuilder.newRow();
 			Grid grid = g.getGrid();
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			boolean firstPrimary = true;
 			for (Field f : grid.getField()) {
 				if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 					aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
@@ -225,8 +226,7 @@ public class WFCDetailCASRequestsUtil {
 
 					} else { // Default Verhalten, entsprechenden Wert im Index finden
 						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-							if (indexColumns.get(i).getName().equals(f.getName())
-									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+							if (indexColumns.get(i).getName().equals(f.getName()) || (firstPrimary && indexColumns.get(i).getName().equals("KeyLong"))) {
 								found = true;
 								gridRowBuilder.withValue(row.getValue(i).getValue());
 							}
@@ -236,6 +236,7 @@ public class WFCDetailCASRequestsUtil {
 					if (!found) {
 						gridRowBuilder.withValue(null);
 					}
+					firstPrimary = false;
 				}
 			}
 			Row gridRow = gridRowBuilder.create();

@@ -516,16 +516,18 @@ public class SectionGrid {
 					}
 				}
 
-			} else { // Default: Name stimmt überein oder SQL-Index 0 in OP bekommt Wert von KeyLong in Hauptmaske
+			} else { // Default: Name stimmt überein oder erstes Primary-Feld bekommt Wert von KeyLong in Hauptmaske
+				boolean firstPrimary = true;
 				for (Field f : grid.getField()) {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
 						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
 							r.setValue(primaryKeys.get(f.getName()), index);
-						} else if (f.getSqlIndex().intValue() == 0) { // Default: Feld mit SQL-Index 0 bekommt Wert von KeyLong
+						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
 							r.setValue(primaryKeys.get("KeyLong"), index);
 						}
+						firstPrimary = false;
 					}
 				}
 			}
