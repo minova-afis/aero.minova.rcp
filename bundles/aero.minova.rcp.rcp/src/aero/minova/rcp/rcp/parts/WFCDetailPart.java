@@ -324,22 +324,24 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void addOPFromForm(Form opForm, Composite parent, Node opNode) {
+		// TODO: Gibt es die Keys -> Fehlermeldung
 		mDetail.addOptionPage(opForm);
-		mDetail.addOptionPageKeys(opForm.getTitle(), XBSUtil.getKeynamesToValues(opNode));
+		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), XBSUtil.getKeynamesToValues(opNode));
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
-			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getTitle());
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix());
 			layoutSection(parent, wrapper);
 		}
 	}
 
 	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) {
+		// TODO: Gibt es die Keys -> Fehlermeldung
 		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
 		layoutSection(parent, wrapper);
 
 		// OP-Feldname zu Index Map aus .xbs setzten
 		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
-		sg.setKeysToIndex(XBSUtil.getKeynamesToValues(opNode));
+		sg.setFieldnameToValue(XBSUtil.getKeynamesToValues(opNode));
 	}
 
 	/**
@@ -639,6 +641,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			Field field = (Field) fieldOrGrid;
 			MField f = ModelToViewModel.convert(field);
 			f.addValueChangeListener(this);
+			String fieldName = (headOrPage.isOP ? headOrPage.formTitle + "." : "") + f.getName();
+			f.setName(fieldName);
+
 			getDetail().putField(f);
 
 			if (!field.isVisible()) {

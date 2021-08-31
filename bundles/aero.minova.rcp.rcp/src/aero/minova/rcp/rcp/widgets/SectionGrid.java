@@ -150,7 +150,7 @@ public class SectionGrid {
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
 
-		setKeysToIndex(new HashMap<>());
+		setFieldnameToValue(new HashMap<>());
 	}
 
 	public void createGrid() {
@@ -511,7 +511,7 @@ public class SectionGrid {
 		return fieldnameToValue;
 	}
 
-	public void setKeysToIndex(Map<String, String> fieldnameToValue) {
+	public void setFieldnameToValue(Map<String, String> fieldnameToValue) {
 		this.fieldnameToValue = fieldnameToValue;
 	}
 
