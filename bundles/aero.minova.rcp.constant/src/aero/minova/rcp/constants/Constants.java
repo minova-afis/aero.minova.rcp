@@ -120,6 +120,7 @@ public class Constants {
 
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
+	public static final Object OPTION_PAGE_GRID = "OptionPageGrid";
 
 	// Commands
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
