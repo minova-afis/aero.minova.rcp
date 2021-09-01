@@ -5,11 +5,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -250,9 +255,10 @@ class CasCommunicationIntegrationTest {
 
 		String body = "";
 		String url = server + "/ping";
+
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
-				.header("User-Agent", "usertest")//
-				.header("Content-Type", "application/xml; charset=utf-8") //
+				.header("Accept-Charset", "UTF-8") //
+				.header("Content-Type", "application/json; charset=utf-8") //
 				.method("GET", BodyPublishers.ofString(body)).build();
 
 		HttpHeaders headers = request.headers();
@@ -260,11 +266,54 @@ class CasCommunicationIntegrationTest {
 		try {
 			response = build.send(request, BodyHandlers.ofString());
 			// System.out.println(response.body());
-		} catch (IOException | InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		assertEquals(200, response.statusCode());
+	}
+
+	@Test
+	void cheatPasswordUmlauteLogin() throws IOException {
+		String username = "testuser";
+		String password = "täst";
+		String s = new String(password.getBytes(), "UTF-8");
+		// password.getBytes(UTF_8);
+		char[] pwArray = s.toCharArray();
+
+		Authenticator authenticator = new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, pwArray);
+			}
+		};
+		HttpClient build = HttpClient.newBuilder()//
+				.sslContext(disabledSslVerificationContext())//
+				.authenticator(authenticator).build();
+
+		String body = "";
+		String url = server + "/ping";
+
+		URL urli = new URL(url.strip());
+		String encoding = Base64.getEncoder().encodeToString(new String(username + ":" + password).getBytes("UTF-8"));
+
+		HttpURLConnection connection = (HttpURLConnection) urli.openConnection();
+		try {
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Basic " + encoding);
+			InputStream content = connection.getInputStream();
+			BufferedReader in = new BufferedReader(new InputStreamReader(content));
+			String line;
+			while ((line = in.readLine()) != null) {
+				System.out.println(line);
+			}
+			int status = connection.getResponseCode();
+			assertEquals(200, status);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			connection.disconnect();
+		}
 	}
 
 	@Test
