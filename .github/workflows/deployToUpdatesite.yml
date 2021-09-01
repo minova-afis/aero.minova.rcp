@@ -46,7 +46,7 @@ jobs:
         cp -r ../releng/aero.minova.rcp.update/target/repository/* .
         git add .
         git commit -m "New version of the update site"
-        git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:master
+        git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:main
         
       
      
