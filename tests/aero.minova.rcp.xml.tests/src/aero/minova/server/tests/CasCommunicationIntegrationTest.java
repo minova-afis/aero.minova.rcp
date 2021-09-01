@@ -21,6 +21,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -31,6 +32,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -236,6 +238,7 @@ class CasCommunicationIntegrationTest {
 
 	@Test
 	@DisplayName("WFC Issue #743, Passwort mit Umlaut")
+	@Disabled
 	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
 		String username = "testuser";
 		String password = "täst";
@@ -255,10 +258,9 @@ class CasCommunicationIntegrationTest {
 
 		String body = "";
 		String url = server + "/ping";
-
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
-				.header("Accept-Charset", "UTF-8") //
-				.header("Content-Type", "application/json; charset=utf-8") //
+				.header("User-Agent", "usertest")//
+				.header("Content-Type", "application/xml; charset=utf-8") //
 				.method("GET", BodyPublishers.ofString(body)).build();
 
 		HttpHeaders headers = request.headers();
@@ -266,11 +268,39 @@ class CasCommunicationIntegrationTest {
 		try {
 			response = build.send(request, BodyHandlers.ofString());
 			// System.out.println(response.body());
-		} catch (Exception e) {
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		assertEquals(200, response.statusCode());
+	}
+
+	@Test
+	void ensureDefaultCharsetIsUTF8() {
+		Charset defaultCharset = Charset.defaultCharset();
+		assertEquals(defaultCharset, Charset.forName("UTF-8"));
+	}
+
+	@Test
+	void testName() {
+		Base64.Encoder encoder = Base64.getEncoder();
+		var charset = UTF_8;
+
+		String username = "testuser";
+		String password = "täst";
+
+		System.out.println("Default Charset=" + Charset.defaultCharset());
+
+		StringBuilder sb = new StringBuilder(128);
+		sb.append(username).append(':').append(password);
+		String originalString = sb.toString();
+		String encodedString = encoder.encodeToString(sb.toString().getBytes(charset));
+
+		byte[] decodedBytes = Base64.getDecoder().decode(encodedString.getBytes(charset));
+		String decodedString = new String(decodedBytes);
+
+		assertEquals(originalString, decodedString);
+
 	}
 
 	@Test
@@ -314,26 +344,6 @@ class CasCommunicationIntegrationTest {
 		} finally {
 			connection.disconnect();
 		}
-	}
-
-	@Test
-	void testName() {
-		Base64.Encoder encoder = Base64.getEncoder();
-		var charset = UTF_8;
-
-		String username = "testuser";
-		String password = "täst";
-
-		StringBuilder sb = new StringBuilder(128);
-		sb.append(username).append(':').append(password);
-		String originalString = sb.toString();
-		String encodedString = encoder.encodeToString(sb.toString().getBytes(charset));
-
-		byte[] decodedBytes = Base64.getDecoder().decode(encodedString.getBytes(charset));
-		String decodedString = new String(decodedBytes);
-
-		assertEquals(originalString, decodedString);
-
 	}
 
 }
