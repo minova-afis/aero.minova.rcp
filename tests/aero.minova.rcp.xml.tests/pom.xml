@@ -22,7 +22,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<excludes>
           			<!-- Tests trying to access the server-->
           			<exclude>ReadDetailFromMaskTest</exclude>
-          			<exclude>CasCommunicationTest</exclude>
 				</excludes>
 			</configuration>
 		</plugin>
