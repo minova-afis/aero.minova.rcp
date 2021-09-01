@@ -1,11 +1,14 @@
 
 name: Deploy to Updatesite
 
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_dispatch:
+    inputs:
+      description:
+        description: 'Beschreibung (Keine Sonderzeichen!)'
+        required: true
+  
 jobs: 
   build:
     runs-on: ubuntu-latest
@@ -45,7 +48,7 @@ jobs:
         pwd
         cp -r ../releng/aero.minova.rcp.update/target/repository/* .
         git add .
-        git commit -m "New version of the update site"
+        git commit -m "${{ github.event.inputs.description }}"
         git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:main
         
       
