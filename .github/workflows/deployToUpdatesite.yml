@@ -41,8 +41,9 @@ jobs:
         git config user.email "erlanger@minova.com"
         git config user.name "CE7"
         cd aero.minova.rcp.updatesite
-        rm -fr *
-        cp -r ../aero.minova.rcp/releng/aero.minova.rcp.update/target/repository/* .
+        rm -fr * 
+        pwd
+        cp -r ../releng/aero.minova.rcp.update/target/repository/* .
         git add .
         git commit -m "New version of the update site"
         git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:master
