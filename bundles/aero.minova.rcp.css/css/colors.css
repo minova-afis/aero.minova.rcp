@@ -3,16 +3,16 @@ CTabItem, LayoutComposite, ExpandableComposite,
 	background-color: COLOR-WIDGET-BACKGROUND;
 	color: #222222;
 }
-Label, Section  {
+Label, Button, Section  {
 	color: #222222;
 	background-color: inherit;
 }
 
 
 /* Für Winows wäre es gut, die Farbe der Buttons auf weiß setzten zu können #768*/
-Button {
+Button[style~='SWT.PUSH'] {
 	color: #222222;
-	background-color: inherit;
+	background-color: white;
 }
 
 Label.DescriptionLabel {
