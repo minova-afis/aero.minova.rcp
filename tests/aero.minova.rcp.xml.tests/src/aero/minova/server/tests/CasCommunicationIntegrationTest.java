@@ -16,6 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -268,6 +269,12 @@ class CasCommunicationIntegrationTest {
 
 		assertEquals(200, response.statusCode());
 	}
+	
+	@Test
+	void ensureDefaultCharsetIsUTF8() {
+		Charset defaultCharset = Charset.defaultCharset();
+		assertEquals(defaultCharset, Charset.forName("UTF-8"));
+	}
 
 	@Test
 	void testName() {
@@ -276,6 +283,8 @@ class CasCommunicationIntegrationTest {
 
 		String username = "testuser";
 		String password = "täst";
+		
+		System.out.println("Default Charset=" + Charset.defaultCharset());
 
 		StringBuilder sb = new StringBuilder(128);
 		sb.append(username).append(':').append(password);
