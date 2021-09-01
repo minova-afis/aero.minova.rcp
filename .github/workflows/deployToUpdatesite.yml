@@ -15,10 +15,8 @@ jobs:
     
     - name: Deploy 🚀
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
       run: |
-        echo ${{ secrets.GITHUB_TOKEN }}
-        echo $GITHUB_TOKEN
-        git clone https://janiak-minova:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite # This works
+        git clone https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite # This works
         git config user.email "erlanger@minova.com"
         git config user.name "CE7"
