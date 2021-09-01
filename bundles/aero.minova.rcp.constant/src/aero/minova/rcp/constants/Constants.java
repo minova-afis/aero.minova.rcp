@@ -108,6 +108,7 @@ public class Constants {
 	public static final String PERSPECTIVE_TOOLBAR = "perspectivetoolbar";
 	public static final String PREFERENCES_KEPTPERSPECTIVES = "aero.minova.rcp.preferences.keptperspectives";
 	public static final String PREFERENCES_TOOLBARORDER = "aero.minova.rcp.preferences.toolbarorder";
+	public static final String PREFERENCES_DETAILSECTIONS = "aero.minova.rcp.preferences.detailsections";
 
 	public static final String KEPT_PERSPECTIVE_FORMNAME = ".FormName";
 	public static final String KEPT_PERSPECTIVE_FORMID = ".FormId";

@@ -157,6 +157,8 @@ public class LifeCycle {
 					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.keptperspectives.prefs"));
 			Files.deleteIfExists(
 					Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.toolbarorder.prefs"));
+			Files.deleteIfExists(Path.of(workspaceLocation)
+					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.detailsections.prefs"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
