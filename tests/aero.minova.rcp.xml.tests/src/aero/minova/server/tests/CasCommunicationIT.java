@@ -39,7 +39,7 @@ public class CasCommunicationIT {
 	private String username = "admin";
 	private String password = "rqgzxTf71EAx8chvchMi";
 	// Dies ist unser üblicher Server, von welchen wir unsere Daten abfragen
-	private String server = "https://publictest.minova.com:17280";
+	private String server = "http://publictest.minova.com:17280/cas";
 
 	private HttpClient httpClient;
 	private Authenticator authentication;
@@ -260,7 +260,8 @@ public class CasCommunicationIT {
 				+ "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n" + "        null,\n"
 				+ "        null,\n" + "        null,\n" + "        null,\n" + "        null\n" + "      ]\n" + "    }\n" + "  ]\n" + "}";
 
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://publictest.minova.com:17280/data/index")) //
+		String url = server+"/data/index";
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;
