@@ -26,6 +26,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -231,6 +232,7 @@ class CasCommunicationIntegrationTest {
 
 	@Test
 	@DisplayName("WFC Issue #743, Passwort mit Umlaut")
+	@Disabled
 	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
 		String username = "testuser";
 		String password = "täst";
