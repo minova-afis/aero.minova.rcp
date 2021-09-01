@@ -8,8 +8,7 @@ Label, Button, Section  {
 	background-color: inherit;
 }
 
-
-/* Für Winows wäre es gut, die Farbe der Buttons auf weiß setzten zu können #768*/
+/* Für Winows Push-Buttons auf weiß setzten #768*/
 Button[style~='SWT.PUSH'] {
 	color: #222222;
 	background-color: white;
