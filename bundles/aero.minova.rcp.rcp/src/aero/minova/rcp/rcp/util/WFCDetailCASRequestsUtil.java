@@ -194,7 +194,7 @@ public class WFCDetailCASRequestsUtil {
 					Table opFormTable = createReadTableFromForm(opForm, row);
 					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
 					opFuture.thenAccept(t -> sync.asyncExec(() -> {
-						selectedOptionPages.put(opForm.getTitle(), t.getOutputParameters());
+						selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
 						updateSelectedEntry();
 					}));
 				}
@@ -216,11 +216,11 @@ public class WFCDetailCASRequestsUtil {
 					gridRequestTable.addColumn(column);
 
 					boolean found = false;
-					if (!sg.getKeysToIndex().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
-						if (sg.getKeysToIndex().containsKey(f.getName())) {
+					if (!sg.getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
+						if (sg.getFieldnameToValue().containsKey(f.getName())) {
 							found = true;
-							int index = sg.getKeysToIndex().get(f.getName());
-							Value v = mDetail.getPrimaryFields().get(index).getValue();
+							String fieldNameInMain = sg.getFieldnameToValue().get(f.getName());
+							Value v = mDetail.getField(fieldNameInMain).getValue();
 							gridRowBuilder.withValue(v);
 						}
 
@@ -256,8 +256,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private Table createReadTableFromForm(Form tableForm, Row row) {
-		Map<String, Integer> keysToIndex = mDetail.getOptionPageKeys(tableForm.getTitle());
-		boolean useColumnName = tableForm.equals(form) || keysToIndex == null; // Hauptmaske oder keine key-zu-Index Map in xbs gegeben
+		Map<String, String> keysToValue = mDetail.getOptionPageKeys(tableForm.getDetail().getProcedureSuffix());
+		boolean useColumnName = tableForm.equals(form) || keysToValue == null; // Hauptmaske oder keine key-zu-value Map in xbs gegeben
 
 		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
 		RowBuilder builder = RowBuilder.newRow();
@@ -273,8 +273,8 @@ public class WFCDetailCASRequestsUtil {
 				// Spalte mit Feld vergleichen
 				if (useColumnName) {
 					found = indexColumns.get(i).getName().equals(f.getName());
-				} else if (keysToIndex.containsKey(f.getName())) {
-					MField correspondingField = mDetail.getPrimaryFields().get(keysToIndex.get(f.getName()));
+				} else if (keysToValue.containsKey(f.getName())) {
+					MField correspondingField = mDetail.getField(keysToValue.get(f.getName()));
 					found = correspondingField.getName().equals(indexColumns.get(i).getName());
 				}
 
@@ -311,12 +311,12 @@ public class WFCDetailCASRequestsUtil {
 	public void updateSelectedEntry() {
 		// Hauptmaske
 		if (selectedTable != null) {
-			setFieldsFromTable(selectedTable);
+			setFieldsFromTable(null, selectedTable);
 		}
 
 		// Option Pages
-		for (Table t : selectedOptionPages.values()) {
-			setFieldsFromTable(t);
+		for (Entry<String, Table> e : selectedOptionPages.entrySet()) {
+			setFieldsFromTable(e.getKey(), e.getValue());
 		}
 
 		// Grids
@@ -329,9 +329,9 @@ public class WFCDetailCASRequestsUtil {
 	/*
 	 * Updatet die Felder mit der übergebenen Tabelle
 	 */
-	private void setFieldsFromTable(Table table) {
+	private void setFieldsFromTable(String opName, Table table) {
 		for (int i = 0; i < table.getColumnCount(); i++) {
-			String name = table.getColumnName(i);
+			String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
 			MField c = mDetail.getField(name);
 			if (c != null && c.getConsumer() != null) {
 				try {
@@ -388,7 +388,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private Table createInsertUpdateTableFromForm(Form buildForm) {
 
-		Map<String, Integer> keysToIndex = mDetail.getOptionPageKeys(buildForm.getTitle());
+		Map<String, String> keysToIndex = mDetail.getOptionPageKeys(buildForm.getDetail().getProcedureSuffix());
 		Table formTable = getInsertUpdateTable(buildForm);
 		RowBuilder rb = RowBuilder.newRow();
 
@@ -400,7 +400,7 @@ public class WFCDetailCASRequestsUtil {
 				rb.withValue(null);
 			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) {
 				// Für OPs Keywert aus Hauptmaske nutzen
-				MField correspondingField = mDetail.getPrimaryFields().get(keysToIndex.get(f.getName()));
+				MField correspondingField = mDetail.getField(keysToIndex.get(f.getName()));
 				rb.withValue(getKeys().get(correspondingField.getName()));
 			} else if (getKeys().containsKey(f.getName())) {
 				rb.withValue(getKeys().get(f.getName()));
@@ -411,7 +411,8 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		while (valuePosition < formTable.getColumnCount()) {
-			MField field = mDetail.getField(formTable.getColumnName(valuePosition));
+			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + formTable.getColumnName(valuePosition);
+			MField field = mDetail.getField(fieldname);
 			rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
 			valuePosition++;
 		}
@@ -430,7 +431,8 @@ public class WFCDetailCASRequestsUtil {
 			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
 			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
 			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
-				if (mDetail.getField(c.getName()).isPrimary()) {
+				String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+				if (mDetail.getField(fieldname).isPrimary()) {
 					c.setOutputType(OutputType.OUTPUT);
 				}
 			}
@@ -676,18 +678,19 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
 	 */
-	private Table createDeleteTableFromForm(Form form) {
-		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-			tablename = form.getDetail().getProcedurePrefix();
+	private Table createDeleteTableFromForm(Form deleteForm) {
+		String tablename = deleteForm.getIndexView() != null ? "sp" : "op";
+		if ((!"sp".equals(deleteForm.getDetail().getProcedurePrefix()) && !"op".equals(deleteForm.getDetail().getProcedurePrefix()))) {
+			tablename = deleteForm.getDetail().getProcedurePrefix();
 		}
 		tablename += "Delete";
-		tablename += form.getDetail().getProcedureSuffix();
+		tablename += deleteForm.getDetail().getProcedureSuffix();
 		TableBuilder tb = TableBuilder.newTable(tablename);
 		RowBuilder rb = RowBuilder.newRow();
-		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
-			tb.withColumn(f.getName(), mDetail.getField(f.getName()).getDataType());
-			rb.withValue(mDetail.getField(f.getName()).getValue());
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(deleteForm)) {
+			String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + f.getName();
+			tb.withColumn(f.getName(), mDetail.getField(fieldName).getDataType());
+			rb.withValue(mDetail.getField(fieldName).getValue());
 		}
 		Table t = tb.create();
 		Row r = rb.create();
@@ -951,9 +954,10 @@ public class WFCDetailCASRequestsUtil {
 	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
 	 */
 	private boolean checkFieldsWithTable(Table t, Form f) {
+		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
 		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < t.getColumnCount(); i++) {
-			MField c = mDetail.getField(t.getColumnName(i));
+			MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
 			checkedFields.add(c);
 			Value sV = t.getRows().get(0).getValue(i);
 			if (c == null) {
@@ -977,7 +981,7 @@ public class WFCDetailCASRequestsUtil {
 
 		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
 		for (Field field : dataFormService.getFieldsFromForm(f)) {
-			MField mfield = mDetail.getField(field.getName());
+			MField mfield = mDetail.getField(fieldPrefix + field.getName());
 			if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
 				return true;
 			}
@@ -987,12 +991,12 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private boolean checkOPs() {
-
 		// Sind die OP Felder leer?
 		if (selectedOptionPages.isEmpty()) {
 			for (Form opform : mDetail.getOptionPages()) {
 				for (Field field : dataFormService.getFieldsFromForm(opform)) {
-					if (mDetail.getField(field.getName()).getValue() != null) {
+					String fieldName = opform.getDetail().getProcedureSuffix() + "." + field.getName();
+					if (mDetail.getField(fieldName).getValue() != null) {
 						return true;
 					}
 				}

@@ -128,7 +128,7 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
-	private Map<String, Integer> keynameToIndex;
+	private Map<String, String> fieldnameToValue;
 
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
@@ -150,7 +150,7 @@ public class SectionGrid {
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
 
-		setKeysToIndex(new HashMap<>());
+		setFieldnameToValue(new HashMap<>());
 	}
 
 	public void createGrid() {
@@ -507,23 +507,22 @@ public class SectionGrid {
 		updateNatTable();
 	}
 
-	public Map<String, Integer> getKeysToIndex() {
-		return keynameToIndex;
+	public Map<String, String> getFieldnameToValue() {
+		return fieldnameToValue;
 	}
 
-	public void setKeysToIndex(Map<String, Integer> keynameToIndex) {
-		this.keynameToIndex = keynameToIndex;
+	public void setFieldnameToValue(Map<String, String> fieldnameToValue) {
+		this.fieldnameToValue = fieldnameToValue;
 	}
 
 	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
 		for (Row r : dataTable.getRows()) {
 
-			if (!getKeysToIndex().isEmpty()) { // Zuordnung aus .xbs nutzen
+			if (!getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen
 
 				for (Field f : grid.getField()) {
-					if (getKeysToIndex().containsKey(f.getName())) {
-						int index = getKeysToIndex().get(f.getName());
-						Value v = mDetail.getPrimaryFields().get(index).getValue();
+					if (getFieldnameToValue().containsKey(f.getName())) {
+						Value v = mDetail.getField(getFieldnameToValue().get(f.getName())).getValue();
 						r.setValue(v, grid.getField().indexOf(f));
 					}
 				}

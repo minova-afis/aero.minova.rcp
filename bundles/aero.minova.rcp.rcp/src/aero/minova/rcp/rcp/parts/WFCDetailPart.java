@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -80,6 +81,7 @@ import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
@@ -215,6 +217,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		public boolean isHead = false;
 		public boolean isOP = false;
 		private String formTitle;
+		public String formSuffix;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -223,9 +226,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
-		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formTitle) {
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
 			this.formTitle = formTitle;
+			this.formSuffix = formSuffix;
 			this.isOP = isOP;
 			if (headOrPageOrGrid instanceof Head && !isOP) {
 				isHead = true;
@@ -316,30 +320,75 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 						}
 					} catch (InterruptedException | ExecutionException e) {
 						e.printStackTrace();
+					} catch (NoSuchFieldException e) {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 					}
 				}
 			}
 		}
-
 	}
 
-	private void addOPFromForm(Form opForm, Composite parent, Node opNode) {
+	private void addOPFromForm(Form opForm, Composite parent, Node opNode) throws NoSuchFieldException {
 		mDetail.addOptionPage(opForm);
-		mDetail.addOptionPageKeys(opForm.getTitle(), XBSUtil.getKeynamesToIndex(opNode));
+		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(opNode);
+		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), keynamesToValues);
+
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
-			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getTitle());
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle());
 			layoutSection(parent, wrapper);
+		}
+
+		// Keyzuordnung aus .xbs prüfen, gibt es alle Felder?
+		for (Entry<String, String> e : keynamesToValues.entrySet()) {
+			String opFieldName = opForm.getDetail().getProcedureSuffix() + "." + e.getKey();
+			String mainFieldName = e.getValue();
+			if (mDetail.getField(opFieldName) == null) {
+				throw new NoSuchFieldException(
+						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+			}
+			if (mDetail.getField(mainFieldName) == null) {
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
+						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
+			}
 		}
 	}
 
-	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) {
+	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) throws NoSuchFieldException {
 		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
 		layoutSection(parent, wrapper);
 
-		// OP-Feldname zu Index Map aus .xbs setzten
-		MGrid opMGrid = mDetail.getGrid(opGrid.getProcedureSuffix());
+		addKeysFromXBSToGrid(opGrid, opNode);
+	}
+
+	/**
+	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt diese ins Grid und überprüft, ob es alle Felder gibt
+	 * 
+	 * @param grid
+	 * @param Node
+	 * @throws NoSuchFieldException
+	 */
+	private void addKeysFromXBSToGrid(Grid grid, Node node) throws NoSuchFieldException {
+		// OP-Feldnamen zu Values Map aus .xbs setzten
+		MGrid opMGrid = mDetail.getGrid(grid.getProcedureSuffix());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
-		sg.setKeysToIndex(XBSUtil.getKeynamesToIndex(opNode));
+		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(node);
+		sg.setFieldnameToValue(keynamesToValues);
+
+		// Keyzuordnung aus .xbs prüfen, gibt es alle Felder?
+		List<String> sgColumnNames = new ArrayList<>();
+		for (Column c : sg.getDataTable().getColumns()) {
+			sgColumnNames.add(c.getName());
+		}
+		for (Entry<String, String> e : keynamesToValues.entrySet()) {
+			if (!sgColumnNames.contains(e.getKey())) {
+				throw new NoSuchFieldException(
+						"Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+			}
+			if (mDetail.getField(e.getValue()) == null) {
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \"" + sg.getDataTable().getName()
+						+ "\"! (As defined in .xbs)");
+			}
+		}
 	}
 
 	/**
@@ -633,32 +682,61 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 					sg.createGrid();
 					mGrid.setDataTable(sg.getDataTable());
+
+					// XBS nach Keyzuordnung überprüfen, gilt nur fürs erste Grid
+					try {
+						if (mDetail.getGrids().size() == 1) {
+							checkXBSForGridKeys((Grid) fieldOrGrid);
+						}
+					} catch (NoSuchFieldException e) {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+					}
 				}
-				continue;
-			}
-			Field field = (Field) fieldOrGrid;
-			MField f = ModelToViewModel.convert(field);
-			f.addValueChangeListener(this);
-			getDetail().putField(f);
+			} else {
+				Field field = (Field) fieldOrGrid;
+				MField f = ModelToViewModel.convert(field);
+				f.addValueChangeListener(this);
+				String fieldName = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + f.getName();
+				f.setName(fieldName);
 
-			if (!field.isVisible()) {
-				continue; // nur sichtbare Felder
-			}
-			width = getWidth(field);
-			if (column + width > 4) {
-				column = 0;
-				row++;
-			}
-			createField(composite, f, row, column);
-			f.setmPage(mSection);
-			mSection.addTabField(f);
+				getDetail().putField(f);
 
-			column += width;
-			if (!headOrPage.isHead) {
-				row += getExtraHeight(field);
+				if (!field.isVisible()) {
+					continue; // nur sichtbare Felder
+				}
+				width = getWidth(field);
+				if (column + width > 4) {
+					column = 0;
+					row++;
+				}
+				createField(composite, f, row, column);
+				f.setmPage(mSection);
+				mSection.addTabField(f);
+
+				column += width;
+				if (!headOrPage.isHead) {
+					row += getExtraHeight(field);
+				}
 			}
 		}
 		addBottonMargin(composite, row + 1, column);
+	}
+
+	/**
+	 * XBS überprüfen, ob es eine Keyzuordnung für dieses Grid gibt
+	 */
+	private void checkXBSForGridKeys(Grid grid) throws NoSuchFieldException {
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
+		if (maskNode == null) {
+			return;
+		}
+
+		for (Node settingsForMask : maskNode.getNode()) {
+			if (settingsForMask.getName().equals(Constants.OPTION_PAGE_GRID)) {
+				addKeysFromXBSToGrid(grid, settingsForMask);
+			}
+		}
 	}
 
 	private int getExtraHeight(Field field) {

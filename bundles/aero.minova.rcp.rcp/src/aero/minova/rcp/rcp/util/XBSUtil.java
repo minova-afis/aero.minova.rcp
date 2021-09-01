@@ -45,20 +45,19 @@ public class XBSUtil {
 	}
 
 	/**
-	 * Liefert eine Map von Feldnamen in der OP zu "Index" des primary Keys in der Hauptmaske. "Index" 0 bedeutet erstes primary-Feld, es können nicht-primary
-	 * Felder davorstehen.
+	 * Liefert eine Map von Feldnamen in der OP zu Feldnamen in der Hauptmaske <br>
+	 * TODO: Statt Feldnamen in der Hauptmaske können auch direkt Werte enthalten sein (mit @, siehe #825)<br>
+	 * TODO: "visible"-Ausnahme entfernen, sobald das über Helper funktioniert
 	 */
-	public static Map<String, Integer> getKeynamesToIndex(Node node) {
-		Map<String, Integer> namesToIndex = new HashMap<>();
+	public static Map<String, String> getKeynamesToValues(Node node) {
+		Map<String, String> namesToValues = new HashMap<>();
 
 		for (Entry entry : node.getMap().getEntry()) {
-			String uppercaseString = entry.getKey().toUpperCase();
-			if (uppercaseString.startsWith("KEY")) {
-				int index = Integer.parseInt(uppercaseString.replace("KEY", ""));
-				namesToIndex.put(entry.getValue(), index);
+			if (!entry.getKey().contains("visible")) {
+				namesToValues.put(entry.getKey(), entry.getValue());
 			}
 		}
 
-		return namesToIndex;
+		return namesToValues;
 	}
 }

@@ -29,7 +29,7 @@ public class MDetail {
 	private Control selectedField;
 
 	private Map<String, Form> optionPages = new HashMap<>();
-	private Map<String, Map<String, Integer>> optionPageKeys = new HashMap<>();
+	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -83,7 +83,6 @@ public class MDetail {
 	}
 
 	/**
-	 * ACHTUNG: Felder aus OPs haben aktuell noch kein Präfix! <br>
 	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in einer OptionPage haben das Präfix aus der XBS. z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
@@ -115,18 +114,18 @@ public class MDetail {
 	}
 
 	public void addOptionPage(Form op) {
-		this.optionPages.put(op.getTitle(), op);
+		this.optionPages.put(op.getDetail().getProcedureSuffix(), op);
 	}
 
 	public Form getOptionPage(String name) {
 		return optionPages.get(name);
 	}
 
-	public void addOptionPageKeys(String name, Map<String, Integer> keysToIndex) {
-		this.optionPageKeys.put(name, keysToIndex);
+	public void addOptionPageKeys(String name, Map<String, String> keysToValue) {
+		this.optionPageKeys.put(name, keysToValue);
 	}
 
-	public Map<String, Integer> getOptionPageKeys(String name) {
+	public Map<String, String> getOptionPageKeys(String name) {
 		return optionPageKeys.get(name);
 	}
 
