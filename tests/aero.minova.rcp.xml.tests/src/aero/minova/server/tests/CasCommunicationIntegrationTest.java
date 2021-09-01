@@ -1,14 +1,17 @@
 package aero.minova.server.tests;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
@@ -16,6 +19,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -56,6 +60,7 @@ class CasCommunicationIntegrationTest {
 		// TODO: fix certificate-problems
 		httpClient = HttpClient.newBuilder()//
 				.sslContext(disabledSslVerificationContext())//
+				.version(HttpClient.Version.HTTP_2) //
 				.authenticator(authentication).build();
 		gson = new Gson();
 		gson = new GsonBuilder() //
@@ -120,7 +125,7 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
+			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -163,7 +168,7 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
+			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -177,7 +182,7 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
+			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -197,7 +202,7 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
+			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -205,7 +210,7 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("CAS Issue #184")
+	@DisplayName("CAS Issue #184, HTTP Version 1")
 	void ensureThatTheServerUsesAnAncientProtocol() {
 		String body = "";
 		String url = server + "/data/index";
@@ -216,12 +221,70 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
+			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		assertEquals(HttpClient.Version.HTTP_1_1, response.version());
+	}
+
+	@Test
+	@DisplayName("WFC Issue #743, Passwort mit Umlaut")
+	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
+		String username = "testuser";
+		String password = "täst";
+		String s = new String(password.getBytes(), "UTF-8");
+		// password.getBytes(UTF_8);
+		char[] pwArray = s.toCharArray();
+
+		Authenticator authenticator = new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, pwArray);
+			}
+		};
+		HttpClient build = HttpClient.newBuilder()//
+				.sslContext(disabledSslVerificationContext())//
+				.authenticator(authenticator).build();
+
+		String body = "";
+		String url = server + "/ping";
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
+				.header("User-Agent", "usertest")//
+				.header("Content-Type", "application/xml; charset=utf-8") //
+				.method("GET", BodyPublishers.ofString(body)).build();
+
+		HttpHeaders headers = request.headers();
+		HttpResponse<String> response = null;
+		try {
+			response = build.send(request, BodyHandlers.ofString());
+			// System.out.println(response.body());
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		assertEquals(200, response.statusCode());
+	}
+
+	@Test
+	void testName() {
+		Base64.Encoder encoder = Base64.getEncoder();
+		var charset = UTF_8;
+
+		String username = "testuser";
+		String password = "täst";
+
+		StringBuilder sb = new StringBuilder(128);
+		sb.append(username).append(':').append(password);
+		String originalString = sb.toString();
+		String encodedString = encoder.encodeToString(sb.toString().getBytes(charset));
+
+		byte[] decodedBytes = Base64.getDecoder().decode(encodedString.getBytes(charset));
+		String decodedString = new String(decodedBytes);
+
+		assertEquals(originalString, decodedString);
+
 	}
 
 }
