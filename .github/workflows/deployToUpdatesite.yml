@@ -36,10 +36,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUBACTION_TOKEN_SECRET }}
       run: |
-        echo $GITHUB_TOKEN
-        git clone https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
         git config user.email "erlanger@minova.com"
         git config user.name "CE7"
+        echo $GITHUB_TOKEN
+        git clone https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
         cd aero.minova.rcp.updatesite
         rm -fr * 
         pwd
