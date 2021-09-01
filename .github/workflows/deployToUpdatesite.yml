@@ -11,7 +11,26 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+
+    - name: Checkout aero.minova.rcp
+      uses: actions/checkout@v2
+
+    - uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+        
+    # Maven Cachen
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+        
+    - name: Build with Maven 
+      run: mvn clean verify --file pom.xml
     
     - name: Deploy 🚀
       env:
@@ -19,3 +38,14 @@ jobs:
       run: |
         echo $GITHUB_TOKEN
         git clone https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
+        git config user.email "erlanger@minova.com"
+        git config user.name "CE7"
+        cd aero.minova.rcp.updatesite
+        rm -fr *
+        cp -r ../aero.minova.rcp/releng/aero.minova.rcp.update/target/repository/* .
+        git add .
+        git commit -m "New version of the update site"
+        git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:master
+        
+      
+     
