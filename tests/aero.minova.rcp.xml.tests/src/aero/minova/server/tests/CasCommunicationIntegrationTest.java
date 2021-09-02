@@ -1,38 +1,29 @@
 package aero.minova.server.tests;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
-import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -63,7 +54,7 @@ class CasCommunicationIntegrationTest {
 		authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(encodedPW, password.toCharArray());
+				return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
 			}
 		};
 		// TODO: fix certificate-problems
@@ -111,7 +102,6 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -134,7 +124,6 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -271,64 +260,6 @@ class CasCommunicationIntegrationTest {
 		}
 
 		assertEquals(200, response.statusCode());
-	}
-
-	@Test
-	@Disabled("Auf Github wird \"falsches\" Charset genutzt")
-	void ensureDefaultCharsetIsUTF8() {
-		Charset defaultCharset = Charset.defaultCharset();
-		assertEquals(Charset.forName("UTF-8"), defaultCharset);
-	}
-
-	@Test
-	@Disabled("Auf Github wird \"falsches\" Charset genutzt")
-	void testEncoding() {
-		Base64.Encoder encoder = Base64.getEncoder();
-		var charset = UTF_8;
-
-		String username = "testuser";
-		String password = "täst";
-
-		System.out.println("Default Charset=" + Charset.defaultCharset());
-
-		StringBuilder sb = new StringBuilder(128);
-		sb.append(username).append(':').append(password);
-		String originalString = sb.toString();
-		String encodedString = encoder.encodeToString(sb.toString().getBytes(charset));
-
-		byte[] decodedBytes = Base64.getDecoder().decode(encodedString.getBytes(charset));
-		String decodedString = new String(decodedBytes);
-
-		assertEquals(originalString, decodedString);
-
-	}
-
-	@Test
-	void cheatPasswordUmlauteLogin() throws IOException {
-		String username = "testuser";
-		String password = "täst";
-		String url = server + "/ping";
-
-		URL urli = new URL(url.strip());
-		String encoding = Base64.getEncoder().encodeToString(new String(username + ":" + password).getBytes("UTF-8"));
-
-		HttpURLConnection connection = (HttpURLConnection) urli.openConnection();
-		try {
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", "Basic " + encoding);
-			InputStream content = connection.getInputStream();
-			BufferedReader in = new BufferedReader(new InputStreamReader(content));
-			String line;
-			while ((line = in.readLine()) != null) {
-				System.out.println(line);
-			}
-			int status = connection.getResponseCode();
-			assertEquals(200, status);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			connection.disconnect();
-		}
 	}
 
 }
