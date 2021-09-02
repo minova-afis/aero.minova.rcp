@@ -17,7 +17,7 @@
 	</parent>
 	
 	<properties>
-		<uitest.vmparams>-Xms256m -Xmx8096m</uitest.vmparams>
+		<uitest.vmparams>-Xms256m -Xmx8096m -Dfile.encoding=UTF-8</uitest.vmparams>
 	</properties>
 	
 	

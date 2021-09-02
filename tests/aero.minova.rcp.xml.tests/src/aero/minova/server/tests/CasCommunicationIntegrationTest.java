@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -236,6 +237,10 @@ class CasCommunicationIntegrationTest {
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
 
+		
+		 System.out.println("Default Charset=" + Charset.defaultCharset());
+		 
+		
 		Authenticator authenticator = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
