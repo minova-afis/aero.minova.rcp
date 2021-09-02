@@ -82,8 +82,10 @@ import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
@@ -226,6 +228,13 @@ public class SectionGrid {
 		if (btn.getText() != null) {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
 		}
+
+		MButton mButton = new MButton(btn.getId());
+		mButton.setIcon(btn.getIcon());
+		mButton.setText(btn.getText());
+		ButtonAccessor bA = new ButtonAccessor(mButton, item);
+		mButton.setButtonAccessor(bA);
+		mDetail.putButton(mButton);
 
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
