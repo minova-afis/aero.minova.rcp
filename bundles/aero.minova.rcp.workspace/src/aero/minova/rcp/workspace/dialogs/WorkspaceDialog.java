@@ -235,6 +235,7 @@ public class WorkspaceDialog extends Dialog {
 	protected void okPressed() {
 		WorkspaceHandler workspaceHandler = null;
 		try {
+			message.setText("");
 			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
 			workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(), btnDefault.getSelection());
 			workspaceHandler.open();
