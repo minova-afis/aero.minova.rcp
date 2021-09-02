@@ -92,6 +92,7 @@ import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MBooleanField;
+import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
@@ -105,6 +106,7 @@ import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
@@ -292,10 +294,16 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
-			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+			IHelper iHelper = null;
+			for (IHelper h : helperlist) {
+				if (Objects.equals(helperClass, h.getClass().getName())) {
+					iHelper = h;
+				}
+			}
+
+			if (iHelper == null) {
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
-			IHelper iHelper = helperlist.get(0);
 			getDetail().setHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
@@ -369,7 +377,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	/**
 	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt diese ins Grid und überprüft, ob es alle Felder gibt
-	 * 
+	 *
 	 * @param grid
 	 * @param Node
 	 * @throws NoSuchFieldException
@@ -492,6 +500,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
 			final ToolItem item = new ToolItem(bar, SWT.PUSH);
+
+			MButton mButton = new MButton(btn.getId());
+			mButton.setIcon(btn.getIcon());
+			mButton.setText(btn.getText());
+			ButtonAccessor bA = new ButtonAccessor(mButton, item);
+			mButton.setButtonAccessor(bA);
+			mDetail.putButton(mButton);
+
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
 			if (btn.getText() != null) {

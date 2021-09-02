@@ -21,6 +21,7 @@ public class MDetail {
 	private HashMap<String, MField> fields = new HashMap<>();
 	private List<MField> primaryFields = new ArrayList<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
+	private HashMap<String, MButton> buttons = new HashMap<>();
 
 	private List<MSection> pageList = new ArrayList<>();
 
@@ -80,6 +81,21 @@ public class MDetail {
 	 */
 	public MGrid getGrid(String name) {
 		return grids.get(name);
+	}
+
+	public void putButton(MButton b) {
+		if (b == null) {
+			return;
+		}
+		buttons.put(b.getId(), b);
+	}
+
+	public Collection<MButton> getButtons() {
+		return buttons.values();
+	}
+
+	public MButton getButton(String id) {
+		return buttons.get(id);
 	}
 
 	/**
