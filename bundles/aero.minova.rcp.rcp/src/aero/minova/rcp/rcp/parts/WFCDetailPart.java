@@ -292,10 +292,16 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
-			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+			IHelper iHelper = null;
+			for (IHelper h : helperlist) {
+				if (Objects.equals(helperClass, h.getClass().getName())) {
+					iHelper = h;
+				}
+			}
+
+			if (iHelper == null) {
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
-			IHelper iHelper = helperlist.get(0);
 			getDetail().setHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
@@ -369,7 +375,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	/**
 	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt diese ins Grid und überprüft, ob es alle Felder gibt
-	 * 
+	 *
 	 * @param grid
 	 * @param Node
 	 * @throws NoSuchFieldException
