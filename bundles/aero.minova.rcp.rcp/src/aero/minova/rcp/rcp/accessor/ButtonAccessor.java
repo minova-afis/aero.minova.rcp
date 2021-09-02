@@ -31,4 +31,14 @@ public class ButtonAccessor implements IButtonAccessor {
 		this.button = button;
 	}
 
+	@Override
+	public void setEnabled(boolean enabled) {
+		button.setEnabled(enabled);
+	}
+
+	@Override
+	public boolean getEnabled() {
+		return button.getEnabled();
+	}
+
 }

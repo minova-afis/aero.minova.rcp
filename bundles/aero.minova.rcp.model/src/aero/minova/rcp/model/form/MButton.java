@@ -39,4 +39,12 @@ public class MButton {
 		this.buttonAccessor = buttonAccessor;
 	}
 
+	public void setEnabled(boolean enabled) {
+		buttonAccessor.setEnabled(enabled);
+	}
+
+	public boolean getEnabled() {
+		return buttonAccessor.getEnabled();
+	}
+
 }
