@@ -232,6 +232,7 @@ class CasCommunicationIntegrationTest {
 	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
 		String username = "tästuser";
 		String password = "täst";
+		System.out.println("Username: " + username + ", passwort: " + password);
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
 
