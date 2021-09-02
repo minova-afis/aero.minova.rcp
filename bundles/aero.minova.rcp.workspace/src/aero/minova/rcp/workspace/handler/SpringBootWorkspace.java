@@ -5,6 +5,7 @@ import static java.nio.file.Files.isRegularFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -16,6 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -96,7 +98,11 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 		if (!getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
 			// Entwender das Passwort ist null/leer oder es wurde manuell eingetragten / geändert
-			checkCredentials(getPassword());
+			try {
+				checkCredentials(getPassword());
+			} catch (UnsupportedEncodingException | WorkspaceException e) {
+				e.printStackTrace();
+			}
 		}
 
 		if (!Platform.getInstanceLocation().isSet()) {
@@ -165,7 +171,11 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				}
 			}
 		}
-		checkCredentials(workspaceData.getPassword());
+		try {
+			checkCredentials(workspaceData.getPassword());
+		} catch (UnsupportedEncodingException | WorkspaceException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static SSLContext disabledSslVerificationContext() {
@@ -211,15 +221,19 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	 * Diese Methode überprüft die angegebenen Einträge und versucht eine verbindung zum Server herzustellen
 	 *
 	 * @throws WorkspaceException
+	 * @throws UnsupportedEncodingException
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	private void checkCredentials(String pw) throws WorkspaceException {
+	private void checkCredentials(String pw) throws WorkspaceException, UnsupportedEncodingException {
+
+		String encodedUser = new String(getUsername().getBytes(), StandardCharsets.ISO_8859_1.toString());
+		String encodedPW = new String(pw.getBytes(), StandardCharsets.ISO_8859_1.toString());
 
 		Authenticator authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(getUsername(), pw.toCharArray());
+				return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
 			}
 		};
 

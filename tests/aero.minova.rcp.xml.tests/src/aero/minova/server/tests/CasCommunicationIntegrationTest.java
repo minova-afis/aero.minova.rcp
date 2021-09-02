@@ -16,12 +16,12 @@ import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -57,11 +57,13 @@ class CasCommunicationIntegrationTest {
 	private Gson gson;
 
 	@BeforeEach
-	public void setup() {
+	public void setup() throws UnsupportedEncodingException {
+		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
+		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		authentication = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password.toCharArray());
+				return new PasswordAuthentication(encodedPW, password.toCharArray());
 			}
 		};
 		// TODO: fix certificate-problems
@@ -237,19 +239,17 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("WFC Issue #743, Passwort mit Umlaut")
-	@Disabled
+	@DisplayName("Passwort mit Umlaut, WFC Issue #743")
 	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
-		String username = "testuser";
+		String username = "tästuser";
 		String password = "täst";
-		String s = new String(password.getBytes(), "UTF-8");
-		// password.getBytes(UTF_8);
-		char[] pwArray = s.toCharArray();
+		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
+		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
 
 		Authenticator authenticator = new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, pwArray);
+				return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
 			}
 		};
 		HttpClient build = HttpClient.newBuilder()//
@@ -263,11 +263,9 @@ class CasCommunicationIntegrationTest {
 				.header("Content-Type", "application/xml; charset=utf-8") //
 				.method("GET", BodyPublishers.ofString(body)).build();
 
-		HttpHeaders headers = request.headers();
 		HttpResponse<String> response = null;
 		try {
 			response = build.send(request, BodyHandlers.ofString());
-			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -309,21 +307,6 @@ class CasCommunicationIntegrationTest {
 	void cheatPasswordUmlauteLogin() throws IOException {
 		String username = "testuser";
 		String password = "täst";
-		String s = new String(password.getBytes(), "UTF-8");
-		// password.getBytes(UTF_8);
-		char[] pwArray = s.toCharArray();
-
-		Authenticator authenticator = new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, pwArray);
-			}
-		};
-		HttpClient build = HttpClient.newBuilder()//
-				.sslContext(disabledSslVerificationContext())//
-				.authenticator(authenticator).build();
-
-		String body = "";
 		String url = server + "/ping";
 
 		URL urli = new URL(url.strip());
