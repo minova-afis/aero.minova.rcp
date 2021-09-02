@@ -67,6 +67,7 @@
 							<version>1.0.1-SNAPSHOT</version>
 						</artifact>
 					</target>
+					<resolveWithExecutionEnvironmentConstraints>false</resolveWithExecutionEnvironmentConstraints>
 					<!-- end::target-definition[] -->
 					<environments>
 						<environment>
