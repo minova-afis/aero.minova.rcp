@@ -2,10 +2,12 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -105,11 +107,15 @@ public class DataFormService implements IDataFormService {
 		List<Field> allFields = null;
 		allFields = getFieldsFromForm(form);
 
+		// Sortierung der Felder nach sql-index oder der Reihe nach!
+		allFields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).collect(Collectors.toList());
+
 		for (Field f : allFields) {
 			dataTable.addColumn(createColumnFromField(f, prefix));
 		}
 		return dataTable;
 	}
+
 
 	@Override
 	public List<Field> getFieldsFromForm(Form form) {
@@ -172,9 +178,9 @@ public class DataFormService implements IDataFormService {
 			type = DataType.BIGDECIMAL;
 		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
-		} else if (f.getText() != null) {
+		} else if ((f.getText() != null) || ((f.getDateTime() == null) && (f.getShortDate() == null) && (f.getShortTime() == null))) {
 			type = DataType.STRING;
-		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
+		} else {
 			type = DataType.INSTANT;
 			if (f.getDateTime() != null) {
 				dateTimeType = DateTimeType.DATETIME;
@@ -183,8 +189,6 @@ public class DataFormService implements IDataFormService {
 			} else if (f.getShortTime() != null) {
 				dateTimeType = DateTimeType.TIME;
 			}
-		} else { // Default fall für noch nicht implementierte Typen
-			type = DataType.STRING;
 		}
 
 		aero.minova.rcp.model.Column c;
