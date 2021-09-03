@@ -108,14 +108,10 @@ public class DataFormService implements IDataFormService {
 		allFields = getFieldsFromForm(form);
 
 		// Sortierung der Felder nach sql-index oder der Reihe nach!
-		allFields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).collect(Collectors.toList());
-
-		for (Field f : allFields) {
-			dataTable.addColumn(createColumnFromField(f, prefix));
-		}
+		allFields = allFields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).collect(Collectors.toList());
+		allFields.stream().forEach(f -> dataTable.addColumn(createColumnFromField(f, prefix)));
 		return dataTable;
 	}
-
 
 	@Override
 	public List<Field> getFieldsFromForm(Form form) {
