@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       description:
-        description: 'Beschreibung (Keine Sonderzeichen!)'
+        description: 'Commitmessage (Keine Sonderzeichen!)'
         required: true
   
 jobs: 
