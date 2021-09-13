@@ -46,8 +46,6 @@ public class DateTimeValueAccessor extends AbstractValueAccessor {
 				((TextAssist) control).setText(localDateTime.format(DateTimeFormatter.ofPattern(pattern + "HH:mm").withLocale(locale)));
 			} else if (dateUtil.isBlank()) {
 				((TextAssist) control).setText(localDateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy" + pattern).withLocale(locale)));
-				String test = ((TextAssist) control).getText();
-				System.out.println(test);
 			} else {
 				((TextAssist) control).setText(localDateTime.format(dtf));
 			}
