@@ -331,6 +331,7 @@ printInvoice.addSelectionListener(new SelectionListener() {
 
 * Felder ein-/ausblenden -> Wie werden Werte ans CAS geschickt? Werden ausgeblendete Felder komplett ignoriert?
 * Ganze Sections ein-/ausblenden
+** SuperUser Modus vorerst durch Einstellung "Experten Modus" ersetzt (für ein-/ausblenden von Feldern/Sections)
 * Anwendungsspezifische Einstellungen
 * Umwandeln von JavaScript zu Code im Helper
 
