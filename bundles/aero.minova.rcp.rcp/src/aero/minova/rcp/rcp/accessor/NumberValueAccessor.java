@@ -31,10 +31,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
+		// we see this control disposed in our unit tests
+		if (control.isDisposed()) {
+			return;
+		}
 		if (value == null) {
 			((Text) control).setText("");
 		} else {
-			int decimals = (int) field.getDecimals();
+			int decimals = field.getDecimals();
 			Locale locale = (Locale) control.getData(FieldUtil.TRANSLATE_LOCALE);
 
 			NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);

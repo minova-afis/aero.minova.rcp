@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.root</artifactId>
-		<version>12.0.24-SNAPSHOT</version>
+		<version>12.0.26-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -17,6 +17,7 @@
 		<module>aero.minova.rcp.core</module>
 		<module>aero.minova.rcp.form.model</module>
 		<module>aero.minova.rcp.form.menu</module>
+		<module>aero.minova.rcp.form.setup</module>
 		<module>aero.minova.rcp.model</module>
 		<module>aero.minova.rcp.workspace</module>
 		<module>aero.minova.rcp.rcp</module>
@@ -26,7 +27,7 @@
 		<module>aero.minova.rcp.translate</module>
 		<module>aero.minova.rcp.preferencewindow</module>
 		<module>aero.minova.rcp.images</module>
-		<module>aero.minova.workingtime.helper</module>
+		<module>aero.minova.rcp.widgets</module>
 		<module>jakarta.xml.bind-api</module>
 	</modules>
 	<build>

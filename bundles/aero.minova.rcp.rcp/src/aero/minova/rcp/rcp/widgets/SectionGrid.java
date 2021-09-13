@@ -10,11 +10,15 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -47,7 +51,6 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
-import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -56,11 +59,8 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormData;
@@ -69,12 +69,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.Section;
+import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Button;
-import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
@@ -82,8 +82,12 @@ import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MButton;
+import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
+import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.ImageUtil;
@@ -92,6 +96,8 @@ import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 
 public class SectionGrid {
+
+	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
 
 	@Inject
 	private TranslationService translationService;
@@ -109,12 +115,15 @@ public class SectionGrid {
 	private EModelService emservice;
 	@Inject
 	private Form form;
+	@Inject
+	private MWindow mwindow;
 
 	private NatTable natTable;
 	private Table dataTable;
 	private Grid grid;
 	private Composite composite;
 	private Section section;
+	private MDetail mDetail;
 
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
@@ -127,6 +136,8 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
+	private Map<String, String> fieldnameToValue;
+
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
@@ -136,15 +147,18 @@ public class SectionGrid {
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
 	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
 
-	public SectionGrid(Composite composite, Section section, Grid grid) {
+	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
+		this.mDetail = mDetail;
 		resManager = new LocalResourceManager(JFaceResources.getResources(), composite);
 
 		rowsToInsert = new ArrayList<>();
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
+
+		setFieldnameToValue(new HashMap<>());
 	}
 
 	public void createGrid() {
@@ -160,14 +174,13 @@ public class SectionGrid {
 	 */
 	private void createButton() {
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
-		// bar.setData("org.eclipse.swtbot.widget.key", "GridToolBar");
 
 		if (grid.isButtonInsertVisible()) {
 			Button btnInsert = new Button();
 			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
-			btnInsert.setEnabled(false);
+			btnInsert.setEnabled(true);
 			insertToolItem = createToolItem(bar, btnInsert);
 		}
 
@@ -204,7 +217,7 @@ public class SectionGrid {
 	}
 
 	public ToolItem createToolItem(ToolBar bar, Button btn) {
-		return createToolItem(bar, btn, "aero.minova.rcp.rcp.command.gridbuttoncommand");
+		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND);
 	}
 
 	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
@@ -215,6 +228,13 @@ public class SectionGrid {
 		if (btn.getText() != null) {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
 		}
+
+		MButton mButton = new MButton(btn.getId());
+		mButton.setIcon(btn.getIcon());
+		mButton.setText(btn.getText());
+		ButtonAccessor bA = new ButtonAccessor(mButton, item);
+		mButton.setButtonAccessor(bA);
+		mDetail.putButton(mButton);
 
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -322,36 +342,33 @@ public class SectionGrid {
 						new CellPainterMouseEventMatcher(GridRegion.BODY, MouseEventMatcher.LEFT_BUTTON, TriStateCheckBoxPainter.class), mouseEditAction);
 			}
 		});
-		
+
 		getNatTable().addFocusListener(new FocusListener() {
-			
 			@Override
 			public void focusLost(FocusEvent e) {
 				// TODO Auto-generated method stub
-				
 			}
-			
+
 			@Override
 			public void focusGained(FocusEvent e) {
-				getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+				if (selectionLayer.getSelectedCells().isEmpty())
+					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
 			}
 		});
-		
-		getNatTable().addTraverseListener(new TraverseListener() {
-			
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				switch (e.detail) {
-				case SWT.TRAVERSE_TAB_NEXT:
-					e.doit = true;
-					break;
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-					e.doit = true;
-					break;
-				default:
-					break;
-				}
-				
+
+		getNatTable().addTraverseListener(e -> {
+
+			switch (e.detail) {
+			case SWT.TRAVERSE_TAB_NEXT:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
+			default:
+				break;
 			}
 		});
 
@@ -362,38 +379,26 @@ public class SectionGrid {
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'n'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'n'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_INSERT, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'd'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'd'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_DELETE, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'h'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'h'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1 , 'v'), new IKeyAction() {
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				String commandName = "aero.minova.rcp.rcp.command.gridbuttoncommand";
-				execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.MOD2 | SWT.MOD1, 'v'), (nt, event) -> {
+			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
+			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 		});
 
 		return getNatTable();
 	}
-	
+
 	public void execButtonHandler(String btnId, String commandName) {
 		Map<String, String> parameter = new HashMap<>();
 		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
@@ -479,6 +484,11 @@ public class SectionGrid {
 	}
 
 	public void adjustWidth() {
+
+		int detailWidthPercentage = Integer.parseInt(emservice
+				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.details", MPartStack.class).get(0).getContainerData());
+		int detailWidthUI = (int) (mwindow.getWidth() * (detailWidthPercentage / 10000.0)) - 50;
+
 		FormData fd = (FormData) natTable.getLayoutData();
 
 		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
@@ -486,6 +496,9 @@ public class SectionGrid {
 		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
 			optimalWidth -= natTable.getColumnWidthByPosition(i);
 		}
+
+		// Maximal aktuelle Detailbreite ausfüllen
+		optimalWidth = Math.min(detailWidthUI, optimalWidth);
 
 		// Toggel zwischen Default-Breite und kompletter Nattable
 		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
@@ -501,28 +514,55 @@ public class SectionGrid {
 		// Width in den Context setzten, damit wir überall darauf zugreifen können
 		MPart detail = emservice.findElements(perspective, "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
 		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
+
+		// Width Speicher, damit beim Neuladen wieder hergestellt wird
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
+		prefsDetailSections.put(key, rd.width + "");
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
-		preallocatePrimaryKeys(newRow);
 		rowsToInsert.add(newRow);
 		updateNatTable();
 	}
 
-	private void preallocatePrimaryKeys(Row r) {
-		List<Column> indexColumns = form.getIndexView().getColumn();
-		Row indexRow = ((List<Row>) perspective.getContext().get(Constants.BROKER_ACTIVEROWS)).get(0);
-		for (Field f : grid.getField()) {
-			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
-				int index = grid.getField().indexOf(f);
+	public Map<String, String> getFieldnameToValue() {
+		return fieldnameToValue;
+	}
 
-				// Entsprechenden Wert im Index finden
-				for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-					// Name muss übereinstimmen oder Feld muss SQL-Index 0 haben und Column ist KeyLong
-					if (indexColumns.get(i).getName().equals(f.getName())
-							|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
-						r.setValue(new Value(indexRow.getValue(i).getValue()), index);
+	public void setFieldnameToValue(Map<String, String> fieldnameToValue) {
+		this.fieldnameToValue = fieldnameToValue;
+	}
+
+	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
+		for (Row r : dataTable.getRows()) {
+
+			if (!getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen
+
+				for (Field f : grid.getField()) {
+					if (getFieldnameToValue().containsKey(f.getName())) {
+						Value v = mDetail.getField(getFieldnameToValue().get(f.getName())).getValue();
+						r.setValue(v, grid.getField().indexOf(f));
+					}
+				}
+
+			} else { // Default: Name stimmt überein oder erstes Primary-Feld bekommt Wert von KeyLong in Hauptmaske
+				boolean firstPrimary = true;
+				for (Field f : grid.getField()) {
+					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
+						int index = grid.getField().indexOf(f);
+
+						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
+							r.setValue(primaryKeys.get(f.getName()), index);
+						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
+							r.setValue(primaryKeys.get("KeyLong"), index);
+						}
+						firstPrimary = false;
 					}
 				}
 			}
@@ -549,9 +589,5 @@ public class SectionGrid {
 
 	public void closeEditor() {
 		natTable.commitAndCloseActiveCellEditor();
-	}
-
-	public void enableInsert(boolean enable) {
-		insertToolItem.setEnabled(enable);
 	}
 }

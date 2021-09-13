@@ -3,6 +3,7 @@ package aero.minova.rcp.dataservice.internal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -12,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -198,16 +200,24 @@ public class DataService implements IDataService {
 
 	private void init() {
 
-		Authenticator authentication = new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password.toCharArray());
-			}
-		};
-		// TODO: fix certificate-problems
-		httpClient = HttpClient.newBuilder()//
-				.sslContext(disabledSslVerificationContext())//
-				.authenticator(authentication).build();
+		try {
+			// Damit Umlaute in Username und Passwort genutzt werden können muss mit ISO_8859_1 encoded werden
+			String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
+			String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
+			Authenticator authentication = new Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
+				}
+			};
+			// TODO: fix certificate-problems
+			httpClient = HttpClient.newBuilder()//
+					.sslContext(disabledSslVerificationContext())//
+					.authenticator(authentication).build();
+
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //

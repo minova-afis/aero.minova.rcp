@@ -1,28 +1,24 @@
 CTabItem, LayoutComposite, ExpandableComposite,
-	ScrolledComposite, Canvas, DetailComposite, ToolBar,
-	LookupControl, NatTable, Section  {
+	ScrolledComposite, Canvas, DetailComposite, ToolBar, NatTable, Section  {
 	background-color: COLOR-WIDGET-BACKGROUND;
+	color: #222222;
 }
-Label, Button, Section  {
-	color: #666666;
+Label, Section  {
+	color: #222222;
 	background-color: inherit;
-	/*
-	background-color: #eeee88;
-	*/
 }
-/*
-Composite.TEST {
-	background-color: #ee8888;
+
+
+/* Für Winows wäre es gut, die Farbe der Buttons auf weiß setzten zu können #768*/
+Button {
+	color: #222222;
+	background-color: inherit;
 }
-*/
+
 Label.DescriptionLabel {
 	color: black;
 }
-/* 
-Composite, Label {
-	background-color: #e8e8e8;
-}
-*/
+
 
 Composite {
 	background-color: COLOR-WIDGET-BACKGROUND;
@@ -39,22 +35,22 @@ CTabItem:selected {
 	background-color: white;
 }
 
-Text.Standard, Lookup.Standard, TextAssist.Standard {
+Text.Standard, LookupComposite.Standard, TextAssist.Standard {
 	background-color: white;
 	color: black;
 }
 
-Text.ValueRequired, Lookup.ValueRequired, TextAssist.ValueRequired {
+Text.ValueRequired, LookupComposite.ValueRequired, TextAssist.ValueRequired {
 	background-color: #FCD267;
 	color: black;
 }
 
-Text.InvalidValue, Lookup.InvalidValue, TextAssist.InvalidValue {
+Text.InvalidValue, LookupComposite.InvalidValue, TextAssist.InvalidValue {
 	background-color: red;
 	color: black;
 }
 
-Text.ReadOnly, Lookup.ReadOnly, TextAssist.ReadOnly {
+Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {
 	background-color: inherit;
 }
 
@@ -62,9 +58,7 @@ Text#Console {
 	color: white;
 	background-color: black;
 }
-LookupControl Label {
-	color: black;
-}
+
 /*
 
 Label.UnitText {

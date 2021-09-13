@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.widgets.Control;
 
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.helper.IHelper;
 
 /**
@@ -17,13 +19,18 @@ import aero.minova.rcp.model.helper.IHelper;
 public class MDetail {
 
 	private HashMap<String, MField> fields = new HashMap<>();
+	private List<MField> primaryFields = new ArrayList<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
+	private HashMap<String, MButton> buttons = new HashMap<>();
 
 	private List<MSection> pageList = new ArrayList<>();
 
 	private IHelper helper;
 
 	private Control selectedField;
+
+	private Map<String, Form> optionPages = new HashMap<>();
+	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -41,6 +48,10 @@ public class MDetail {
 		}
 		fields.put(field.getName(), field);
 		field.setDetail(this);
+
+		if (field.isPrimary()) {
+			primaryFields.add(field);
+		}
 	}
 
 	/**
@@ -72,6 +83,21 @@ public class MDetail {
 		return grids.get(name);
 	}
 
+	public void putButton(MButton b) {
+		if (b == null) {
+			return;
+		}
+		buttons.put(b.getId(), b);
+	}
+
+	public Collection<MButton> getButtons() {
+		return buttons.values();
+	}
+
+	public MButton getButton(String id) {
+		return buttons.get(id);
+	}
+
 	/**
 	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in einer OptionPage haben das Präfix aus der XBS. z.B.
 	 * <ul>
@@ -101,7 +127,26 @@ public class MDetail {
 
 	public void addPage(MSection page) {
 		this.pageList.add(page);
+	}
 
+	public void addOptionPage(Form op) {
+		this.optionPages.put(op.getDetail().getProcedureSuffix(), op);
+	}
+
+	public Form getOptionPage(String name) {
+		return optionPages.get(name);
+	}
+
+	public void addOptionPageKeys(String name, Map<String, String> keysToValue) {
+		this.optionPageKeys.put(name, keysToValue);
+	}
+
+	public Map<String, String> getOptionPageKeys(String name) {
+		return optionPageKeys.get(name);
+	}
+
+	public Collection<Form> getOptionPages() {
+		return optionPages.values();
 	}
 
 	public IHelper getHelper() {
@@ -132,5 +177,9 @@ public class MDetail {
 
 	public void setSelectedField(Control selectedField) {
 		this.selectedField = selectedField;
+	}
+
+	public List<MField> getPrimaryFields() {
+		return primaryFields;
 	}
 }

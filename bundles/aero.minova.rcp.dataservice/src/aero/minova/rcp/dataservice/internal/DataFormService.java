@@ -82,6 +82,9 @@ public class DataFormService implements IDataFormService {
 			}
 			tableColumn.setDateTimeType(dateTimeType);
 
+			boolean visibleBasedOnSize = c.getSize() == null || c.getSize().intValue() > 0;
+			tableColumn.setVisible(c.isVisible() && visibleBasedOnSize);
+
 			dataTable.addColumn(tableColumn);
 		}
 		return dataTable;
@@ -180,6 +183,8 @@ public class DataFormService implements IDataFormService {
 			} else if (f.getShortTime() != null) {
 				dateTimeType = DateTimeType.TIME;
 			}
+		} else { // Default fall für noch nicht implementierte Typen
+			type = DataType.STRING;
 		}
 
 		aero.minova.rcp.model.Column c;
@@ -199,6 +204,7 @@ public class DataFormService implements IDataFormService {
 		if (f.getLookup() != null) {
 			c.setLookupTable(f.getLookup().getTable());
 		}
+		c.setVisible(f.isVisible());
 
 		return c;
 

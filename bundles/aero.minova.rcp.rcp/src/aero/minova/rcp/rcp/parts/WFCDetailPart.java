@@ -14,13 +14,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -61,24 +66,33 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
+import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
+import aero.minova.rcp.form.setup.xbs.Node;
+import aero.minova.rcp.form.setup.xbs.Preferences;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MBooleanField;
+import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
@@ -92,6 +106,7 @@ import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
@@ -100,10 +115,12 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.rcp.util.XBSUtil;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.widgets.LookupComposite;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
@@ -120,6 +137,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
 	boolean selectAllControls;
+
+	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
 
 	@Inject
 	@Service
@@ -158,6 +177,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Inject
 	EModelService eModelService;
+	MApplication mApplication;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -165,6 +185,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		appContext = mApp.getContext();
+		mApplication = mApp;
 		getForm();
 		layoutForm(parent);
 
@@ -203,6 +224,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private static class HeadOrPageOrGridWrapper {
 		private Object headOrPageOrGrid;
 		public boolean isHead = false;
+		public boolean isOP = false;
+		private String formTitle;
+		public String formSuffix;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -211,9 +235,21 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle) {
+			this.headOrPageOrGrid = headOrPageOrGrid;
+			this.formTitle = formTitle;
+			this.formSuffix = formSuffix;
+			this.isOP = isOP;
+			if (headOrPageOrGrid instanceof Head && !isOP) {
+				isHead = true;
+			}
+		}
+
 		public String getTranslationText() {
 			if (isHead) {
 				return "@Head";
+			} else if (headOrPageOrGrid instanceof Head && isOP) {
+				return formTitle;
 			} else if (headOrPageOrGrid instanceof Grid) {
 				return ((Grid) headOrPageOrGrid).getTitle();
 			} else if (headOrPageOrGrid instanceof Page) {
@@ -223,7 +259,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		public List<Object> getFieldOrGrid() {
-			if (isHead) {
+			if (headOrPageOrGrid instanceof Head) {
 				return ((Head) headOrPageOrGrid).getFieldOrGrid();
 			} else if (headOrPageOrGrid instanceof Grid) {
 				// es existieren keine Felder, nur eine Table
@@ -243,6 +279,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			layoutSection(parent, wrapper);
 		}
 
+		loadOptionPages(parent);
+
 		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
 		// Holen des Parts
@@ -256,12 +294,115 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
 			String helperClass = form.getHelperClass();
-			if (!Objects.equals(helperClass, helperlist.get(0).getClass().getName())) {
+			IHelper iHelper = null;
+			for (IHelper h : helperlist) {
+				if (Objects.equals(helperClass, h.getClass().getName())) {
+					iHelper = h;
+				}
+			}
+
+			if (iHelper == null) {
 				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
 			}
-			IHelper iHelper = helperlist.get(0);
 			getDetail().setHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
+		}
+	}
+
+	private void loadOptionPages(Composite parent) {
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+
+		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
+		if (maskNode == null) {
+			return;
+		}
+
+		for (Node settingsForMask : maskNode.getNode()) {
+			if (settingsForMask.getName().equals(Constants.OPTION_PAGES)) {
+				for (Node op : settingsForMask.getNode()) {
+					try {
+						try {
+							Form opForm = dataFormService.getForm(op.getName());
+							addOPFromForm(opForm, parent, op);
+						} catch (IllegalArgumentException e) {
+							try {
+								String opContent = dataService.getHashedFile(op.getName()).get();
+								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
+								addOPFromGrid(opGrid, parent, op);
+							} catch (JAXBException e1) {
+								e1.printStackTrace();
+							}
+						}
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					} catch (NoSuchFieldException e) {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+					}
+				}
+			}
+		}
+	}
+
+	private void addOPFromForm(Form opForm, Composite parent, Node opNode) throws NoSuchFieldException {
+		mDetail.addOptionPage(opForm);
+		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(opNode);
+		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), keynamesToValues);
+
+		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
+			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle());
+			layoutSection(parent, wrapper);
+		}
+
+		// Keyzuordnung aus .xbs prüfen, gibt es alle Felder?
+		for (Entry<String, String> e : keynamesToValues.entrySet()) {
+			String opFieldName = opForm.getDetail().getProcedureSuffix() + "." + e.getKey();
+			String mainFieldName = e.getValue();
+			if (mDetail.getField(opFieldName) == null) {
+				throw new NoSuchFieldException(
+						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+			}
+			if (mDetail.getField(mainFieldName) == null) {
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
+						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
+			}
+		}
+	}
+
+	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) throws NoSuchFieldException {
+		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
+		layoutSection(parent, wrapper);
+
+		addKeysFromXBSToGrid(opGrid, opNode);
+	}
+
+	/**
+	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt diese ins Grid und überprüft, ob es alle Felder gibt
+	 *
+	 * @param grid
+	 * @param Node
+	 * @throws NoSuchFieldException
+	 */
+	private void addKeysFromXBSToGrid(Grid grid, Node node) throws NoSuchFieldException {
+		// OP-Feldnamen zu Values Map aus .xbs setzten
+		MGrid opMGrid = mDetail.getGrid(grid.getProcedureSuffix());
+		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
+		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(node);
+		sg.setFieldnameToValue(keynamesToValues);
+
+		// Keyzuordnung aus .xbs prüfen, gibt es alle Felder?
+		List<String> sgColumnNames = new ArrayList<>();
+		for (Column c : sg.getDataTable().getColumns()) {
+			sgColumnNames.add(c.getName());
+		}
+		for (Entry<String, String> e : keynamesToValues.entrySet()) {
+			if (!sgColumnNames.contains(e.getKey())) {
+				throw new NoSuchFieldException(
+						"Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+			}
+			if (mDetail.getField(e.getValue()) == null) {
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \"" + sg.getDataTable().getName()
+						+ "\"! (As defined in .xbs)");
+			}
 		}
 	}
 
@@ -285,11 +426,32 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			sectionControl = section.getChildren()[0];
 		}
 
-		headLayoutData.width = SECTION_WIDTH;
+		// Alten Zustand wiederherstellen
+		String prefsWidthKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".width";
+		String widthString = prefsDetailSections.get(prefsWidthKey, SECTION_WIDTH + "");
+		headLayoutData.width = Integer.parseInt(widthString);
+		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
+		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
+		section.setExpanded(Boolean.parseBoolean(expandedString));
 
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 		section.setLayoutData(headLayoutData);
 		section.setText(headOrPageOrGrid.getTranslationText());
+
+		section.addExpansionListener(new IExpansionListener() {
+			@Override
+			public void expansionStateChanging(ExpansionEvent e) {}
+
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				prefsDetailSections.put(prefsExpandedString, e.getState() + "");
+				try {
+					prefsDetailSections.flush();
+				} catch (BackingStoreException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 
 		// Client Area
 		Composite composite = formToolkit.createComposite(section);
@@ -338,6 +500,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
 			final ToolItem item = new ToolItem(bar, SWT.PUSH);
+
+			MButton mButton = new MButton(btn.getId());
+			mButton.setIcon(btn.getIcon());
+			mButton.setText(btn.getText());
+			ButtonAccessor bA = new ButtonAccessor(mButton, item);
+			mButton.setButtonAccessor(bA);
+			mDetail.putButton(mButton);
+
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
 			if (btn.getText() != null) {
@@ -494,7 +664,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		Control[] compositeChilds = composite.getChildren();
 		for (Control control : compositeChilds) {
-			if (control instanceof Lookup || control instanceof TextAssist || control instanceof Text) {
+			if (control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text) {
 				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
 				if (!field.isReadOnly()) {
 					tabList.add(control);
@@ -545,7 +715,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
 			if (!(fieldOrGrid instanceof Field)) {
 				if (fieldOrGrid instanceof Grid) {
-					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid);
+					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 					mGrid.addGridChangeListener(this);
 					GridAccessor gA = new GridAccessor(mGrid);
@@ -556,32 +726,61 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 					sg.createGrid();
 					mGrid.setDataTable(sg.getDataTable());
+
+					// XBS nach Keyzuordnung überprüfen, gilt nur fürs erste Grid
+					try {
+						if (mDetail.getGrids().size() == 1) {
+							checkXBSForGridKeys((Grid) fieldOrGrid);
+						}
+					} catch (NoSuchFieldException e) {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+					}
 				}
-				continue;
-			}
-			Field field = (Field) fieldOrGrid;
-			MField f = ModelToViewModel.convert(field);
-			f.addValueChangeListener(this);
-			getDetail().putField(f);
+			} else {
+				Field field = (Field) fieldOrGrid;
+				MField f = ModelToViewModel.convert(field);
+				f.addValueChangeListener(this);
+				String fieldName = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + f.getName();
+				f.setName(fieldName);
 
-			if (!field.isVisible()) {
-				continue; // nur sichtbare Felder
-			}
-			width = getWidth(field);
-			if (column + width > 4) {
-				column = 0;
-				row++;
-			}
-			createField(composite, f, row, column);
-			f.setmPage(mSection);
-			mSection.addTabField(f);
+				getDetail().putField(f);
 
-			column += width;
-			if (!headOrPage.isHead) {
-				row += getExtraHeight(field);
+				if (!field.isVisible()) {
+					continue; // nur sichtbare Felder
+				}
+				width = getWidth(field);
+				if (column + width > 4) {
+					column = 0;
+					row++;
+				}
+				createField(composite, f, row, column);
+				f.setmPage(mSection);
+				mSection.addTabField(f);
+
+				column += width;
+				if (!headOrPage.isHead) {
+					row += getExtraHeight(field);
+				}
 			}
 		}
 		addBottonMargin(composite, row + 1, column);
+	}
+
+	/**
+	 * XBS überprüfen, ob es eine Keyzuordnung für dieses Grid gibt
+	 */
+	private void checkXBSForGridKeys(Grid grid) throws NoSuchFieldException {
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
+		if (maskNode == null) {
+			return;
+		}
+
+		for (Node settingsForMask : maskNode.getNode()) {
+			if (settingsForMask.getName().equals(Constants.OPTION_PAGE_GRID)) {
+				addKeysFromXBSToGrid(grid, settingsForMask);
+			}
+		}
 	}
 
 	private int getExtraHeight(Field field) {
