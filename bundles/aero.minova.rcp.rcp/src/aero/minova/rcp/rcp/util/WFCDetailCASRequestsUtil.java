@@ -244,7 +244,7 @@ public class WFCDetailCASRequestsUtil {
 
 			CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
 			gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-				if (t != null) {
+				if (t != null && t.getResultSet() != null) {
 					Table result = t.getResultSet();
 					if (result.getName().equals(g.getDataTable().getName())) {
 						selectedGrids.put(g.getProcedureSuffix(), result.copy());
