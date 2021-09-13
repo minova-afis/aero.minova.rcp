@@ -174,9 +174,7 @@ public class DataFormService implements IDataFormService {
 			type = DataType.BIGDECIMAL;
 		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
-		} else if ((f.getText() != null) || ((f.getDateTime() == null) && (f.getShortDate() == null) && (f.getShortTime() == null))) {
-			type = DataType.STRING;
-		} else {
+		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
 			type = DataType.INSTANT;
 			if (f.getDateTime() != null) {
 				dateTimeType = DateTimeType.DATETIME;
@@ -185,6 +183,8 @@ public class DataFormService implements IDataFormService {
 			} else if (f.getShortTime() != null) {
 				dateTimeType = DateTimeType.TIME;
 			}
+		} else {
+			type = DataType.STRING;
 		}
 
 		aero.minova.rcp.model.Column c;

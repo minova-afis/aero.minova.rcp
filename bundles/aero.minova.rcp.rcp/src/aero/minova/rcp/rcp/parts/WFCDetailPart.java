@@ -765,7 +765,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				} catch (NullPointerException e) {
 					if (field.getSqlIndex() == null) {
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
-								"Feld " + (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName() + " hat keinen SQL-Index!");
+								"Field " + (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName() + " has no SQL-Index!");
 					} else {
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 					}
