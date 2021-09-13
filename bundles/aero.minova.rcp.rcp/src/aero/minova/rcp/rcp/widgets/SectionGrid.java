@@ -78,6 +78,7 @@ import aero.minova.rcp.form.model.xsd.Button;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -411,11 +412,24 @@ public class SectionGrid {
 		return dataTable;
 	}
 
-	public void setDataTable(Table dataTable) {
+	public void setDataTable(Table newDataTable) {
 		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
-		for (Row r : dataTable.getRows()) {
-			this.dataTable.addRow(r);
+
+		for (Row rowInNewTable : newDataTable.getRows()) {
+			Row rowInOriginal = this.dataTable.addRow();
+
+			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
+			for (Column originalColumn : this.dataTable.getColumns()) {
+
+				for (Column newColumn : newDataTable.getColumns()) {
+					if (originalColumn.getName().equals(newColumn.getName())) {
+						Value v = rowInNewTable.getValue(newDataTable.getColumns().indexOf(newColumn));
+						int index = this.dataTable.getColumns().indexOf(originalColumn);
+						rowInOriginal.setValue(v, index);
+					}
+				}
+			}
 		}
 		updateNatTable();
 	}

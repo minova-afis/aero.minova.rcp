@@ -170,13 +170,18 @@ public class Table {
 				if (v == null) {
 					newRow.addValue(null);
 				} else {
-					newRow.addValue(new Value(v.getValue()));
+					newRow.addValue(new Value(v.getValue(), v.getType()));
 				}
 			}
 			table.addRow(newRow);
 		}
 
 		return table;
+	}
+
+	@Override
+	public String toString() {
+		return "Table " + name;
 	}
 
 }

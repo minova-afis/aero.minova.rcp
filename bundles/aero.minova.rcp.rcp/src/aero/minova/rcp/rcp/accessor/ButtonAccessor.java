@@ -1,5 +1,6 @@
 package aero.minova.rcp.rcp.accessor;
 
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.ToolItem;
 
 import aero.minova.rcp.model.form.IButtonAccessor;
@@ -39,6 +40,16 @@ public class ButtonAccessor implements IButtonAccessor {
 	@Override
 	public boolean getEnabled() {
 		return button.getEnabled();
+	}
+
+	@Override
+	public void addSelectionListener(SelectionListener listener) {
+		button.addSelectionListener(listener);
+	}
+
+	@Override
+	public void removeSelectionListener(SelectionListener listener) {
+		button.removeSelectionListener(listener);
 	}
 
 }

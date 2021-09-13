@@ -70,7 +70,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
- *       &lt;attribute name="sql-index" type="{http://www.w3.org/2001/XMLSchema}integer" default="-1" /&gt;
+ *       &lt;attribute name="sql-index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="validation-order" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="number-columns-spanned" default="2"&gt;
  *         &lt;simpleType&gt;
@@ -197,7 +197,7 @@ public class Field {
     protected java.lang.Boolean offline;
     @XmlAttribute(name = "total")
     protected java.lang.Boolean total;
-    @XmlAttribute(name = "sql-index")
+    @XmlAttribute(name = "sql-index", required = true)
     protected BigInteger sqlIndex;
     @XmlAttribute(name = "validation-order")
     protected BigInteger validationOrder;
@@ -840,11 +840,7 @@ public class Field {
      *     
      */
     public BigInteger getSqlIndex() {
-        if (sqlIndex == null) {
-            return new BigInteger("-1");
-        } else {
-            return sqlIndex;
-        }
+        return sqlIndex;
     }
 
     /**

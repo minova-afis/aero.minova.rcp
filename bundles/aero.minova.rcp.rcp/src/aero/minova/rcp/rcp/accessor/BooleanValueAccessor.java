@@ -15,9 +15,9 @@ public class BooleanValueAccessor extends AbstractValueAccessor {
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
 		if (value == null) {
-			((Button) control).setEnabled(false);
+			((Button) control).setSelection(false);
 		} else {
-			((Button) control).setEnabled(value.getBooleanValue());
-			}
+			((Button) control).setSelection(value.getBooleanValue());
 		}
+	}
 }
