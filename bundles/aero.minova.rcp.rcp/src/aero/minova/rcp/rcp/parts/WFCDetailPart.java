@@ -738,28 +738,37 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				}
 			} else {
 				Field field = (Field) fieldOrGrid;
-				MField f = ModelToViewModel.convert(field);
-				f.addValueChangeListener(this);
-				String fieldName = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + f.getName();
-				f.setName(fieldName);
+				try {
+					MField f = ModelToViewModel.convert(field);
+					f.addValueChangeListener(this);
+					String fieldName = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName();
+					f.setName(fieldName);
 
-				getDetail().putField(f);
+					getDetail().putField(f);
 
-				if (!field.isVisible()) {
-					continue; // nur sichtbare Felder
-				}
-				width = getWidth(field);
-				if (column + width > 4) {
-					column = 0;
-					row++;
-				}
-				createField(composite, f, row, column);
-				f.setmPage(mSection);
-				mSection.addTabField(f);
+					if (!field.isVisible()) {
+						continue; // nur sichtbare Felder
+					}
+					width = getWidth(field);
+					if (column + width > 4) {
+						column = 0;
+						row++;
+					}
+					createField(composite, f, row, column);
+					f.setmPage(mSection);
+					mSection.addTabField(f);
 
-				column += width;
-				if (!headOrPage.isHead) {
-					row += getExtraHeight(field);
+					column += width;
+					if (!headOrPage.isHead) {
+						row += getExtraHeight(field);
+					}
+				} catch (NullPointerException e) {
+					if (field.getSqlIndex() == null) {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
+								"Feld " + (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName() + " hat keinen SQL-Index!");
+					} else {
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+					}
 				}
 			}
 		}
