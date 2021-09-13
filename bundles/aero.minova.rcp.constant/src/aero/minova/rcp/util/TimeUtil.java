@@ -242,8 +242,12 @@ public class TimeUtil {
 		String[] subStrings = input.split(":");
 
 		if (subStrings.length == 2) {
-			hours = Integer.valueOf(subStrings[0]);
-			minutes = Integer.valueOf(subStrings[1]);
+			if (!subStrings[0].isBlank() && !subStrings[1].isBlank()) {
+				hours = Integer.valueOf(subStrings[0]);
+				minutes = Integer.valueOf(subStrings[1]);
+			} else {
+				return null;
+			}
 		}
 
 		if (subStrings.length < 2) {
