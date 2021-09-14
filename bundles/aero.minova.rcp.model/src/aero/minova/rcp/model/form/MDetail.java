@@ -121,6 +121,15 @@ public class MDetail {
 		return pageList;
 	}
 
+	public MSection getPage(String id) {
+		for (MSection m : pageList) {
+			if (m.getId().equals(id)) {
+				return m;
+			}
+		}
+		return null;
+	}
+
 	public void setPageList(List<MSection> pageList) {
 		this.pageList = pageList;
 	}

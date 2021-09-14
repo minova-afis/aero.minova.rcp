@@ -227,11 +227,17 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		public boolean isOP = false;
 		private String formTitle;
 		public String formSuffix;
+		public String id;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
 			if (headOrPageOrGrid instanceof Head) {
 				isHead = true;
+				id = "Head";
+			} else if (headOrPageOrGrid instanceof Page) {
+				id = ((Page) headOrPageOrGrid).getId();
+			} else {
+				id = ((Grid) headOrPageOrGrid).getId();
 			}
 		}
 
@@ -460,7 +466,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		section.setClient(composite);
 
 		// Wir erstellen die HEAD Section des Details.
-		MSection mSection = new MSection(true, "open", mDetail, section.getText(), sectionControl, section);
+		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
 		// Erstellen der Field des Section.
