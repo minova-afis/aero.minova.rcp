@@ -271,7 +271,6 @@ Diese Klasse kann dann als Listener zu einem Feld oder Grid hinzugefügt werden 
 
 [source,java]
 ----
-
 TicketHelper ticketHelper = new TicketHelper(this);
 mDetail.getField("OrderReceiverKey").addValueChangeListener(ticketHelper);
 
@@ -303,8 +302,8 @@ Da wir kein JavaScript mehr in der Maske wollen kann der entsprechende Code im H
 
 [source,java]
 ----
-MField keyLong = detail.getField("KeyLong");
-MButton printInvoice = detail.getButton("PrintInvoice");
+MField keyLong = mDetail.getField("KeyLong");
+MButton printInvoice = mDetail.getButton("PrintInvoice");
 printInvoice.setEnabled(keyLong.getValue() != null);
 ----
 
@@ -313,7 +312,7 @@ Dafür kann ein `SelectionListener` auf den Button registriert werden:
 
 [source,java]
 ----
-MButton printInvoice = detail.getButton("PrintInvoice");
+MButton printInvoice = mDetail.getButton("PrintInvoice");
 printInvoice.addSelectionListener(new SelectionListener() {
 	@Override
 	public void widgetSelected(SelectionEvent e) {
@@ -325,13 +324,42 @@ printInvoice.addSelectionListener(new SelectionListener() {
 });
 ----
 
+=== Ein-/Ausblenden von Sections
+
+In Version 11 konnten einzelne Sections über die Maske ein- oder ausgeplendet werden.
+
+[source,xml]
+----
+<!-- Alte Maske -->
+ <page id="Debug" text="@Administration" icon="Administration" visible="false">
+    <dynamic property="visible">app.isSUMode()</dynamic>
+    ...
+</page>
+----
+
+Auch dies wird in Version 12 über einen Helper umgesetzt.
+Vorerst gibt es keinen Super User Modus mehr, stattdessen können versteckte Abschnitte über die Einstellungen eingeblendet werden ("Darstellung" Tab, die Einstellung hat ID `ApplicationPreferences.SHOW_HIDDEN_SECTIONS`).
+Die Umsetzung im Helper kann dann wie folgt aussehen:
+
+[source,java]
+----
+//MSection über ihre ID aus dem MDetail holen
+MSection debugSection = mDetail.getPage("Debug");
+
+// Initial Sichtbarkeit entsprechend der Einstellung setzten
+debugSection.setVisible(preferences.getBoolean(ApplicationPreferences.SHOW_HIDDEN_SECTIONS, false));
+
+// Bei einer Änderung der Einstellung Sichtbarkeit anpassen
+preferences.addPreferenceChangeListener(event -> {
+	if (event.getKey().equals(ApplicationPreferences.SHOW_HIDDEN_SECTIONS)) {
+		debugSection.setVisible(event.getNewValue().equals("true"));
+	}
+});
+----
 
 
 === TODO, muss noch implementiert und dokumentiert werden
 
-* Felder ein-/ausblenden -> Wie werden Werte ans CAS geschickt? Werden ausgeblendete Felder komplett ignoriert?
-* Ganze Sections ein-/ausblenden
-** SuperUser Modus vorerst durch Einstellung "Experten Modus" ersetzt (für ein-/ausblenden von Feldern/Sections)
 * Anwendungsspezifische Einstellungen
 * Umwandeln von JavaScript zu Code im Helper
 
