@@ -26,6 +26,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
@@ -297,7 +298,7 @@ public class SectionGrid {
 		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
 		selectionLayer.addLayerListener(event -> {
 			if (deleteToolItem != null) {
-				deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0);
+				deleteToolItem.setEnabled(selectionLayer.getSelectedCellPositions().length > 0);
 			}
 		});
 
@@ -361,9 +362,6 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
-				selectionLayer.clear();
-				e.doit = true;
-				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
 				selectionLayer.clear();
 				e.doit = true;
@@ -590,9 +588,12 @@ public class SectionGrid {
 	}
 
 	public void deleteCurrentRows() {
-		for (int i : selectionLayer.getFullySelectedRowPositions()) {
-			dataTable.deleteRow(sortedList.get(i));
-			rowsToDelete.add(sortedList.get(i));
+		natTable.commitAndCloseActiveCellEditor();
+		for (Range r : selectionLayer.getSelectedRowPositions()) {
+			for (int i = r.start; i < r.end; i++) {
+				dataTable.deleteRow(sortedList.get(i));
+				rowsToDelete.add(sortedList.get(i));
+			}
 		}
 		updateNatTable();
 	}
