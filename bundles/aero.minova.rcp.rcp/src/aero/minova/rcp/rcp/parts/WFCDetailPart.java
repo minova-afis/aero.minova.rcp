@@ -34,6 +34,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -178,6 +179,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Inject
 	EModelService eModelService;
 	MApplication mApplication;
+	private List<SectionGrid> sectionGrids = new ArrayList<>();
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -728,6 +730,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					gA.setSectionGrid(sg);
 					mGrid.setGridAccessor(gA);
 					mSection.getmDetail().putGrid(mGrid);
+					sectionGrids.add(sg);
 
 					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 					sg.createGrid();
@@ -949,6 +952,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			if (this.dirtyFlag != setDirty) {
 				setDirtyFlag(setDirty);
 			}
+		}
+	}
+
+	@PersistState
+	public void persistState() {
+		for (SectionGrid sg : sectionGrids) {
+			sg.saveState();
 		}
 	}
 
