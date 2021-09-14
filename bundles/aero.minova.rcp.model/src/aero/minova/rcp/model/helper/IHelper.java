@@ -4,7 +4,7 @@ import aero.minova.rcp.model.form.MDetail;
 
 public interface IHelper {
 
-	void setControls(MDetail detail);
+	void setControls(MDetail mDetail);
 
 	void handleDetailAction(ActionCode code);
 
