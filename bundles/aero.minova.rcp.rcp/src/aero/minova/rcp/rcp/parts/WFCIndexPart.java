@@ -20,6 +20,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -106,7 +107,9 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
+import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
+import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -172,16 +175,28 @@ public class WFCIndexPart extends WFCFormPart {
 		parent.setLayout(new GridLayout());
 
 		natTable = createNatTable(parent, form, getData(), selectionService, mPerspective.getContext());
-		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT, autoLoadIndex);
+		loadPrefs(Constants.LAST_STATE, autoLoadIndex);
 	}
 
-	@Inject
-	@Optional
-	public void savePrefs(@UIEventTopic(Constants.BROKER_SAVESEARCHCRITERIA) String name) {
-		// xxx.index.size (index,breite(int));
-		// xxx.index.sortby (index,sortDirection(ASC|DESC);index2....);
-		// xxx.index.groupby (expand[0,1];index;index2...);
-		// Ähnlich im SearchPart
+	@PersistState
+	public void persistState() {
+		savePrefs(true, Constants.LAST_STATE);
+	}
+
+	/**
+	 * xxx.index.size (index,breite(int)); -> Speichert auch Reihenfolge der Spalte <br>
+	 * xxx.index.sortby (index,sortDirection(ASC|DESC);index2....); -> Sortierung <br>
+	 * xxx.index.groupby (expand[0,1];index;index2...); -> Gruppierung <br>
+	 * Ähnlich im SearchPart
+	 * 
+	 * @param saveRowConfig
+	 * @param name
+	 */
+	@PersistTableSelection
+	public void savePrefs(@Named("SaveRowConfig") boolean saveRowConfig, @Named("ConfigName") String name) {
+		if (!saveRowConfig) {
+			return;
+		}
 
 		String tableName = form.getIndexView().getSource();
 
@@ -220,9 +235,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 	}
 
-	@Inject
-	@Optional
-	public void loadPrefs(@UIEventTopic(Constants.BROKER_LOADSEARCHCRITERIA) String name) {
+	@LoadTableSelection
+	public void loadPrefs(@Named("ConfigName") String name) {
 		loadPrefs(name, true);
 	}
 
