@@ -13,11 +13,11 @@ import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 
-import aero.minova.rcp.core.ui.PartsID;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
 public class SelectSearchPart {
-	
+
 	@Inject
 	private EModelService model;
 
@@ -26,7 +26,7 @@ public class SelectSearchPart {
 
 	@Execute
 	public void execute(MPerspective mPerspective) {
-		List<MPart> findElements = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
+		List<MPart> findElements = model.findElements(mPerspective, Constants.SEARCH_PART, MPart.class);
 		MPart part = findElements.get(0);
 		partService.activate(part);
 		WFCSearchPart searchPart = (WFCSearchPart) part.getObject();

@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Column;
@@ -603,7 +602,7 @@ public class WFCDetailCASRequestsUtil {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
 			// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, PartsID.SEARCH_PART, MPart.class);
+			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
 			partService.activate(findElements.get(0));
 
 			MessageDialog.openError(shell, ERROR, getTranslation(message));
@@ -632,7 +631,7 @@ public class WFCDetailCASRequestsUtil {
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
 			// Fokus auf den Search Part legen, damit Fehlermeldungen von Lookups nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, PartsID.SEARCH_PART, MPart.class);
+			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
 			partService.activate(findElements.get(0));
 
 			if (et.getT() == null) {
