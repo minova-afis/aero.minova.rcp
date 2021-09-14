@@ -18,6 +18,8 @@ public class MSection {
 	// Liste an allen mit Tab erreichbaren Feldern der Section. Festlegen dieser
 	// anhand der Preferences
 	private List<MField> tabList = new ArrayList<>();
+	// ID dieser Page ("Head" für Head)
+	private String id;
 	// Text für diese Page
 	private String label;
 	// Symbol für diese Page
@@ -43,10 +45,11 @@ public class MSection {
 	 * @param section
 	 *            das org.eclipse.ui.forms.widgets.Section Element
 	 */
-	public MSection(boolean isHead, String status, MDetail mDetail, String label, Control control, Section section) {
+	public MSection(boolean isHead, String status, MDetail mDetail, String id, String label, Control control, Section section) {
 		this.isHead = isHead;
 		this.status = status;
 		this.mDetail = mDetail;
+		this.id = id;
 		this.label = label;
 		this.control = control;
 		this.section = section;
@@ -99,6 +102,14 @@ public class MSection {
 		this.tabList.add(mField);
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getLabel() {
 		return label;
 	}
@@ -122,5 +133,15 @@ public class MSection {
 	 */
 	public Section getSection() {
 		return section;
+	}
+
+	/**
+	 * Ändert die Sichtbarkeit zum gegeben Wert. Außerdem wird die Section ein-/ausgeklappt damit sie weniger Platz wegnimmt
+	 * 
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		section.setVisible(visible);
+		section.setExpanded(visible);
 	}
 }

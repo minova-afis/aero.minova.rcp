@@ -91,6 +91,12 @@ public class PreferenceWindowModel {
 				DisplayType.DATE_UTIL, ""));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilPattern", null), 0.2,
 				DisplayType.TIME_UTIL, ""));
+
+		psd = new PreferenceSectionDescriptor("ExpertMode", translationService.translate("@Preferences.ExpertMode", null), 0.4);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_HIDDEN_SECTIONS, //
+				translationService.translate("@Preferences.ShowHiddenSections", null), 0.1, DisplayType.CHECK, false));
+
 		return ptd;
 	}
 
