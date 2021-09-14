@@ -134,4 +134,14 @@ public class MSection {
 	public Section getSection() {
 		return section;
 	}
+
+	/**
+	 * Ändert die Sichtbarkeit zum gegeben Wert. Außerdem wird die Section ein-/ausgeklappt damit sie weniger Platz wegnimmt
+	 * 
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+		section.setVisible(visible);
+		section.setExpanded(visible);
+	}
 }

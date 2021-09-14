@@ -465,7 +465,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		formToolkit.paintBordersFor(composite);
 		section.setClient(composite);
 
-		// Wir erstellen die HEAD Section des Details.
+		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
