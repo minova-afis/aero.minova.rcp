@@ -276,5 +276,7 @@ public class ApplicationPreferences {
 	 */
 	public static final String SHOW_DISCARD_CHANGES_DIALOG_INDEX = "ShowDiscardChangesDialogIndex";
 
+	public static final String SHOW_HIDDEN_SECTIONS = "ShowHiddenSections";
+
 	private ApplicationPreferences() {}
 }
