@@ -1,8 +1,7 @@
 package aero.minova.rcp.rcp.widgets;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
@@ -33,6 +33,7 @@ import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -47,10 +48,14 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
+import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -146,7 +151,7 @@ public class SectionGrid {
 	private int prevHeight;
 	private static final int BUFFER = 31;
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
-	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
+	private int default_height;
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -297,7 +302,7 @@ public class SectionGrid {
 		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
 		selectionLayer.addLayerListener(event -> {
 			if (deleteToolItem != null) {
-				deleteToolItem.setEnabled(selectionLayer.getFullySelectedRowPositions().length > 0);
+				deleteToolItem.setEnabled(selectionLayer.getSelectedCellPositions().length > 0);
 			}
 		});
 
@@ -309,6 +314,15 @@ public class SectionGrid {
 				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Datumsspalten)
+		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
+		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
+		for (int i = 0; i < columnHeaderDataLayer.getColumnCount(); i++) {
+			labelAccumulator.registerColumnOverrides(i, Constants.COMPARATOR_LABEL);
+		}
+		configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new CustomComparator(), DisplayMode.NORMAL, Constants.COMPARATOR_LABEL);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -321,7 +335,7 @@ public class SectionGrid {
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// build the grid layer
-		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
+		GridLayer gridLayer = new GridLayer(viewportLayer, sortHeaderLayer, rowHeaderLayer, cornerLayer);
 
 		setNatTable(new NatTable(composite, gridLayer, false));
 
@@ -361,9 +375,6 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
-				selectionLayer.clear();
-				e.doit = true;
-				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
 				selectionLayer.clear();
 				e.doit = true;
@@ -375,7 +386,10 @@ public class SectionGrid {
 
 		FormData fd = new FormData();
 		fd.width = DEFAULT_WIDTH;
-		fd.height = DEFAULT_HEIGHT;
+		default_height = natTable.getRowHeightByPosition(0) * 5;
+		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
+		String heightString = prefsDetailSections.get(prefsHeightKey, null);
+		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
 		prevHeight = fd.height;
 		getNatTable().setLayoutData(fd);
 
@@ -478,13 +492,13 @@ public class SectionGrid {
 	public void adjustHeight() {
 		FormData fd = (FormData) natTable.getLayoutData();
 
-		// Maximal 10 Zeilen anzeigen
-		int optimalHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
+		// Maximal 15 Zeilen anzeigen
+		int optimalHeight = Math.min(natTable.getRowHeightByPosition(0) * 16, natTable.getPreferredHeight());
 		// Minimal 2 Zeilen anzeigen
 		optimalHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, optimalHeight);
 
 		if (optimalHeight == prevHeight) {
-			optimalHeight = DEFAULT_HEIGHT;
+			optimalHeight = default_height;
 		}
 
 		prevHeight = optimalHeight;
@@ -495,6 +509,15 @@ public class SectionGrid {
 		RowData rd = (RowData) section.getLayoutData();
 		rd.height = p.y;
 		section.requestLayout();
+
+		// Height Speicher, damit beim Neuladen wieder hergestellt wird
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
+		prefsDetailSections.put(key, rd.height + "");
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void adjustWidth() {
@@ -590,9 +613,12 @@ public class SectionGrid {
 	}
 
 	public void deleteCurrentRows() {
-		for (int i : selectionLayer.getFullySelectedRowPositions()) {
-			dataTable.deleteRow(sortedList.get(i));
-			rowsToDelete.add(sortedList.get(i));
+		closeEditor();
+		for (Range r : selectionLayer.getSelectedRowPositions()) {
+			for (int i = r.start; i < r.end; i++) {
+				dataTable.deleteRow(sortedList.get(i));
+				rowsToDelete.add(sortedList.get(i));
+			}
 		}
 		updateNatTable();
 	}
@@ -603,5 +629,25 @@ public class SectionGrid {
 
 	public void closeEditor() {
 		natTable.commitAndCloseActiveCellEditor();
+	}
+
+	private class CustomComparator implements Comparator<Object> {
+		@Override
+		public int compare(Object o1, Object o2) {
+			if (o1 == null) {
+				if (o2 == null) {
+					return 0;
+				} else {
+					return -1;
+				}
+			} else if (o2 == null) {
+				return 1;
+			} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
+																														// gleiche Klasse haben
+				return ((Comparable) o1).compareTo(o2);
+			} else {
+				return o1.toString().compareTo(o2.toString());
+			}
+		}
 	}
 }
