@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.widgets;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -48,10 +50,14 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
+import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -310,6 +316,15 @@ public class SectionGrid {
 				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
+		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Datumsspalten)
+		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
+		columnHeaderDataLayer.setConfigLabelAccumulator(labelAccumulator);
+		for (int i = 0; i < columnHeaderDataLayer.getColumnCount(); i++) {
+			labelAccumulator.registerColumnOverrides(i, Constants.COMPARATOR_LABEL);
+		}
+		configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new CustomComparator(), DisplayMode.NORMAL, Constants.COMPARATOR_LABEL);
 
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
@@ -322,7 +337,7 @@ public class SectionGrid {
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// build the grid layer
-		GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer);
+		GridLayer gridLayer = new GridLayer(viewportLayer, sortHeaderLayer, rowHeaderLayer, cornerLayer);
 
 		setNatTable(new NatTable(composite, gridLayer, false));
 
@@ -588,7 +603,7 @@ public class SectionGrid {
 	}
 
 	public void deleteCurrentRows() {
-		natTable.commitAndCloseActiveCellEditor();
+		closeEditor();
 		for (Range r : selectionLayer.getSelectedRowPositions()) {
 			for (int i = r.start; i < r.end; i++) {
 				dataTable.deleteRow(sortedList.get(i));
@@ -604,5 +619,25 @@ public class SectionGrid {
 
 	public void closeEditor() {
 		natTable.commitAndCloseActiveCellEditor();
+	}
+
+	private class CustomComparator implements Comparator<Object> {
+		@Override
+		public int compare(Object o1, Object o2) {
+			if (o1 == null) {
+				if (o2 == null) {
+					return 0;
+				} else {
+					return -1;
+				}
+			} else if (o2 == null) {
+				return 1;
+			} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
+																														// gleiche Klasse haben
+				return ((Comparable) o1).compareTo(o2);
+			} else {
+				return o1.toString().compareTo(o2.toString());
+			}
+		}
 	}
 }
