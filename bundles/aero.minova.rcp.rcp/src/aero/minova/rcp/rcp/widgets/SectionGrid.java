@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.widgets;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -153,7 +151,7 @@ public class SectionGrid {
 	private int prevHeight;
 	private static final int BUFFER = 31;
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
-	private static final int DEFAULT_HEIGHT = COLUMN_HEIGHT * 3;
+	private int default_height;
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -388,7 +386,10 @@ public class SectionGrid {
 
 		FormData fd = new FormData();
 		fd.width = DEFAULT_WIDTH;
-		fd.height = DEFAULT_HEIGHT;
+		default_height = natTable.getRowHeightByPosition(0) * 5;
+		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
+		String heightString = prefsDetailSections.get(prefsHeightKey, null);
+		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
 		prevHeight = fd.height;
 		getNatTable().setLayoutData(fd);
 
@@ -491,13 +492,13 @@ public class SectionGrid {
 	public void adjustHeight() {
 		FormData fd = (FormData) natTable.getLayoutData();
 
-		// Maximal 10 Zeilen anzeigen
-		int optimalHeight = Math.min(natTable.getRowHeightByPosition(0) * 11, natTable.getPreferredHeight());
+		// Maximal 15 Zeilen anzeigen
+		int optimalHeight = Math.min(natTable.getRowHeightByPosition(0) * 16, natTable.getPreferredHeight());
 		// Minimal 2 Zeilen anzeigen
 		optimalHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, optimalHeight);
 
 		if (optimalHeight == prevHeight) {
-			optimalHeight = DEFAULT_HEIGHT;
+			optimalHeight = default_height;
 		}
 
 		prevHeight = optimalHeight;
@@ -508,6 +509,15 @@ public class SectionGrid {
 		RowData rd = (RowData) section.getLayoutData();
 		rd.height = p.y;
 		section.requestLayout();
+
+		// Height Speicher, damit beim Neuladen wieder hergestellt wird
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
+		prefsDetailSections.put(key, rd.height + "");
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void adjustWidth() {
