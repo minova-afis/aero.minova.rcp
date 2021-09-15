@@ -244,8 +244,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void openRestoringUIDialog() {
 		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
 		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
+		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
+		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
+				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
 
-		if (!neverShow && !shownThisSession) {
+		if (!neverShow && !shownThisSession && !neverShowContext) {
 			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
 					translationService.translate("@RestoringUIDialog.Title", null), //
 					translationService.translate("@RestoringUIDialog.InfoText", null), //
