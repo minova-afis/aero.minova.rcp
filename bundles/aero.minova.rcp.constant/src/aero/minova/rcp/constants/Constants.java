@@ -95,7 +95,11 @@ public class Constants {
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 	public static final String LAST_LOADED_SEARCHCRITERIA = "aero.minova.rcp.preferences.lastsearchcriteria";
 	public static final String LAST_SEARCHCRITERIA = "LastLoadedSearchCriteria";
+
+	// Wiederherstellen der UI
 	public static final String LAST_STATE = "LAST_STATE";
+	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
+	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
 
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
