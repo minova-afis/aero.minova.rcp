@@ -268,10 +268,7 @@ public class WFCSearchPart extends WFCFormPart {
 	@LoadTableSelection
 	public void loadPrefs(@Named("ConfigName") String name) {
 
-		// Close Editor
-		if (natTable.getActiveCellEditor() != null) {
-			natTable.getActiveCellEditor().close();
-		}
+		natTable.commitAndCloseActiveCellEditor();
 
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".table", null);
@@ -333,10 +330,8 @@ public class WFCSearchPart extends WFCFormPart {
 		if (!mPart.equals(this.mPart)) {
 			return;
 		}
-		// Close Editor
-		if (natTable.getActiveCellEditor() != null) {
-			natTable.getActiveCellEditor().close();
-		}
+
+		natTable.commitAndCloseActiveCellEditor();
 
 		// Alle Einträge entfernen
 		getData().getRows().clear();
@@ -358,10 +353,8 @@ public class WFCSearchPart extends WFCFormPart {
 				rows2delete.add(sortedList.get(i));
 			}
 		}
-		// Close Editor
-		if (natTable.getActiveCellEditor() != null) {
-			natTable.getActiveCellEditor().close();
-		}
+
+		natTable.commitAndCloseActiveCellEditor();
 		deleteSearchRows(rows2delete);
 		refreshNatTable();
 	}
