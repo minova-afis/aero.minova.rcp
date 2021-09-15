@@ -15,6 +15,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -117,7 +118,7 @@ public class WFCSearchPart extends WFCFormPart {
 
 		natTable = createNatTable(parent, form, getData());
 
-		loadPrefs(Constants.SEARCHCRITERIA_DEFAULT);
+		loadPrefs(Constants.LAST_STATE);
 	}
 
 	/**
@@ -229,11 +230,23 @@ public class WFCSearchPart extends WFCFormPart {
 		return natTable;
 	}
 
+	@PersistState
+	public void persistState() {
+		savePrefs(true, Constants.LAST_STATE);
+	}
+
+	/**
+	 * xxx.table -> Inhalt der Tabelle <br>
+	 * xxx.search.size (index,breite(int)) -> Speichert auch Reihenfolge der Spalten <br>
+	 * Ähnlich im IndexPart
+	 * 
+	 * @param saveRowConfig
+	 * @param name
+	 * @param perspective
+	 */
 	@PersistTableSelection
-	public void savePrefs(@Named("SaveRowConfig") Boolean saveRowConfig, @Named("ConfigName") String name) {
-		// xxx.table
-		// xxx.search.size (index,breite(int)), Speichert auch Reihenfolge der Spalten
-		// Ähnlich im IndexPart
+	public void savePrefs(@Named("SaveRowConfig") boolean saveRowConfig, @Named("ConfigName") String name) {
+
 		saveNattable();
 		String tableName = getData().getName();
 		prefs.put(tableName + "." + name + ".table", mjs.table2Json(getData(), true));
@@ -254,10 +267,8 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@LoadTableSelection
 	public void loadPrefs(@Named("ConfigName") String name) {
-		// Close Editor
-		if (natTable.getActiveCellEditor() != null) {
-			natTable.getActiveCellEditor().close();
-		}
+
+		natTable.commitAndCloseActiveCellEditor();
 
 		String tableName = form.getIndexView().getSource();
 		String string = prefs.get(tableName + "." + name + ".table", null);
@@ -319,10 +330,8 @@ public class WFCSearchPart extends WFCFormPart {
 		if (!mPart.equals(this.mPart)) {
 			return;
 		}
-		// Close Editor
-		if (natTable.getActiveCellEditor() != null) {
-			natTable.getActiveCellEditor().close();
-		}
+
+		natTable.commitAndCloseActiveCellEditor();
 
 		// Alle Einträge entfernen
 		getData().getRows().clear();
@@ -344,10 +353,8 @@ public class WFCSearchPart extends WFCFormPart {
 				rows2delete.add(sortedList.get(i));
 			}
 		}
-		// Close Editor
-		if (natTable.getActiveCellEditor() != null) {
-			natTable.getActiveCellEditor().close();
-		}
+
+		natTable.commitAndCloseActiveCellEditor();
 		deleteSearchRows(rows2delete);
 		refreshNatTable();
 	}

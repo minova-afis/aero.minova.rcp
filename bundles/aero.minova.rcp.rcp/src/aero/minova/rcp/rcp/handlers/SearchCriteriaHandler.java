@@ -13,17 +13,18 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 import aero.minova.rcp.rcp.util.DeleteSearchCriteriaDialog;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
@@ -51,29 +52,29 @@ public class SearchCriteriaHandler {
 	}
 
 	@Inject
-	IEventBroker broker;
-
-	@Inject
 	TranslationService translationService;
 
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
-	
+
+	@Inject
+	private EPartService partService;
+
 	Preferences loadedTablePrefs = InstanceScope.INSTANCE.getNode(Constants.LAST_LOADED_SEARCHCRITERIA);
 
 	@Execute
 	public void execute(@Named(COMMAND_ACTION) final String action, @Optional @Named(COMMAND_NAME) String name, final MPart part,
 			@Named(IServiceConstants.ACTIVE_SHELL) final Shell shell, final MPerspective perspective) {
-		Object wfcPart = part.getObject();
-		if (wfcPart != null) {
+
+		WFCSearchPart wfcSearchPart = (WFCSearchPart) part.getObject();
+		WFCIndexPart wfcIndexPart = (WFCIndexPart) partService.findPart(Constants.INDEX_PART).getObject();
+
+		if (wfcSearchPart != null) {
 			final CriteriaAction ia = CriteriaAction.valueOf(action.toUpperCase(Locale.ENGLISH));
-			IEclipseContext context = part.getContext();
-			String tableName = null;
-			if (wfcPart instanceof WFCSearchPart) {
-				Table data = ((WFCSearchPart) wfcPart).getData();
-				tableName = data.getName();
-			}
+			IEclipseContext context = perspective.getContext();
+			Table data = wfcSearchPart.getData();
+			String tableName = data.getName();
 
 			try {
 				switch (ia) {
@@ -81,8 +82,8 @@ public class SearchCriteriaHandler {
 					name = Constants.SEARCHCRITERIA_DEFAULT;
 				case LOAD:
 					context.set("ConfigName", name);// setzen der Konfiguration, verfügbar auch später.
-					ContextInjectionFactory.invoke(part.getObject(), LoadTableSelection.class, context);
-					broker.send(Constants.BROKER_LOADSEARCHCRITERIA, name);
+					ContextInjectionFactory.invoke(wfcSearchPart, LoadTableSelection.class, context);
+					ContextInjectionFactory.invoke(wfcIndexPart, LoadTableSelection.class, context);
 					loadedTablePrefs.put(Constants.LAST_SEARCHCRITERIA, name);
 					break;
 				case SAVE_DEFAULT:
@@ -95,10 +96,9 @@ public class SearchCriteriaHandler {
 					}
 					name = Constants.SEARCHCRITERIA_DEFAULT;// setzen der Konfiguration, verfügbar auch später.
 				case SAVE_NAME:
-					context.set("SaveRowConfig", true);// setzen der Konfiguration, verfügbar auch später.
-					context.set("ConfigName", name);// setzen der Konfiguration, verfügbar auch später.
-					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
-					broker.send(Constants.BROKER_SAVESEARCHCRITERIA, name);
+
+					invoke(true, name, perspective, context, wfcSearchPart, wfcIndexPart);
+
 					break;
 				case SAVE:
 					final SaveSearchCriteriaDialog sscd = new SaveSearchCriteriaDialog(shell, translationService, prefs, tableName);
@@ -107,13 +107,10 @@ public class SearchCriteriaHandler {
 					if (criteriaName == null) {
 						break;
 					}
-					boolean saveColumnWidth = true; // sscd.getSaveWidths();
-					context.set("SaveRowConfig", saveColumnWidth);// setzen der Konfiguration, verfügbar auch später.
-					context.set("ConfigName", criteriaName);// setzen der Konfiguration, verfügbar auch später.
-					ContextInjectionFactory.invoke(part.getObject(), PersistTableSelection.class, context);
-					if (saveColumnWidth) {
-						broker.send(Constants.BROKER_SAVESEARCHCRITERIA, criteriaName);
-					}
+					boolean saveColumnWidth = sscd.getSaveWidths();
+
+					invoke(saveColumnWidth, criteriaName, perspective, context, wfcSearchPart, wfcIndexPart);
+
 					loadedTablePrefs.put(Constants.LAST_SEARCHCRITERIA, criteriaName);
 					break;
 				case DELETE:
@@ -126,4 +123,13 @@ public class SearchCriteriaHandler {
 			}
 		}
 	}
+
+	private void invoke(boolean saveColumnWidth, String criteriaName, MPerspective perspective, IEclipseContext context, WFCSearchPart wfcSearchPart,
+			WFCIndexPart wfcIndexPart) {
+		context.set("SaveRowConfig", saveColumnWidth);// setzen der Konfiguration, verfügbar auch später.
+		context.set("ConfigName", criteriaName);// setzen der Konfiguration, verfügbar auch später.
+		ContextInjectionFactory.invoke(wfcSearchPart, PersistTableSelection.class, context);
+		ContextInjectionFactory.invoke(wfcIndexPart, PersistTableSelection.class, context);
+	}
+
 }

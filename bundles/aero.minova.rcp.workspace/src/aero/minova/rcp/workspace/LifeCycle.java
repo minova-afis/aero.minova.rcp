@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.translate.lifecycle.Manager;
@@ -56,6 +57,8 @@ public class LifeCycle {
 		for (String string : applicationArgs) {
 			if (string.startsWith("-user=")) {
 				argUser = string.substring(string.indexOf("=") + 1);
+				// In UI-Tests darf sich der Dialog nicht öffnen
+				workbenchContext.set(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, true);
 			}
 			if (string.startsWith("-pw=")) {
 				argPW = string.substring(string.indexOf("=") + 1);

@@ -12,7 +12,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
 public class ClearSearchHandler {
@@ -25,8 +24,8 @@ public class ClearSearchHandler {
 
 	@Execute
 	public void execute(MPerspective mPerspective) {
-		List<MPart> findElements = model.findElements(mPerspective, PartsID.SEARCH_PART, MPart.class);
-		broker.post(Constants.BROKER_DELETEROWSEARCHTABLE, PartsID.SEARCH_PART);
+		List<MPart> findElements = model.findElements(mPerspective, Constants.SEARCH_PART, MPart.class);
+		broker.post(Constants.BROKER_DELETEROWSEARCHTABLE, Constants.SEARCH_PART);
 	}
 
 	@CanExecute

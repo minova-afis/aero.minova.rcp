@@ -34,6 +34,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -44,6 +45,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -138,6 +140,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
 	boolean selectAllControls;
 
+	@Inject
+	@Preference
+	private IEclipsePreferences prefs;
+
 	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
 
 	@Inject
@@ -178,6 +184,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Inject
 	EModelService eModelService;
 	MApplication mApplication;
+	private List<SectionGrid> sectionGrids = new ArrayList<>();
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -202,6 +209,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen
+		// Außerdem wird "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
 		IWindowCloseHandler handler = mWindow -> {
 			@SuppressWarnings("unchecked")
 			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
@@ -214,11 +222,43 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
 						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
 
-				return dialog.open() == 0;
+				boolean res = dialog.open() == 0;
+				if (res) {
+					prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
+				}
+				return res;
 			}
+			prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
+
 			return true;
 		};
 		window.getContext().set(IWindowCloseHandler.class, handler);
+
+		openRestoringUIDialog();
+	}
+
+	/**
+	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
+	 * gewählt wurde
+	 */
+	private void openRestoringUIDialog() {
+		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
+		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
+		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
+		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
+				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
+
+		if (!neverShow && !shownThisSession && !neverShowContext) {
+			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
+					translationService.translate("@RestoringUIDialog.Title", null), //
+					translationService.translate("@RestoringUIDialog.InfoText", null), //
+					translationService.translate("@RestoringUIDialog.NeverShowAgain", null), //
+					false, null, null);
+			if (mdwt.getToggleState()) {
+				prefs.put(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, "true");
+			}
+			prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "true");
+		}
 	}
 
 	private static class HeadOrPageOrGridWrapper {
@@ -728,6 +768,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					gA.setSectionGrid(sg);
 					mGrid.setGridAccessor(gA);
 					mSection.getmDetail().putGrid(mGrid);
+					sectionGrids.add(sg);
 
 					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 					sg.createGrid();
@@ -949,6 +990,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			if (this.dirtyFlag != setDirty) {
 				setDirtyFlag(setDirty);
 			}
+		}
+	}
+
+	@PersistState
+	public void persistState() {
+		for (SectionGrid sg : sectionGrids) {
+			sg.saveState();
 		}
 	}
 

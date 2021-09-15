@@ -2,6 +2,11 @@ package aero.minova.rcp.constants;
 
 public class Constants {
 
+	// Parts
+	public static final String SEARCH_PART = "aero.minova.rcp.rcp.part.search";
+	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
+	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
+
 	public static final String TABLE_KEYTEXT = "KeyText";
 	public static final String TABLE_KEYLONG = "KeyLong";
 	public static final String TABLE_DESCRIPTION = "Description";
@@ -90,6 +95,11 @@ public class Constants {
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
 	public static final String LAST_LOADED_SEARCHCRITERIA = "aero.minova.rcp.preferences.lastsearchcriteria";
 	public static final String LAST_SEARCHCRITERIA = "LastLoadedSearchCriteria";
+
+	// Wiederherstellen der UI
+	public static final String LAST_STATE = "LAST_STATE";
+	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
+	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
 
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung

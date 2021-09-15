@@ -53,6 +53,7 @@ import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -153,6 +154,12 @@ public class SectionGrid {
 	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
 	private int default_height;
 
+	private ColumnReorderLayer columnReorderLayer;
+
+	private DataLayer bodyDataLayer;
+
+	private SortHeaderLayer sortHeaderLayer;
+
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
@@ -171,6 +178,7 @@ public class SectionGrid {
 		createButton();
 		dataTable = dataFormService.getTableFromGrid(grid);
 		createNatTable();
+		loadState();
 	}
 
 	/**
@@ -274,7 +282,7 @@ public class SectionGrid {
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
-		DataLayer bodyDataLayer = new DataLayer(bodyDataProvider);
+		bodyDataLayer = new DataLayer(bodyDataProvider);
 		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
@@ -295,7 +303,7 @@ public class SectionGrid {
 
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
-		ColumnReorderLayer columnReorderLayer = new ColumnReorderLayer(eventLayer);
+		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
@@ -314,7 +322,7 @@ public class SectionGrid {
 				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
 		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
-		SortHeaderLayer<Row> sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
+		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Datumsspalten)
 		ColumnOverrideLabelAccumulator labelAccumulator = new ColumnOverrideLabelAccumulator(columnHeaderDataLayer);
@@ -649,5 +657,78 @@ public class SectionGrid {
 				return o1.toString().compareTo(o2.toString());
 			}
 		}
+	}
+
+	public void saveState() {
+
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY);
+
+		// Spaltenanordung und -breite
+		String size = "";
+		for (int i : columnReorderLayer.getColumnIndexOrder()) {
+			size += i + "," + bodyDataLayer.getColumnWidthByPosition(i) + ";";
+
+		}
+		prefsDetailSections.put(key + ".size", size);
+
+		// Sortierung
+		String sort = "";
+		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
+			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+		}
+		prefsDetailSections.put(key + ".sortby", sort);
+
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void loadState() {
+
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY);
+
+		// Spaltenanordung und Breite
+		String string = prefsDetailSections.get(key + ".size", null);
+		if (string != null && !string.equals("")) {
+			String[] fields = string.split(";");
+			ArrayList<Integer> order = new ArrayList<>();
+			for (String s : fields) {
+				String[] keyValue = s.split(",");
+				int position = Integer.parseInt(keyValue[0].trim());
+				int width = Integer.parseInt(keyValue[1].trim());
+				order.add(position);
+				bodyDataLayer.setColumnWidthByPosition(position, width);
+			}
+			// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
+			if (columnReorderLayer.getColumnIndexOrder().size() < order.size()) {
+				ArrayList<Integer> toDelete = new ArrayList<>();
+				for (int i : order) {
+					if (!columnReorderLayer.getColumnIndexOrder().contains(i)) {
+						toDelete.add(i);
+					}
+				}
+				order.removeAll(toDelete);
+			}
+			columnReorderLayer.getColumnIndexOrder().removeAll(order);
+			columnReorderLayer.getColumnIndexOrder().addAll(0, order);
+			columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+		}
+
+		// Sortierung
+		string = prefsDetailSections.get(key + ".sortby", null);
+		if (string != null && !string.equals("")) {
+			String[] fields = string.split(";");
+			sortHeaderLayer.getSortModel().clear();
+			for (String s : fields) {
+				String[] keyValue = s.split(",");
+				int index = Integer.parseInt(keyValue[0].trim());
+				SortDirectionEnum direction = SortDirectionEnum.valueOf(keyValue[1].trim());
+				sortHeaderLayer.getSortModel().sort(index, direction, true);
+			}
+		}
+
 	}
 }
