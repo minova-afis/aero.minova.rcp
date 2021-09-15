@@ -148,6 +148,14 @@ image::images/symbol_size_big_48x48.png[48x48,550,300]
 
 [%hardbreaks]
 
+===== TODO: Datums-/Zeitformat
+
+===== Experten Modus - Zeige versteckte Abschnitte an
+
+Manche Abschnitte sind nur sichtbar, wenn diese Option gewählt ist. 
+Das ein-/ausblenden wird über die Helper der einzelnen Masken geregelt.
+Ersatz für Teil des SuperUser Modus von Version 11.
+
 ==== Erweitert Tab
 
 ===== Index beim Öffnen der Maske automatisch laden
