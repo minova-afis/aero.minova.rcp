@@ -735,8 +735,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mgrid.setHelperClass(grid.getHelperClass());
 		List<MField> mFields = new ArrayList<>();
 		for (Field f : grid.getField()) {
-			MField mF = ModelToViewModel.convert(f);
-			mFields.add(mF);
+			try {
+				MField mF = ModelToViewModel.convert(f);
+				mFields.add(mF);
+			} catch (NullPointerException e) {
+				showErrorMissingSQLIndex(f, grid.getProcedureSuffix() + "." + f.getName(), e);
+			}
 		}
 		mgrid.setGrid(grid);
 		mgrid.setFields(mFields);
@@ -810,16 +814,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 						row += getExtraHeight(field);
 					}
 				} catch (NullPointerException e) {
-					if (field.getSqlIndex() == null) {
-						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
-								"Field " + (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName() + " has no SQL-Index!");
-					} else {
-						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
-					}
+					String fieldname = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName();
+					showErrorMissingSQLIndex(field, fieldname, e);
 				}
 			}
 		}
 		addBottonMargin(composite, row + 1, column);
+	}
+
+	private void showErrorMissingSQLIndex(Field field, String fieldname, NullPointerException e) {
+		if (field.getSqlIndex() == null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Field " + fieldname + " has no SQL-Index!");
+		} else {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+		}
 	}
 
 	/**
