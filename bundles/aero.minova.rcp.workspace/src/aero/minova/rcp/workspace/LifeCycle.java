@@ -59,6 +59,7 @@ public class LifeCycle {
 		// Versuchen über Commandline-Argumente einzuloggen, für UI-Tests genutzt
 		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
 
+		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
 
 			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, logger, sync);
@@ -71,11 +72,11 @@ public class LifeCycle {
 				workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 			}
 
+			// Das darf für UI-Tests nicht ausgeführt werden!
 			checkModelVersion(workspaceLocation);
-		}
-
-		if (deletePrefs) {
-			deleteCustomPrefs(workspaceLocation);
+			if (deletePrefs) {
+				deleteCustomPrefs(workspaceLocation);
+			}
 		}
 
 		Manager manager = new Manager();
@@ -94,6 +95,7 @@ public class LifeCycle {
 			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 			if (!Platform.getInstanceLocation().isSet()) {
 				Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+
 				try {
 					workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 				} catch (URISyntaxException e) {
@@ -102,11 +104,9 @@ public class LifeCycle {
 
 				if (workspaceLocation == null) {
 					WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
-					loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+					workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 				} else {
-
 					workspaceLocation = checkDefaultWorkspace(workspaceLocation, workspaceDialog, sPrefs);
-
 				}
 			}
 		} catch (Exception e) {
