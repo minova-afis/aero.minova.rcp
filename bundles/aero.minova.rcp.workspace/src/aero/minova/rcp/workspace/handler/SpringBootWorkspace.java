@@ -100,7 +100,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			// Entwender das Passwort ist null/leer oder es wurde manuell eingetragten / geändert
 			try {
 				checkCredentials(getPassword());
-			} catch (UnsupportedEncodingException | WorkspaceException e) {
+			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		}
@@ -173,7 +173,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		}
 		try {
 			checkCredentials(workspaceData.getPassword());
-		} catch (UnsupportedEncodingException | WorkspaceException e) {
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 	}
