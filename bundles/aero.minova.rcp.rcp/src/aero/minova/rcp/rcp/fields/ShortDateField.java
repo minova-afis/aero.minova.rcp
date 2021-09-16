@@ -50,6 +50,8 @@ public class ShortDateField {
 	}
 
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
@@ -81,7 +83,12 @@ public class ShortDateField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		text.setMessage(LocalDate.of(2000, 1, 1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		if(dateUtil.isBlank()) {
+			text.setMessage(LocalDate.of(2000, 1, 1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		} else {
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
+			text.setMessage(LocalDate.of(2000, 1, 1).format(dtf));
+		}
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {
