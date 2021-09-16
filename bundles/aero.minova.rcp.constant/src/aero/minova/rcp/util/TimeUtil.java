@@ -239,7 +239,16 @@ public class TimeUtil {
 	private static Instant getTimeFromNumbers(String input) {
 		Integer hours = 0;
 		Integer minutes = 0;
-		String[] subStrings = input.split(":");
+		String seperator = ":";
+		for (char character : input.toCharArray()) {
+			if (!Character.isDigit(character) && !Character.isLetter(character)) {
+				seperator = String.valueOf(character);
+				if (seperator.equals("."))
+					seperator = "\\.";
+				break;
+			}
+		}
+		String[] subStrings = input.split(seperator);
 
 		if (subStrings.length == 2) {
 			if (!subStrings[0].isBlank() && !subStrings[1].isBlank()) {
