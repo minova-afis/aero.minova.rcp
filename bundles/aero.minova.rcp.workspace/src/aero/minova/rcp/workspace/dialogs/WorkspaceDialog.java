@@ -46,6 +46,7 @@ public class WorkspaceDialog extends Dialog {
 	private Text message;
 	private Text connectionString;
 	private Combo profile;
+	private String profileName;
 
 	private String usernameText;
 	private String pwText;
@@ -57,6 +58,12 @@ public class WorkspaceDialog extends Dialog {
 	public WorkspaceDialog(Shell parentShell, Logger logger, UISynchronize sync) {
 		super(parentShell);
 		this.logger = logger;
+	}
+
+	public WorkspaceDialog(Shell parentShell, Logger logger, UISynchronize sync, String profileName) {
+		super(parentShell);
+		this.logger = logger;
+		this.profileName = profileName;
 	}
 
 	@Override
@@ -165,8 +172,13 @@ public class WorkspaceDialog extends Dialog {
 		message.setEnabled(false);
 		// Wird benötigt, damit 2 Zeilen für das Message-Feld angezeigt werden.
 		new Label(container, SWT.NONE);
+
 		// initialisieren --> alle Felder leer setzen
 		deleteDialogEntries();
+
+		// Wenn profileName gegeben wurde dieses laden
+		setProfile(profileName);
+		loadProfileData();
 
 		return container;
 	}
@@ -262,6 +274,15 @@ public class WorkspaceDialog extends Dialog {
 
 	public String getConnection() {
 		return connectionText;
+	}
+
+	private void setProfile(String profileName) {
+		for (int i = 0; i < profile.getItemCount(); i++) {
+			if (profile.getItem(i).equals(profileName)) {
+				profile.select(i);
+				break;
+			}
+		}
 	}
 
 }
