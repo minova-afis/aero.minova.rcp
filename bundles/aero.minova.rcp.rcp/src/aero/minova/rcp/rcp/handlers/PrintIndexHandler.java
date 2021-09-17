@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -59,7 +58,6 @@ import aero.minova.rcp.rcp.util.PDFGenerator;
 import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
-import aero.minova.rcp.util.Tools;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TreeList;
 
@@ -230,9 +228,9 @@ public class PrintIndexHandler {
 
 				// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
 				if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
-					showFile(url_pdf.toString(), null);
+					PrintUtil.showFile(url_pdf.toString(), null);
 				} else {
-					showFile(url_pdf.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
+					PrintUtil.showFile(url_pdf.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -491,32 +489,6 @@ public class PrintIndexHandler {
 			e.printStackTrace();
 		}
 		broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Drucken des Index schlug fehl!");
-	}
-
-	/**
-	 * Öffnet entwender das BrowserWiget um den Index-Druck anzuzeigen oder den Default PDF Reader!
-	 *
-	 * @param urlString
-	 * @param preview
-	 */
-	private void showFile(String urlString, Preview preview) {
-		if (urlString != null) {
-			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
-			try {
-				if (preview == null) {
-					System.out.println(MessageFormat.format("öffne {0} auf dem Desktop", urlString));
-					Tools.openURL(urlString);
-				} else {
-					System.out.println(MessageFormat.format("öffne {0} im Preview-Fenster", urlString));
-					preview.openURL(urlString);
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				System.out.println("Error occured during the file open");
-			}
-		} else {
-			System.out.println("kann Datei NULL nicht anzeigen");
-		}
 	}
 
 }

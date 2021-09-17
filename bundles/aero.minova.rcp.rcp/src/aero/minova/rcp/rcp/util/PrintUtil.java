@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
+import java.text.MessageFormat;
+
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -7,6 +9,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 
 import aero.minova.rcp.rcp.parts.Preview;
+import aero.minova.rcp.util.Tools;
 
 public class PrintUtil {
 
@@ -41,6 +44,32 @@ public class PrintUtil {
 			preview.clear();
 		}
 		return preview;
+	}
+
+	/**
+	 * Öffnet entwender das BrowserWiget um den Index-Druck anzuzeigen oder den Default PDF Reader!
+	 *
+	 * @param urlString
+	 * @param preview
+	 */
+	public static void showFile(String urlString, Preview preview) {
+		if (urlString != null) {
+			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
+			try {
+				if (preview == null) {
+					System.out.println(MessageFormat.format("öffne {0} auf dem Desktop", urlString));
+					Tools.openURL(urlString);
+				} else {
+					System.out.println(MessageFormat.format("öffne {0} im Preview-Fenster", urlString));
+					preview.openURL(urlString);
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+				System.out.println("Error occured during the file open");
+			}
+		} else {
+			System.out.println("kann Datei NULL nicht anzeigen");
+		}
 	}
 
 }
