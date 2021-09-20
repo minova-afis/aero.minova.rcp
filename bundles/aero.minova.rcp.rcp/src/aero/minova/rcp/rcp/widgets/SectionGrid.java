@@ -434,7 +434,7 @@ public class SectionGrid {
 		return dataTable;
 	}
 
-	public void setDataTable(Table newDataTable) {
+	public Table setDataTable(Table newDataTable) {
 		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
 
@@ -454,6 +454,7 @@ public class SectionGrid {
 			}
 		}
 		updateNatTable();
+		return dataTable.copy();
 	}
 
 	public NatTable getNatTable() {
