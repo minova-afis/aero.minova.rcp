@@ -120,8 +120,6 @@ public class MenuTest {
 	private int checkEntries(List<String> entries, int counter, Object menuOrEntry) {
 		if (menuOrEntry instanceof MenuType) {
 			String translated = translationService.translate(((MenuType) menuOrEntry).getText(), null);
-			System.out.println(translated + " " + entries.get(counter));
-
 			assertEquals(translated, entries.get(counter));
 			counter++;
 			for (Object o : ((MenuType) menuOrEntry).getEntryOrMenu()) {
@@ -132,8 +130,6 @@ public class MenuTest {
 			if (entry.getId() instanceof Action) {
 				String name = ((Action) entry.getId()).getText();
 				String translated = translationService.translate(name, null);
-				System.out.println(translated + " " + entries.get(counter));
-
 				assertEquals(translated, entries.get(counter));
 				counter++;
 			}
