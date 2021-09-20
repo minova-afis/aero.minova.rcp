@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -84,9 +86,12 @@ public class MenuTest {
 
 			// Liste mit Menueinträgen (depth-first)
 			List<String> menuEntries = new ArrayList<>();
+			Map<String, Integer> callsToMenu = new HashMap<>();
 			SWTBotRootMenu menu = bot.menu();
 			for (String menuEntry : menu.menuItems()) {
-				SWTBotMenu menu2 = bot.menu(menuEntry);
+				int i = callsToMenu.get(menuEntry) == null ? 0 : callsToMenu.get(menuEntry);
+				callsToMenu.put(menuEntry, i + 1);
+				SWTBotMenu menu2 = bot.menu().menu(menuEntry, false, i);
 				// File Menü überspringen (nicht von uns)
 				if (menu2.getText().equals("File")) {
 					continue;
@@ -115,9 +120,10 @@ public class MenuTest {
 	private int checkEntries(List<String> entries, int counter, Object menuOrEntry) {
 		if (menuOrEntry instanceof MenuType) {
 			String translated = translationService.translate(((MenuType) menuOrEntry).getText(), null);
+			System.out.println(translated + " " + entries.get(counter));
+
 			assertEquals(translated, entries.get(counter));
 			counter++;
-
 			for (Object o : ((MenuType) menuOrEntry).getEntryOrMenu()) {
 				counter = checkEntries(entries, counter, o);
 			}
@@ -126,6 +132,8 @@ public class MenuTest {
 			if (entry.getId() instanceof Action) {
 				String name = ((Action) entry.getId()).getText();
 				String translated = translationService.translate(name, null);
+				System.out.println(translated + " " + entries.get(counter));
+
 				assertEquals(translated, entries.get(counter));
 				counter++;
 			}
