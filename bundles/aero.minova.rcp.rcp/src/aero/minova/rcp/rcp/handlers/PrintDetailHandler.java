@@ -97,11 +97,11 @@ public class PrintDetailHandler {
 			return false;
 		}
 
-		// Wenn diese Maske noch nicht geöffnet wurde application.xsl überprüfen und ggf. .xsl laden
+		// Wenn diese Maske noch nicht geöffnet wurde application.xbs überprüfen
 		if (!checkedMasks.contains(maskName)) {
 			checkedMasks.add(maskName);
 
-			// Finden des report und procedurenamens? (Über application.xbs definiert)
+			// Finden des report, rootelement und procedurenamens (Über application.xbs definiert)
 			Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
 			Node maskNode = XBSUtil.getNodeWithName(preferences, maskName);
 			if (maskNode == null) {
@@ -176,13 +176,11 @@ public class PrintDetailHandler {
 			CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table.getName(), table, rootElements.get(maskName));
 			tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
 				try {
+					// Aus xml und xsl Datei PDF erstellen
 					Path pdfPath = dataService.getStoragePath().resolve("reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
 					URL pdfFile = pdfPath.toFile().toURI().toURL();
-
 					String xmlString = Files.readString(xmlPath);
-
 					PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve("reports/" + reportNames.get(maskName)).toFile());
-
 					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
 				} catch (IOException e) {
 					e.printStackTrace();

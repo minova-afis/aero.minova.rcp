@@ -296,9 +296,7 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer XML Detail:\n" + t.body());
-
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-
 			try {
 				FileWriter fw = new FileWriter(path.toFile());
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
@@ -309,11 +307,9 @@ public class DataService implements IDataService {
 				}
 				fw.write("</" + rootElement + ">");
 				fw.close();
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 			return path;
 		});
 	}
