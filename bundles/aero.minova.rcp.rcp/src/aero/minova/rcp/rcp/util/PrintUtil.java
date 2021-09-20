@@ -1,12 +1,19 @@
 package aero.minova.rcp.rcp.util;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.text.MessageFormat;
+
+import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
+import org.xml.sax.SAXException;
 
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.util.Tools;
@@ -70,6 +77,26 @@ public class PrintUtil {
 		} else {
 			System.out.println("kann Datei NULL nicht anzeigen");
 		}
+	}
+
+	/**
+	 * Generiert ein PDF Dokument und gibt es als FileOutputStream zurück!
+	 *
+	 * @param pdf
+	 * @param xml
+	 * @param xsl
+	 * @return
+	 * @return
+	 */
+	public static FileOutputStream generatePDF(URL pdf, String xmlString, File stylesheet) {
+		try {
+			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
+			PDFGenerator.createPdfFile(xmlString, stylesheet, pdfOutput);
+			return pdfOutput;
+		} catch (IOException | SAXException | TransformerException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

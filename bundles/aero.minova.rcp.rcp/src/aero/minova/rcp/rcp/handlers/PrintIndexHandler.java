@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +16,6 @@ import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -41,7 +39,6 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -54,7 +51,6 @@ import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
 import aero.minova.rcp.rcp.print.ReportCreationException;
 import aero.minova.rcp.rcp.print.TableXSLCreator;
-import aero.minova.rcp.rcp.util.PDFGenerator;
 import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
@@ -210,27 +206,30 @@ public class PrintIndexHandler {
 			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 			try {
-				Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
-				Files.createDirectories(path_pdf.getParent());
-				createFile(path_pdf.toString());
-				URL url_pdf = path_pdf.toFile().toURI().toURL();
+				Path pathPDF = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+				Files.createDirectories(pathPDF.getParent());
+				createFile(pathPDF.toString());
+				URL urlPDF = pathPDF.toFile().toURI().toURL();
 
-				if (createXmlXsl) {
-					Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
-					Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
-					createFile(path_xml.toString());
-					createFile(path_xsl.toString());
-					IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
-					IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
+				Path pathXML = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
+				Path pathXSL = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
+				createFile(pathXML.toString());
+				createFile(pathXSL.toString());
+				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");
+				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
+
+				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
+
+				if (!createXmlXsl) {
+					Files.delete(pathXSL);
+					Files.delete(pathXML);
 				}
-
-				generatePDF(url_pdf, xml.toString(), xslString);
 
 				// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
 				if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
-					PrintUtil.showFile(url_pdf.toString(), null);
+					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
-					PrintUtil.showFile(url_pdf.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
+					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -463,32 +462,6 @@ public class PrintIndexHandler {
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
 		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), Locale.getDefault()) + "]]></PrintDate>\n");
-	}
-
-	/**
-	 * Generiert ein PDF Dokument und gibt es als FileOutputStream zurück!
-	 *
-	 * @param pdf
-	 * @param xml
-	 * @param xsl
-	 * @return
-	 */
-	public void generatePDF(URL pdf, String xmlString, String xslString) {
-		PDFGenerator pdfGenerator = new PDFGenerator();
-		try {
-			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
-			pdfGenerator.createPdfFile(xmlString, xslString, pdfOutput);
-			return;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Drucken des Index schlug fehl!");
 	}
 
 }
