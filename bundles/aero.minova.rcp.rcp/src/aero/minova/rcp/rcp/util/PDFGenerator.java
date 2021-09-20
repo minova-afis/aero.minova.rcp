@@ -25,38 +25,32 @@ import org.xml.sax.SAXException;
  */
 public class PDFGenerator {
 
-	public PDFGenerator() {}
+	private PDFGenerator() {}
 
-	public void createPdfFile(String xmlDataString, String templateString, OutputStream pdfOutputStream)
+	public static void createPdfFile(String xmlDataString, File stylesheet, OutputStream pdfOutputStream)
 			throws IOException, SAXException, TransformerException {
 		System.out.println("Create pdf file ...");
-		File tempFile = File.createTempFile("fop-" + System.currentTimeMillis(), ".pdf");
 
 		FopFactory fopFactory = FopFactory.newInstance();
 		fopFactory.setBaseURL(new File(".").toURI().toURL().toString());
 		FOUserAgent userAgent = fopFactory.newFOUserAgent();
 
-		try {
-			// set output format
-			Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, pdfOutputStream);
+		// set output format
+		Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, pdfOutputStream);
 
-			// Load template
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory
-					.newTransformer(new StreamSource(new ByteArrayInputStream(templateString.getBytes(StandardCharsets.UTF_8))));
+		// Load template
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer(new StreamSource(stylesheet));
 
-			// Set value of parameters in stylesheet
-			transformer.setParameter("version", "1.0");
+		// Set value of parameters in stylesheet
+		transformer.setParameter("version", "1.0");
 
-			// Input for XSLT transformations
-			Source xmlSource = new StreamSource(new ByteArrayInputStream(xmlDataString.getBytes(StandardCharsets.UTF_8)));
+		// Input for XSLT transformations
+		Source xmlSource = new StreamSource(new ByteArrayInputStream(xmlDataString.getBytes(StandardCharsets.UTF_8)));
 
-			Result result = new SAXResult(fop.getDefaultHandler());
+		Result result = new SAXResult(fop.getDefaultHandler());
 
-			transformer.transform(xmlSource, result);
-		} finally {
-			tempFile.delete();
-		}
+		transformer.transform(xmlSource, result);
 	}
 
 }
