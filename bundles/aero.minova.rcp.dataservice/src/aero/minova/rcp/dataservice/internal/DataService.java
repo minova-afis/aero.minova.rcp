@@ -298,7 +298,7 @@ public class DataService implements IDataService {
 			log("CAS Answer XML Detail:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 			try {
-				FileWriter fw = new FileWriter(path.toFile());
+				FileWriter fw = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 				fw.write("<" + rootElement + ">");
 				for (Row r : fromJson.getResultSet().getRows()) {
