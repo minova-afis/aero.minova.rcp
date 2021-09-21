@@ -225,8 +225,7 @@ public class PrintIndexHandler {
 					Files.delete(pathXML);
 				}
 
-				// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
-				if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
+				if (disablePreview) {
 					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
 					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
