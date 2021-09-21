@@ -2,8 +2,9 @@ package aero.minova.rcp.rcp.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.Result;
@@ -27,9 +28,10 @@ public class PDFGenerator {
 
 	private PDFGenerator() {}
 
-	public static void createPdfFile(String xmlDataString, File stylesheet, OutputStream pdfOutputStream)
-			throws IOException, SAXException, TransformerException {
+	public static void createPdfFile(String xmlDataString, File stylesheet, URL pdf) throws IOException, SAXException, TransformerException {
 		System.out.println("Create pdf file ...");
+
+		FileOutputStream pdfOutputStream = new FileOutputStream(pdf.getFile());
 
 		FopFactory fopFactory = FopFactory.newInstance();
 		fopFactory.setBaseURL(new File(".").toURI().toURL().toString());
@@ -51,6 +53,9 @@ public class PDFGenerator {
 		Result result = new SAXResult(fop.getDefaultHandler());
 
 		transformer.transform(xmlSource, result);
+
+		pdfOutputStream.flush();
+		pdfOutputStream.close();
 	}
 
 }
