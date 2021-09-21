@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -80,23 +79,17 @@ public class PrintUtil {
 	}
 
 	/**
-	 * Generiert ein PDF Dokument und gibt es als FileOutputStream zurück!
+	 * Generiert ein PDF Dokument mithilfe der gegebenen xml und xsl
 	 *
 	 * @param pdf
 	 * @param xml
 	 * @param xsl
-	 * @return
-	 * @return
+	 * @throws TransformerException
+	 * @throws SAXException
+	 * @throws IOException
 	 */
-	public static FileOutputStream generatePDF(URL pdf, String xmlString, File stylesheet) {
-		try {
-			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
-			PDFGenerator.createPdfFile(xmlString, stylesheet, pdfOutput);
-			return pdfOutput;
-		} catch (IOException | SAXException | TransformerException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public static void generatePDF(URL pdf, String xmlString, File stylesheet) throws IOException, SAXException, TransformerException {
+		PDFGenerator.createPdfFile(xmlString, stylesheet, pdf);
 	}
 
 }

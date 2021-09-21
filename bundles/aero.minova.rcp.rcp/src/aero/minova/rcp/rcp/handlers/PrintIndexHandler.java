@@ -16,6 +16,7 @@ import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -38,7 +39,9 @@ import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
+import org.xml.sax.SAXException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -218,6 +221,9 @@ public class PrintIndexHandler {
 				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
+				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
+				PrintUtil.checkPreview(window, modelService, partService, preview);
+
 				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
 				if (!createXmlXsl) {
@@ -230,8 +236,9 @@ public class PrintIndexHandler {
 				} else {
 					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
 				}
-			} catch (IOException e) {
+			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
+				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
 			}
 
 		}

@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -26,6 +27,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -180,10 +182,15 @@ public class PrintDetailHandler {
 					Path pdfPath = dataService.getStoragePath().resolve("reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
 					URL pdfFile = pdfPath.toFile().toURI().toURL();
 					String xmlString = Files.readString(xmlPath);
+
+					// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
+					PrintUtil.checkPreview(window, modelService, partService, preview);
+
 					PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve("reports/" + reportNames.get(maskName)).toFile());
 					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
-				} catch (IOException e) {
+				} catch (IOException | SAXException | TransformerException e) {
 					e.printStackTrace();
+					broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
 				}
 			}));
 		} catch (Exception ex) {

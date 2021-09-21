@@ -11,10 +11,12 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Druck-Vorschau
@@ -33,6 +35,8 @@ public class Preview {
 
 	private Browser browser;
 
+	private boolean loading;
+
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window) {
 		window.getContext().set(Preview.class, this);
@@ -40,15 +44,20 @@ public class Preview {
 
 		browser = new Browser(parent, SWT.NONE);
 
-		DisposeListener dl = new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-//				browser, "disposed");
-				// damit ist auch der Preview nicht mehr gültig, es muss ein neuer erzeugt werden
-				window.getContext().set(Preview.class, null);
-			}
-		};
+		DisposeListener dl = e -> window.getContext().set(Preview.class, null);
 		browser.addDisposeListener(dl);
+
+		browser.addProgressListener(new ProgressListener() {
+			@Override
+			public void completed(ProgressEvent event) {
+				loading = false;
+			}
+
+			@Override
+			public void changed(ProgressEvent event) {
+				loading = true;
+			}
+		});
 	}
 
 	/**
@@ -63,8 +72,26 @@ public class Preview {
 		part.setVisible(true);
 		part.getParent().setSelectedElement(part);
 
-		System.out.println(MessageFormat.format("verwende Browser {0}", browser.getBrowserType()));
-		browser.setUrl(url);
+		System.out.println(MessageFormat.format("verwende Browser {0} um URL {1} zu öffnen", browser.getBrowserType(), url));
+		loadPage(url);
+	}
+
+	/**
+	 * Synchrone Methode eine URL zu laden
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private boolean loadPage(String url) {
+		Display display = Display.getCurrent();
+		boolean set = browser.setUrl(url); // URL content loading is asynchronous
+		loading = true;
+		while (loading) { // Add synchronous behavior: wait till it finishes loading
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		return set;
 	}
 
 	/**
@@ -73,7 +100,8 @@ public class Preview {
 	 * @author wild
 	 */
 	public void clear() {
-		browser.setUrl("about:blank");
+		loadPage("about:blank");
+		System.out.println("--Setting blank");
 		// lasse dem Thread Zeit, den Zugriff auf die geöffnete Datei zu schließen
 		try {
 			Thread.sleep(1);
