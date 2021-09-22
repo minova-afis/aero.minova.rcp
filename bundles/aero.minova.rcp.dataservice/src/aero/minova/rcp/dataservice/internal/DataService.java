@@ -918,6 +918,32 @@ public class DataService implements IDataService {
 		}
 	}
 
+	@Override
+	public CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType) {
+
+		Table t = TableBuilder.newTable(tablename) //
+				.withColumn(requestColumn, requestValue.getType())//
+				.withColumn(resultColumn, resultType)//
+				.create();
+		Row row = RowBuilder.newRow() //
+				.withValue(requestValue) //
+				.withValue(null) //
+				.create();
+		t.addRow(row);
+
+		CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t, false);
+
+		return tableFuture.thenApply(ta -> {
+			Value v = null;
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					v = r.getValue(1);
+				}
+			}
+			return v;
+		});
+	}
+
 	private CompletableFuture<?> getRequestedTable(int keyLong, String keyText, MField field, String purpose) {
 		MDetail detail = field.getDetail();
 		String tableName;
