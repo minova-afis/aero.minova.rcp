@@ -31,7 +31,7 @@ public class Value implements Serializable {
 		} else if (valueNew instanceof ZonedDateTime) {
 			type = DataType.ZONED;
 		} else {
-			throw new RuntimeException();
+			throw new RuntimeException("Class " + valueNew.getClass() + " not supported for Value");
 		}
 		this.value = valueNew;
 	}
@@ -175,7 +175,7 @@ public class Value implements Serializable {
 		return type == DataType.DOUBLE ? (Double) value : null;
 	}
 
-	public Object getBigDecimalValue() {
+	public Double getBigDecimalValue() {
 		return type == DataType.BIGDECIMAL ? (Double) value : null;
 	}
 
