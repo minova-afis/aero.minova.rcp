@@ -43,6 +43,7 @@ public class ModelToViewModel {
 			MField f = new MLookupField();
 			f.setLookupTable(field.getLookup().getTable());
 			f.setLookupProcedurePrefix(field.getLookup().getProcedurePrefix());
+			f.setLookupDescription(field.getLookup().getDescriptionName());
 			for (TypeParam typeParam : field.getLookup().getParam()) {
 				f.addLookupParameter(typeParam.getFieldName());
 			}

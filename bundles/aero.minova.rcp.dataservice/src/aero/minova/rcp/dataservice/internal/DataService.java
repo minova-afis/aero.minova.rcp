@@ -680,7 +680,7 @@ public class DataService implements IDataService {
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
-					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(field.getLookupDescription(), DataType.STRING)//
 					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
 					.create();
 			Row row = RowBuilder.newRow() //
@@ -821,7 +821,7 @@ public class DataService implements IDataService {
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
-					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(field.getLookupDescription(), DataType.STRING)//
 					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
 					.create();
 			Row row = RowBuilder.newRow() //
@@ -959,7 +959,7 @@ public class DataService implements IDataService {
 		if (isTable) {
 			tableBuilder = tableBuilder.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
-					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(field.getLookupDescription(), DataType.STRING)//
 					.withColumn(TABLE_LASTACTION, DataType.INTEGER);//
 			if (keyLong == 0) {
 				rowBuilder = rowBuilder.withValue(null);

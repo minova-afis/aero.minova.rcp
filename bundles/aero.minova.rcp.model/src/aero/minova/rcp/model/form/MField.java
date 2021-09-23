@@ -35,6 +35,7 @@ public abstract class MField {
 	private boolean fillToRight = false;
 	private String lookupTable;
 	private String lookupProcedurePrefix;
+	private String lookupDescription;
 	private List<String> lookupParameters;
 	private final DataType dataType;
 	private MDetail detail;
@@ -244,6 +245,14 @@ public abstract class MField {
 
 	public void setLookupTable(String lookupTable) {
 		this.lookupTable = lookupTable;
+	}
+
+	public String getLookupDescription() {
+		return lookupDescription;
+	}
+
+	public void setLookupDescription(String lookupDescription) {
+		this.lookupDescription = lookupDescription == null ? Constants.TABLE_DESCRIPTION : lookupDescription;
 	}
 
 	public List<String> getLookupParameters() {
