@@ -1,10 +1,10 @@
 package aero.minova.rcp.model.util;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,6 +15,8 @@ import aero.minova.rcp.model.Value;
 public class ParamStringUtil {
 
 	private ParamStringUtil() {}
+
+	private static final String PATTERN = "yyyyMMddHHmmss";
 
 	/**
 	 * TODO: geschachtelte Param-String-Felder?
@@ -52,10 +54,7 @@ public class ParamStringUtil {
 					break;
 				case INSTANT:
 					Instant instantv = v.getInstantValue();
-
-					// TODO: Format! "yyyyMMddHHmmss"
-					DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.getDefault())
-							.withZone(ZoneId.systemDefault());
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN).withLocale(Locale.getDefault()).withZone(ZoneId.systemDefault());
 					String dateString = formatter.format(instantv);
 					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateString.length() + "}" + dateString);
 
@@ -70,14 +69,13 @@ public class ParamStringUtil {
 					break;
 				case ZONED:
 					ZonedDateTime zdtv = v.getZonedDateTimeValue();
-					formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+					formatter = DateTimeFormatter.ofPattern(PATTERN);
 					dateString = zdtv.format(formatter);
 					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateString.length() + "}" + dateString);
 					break;
 				default:
 					output.append("{" + i + "-" + IVariantType.VARIANT_OBJECT + "-" + v.getValue().toString().length() + "}" + v.getValue().toString());
 					break;
-
 				}
 			}
 
@@ -119,11 +117,12 @@ public class ParamStringUtil {
 				break;
 			case IVariantType.VARIANT_OBJECT:
 				if (length == 14) {
-					newVar = "TODO"; // TODO: StringTools.convertStringToTime(parameter);
+					newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, Locale.getDefault())).atZone(ZoneId.systemDefault())
+							.toInstant();
 				}
 				break;
 			case IVariantType.VARIANT_DATE:
-				newVar = "TODO"; // TODO DateUtil.convertStringToTime(parameter).getTime();
+				newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, Locale.getDefault())).atZone(ZoneId.systemDefault()).toInstant();
 				break;
 			case IVariantType.VARIANT_EMPTY:
 				newVar = null;
