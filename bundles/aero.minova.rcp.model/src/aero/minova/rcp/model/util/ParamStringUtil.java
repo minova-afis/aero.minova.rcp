@@ -24,7 +24,7 @@ public class ParamStringUtil {
 	 * @param values
 	 * @return
 	 */
-	public static String convertObjectToStringParameter(List<Value> values) {
+	public static String convertValuesToStringParameter(List<Value> values) {
 		if (values == null) {
 			return null;
 		}
@@ -85,7 +85,7 @@ public class ParamStringUtil {
 
 	}
 
-	public static List<Value> convertStringParameterToObject(String value) {
+	public static List<Value> convertStringParameterToValues(String value) {
 		List<Value> values = new ArrayList<>();
 		if (value == null || value.length() == 0) {
 			return values;

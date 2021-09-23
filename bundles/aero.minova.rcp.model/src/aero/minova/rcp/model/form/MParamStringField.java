@@ -63,7 +63,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 		}
 
 		// String parsen
-		List<Value> values = ParamStringUtil.convertStringParameterToObject(value.getStringValue());
+		List<Value> values = ParamStringUtil.convertStringParameterToValues(value.getStringValue());
 
 		// Unterfelder füllen
 		for (int i = 0; i < subMFields.size(); i++) {
@@ -81,7 +81,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 			values.add(subMField.getValue());
 		}
 
-		String paramString = ParamStringUtil.convertObjectToStringParameter(values);
+		String paramString = ParamStringUtil.convertValuesToStringParameter(values);
 
 		return new Value(paramString);
 	}
