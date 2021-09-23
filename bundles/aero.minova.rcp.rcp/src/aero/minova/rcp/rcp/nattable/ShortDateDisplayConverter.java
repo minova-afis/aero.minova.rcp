@@ -3,8 +3,13 @@ package aero.minova.rcp.rcp.nattable;
 import java.time.Instant;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
+import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.util.DateUtil;
 
 public class ShortDateDisplayConverter extends DisplayConverter {
@@ -17,8 +22,11 @@ public class ShortDateDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object canonicalToDisplayValue(Object canonicalValue) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
+
 		if (canonicalValue instanceof Instant) {
-			return DateUtil.getDateString((Instant) canonicalValue, locale);
+			return DateUtil.getDateString((Instant) canonicalValue, locale, dateUtil);
 		}
 		return null;
 	}
