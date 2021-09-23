@@ -5,13 +5,17 @@ import java.util.List;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.event.ValueChangeEvent;
+import aero.minova.rcp.model.event.ValueChangeListener;
+import aero.minova.rcp.model.util.ParamStringUtil;
 
-public class MParamStringField extends MField {
+public class MParamStringField extends MField implements ValueChangeListener {
 
 	protected MParamStringField() {
 		super(DataType.STRING);
 		this.subMFields = new ArrayList<>();
-		this.setSubFields(new ArrayList<>());
+		this.subFields = new ArrayList<>();
 	}
 
 	private List<MField> subMFields;
@@ -21,12 +25,21 @@ public class MParamStringField extends MField {
 		return subMFields;
 	}
 
-	public void setSubfields(List<MField> subMFields) {
+	public void setSubMFields(List<MField> subMFields) {
 		this.subMFields = subMFields;
+
+		for (MField f : subMFields) {
+			f.addValueChangeListener(this);
+		}
 	}
 
 	public void addSubMField(MField f) {
 		subMFields.add(f);
+		f.addValueChangeListener(this);
+	}
+
+	public void clearSubMFields() {
+		subMFields.clear();
 	}
 
 	public List<Field> getSubFields() {
@@ -37,8 +50,48 @@ public class MParamStringField extends MField {
 		this.subFields = subFields;
 	}
 
-	public void clearSubMFields() {
-		subMFields.clear();
+	@Override
+	public void setValue(Value value, boolean user) {
+		super.setValue(value, user);
+
+		// Alle Unterfelder leeren
+		if (value == null || value.getStringValue() == null) {
+			for (MField subMField : subMFields) {
+				subMField.setValue(null, user);
+			}
+			return;
+		}
+
+		// String parsen
+		List<Value> values = ParamStringUtil.convertStringParameterToObject(value.getStringValue());
+
+		// Unterfelder füllen
+		for (int i = 0; i < subMFields.size(); i++) {
+			System.out.println("Setting " + subMFields.get(i).getLabel() + " " + values.get(i));
+			subMFields.get(i).setValue(values.get(i), false);
+		}
+	}
+
+	@Override
+	public Value getValue() {
+
+		List<Value> values = new ArrayList<>();
+
+		for (MField subMField : subMFields) {
+			values.add(subMField.getValue());
+		}
+
+		String paramString = ParamStringUtil.convertObjectToStringParameter(values);
+
+		return new Value(paramString);
+	}
+
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		if (evt.isUser()) {
+			this.setValue(getValue(), false);
+		}
+
 	}
 
 }
