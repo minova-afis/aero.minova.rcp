@@ -31,6 +31,8 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -42,6 +44,8 @@ import aero.minova.rcp.form.model.xsd.EventParam;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.form.model.xsd.Head;
+import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
@@ -55,6 +59,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MParamStringField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
@@ -1055,4 +1060,102 @@ public class WFCDetailCASRequestsUtil {
 		t.addRow(r);
 		dataService.getDetailDataAsync(t.getName(), t);
 	}
+
+	/**
+	 * Zeichnet alle Felder der MSection neu. Falls Param-String Felder enthalten sind werden die aktuellen MFields dieser gezeichnet, alte Felder werden
+	 * entfernt
+	 * 
+	 * @param sectionID
+	 */
+	public void redrawSection(MSection mSection) {
+
+		// SubFelder von Param-String Feldern entfernen
+		List<MField> toRemove = new ArrayList<>();
+		for (MField mField : mDetail.getFields()) {
+			if (mField instanceof MParamStringField && mField.getmSection().equals(mSection)) {
+				toRemove.addAll(((MParamStringField) mField).getSubMFields());
+				((MParamStringField) mField).clearSubMFields();
+			}
+		}
+		mSection.getTabList().removeAll(toRemove);
+		mDetail.getFields().removeAll(toRemove);
+
+		List<MField> visibleMFields = new ArrayList<>();
+
+		List<MField> toTraverse = new ArrayList<>();
+		toTraverse.addAll(mSection.getTabList());
+		for (MField f : toTraverse) {
+			visibleMFields.add(f);
+
+			if (f instanceof MParamStringField) {
+				String name = f.getName();
+				String suffix = name.contains("\\.") ? name.substring(name.lastIndexOf("\\."), name.length()) : "";
+
+				MParamStringField mParamString = (MParamStringField) f;
+				for (Field subField : mParamString.getSubFields()) {
+					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
+					visibleMFields.add(subMField);
+					mParamString.addSubMField(subMField);
+
+				}
+
+			}
+		}
+
+		// Ganzen Body/ Client Area der Section entfernen
+		mSection.getSection().getClient().dispose();
+
+		// Neuen Body erstellen
+		Composite clientComposite = wfcDetailPart.getFormToolkit().createComposite(mSection.getSection());
+		clientComposite.setLayout(new FormLayout());
+		wfcDetailPart.getFormToolkit().paintBordersFor(clientComposite);
+		mSection.getSection().setClient(clientComposite);
+
+		// Felder zeichnen
+		wfcDetailPart.createUIFields(visibleMFields, clientComposite);
+
+		// Sortieren der Fields nach Tab-Index.
+		wfcDetailPart.sortTabList(mSection);
+		// Setzen der TabListe für die einzelnen Sections.
+		clientComposite.setTabList(wfcDetailPart.getTabListForSectionComposite(mSection, clientComposite));
+		// Setzen der TabListe der Sections im Part.
+		clientComposite.getParent().setTabList(wfcDetailPart.getTabListForSection(clientComposite.getParent()));
+
+		mSection.getSection().requestLayout();
+		wfcDetailPart.translate(clientComposite);
+
+	}
+
+	/**
+	 * Das übergebene MParamStringField wird mit den Feldern aus der Maske mit formName geladen. Dafür wird die gesamte Section neu gezeichnet
+	 * 
+	 * @param mParamString
+	 * @param formName
+	 */
+	public void updateParamStringField(MParamStringField mParamString, String formName) {
+		Form f = dataFormService.getForm(formName);
+
+		List<Field> subfields = new ArrayList<>();
+
+		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
+			if (o instanceof Head) {
+				for (Object fieldOrGrid : ((Head) o).getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						subfields.add((Field) fieldOrGrid);
+					}
+				}
+			} else if (o instanceof Page) {
+				for (Object fieldOrGrid : ((Page) o).getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						subfields.add((Field) fieldOrGrid);
+					}
+				}
+			}
+		}
+
+		mParamString.getSubFields().clear();
+		mParamString.getSubFields().addAll(subfields);
+		redrawSection(mParamString.getmSection());
+	}
+
 }
