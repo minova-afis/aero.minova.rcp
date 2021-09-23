@@ -810,6 +810,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 			createField(clientComposite, mField, row, column);
 
+			row += mField.getNumberRowsSpanned() - 1;
 			column += width;
 		}
 		addBottonMargin(clientComposite, row + 1, column);
