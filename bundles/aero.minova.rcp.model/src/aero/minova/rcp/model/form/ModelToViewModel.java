@@ -90,10 +90,14 @@ public class ModelToViewModel {
 			return f;
 		}
 
+		if (field.getParamString() != null) {
+			MParamStringField f = new MParamStringField();
+			f.setSubFields(field.getParamString().getField());
+			return f;
+		}
+
 		if (field.getEditor() != null) {
 			System.err.println("Field " + field.getName() + " is of Type Editor, which isn't implemented yet");
-		} else if (field.getParamString() != null) {
-			System.err.println("Field " + field.getName() + " is of Type Param-String, which isn't implemented yet");
 		} else {
 			throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
 		}
