@@ -101,6 +101,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.form.MParamStringField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
@@ -199,7 +200,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
-		mPerspective.getContext().set("WFCDetailCASRequestsUtil", casRequestsUtil);
+		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
 		mPerspective.getContext().set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
 		translate(composite);
 
@@ -282,12 +283,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle) {
-			this.headOrPageOrGrid = headOrPageOrGrid;
+			this(headOrPageOrGrid);
 			this.formTitle = formTitle;
 			this.formSuffix = formSuffix;
 			this.isOP = isOP;
 			if (headOrPageOrGrid instanceof Head && !isOP) {
 				isHead = true;
+			} else {
+				isHead = false;
 			}
 		}
 
@@ -466,9 +469,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		Section section;
 		Control sectionControl = null;
 		if (headOrPageOrGrid.isHead) {
-			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			section = getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			section = formToolkit.createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section = getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 			sectionControl = section.getChildren()[0];
 		}
 
@@ -499,27 +502,32 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		});
 
-		// Client Area
-		Composite composite = formToolkit.createComposite(section);
-		composite.setLayout(new FormLayout());
-		formToolkit.paintBordersFor(composite);
-		section.setClient(composite);
-
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText(), sectionControl, section);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
-		// Erstellen der Field des Section.
-		createFields(composite, headOrPageOrGrid, mSection, section);
-		// Sortieren der Fields nach Tab-Index.
-		sortTabList(mSection);
-		// Setzen der TabListe für die einzelnen Sections.
-		composite.setTabList(getTabListForSectionComposite(mSection, composite));
-		// Setzen der TabListe der Sections im Part.
-		composite.getParent().setTabList(getTabListForSection(composite.getParent()));
+
+		layoutSectionClient(headOrPageOrGrid, section, mSection);
 
 		// MSection wird zum MDetail hinzugefügt.
 		mDetail.addPage(mSection);
+	}
+
+	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
+		// Client Area
+		Composite clientComposite = getFormToolkit().createComposite(section);
+		clientComposite.setLayout(new FormLayout());
+		getFormToolkit().paintBordersFor(clientComposite);
+		section.setClient(clientComposite);
+
+		// Erstellen der Field des Section.
+		createFields(clientComposite, headOrPageOrGrid, mSection, section);
+		// Sortieren der Fields nach Tab-Index.
+		sortTabList(mSection);
+		// Setzen der TabListe für die einzelnen Sections.
+		clientComposite.setTabList(getTabListForSectionComposite(mSection, clientComposite));
+		// Setzen der TabListe der Sections im Part.
+		clientComposite.getParent().setTabList(getTabListForSection(clientComposite.getParent()));
 	}
 
 	/**
@@ -614,7 +622,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 * @param traverseListener
 	 *            der zuzuweisende TraverseListener für die Fields
 	 */
-	private void sortTabList(MSection mSection) {
+	public void sortTabList(MSection mSection) {
 		List<MField> tabList = mSection.getTabList();
 		Collections.sort(tabList, (f1, f2) -> {
 			if (f1.getTabIndex() == f2.getTabIndex()) {
@@ -652,13 +660,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 *            die Setion, von der die TabListe gesetzt werden soll.
 	 * @return Array mit Controls
 	 */
-	private Control[] getTabListForSection(Composite composite) {
+	public Control[] getTabListForSection(Composite composite) {
 		List<Control> tabList = new ArrayList<>();
 
 		if (selectAllControls && composite.getChildren()[0] instanceof Twistie) {
 			for (Control child : composite.getChildren()) {
 				if (child instanceof ToolBar) {
-					tabList.add(1, child);
+					tabList.add(Math.min(tabList.size(), 1), child);
 				} else if (child instanceof Label) {} else {
 					tabList.add(child);
 				}
@@ -666,7 +674,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		} else {
 			for (Control child : composite.getChildren()) {
 				if (child instanceof ToolBar) {
-					tabList.add(1, child);
+					tabList.add(Math.min(tabList.size(), 1), child);
 				} else if (child instanceof Twistie || child instanceof Label) {} else {
 					tabList.add(child);
 				}
@@ -704,7 +712,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 *            der Section
 	 * @return Array mit Controls
 	 */
-	private Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
+	public Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
 
 		List<Control> tabList = new ArrayList<>();
 
@@ -758,71 +766,101 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 *            die Section deren Fields erstellt werden.
 	 */
 	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, Section section) {
-		int row = 0;
-		int column = 0;
-		int width;
 		IEclipseContext context = mPerspective.getContext();
+		List<MField> visibleMFields = new ArrayList<>();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
-			if (!(fieldOrGrid instanceof Field)) {
-				if (fieldOrGrid instanceof Grid) {
-					SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
-					MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
-					mGrid.addGridChangeListener(this);
-					GridAccessor gA = new GridAccessor(mGrid);
-					gA.setSectionGrid(sg);
-					mGrid.setGridAccessor(gA);
-					mSection.getmDetail().putGrid(mGrid);
-					sectionGrids.add(sg);
+			if (fieldOrGrid instanceof Grid) {
 
-					ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
-					sg.createGrid();
-					mGrid.setDataTable(sg.getDataTable());
+				createGrid(composite, mSection, section, context, fieldOrGrid);
 
-					// XBS nach Keyzuordnung überprüfen, gilt nur fürs erste Grid
-					try {
-						if (mDetail.getGrids().size() == 1) {
-							checkXBSForGridKeys((Grid) fieldOrGrid);
-						}
-					} catch (NoSuchFieldException e) {
-						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
-					}
-				}
 			} else {
+
 				Field field = (Field) fieldOrGrid;
-				try {
-					MField f = ModelToViewModel.convert(field);
-					f.addValueChangeListener(this);
-					String fieldName = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName();
-					f.setName(fieldName);
 
-					getDetail().putField(f);
+				String suffix = headOrPage.isOP ? headOrPage.formSuffix + "." : "";
+				MField mField = createMField(field, mSection, suffix);
+				if (field.isVisible()) {
+					visibleMFields.add(mField);
+				}
 
-					if (!field.isVisible()) {
-						continue; // nur sichtbare Felder
+				if (mField instanceof MParamStringField) {
+					for (Field f : ((MParamStringField) mField).getSubFields()) {
+						MField subfield = createMField(f, mSection, suffix);
+						((MParamStringField) mField).addSubMField(subfield);
+						if (f.isVisible()) {
+							visibleMFields.add(subfield);
+						}
 					}
-					width = getWidth(field);
-					if (column + width > 4) {
-						column = 0;
-						row++;
-					}
-					createField(composite, f, row, column);
-					f.setmPage(mSection);
-					mSection.addTabField(f);
-
-					column += width;
-					if (!headOrPage.isHead) {
-						row += getExtraHeight(field);
-					}
-				} catch (NullPointerException e) {
-					String fieldname = (headOrPage.isOP ? headOrPage.formSuffix + "." : "") + field.getName();
-					showErrorMissingSQLIndex(field, fieldname, e);
 				}
 			}
 		}
-		addBottonMargin(composite, row + 1, column);
+		createUIFields(visibleMFields, composite);
 	}
 
-	private void showErrorMissingSQLIndex(Field field, String fieldname, NullPointerException e) {
+	public void createUIFields(List<MField> mFields, Composite clientComposite) {
+		int row = 0;
+		int column = 0;
+		for (MField mField : mFields) {
+			int width = mField.getNumberColumnsSpanned();
+
+			if (column + width > 4) {
+				column = 0;
+				row++;
+			}
+
+			createField(clientComposite, mField, row, column);
+
+			column += width;
+		}
+		addBottonMargin(clientComposite, row + 1, column);
+	}
+
+	public MField createMField(Field field, MSection mSection, String suffix) {
+		String fieldName = suffix + field.getName();
+		try {
+			MField f = ModelToViewModel.convert(field);
+			f.addValueChangeListener(this);
+			f.setName(fieldName);
+
+			getDetail().putField(f);
+
+			if (field.isVisible()) {
+				f.setmPage(mSection);
+				mSection.addTabField(f);
+			}
+
+			return f;
+		} catch (NullPointerException e) {
+			showErrorMissingSQLIndex(field, fieldName, e);
+		}
+		return null;
+	}
+
+	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context, Object fieldOrGrid) {
+		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
+		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
+		mGrid.addGridChangeListener(this);
+		GridAccessor gA = new GridAccessor(mGrid);
+		gA.setSectionGrid(sg);
+		mGrid.setGridAccessor(gA);
+		mSection.getmDetail().putGrid(mGrid);
+		sectionGrids.add(sg);
+
+		ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
+		sg.createGrid();
+		mGrid.setDataTable(sg.getDataTable());
+
+		// XBS nach Keyzuordnung überprüfen, gilt nur fürs erste Grid
+		try {
+			if (mDetail.getGrids().size() == 1) {
+				checkXBSForGridKeys((Grid) fieldOrGrid);
+			}
+		} catch (NoSuchFieldException e) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+		}
+	}
+
+	public void showErrorMissingSQLIndex(Field field, String fieldname, NullPointerException e) {
 		if (field.getSqlIndex() == null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Field " + fieldname + " has no SQL-Index!");
 		} else {
@@ -877,7 +915,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
 		} else if (field instanceof MLookupField) {
 			LookupField.create(composite, field, row, column, locale, mPerspective);
-		} else if (field instanceof MTextField) {
+		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(composite, field, row, column, mPerspective);
 		}
 	}
@@ -891,7 +929,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
-	private void translate(Composite composite) {
+	public void translate(Composite composite) {
 		for (Control control : composite.getChildren()) {
 			if (control.getData(TRANSLATE_PROPERTY) != null) {
 				String property = (String) control.getData(TRANSLATE_PROPERTY);
@@ -1006,6 +1044,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (SectionGrid sg : sectionGrids) {
 			sg.saveState();
 		}
+	}
+
+	public FormToolkit getFormToolkit() {
+		return formToolkit;
 	}
 
 }
