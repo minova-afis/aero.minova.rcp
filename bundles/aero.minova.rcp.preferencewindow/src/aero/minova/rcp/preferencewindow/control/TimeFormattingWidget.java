@@ -81,11 +81,7 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	private String getTimeStringFromPattern(String pattern) {
 		try {
 			LocalTime lt = LocalTime.of(23, 35, 54);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
-			if (pattern.contains("hh")) {
-				pattern = pattern + " a";
-				dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
-			}
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, locale);
 			String formatted = lt.format(dtf);
 			return formatted;
 		} catch (Exception e) {
