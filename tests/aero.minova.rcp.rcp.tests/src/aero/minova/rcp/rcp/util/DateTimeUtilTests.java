@@ -566,6 +566,6 @@ public class DateTimeUtilTests {
 	@Test
 	public void testGetDateTimeString() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		assertEquals("13.05.20 18:12", DateTimeUtil.getDateTimeString(bithday, Locale.GERMANY, "dd.MM.yy", "hh:mm"));
+		assertEquals("13.05.20 18:12", DateTimeUtil.getDateTimeString(bithday, Locale.GERMANY, "dd.MM.yy", "HH:mm"));
 	}
 }
