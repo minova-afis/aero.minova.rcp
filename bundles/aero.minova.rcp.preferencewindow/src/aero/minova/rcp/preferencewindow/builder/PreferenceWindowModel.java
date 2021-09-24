@@ -139,7 +139,7 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX,
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndexExplanation", null), 0.7, DisplayType.CHECKEXPLANATION, false));
 
-		boolean xbsShowDelete = Boolean.parseBoolean(xbsPreferences.get(Constants.XBS_SHOW_DELETE_DIALOG));
+		boolean xbsShowDelete = Boolean.parseBoolean(xbsPreferences.get(Constants.XBS_SHOW_DELETE_DIALOG)); // Default aus xbs nehmen
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DELETE_WARNING, translationService.translate("@Preferences.ShowDeleteWarning", null), 0.8,
 				DisplayType.CHECK, xbsShowDelete));
 
