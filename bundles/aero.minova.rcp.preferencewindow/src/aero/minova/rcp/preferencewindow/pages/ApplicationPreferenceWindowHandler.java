@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
@@ -97,6 +98,8 @@ public class ApplicationPreferenceWindowHandler {
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
 		pwm = new PreferenceWindowModel(s);
+		ContextInjectionFactory.inject(pwm, application.getContext()); // In Context injected, damit TranslationService genutzt werden kann
+
 		this.workbench = workbench;
 
 		// Shell des Windows der Application finden
