@@ -12,8 +12,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,27 +64,7 @@ public class DateTimeField {
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
-					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
-							locale);
-					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
-							locale);
-					LocalDateTime localeDateTime = LocalDateTime.ofInstant(date, ZoneId.of("UTC"));
-					String pattern = dateUtil + " " + timeUtil;
-					if (dateUtil.isBlank() && timeUtil.isBlank()) {
-						result.add(DateTimeUtil.getDateTimeString(date, locale));
-					} else if (dateUtil.isBlank()) {
-						String datePattern = "dd.MM.yyyy" + pattern;
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern);
-						result.add(localeDateTime.format(dtf));
-					} else if (timeUtil.isBlank()) {
-						String timePattern = pattern + "HH:mm";
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timePattern);
-						result.add(localeDateTime.format(dtf));
-					} else {
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
-						result.add(localeDateTime.format(dtf));
-					}
+					result.add(DateTimeUtil.getDateTimeString(date, locale, dateUtil, timeUtil));
 					field.setValue(new Value(date), true);
 				}
 				return result;

@@ -98,6 +98,12 @@ public class PrintIndexHandler {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DISABLE_PREVIEW)
 	public boolean disablePreview;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DATE_UTIL)
+	public String dateUtilPref;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
+	public String timeUtilPref;
 
 	private boolean pdfFolderExists;
 
@@ -329,7 +335,7 @@ public class PrintIndexHandler {
 							Object colVal = gbo.getDescriptor().get(i);
 							colValString = colVal.toString();
 							if (colVal instanceof Instant) {
-								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, Locale.getDefault());
+								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, Locale.getDefault(), dateUtilPref, timeUtilPref);
 							}
 							tableTitle += colName + ": " + colValString + ", ";
 						}
@@ -464,7 +470,8 @@ public class PrintIndexHandler {
 		xml.append("<Site>\n" + "<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>\n" + "<Address2><![CDATA[Tröltschstraße 4]]></Address2>\n"
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
-		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), Locale.getDefault()) + "]]></PrintDate>\n");
+		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), Locale.getDefault(), dateUtilPref, timeUtilPref)
+				+ "]]></PrintDate>\n");
 	}
 
 	/**
