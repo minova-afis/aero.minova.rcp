@@ -176,7 +176,7 @@ public class DateUtil {
 	public static String getDateString(Instant instant, Locale locale, String dateUtilPref) {
 		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
 		if (!dateUtilPref.isBlank()) {
-			dtf = DateTimeFormatter.ofPattern(dateUtilPref, locale);
+			dtf = DateTimeFormatter.ofPattern(dateUtilPref);
 		}
 		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
 	}
@@ -185,9 +185,9 @@ public class DateUtil {
 		DateTimeFormatter dtfD = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
 		DateTimeFormatter dtfT = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
 		if (!dateUtilPref.isBlank())
-			dtfD = DateTimeFormatter.ofPattern(dateUtilPref, locale);
+			dtfD = DateTimeFormatter.ofPattern(dateUtilPref);
 		if (!timeUtilPref.isBlank())
-			dtfT = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+			dtfT = DateTimeFormatter.ofPattern(timeUtilPref);
 		return LocalDate.ofInstant(instant, zoneId).format(dtfD) + " " + LocalTime.ofInstant(instant, zoneId).format(dtfT);
 	}
 

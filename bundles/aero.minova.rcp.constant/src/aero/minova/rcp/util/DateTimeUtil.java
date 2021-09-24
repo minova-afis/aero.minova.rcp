@@ -27,38 +27,35 @@ public class DateTimeUtil {
 		return getDateTime(todayNow, input, locale, "", "", "UTC");
 	}
 
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern,
-			String timeUtilPattern) {
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern) {
 		return getDateTime(todayNow, input, locale, dateUtilPattern, timeUtilPattern, "UTC");
 	}
-	
+
 	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String zoneId) {
 		return getDateTime(todayNow, input, locale, "", "", zoneId);
 	}
-	
+
 	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
 		return getDateTime(todayNow, input, Locale.getDefault(), "", "", zoneId);
 	}
 
-	public static String getDateTimeString(Instant instant, Locale locale) {
-		String part1 = DateUtil.getDateString(instant, locale);
-		String part2 = TimeUtil.getTimeString(instant, locale);
+	public static String getDateTimeString(Instant instant, Locale locale, String datePattern, String timePattern) {
+
+		String part1 = DateUtil.getDateString(instant, locale, datePattern);
+		String part2 = TimeUtil.getTimeString(instant, locale, timePattern);
 		return part1 + " " + part2;
 	}
 
 	/**
-	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und
-	 * TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer
-	 * Leerstelle getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist,
-	 * wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in
-	 * DateUtil und TimeUtil festgelegt.
+	 * Diese Methode erstellt ein Instant aus DateUtil.getDate() und TimeUtil.getTime(). Das Datum und die Zeit werden bei der Eingabe mit einer Leerstelle
+	 * getrennt. Wenn die Eingabe vom Datum oder der Zeit unzulässig ist, wird null zurückgegeben. Was einer zulässigen Eingabe entspricht, wird in DateUtil und
+	 * TimeUtil festgelegt.
 	 * 
 	 * @param todayNow
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern,
-			String timeUtilPattern, String zoneId) {
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern, String zoneId) {
 		String[] splitInput = null;
 		Instant dateIn;
 		Instant timeIn;

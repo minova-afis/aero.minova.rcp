@@ -70,12 +70,11 @@ public class ShortDateField {
 					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
 							locale);
 					LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
-					if (dateUtil.isBlank()) {
-						result.add(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
-					} else {
-						result.add(localDate.format(dtf));
+					DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+					if (!dateUtil.isBlank()) {
+						dtf = DateTimeFormatter.ofPattern(dateUtil);
 					}
+					result.add(localDate.format(dtf));
 					field.setValue(new Value(date), true);
 				}
 				return result;
@@ -83,7 +82,7 @@ public class ShortDateField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		if(dateUtil.isBlank()) {
+		if (dateUtil.isBlank()) {
 			text.setMessage(LocalDate.of(2000, 1, 1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 		} else {
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);

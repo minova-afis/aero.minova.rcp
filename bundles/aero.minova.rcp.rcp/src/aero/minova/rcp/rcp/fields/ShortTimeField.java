@@ -70,12 +70,11 @@ public class ShortTimeField {
 					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
 							locale);
 					LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtil, locale);
-					if (timeUtil.isBlank()) {
-						result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
-					} else {
-						result.add(localTime.format(dtf));
+					DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
+					if (!timeUtil.isBlank()) {
+						dtf = DateTimeFormatter.ofPattern(timeUtil, locale);
 					}
+					result.add(localTime.format(dtf));
 					field.setValue(new Value(time), true);
 				}
 				return result;
@@ -83,9 +82,9 @@ public class ShortTimeField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		if(timeUtil.isBlank()) {
+		if (timeUtil.isBlank()) {
 			text.setMessage(LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
-		}else {
+		} else {
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtil, locale);
 			text.setMessage(LocalTime.of(23, 59).format(dtf));
 		}
