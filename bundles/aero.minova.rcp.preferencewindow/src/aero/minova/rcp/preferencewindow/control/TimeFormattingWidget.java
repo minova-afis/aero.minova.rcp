@@ -62,13 +62,14 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
-		
+
 		Label example = new Label(cmp, SWT.NONE);
 		addControl(example);
 		final GridData exampleGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		example.setLayoutData(exampleGridData);
-		example.setText(getTimeStringFromPattern(text.getText()));;
-		
+		example.setText(getTimeStringFromPattern(text.getText()));
+		;
+
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());
 			example.setText(getTimeStringFromPattern(text.getText()));
@@ -76,11 +77,15 @@ public class TimeFormattingWidget extends CustomPWWidget {
 
 		return text;
 	}
-	
+
 	private String getTimeStringFromPattern(String pattern) {
 		try {
 			LocalTime lt = LocalTime.of(12, 35, 54);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, locale);
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
+			if (pattern.contains("hh")) {
+				pattern = pattern + " a";
+				dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
+			}
 			String formatted = lt.format(dtf);
 			return formatted;
 		} catch (Exception e) {
@@ -98,8 +103,7 @@ public class TimeFormattingWidget extends CustomPWWidget {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
 		} else {
 			if (!(value instanceof String)) {
-				throw new UnsupportedOperationException(
-						"The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
+				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
 			}
 		}
 	}
