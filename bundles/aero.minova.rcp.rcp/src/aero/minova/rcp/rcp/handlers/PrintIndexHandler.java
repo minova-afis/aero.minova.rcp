@@ -2,13 +2,11 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
@@ -42,6 +39,7 @@ import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
+import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -56,10 +54,9 @@ import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
 import aero.minova.rcp.rcp.print.ReportCreationException;
 import aero.minova.rcp.rcp.print.TableXSLCreator;
-import aero.minova.rcp.rcp.util.PDFGenerator;
+import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.IOUtil;
-import aero.minova.rcp.util.Tools;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TreeList;
 
@@ -218,30 +215,36 @@ public class PrintIndexHandler {
 			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 			try {
-				Path path_pdf = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
-				Files.createDirectories(path_pdf.getParent());
-				createFile(path_pdf.toString());
-				URL url_pdf = path_pdf.toFile().toURI().toURL();
+				Path pathPDF = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+				Files.createDirectories(pathPDF.getParent());
+				createFile(pathPDF.toString());
+				URL urlPDF = pathPDF.toFile().toURI().toURL();
 
-				if (createXmlXsl) {
-					Path path_xml = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
-					Path path_xsl = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
-					createFile(path_xml.toString());
-					createFile(path_xsl.toString());
-					IOUtil.saveLoud(xml.toString(), path_xml.toString(), "UTF-8");
-					IOUtil.saveLoud(xslString, path_xsl.toString(), "UTF-8");
+				Path pathXML = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
+				Path pathXSL = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
+				createFile(pathXML.toString());
+				createFile(pathXSL.toString());
+				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");
+				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
+
+				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
+				PrintUtil.checkPreview(window, modelService, partService, preview);
+
+				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
+
+				if (!createXmlXsl) {
+					Files.delete(pathXSL);
+					Files.delete(pathXML);
 				}
 
-				generatePDF(url_pdf, xml.toString(), xslString);
-
-				// Auf Windows gibt es Probleme mit der internen Vorschau, deshalb immer deaktiviert
-				if (disablePreview || System.getProperty("os.name").startsWith("Win")) {
-					showFile(url_pdf.toString(), null);
+				if (disablePreview) {
+					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
-					showFile(url_pdf.toString(), checkPreview(window, modelService, partService, preview));
+					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
 				}
-			} catch (IOException e) {
+			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
+				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
 			}
 
 		}
@@ -472,89 +475,6 @@ public class PrintIndexHandler {
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
 		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), Locale.getDefault(), dateUtilPref, timeUtilPref)
 				+ "]]></PrintDate>\n");
-	}
-
-	/**
-	 * Generiert ein PDF Dokument und gibt es als FileOutputStream zurück!
-	 *
-	 * @param pdf
-	 * @param xml
-	 * @param xsl
-	 * @return
-	 */
-	public void generatePDF(URL pdf, String xmlString, String xslString) {
-		PDFGenerator pdfGenerator = new PDFGenerator();
-		try {
-			FileOutputStream pdfOutput = new FileOutputStream(pdf.getFile());
-			pdfGenerator.createPdfFile(xmlString, xslString, pdfOutput);
-			return;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Drucken des Index schlug fehl!");
-	}
-
-	/**
-	 * Öffnet entwender das BrowserWiget um den Index-Druck anzuzeigen oder den Default PDF Reader!
-	 *
-	 * @param urlString
-	 * @param preview
-	 */
-	private void showFile(String urlString, Preview preview) {
-		if (urlString != null) {
-			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
-			try {
-				if (preview == null) {
-					System.out.println(MessageFormat.format("öffne {0} auf dem Desktop", urlString));
-					Tools.openURL(urlString);
-				} else {
-					System.out.println(MessageFormat.format("öffne {0} im Preview-Fenster", urlString));
-					preview.openURL(urlString);
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				System.out.println("Error occured during the file open");
-			}
-		} else {
-			System.out.println("kann Datei NULL nicht anzeigen");
-		}
-	}
-
-	/**
-	 * Bereitet die Druckvorschau vor
-	 *
-	 * @param window
-	 *            das aktuelle Fenster (benötigt um den Druckvorschau-Part zu finden)
-	 * @param modelService
-	 *            der ModelService (benötigt um den Druckvorschau-Part zu finden)
-	 * @param partService
-	 *            der PartService (benötigt um den Druckvorschau-Part anzuzeigen)
-	 * @param preview
-	 *            der Druckvorschau-Part (falls nicht vorhanden, wird versucht, einen zu erzeugen)
-	 * @return der Druckvorschau-Part (falls schon vorhanden, wird dasselbe Objekt zurückgegeben)
-	 * @author wild
-	 * @since 11.0.0
-	 */
-	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
-		if (preview == null) {
-			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
-			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
-			if (previewPart.getObject() == null) {
-				partService.showPart(previewPart, PartState.CREATE);
-			}
-			previewPart.setVisible(true);
-			previewPart.getParent().setSelectedElement(previewPart);
-			preview = (Preview) previewPart.getObject();
-		} else {
-			preview.clear();
-		}
-		return preview;
 	}
 
 }

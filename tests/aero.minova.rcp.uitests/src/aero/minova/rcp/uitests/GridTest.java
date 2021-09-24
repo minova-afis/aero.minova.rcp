@@ -69,7 +69,7 @@ class GridTest {
 		// Maske über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Manuelle Abwicklung");
 		assertNotNull(adminMenu);
-		SWTBotMenu stundenErfassung = adminMenu.menu("tGraduation");
+		SWTBotMenu stundenErfassung = adminMenu.menu("Staffelsatz");
 		assertNotNull(stundenErfassung);
 		stundenErfassung.click();
 
@@ -99,7 +99,6 @@ class GridTest {
 	void tearDown() {
 
 	}
-
 
 	@Test
 	void ensurePartsAreAvailable() {
@@ -132,7 +131,6 @@ class GridTest {
 
 	}
 
-
 	@Test
 	public void ensureDataEntryCanBeCreated() {
 		// Do not start on Linux
@@ -162,9 +160,7 @@ class GridTest {
 		SWTBotView detailPart = bot.partByTitle("@Form.Details");
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
-
 		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
-
 
 		// Testeintrag erstellen
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
@@ -172,7 +168,6 @@ class GridTest {
 		createEntry();
 		saveDetail();
 		reloadIndex();
-
 
 //		// Zeilen einfügen und prüfen ob sie gespeichert wurden
 //		insertRows();
@@ -207,14 +202,14 @@ class GridTest {
 	 */
 	private void saveDetail() {
 		SWTBotView detailPart = bot.partByTitle("@Form.Details");
-		List<SWTBotToolbarButton>  detailToolbarButtons = detailPart.getToolbarButtons();
-		
+		List<SWTBotToolbarButton> detailToolbarButtons = detailPart.getToolbarButtons();
+
 		detailToolbarButtons.get(0).click();
 
 		UITestUtil.sleep();
-	
+
 	}
-	
+
 	private void reloadIndex() {
 		SWTBotView indexPart = bot.partByTitle("@Form.Index");
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
@@ -231,10 +226,10 @@ class GridTest {
 	private void createEntry() {
 		UIThreadRunnable.syncExec(bot.getDisplay(), () -> {
 			MField f = wfcPart.getDetail().getField("KeyText");
-			
+
 			UUID uuid = UUID.randomUUID();
 			String randomUUIDString = uuid.toString().substring(0, 8);
-	        
+
 			f.setValue(new Value(randomUUIDString), false);
 
 			f = wfcPart.getDetail().getField("Description");
@@ -323,6 +318,5 @@ class GridTest {
 		bot.text().setFocus();
 		UITestUtil.sleep();
 	}
-
 
 }

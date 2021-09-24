@@ -30,7 +30,7 @@ public interface IDataService {
 
 	CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable);
 
-	CompletableFuture<Path> getPDFAsync(String tableName, Table detailTable);
+	CompletableFuture<Path> getXMLAsync(String tableName, Table detailTable, String rootElement);
 
 	/**
 	 * Diese Methode löst einen Wert auf.

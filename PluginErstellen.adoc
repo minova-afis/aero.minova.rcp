@@ -343,6 +343,9 @@ Die Umsetzung im Helper kann dann wie folgt aussehen:
 
 [source,java]
 ----
+//Preferences laden
+IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+
 //MSection über ihre ID aus dem MDetail holen
 MSection debugSection = mDetail.getPage("Debug");
 

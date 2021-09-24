@@ -186,6 +186,18 @@ image::images/show_button_text_false.png[false,550,300]
 Schaltflächen in den Toolbars mit ShowButtonText = true:
 image::images/show_button_text_true.png[true,550,300]
 
+
+===== TODO: Masken Puffer benutzen
+
+===== Nachricht bei ungespeicherten Änderungen anzeigen
+
+Zeigt eine Nachricht an, wenn ungespeicherte Änderungen durch das Laden eines Datensatzes im Index verworfen werden.
+
+===== Bestätigungsdialog vor Löschen
+
+Zeigt einen Bestätigungsdialog an, bevor ein Datensatz gelöscht wird. Der Default-Wert für diese Einstellung wird aus der XBS ausgelesen (ShowDeleteDialog).
+Die Entscheidung der Nutzer übertrifft aber die XBS-Einstellung.
+
 [%hardbreaks]
 
 ===== Anzeige Puffer [ms]

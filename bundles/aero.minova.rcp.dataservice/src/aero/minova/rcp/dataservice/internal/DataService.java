@@ -2,6 +2,7 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
@@ -261,21 +262,21 @@ public class DataService implements IDataService {
 	}
 
 	/**
-	 * Laden einer PDF Datei
+	 * Laden einer XML Datei
 	 *
 	 * @param tablename
 	 * @param detailTable
 	 * @return
 	 */
 	@Override
-	public CompletableFuture<Path> getPDFAsync(String tablename, Table detailTable) {
+	public CompletableFuture<Path> getXMLAsync(String tablename, Table detailTable, String rootElement) {
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
-		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
+		Path path = getStoragePath().resolve("reports/" + tablename + detailTable.getRows().get(0).getValue(0).getStringValue() + ".xml");
 		try {
 			Files.createDirectories(path.getParent());
 			createFile(path.toString());
@@ -284,17 +285,31 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		log("CAS Request PDF Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 
-		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "PDF Detail", true);
+			handleCASError(ex, "XML Detail", true);
 			return null;
 		});
 
 		return sendRequest.thenApply(t -> {
-			log("CAS Answer PDF Detail:\n" + t.body());
+			log("CAS Answer XML Detail:\n" + t.body());
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			try {
+				FileWriter fw = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
+				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+				fw.write("<" + rootElement + ">");
+				for (Row r : fromJson.getResultSet().getRows()) {
+					String s = r.getValue(0).getStringValue();
+					fw.write(s + "\n");
+				}
+				fw.write("</" + rootElement + ">");
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			return path;
 		});
 	}

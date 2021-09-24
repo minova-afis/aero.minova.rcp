@@ -20,7 +20,7 @@ public class XBSUtil {
 	public static Node getNodeWithName(Preferences preferences, String name) {
 
 		for (Node node : preferences.getRoot().getNode()) {
-			Node nodeWithName = walkNode(node, name);
+			Node nodeWithName = getNodeWithName(node, name);
 			if (nodeWithName != null) {
 				return nodeWithName;
 			}
@@ -29,13 +29,20 @@ public class XBSUtil {
 		return null;
 	}
 
-	private static Node walkNode(Node node, String name) {
+	/**
+	 * Liefert die ERSTE Node mit angegebenen Namen aus der übergebenen Parentnode (wenn die Parentnode den Namen hat wird sie zurückgegeben )
+	 * 
+	 * @param node
+	 * @param name
+	 * @return
+	 */
+	public static Node getNodeWithName(Node node, String name) {
 		if (node.getName().equals(name)) {
 			return node;
 		}
 
 		for (Node childNode : node.getNode()) {
-			Node nodeWithName = walkNode(childNode, name);
+			Node nodeWithName = getNodeWithName(childNode, name);
 			if (nodeWithName != null) {
 				return nodeWithName;
 			}
