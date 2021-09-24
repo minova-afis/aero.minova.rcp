@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.setup.xbs.Map.Entry;
+import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.DataType;
@@ -43,9 +44,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.PrintUtil;
-import aero.minova.rcp.rcp.util.XBSUtil;
 
 public class PrintDetailHandler {
 
@@ -104,7 +103,7 @@ public class PrintDetailHandler {
 			checkedMasks.add(maskName);
 
 			// Finden des report, rootelement und procedurenamens (Über application.xbs definiert)
-			Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+			Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 			Node maskNode = XBSUtil.getNodeWithName(preferences, maskName);
 			if (maskNode == null) {
 				return false;
