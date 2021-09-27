@@ -1,7 +1,10 @@
 package aero.minova.rcp.preferencewindow.control;
 
 import java.time.LocalTime;
+import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -58,6 +61,7 @@ public class TimeFormattingWidget extends CustomPWWidget {
 
 		final Text text = new Text(cmp, SWT.BORDER);
 		addControl(text);
+		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
@@ -68,7 +72,6 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		final GridData exampleGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		example.setLayoutData(exampleGridData);
 		example.setText(getTimeStringFromPattern(text.getText()));
-		;
 
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());
@@ -81,9 +84,11 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	private String getTimeStringFromPattern(String pattern) {
 		try {
 			LocalTime lt = LocalTime.of(12, 35, 54);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
+			DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
 			if (pattern.contains("hh")) {
 				pattern = pattern + " a";
+				dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
+			} else if (!pattern.isBlank()) {
 				dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
 			}
 			String formatted = lt.format(dtf);
