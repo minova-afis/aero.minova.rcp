@@ -63,6 +63,9 @@ public class DateFormattingWidget extends CustomPWWidget {
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+		text.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
