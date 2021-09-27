@@ -68,7 +68,6 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		final GridData exampleGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		example.setLayoutData(exampleGridData);
 		example.setText(getTimeStringFromPattern(text.getText()));
-		;
 
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());

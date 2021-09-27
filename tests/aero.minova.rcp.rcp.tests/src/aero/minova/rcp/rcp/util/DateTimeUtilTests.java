@@ -41,8 +41,7 @@ public class DateTimeUtilTests {
 	@Test
 	public void testGetDateTime_0() {
 		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(bithday, " 0"));
+		assertEquals(bithday, DateTimeUtil.getDateTime(bithday, " 0"));
 	}
 
 	@Test
