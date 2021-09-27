@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -74,17 +74,7 @@ public class DateTimeField {
 
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
 		LocalDateTime of = LocalDateTime.of(LocalDate.of(2020, 12, 12), LocalTime.of(22, 55));
-		String pattern = dateUtil + " " + timeUtil;
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
-		if (dateUtil.isBlank() && timeUtil.isBlank()) {
-			text.setMessage(of.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").withLocale(locale)));
-		} else if (timeUtil.isBlank()) {
-			text.setMessage(of.format(DateTimeFormatter.ofPattern(pattern + "HH:mm").withLocale(locale)));
-		} else if (dateUtil.isBlank()) {
-			text.setMessage(of.format(DateTimeFormatter.ofPattern("dd.MM.yyyy" + pattern).withLocale(locale)));
-		} else {
-			text.setMessage(of.format(dtf));
-		}
+		text.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {
