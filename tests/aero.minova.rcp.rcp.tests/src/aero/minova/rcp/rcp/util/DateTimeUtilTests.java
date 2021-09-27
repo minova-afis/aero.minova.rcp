@@ -492,7 +492,7 @@ public class DateTimeUtilTests {
 	public void testGetDate070120US() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(2020, JANUARY, 7).atStartOfDay().plusHours(1).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "070120 1", Locale.US, "dd-MM-yy", "hh:mm"));
+		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "070120 1", Locale.US, "dd-MM-yy", "HH:mm"));
 	}
 
 	@Test
