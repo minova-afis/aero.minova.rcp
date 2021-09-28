@@ -101,7 +101,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 	}
 
 	private boolean validatePattern(String input) {
-		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,\\s]{0,1})([dM]{0,3})([\\.,\\s]{0,1})([dMyu]{0,4})");
+		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\\s]{0,1})([dM]{0,3})([\\.,/\\s]{0,1})([dMyu]{0,4})");
 		if (pattern.matcher(input).matches()) {
 			return true;
 		}
