@@ -1,11 +1,12 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.chrono.Chronology;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -16,6 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import aero.minova.rcp.util.DateUtil;
 
 public class DateFormattingWidget extends CustomPWWidget {
 
@@ -85,17 +88,24 @@ public class DateFormattingWidget extends CustomPWWidget {
 	}
 
 	private String getDateStringFromPattern(String pattern) {
-		try {
-			LocalDate ld = LocalDate.of(2015, 12, 24);
-			DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
-			if (!pattern.isBlank()) {
-				dtf = DateTimeFormatter.ofPattern(pattern, locale);
+		if (validatePattern(pattern) || pattern.isBlank()) {
+			try {
+				LocalDateTime date = LocalDateTime.of(2015, 12, 24, 23, 45);
+				String formatted = DateUtil.getDateString(date.toInstant(ZoneOffset.UTC), locale, pattern);
+				return formatted;
+			} catch (Exception e) {
+				return "Invalid format!";
 			}
-			String formatted = ld.format(dtf);
-			return formatted;
-		} catch (Exception e) {
-			return "Invalid format!";
 		}
+		return "Invalid format!";
+	}
+
+	private boolean validatePattern(String input) {
+		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,\\s]{0,1})([dM]{0,3})([\\.,\\s]{0,1})([dMyu]{0,4})");
+		if (pattern.matcher(input).matches()) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
