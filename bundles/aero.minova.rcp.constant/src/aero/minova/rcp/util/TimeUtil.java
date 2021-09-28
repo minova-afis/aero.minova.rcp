@@ -69,13 +69,13 @@ public class TimeUtil {
 	}
 
 	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
-		if (input.contains("-") || input.contains("+")) {
-			String[] split = splitInput(input);
-			now = changeHours(now, split);
-		} else if (input.equals("0")) {
+		if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 			now = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
+		} else if (input.contains("-") || input.contains("+")) {
+			String[] split = splitInput(input);
+			now = changeHours(now, split);
 		} else if (input.equals("")) {
 			return null;
 		} else {
@@ -243,7 +243,17 @@ public class TimeUtil {
 	private static Instant getTimeFromNumbers(String input) {
 		Integer hours = 0;
 		Integer minutes = 0;
-		String[] subStrings = input.split(":");
+		String clearInput = "";
+		String regex = "(\\hHm)";
+
+		for (char c : input.toCharArray()) {
+			if (Character.isLetter(c) && !String.valueOf(c).matches(regex)) {
+				continue;
+			}
+			clearInput = clearInput + String.valueOf(c);
+		}
+
+		String[] subStrings = clearInput.split("[\\:/\\s]");
 
 		if (subStrings.length == 2) {
 			if (!subStrings[0].isBlank() && !subStrings[1].isBlank()) {
@@ -255,7 +265,8 @@ public class TimeUtil {
 		}
 
 		if (subStrings.length < 2) {
-			int[] timeList = checkNumbersForTime(input);
+			clearInput = clearInput.replaceAll("[\\:/\\s]", "");
+			int[] timeList = checkNumbersForTime(clearInput);
 			if (timeList != null) {
 				hours = timeList[0];
 				minutes = timeList[1];
