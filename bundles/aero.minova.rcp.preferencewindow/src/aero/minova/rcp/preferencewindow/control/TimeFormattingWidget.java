@@ -1,7 +1,10 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.chrono.Chronology;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -13,6 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import aero.minova.rcp.util.TimeUtil;
 
 public class TimeFormattingWidget extends CustomPWWidget {
 
@@ -58,7 +63,11 @@ public class TimeFormattingWidget extends CustomPWWidget {
 
 		final Text text = new Text(cmp, SWT.BORDER);
 		addControl(text);
+		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+		text.setToolTipText("H: " + translationService.translate("@Preferences.DateUtilPattern.24Hour", null) + "\nh: "
+				+ translationService.translate("@Preferences.DateUtilPattern.12Hour", null) + "\nm: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Minute", null) + "\na: AM/PM");
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
@@ -79,9 +88,8 @@ public class TimeFormattingWidget extends CustomPWWidget {
 
 	private String getTimeStringFromPattern(String pattern) {
 		try {
-			LocalTime lt = LocalTime.of(23, 35, 54);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, locale);
-			String formatted = lt.format(dtf);
+			LocalDateTime time = LocalDateTime.of(2000, 01, 01, 23, 45);
+			String formatted = TimeUtil.getTimeString(time.toInstant(ZoneOffset.UTC), locale, pattern);
 			return formatted;
 		} catch (Exception e) {
 			return "Invalid format!";

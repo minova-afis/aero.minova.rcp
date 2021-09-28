@@ -96,7 +96,7 @@ public class TimeUtil {
 			FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
 			for (FormatStyle formatStyle : styles) {
 				try {
-					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					dtf = DateTimeFormatter.ofLocalizedTime(formatStyle).withLocale(locale);
 					LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
 					String formatted = lt.format(dtf);
 					now = Instant.parse(formatted);

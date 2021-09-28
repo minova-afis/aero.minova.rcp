@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.e4.core.di.annotations,
  org.eclipse.equinox.security,
  aero.minova.rcp.preferences,
  org.eclipse.e4.core.commands,
- org.eclipse.jface;bundle-version="3.22.100"
+ org.eclipse.jface;bundle-version="3.22.100",
+ aero.minova.rcp.constant
 Export-Package: aero.minova.rcp.preferencewindow.builder,
  aero.minova.rcp.preferencewindow.control
 Import-Package: aero.minova.rcp.dataservice,
