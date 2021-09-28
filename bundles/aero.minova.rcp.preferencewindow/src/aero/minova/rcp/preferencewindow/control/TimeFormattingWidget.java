@@ -89,7 +89,7 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	private String getTimeStringFromPattern(String pattern) {
 		try {
 			LocalDateTime time = LocalDateTime.of(2000, 01, 01, 23, 45);
-			String formatted = TimeUtil.getTimeString(time.toInstant(ZoneOffset.UTC), locale);
+			String formatted = TimeUtil.getTimeString(time.toInstant(ZoneOffset.UTC), locale, pattern);
 			return formatted;
 		} catch (Exception e) {
 			return "Invalid format!";

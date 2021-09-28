@@ -143,7 +143,7 @@ public class DateUtil {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
-		
+
 		if (!input.isEmpty() && startOfToday == null) {
 			if (!dateUtilPref.equals("")) {
 				try {
@@ -173,13 +173,22 @@ public class DateUtil {
 
 	}
 
-	public static String getDateString(Instant instant, Locale locale) {
-		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
+	public static String getDateString(Instant instant, Locale locale, String dateUtilPref) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+		if (!dateUtilPref.isBlank()) {
+			dtf = DateTimeFormatter.ofPattern(dateUtilPref);
+		}
+		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
 	}
 
-	public static String getDateTimeString(Instant instant, Locale locale, ZoneId zoneId) {
-		return LocalDate.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)) + " "
-				+ LocalTime.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
+	public static String getDateTimeString(Instant instant, Locale locale, ZoneId zoneId, String dateUtilPref, String timeUtilPref) {
+		DateTimeFormatter dtfD = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+		DateTimeFormatter dtfT = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
+		if (!dateUtilPref.isBlank())
+			dtfD = DateTimeFormatter.ofPattern(dateUtilPref);
+		if (!timeUtilPref.isBlank())
+			dtfT = DateTimeFormatter.ofPattern(timeUtilPref);
+		return LocalDate.ofInstant(instant, zoneId).format(dtfD) + " " + LocalTime.ofInstant(instant, zoneId).format(dtfT);
 	}
 
 	public static String[] splitInput(String input) {

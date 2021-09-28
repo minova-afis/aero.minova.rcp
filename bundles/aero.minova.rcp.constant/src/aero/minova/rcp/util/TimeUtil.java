@@ -156,9 +156,13 @@ public class TimeUtil {
 			return result;
 	}
 
-	public static String getTimeString(Instant instant, Locale locale) {
+	public static String getTimeString(Instant instant, Locale locale, String timeUtilPref) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
+		if (!timeUtilPref.isBlank()) {
+			dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+		}
 		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
-		return localDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
+		return localDateTime.format(dtf);
 	}
 
 	private static Instant changeHours(Instant instant, String[] splits) {

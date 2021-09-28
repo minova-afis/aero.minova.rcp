@@ -20,7 +20,7 @@ public class TimeUtilTests {
 	@Test
 	public void testGetTimeString1_59() {
 		Instant instant = LocalDateTime.of(1900, JANUARY, 1, 1, 59).toInstant(ZoneOffset.UTC);
-		assertEquals("01:59", TimeUtil.getTimeString(instant, Locale.GERMANY));
+		assertEquals("01:59", TimeUtil.getTimeString(instant, Locale.GERMANY, "hh:mm"));
 	}
 
 	@Test
@@ -50,14 +50,14 @@ public class TimeUtilTests {
 		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 12, 34).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(now, "1234"));
 	}
-	
+
 	@Test
 	public void testGetTime1234Formatted() {
 		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDateTime.of(1900, JANUARY, 1, 12, 34).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(now, "1234", "hh:mm:ss", Locale.GERMANY));
 	}
-	
+
 	@Test
 	public void testGetTime123456Formatted() {
 		Instant now = LocalDateTime.of(1900, JANUARY, 2, 0, 0).toInstant(ZoneOffset.UTC);
