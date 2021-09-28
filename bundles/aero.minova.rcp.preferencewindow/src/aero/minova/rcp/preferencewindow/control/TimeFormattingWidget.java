@@ -1,7 +1,7 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import java.time.Instant;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
@@ -88,8 +88,8 @@ public class TimeFormattingWidget extends CustomPWWidget {
 
 	private String getTimeStringFromPattern(String pattern) {
 		try {
-			LocalTime lt = LocalTime.of(12, 35, 54);
-			String formatted = TimeUtil.getTimeString(Instant.from(lt), locale);
+			LocalDateTime time = LocalDateTime.of(2000, 01, 01, 23, 45);
+			String formatted = TimeUtil.getTimeString(time.toInstant(ZoneOffset.UTC), locale);
 			return formatted;
 		} catch (Exception e) {
 			return "Invalid format!";
