@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -13,7 +12,6 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.util.DateTimeUtil;
-import aero.minova.rcp.util.DateUtil;
 
 public class DateTimeDisplayConverter extends DisplayConverter {
 
@@ -30,9 +28,7 @@ public class DateTimeDisplayConverter extends DisplayConverter {
 	public Object canonicalToDisplayValue(Object canonicalValue) {
 		if (canonicalValue instanceof Instant) {
 			IEclipsePreferences node = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
-			String string = node.get("timezone", "UTC");
-			ZoneId z = ZoneId.of(string);
-			return DateUtil.getDateTimeString((Instant) canonicalValue, locale, z, dateUtil, timeUtil);
+			return DateTimeUtil.getDateTimeString((Instant) canonicalValue, locale, dateUtil, timeUtil);
 		}
 		return null;
 	}

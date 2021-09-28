@@ -208,7 +208,7 @@ public class DateUtilTests {
 
 	@Test
 	public void testGetDate0minus1() {
-		assertNull(DateUtil.getDate("0-1", Locale.GERMANY));
+		assertNull(DateUtil.getDate("0-1"));
 	}
 
 	@Test

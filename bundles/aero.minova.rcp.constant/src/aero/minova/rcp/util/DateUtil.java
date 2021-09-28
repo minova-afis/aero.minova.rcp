@@ -4,11 +4,9 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -98,26 +96,16 @@ public class DateUtil {
 		DateUtil.shortcuts = day + month + year + week;
 	}
 
+	public static Instant getDate(String input) {
+		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
+	}
+
 	public static Instant getDate(Instant today, String input) {
 		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
 	}
 
-	public static Instant getDate(String input, Locale locale) {
-		Instant date = getDate(input);
-		LocalDate ld;
-		if (date == null && !input.isEmpty()) {
-			try {
-				ld = LocalDate.parse(input, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
-				date = ld.atStartOfDay().toInstant(ZoneOffset.UTC);
-			} catch (DateTimeParseException dtpe) {
-				date = null;
-			}
-		}
-		return date;
-	}
-
-	public static Instant getDate(String input) {
-		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
+	public static Instant getDate(String input, Locale locale, String datePattern) {
+		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input, locale, datePattern);
 	}
 
 	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilPref) {
@@ -179,16 +167,6 @@ public class DateUtil {
 			dtf = DateTimeFormatter.ofPattern(dateUtilPref);
 		}
 		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
-	}
-
-	public static String getDateTimeString(Instant instant, Locale locale, ZoneId zoneId, String dateUtilPref, String timeUtilPref) {
-		DateTimeFormatter dtfD = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
-		DateTimeFormatter dtfT = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
-		if (!dateUtilPref.isBlank())
-			dtfD = DateTimeFormatter.ofPattern(dateUtilPref);
-		if (!timeUtilPref.isBlank())
-			dtfT = DateTimeFormatter.ofPattern(timeUtilPref);
-		return LocalDate.ofInstant(instant, zoneId).format(dtfD) + " " + LocalTime.ofInstant(instant, zoneId).format(dtfT);
 	}
 
 	public static String[] splitInput(String input) {

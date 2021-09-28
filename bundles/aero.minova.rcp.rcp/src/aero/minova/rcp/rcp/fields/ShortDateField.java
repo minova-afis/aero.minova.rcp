@@ -61,14 +61,14 @@ public class ShortDateField {
 
 			@Override
 			public List<String> getContent(String entry) {
+				Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+				String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
+						locale);
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateUtil.getDate(entry, locale);
+				Instant date = DateUtil.getDate(entry, locale, dateUtil);
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
-					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
-							locale);
 					result.add(DateUtil.getDateString(date, locale, dateUtil));
 					field.setValue(new Value(date), true);
 				}
