@@ -1,8 +1,8 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.time.Instant;
 import java.time.LocalTime;
 import java.time.chrono.Chronology;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Locale;
@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import aero.minova.rcp.util.TimeUtil;
 
 public class TimeFormattingWidget extends CustomPWWidget {
 
@@ -87,14 +89,7 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	private String getTimeStringFromPattern(String pattern) {
 		try {
 			LocalTime lt = LocalTime.of(12, 35, 54);
-			DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
-			if (pattern.contains("hh")) {
-				pattern = pattern + " a";
-				dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
-			} else if (!pattern.isBlank()) {
-				dtf = DateTimeFormatter.ofPattern(pattern, Locale.US);
-			}
-			String formatted = lt.format(dtf);
+			String formatted = TimeUtil.getTimeString(Instant.from(lt), locale);
 			return formatted;
 		} catch (Exception e) {
 			return "Invalid format!";
