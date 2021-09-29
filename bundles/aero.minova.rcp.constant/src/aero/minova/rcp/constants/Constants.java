@@ -7,6 +7,9 @@ public class Constants {
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
 
+	public static final String MDI_FILE_NAME = "application.mdi";
+	public static final String XBS_FILE_NAME = "application.xbs";
+
 	public static final String TABLE_KEYTEXT = "KeyText";
 	public static final String TABLE_KEYLONG = "KeyLong";
 	public static final String TABLE_DESCRIPTION = "Description";
@@ -136,6 +139,9 @@ public class Constants {
 	// Commands
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
+
+	// XBS Einstellungen
+	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";
 
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
