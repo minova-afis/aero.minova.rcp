@@ -28,6 +28,7 @@ import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
 import aero.minova.rcp.form.setup.xbs.Preferences;
+import aero.minova.rcp.rcp.util.ImageUtil;
 
 public class MenuProcessor {
 
@@ -182,8 +183,9 @@ public class MenuProcessor {
 		handledMenuItem.setElementId("menuItemFor." + actionMDI.getId());
 
 		handledMenuItem.setLabel(actionMDI.getText());
-
-		handledMenuItem.setIconURI(actionMDI.getIcon());
+		
+		String retrieveIcon = ImageUtil.retrieveIcon(actionMDI.getIcon());
+		handledMenuItem.setIconURI(retrieveIcon);
 
 		return handledMenuItem;
 	}
