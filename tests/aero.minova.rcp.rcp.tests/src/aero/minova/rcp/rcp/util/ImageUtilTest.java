@@ -18,7 +18,6 @@ class ImageUtilTest {
 
 	@Test
 	void testGetImageDescriptorFromImagesBundle() {
-
 		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptorFromImagesBundle("Book.Command");
 		assertEquals(16, imageDescriptorFromImagesBundle.getImageData(100).width);
 		assertEquals(16, imageDescriptorFromImagesBundle.getImageData(100).height);
