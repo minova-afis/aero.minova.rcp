@@ -107,6 +107,7 @@ public class Constants {
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
 	public static final String REQUIRED_CELL_LABEL = "REQUIRED_CELL";
+	public static final String READ_ONLY_CELL_LABEL = "READ_ONLY_CELL";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";
