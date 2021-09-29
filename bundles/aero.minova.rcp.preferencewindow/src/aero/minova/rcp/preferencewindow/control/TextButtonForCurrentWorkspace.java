@@ -1,6 +1,9 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import static org.eclipse.jface.dialogs.PlainMessageDialog.getBuilder;
+
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -9,7 +12,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -101,9 +104,12 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Shell activeShell = Display.getCurrent().getActiveShell();
-				boolean openConfirm = MessageDialog.openConfirm(activeShell, "Neustart", translationService.translate("@msg.WFCDeleteWorkspaceRestart", null));
 
-				if (openConfirm) {
+				PlainMessageDialog confirmRestart = getBuilder(activeShell, translationService.translate("@Action.Restart", null))
+						.buttonLabels(List.of(translationService.translate("@Action.Restart", null), translationService.translate("@Abort", null)))
+						.message(translationService.translate("@msg.WFCDeleteWorkspaceRestart", null)).build();
+
+				if (confirmRestart.open() == 0) {
 					context.set(IWorkbench.PERSIST_STATE, false);
 					try {
 						FileUtils.deleteDirectory(dataService.getStoragePath().toAbsolutePath().toFile());
