@@ -108,7 +108,7 @@ public class DateUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input, locale, datePattern);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilPref) {
+	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
 
@@ -121,7 +121,7 @@ public class DateUtil {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
 					// Es beginnt mit eine Tagesangabe
-					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC")).atStartOfDay();
+					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
@@ -133,9 +133,9 @@ public class DateUtil {
 		}
 
 		if (!input.isEmpty() && startOfToday == null) {
-			if (!dateUtilPref.equals("")) {
+			if (!datePattern.equals("")) {
 				try {
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtilPref, locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern, locale);
 					LocalDate ld = LocalDate.parse(input, dtf);
 					startOfToday = ld.atStartOfDay();
 				} catch (Exception e) {
@@ -174,7 +174,7 @@ public class DateUtil {
 		String regex;
 		Pattern pattern;
 		Matcher matcher;
-		input = input.replaceAll("\\.,/\\s", "");
+		input = input.replaceAll("\\.,\\s", "");
 		input = input.replaceAll("\\/", "");
 
 		input = input.toLowerCase();
@@ -219,7 +219,7 @@ public class DateUtil {
 		}
 	}
 
-	static Instant getNumericDate(Instant now, String input) {
+	static Instant getNumericDate(Instant now, String input, String datePattern) {
 		int day;
 		int month;
 		int year;
