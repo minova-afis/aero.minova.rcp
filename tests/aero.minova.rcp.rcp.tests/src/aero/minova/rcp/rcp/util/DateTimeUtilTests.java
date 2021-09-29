@@ -509,12 +509,6 @@ public class DateTimeUtilTests {
 	}
 
 	@Test
-	public void testGetDate07Slash01SlashUS() {
-		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		assertNull(DateTimeUtil.getDateTime(bithday, "07/01 1", Locale.US));
-	}
-
-	@Test
 	public void testGetDate070120Stern1GERMANY() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(2020, JANUARY, 7).atStartOfDay().plusHours(1).toInstant(ZoneOffset.UTC);
@@ -524,7 +518,7 @@ public class DateTimeUtilTests {
 	@Test
 	public void testGetDate02Slash05Slash1988Stern1530() {
 		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(2088, Month.FEBRUARY, 5).atStartOfDay().plusHours(15).plusMinutes(30).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDate.of(1988, Month.FEBRUARY, 5).atStartOfDay().plusHours(15).plusMinutes(30).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, DateTimeUtil.getDateTime(bithday, "02/05/88*1530", Locale.US));
 	}
 
