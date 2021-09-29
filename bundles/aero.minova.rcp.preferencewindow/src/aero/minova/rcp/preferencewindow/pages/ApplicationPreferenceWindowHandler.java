@@ -1,5 +1,7 @@
 package aero.minova.rcp.preferencewindow.pages;
 
+import static org.eclipse.jface.dialogs.PlainMessageDialog.getBuilder;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +23,7 @@ import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -179,10 +181,13 @@ public class ApplicationPreferenceWindowHandler {
 		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
 
-			boolean openConfirm = MessageDialog.openConfirm(activeShell, translationService.translate("@Action.Restart", null),
-					translationService.translate("@Preferences.RestartMessage", null));
-
-			if (openConfirm) {
+			
+			PlainMessageDialog confirmRestart = getBuilder(activeShell, translationService.translate("@Action.Restart", null))
+					.buttonLabels(List.of(translationService.translate("@Action.Restart", null), translationService.translate("@Abort", null)))
+					.message(translationService.translate("@Preferences.RestartMessage", null)).build();
+			
+			int openConfirm = confirmRestart.open();
+			if (openConfirm== 0) {
 				if (!currentTheme.equals(newTheme)) {
 					updateTheme(newTheme, themeEngine, workbench);
 				} else {
