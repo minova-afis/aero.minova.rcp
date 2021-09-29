@@ -244,7 +244,7 @@ public class TimeUtil {
 		Integer hours = 0;
 		Integer minutes = 0;
 		String clearInput = "";
-		String regex = "(\\hHm)";
+		String regex = "([" + shortcuts + "])";
 
 		for (char c : input.toCharArray()) {
 			if (Character.isLetter(c) && !String.valueOf(c).matches(regex)) {
