@@ -1,7 +1,10 @@
 package aero.minova.rcp.preferencewindow.control;
 
 import java.time.LocalDate;
+import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -58,17 +61,21 @@ public class DateFormattingWidget extends CustomPWWidget {
 
 		final Text text = new Text(cmp, SWT.BORDER);
 		addControl(text);
+		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+		text.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
-		
+
 		Label example = new Label(cmp, SWT.NONE);
 		addControl(example);
 		final GridData exampleGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		example.setLayoutData(exampleGridData);
-		example.setText(getDateStringFromPattern(text.getText()));;
-		
+		example.setText(getDateStringFromPattern(text.getText()));
+
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());
 			example.setText(getDateStringFromPattern(text.getText()));
@@ -76,11 +83,14 @@ public class DateFormattingWidget extends CustomPWWidget {
 
 		return text;
 	}
-	
+
 	private String getDateStringFromPattern(String pattern) {
 		try {
 			LocalDate ld = LocalDate.of(2015, 12, 24);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern, locale);
+			DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+			if (!pattern.isBlank()) {
+				dtf = DateTimeFormatter.ofPattern(pattern, locale);
+			}
 			String formatted = ld.format(dtf);
 			return formatted;
 		} catch (Exception e) {
@@ -98,8 +108,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
 		} else {
 			if (!(value instanceof String)) {
-				throw new UnsupportedOperationException(
-						"The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
+				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
 			}
 		}
 	}
