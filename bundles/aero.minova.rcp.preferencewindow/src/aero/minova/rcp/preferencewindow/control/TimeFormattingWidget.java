@@ -66,9 +66,9 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		text.setToolTipText("H: " + translationService.translate("@Preferences.DateUtilPattern.24Hour", null) + "\nh:"
-				+ translationService.translate("@Preferences.DateUtilPattern.12Hour", null) + "\nm: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Minute", null) + "\na: AM/PM");
+		text.setToolTipText("H: " + translationService.translate("@Preferences.TimeUtilPattern.24Hour", null) + "\nh:"
+				+ translationService.translate("@Preferences.TimeUtilPattern.12Hour", null) + "\nm: "
+				+ translationService.translate("@Preferences.TimeUtilPattern.Minute", null) + "\na: AM/PM");
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
