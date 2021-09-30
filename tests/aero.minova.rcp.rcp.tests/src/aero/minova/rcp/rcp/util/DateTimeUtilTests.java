@@ -373,14 +373,13 @@ public class DateTimeUtilTests {
 	}
 
 	@Test
-	public void testGetDate07_01_1967() {
+	public void testGetDate07_01_1967_withoutTime() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		Instant expected = LocalDate.of(1967, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
 		assertNull(DateUtil.getDate(bithday, "07.01.1967", Locale.GERMANY, "MEDIUM"));
 	}
 
 	@Test
-	public void testGetDate07Point01Point20() {
+	public void testGetDate07Point01Point20_withoutTime() {
 		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		assertNull(null, DateTimeUtil.getDateTime(bithday, "07.01.20"));
 	}

@@ -86,6 +86,7 @@ import aero.minova.rcp.form.model.xsd.Onclick;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.form.model.xsd.Wizard;
+import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.Column;
@@ -117,10 +118,8 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.processor.MenuProcessor;
 import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.util.XBSUtil;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.LookupComposite;
 
@@ -356,7 +355,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void loadOptionPages(Composite parent) {
-		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 
 		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
 		if (maskNode == null) {
@@ -834,7 +833,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 * XBS überprüfen, ob es eine Keyzuordnung für dieses Grid gibt
 	 */
 	private void checkXBSForGridKeys(Grid grid) throws NoSuchFieldException {
-		Preferences preferences = (Preferences) mApplication.getTransientData().get(MenuProcessor.XBS_FILE_NAME);
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node maskNode = XBSUtil.getNodeWithName(preferences, mPerspective.getPersistedState().get(Constants.FORM_NAME));
 		if (maskNode == null) {
 			return;

@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -16,11 +17,13 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.PlainMessageDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -43,6 +46,7 @@ public class LifeCycle {
 
 	@Inject
 	IDataService dataService;
+	
 
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException {
@@ -107,7 +111,7 @@ public class LifeCycle {
 					workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 				} else {
 					workspaceLocation = checkDefaultWorkspace(workspaceLocation, workspaceDialog, sPrefs);
-				}
+				}	
 			}
 		} catch (Exception e) {
 			logger.error(e);
@@ -255,9 +259,9 @@ public class LifeCycle {
 	}
 
 	private void showUserDialog() {
-		MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Reset Workspace",
-				"Due to structural changes, the application area to be loaded is reset!");
-
+		PlainMessageDialog.getBuilder(Display.getCurrent().getActiveShell(), "Reset Workspace").image(SWT.ICON_WARNING)
+		.buttonLabels(List.of("Reset", "Cancel"))
+		.message("Due to structural changes, the application area to be loaded is reset!").build().open();
 	}
 
 	private URI loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
