@@ -259,7 +259,7 @@ table.addColumn(new Column(bookingDate.getName(), bookingDate.getDataType()));
 r.addValue(bookingDateValue);
 
 t.addRow(r);
-WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
+WFCDetailCASRequestsUtil casUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 casUtil.setSelectedTable(t);
 ----
 
