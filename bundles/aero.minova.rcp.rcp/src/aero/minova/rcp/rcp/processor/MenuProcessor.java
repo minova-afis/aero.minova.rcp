@@ -22,13 +22,13 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
 import aero.minova.rcp.form.setup.xbs.Preferences;
-import aero.minova.rcp.rcp.util.ImageUtil;
 
 public class MenuProcessor {
 

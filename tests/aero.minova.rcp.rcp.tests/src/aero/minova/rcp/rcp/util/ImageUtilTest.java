@@ -7,6 +7,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 
 class ImageUtilTest {
