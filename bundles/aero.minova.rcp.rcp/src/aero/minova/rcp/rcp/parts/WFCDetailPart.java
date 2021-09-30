@@ -337,7 +337,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		part.setTabList(getTabListForPart(part));
 		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
 		List<Control> tabList = new ArrayList<>();
-		part.getParent().setTabList(listToArray(tabList));
+		part.getParent().setTabList(tabList.toArray(new Control[0]));
 
 		// Helper-Klasse initialisieren
 		if (form.getHelperClass() != null) {
@@ -526,7 +526,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Setzen der TabListe für die einzelnen Sections.
 		clientComposite.setTabList(getTabListForSectionComposite(mSection, clientComposite));
 		// Setzen der TabListe der Sections im Part.
-		clientComposite.getParent().setTabList(getTabListForSection(clientComposite.getParent()));
+		clientComposite.getParent().setTabList(getTabListForSection(clientComposite.getParent(), mSection));
 	}
 
 	/**
@@ -636,70 +636,38 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Setzt alle Elemente aus der übergebenen Liste in einen Array
-	 *
-	 * @param tabList
-	 * @return Array mit Controls
-	 */
-	private Control[] listToArray(List<Control> tabList) {
-		Control[] tabArray = new Control[tabList.size()];
-		int i = 0;
-		while (i < tabList.size()) {
-			tabArray[i] = tabList.get(i);
-			i++;
-		}
-		return tabArray;
-	}
-
-	/**
 	 * Gibt einen Array mit den Controls für die TabListe der Section zurück. Wenn SelectAllControls gesetzt ist, wird das SectionControl(der Twistie) mit in
 	 * den Array gesetzt.
 	 *
 	 * @param composite
 	 *            die Setion, von der die TabListe gesetzt werden soll.
+	 * @param mSection
 	 * @return Array mit Controls
 	 */
-	public Control[] getTabListForSection(Composite composite) {
+	public Control[] getTabListForSection(Composite composite, MSection mSection) {
 		List<Control> tabList = new ArrayList<>();
-
-		if (selectAllControls && composite.getChildren()[0] instanceof Twistie) {
-			for (Control child : composite.getChildren()) {
-				if (child instanceof ToolBar) {
-					tabList.add(Math.min(tabList.size(), 1), child);
-				} else if (child instanceof Label) {} else {
-					tabList.add(child);
-				}
-			}
-		} else {
-			for (Control child : composite.getChildren()) {
-				if (child instanceof ToolBar) {
-					tabList.add(Math.min(tabList.size(), 1), child);
-				} else if (child instanceof Twistie || child instanceof Label) {} else {
-					tabList.add(child);
-				}
+		for (Control child : composite.getChildren()) {
+			if (child instanceof ToolBar && selectAllControls && !mSection.isHead()) {
+				tabList.add(1, child);
+			} else if ((child instanceof Twistie && !selectAllControls) || child instanceof Label) {
+				// Die sollen nicht in die Tabliste
+			} else {
+				tabList.add(child);
 			}
 		}
-		return listToArray(tabList);
+		return tabList.toArray(new Control[0]);
 	}
 
-	/**
-	 * Gibt einen Array mit den Controls für die TabListe des Parts zurück. Wenn SelectAllControls gesetzt ist, wird die Toolbar mit in den Array gesetzt.
-	 *
-	 * @param composite
-	 *            die Setion, von der die TabListe gesetzt werden soll.
-	 * @return Array mit Controls
-	 */
 	private Control[] getTabListForPart(Composite composite) {
 		List<Control> tabList = new ArrayList<>();
 
 		if (selectAllControls) {
-			int i = 0;
-			while (i < composite.getChildren().length) {
-				tabList.add(composite.getChildren()[i]);
-				i++;
+			for (Control c : composite.getChildren()) {
+				tabList.add(c);
 			}
 		}
-		return listToArray(tabList);
+
+		return tabList.toArray(new Control[0]);
 	}
 
 	/**
@@ -727,7 +695,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
-		return listToArray(tabList);
+		return tabList.toArray(new Control[0]);
 	}
 
 	private MGrid createMGrid(Grid grid, MSection section) {
