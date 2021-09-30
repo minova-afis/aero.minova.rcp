@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.form.setup.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,5 +66,24 @@ public class XBSUtil {
 		}
 
 		return namesToValues;
+	}
+
+	/**
+	 * Liefert die Map mit den Einstellungen für die gesamte Anwendung zurück. <br>
+	 * ACHTUNG: Geht aktuell davon aus, das diese immer im zweiten Knoten liegt! Muss evtl angepasst werden
+	 * 
+	 * @param preferences
+	 * @return
+	 */
+	public static Map<String, String> getMainMap(Preferences preferences) {
+
+		aero.minova.rcp.form.setup.xbs.Map prefMap = preferences.getRoot().getNode().get(0).getNode().get(0).getMap();
+		Map<String, String> map = new HashMap<>();
+
+		for (Entry e : prefMap.getEntry()) {
+			map.put(e.getKey(), e.getValue());
+		}
+
+		return map;
 	}
 }
