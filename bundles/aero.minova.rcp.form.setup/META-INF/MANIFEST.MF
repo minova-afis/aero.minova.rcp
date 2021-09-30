@@ -7,4 +7,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: com.sun.xml.bind.v2;version="2.3.3",
  javax.xml.bind.annotation;version="2.3.3",
  javax.xml.bind.annotation.adapters;version="2.3.3"
-Export-Package: aero.minova.rcp.form.setup.xbs
+Export-Package: aero.minova.rcp.form.setup.util,
+ aero.minova.rcp.form.setup.xbs
