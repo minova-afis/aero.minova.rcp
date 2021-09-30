@@ -6,7 +6,7 @@
 
 * xref:doc/adoc/workspace.adoc[Workspace Preferences]
 
-== TraverseListener Verhalten
+== Tastaturnavigation
 
-* xref:doc/adoc/keyboardnavigation.adoc[TraverseListener Verhalten]
+* xref:doc/adoc/keyboardnavigation.adoc[Tastaturnavigation]
 
