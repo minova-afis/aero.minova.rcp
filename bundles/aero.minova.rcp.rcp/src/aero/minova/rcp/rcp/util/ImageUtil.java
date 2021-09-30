@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.util;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 
@@ -33,7 +32,6 @@ public class ImageUtil {
 		final URL url = FileLocator.find(bundle, new Path("icons/" + filename), null);
 		return ImageDescriptor.createFromURL(url);
 	}
-	
 
 	/**
 	 * Liefert einen ImageDescriptor für ein Bild, das im "images" Ordner im aero.minova.rcp.images Plugin liegt. Der ImageDescriptor sollte mit
@@ -44,25 +42,11 @@ public class ImageUtil {
 	 * @param filename
 	 * @return
 	 */
-	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename) {
+	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename, boolean isToolBar) {
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
 		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
-		String iconSize = calculateImgaesSize(size, false);
-		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + iconSize)));
-	}
-
-	/**
-	 * Liefert ein ToolbarImage zurück, welches im Vergleich zu dem Menuicon ein wenig größer ist.
-	 *
-	 * @param filename
-	 * @return
-	 */
-	public static ImageDescriptor getToolBarImageDescriptorFromImagesBundle(String filename) {
-		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
-
-		String iconSize = calculateImgaesSize(size, true);
-		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + iconSize)));
+		String iconSize = calculateImgaesSize(size, isToolBar);
+		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + "/" + iconSize)));
 	}
 
 	private static String calculateImgaesSize(String size, boolean isToolbar) {
@@ -84,33 +68,37 @@ public class ImageUtil {
 		default:
 			throw new RuntimeException("Angeforderte Größe ist nicht verfügbar!");
 		}
-		return "/" + calculatedSize + "x" + calculatedSize + ".png";
+		return calculatedSize + "x" + calculatedSize + ".png";
 	}
 
-	public static String retrieveIcon(String icon) {
+	public static String retrieveIcon(String icon, boolean isToolBar) {
 		String iconWithoutExtension = icon.replace(".png", "").replace(".ico", "").toLowerCase();
-		// 
+		//
 		// im Falle der Unit tests haben wir keinen bundle context
 		Bundle bundle = FrameworkUtil.getBundle(ImageUtil.class);
 		ServiceReference<IDataService> serviceReference = bundle.getBundleContext().getServiceReference(IDataService.class);
 		IDataService service = bundle.getBundleContext().getService(serviceReference);
 		Objects.requireNonNull(service);
-		java.nio.file.Path storagePath = service.getStoragePath().resolve("images");
-		
-		File[] listFiles = storagePath.toFile().listFiles();
-		java.nio.file.Path resolve = null;
-		for (File file : listFiles) {
-			if (file.getName().toLowerCase().equals(iconWithoutExtension)) {
-				resolve = file.toPath().resolve("32x32.png");
+		java.nio.file.Path storagePath = service.getStoragePath().resolve("Images");
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+
+		if (storagePath != null && storagePath.toFile().isDirectory()) {
+			File[] listFiles = storagePath.toFile().listFiles();
+			java.nio.file.Path resolve = null;
+			if (listFiles != null) {
+				for (File file : listFiles) {
+					if (file.getName().toLowerCase().equals(iconWithoutExtension)) {
+						resolve = file.toPath().resolve(calculateImgaesSize(size, isToolBar));
+					}
+				}
+			}
+			if (resolve != null) {
+				System.out.println(resolve.toUri());
+				return resolve.toUri().toString();
 			}
 		}
-		if (resolve!=null) {
-			System.out.println(resolve.toUri());
-			return resolve.toUri().toString();
-		}
 		return "ERROR! Icon not found: " + icon;
-		
+
 	}
 
-	
 }

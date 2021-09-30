@@ -19,14 +19,14 @@ class ImageUtilTest {
 	@Test
 	void testGetImageDescriptorFromImagesBundle() {
 
-		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptorFromImagesBundle("Book.Command");
+		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptorFromImagesBundle("Book.Command", false);
 		assertEquals(16, imageDescriptorFromImagesBundle.getImageData(100).width);
 		assertEquals(16, imageDescriptorFromImagesBundle.getImageData(100).height);
 	}
 
 	@Test
 	void testGetToolBarImageDescriptorFromImagesBundle() {
-		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getToolBarImageDescriptorFromImagesBundle("Book.Command");
+		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptorFromImagesBundle("Book.Command", true);
 		assertEquals(24, imageDescriptorFromImagesBundle.getImageData(100).width);
 		assertEquals(24, imageDescriptorFromImagesBundle.getImageData(100).height);
 	}
