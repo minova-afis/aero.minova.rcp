@@ -29,14 +29,14 @@ public class ImageUtil {
 	private ImageUtil() {}
 
 	/**
-	 * Liefert einen ImageDescriptor für ein Bild, das im "icons" Ordner im aero.minova.rcp.rcp Plugin liegt. Der ImageDescriptor sollte mit
-	 * einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
+	 * Liefert einen ImageDescriptor für ein Bild, das im "icons" Ordner im aero.minova.rcp.images Plugin liegt. Diese gibt es nur ein einer Größe<br>
+	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
 	 *
 	 * @param filename
 	 * @return
 	 */
 	public static ImageDescriptor getImageDefault(final String filename) {
-		final Bundle bundle = FrameworkUtil.getBundle(ImageUtil.class);
+		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
 		final URL url = FileLocator.find(bundle, new Path("icons/" + filename), null);
 		return ImageDescriptor.createFromURL(url);
 	}
