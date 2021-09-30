@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
@@ -21,6 +22,17 @@ public class ZipService {
 	 * @throws IOException
 	 */
 	public static void unzipFile(File fileZip, String destDirName) throws IOException {
+
+		int lastIndexOf = fileZip.toString().lastIndexOf('.');
+		String pathseparator = File.separator;
+		int pathIndex = fileZip.toString().lastIndexOf(pathseparator);
+		
+
+		
+		String targetDir = fileZip.toString().substring(pathIndex + 1, lastIndexOf);
+
+		deleteChildrenInTargetFolder(Path.of(destDirName, targetDir).toFile());
+
 		File destDir = new File(destDirName);
 		byte[] buffer = new byte[1024];
 		try (ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip))) {
@@ -34,10 +46,10 @@ public class ZipService {
 				} else {
 					// fix for Windows-created archives
 					File parent = newFile.getParentFile();
+
 					if (!parent.isDirectory() && !parent.mkdirs()) {
 						throw new IOException("Failed to create directory " + parent);
 					}
-
 					// write file content
 					try (FileOutputStream fos = new FileOutputStream(newFile)) {
 						int len;
@@ -50,6 +62,16 @@ public class ZipService {
 			}
 			zis.closeEntry();
 		}
+	}
+
+	private static void deleteChildrenInTargetFolder(File dir) {
+		if (!Files.isDirectory(dir.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+			return;
+		}
+		for(File file: dir.listFiles()) 
+			if (!file.isDirectory()) {
+				file.delete();
+			}
 	}
 
 	public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {

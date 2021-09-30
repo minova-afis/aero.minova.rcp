@@ -12,9 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -48,6 +46,9 @@ import aero.minova.rcp.util.DateTimeUtil;
 public class DateTimeField {
 
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
+		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 
@@ -63,27 +64,7 @@ public class DateTimeField {
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
-					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
-							locale);
-					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
-							locale);
-					LocalDateTime localeDateTime = LocalDateTime.ofInstant(date, ZoneId.of("UTC"));
-					String pattern = dateUtil + " " + timeUtil;
-					if (dateUtil.isBlank() && timeUtil.isBlank()) {
-						result.add(DateTimeUtil.getDateTimeString(date, locale));
-					} else if (dateUtil.isBlank()) {
-						String datePattern = "dd.MM.yyyy" + pattern;
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern);
-						result.add(localeDateTime.format(dtf));
-					} else if (timeUtil.isBlank()) {
-						String timePattern = pattern + "HH:mm";
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timePattern);
-						result.add(localeDateTime.format(dtf));
-					} else {
-						DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
-						result.add(localeDateTime.format(dtf));
-					}
+					result.add(DateTimeUtil.getDateTimeString(date, locale, dateUtil, timeUtil));
 					field.setValue(new Value(date), true);
 				}
 				return result;
@@ -93,8 +74,7 @@ public class DateTimeField {
 
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
 		LocalDateTime of = LocalDateTime.of(LocalDate.of(2020, 12, 12), LocalTime.of(22, 55));
-		Instant ofEpochSecond = Instant.ofEpochSecond(of.toEpochSecond(ZoneOffset.UTC), of.getNano());
-		text.setMessage(DateTimeUtil.getDateTimeString(ofEpochSecond, locale));
+		text.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {

@@ -2,8 +2,8 @@
 <feature
       id="aero.minova.rcp.feature"
       label="Feature aero.minova.rcp.feature"
-      version="12.0.22.qualifier"
-      provider-name="SAAK">
+      version="12.0.26.qualifier"
+      provider-name="Minova Information Services GmbH">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -238,21 +238,21 @@
          unpack="false"/>
 
    <plugin
-         id="aero.minova.workingtime.helper"
+         id="aero.minova.rcp.constant"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="aero.minova.rcp.constant"
+         id="aero.minova.rcp.widgets"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-   
+
    <plugin
-         id="aero.minova.workingtime.wizard"
+         id="aero.minova.rcp.form.setup"
          download-size="0"
          install-size="0"
          version="0.0.0"

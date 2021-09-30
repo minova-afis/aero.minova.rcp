@@ -8,9 +8,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.e4.core.services.log.Logger;
 
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MLookupField;
 
 public interface IDataService {
@@ -30,7 +32,7 @@ public interface IDataService {
 
 	CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable);
 
-	CompletableFuture<Path> getPDFAsync(String tableName, Table detailTable);
+	CompletableFuture<Path> getXMLAsync(String tableName, Table detailTable, String rootElement);
 
 	/**
 	 * Diese Methode löst einen Wert auf.
@@ -91,6 +93,9 @@ public interface IDataService {
 
 	CompletableFuture<String> getCachedFileContent(String filename);
 
+	/*
+	 * returns true if zip file could be downloaded
+	 */
 	boolean getHashedZip(String zipname);
 
 	void setTimeout(int timeout);
@@ -98,5 +103,7 @@ public interface IDataService {
 	void setTimeoutOpenNotification(int timeoutOpenNotification);
 
 	void sendLogs();
+
+	CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType);
 
 }

@@ -1,9 +1,11 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -20,6 +22,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
+
+import aero.minova.rcp.constants.Constants;
 
 /**
  * Dieser Dialog zeigt die bestehenden (Such-)Kriterien an und bietet die Möglichkeit, welche zu löschen
@@ -37,6 +42,8 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 	private Button delete;
 
 	private String criteriaName;
+	
+	Preferences loadedTablePrefs = InstanceScope.INSTANCE.getNode(Constants.LAST_LOADED_SEARCHCRITERIA);
 
 	public DeleteSearchCriteriaDialog(Shell parent, TranslationService translationService, IEclipsePreferences prefs, String tableName) {
 		super(parent);
@@ -70,6 +77,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 		});
 
 		criterias = getCriteriaNames();
+		Collections.sort(criterias);
 
 		// Input setzen
 		viewer.setInput(criterias);
@@ -103,7 +111,10 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 						System.out.println("probleme mit dem Löschen der Kriterien!");
 						e1.printStackTrace();
 					}
-
+					String prefValue = loadedTablePrefs.get(Constants.LAST_SEARCHCRITERIA, prefCriteriaName);
+					if(prefCriteriaName.equals(prefValue)) {
+						loadedTablePrefs.remove(Constants.LAST_SEARCHCRITERIA);						
+					}
 					criterias.remove(criteriaName);
 					viewer.refresh();
 				}

@@ -19,6 +19,7 @@ import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ComboBoxPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
@@ -43,11 +44,13 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private Grid grid;
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
 	private IDataService dataService;
+	private List<String> readOnlyColumns;
 
 	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService) {
 		this.columns = columns;
 		this.grid = grid;
 		this.dataService = dataService;
+		this.readOnlyColumns = new ArrayList<>();
 		initGridFields();
 	}
 
@@ -60,12 +63,33 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	@Override
 	public void configureRegistry(IConfigRegistry configRegistry) {
-		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.ALWAYS_EDITABLE);
+		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, new IEditableRule() {
+
+			@Override
+			public boolean isEditable(ILayerCell cell, IConfigRegistry configRegistry) {
+				for (String s : readOnlyColumns) {
+					if (cell.getConfigLabels().hasLabel(s)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			@Override
+			public boolean isEditable(int columnIndex, int rowIndex) {
+				return false;
+			}
+		});
 
 		// RequiredValue Style
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.getColor(252, 210, 103));
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, Constants.REQUIRED_CELL_LABEL);
+
+		// ReadOnlyValue Style
+		cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.getColor(235, 235, 235));
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, Constants.READ_ONLY_CELL_LABEL);
 
 		configureCells(configRegistry);
 	}
@@ -123,7 +147,12 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT, configLabel + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			// Bei Read-Only Zellen soll der Pfeil des ComboBoxPainters nicht gezeigt werden, deswegen einfacher ReadOnlyValuePainter
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredLookupPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		} else {
@@ -152,7 +181,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
@@ -166,9 +199,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
-		ShortDateTimeDisplayConverter shortDateTimeDisplayConverter = new ShortDateTimeDisplayConverter(locale);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, shortDateTimeDisplayConverter, DisplayMode.NORMAL,
-				configLabel + columnIndex);
+		DateTimeDisplayConverter dateTimeDisplayConverter = new DateTimeDisplayConverter(locale);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, dateTimeDisplayConverter, DisplayMode.NORMAL, configLabel + columnIndex);
 
 		if (!isReadOnly) {
 			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
@@ -177,10 +209,15 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+
 	}
 
 	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired) {
@@ -202,7 +239,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
@@ -227,7 +268,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
@@ -246,7 +291,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
@@ -291,7 +340,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
@@ -309,7 +362,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isRequired) {
+		if (isReadOnly) {
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+			readOnlyColumns.add(configLabel + columnIndex);
+		} else if (isRequired) {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}

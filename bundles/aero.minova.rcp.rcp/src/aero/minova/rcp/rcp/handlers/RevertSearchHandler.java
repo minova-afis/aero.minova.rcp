@@ -17,4 +17,5 @@ public class RevertSearchHandler {
 	public void execute(MPart mpart) {
 		broker.post(Constants.BROKER_REVERTSEARCHTABLE, mpart);
 	}
+
 }

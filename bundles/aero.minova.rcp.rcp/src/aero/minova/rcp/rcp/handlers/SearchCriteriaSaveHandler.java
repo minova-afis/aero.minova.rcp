@@ -1,6 +1,8 @@
 
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,6 +19,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.osgi.service.prefs.BackingStoreException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
@@ -39,10 +42,17 @@ public class SearchCriteriaSaveHandler {
 		if (data != null) {
 			try {
 				String[] keys = prefs.keys();
-				for (String s : keys) {
+				List<String> keyList = new ArrayList<>();
+				for (String string : keys) {
+					keyList.add(string);
+				}
+				Collections.sort(keyList);
+				for (String s : keyList) {
 					if (s.endsWith(".table") && s.startsWith(data.getName() + ".")) {
 						MHandledMenuItem md = createMenuItem(service, s);
-						items.add(md);
+						if (!md.getLabel().equals(Constants.LAST_STATE)) { // Last_State ist nur zum wiederherstellen der UI
+							items.add(md);
+						}
 					}
 				}
 			} catch (BackingStoreException e) {
@@ -53,7 +63,6 @@ public class SearchCriteriaSaveHandler {
 
 	}
 
-
 	private MHandledMenuItem createMenuItem(EModelService service, String criteriaTableName) {
 		MHandledMenuItem mi = service.createModelElement(MHandledMenuItem.class);
 		// Name aus dem Eintrag suchen!
@@ -61,7 +70,7 @@ public class SearchCriteriaSaveHandler {
 		// vWorkingTime.erlanger Heute
 		// erlanger Heute
 		String displayName = criteriaTableName.replace(".table", "");
-		displayName = displayName.substring(displayName.indexOf(".") + 1, displayName.length());
+		displayName = displayName.substring(displayName.lastIndexOf(".") + 1, displayName.length());
 		mi.setLabel(displayName);
 
 		final MCommand cmd = MCommandsFactory.INSTANCE.createCommand();

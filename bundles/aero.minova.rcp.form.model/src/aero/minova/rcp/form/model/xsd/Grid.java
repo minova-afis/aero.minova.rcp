@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="read-only" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="number-rows-spanned" type="{http://www.w3.org/2001/XMLSchema}integer" default="15" /&gt;
  *       &lt;attribute name="key-cols" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="title" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="title" type="{http://www.w3.org/2001/XMLSchema}string" default="" /&gt;
  *       &lt;attribute name="sort-by" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="group-by" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="icon" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
@@ -503,7 +503,11 @@ public class Grid {
      *     
      */
     public String getTitle() {
-        return title;
+        if (title == null) {
+            return "";
+        } else {
+            return title;
+        }
     }
 
     /**

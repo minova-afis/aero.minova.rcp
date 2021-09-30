@@ -29,7 +29,7 @@ public class Table {
 	}
 
 	public void addColumn(Column c) {
-		if (rows.size() != 0) {
+		if (!rows.isEmpty()) {
 			throw new RuntimeException("Tabelle mit existierenden Zeilen kann nicht erweitert werden!");
 		}
 		columns.add(c);
@@ -91,4 +91,97 @@ public class Table {
 	public void deleteRow(Row row) {
 		rows.remove(row);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+
+		Table other = (Table) obj;
+
+		// Namen vergleichen
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+
+		// Spalten vergleichen
+		if (columns == null) {
+			if (other.columns != null)
+				return false;
+		} else if (columns.size() != other.columns.size()) {
+			return false;
+		} else {
+			for (int i = 0; i < columns.size(); i++) {
+				if (!columns.get(i).equals(other.columns.get(i))) {
+					return false;
+				}
+			}
+		}
+
+		// Zeilen vergleichen
+		if (rows == null) {
+			if (other.rows != null)
+				return false;
+		} else if (rows.size() != other.rows.size()) {
+			return false;
+		} else {
+			for (int i = 0; i < rows.size(); i++) {
+				if (!rows.get(i).equals(other.rows.get(i), false)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Gibt eine Kopie der Tabelle zurück. Änderungen an Zeilen dieser Tabelle haben keine Auswirkung auf die ursprüngliche Tabelle.
+	 * 
+	 * @return
+	 */
+	public Table copy() {
+		Table table = new Table();
+		table.setName(name);
+
+		for (Column c : getColumns()) {
+			table.addColumn(c);
+		}
+
+		for (Row r : getRows()) {
+			Row newRow = new Row();
+			for (Value v : r.getValues()) {
+				if (v == null) {
+					newRow.addValue(null);
+				} else {
+					newRow.addValue(new Value(v.getValue(), v.getType()));
+				}
+			}
+			table.addRow(newRow);
+		}
+
+		return table;
+	}
+
+	@Override
+	public String toString() {
+		return "Table " + name;
+	}
+
 }

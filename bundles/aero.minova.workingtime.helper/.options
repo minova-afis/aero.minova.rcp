@@ -1,8 +1,0 @@
-# Debugging options for the aero.minova.rcp.dataservice plugin.
-
-
-# Turn on debugging for the plugin.
-aero.minova.workingtime.heper/debug=false
-
-# Turn on debugging for the plugin.
-aero.minova.workingtime.heper/debug/tickethelper=false

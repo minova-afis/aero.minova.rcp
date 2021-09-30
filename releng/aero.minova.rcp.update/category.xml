@@ -3,5 +3,8 @@
    <feature id="aero.minova.rcp.feature">
       <category name="rcpcore"/>
    </feature>
+   <feature id="aero.minova.libs.feature">
+      <category name="rcpcore"/>
+   </feature>
    <category-def name="rcpcore" label="Core RCP Application"/>
 </site>

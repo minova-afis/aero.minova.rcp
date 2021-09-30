@@ -271,5 +271,20 @@ public class ApplicationPreferences {
 	 */
 	public static final String TIMEOUT_OPEN_NOTIFICATION = "TimeoutOpenNotification";
 
+	/**
+	 * Soll eine Nachricht angezeigt werden, wenn ungespeicherte Änderungen durch das Wählen eines neuen Datensatzes im Index verworfen werden
+	 */
+	public static final String SHOW_DISCARD_CHANGES_DIALOG_INDEX = "ShowDiscardChangesDialogIndex";
+
+	/**
+	 * Sollen versteckte Abschnitte angezeigt werden. Ersatz für app.isSUMode() aus Masken der Version 11
+	 */
+	public static final String SHOW_HIDDEN_SECTIONS = "ShowHiddenSections";
+
+	/**
+	 * Soll eine Nachricht angezeigt werden bevor ein Datensatz gelöscht wird
+	 */
+	public static final String SHOW_DELETE_WARNING = "ShowDeleteWarning";
+
 	private ApplicationPreferences() {}
 }

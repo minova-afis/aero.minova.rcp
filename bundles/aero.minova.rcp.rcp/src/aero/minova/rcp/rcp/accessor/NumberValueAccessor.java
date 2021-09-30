@@ -31,10 +31,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
+		// we see this control disposed in our unit tests
+		if (control.isDisposed()) {
+			return;
+		}
 		if (value == null) {
 			((Text) control).setText("");
 		} else {
-			int decimals = (int) field.getDecimals();
+			int decimals = field.getDecimals();
 			Locale locale = (Locale) control.getData(FieldUtil.TRANSLATE_LOCALE);
 
 			NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
@@ -113,7 +117,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			DecimalFormatSymbols decimalFormatSymbols) {
 		Result result = new Result();
 		String text;
-		Boolean doit;
+		Boolean doit = false;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
@@ -121,19 +125,22 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 
 		// Prüft ob die Eingabe statt findet oder nicht
-		if (!textBefore.isEmpty() && keyCode == 127 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
-					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) { // entfernt werden soll
-				doit = false;
-			} else {
-				doit = true;
-			}
-		} else if (!textBefore.isEmpty() && keyCode == 8 && caretPosition > 0) {
-			if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()// prüft ob ein dezimal oder Gruppierungs trennzeichen
-					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {// gelöscht werden soll
-				doit = false;
-			} else {
-				doit = true;
+		if (!textBefore.isEmpty() && (textBefore.contains("[" + decimalFormatSymbols.getGroupingSeparator() + "]")
+				|| textBefore.contains("[" + decimalFormatSymbols.getDecimalSeparator() + "]"))) {
+			if (keyCode == 127 && caretPosition > 0) {
+				if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
+						|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) { // entfernt werden soll
+					doit = false;
+				} else {
+					doit = true;
+				}
+			} else if (keyCode == 8 && caretPosition > 0) {
+				if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()// prüft ob ein dezimal oder Gruppierungs trennzeichen
+						|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {// gelöscht werden soll
+					doit = false;
+				} else {
+					doit = true;
+				}
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
 			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) { 

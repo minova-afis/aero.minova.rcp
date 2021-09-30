@@ -1,0 +1,122 @@
+name: Tag and Release WFC-Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'major.minor.patch'
+        required: true
+      description:
+        description: 'Beschreibung (Keine Sonderzeichen!)'
+        required: true
+
+jobs:
+  tagAndReleaseWFC:
+  
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+    - name: Checkout aero.minova.rcp
+      uses: actions/checkout@v2
+
+    - uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+    # Version in der Pom.xml und allen anderen Paketen inkrementieren und Commiten
+    - name: Increment Version 
+      run: mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="${{ github.event.inputs.version }}.qualifier"
+    - name: Git commit Version 
+      run: |
+       git config user.email "erlanger@minova.com"
+       git config user.name "CE7"
+       git add . 
+       git commit -m "Increment Version to ${{ github.event.inputs.version }}, ${{ github.event.inputs.description }}"
+       git push
+       
+    # Version als tag anlegen
+    - name: Tag version
+      run: |
+        git config user.email "erlanger@minova.com"
+        git config user.name "CE7"
+        git tag -a "v${{ github.event.inputs.version }}" -m "${{ github.event.inputs.description }}"
+        git push --tags
+        
+    # Maven Cachen
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    # Bauen
+    - name: Build with Maven 
+      run: mvn --batch-mode --update-snapshots verify --file pom.xml
+    
+    # Zips hochladen
+    - name: Copy .zip to Stage area
+      run: mkdir staging && cp releng/aero.minova.rcp.product/target/products/*.zip staging
+    - name: Upload .zip 
+      uses: actions/upload-artifact@v2
+      with:
+        name: aero.minova.rcp ${{ github.event.inputs.version }}
+        path: staging
+        
+        
+    # Release erstellen
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: v${{ github.event.inputs.version }}
+        release_name: Release ${{ github.event.inputs.version }}
+        body: |
+          AUTOMATICALLY GENERATED, UPDATE WITH CHANGES
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: false
+      
+    # .zips zum Release hinzufügen  
+    - name: Upload windows zip as Release Asset
+      id: upload-release-asset-win
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: staging/WebFatClient-win32.win32.x86_64.zip
+        asset_name: WFC_Windows_${{ github.event.inputs.version }}.zip
+        asset_content_type: application/zip
+    - name: Upload Mac zip as Release Asset
+      id: upload-release-asset-mac
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: staging/WebFatClient-macosx.cocoa.x86_64.zip
+        asset_name: WFC_macOS_${{ github.event.inputs.version }}.zip
+        asset_content_type: application/zip
+    - name: Upload Linux zip as Release Asset
+      id: upload-release-asset-linux
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: staging/WebFatClient-linux.gtk.x86_64.zip
+        asset_name: WFC_Linux_${{ github.event.inputs.version }}.zip
+        asset_content_type: application/zip
+        
+        
+        
+        
+        

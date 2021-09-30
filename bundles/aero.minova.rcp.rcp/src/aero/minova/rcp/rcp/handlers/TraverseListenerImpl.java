@@ -22,7 +22,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public class TraverseListenerImpl implements TraverseListener {
 
@@ -46,7 +46,7 @@ public class TraverseListenerImpl implements TraverseListener {
 	public void keyTraversed(TraverseEvent e) {
 
 		Control focussedControl = (Control) e.widget;
-		if ((focussedControl.getParent() instanceof Lookup) || (focussedControl.getParent() instanceof TextAssist)) {
+		if ((focussedControl.getParent() instanceof LookupComposite) || (focussedControl.getParent() instanceof TextAssist)) {
 			focussedControl = focussedControl.getParent();
 		}
 
@@ -291,8 +291,8 @@ public class TraverseListenerImpl implements TraverseListener {
 				DisplayType.CHECK, true, locale);
 
 		boolean popupOpen = false;
-		if (focussedControl instanceof Lookup) {
-			Lookup lookup = (Lookup) focussedControl;
+		if (focussedControl instanceof LookupComposite) {
+			LookupComposite lookup = (LookupComposite) focussedControl;
 			// Wir holen uns den Status des Popup des Lookup
 			popupOpen = lookup.popupIsOpen();
 		}
@@ -316,7 +316,7 @@ public class TraverseListenerImpl implements TraverseListener {
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
 			focussedControl = ((AbstractValueAccessor) selectedField.getValueAccessor()).getControl();
 			focussedControl.setFocus();
-			Lookup lookup = (Lookup) focussedControl;
+			LookupComposite lookup = (LookupComposite) focussedControl;
 			lookup.closePopup();
 			return;
 		}
@@ -347,8 +347,8 @@ public class TraverseListenerImpl implements TraverseListener {
 			// Sind auf der selben Section vor meinem Feld noch unausgefüllte Required Fields?
 			fc = getNextRequiredFieldWhichNull(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
 			if (fc == null) {
-				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
+				if (focussedControl instanceof LookupComposite) {
+					LookupComposite lookup = (LookupComposite) focussedControl;
 					lookup.closePopup();
 				}
 			}

@@ -12,8 +12,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -35,8 +33,8 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.widgets.Lookup;
-import aero.minova.rcp.rcp.widgets.LookupContentProvider;
+import aero.minova.rcp.widgets.LookupComposite;
+import aero.minova.rcp.widgets.LookupContentProvider;
 
 public class LookupField {
 
@@ -48,7 +46,7 @@ public class LookupField {
 
 		IEclipseContext context = perspective.getContext();
 
-		Lookup lookupControl = new Lookup(composite, SWT.BORDER | SWT.LEFT);
+		LookupComposite lookupControl = new LookupComposite(composite, SWT.BORDER | SWT.LEFT);
 		lookupControl.setMessage("...");
 		lookupControl.setLabel(label);
 		ContextInjectionFactory.inject(lookupControl, context); // In Context injected, damit TranslationService genutzt werden kann
@@ -89,20 +87,16 @@ public class LookupField {
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
 
-		lookupControl.addTraverseListener(new TraverseListener() {
-
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				Text text = ((Text) e.getSource());
-				Lookup t = (Lookup) text.getParent();
-				switch (e.detail) {
-				case SWT.TRAVERSE_TAB_PREVIOUS:
-				case SWT.TRAVERSE_TAB_NEXT:
-				case SWT.TRAVERSE_RETURN:
-					t.fillSelectedValue();
-					e.doit = true;
-					break;
-				}
+		lookupControl.addTraverseListener(e -> {
+			Text text = ((Text) e.getSource());
+			LookupComposite t = (LookupComposite) text.getParent();
+			switch (e.detail) {
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+			case SWT.TRAVERSE_TAB_NEXT:
+			case SWT.TRAVERSE_RETURN:
+				t.fillSelectedValue();
+				e.doit = true;
+				break;
 			}
 		});
 		return lookupControl;
@@ -116,7 +110,7 @@ public class LookupField {
 	 */
 	@Inject
 	@Optional
-	public static void requestLookUpEntriesAll(MField field, MDetail detail, Lookup lookup) {
+	public static void requestLookUpEntriesAll(MField field, MDetail detail, LookupComposite lookup) {
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
@@ -132,7 +126,7 @@ public class LookupField {
 	 * @param ta
 	 * @param c
 	 */
-	public static void changeOptionsForLookupField(Table ta, Lookup lookupControl, boolean twisty) {
+	public static void changeOptionsForLookupField(Table ta, LookupComposite lookupControl, boolean twisty) {
 		MLookupField field = (MLookupField) lookupControl.getData(Constants.CONTROL_FIELD);
 		field.setOptions(ta);
 		changeSelectionBoxList(lookupControl, field, twisty);
@@ -143,7 +137,7 @@ public class LookupField {
 	 *
 	 * @param lookUpControl
 	 */
-	public static void changeSelectionBoxList(Lookup lookUpControl, MLookupField field, boolean twisty) {
+	public static void changeSelectionBoxList(LookupComposite lookUpControl, MLookupField field, boolean twisty) {
 		if (field.getOptions() != null) {
 			Table t = field.getOptions();
 			// Existiert nur ein Wert für das gegebene Feld, so wird überprüft ob die
@@ -214,7 +208,7 @@ public class LookupField {
 	 * @param c
 	 * @param t
 	 */
-	public static void changeProposals(Lookup lc, Table t) {
+	public static void changeProposals(LookupComposite lc, Table t) {
 		LookupContentProvider contentProvider = lc.getContentProvider();
 		contentProvider.setTable(t);
 	}

@@ -4,7 +4,7 @@ public class Column {
 
 	public Column(String name, DataType type, OutputType outputType) {
 		this(name, type);
-		this.outputType = outputType;
+		this.setOutputType(outputType);
 	}
 
 	public Column(String name, DataType type) {
@@ -21,12 +21,13 @@ public class Column {
 	boolean readOnly;
 	boolean required;
 	boolean isLookup;
+	boolean visible;
 	String lookupTable;
 	KeyType keyType;
 
 	@Override
 	public String toString() {
-		return "Column [name=" + getName() + ", type=" + getType() + ", outputType=" + outputType + "]";
+		return "Column [name=" + getName() + ", type=" + getType() + ", outputType=" + getOutputType() + "]";
 	}
 
 	public DataType getType() {
@@ -43,6 +44,14 @@ public class Column {
 
 	public String getLabel() {
 		return label;
+	}
+
+	public OutputType getOutputType() {
+		return outputType;
+	}
+
+	public void setOutputType(OutputType outputType) {
+		this.outputType = outputType;
 	}
 
 	public Integer getDecimals() {
@@ -85,6 +94,14 @@ public class Column {
 		this.isLookup = isLookup;
 	}
 
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
 	public String getLookupTable() {
 		return lookupTable;
 	}
@@ -99,6 +116,46 @@ public class Column {
 
 	public void setKeyType(KeyType keyType) {
 		this.keyType = keyType;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dateTimeType == null) ? 0 : dateTimeType.hashCode());
+		result = prime * result + ((decimals == null) ? 0 : decimals.hashCode());
+		result = prime * result + (isLookup ? 1231 : 1237);
+		result = prime * result + ((keyType == null) ? 0 : keyType.hashCode());
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + ((lookupTable == null) ? 0 : lookupTable.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((getOutputType() == null) ? 0 : getOutputType().hashCode());
+		result = prime * result + (readOnly ? 1231 : 1237);
+		result = prime * result + (required ? 1231 : 1237);
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Column other = (Column) obj;
+
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equalsIgnoreCase(other.name))
+			return false;
+
+		// TODO: Typ überprüfen?
+//		if (type != other.type)
+//			return false;
+		return true;
 	}
 
 }

@@ -81,8 +81,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		int i = 0;
 		for (Field field : grid.getField()) {
 			String translate = field.getName();
-			if (field.getText() != null) {
-				translate = translationService.translate(field.getText().toString(), null);
+			if (field.getLabel() != null) {
+				translate = translationService.translate(field.getLabel(), null);
 			}
 			getTableHeadersMap().put(field.getName(), translate);
 			propertyNames[i++] = field.getName();

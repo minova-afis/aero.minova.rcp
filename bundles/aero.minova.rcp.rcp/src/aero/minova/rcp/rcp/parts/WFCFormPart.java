@@ -2,45 +2,43 @@ package aero.minova.rcp.rcp.parts;
 
 import javax.inject.Inject;
 
-import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.widgets.LabelFactory;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.IMinovaPluginService;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 public abstract class WFCFormPart {
 
 	@Inject
-	protected MPerspective perspective;
+	protected MPerspective mPerspective;
 	@Inject
 	protected IDataFormService dataFormService;
 	@Inject
 	protected IDataService dataService;
-	protected Form form;
 
 	@Inject
-	Logger logger;
+	protected IMinovaPluginService pluginService;
+	protected Form form;
 
-	public Form getForm(Composite parent) {
-		// form = perspective.getContext().get(Form.class);
+	public Form getForm() {
+		IEclipseContext ctx = mPerspective.getContext();
+//		form = ctx.get(Form.class);
 		if (form == null) {
-			String formName = perspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
+			// TODO herausfinden wo das gesetzt wird und dokumentieren
+			String formName = mPerspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
 
 			form = dataFormService.getForm(formName);
-			if (form == null) {
-				LabelFactory.newLabel(SWT.CENTER).align(SWT.CENTER).text(formName).create(parent);
-				logger.error("Server konnte " + formName + " nicht laden!");
-				return null;
-			}
-
 			// Form in den Context injected, damit überall darauf zugegriffen werden kann
-			perspective.getContext().set(Form.class, form);
+			ctx.set(Form.class, form);
+			if (form.getHelperClass() != null) {
+				pluginService.activatePlugin(form.getHelperClass());
+			}
 		}
+
 		return form;
 	}
 

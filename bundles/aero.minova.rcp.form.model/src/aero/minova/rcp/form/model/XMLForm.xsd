@@ -386,7 +386,7 @@
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute default="false" name="total" type="xs:boolean" />
-		<xs:attribute default="0" name="sql-index" type="xs:integer" use="optional" />
+		<xs:attribute name="sql-index" type="xs:integer" use="required" />
 		<xs:attribute name="validation-order" type="xs:integer" use="optional" />
 		<xs:attribute default="2" name="number-columns-spanned" use="optional">
 			<xs:simpleType>
@@ -1379,7 +1379,7 @@
 					<xs:documentation>Definiert die Schlüsselspalten</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="title" type="xs:string" use="optional">
+			<xs:attribute default="" name="title" type="xs:string" use="optional">
 				<xs:annotation>
 					<xs:documentation>Grid-Überschrift vom Grid. Erscheint über dem
 						Grid oder in der TabPage, wenn es sich ein

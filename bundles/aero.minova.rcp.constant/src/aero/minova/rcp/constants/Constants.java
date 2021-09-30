@@ -2,6 +2,14 @@ package aero.minova.rcp.constants;
 
 public class Constants {
 
+	// Parts
+	public static final String SEARCH_PART = "aero.minova.rcp.rcp.part.search";
+	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
+	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
+
+	public static final String MDI_FILE_NAME = "application.mdi";
+	public static final String XBS_FILE_NAME = "application.xbs";
+
 	public static final String TABLE_KEYTEXT = "KeyText";
 	public static final String TABLE_KEYLONG = "KeyLong";
 	public static final String TABLE_DESCRIPTION = "Description";
@@ -32,8 +40,7 @@ public class Constants {
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
 
-	// dient dazu, um auf die aus den preferences übernommene Zeitzone im
-	// textfieldVerifier zuzugreifen
+	// dient dazu, um auf die aus den preferences übernommene Zeitzone im textfieldVerifier zuzugreifen
 	public static final String FOCUSED_ORIGIN = "XMLDetailPart";
 
 	public static final String CLEAR_REQUEST = "Clear";
@@ -42,8 +49,7 @@ public class Constants {
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
 
-	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden
-	// müssen
+	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden müssen
 	public static final String FORM_BOOKINGDATE = "BookingDate";
 	public static final String FORM_STARTDATE = "StartDate";
 	public static final String FORM_ENDDATE = "EndDate";
@@ -57,6 +63,7 @@ public class Constants {
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
 	public static final String BROKER_NEWENTRY = "aero/minova/rcp/NewFields";
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
+	public static final String BROKER_CLEARSELECTION = "aero/minova/rcp/ClearSelection";
 	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
@@ -72,10 +79,14 @@ public class Constants {
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
 	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
-	public static final String BROKER_RESOLVETICKET = "aero/minova/rcp/ResolveTicket";
 	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
 	public static final String BROKER_SHOWCONNECTIONERRORMESSAGE = "aero/minova/rcp/ShowConnectionErrorMessage";
+	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
+	public static final String BROKER_PROCEDUREWITHTABLEERROR = "aero/minova/rcp/ProcedureWithTableError";
+	public static final String BROKER_PROCEDUREWITHTABLESUCCESS = "aero/minova/rcp/ProcedureWithTableSuccess";
+	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
+	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
@@ -85,20 +96,24 @@ public class Constants {
 
 	// SeachCriteria
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";
+	public static final String LAST_LOADED_SEARCHCRITERIA = "aero.minova.rcp.preferences.lastsearchcriteria";
+	public static final String LAST_SEARCHCRITERIA = "LastLoadedSearchCriteria";
+
+	// Wiederherstellen der UI
+	public static final String LAST_STATE = "LAST_STATE";
+	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
+	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
 
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
 	public static final String REQUIRED_CELL_LABEL = "REQUIRED_CELL";
+	public static final String READ_ONLY_CELL_LABEL = "READ_ONLY_CELL";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";
 	public static final String CSS_REQUIRED = "ValueRequired";
 	public static final String CSS_INVALID = "InvalidValue";
 	public static final String CSS_READONLY = "ReadOnly";
-
-	/**
-	 * Id for command parameter "Perspective ID" (value is <code>"org.eclipse.e4.ui.perspectives.parameters.perspectiveId"</code>).
-	 */
 
 	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
 	public static final String FORM_ID = "aero.minova.rcp.perspectiveswitcher.parameters.formId"; //$NON-NLS-1$
@@ -107,6 +122,7 @@ public class Constants {
 	public static final String PERSPECTIVE_TOOLBAR = "perspectivetoolbar";
 	public static final String PREFERENCES_KEPTPERSPECTIVES = "aero.minova.rcp.preferences.keptperspectives";
 	public static final String PREFERENCES_TOOLBARORDER = "aero.minova.rcp.preferences.toolbarorder";
+	public static final String PREFERENCES_DETAILSECTIONS = "aero.minova.rcp.preferences.detailsections";
 
 	public static final String KEPT_PERSPECTIVE_FORMNAME = ".FormName";
 	public static final String KEPT_PERSPECTIVE_FORMID = ".FormId";
@@ -114,6 +130,19 @@ public class Constants {
 	public static final String KEPT_PERSPECTIVE_ICONURI = ".IconURI";
 	public static final String KEPT_PERSPECTIVE_LOCALIZEDLABEL = ".LocalizedLabel";
 	public static final String KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP = ".LocalizedToolTip";
+
+	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
+
+	public static final String DETAIL_WIDTH = "Detail_Width";
+	public static final String OPTION_PAGES = "OptionPages";
+	public static final Object OPTION_PAGE_GRID = "OptionPageGrid";
+
+	// Commands
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
+
+	// XBS Einstellungen
+	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";
 
 	/**
 	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden

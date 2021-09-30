@@ -96,7 +96,7 @@ public class TimeUtil {
 			FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
 			for (FormatStyle formatStyle : styles) {
 				try {
-					dtf = DateTimeFormatter.ofLocalizedDate(formatStyle).withLocale(locale);
+					dtf = DateTimeFormatter.ofLocalizedTime(formatStyle).withLocale(locale);
 					LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
 					String formatted = lt.format(dtf);
 					now = Instant.parse(formatted);
@@ -156,9 +156,13 @@ public class TimeUtil {
 			return result;
 	}
 
-	public static String getTimeString(Instant instant, Locale locale) {
+	public static String getTimeString(Instant instant, Locale locale, String timeUtilPref) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
+		if (!timeUtilPref.isBlank()) {
+			dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+		}
 		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
-		return localDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
+		return localDateTime.format(dtf);
 	}
 
 	private static Instant changeHours(Instant instant, String[] splits) {
@@ -242,8 +246,12 @@ public class TimeUtil {
 		String[] subStrings = input.split(":");
 
 		if (subStrings.length == 2) {
-			hours = Integer.valueOf(subStrings[0]);
-			minutes = Integer.valueOf(subStrings[1]);
+			if (!subStrings[0].isBlank() && !subStrings[1].isBlank()) {
+				hours = Integer.valueOf(subStrings[0]);
+				minutes = Integer.valueOf(subStrings[1]);
+			} else {
+				return null;
+			}
 		}
 
 		if (subStrings.length < 2) {

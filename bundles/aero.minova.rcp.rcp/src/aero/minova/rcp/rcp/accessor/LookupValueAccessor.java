@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
@@ -16,7 +17,7 @@ import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public class LookupValueAccessor extends AbstractValueAccessor {
 
@@ -28,7 +29,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	@Inject
 	UISynchronize sync;
 
-	public LookupValueAccessor(MField field, Lookup control) {
+	public LookupValueAccessor(MField field, LookupComposite control) {
 		super(field, control);
 
 	}
@@ -52,6 +53,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	 */
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
+		// we see this control disposed in our unit tests
+		if (control.isDisposed()) {
+			return;
+		}
 		if (LOG) {
 			try {
 				System.out.println("updateControlFromValue " + value.toString());
@@ -62,23 +67,23 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 
 		if (value == null) {
-			((Lookup) control).getDescription().setText("");
-			((Lookup) control).setText("");
-			if (((Lookup) control).getEditable()) {
-				((Lookup) control).setMessage("...");
+			((LookupComposite) control).getDescription().setText("");
+			((LookupComposite) control).setText("");
+			if (((LookupComposite) control).getEditable()) {
+				((LookupComposite) control).setMessage("...");
 				if (LOG) {
-					System.out.println("Lookup " + ((Lookup) control).getLabel().getText() + " ist null");
+					System.out.println("Lookup " + ((LookupComposite) control).getLabel().getText() + " ist null");
 				}
 			}
 			return;
 		}
 		if (value instanceof LookupValue) {
 			LookupValue lv = (LookupValue) value;
-			((Lookup) control).getDescription().setText(lv.description);
-			((Lookup) control).setText(lv.keyText);
-			((Lookup) control).setMessage("...");
+			((LookupComposite) control).getDescription().setText(lv.description);
+			((LookupComposite) control).setText(lv.keyText);
+			((LookupComposite) control).setMessage("...");
 			if (LOG) {
-				System.out.println("Lookup " + ((Lookup) control).getLabel().getText() + " ist leer");
+				System.out.println("Lookup " + ((LookupComposite) control).getLabel().getText() + " ist leer");
 			}
 		} else {
 			Integer keyLong = null;
@@ -113,10 +118,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine
 		// Optionen vorlagen oder der DisplayValue neu gesetzt wird
 		if (field.getValue() == getDisplayValue()) {
-			String displayText = ((Lookup) control).getText();
+			String displayText = ((LookupComposite) control).getText();
 			if (("").equals(displayText)) {
-				if (((Lookup) control).getEditable()) {
-					((Lookup) control).setMessage("");
+				if (((LookupComposite) control).getEditable()) {
+					((LookupComposite) control).setMessage("");
 				}
 				field.setValue(null, false);
 			} else {
@@ -129,9 +134,16 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	}
 
 	public void updatePossibleValues() {
-		Lookup up = ((Lookup) control);
+		LookupComposite up = ((LookupComposite) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> up.getContentProvider().setValuesOnly(l)));
+		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> {
+			try {
+				up.getContentProvider().setValuesOnly(l);
+				if (l.size() == 1) {
+					field.setValue(l.get(0), false);
+				}
+			} catch (SWTException e) {}
+		}));
 	}
 
 	/**
