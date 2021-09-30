@@ -51,13 +51,19 @@ public class ImageUtil {
 	 * @return
 	 */
 	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename, boolean isToolBar) {
+		if (filename == null) {
+			return ImageDescriptor.createFromURL(null);
+		}
+
 		String location = retrieveIcon(filename, isToolBar);
 
 		try {
 			URL url = URI.create(location).toURL();
 			return ImageDescriptor.createFromURL(url);
-		} catch (MalformedURLException e) {}
-		return null;
+		} catch (MalformedURLException | IllegalArgumentException e) {
+			System.err.println("Invalid URI " + location + " for icon " + filename);
+		}
+		return ImageDescriptor.createFromURL(null);
 	}
 
 	/**
@@ -68,6 +74,11 @@ public class ImageUtil {
 	 * @return
 	 */
 	public static String retrieveIcon(String icon, boolean isToolBar) {
+
+		if (icon == null) {
+			return null;
+		}
+
 		String iconWithoutExtension = icon.replace(".png", "").replace(".ico", "").toLowerCase();
 		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
 
