@@ -1,5 +1,6 @@
 package aero.minova.rcp.perspectiveswitcher.handler;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -15,7 +16,9 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
@@ -47,7 +50,7 @@ public class SwitchPerspectiveHandler {
 
 	/**
 	 * Opens the perspective with the given identifier.
-	 * 
+	 *
 	 * @param perspectiveId
 	 *            The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException
@@ -64,7 +67,7 @@ public class SwitchPerspectiveHandler {
 
 	/**
 	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt sofort zur neuen Perspektive.
-	 * 
+	 *
 	 * @param window
 	 * @param perspectiveStack
 	 * @param perspectiveID
@@ -82,6 +85,26 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		} else {
+			// Änderung der Größe für die Parts
+			List<MPart> findElements = modelService.findElements(element, null, MPart.class);
+			for (MPart mPart : findElements) {
+				String iconURI = mPart.getIconURI();
+				if (iconURI.contains("32x32")) {
+					iconURI = iconURI.replace("32x32", "64x64");
+					mPart.setIconURI(iconURI);
+				}
+			}
+
+			// Änderung der Größe für die HandledToolItems
+			List<MHandledToolItem> findElements2 = modelService.findElements(element, null, MHandledToolItem.class);
+			for (MHandledToolItem mHandledToolItem : findElements2) {
+				String iconURI = mHandledToolItem.getIconURI();
+				if (iconURI.contains("32x32")) {
+					iconURI = iconURI.replace("32x32", "64x64");
+					mHandledToolItem.setIconURI(iconURI);
+				}
+			}
+
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.getPersistedState().put(Constants.FORM_NAME, formName);
@@ -94,8 +117,8 @@ public class SwitchPerspectiveHandler {
 	}
 
 	/**
-	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist 
-	 * 
+	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist
+	 *
 	 * @param element
 	 */
 	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
