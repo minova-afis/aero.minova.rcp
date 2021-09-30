@@ -23,7 +23,8 @@ Import-Package: aero.minova.rcp.constants,
  org.osgi.service.component.annotations;resolution:=optional
 Service-Component: OSGI-INF/aero.minova.rcp.dataservice.XmlProcessor.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.DataFormService.xml,
- OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.DataService.xml,
+ OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaImageService.xml,
+ OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaJsonService.xml,
  OSGI-INF/aero.minova.rcp.dataservice.internal.MinovaPluginService.xml
 Bundle-ActivationPolicy: lazy
