@@ -1,6 +1,5 @@
 package aero.minova.rcp.perspectiveswitcher.handler;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -16,13 +15,12 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.ImageUtil;
 
 public class SwitchPerspectiveHandler {
 
@@ -85,25 +83,6 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		} else {
-			// Änderung der Größe für die Parts
-			List<MPart> findElements = modelService.findElements(element, null, MPart.class);
-			for (MPart mPart : findElements) {
-				String iconURI = mPart.getIconURI();
-				if (iconURI.contains("32x32")) {
-					iconURI = iconURI.replace("32x32", "64x64");
-					mPart.setIconURI(iconURI);
-				}
-			}
-
-			// Änderung der Größe für die HandledToolItems
-			List<MHandledToolItem> findElements2 = modelService.findElements(element, null, MHandledToolItem.class);
-			for (MHandledToolItem mHandledToolItem : findElements2) {
-				String iconURI = mHandledToolItem.getIconURI();
-				if (iconURI.contains("32x32")) {
-					iconURI = iconURI.replace("32x32", "64x64");
-					mHandledToolItem.setIconURI(iconURI);
-				}
-			}
 
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
@@ -112,6 +91,7 @@ public class SwitchPerspectiveHandler {
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);
 
+			ImageUtil.updateModelIcons(element, modelService);
 		}
 		return perspective;
 	}
