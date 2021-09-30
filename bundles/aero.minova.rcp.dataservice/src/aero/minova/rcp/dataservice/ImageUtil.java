@@ -1,6 +1,9 @@
 package aero.minova.rcp.dataservice;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -39,53 +42,51 @@ public class ImageUtil {
 	}
 
 	/**
-	 * Liefert einen ImageDescriptor für ein Bild, das im "images" Ordner im aero.minova.rcp.images Plugin liegt. Der ImageDescriptor sollte mit
-	 * einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird. <br>
-	 * TODO: Unterschiedliche ImageBundles unterstützen, diese vom Server laden (siehe #237) <br>
-	 * TODO: Verschiedene Größen laden (durch Einstellung gesteuert, siehe #399)
+	 * Liefert einen ImageDescriptor für das Bild. <br>
+	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht. <br>
+	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
+	 * <br>
 	 *
 	 * @param filename
 	 * @return
 	 */
 	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename, boolean isToolBar) {
-		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
-		String iconSize = calculateImagesSize(size, isToolBar);
-		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + "/" + iconSize)));
+		String location = retrieveIcon(filename, isToolBar);
+
+		try {
+			URL url = URI.create(location).toURL();
+			return ImageDescriptor.createFromURL(url);
+		} catch (MalformedURLException e) {}
+		return null;
 	}
 
-	private static String calculateImagesSize(String size, boolean isToolbar) {
-		int calculatedSize = 0;
-		switch (size) {
-		case "s":
-			calculatedSize = isToolbar ? 24 : 16;
-			break;
-		case "m":
-			calculatedSize = isToolbar ? 32 : 24;
-			break;
-		case "l":
-			calculatedSize = isToolbar ? 48 : 32;
-			break;
-		case "xl":
-			calculatedSize = isToolbar ? 64 : 48;
-			break;
-
-		default:
-			throw new RuntimeException("Angeforderte Größe ist nicht verfügbar!");
-		}
-		return calculatedSize + "x" + calculatedSize + ".png";
-	}
-
+	/**
+	 * Liefert einen String mit der Location des Bildes. <br>
+	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht.
+	 *
+	 * @param filename
+	 * @return
+	 */
 	public static String retrieveIcon(String icon, boolean isToolBar) {
 		String iconWithoutExtension = icon.replace(".png", "").replace(".ico", "").toLowerCase();
-		//
-		// im Falle der Unit tests haben wir keinen bundle context
-		Bundle bundle = FrameworkUtil.getBundle(ImageUtil.class);
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+
+		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen
+		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
+		String iconSize = calculateImagesSize(size, isToolBar);
+		URL localURL = FileLocator.find(bundle, new Path("images/" + iconWithoutExtension + "/" + iconSize));
+		if (localURL != null) {
+			try {
+				return localURL.toURI().toString();
+			} catch (URISyntaxException e) {}
+		}
+
+		// Ansonsten im heruntergelandenen Images Ordner suchen
+		bundle = FrameworkUtil.getBundle(ImageUtil.class);
 		ServiceReference<IDataService> serviceReference = bundle.getBundleContext().getServiceReference(IDataService.class);
 		IDataService service = bundle.getBundleContext().getService(serviceReference);
 		Objects.requireNonNull(service);
 		java.nio.file.Path storagePath = service.getStoragePath().resolve("Images");
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
 
 		if (storagePath != null && storagePath.toFile().isDirectory()) {
 			File[] listFiles = storagePath.toFile().listFiles();
@@ -93,17 +94,17 @@ public class ImageUtil {
 			if (listFiles != null) {
 				for (File file : listFiles) {
 					if (file.getName().toLowerCase().equals(iconWithoutExtension)) {
-						resolve = file.toPath().resolve(calculateImagesSize(size, isToolBar));
+						resolve = file.toPath().resolve(iconSize);
 					}
 				}
 			}
 			if (resolve != null) {
-				System.out.println(resolve.toUri());
 				return resolve.toUri().toString();
 			}
 		}
-		return "ERROR! Icon not found: " + icon;
 
+		// Wenn nichts gefunden wurde ursprünglichen Text zurückgeben
+		return icon;
 	}
 
 	/**
@@ -143,6 +144,28 @@ public class ImageUtil {
 		int indexOfLastSlash = oldIconString.lastIndexOf("/");
 		String newIconString = oldIconString.substring(0, indexOfLastSlash + 1);
 		return newIconString + calculateImagesSize(size, false);
+	}
+
+	private static String calculateImagesSize(String size, boolean isToolbar) {
+		int calculatedSize = 0;
+		switch (size) {
+		case "s":
+			calculatedSize = isToolbar ? 24 : 16;
+			break;
+		case "m":
+			calculatedSize = isToolbar ? 32 : 24;
+			break;
+		case "l":
+			calculatedSize = isToolbar ? 48 : 32;
+			break;
+		case "xl":
+			calculatedSize = isToolbar ? 64 : 48;
+			break;
+
+		default:
+			throw new RuntimeException("Angeforderte Größe ist nicht verfügbar!");
+		}
+		return calculatedSize + "x" + calculatedSize + ".png";
 	}
 
 }
