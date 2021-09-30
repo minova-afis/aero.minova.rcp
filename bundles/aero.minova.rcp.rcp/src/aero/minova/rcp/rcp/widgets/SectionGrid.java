@@ -263,7 +263,7 @@ public class SectionGrid {
 		});
 
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon());
+			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon(), false);
 			Image buttonImage = resManager.createImage(buttonImageDescriptor);
 			item.setImage(buttonImage);
 		}
@@ -374,8 +374,9 @@ public class SectionGrid {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty())
+				if (selectionLayer.getSelectedCells().isEmpty()) {
 					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+				}
 			}
 		});
 

@@ -183,8 +183,8 @@ public class MenuProcessor {
 		handledMenuItem.setElementId("menuItemFor." + actionMDI.getId());
 
 		handledMenuItem.setLabel(actionMDI.getText());
-		
-		String retrieveIcon = ImageUtil.retrieveIcon(actionMDI.getIcon());
+
+		String retrieveIcon = ImageUtil.retrieveIcon(actionMDI.getIcon(), false);
 		handledMenuItem.setIconURI(retrieveIcon);
 
 		return handledMenuItem;
