@@ -8,9 +8,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.e4.core.services.log.Logger;
 
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MLookupField;
 
 public interface IDataService {
@@ -101,5 +103,7 @@ public interface IDataService {
 	void setTimeoutOpenNotification(int timeoutOpenNotification);
 
 	void sendLogs();
+
+	CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType);
 
 }
