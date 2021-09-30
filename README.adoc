@@ -285,6 +285,7 @@ Die Configuration habe ich auch standalone erstellt / released.
 * link:PluginErstellen.adoc[Erstellen von neuen Plugins (für Helper, Ersatz von JavaScript in Masken)]
 * link:Updatesite.adoc[Erstellen und Nutzen von der Updatesite]
 * link:bundles/aero.minova.rcp.preferences/README.adoc[Einstellungen]
+* link:bundles/aero.minova.rcp.rcp/README.adoc[UI Eigenschaften]
 * link:bundles/aero.minova.rcp.dataservice/README.adoc[Verhalten wenn CAS nicht erreichbar ist]
 
 
