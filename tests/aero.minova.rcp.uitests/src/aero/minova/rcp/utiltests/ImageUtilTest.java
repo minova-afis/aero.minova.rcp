@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.utiltests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
