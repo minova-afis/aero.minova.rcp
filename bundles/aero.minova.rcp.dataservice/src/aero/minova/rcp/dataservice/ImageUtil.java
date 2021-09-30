@@ -1,19 +1,24 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.dataservice;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 
 public class ImageUtil {
@@ -45,11 +50,11 @@ public class ImageUtil {
 	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename, boolean isToolBar) {
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
 		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
-		String iconSize = calculateImgaesSize(size, isToolBar);
+		String iconSize = calculateImagesSize(size, isToolBar);
 		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + "/" + iconSize)));
 	}
 
-	private static String calculateImgaesSize(String size, boolean isToolbar) {
+	private static String calculateImagesSize(String size, boolean isToolbar) {
 		int calculatedSize = 0;
 		switch (size) {
 		case "s":
@@ -88,7 +93,7 @@ public class ImageUtil {
 			if (listFiles != null) {
 				for (File file : listFiles) {
 					if (file.getName().toLowerCase().equals(iconWithoutExtension)) {
-						resolve = file.toPath().resolve(calculateImgaesSize(size, isToolBar));
+						resolve = file.toPath().resolve(calculateImagesSize(size, isToolBar));
 					}
 				}
 			}
@@ -99,6 +104,45 @@ public class ImageUtil {
 		}
 		return "ERROR! Icon not found: " + icon;
 
+	}
+
+	/**
+	 * Updated die Größe der Model-Icons (Icons der Parts und der Part-Toolbars) entsprechend der Einstellungen
+	 * 
+	 * @param element
+	 * @param modelService
+	 */
+	public static void updateModelIcons(MUIElement element, EModelService modelService) {
+
+		// Finden der Parts
+		List<MPart> mParts = modelService.findElements(element, null, MPart.class);
+		for (MPart mPart : mParts) {
+			// Part-Icons
+			mPart.setIconURI(getNewIconString(mPart.getIconURI()));
+
+			// Part-Toolbars
+			if (mPart.getToolbar() != null) {
+				List<MToolBarElement> children = mPart.getToolbar().getChildren();
+				for (MToolBarElement mToolBarElement : children) {
+					MHandledToolItem ti = (MHandledToolItem) mToolBarElement;
+					ti.setIconURI(getNewIconString(ti.getIconURI()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Ersetzt im Icon String die Größe entsprechend der Einstellungen
+	 * 
+	 * @param oldIconString
+	 * @return
+	 */
+	private static String getNewIconString(String oldIconString) {
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+
+		int indexOfLastSlash = oldIconString.lastIndexOf("/");
+		String newIconString = oldIconString.substring(0, indexOfLastSlash + 1);
+		return newIconString + calculateImagesSize(size, false);
 	}
 
 }
