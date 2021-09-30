@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Uitests
-Bundle-SymbolicName: aero.minova.rcp.uitests
+Bundle-SymbolicName: aero.minova.rcp.plugintests
 Bundle-Version: 12.0.26.qualifier
 Automatic-Module-Name: aero.minova.rcp.uitests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
