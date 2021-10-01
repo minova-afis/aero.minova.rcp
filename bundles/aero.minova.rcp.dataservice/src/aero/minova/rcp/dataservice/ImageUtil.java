@@ -85,7 +85,7 @@ public class ImageUtil {
 		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
 		String iconSize = calculateImagesSize(size, isToolBar);
-		URL localURL = FileLocator.find(bundle, new Path("images/" + iconWithoutExtension + "/" + iconSize));
+		URL localURL = FileLocator.find(bundle, new Path("images/" + icon + "/" + iconSize));
 		if (localURL != null) {
 			try {
 				return localURL.toURI().toString();
