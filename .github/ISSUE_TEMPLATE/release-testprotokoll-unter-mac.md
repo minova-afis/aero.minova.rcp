@@ -144,8 +144,11 @@ KeyBIndings die nur im IndexPart ansprechbar sind:
 
 ## Preferences
 - [ ] Die Sprachauswahl zeigt nur unterstützte Sprachen an
-- [ ] Das angegebene Pattern für das Datum formatiert die Date- und DateTimeFields
+- [ ] Das angegebene Pattern für das Datum formatiert die Date-, Time- und DateTimeFields
 - [ ] Das angegebene Pattern für die Zeit formatiert die Time- und DateTimeFields
+- [ ] Datepattern erlaubt nur [.,/Leerzeichen] als Trennzeichen
+- [ ] Timepattern erlaubt nur [:/Leerzeichen] als Trennzeichen
+- [ ] Icons ändern sich, wenn die Schrift- und Icongröße geändert wird
 - [ ] Wenn kein Pattern angegeben ist, wird der Standard verwendet (Test: Vorschlagsliste ist nicht leer)
 
 ## Plugin laden (Nur Stundenerfassung)
