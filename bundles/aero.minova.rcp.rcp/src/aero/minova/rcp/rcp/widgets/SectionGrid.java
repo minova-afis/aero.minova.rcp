@@ -80,6 +80,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.form.model.xsd.Button;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -97,7 +98,6 @@ import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.rcp.util.ImageUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -263,7 +263,7 @@ public class SectionGrid {
 		});
 
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon());
+			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon(), false);
 			Image buttonImage = resManager.createImage(buttonImageDescriptor);
 			item.setImage(buttonImage);
 		}
@@ -374,8 +374,9 @@ public class SectionGrid {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty())
+				if (selectionLayer.getSelectedCells().isEmpty()) {
 					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+				}
 			}
 		});
 

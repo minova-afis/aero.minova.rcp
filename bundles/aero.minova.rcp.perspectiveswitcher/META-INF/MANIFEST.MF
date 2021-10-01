@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.e4.core.contexts,
  org.eclipse.ui.forms,
  aero.minova.rcp.constant;bundle-version="12.0.15",
  org.eclipse.equinox.preferences,
- org.eclipse.e4.core.di.extensions
+ org.eclipse.e4.core.di.extensions,
+ aero.minova.rcp.dataservice;bundle-version="12.0.26"
 Export-Package: aero.minova.rcp.perspectiveswitcher.commands,
  aero.minova.rcp.perspectiveswitcher.handler
 Import-Package: javax.inject;version="1.0.0"
