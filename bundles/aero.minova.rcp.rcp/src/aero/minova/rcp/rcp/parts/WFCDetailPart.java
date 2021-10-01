@@ -350,10 +350,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 
 			if (iHelper == null) {
-				throw new RuntimeException("Helperklasse nicht eindeutig! Bitte Prüfen");
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
+			} else {
+				getDetail().setHelper(iHelper);
+				ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 			}
-			getDetail().setHelper(iHelper);
-			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
 
