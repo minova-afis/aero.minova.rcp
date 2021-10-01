@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
@@ -181,7 +182,8 @@ public class MenuProcessor {
 
 		handledMenuItem.setLabel(actionMDI.getText());
 
-		handledMenuItem.setIconURI(actionMDI.getIcon());
+		String retrieveIcon = ImageUtil.retrieveIcon(actionMDI.getIcon(), false);
+		handledMenuItem.setIconURI(retrieveIcon);
 
 		return handledMenuItem;
 	}

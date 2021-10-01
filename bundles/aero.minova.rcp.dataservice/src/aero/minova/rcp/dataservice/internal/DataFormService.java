@@ -151,7 +151,9 @@ public class DataFormService implements IDataFormService {
 			}
 			// TODO:Grid verarbeiten
 		}
-		fields.sort((o1, o2) -> o1.getSqlIndex().compareTo(o2.getSqlIndex()));
+
+		// Nach SQL-Index sortieren und nur Felder mit SQL-Index >= 0 zurückgeben
+		fields = fields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).filter(f -> f.getSqlIndex().intValue() >= 0).collect(Collectors.toList());
 		return fields;
 	}
 

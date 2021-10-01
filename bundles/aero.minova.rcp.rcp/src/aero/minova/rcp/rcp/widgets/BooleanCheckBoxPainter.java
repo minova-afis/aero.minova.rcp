@@ -2,7 +2,7 @@ package aero.minova.rcp.rcp.widgets;
 
 import org.eclipse.nebula.widgets.nattable.painter.cell.CheckBoxPainter;
 
-import aero.minova.rcp.rcp.util.ImageUtil;
+import aero.minova.rcp.dataservice.ImageUtil;
 
 public class BooleanCheckBoxPainter extends CheckBoxPainter {
 
