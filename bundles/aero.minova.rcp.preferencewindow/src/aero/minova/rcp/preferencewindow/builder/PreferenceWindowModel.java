@@ -94,13 +94,8 @@ public class PreferenceWindowModel {
 
 		psd = new PreferenceSectionDescriptor("Themes", translationService.translate("@Preferences.Themes", null), 0.2);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
 				"M", "S", "M", "L", "XL"));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.ICON_SIZE, translationService.translate("@Preferences.IconSize", null), 0.2, DisplayType.COMBO,
-				"24x24", "16x16", "24x24", "32x32", "48x48", "64x64"));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.ICON_SIZE_BIG, translationService.translate("@Preferences.IconSizeBig", null), 0.3,
-				DisplayType.COMBO, "32x32", "16x16", "24x24", "32x32", "48x48", "64x64"));
-
 		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), 0.1,
