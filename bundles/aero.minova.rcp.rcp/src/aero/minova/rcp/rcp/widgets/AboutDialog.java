@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import aero.minova.rcp.rcp.util.ImageUtil;
+import aero.minova.rcp.dataservice.ImageUtil;
 
 public class AboutDialog extends TitleAreaDialog {
 	private Font lizenzFont;
