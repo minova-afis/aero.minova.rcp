@@ -308,19 +308,16 @@ printInvoice.setEnabled(keyLong.getValue() != null);
 ----
 
 Außerdem muss ein Helper auf das Drücken eines Buttons reagieren können. 
-Dafür kann ein `SelectionListener` auf den Button registriert werden:
+Dafür kann ein `SimpleSelectionAdapter` auf den Button registriert werden:
 
 [source,java]
 ----
 MButton printInvoice = mDetail.getButton("PrintInvoice");
-printInvoice.addSelectionListener(new SelectionListener() {
+printInvoice.addSelectionListener(new SimpleSelectionAdapter() {
 	@Override
-	public void widgetSelected(SelectionEvent e) {
+	public void handle(SelectionEvent e) {
 		// Entsprechende Methode(n) ausführen
 	}
-
-	@Override
-	public void widgetDefaultSelected(SelectionEvent e) {}
 });
 ----
 
