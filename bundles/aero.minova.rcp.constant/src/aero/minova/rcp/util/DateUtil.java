@@ -163,7 +163,7 @@ public class DateUtil {
 
 	public static String getDateString(Instant instant, Locale locale, String dateUtilPref) {
 		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
-		if (!dateUtilPref.isBlank()) {
+		if (dateUtilPref != null && !dateUtilPref.isBlank()) {
 			dtf = DateTimeFormatter.ofPattern(dateUtilPref);
 		}
 		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
