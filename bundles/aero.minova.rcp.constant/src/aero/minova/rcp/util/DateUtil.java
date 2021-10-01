@@ -174,7 +174,7 @@ public class DateUtil {
 		String regex;
 		Pattern pattern;
 		Matcher matcher;
-		input = input.replaceAll("[\\\\.,/\\\\s]", "");
+		input = input.replaceAll("[\\.,/\\s]", "");
 
 		input = input.toLowerCase();
 		regex = "[0-9]+|[+]+|[-]+";
