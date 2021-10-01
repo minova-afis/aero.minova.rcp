@@ -201,7 +201,7 @@ public class DateUtilTests {
 
 	@Test
 	public void testGetDate07_01_20() {
-		Instant bithday = LocalDate.of(1920, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
+		Instant bithday = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(2020, JANUARY, 7).atStartOfDay().toInstant(ZoneOffset.UTC);
 		assertEquals(expected, DateUtil.getDate(bithday, "07.01.20", Locale.GERMANY, ""));
 	}
@@ -311,11 +311,5 @@ public class DateUtilTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void testShortcut2WeekCahrs() {
 		DateUtil.setShortcuts("t", "m", "y", "ww");
-	}
-
-	@Test
-	public void testGetDate02Point05() {
-		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		assertNull(DateUtil.getDate(bithday, "02.05"));
 	}
 }
