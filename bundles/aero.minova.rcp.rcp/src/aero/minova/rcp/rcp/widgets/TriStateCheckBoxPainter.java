@@ -8,7 +8,7 @@ import org.eclipse.nebula.widgets.nattable.painter.cell.CheckBoxPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.TreeCheckBoxPainter;
 import org.eclipse.swt.graphics.Image;
 
-import aero.minova.rcp.rcp.util.ImageUtil;
+import aero.minova.rcp.dataservice.ImageUtil;
 
 /**
  * Verwendet den {@link TreeCheckBoxPainter} als "normalen"
