@@ -4,11 +4,9 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -98,29 +96,19 @@ public class DateUtil {
 		DateUtil.shortcuts = day + month + year + week;
 	}
 
-	public static Instant getDate(Instant today, String input) {
-		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
-	}
-
-	public static Instant getDate(String input, Locale locale) {
-		Instant date = getDate(input);
-		LocalDate ld;
-		if (date == null && !input.isEmpty()) {
-			try {
-				ld = LocalDate.parse(input, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
-				date = ld.atStartOfDay().toInstant(ZoneOffset.UTC);
-			} catch (DateTimeParseException dtpe) {
-				date = null;
-			}
-		}
-		return date;
-	}
-
 	public static Instant getDate(String input) {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilPref) {
+	public static Instant getDate(Instant today, String input) {
+		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
+	}
+
+	public static Instant getDate(String input, Locale locale, String datePattern) {
+		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input, locale, datePattern);
+	}
+
+	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
 
@@ -133,7 +121,7 @@ public class DateUtil {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
 					// Es beginnt mit eine Tagesangabe
-					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC")).atStartOfDay();
+					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
@@ -145,9 +133,9 @@ public class DateUtil {
 		}
 
 		if (!input.isEmpty() && startOfToday == null) {
-			if (!dateUtilPref.equals("")) {
+			if (!datePattern.equals("")) {
 				try {
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtilPref, locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern, locale);
 					LocalDate ld = LocalDate.parse(input, dtf);
 					startOfToday = ld.atStartOfDay();
 				} catch (Exception e) {
@@ -181,21 +169,12 @@ public class DateUtil {
 		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
 	}
 
-	public static String getDateTimeString(Instant instant, Locale locale, ZoneId zoneId, String dateUtilPref, String timeUtilPref) {
-		DateTimeFormatter dtfD = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
-		DateTimeFormatter dtfT = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
-		if (!dateUtilPref.isBlank())
-			dtfD = DateTimeFormatter.ofPattern(dateUtilPref);
-		if (!timeUtilPref.isBlank())
-			dtfT = DateTimeFormatter.ofPattern(timeUtilPref);
-		return LocalDate.ofInstant(instant, zoneId).format(dtfD) + " " + LocalTime.ofInstant(instant, zoneId).format(dtfT);
-	}
-
 	public static String[] splitInput(String input) {
 		ArrayList<String> splits = new ArrayList<>();
 		String regex;
 		Pattern pattern;
 		Matcher matcher;
+		input = input.replaceAll("[\\.,/\\s]", "");
 
 		input = input.toLowerCase();
 		regex = "[0-9]+|[+]+|[-]+";
@@ -239,7 +218,7 @@ public class DateUtil {
 		}
 	}
 
-	static Instant getNumericDate(Instant now, String input) {
+	static Instant getNumericDate(Instant now, String input, String datePattern) {
 		int day;
 		int month;
 		int year;

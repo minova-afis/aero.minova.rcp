@@ -72,12 +72,12 @@ public class FilterDisplayConverter extends DisplayConverter {
 					val = TimeUtil.getTimeString((Instant) cv.getFilterValue().getValue(), locale, timeUtil);
 					break;
 				case DATETIME:
-					val = DateUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId, dateUtil, timeUtil);
+					val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, dateUtil, timeUtil);
 					break;
 				}
 				break;
 			case ZONED:
-				val = DateUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId, dateUtil, timeUtil);
+				val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, dateUtil, timeUtil);
 				break;
 			default:
 				val = cv.getFilterValue().getValue().toString();

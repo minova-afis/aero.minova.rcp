@@ -6,6 +6,7 @@ import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -65,9 +66,9 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		text.setToolTipText("H: " + translationService.translate("@Preferences.DateUtilPattern.24Hour", null) + "\nh: "
-				+ translationService.translate("@Preferences.DateUtilPattern.12Hour", null) + "\nm: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Minute", null) + "\na: AM/PM");
+		text.setToolTipText("H: " + translationService.translate("@Preferences.TimeUtilPattern.24Hour", null) + "\nh: "
+				+ translationService.translate("@Preferences.TimeUtilPattern.12Hour", null) + "\nm: "
+				+ translationService.translate("@Preferences.TimeUtilPattern.Minute", null) + "\na: AM/PM");
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
@@ -87,13 +88,24 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	}
 
 	private String getTimeStringFromPattern(String pattern) {
-		try {
-			LocalDateTime time = LocalDateTime.of(2000, 01, 01, 23, 45);
-			String formatted = TimeUtil.getTimeString(time.toInstant(ZoneOffset.UTC), locale, pattern);
-			return formatted;
-		} catch (Exception e) {
-			return "Invalid format!";
+		if (validatePattern(pattern) || pattern.isBlank()) {
+			try {
+				LocalDateTime time = LocalDateTime.of(2000, 01, 01, 23, 45);
+				String formatted = TimeUtil.getTimeString(time.toInstant(ZoneOffset.UTC), locale, pattern);
+				return formatted;
+			} catch (Exception e) {
+				return "Invalid format!";
+			}
 		}
+		return "Invalid format!";
+	}
+
+	private boolean validatePattern(String input) {
+		Pattern pattern = Pattern.compile("([hH]{0,2})([\\:/\\s]{0,1})([m]{0,2})([\\s]?)([a]?)");
+		if (pattern.matcher(input).matches()) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
