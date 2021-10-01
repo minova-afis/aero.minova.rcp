@@ -158,7 +158,7 @@ public class TimeUtil {
 
 	public static String getTimeString(Instant instant, Locale locale, String timeUtilPref) {
 		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
-		if (!timeUtilPref.isBlank()) {
+		if (timeUtilPref != null && !timeUtilPref.isBlank()) {
 			dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
 		}
 		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
