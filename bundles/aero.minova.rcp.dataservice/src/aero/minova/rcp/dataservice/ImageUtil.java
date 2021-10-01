@@ -80,7 +80,7 @@ public class ImageUtil {
 		}
 
 		String iconWithoutExtension = icon.replace(".png", "").replace(".ico", "").toLowerCase();
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
@@ -150,7 +150,7 @@ public class ImageUtil {
 	 * @return
 	 */
 	private static String getNewIconString(String oldIconString) {
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		int indexOfLastSlash = oldIconString.lastIndexOf("/");
 		String newIconString = oldIconString.substring(0, indexOfLastSlash + 1);
