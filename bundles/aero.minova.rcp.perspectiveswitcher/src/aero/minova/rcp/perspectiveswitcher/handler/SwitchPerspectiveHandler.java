@@ -20,6 +20,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.ImageUtil;
 
 public class SwitchPerspectiveHandler {
 
@@ -47,7 +48,7 @@ public class SwitchPerspectiveHandler {
 
 	/**
 	 * Opens the perspective with the given identifier.
-	 * 
+	 *
 	 * @param perspectiveId
 	 *            The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException
@@ -64,7 +65,7 @@ public class SwitchPerspectiveHandler {
 
 	/**
 	 * Erzeugt eine neue Perspektive mit rudimentärem Inhalt. Die Ansicht wechselt sofort zur neuen Perspektive.
-	 * 
+	 *
 	 * @param window
 	 * @param perspectiveStack
 	 * @param perspectiveID
@@ -82,6 +83,7 @@ public class SwitchPerspectiveHandler {
 		if (element == null) {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		} else {
+
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.getPersistedState().put(Constants.FORM_NAME, formName);
@@ -89,13 +91,14 @@ public class SwitchPerspectiveHandler {
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);
 
+			ImageUtil.updateModelIcons(element, modelService);
 		}
 		return perspective;
 	}
 
 	/**
-	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist 
-	 * 
+	 * wechselt zur angegebenen Perspektive, falls das Element eine Perspektive ist
+	 *
 	 * @param element
 	 */
 	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {

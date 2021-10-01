@@ -77,6 +77,7 @@ import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -119,7 +120,6 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
-import aero.minova.rcp.rcp.util.ImageUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.LookupComposite;
@@ -594,7 +594,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon().replace(".ico", ""));
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon().replace(".ico", ""), false);
 				Image buttonImage = resManager.createImage(buttonImageDescriptor);
 				item.setImage(buttonImage);
 			}
@@ -737,7 +737,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mgrid.setFill(grid.getFill());
 		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
 		mgrid.setmSection(section);
-		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(grid.getIcon());
+		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(grid.getIcon(), false);
 		Image gridImage = resManager.createImage(gridImageDescriptor);
 		mgrid.setIcon(gridImage);
 		mgrid.setHelperClass(grid.getHelperClass());
