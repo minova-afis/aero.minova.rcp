@@ -1119,7 +1119,7 @@ public class WFCDetailCASRequestsUtil {
 		// Setzen der TabListe für die einzelnen Sections.
 		clientComposite.setTabList(wfcDetailPart.getTabListForSectionComposite(mSection, clientComposite));
 		// Setzen der TabListe der Sections im Part.
-		clientComposite.getParent().setTabList(wfcDetailPart.getTabListForSection(clientComposite.getParent()));
+		clientComposite.getParent().setTabList(wfcDetailPart.getTabListForSection(clientComposite.getParent(), mSection));
 
 		mSection.getSection().requestLayout();
 		wfcDetailPart.translate(clientComposite);
