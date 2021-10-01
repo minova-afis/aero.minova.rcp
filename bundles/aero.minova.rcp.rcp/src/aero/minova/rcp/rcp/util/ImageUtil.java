@@ -40,7 +40,7 @@ public class ImageUtil {
 	 */
 	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename) {
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 		String iconSize = calculateImgaesSize(size, false);
 		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + iconSize)));
 	}
@@ -53,7 +53,7 @@ public class ImageUtil {
 	 */
 	public static ImageDescriptor getToolBarImageDescriptorFromImagesBundle(String filename) {
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_SIZE, "M").toLowerCase();
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		String iconSize = calculateImgaesSize(size, true);
 		return ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("images/" + filename + iconSize)));

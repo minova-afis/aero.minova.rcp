@@ -13,7 +13,7 @@ class ImageUtilTest {
 
 	@BeforeEach
 	void init() {
-		InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).put(ApplicationPreferences.FONT_SIZE, "S");
+		InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).put(ApplicationPreferences.FONT_ICON_SIZE, "S");
 	}
 
 	@Test
