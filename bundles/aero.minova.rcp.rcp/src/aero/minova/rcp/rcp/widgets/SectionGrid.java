@@ -372,6 +372,7 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
+				selectionLayer.clear();
 				((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
 			}
 

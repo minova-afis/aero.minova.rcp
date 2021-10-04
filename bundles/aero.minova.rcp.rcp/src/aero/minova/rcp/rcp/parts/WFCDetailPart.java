@@ -512,9 +512,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		createButton(headOrPageOrGrid, section);
 
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
-
-		// MSection wird zum MDetail hinzugefügt.
-		mDetail.addMSection(mSection);
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {

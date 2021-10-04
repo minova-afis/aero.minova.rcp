@@ -23,6 +23,8 @@ import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.Preferences;
@@ -164,14 +166,11 @@ public class TraverseEnterHandler {
 			popupOpen = lookup.popupIsOpen();
 		}
 
-		if (focussedControl instanceof TextAssist) {
-			popupOpen = false;
-		}
-
-		if (fcSection.getChildren()[0] instanceof Twistie) {
-			comp = (Composite) fcSection.getChildren()[2];
-		} else {
-			comp = (Composite) fcSection.getChildren()[1];
+		for (Control children : fcSection.getChildren()) {
+			if (children instanceof Composite && !(children instanceof ToolBar)) {
+				comp = (Composite) children;
+				break;
+			}
 		}
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
@@ -207,7 +206,7 @@ public class TraverseEnterHandler {
 			if (!cellSelected) {
 				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
 				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
-				List<MSection> sectionList = mDetail.getMSectionList();
+				List<Section> sectionList = ((DetailAccessor) mDetail.getDetailAccessor()).getSectionList();
 
 				// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 				int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
@@ -216,13 +215,13 @@ public class TraverseEnterHandler {
 					return;
 				}
 
-				int indexFocussedControlSection = sectionList.indexOf(((MField) control.getData(Constants.CONTROL_FIELD)).getmSection());
+				int indexFocussedControlSection = sectionList.indexOf(fcSection);
 				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
 				if (fc != null) {
 					return;
 				}
 
-				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection));
+				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection + 1));
 				if (fc != null) {
 					return;
 				}
@@ -251,10 +250,11 @@ public class TraverseEnterHandler {
 			for (MSection mSection : mDetail.getMSectionList()) {
 				Composite compo = null;
 				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
-				if (section.getChildren()[0] instanceof Twistie) {
-					compo = (Composite) section.getChildren()[2];
-				} else {
-					compo = (Composite) section.getChildren()[1];
+				for (Control children : section.getChildren()) {
+					if (children instanceof Composite && !(children instanceof ToolBar || children instanceof Twistie)) {
+						compo = (Composite) children;
+						break;
+					}
 				}
 				List<Control> tabList = arrayToList(compo.getTabList());
 				fc = getNextRequiredControl(tabList);
@@ -304,6 +304,7 @@ public class TraverseEnterHandler {
 						section.setExpanded(true);
 					}
 					fc = control;
+					fc.setFocus();
 					return fc;
 				}
 			}
@@ -321,15 +322,14 @@ public class TraverseEnterHandler {
 	 *            Liste mit Sections
 	 * @return
 	 */
-	private Control getNextRequiredControlOtherSection(Control focussedControl, List<MSection> sectionList) {
+	private Control getNextRequiredControlOtherSection(Control focussedControl, List<Section> sectionList) {
 		Control fc = null;
 		Composite compo = null;
-		for (MSection mSection : sectionList) {
-			Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
-			if (section.getChildren()[0] instanceof Twistie) {
-				compo = (Composite) section.getChildren()[2];
-			} else {
-				compo = (Composite) section.getChildren()[1];
+		for (Section section : sectionList) {
+			for (Control children : section.getChildren()) {
+				if (children instanceof Composite && !(children instanceof Label || children instanceof ToolBar)) {
+					compo = (Composite) children;
+				}
 			}
 			List<Control> tabList = arrayToList(compo.getTabList());
 			fc = getNextRequiredControl(tabList);
