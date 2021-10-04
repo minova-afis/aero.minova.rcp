@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.Section;
 
 public class MSection {
 
@@ -24,10 +22,7 @@ public class MSection {
 	private String label;
 	// Symbol für diese Page
 	private Image icon;
-
-	private Section section;
-
-	private Control control;
+	private ISectionAccessor sectionAccessor;
 
 	/**
 	 * Erstellt eine neue MSection.
@@ -45,14 +40,12 @@ public class MSection {
 	 * @param section
 	 *            das org.eclipse.ui.forms.widgets.Section Element
 	 */
-	public MSection(boolean isHead, String status, MDetail mDetail, String id, String label, Control control, Section section) {
+	public MSection(boolean isHead, String status, MDetail mDetail, String id, String label) {
 		this.isHead = isHead;
 		this.status = status;
 		this.mDetail = mDetail;
 		this.id = id;
 		this.label = label;
-		this.control = control;
-		this.section = section;
 	}
 
 	public boolean isHead() {
@@ -77,17 +70,6 @@ public class MSection {
 
 	public void setmDetail(MDetail mDetail) {
 		this.mDetail = mDetail;
-	}
-
-	/**
-	 * @return Twistie wenn es vorhanden ist.
-	 */
-	public Control getSectionControl() {
-		return control;
-	}
-
-	public void setSection(Control section) {
-		this.control = section;
 	}
 
 	public List<MField> getTabList() {
@@ -126,23 +108,16 @@ public class MSection {
 		this.icon = icon;
 	}
 
-	/**
-	 * Liefert das org.eclipse.ui.forms.widgets.Section Element zurück.
-	 *
-	 * @return section
-	 */
-	public Section getSection() {
-		return section;
+	public ISectionAccessor getSectionAccessor() {
+		return sectionAccessor;
 	}
 
-	/**
-	 * Ändert die Sichtbarkeit zum gegeben Wert. Außerdem wird die Section ein-/ausgeklappt damit sie weniger Platz wegnimmt <br>
-	 * TODO: Komplett entfernen, nicht nur ausblenden
-	 * 
-	 * @param visible
-	 */
-	public void setVisible(boolean visible) {
-		section.setVisible(visible);
-		section.setExpanded(visible);
+	public void setSectionAccessor(ISectionAccessor sectionAccessor) {
+		this.sectionAccessor = sectionAccessor;
 	}
+
+	public void setVisible(boolean visible) {
+		sectionAccessor.setVisible(visible);
+	}
+
 }
