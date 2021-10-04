@@ -96,6 +96,7 @@ import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
+import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
@@ -371,14 +372,14 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				mDetail.setSelectedControl(null);
+				((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (selectionLayer.getSelectedCells().isEmpty()) {
 					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
-					mDetail.setSelectedControl(getNatTable());
+					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(getNatTable());
 				}
 			}
 		});

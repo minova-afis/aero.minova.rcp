@@ -33,9 +33,12 @@ import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
+import aero.minova.rcp.rcp.accessor.DetailAccessor;
+import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.widgets.LookupComposite;
 
@@ -68,9 +71,9 @@ public class TraverseEnterHandler {
 
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail mDetail = ((WFCDetailPart) part.getObject()).getDetail();
-			if (mDetail.getSelectedControl() != null) {
+			if (((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != null) {
 				// aktuell selektiertes Feld holen
-				Control focussedControl = mDetail.getSelectedControl();
+				Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
 
 				// Ist ein Popup offen?
 				if (focussedControl instanceof LookupComposite) {
@@ -145,8 +148,6 @@ public class TraverseEnterHandler {
 		}
 
 		// Wir holen uns das MField des selektierten Felds.
-		List<Section> sectionList = mDetail.getSectionList();
-
 		Control fc = null;
 		Composite comp = null;
 		Section fcSection = null;
@@ -154,7 +155,7 @@ public class TraverseEnterHandler {
 		if (focussedControl instanceof NatTable) {
 			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
 		} else {
-			fcSection = ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSection();
+			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSectionAccessor()).getSection();
 		}
 
 		if (focussedControl instanceof LookupComposite) {
@@ -206,6 +207,7 @@ public class TraverseEnterHandler {
 			if (!cellSelected) {
 				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
 				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
+				List<MSection> sectionList = mDetail.getMSectionList();
 
 				// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 				int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
@@ -214,7 +216,7 @@ public class TraverseEnterHandler {
 					return;
 				}
 
-				int indexFocussedControlSection = sectionList.indexOf(comp.getParent());
+				int indexFocussedControlSection = sectionList.indexOf(((MField) control.getData(Constants.CONTROL_FIELD)).getmSection());
 				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
 				if (fc != null) {
 					return;
@@ -246,8 +248,9 @@ public class TraverseEnterHandler {
 				}
 			}
 
-			for (Section section : sectionList) {
+			for (MSection mSection : mDetail.getMSectionList()) {
 				Composite compo = null;
+				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
 				if (section.getChildren()[0] instanceof Twistie) {
 					compo = (Composite) section.getChildren()[2];
 				} else {
@@ -282,7 +285,7 @@ public class TraverseEnterHandler {
 			if (!(control instanceof NatTable)) {
 				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
 				if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
-					Section section = field.getmSection().getSection();
+					Section section = ((SectionAccessor) field.getmSection().getSectionAccessor()).getSection();
 					// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
 					if (!section.isExpanded()) {
 						// Section öffnen
@@ -318,10 +321,11 @@ public class TraverseEnterHandler {
 	 *            Liste mit Sections
 	 * @return
 	 */
-	private Control getNextRequiredControlOtherSection(Control focussedControl, List<Section> sectionList) {
+	private Control getNextRequiredControlOtherSection(Control focussedControl, List<MSection> sectionList) {
 		Control fc = null;
 		Composite compo = null;
-		for (Section section : sectionList) {
+		for (MSection mSection : sectionList) {
+			Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
 			if (section.getChildren()[0] instanceof Twistie) {
 				compo = (Composite) section.getChildren()[2];
 			} else {
