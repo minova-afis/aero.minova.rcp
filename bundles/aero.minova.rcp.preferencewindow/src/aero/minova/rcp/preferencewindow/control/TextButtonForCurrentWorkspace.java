@@ -96,12 +96,12 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			text.setText(translationService.translate("Not found", null));
 		}
 
-		final Button showButton = new Button(cmp, SWT.PUSH);
+		final Button openButton = new Button(cmp, SWT.PUSH);
 		GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		showButton.setText(translationService.translate("@Action.Open", null));
-		showButton.setLayoutData(buttonGridData);
+		openButton.setText(translationService.translate("@Action.Open", null));
+		openButton.setLayoutData(buttonGridData);
 
-		showButton.addSelectionListener(new SelectionAdapter() {
+		openButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
