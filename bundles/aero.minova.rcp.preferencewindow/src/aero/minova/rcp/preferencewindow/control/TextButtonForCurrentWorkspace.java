@@ -2,6 +2,7 @@ package aero.minova.rcp.preferencewindow.control;
 
 import static org.eclipse.jface.dialogs.PlainMessageDialog.getBuilder;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 		label.setLayoutData(labelGridData);
 
 		Composite cmp = new Composite(parent, SWT.NONE);
-		cmp.setLayout(new GridLayout(2, false));
+		cmp.setLayout(new GridLayout(3, false));
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
@@ -95,12 +96,28 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			text.setText(translationService.translate("Not found", null));
 		}
 
-		final Button button = new Button(cmp, SWT.PUSH);
-		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		button.setText(translationService.translate("@Action.Delete", null));
-		button.setLayoutData(buttonGridData);
+		final Button showButton = new Button(cmp, SWT.PUSH);
+		GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		showButton.setText(translationService.translate("@Action.Open", null));
+		showButton.setLayoutData(buttonGridData);
 
-		button.addSelectionListener(new SelectionAdapter() {
+		showButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					Desktop.getDesktop().open(dataService.getStoragePath().toAbsolutePath().toFile());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		final Button deleteButton = new Button(cmp, SWT.PUSH);
+		buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		deleteButton.setText(translationService.translate("@Action.Delete", null));
+		deleteButton.setLayoutData(buttonGridData);
+
+		deleteButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Shell activeShell = Display.getCurrent().getActiveShell();
@@ -121,7 +138,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			}
 		});
 
-		return button;
+		return deleteButton;
 	}
 
 	/**
