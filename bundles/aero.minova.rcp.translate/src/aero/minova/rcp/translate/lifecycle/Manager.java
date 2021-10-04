@@ -33,10 +33,8 @@ public class Manager {
 		// welche die mit % anfangen unter der Haube von dem Minova Übersetztungsservice
 		// verwendet)
 		Object currentTranslationService = context.get(TranslationService.class);
-		if ("org.eclipse.e4.core.internal.services.BundleTranslationProvider"
-				.equals(currentTranslationService.getClass().getName())) {
-			WFCTranslationService translationService = ContextInjectionFactory.make(WFCTranslationService.class,
-					context);
+		if ("org.eclipse.e4.core.internal.services.BundleTranslationProvider".equals(currentTranslationService.getClass().getName())) {
+			WFCTranslationService translationService = ContextInjectionFactory.make(WFCTranslationService.class, context);
 			translationService.setTranslationService((TranslationService) currentTranslationService);
 			context.set(TranslationService.class, translationService);
 		}
@@ -49,12 +47,8 @@ public class Manager {
 		preferences.put(ApplicationPreferences.COUNTRY, country);
 		String timezone = preferences.get(ApplicationPreferences.TIMEZONE, ZoneId.systemDefault().getId());
 		preferences.put(ApplicationPreferences.TIMEZONE, timezone);
-		String font = preferences.get(ApplicationPreferences.FONT_SIZE, "M");
-		preferences.put(ApplicationPreferences.FONT_SIZE, font);
-		String symbolMenu = preferences.get(ApplicationPreferences.ICON_SIZE, "24x24");
-		preferences.put(ApplicationPreferences.ICON_SIZE, symbolMenu);
-		String symbolToolbar = preferences.get(ApplicationPreferences.ICON_SIZE_BIG, "32x32");
-		preferences.put(ApplicationPreferences.ICON_SIZE_BIG, symbolToolbar);
+		String font = preferences.get(ApplicationPreferences.FONT_ICON_SIZE, "M");
+		preferences.put(ApplicationPreferences.FONT_ICON_SIZE, font);
 		boolean indexautoload = preferences.getBoolean(ApplicationPreferences.AUTO_LOAD_INDEX, false);
 		preferences.putBoolean(ApplicationPreferences.AUTO_LOAD_INDEX, indexautoload);
 		boolean indexautoupdate = preferences.getBoolean(ApplicationPreferences.AUTO_RELOAD_INDEX, false);

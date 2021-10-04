@@ -63,6 +63,17 @@ Wenn man Datumsinformationen an den CAS übergibt, muss der Zeitpunkt ausgerechn
 Bei der Anzeige könnte man sich überlegen, den Wert bei Verlassen auszurechnen. 
 Sobald der Anwender das Feld wieder anspringt (OnFocus) wird die Formel eingeblendet.
 
+Das Pattern zur Formatierung des Datums kann in den Preferences eingestellt werden. Dabei bestimmt dieses nur die Darstellung des Datums, 
+aber nicht die Reihenfolge von Tag, Monat und Jahr. 
+
+**Beispiel:**
+|===
+| Pattern | Eingabe | Ausgabe
+| dd.MM.y | 120220 | 12.02.2020
+| dd/MMM/yy | 120220 | 12/Feb./20
+| MM.dd.yyyy | 120220 | 12.02.2020
+|===
+
 === Zeitfelder
 
 Alle Zeitangabe werden auf dem Server in UTC gespeichert.
@@ -103,6 +114,19 @@ Die Kürzel können global für die Benutzersprache gesetzt werden.
 | Kürzel (deutsch) | Bedeutung
 | `H` `h` | Stunde
 | `M` `m` | Minute
+|===
+
+Das Pattern zur Formatierung der Zeit kann in den Preferences eingestellt werden. Dabei bestimmt die Eingabe nicht nur die Darstellung, sondern auch, ob das 12-Stunden oder das 24-Stunden Format verwendet wird.
+Bei dem Pattern mit kleinem **h** wird das 12-Stunden Format verwendet und bei großen **H** wird das 24-Stunden Format verwendet. **Beachten: Wenn im Pattern kein a hinzugefügt wird, wird AM/PM nicht mit dargestellt.**
+
+**Beispiel:**
+|===
+| Pattern | Eingabe | Ausgabe
+| hh:mm | 2345 | 11:45
+| hh:mm a | 2345 | 11:45 PM
+| HH:mm | 2345 | 23:45
+| H:mm | 726 | 7:26
+| HH:mm | 726 | 07:26
 |===
 
 === "Datum / Zeit" Felder

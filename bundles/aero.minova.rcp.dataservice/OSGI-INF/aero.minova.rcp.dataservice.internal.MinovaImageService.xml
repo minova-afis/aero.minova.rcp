@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activatePlugin" immediate="true" name="aero.minova.rcp.dataservice.internal.MinovaImageService">
+   <reference bind="getDataService" interface="aero.minova.rcp.dataservice.IDataService" name="getDataService"/>
+   <reference bind="getDummyService" interface="aero.minova.rcp.dataservice.IDummyService" name="getDummyService"/>
+   <implementation class="aero.minova.rcp.dataservice.internal.MinovaImageService"/>
+</scr:component>

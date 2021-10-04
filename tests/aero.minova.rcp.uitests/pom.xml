@@ -5,19 +5,19 @@
 
 	<groupId>aero.minova.rcp</groupId>
 	<artifactId>aero.minova.rcp.uitests</artifactId>
-	<version>12.0.24-SNAPSHOT</version>
+	<version>12.0.27-SNAPSHOT</version>
 	
 	<packaging>eclipse-test-plugin</packaging>
 	
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.tests</artifactId>
-		<version>12.0.24-SNAPSHOT</version>
+		<version>12.0.27-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 	
 	<properties>
-		<uitest.vmparams>-Xms256m -Xmx8096m</uitest.vmparams>
+		<uitest.vmparams>-Xms256m -Xmx8096m -Dfile.encoding=UTF-8</uitest.vmparams>
 	</properties>
 	
 	

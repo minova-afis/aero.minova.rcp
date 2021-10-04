@@ -14,6 +14,8 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
@@ -22,6 +24,7 @@ import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.BooleanValueAccessor;
 
@@ -48,6 +51,18 @@ public class BooleanField {
 		button.setData(TRANSLATE_LOCALE, locale);
 		button.setData(Constants.CONTROL_FIELD, field);
 		button.setData(Constants.CONTROL_DATATYPE, DataType.BOOLEAN);
+
+		button.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				field.setValue(new Value(button.getSelection()), true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				field.setValue(new Value(button.getSelection()), true);
+			}
+		});
 
 		return button;
 	}

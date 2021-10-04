@@ -5,12 +5,17 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Locale;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
+import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.FilterValue;
+import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.builder.DisplayType;
+import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.util.OperatorExtractionUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
@@ -47,6 +52,10 @@ public class FilterDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object canonicalToDisplayValue(Object canonicalValue) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
+		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
+
 		if (canonicalValue instanceof FilterValue) {
 			FilterValue cv = (FilterValue) canonicalValue;
 			String val = "";
@@ -57,18 +66,18 @@ public class FilterDisplayConverter extends DisplayConverter {
 			case INSTANT:
 				switch (datetimetype) {
 				case DATE:
-					val = DateUtil.getDateString((Instant) cv.getFilterValue().getValue(), locale);
+					val = DateUtil.getDateString((Instant) cv.getFilterValue().getValue(), locale, dateUtil);
 					break;
 				case TIME:
-					val = TimeUtil.getTimeString((Instant) cv.getFilterValue().getValue(), locale);
+					val = TimeUtil.getTimeString((Instant) cv.getFilterValue().getValue(), locale, timeUtil);
 					break;
 				case DATETIME:
-					val = DateUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId);
+					val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, dateUtil, timeUtil);
 					break;
 				}
 				break;
 			case ZONED:
-				val = DateUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, zoneId);
+				val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, dateUtil, timeUtil);
 				break;
 			default:
 				val = cv.getFilterValue().getValue().toString();

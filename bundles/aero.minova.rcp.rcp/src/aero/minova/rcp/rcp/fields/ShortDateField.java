@@ -10,10 +10,9 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +50,8 @@ public class ShortDateField {
 	}
 
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
@@ -60,21 +61,15 @@ public class ShortDateField {
 
 			@Override
 			public List<String> getContent(String entry) {
+				Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+				String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
+						locale);
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateUtil.getDate(entry, locale);
+				Instant date = DateUtil.getDate(entry, locale, dateUtil);
 				if (date == null && !entry.isEmpty()) {
 					result.add("!Error converting");
 				} else {
-					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-					String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "",
-							locale);
-					LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
-					if (dateUtil.isBlank()) {
-						result.add(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
-					} else {
-						result.add(localDate.format(dtf));
-					}
+					result.add(DateUtil.getDateString(date, locale, dateUtil));
 					field.setValue(new Value(date), true);
 				}
 				return result;
@@ -82,7 +77,8 @@ public class ShortDateField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		text.setMessage(LocalDate.of(2000, 1, 1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+		LocalDateTime time = LocalDateTime.of(LocalDate.of(2000, 01, 01), LocalTime.of(11, 59));
+		text.setMessage(DateUtil.getDateString(time.toInstant(ZoneOffset.UTC), locale, dateUtil));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {

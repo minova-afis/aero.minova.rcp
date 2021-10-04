@@ -1,0 +1,89 @@
+= Erstellen einer Updatesite und Veröffentlichen des Repositories
+
+Um in anderen Repositories mit Klassen der Core-Anwendung arbeiten zu können muss dieses Repo in Targetplatformen aufgenommen werden können. 
+Um dies zu ermöglichen wird eine Updatesite genutzt. 
+Für die Core Anwendung ist diese link:https://github.com/minova-afis/aero.minova.rcp.updatesite[aero.minova.rcp.updatesite].
+
+== Erstellen der Updatesite
+
+Die Updatesite wird als neues Repositorie angelegt.
+Unter `Settings -> Pages` kann der `main`-Branch zum Veröffentlichen ausgewählt werden.
+Der Inhalt des Repositories wird nun veröffentlicht, sobald auf `main` gepushed wird.
+Weitere Info in der link:https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site[Doku von Github].
+
+image::images/updatesitePages.png[] 
+
+== (Automatisches) Veröffentlichen des Repositories
+
+Das RCP-Repository kann automatisch über einen Workflow veröffentlicht werden. 
+Dafür einfach unter `Actions -> Deploy to Updatesite` den Workflow mit einer entsprechenden Commit-Message anstoßen. 
+Das Projekt wird gebaut und auf die Updatesite ausgeliefert.
+
+Alternativ kann auch per Hand eine neue Version auf der Updatesite eingespielt werden.
+Dafür wird nach dem Bauen der WFC-Anwendung einfach der Inhalt des Ordners `/aero.minova.rcp/releng/aero.minova.rcp.update/target/repository/` in den root-Ordner des Updatesite-Repositories kopiert.
+
+== Vorraussetzungen fürs automatische Veröffentlichen
+
+Um die Anwendung automatisch zu deployen muss ein workflow angelegt werden, für die RCP-Anwendung ist dieser link:https://github.com/minova-afis/aero.minova.rcp/blob/master/.github/workflows/deployToUpdatesite.yml[hier] zu finden.
+Das Deployen wird mit folgendem Code angestoßen:
+
+[source,yml]
+----
+- name: Deploy 🚀
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUBACTION_TOKEN_SECRET }}
+      run: |
+        git config --global user.email "erlanger@minova.com"
+        git config --global user.name "CE7"
+        echo $GITHUB_TOKEN
+        git clone https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite
+        cd aero.minova.rcp.updatesite
+        rm -fr * 
+        pwd
+        cp -r ../releng/aero.minova.rcp.update/target/repository/* .
+        git add .
+        git commit -m "${{ github.event.inputs.description }}"
+        git push -f https://CE7:$GITHUB_TOKEN@github.com/minova-afis/aero.minova.rcp.updatesite HEAD:main
+----
+
+Das Updatesite-Repository wird gecloned, der neue Stand wird in den entsprechenden Ornder kopiert und das ganze wird wieder auf die Updatesite gepushed.
+*Wichtig ist, dass das Updatesite-Repository öffentlich ist.*
+
+Außerdem muss ein Personal Access Token erstellt und dem RCP-Repository hinzugefügt werden.
+Das Token wird unter dem eigenen `Profil -> Settings -> Developer Settings -> Personal Access Tokens` erstellt. 
+Das Token muss Repository-Berechtigungen haben und sollte kein Ablaufdatum haben.
+Der erstellte Wert muss gespeichert werden, da er über Github nach Verlassen der Website nicht mehr einsehbar ist.
+
+Dieses Token wird jetzt im RCP-Repository eingetragen.
+Dafür im Repository unter `Settings -> Secrets` (man benötigt Admin-Rechte im Repository um die Einstellungen zu sehen) den Knopf `New repository secret` klicken, dem Secret einen Namen geben (dieser wird dann im Workflow genutzt) und den geheimen Wert als Value speichern.
+
+image:images/updatesitePAT.png[,450,]
+image:images/updatesiteSecret.png[,450,]
+
+
+== Konfiguration des Core-Projekts
+
+Damit unsere Anwendung Veröffentlicht werden kann haben wir eine Datei `releng/aero.minova.rcp.update/category.xml`, die unsere Features als Einträge enthält:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="aero.minova.rcp.feature">
+      <category name="rcpcore"/>
+   </feature>
+   <feature id="aero.minova.libs.feature">
+      <category name="rcpcore"/>
+   </feature>
+   <category-def name="rcpcore" label="Core RCP Application"/>
+</site>
+----
+
+== Einbinden in Target-Platformen
+
+Die Updatesite kann über die URL link:https://minova-afis.github.io/aero.minova.rcp.updatesite/[https://minova-afis.github.io/aero.minova.rcp.updatesite/] 
+in eine beliebige Targetplatform eingebunden werden.
+
+image:images/updatesiteTarget.png[]
+
+Tipp: Eclipse cached den Inhalt von Softwareseiten. Sollte eine Änderung an der Updatesite nicht in der Targetplatform auftauchen kann ein Neustart von Eclipse helfen.

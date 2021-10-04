@@ -34,6 +34,8 @@ Für link:bundles/aero.minova.rcp.rcp/README.adoc[Datum-/Zeit-Felder] gibt es ei
 == Releaseprozess
 
 Der Releaseprozess funktioniert.
+Aktueller Releaseprozess findet sich link:releng/aero.minova.rcp.product/README.adoc[hier]!
+
 
 === Maven
 
@@ -279,8 +281,11 @@ Die Configuration habe ich auch standalone erstellt / released.
 
 = Weitere Dokumentationen
 
+* link:releng/aero.minova.rcp.product/README.adoc[Aktueller Releaseprozess]
 * link:PluginErstellen.adoc[Erstellen von neuen Plugins (für Helper, Ersatz von JavaScript in Masken)]
+* link:Updatesite.adoc[Erstellen und Nutzen von der Updatesite]
 * link:bundles/aero.minova.rcp.preferences/README.adoc[Einstellungen]
+* link:bundles/aero.minova.rcp.rcp/README.adoc[UI Eigenschaften]
 * link:bundles/aero.minova.rcp.dataservice/README.adoc[Verhalten wenn CAS nicht erreichbar ist]
 
 

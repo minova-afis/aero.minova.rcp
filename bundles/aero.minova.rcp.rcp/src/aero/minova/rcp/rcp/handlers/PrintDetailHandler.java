@@ -1,25 +1,40 @@
 package aero.minova.rcp.rcp.handlers;
 
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.xml.transform.TransformerException;
 
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
+import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.form.setup.xbs.Map.Entry;
+import aero.minova.rcp.form.setup.util.XBSUtil;
+import aero.minova.rcp.form.setup.xbs.Node;
+import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -29,7 +44,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.util.Tools;
+import aero.minova.rcp.rcp.util.PrintUtil;
 
 public class PrintDetailHandler {
 
@@ -42,99 +57,145 @@ public class PrintDetailHandler {
 	@Inject
 	protected UISynchronize sync;
 
-	@Execute
-	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, @Optional Preview preview) {
-		try {
-			// String fileName = "/Users/erlanger/Documents/Urlaubsantrag_250221.pdf";
+	@Inject
+	TranslationService translationService;
 
-			Object wfcDetailpart = mpart.getObject();
-			WFCDetailPart wfcDetail = null;
-			if (wfcDetailpart instanceof WFCDetailPart) {
-				wfcDetail = (WFCDetailPart) wfcDetailpart;
+	@Inject
+	MApplication mApplication;
+
+	public static final String FORMS = "Forms";
+	public static final String DEFAULT = "DEFAULT";
+	public static final String PROCEDURENAME = "procedurename";
+	public static final String REPORTNAME = "reportname";
+	public static final String ROOTELEMENT = "rootelement";
+
+	List<String> checkedMasks = new ArrayList<>();
+	Map<String, String> procedureNames = new HashMap<>();
+	Map<String, String> reportNames = new HashMap<>();
+	Map<String, String> rootElements = new HashMap<>();
+
+	boolean reportsFolderExists = false;
+
+	@PostConstruct
+	public void downloadReportsZip() {
+		try {
+			dataService.getHashedZip("reports.zip");
+		} catch (Exception e) {}
+		File reportsFolder = dataService.getStoragePath().resolve("reports/").toFile();
+		reportsFolderExists = reportsFolder.exists();
+	}
+
+	@CanExecute
+	public boolean canExecute(MPart mpart, MPerspective mPerspective) {
+
+		String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
+		String procedureName = procedureNames.get(maskName);
+		String reportName = reportNames.get(maskName);
+		String rootElement = rootElements.get(maskName);
+
+		// Überprüfen, ob reports Ordner geladen wurde
+		if (!reportsFolderExists) {
+			return false;
+		}
+
+		// Wenn diese Maske noch nicht geöffnet wurde application.xbs überprüfen
+		if (!checkedMasks.contains(maskName)) {
+			checkedMasks.add(maskName);
+
+			// Finden des report, rootelement und procedurenamens (Über application.xbs definiert)
+			Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
+			Node maskNode = XBSUtil.getNodeWithName(preferences, maskName);
+			if (maskNode == null) {
+				return false;
 			}
-			MDetail detail = wfcDetail.getDetail();
-			MField field = detail.getField("KeyLong");
-			Integer integerValue = null;
-			if (field.getValue() != null) {
-				integerValue = field.getValue().getIntegerValue();
-			} else {
-				broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Kein Datensatz zum Drucken selektiert! Bitte Wählen Sie einen Datensatz aus dem Index aus!");
+			Node formsNode = XBSUtil.getNodeWithName(maskNode, FORMS);
+			if (formsNode == null) {
+				return false;
+			}
+			Node defaultNode = XBSUtil.getNodeWithName(formsNode, DEFAULT);
+			if (defaultNode == null) {
+				return false;
+			}
+			Node printNode = defaultNode.getNode().get(0);
+
+			for (Entry e : printNode.getMap().getEntry()) {
+				if (e.getKey().equals(REPORTNAME)) {
+					reportName = e.getValue();
+					reportNames.put(maskName, reportName);
+				}
+				if (e.getKey().equals(PROCEDURENAME)) {
+					procedureName = e.getValue();
+					procedureNames.put(maskName, procedureName);
+				}
+				if (e.getKey().equals(ROOTELEMENT)) {
+					rootElement = e.getValue();
+					rootElements.put(maskName, rootElement);
+				}
+			}
+		}
+
+		// Ist Report in .xbs definiert?
+		if (procedureName == null || reportName == null || rootElement == null) {
+			return false;
+		}
+
+		// Wurde das xsl-File geladen?
+		if (dataService.getCachedFileContent("reports/" + reportName) == null) {
+			return false;
+		}
+
+		// Ist ein Datensatz gewählt?
+		WFCDetailPart wfcDetail = (WFCDetailPart) mpart.getObject();
+		MDetail detail = wfcDetail.getDetail();
+		MField field = detail.getField("KeyLong");
+
+		return field.getValue() != null;
+
+	}
+
+	@Execute
+	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, MPerspective mPerspective,
+			@Optional Preview preview) {
+		try {
+
+			if (!(mpart.getObject() instanceof WFCDetailPart)) {
 				return;
 			}
 
-			Table table = TableBuilder.newTable("xpctsPrintTestergebnis").withColumn("KeyLong", DataType.INTEGER).create();
-			Row row = RowBuilder.newRow().withValue(integerValue).create();
+			// Keylong-Wert finden
+			String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
+			WFCDetailPart wfcDetail = (WFCDetailPart) mpart.getObject();
+			MField field = wfcDetail.getDetail().getField("KeyLong");
+			int integerValue = field.getValue().getIntegerValue();
+
+			// Tabelle ans CAS aufbauen
+			Table table = TableBuilder.newTable(procedureNames.get(maskName)).withColumn("KeyLong", DataType.STRING).create();
+			Row row = RowBuilder.newRow().withValue("" + integerValue).create();
 			table.addRow(row);
 
-			// Table Bauen, Tabellenname + KeyLong
-			CompletableFuture<Path> tableFuture = dataService.getPDFAsync("xpctsPrintTestergebnis", table);
-			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
-
-				URL url;
+			// XML-Dateil vom CAS laden
+			CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table.getName(), table, rootElements.get(maskName));
+			tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
 				try {
-					url = tr.toFile().toURI().toURL();
-//					showFile(url.toString(), checkPreview(window, modelService, partService, preview));
-					showFile(url.toString(), null);
-				} catch (MalformedURLException e) {
+					// Aus xml und xsl Datei PDF erstellen
+					Path pdfPath = dataService.getStoragePath().resolve("reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
+					URL pdfFile = pdfPath.toFile().toURI().toURL();
+					String xmlString = Files.readString(xmlPath);
+
+					// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
+					PrintUtil.checkPreview(window, modelService, partService, preview);
+
+					PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve("reports/" + reportNames.get(maskName)).toFile());
+					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
+				} catch (IOException | SAXException | TransformerException e) {
 					e.printStackTrace();
+					broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
 				}
 			}));
 		} catch (Exception ex) {
-			broker.post(Constants.BROKER_SHOWERRORMESSAGE, "Es gab ein Problem beim Anzeien des Files!");
+			ex.printStackTrace();
+			broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
 		}
-	}
-
-	private void showFile(String urlString, Preview preview) {
-		if (urlString != null) {
-			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
-			try {
-				if (preview == null) {
-					System.out.println(MessageFormat.format("öffne {0} auf dem Desktop", urlString));
-					Tools.openURL(urlString);
-				} else {
-					System.out.println(MessageFormat.format("öffne {0} im Preview-Fenster", urlString));
-					preview.openURL(urlString);
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				System.out.println("Error occured during the file open");
-			}
-		} else {
-			System.out.println("kann Datei NULL nicht anzeigen");
-		}
-
-	}
-
-	/**
-	 * Bereitet die Druckvorschau vor
-	 *
-	 * @param window
-	 *            das aktuelle Fenster (benötigt um den Druckvorschau-Part zu finden)
-	 * @param modelService
-	 *            der ModelService (benötigt um den Druckvorschau-Part zu finden)
-	 * @param partService
-	 *            der PartService (benötigt um den Druckvorschau-Part anzuzeigen)
-	 * @param preview
-	 *            der Druckvorschau-Part (falls nicht vorhanden, wird versucht, einen zu erzeugen)
-	 * @return der Druckvorschau-Part (falls schon vorhanden, wird dasselbe Objekt zurückgegeben)
-	 * @author wild
-	 * @since 11.0.0
-	 */
-	protected static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService, Preview preview) {
-		if (preview == null) {
-			// Wir suchen mal nach dem Druck-Part und aktivieren ihn
-			MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
-			if (previewPart.getObject() == null) {
-				partService.showPart(previewPart, PartState.CREATE);
-			}
-			previewPart.setVisible(true);
-			previewPart.getParent().setSelectedElement(previewPart);
-			preview = (Preview) previewPart.getObject();
-		} else {
-			preview.clear();
-		}
-
-		return preview;
 	}
 
 }

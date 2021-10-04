@@ -21,12 +21,12 @@ public class FieldUtil {
 		COLUMN_HEIGHT = size.y + 20;
 		COLUMN_WIDTH = size.x + 80;
 
-		text.setText("00:00");
+		text.setText("00:00 am");
 		shell.layout();
 		size = text.getSize();
 		SHORT_TIME_WIDTH = size.x + 5;
 
-		text.setText("12.12.2020 22:55");
+		text.setText("12.12.2020 22:55 am");
 		shell.layout();
 		size = text.getSize();
 		DATE_TIME_WIDTH = size.x + 5;

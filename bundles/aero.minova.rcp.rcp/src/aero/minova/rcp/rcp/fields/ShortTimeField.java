@@ -9,10 +9,10 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +50,8 @@ public class ShortTimeField {
 	}
 
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
@@ -67,13 +69,7 @@ public class ShortTimeField {
 					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
 							locale);
-					LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtil, locale);
-					if (timeUtil.isBlank()) {
-						result.add(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
-					} else {
-						result.add(localTime.format(dtf));
-					}
+					result.add(TimeUtil.getTimeString(time, locale, timeUtil));
 					field.setValue(new Value(time), true);
 				}
 				return result;
@@ -81,7 +77,8 @@ public class ShortTimeField {
 
 		};
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
-		text.setMessage(LocalTime.of(23, 59).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+		LocalDateTime date = LocalDateTime.of(LocalDate.of(2000, 01, 01), LocalTime.of(11, 59));
+		text.setMessage(TimeUtil.getTimeString(date.toInstant(ZoneOffset.UTC), locale, timeUtil));
 		text.setNumberOfLines(1);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.addFocusListener(new FocusAdapter() {

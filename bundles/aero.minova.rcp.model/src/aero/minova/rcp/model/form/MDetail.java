@@ -22,6 +22,7 @@ public class MDetail {
 	private HashMap<String, MField> fields = new HashMap<>();
 	private List<MField> primaryFields = new ArrayList<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
+	private HashMap<String, MButton> buttons = new HashMap<>();
 
 	private List<Section> sectionList = new ArrayList<>();
 	private List<MSection> mSectionList = new ArrayList<>();
@@ -31,7 +32,7 @@ public class MDetail {
 	private Control selectedControl;
 
 	private Map<String, Form> optionPages = new HashMap<>();
-	private Map<String, Map<String, Integer>> optionPageKeys = new HashMap<>();
+	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -84,8 +85,22 @@ public class MDetail {
 		return grids.get(name);
 	}
 
+	public void putButton(MButton b) {
+		if (b == null) {
+			return;
+		}
+		buttons.put(b.getId(), b);
+	}
+
+	public Collection<MButton> getButtons() {
+		return buttons.values();
+	}
+
+	public MButton getButton(String id) {
+		return buttons.get(id);
+	}
+
 	/**
-	 * ACHTUNG: Felder aus OPs haben aktuell noch kein Präfix! <br>
 	 * Liefert das Feld mit dem Namen. Felder im Detail haben kein Präfix. Felder in einer OptionPage haben das Präfix aus der XBS. z.B.
 	 * <ul>
 	 * <li>"KeyLong" = Das Feld KeyLong der Detail-Maske</li>
@@ -112,6 +127,15 @@ public class MDetail {
 		this.sectionList = sectionList;
 	}
 
+	public MSection getPage(String id) {
+		for (MSection m : mSectionList) {
+			if (m.getId().equals(id)) {
+				return m;
+			}
+		}
+		return null;
+	}
+
 	public void addSection(Section section) {
 		this.sectionList.add(section);
 
@@ -130,18 +154,18 @@ public class MDetail {
 	}
 
 	public void addOptionPage(Form op) {
-		this.optionPages.put(op.getTitle(), op);
+		this.optionPages.put(op.getDetail().getProcedureSuffix(), op);
 	}
 
 	public Form getOptionPage(String name) {
 		return optionPages.get(name);
 	}
 
-	public void addOptionPageKeys(String name, Map<String, Integer> keysToIndex) {
-		this.optionPageKeys.put(name, keysToIndex);
+	public void addOptionPageKeys(String name, Map<String, String> keysToValue) {
+		this.optionPageKeys.put(name, keysToValue);
 	}
 
-	public Map<String, Integer> getOptionPageKeys(String name) {
+	public Map<String, String> getOptionPageKeys(String name) {
 		return optionPageKeys.get(name);
 	}
 

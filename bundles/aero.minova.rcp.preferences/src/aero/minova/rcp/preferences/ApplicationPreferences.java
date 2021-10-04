@@ -71,7 +71,7 @@ public class ApplicationPreferences {
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
-	public static final String FONT_SIZE = "FontSize";
+	public static final String FONT_ICON_SIZE = "FontSize";
 
 	/**
 	 * Verbirgt beim Drucken die leeren Spalten.
@@ -93,20 +93,6 @@ public class ApplicationPreferences {
 	 * @see ApplicationPreferences#PREFERENCES_NODE
 	 */
 	public static final String HIDE_SEARCH_CRITERIAS = "HideSearchCriterias";
-
-	/**
-	 * Bestimmt die Größe der Symbole für Menü, Detail, usw.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String ICON_SIZE = "IconSize";
-
-	/**
-	 * Bestimmt die Größe der Symbole in den ToolBars.
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String ICON_SIZE_BIG = "IconSizeBig";
 
 	/**
 	 * Bestimmt die Schriftart des Inhaltsverzeichnisses beim Drucken.
@@ -275,6 +261,16 @@ public class ApplicationPreferences {
 	 * Soll eine Nachricht angezeigt werden, wenn ungespeicherte Änderungen durch das Wählen eines neuen Datensatzes im Index verworfen werden
 	 */
 	public static final String SHOW_DISCARD_CHANGES_DIALOG_INDEX = "ShowDiscardChangesDialogIndex";
+
+	/**
+	 * Sollen versteckte Abschnitte angezeigt werden. Ersatz für app.isSUMode() aus Masken der Version 11
+	 */
+	public static final String SHOW_HIDDEN_SECTIONS = "ShowHiddenSections";
+
+	/**
+	 * Soll eine Nachricht angezeigt werden bevor ein Datensatz gelöscht wird
+	 */
+	public static final String SHOW_DELETE_WARNING = "ShowDeleteWarning";
 
 	private ApplicationPreferences() {}
 }

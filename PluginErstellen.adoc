@@ -3,21 +3,101 @@
 Hier wird das Erstellen von neuen Plugins für Masken der WFC Anwendung dokumentiert. Alle Funktionen, die nicht zu der Core-Anwendung gehören, werden in Plugins ausgelagert. 
 Mit der Version 12 wird in Masken kein JavaScript mehr ausgewertet. Die entsprechenden Funktionen müssen ebenfalls in einen Helper ausgelagert werden.
 
-Prinzipiell wird für jede Maske ein eigenes Plugin erstellt.
+Prinzipiell wird für jede Maske ein eigenes Repository und Plugin erstellt.
 
 Grob müssen folgende Schritte befolgt werden:
 
-1. Erstellen des Plugins
-2. Erstellen der Klasse
-3. Umsetzen der Funktionalitäten
-4. Bauen des Plugins
-5. Ausliefern/Hochladen aufs CAS
+1. <<Projekt_erstellen,Erstellen des Projekts>>
+2. <<Plugin_erstellen,Erstellen des Plugins>>
+3. <<Klasse_erstellen,Erstellen der Klasse>>
+4. <<Funktionalitäten,Umsetzen der Funktionalitäten>>
+5. <<Bauen,Bauen des Plugins>>
+6. <<Ausliefern,Ausliefern/Hochladen aufs CAS>>
 
 Diese Schritte sind im Folgenden genauer beschrieben.
 
+[[Projekt_erstellen]]
+== Erstellen des Projekts 
+
+In dem Repository für die Erweiterung muss es einen Ordner `client` geben. In diesem werden die Resourcen für die WFC-Anwendung abgelegt.
+Neben den eigentlichen Plugins müssen noch folgende Dateien erstellt werden:
+
+* `.mvn/extensions.xml`
+* `minova.target`
+* `pom.xml`
+
+Die `.mvn/extensions.xml` Dateil sollte folgenden Inhalt haben:
+
+[source,xml]
+----
+<extensions>
+  <extension>
+    <groupId>org.eclipse.tycho.extras</groupId>
+    <artifactId>tycho-pomless</artifactId>
+    <version>2.4.0</version>
+  </extension>
+</extensions>
+----
+
+Damit braucht nicht jeder Unterordner eine eigene `pom.xml` um mit Maven gebaut werden zu können.
+
+`minova.target` ist die Targetplatform für das Plugin. Um auf Klassen der Core-WFC-Anwendung zugreifen zu können ist folgender Eintrag wichtig:
+
+[source,xml]
+----
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+	<repository location="https://minova-afis.github.io/aero.minova.rcp.updatesite/"/>
+	<unit id="aero.minova.libs.feature.feature.group" version="0.0.0"/>
+	<unit id="aero.minova.rcp.feature.feature.group" version="0.0.0"/>
+</location>
+----
+
+Die komplette Target-Platform des Workingtime-Plugins findet sich link:https://github.com/minova-afis/aero.minova.workingtime/blob/main/client/minova.target[hier].
+
+In der `pom.xml` müssen alle Module vermerkt sein, die gebaut werden sollen. Komplette Datei für Workingtime link:https://github.com/minova-afis/aero.minova.workingtime/blob/main/client/pom.xml[hier].
+
+[source,xml]
+----
+<modules>
+	<module>aero.minova.workingtime.helper</module>
+	<module>aero.minova.workingtime.helper.tests</module>
+</modules>
+----
+
+Beispiel für ein baubares Plugin-Repository:
+
+image:images/projectExample.png[]
+
+Prinzipiell soll es ein eigenes Repositorie für jede Erweiterungen geben (siehe auch link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+In diesem sind dann neben den Plugins für die WFC-Anwendung auch die Masken, OPs, Übersetzungen, Prozeduren, ... enthalten. Als Beispiel kann man link:https://github.com/minova-afis/aero.minova.workingtime[aero.minova.workingtime] anschauen.
+
+Wenn das gesamte Repository in Eclipse geladen werden soll muss auch der Rootordner selbst eine `.project` Datei enthalten. Diese kann etwa so aussehen:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>aero.minova.workingtime.root</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+	</natures>
+</projectDescription>
+----
+
+[[Plugin_erstellen]]
 == Erstellen des Plugins
 
-Zuerst wird ein neues Plug-In Project erstellt.
+In dem client-Ordner des Repositories wird ein neues Plug-In Project erstellt.
 
 image::images/pluginErstellen.png[,300,]
 
@@ -26,8 +106,29 @@ Das Namesschema ist `aero.minova.<Klassenname>.helper`.
 image:images/pluginDialog1.png[,300,]
 image:images/pluginDialog2.png[,300,]
 
-Aktuell werden alle Plugins in das link:https://github.com/minova-afis/aero.minova.rcp[aero.minova.rcp] Projekt gelegt. In Zukunft soll es eigene Repositories für die Erweiterungen geben (siehe auch link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+=== MANIFEST.MF anpassen
 
+Das Manifest des Plugins muss angepasst werden und sollte dann etwa so aussehen:
+
+image::images/pluginManifest.png[,500,]
+
+* Die Version wird zu Beginn auf 12.0.0 gesetzt. Bei neuen Releases wir die Versionsnummer dann nach üblichem Schema erhöht.
+* Der Name wird sinnvoll gefüllt
+* Die Checkbox "Activate this plug-in when one of its classes is loaded" wird gesetzt. Dies ist nötig, damit der Helper zur Laufzeit geladen werden kann
+* Java-11 wird als Execution Environment eingetragen. *Außerdem muss auch "Update the classpath settings" geklickt werden!* Wir wollen auf Java-17 upgraden sobald verfügbar, wenn das geschehen ist sollte natürlich auch in den Plug-Ins Java-17 verwendet werden.
+
+
+=== Plugin für Tests
+
+Auch für die Plugins können Tests erstellt werden. 
+Dafür wird ein neues Plugin benötigt, das Namensschema ist `aero.minova.<maskenname>.helper.tests`.
+Dieses wird dann als Modul in die `pom.xml` eingetragen, damit die Tests beim Bauen automatisch ausgeführt werden.
+
+Bei den Test-Plugins sollte das Manifest ebenfalls entsprechend angepasst werden, vor allem auf die korrekte Java-Version muss geachtet werden.
+Da die Tests aber nicht zur Laufzeit wichtig sind muss die Checkbox "Activate this plug-in when one of its classes is loaded" *nicht* gesetzt werden.
+
+
+[[Klasse_erstellen]]
 == Erstellen der Klasse
 
 Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein:
@@ -52,6 +153,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 
+@Component
 public class JobDefinitionHelper implements IHelper {
 
 	@Override
@@ -66,16 +168,37 @@ public class JobDefinitionHelper implements IHelper {
 }
 ----
 
+=== Methoden
+
 In der ``setControls`` Methode wird das MDetail übergeben, dass unter anderem alle Felder und Grids enthält. Dieses sollte als lokale Variable gespeichert werden.
 
 Die ``handleDetailAction`` Methode wird aufgerufen, wenn von dem/der Nutzer:in eine Aktion ausgefürt wird. Diese sind im nächsten Abschnitt erklärt.
 
+=== Laden zur Laufzeit
 
+Außerdem wird an die Klassen `@Component` geschrieben. 
+Dies wird benötigt, damit der Helper zur Laufzeit geladen werden kann.
+Sobald mit diesem `@Component` gespeichert wird sollte automatisch ein Ordner `OSGI-INF` erstellt werden, der eine XML Datei enthält. 
+Sollte dies nicht geschehen kann es über die Einstellungen aktiviert werden:
+
+image::images/pluginAnnotations.png[,300,]
+
+Das Manifest sollte automatisch um einen `Service-Component`-Eintrag erweitert worden sein (zu finden in der Sourcecode-Darstellung, MANIFEST.MF).
+Der Ordner `OSGI-INF` sollte jetzt noch zu dem Build hinzugefügt werden (`Manifest -> Tab "Build"`).
+
+=== Programmieren des neuen Helpers
+
+Damit der neue Helper entwickelt werden kann, ohne dass dieser erst gebaut und auf dem CAS ausgeliefert werden muss sind folgende Schritte nötig:
+
+* In der Klasse `MinovaPluginService` die Variable `DEBUG` auf true setzten. Damit wird nicht mehr versucht, die Helperplugins vom Server zu laden und zu aktivieren
+* Das neue Plugin in die Debug-Configuration von Eclipse aufnehmen, damit die lokale Version genutzt wird (kleiner Pfeil neben Debug-Icon -> Plug-ins -> entsprechendes Plug-in auswählen)
+
+[[Funktionalitäten]]
 == Umsetzen von Funktionalitäten
 
 Alle Helper liegen im Kontext, es ist also möglich Injection zu nutzen.
 
-Über das MDetail kann auf die Felder und Grids zugegriffen werden. Dies funktioniert jeweils über den Feldnamen (Achtung bei OPs, evtl heißen die Felder hier ``<opTitel>.<Feldname>``):
+Über das MDetail kann auf die Felder und Grids zugegriffen werden. Dies funktioniert jeweils über den Feldnamen (Achtung bei OPs, die Felder heißen ``<opTitel>.<Feldname>``):
 
 [source,java]
 ----
@@ -136,7 +259,7 @@ table.addColumn(new Column(bookingDate.getName(), bookingDate.getDataType()));
 r.addValue(bookingDateValue);
 
 t.addRow(r);
-WFCDetailCASRequestsUtil casUtil = (WFCDetailCASRequestsUtil) mPerspective.getContext().get("WFCDetailCASRequestsUtil");
+WFCDetailCASRequestsUtil casUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 casUtil.setSelectedTable(t);
 ----
 
@@ -148,7 +271,6 @@ Diese Klasse kann dann als Listener zu einem Feld oder Grid hinzugefügt werden 
 
 [source,java]
 ----
-
 TicketHelper ticketHelper = new TicketHelper(this);
 mDetail.getField("OrderReceiverKey").addValueChangeListener(ticketHelper);
 
@@ -164,20 +286,99 @@ public class TicketHelper implements ValueChangeListener {
 }
 ----
 
+=== Buttons
+
+In Version 11 konnten Buttons über die Maske de-/aktiviert werden, je nachdem ob ein gewisses Feld einen Wert hat:
+
+[source,xml]
+----
+<!-- Alte Maske -->
+<button icon="Print.Command" text="@Action.PrintInvoice" id="PrintInvoice">
+       <dynamic property="enabled">KeyLong != null</dynamic>
+</button>
+----
+
+Da wir kein JavaScript mehr in der Maske wollen kann der entsprechende Code im Helper bei einer Änderung im "KeyLong"-Feld etwa wie folgt aussehen. 
+
+[source,java]
+----
+MField keyLong = mDetail.getField("KeyLong");
+MButton printInvoice = mDetail.getButton("PrintInvoice");
+printInvoice.setEnabled(keyLong.getValue() != null);
+----
+
+Außerdem muss ein Helper auf das Drücken eines Buttons reagieren können. 
+Dafür kann ein `SimpleSelectionAdapter` auf den Button registriert werden:
+
+[source,java]
+----
+MButton printInvoice = mDetail.getButton("PrintInvoice");
+printInvoice.addSelectionListener(new SimpleSelectionAdapter() {
+	@Override
+	public void handle(SelectionEvent e) {
+		// Entsprechende Methode(n) ausführen
+	}
+});
+----
+
+=== Ein-/Ausblenden von Sections
+
+In Version 11 konnten einzelne Sections über die Maske ein- oder ausgeplendet werden.
+
+[source,xml]
+----
+<!-- Alte Maske -->
+ <page id="Debug" text="@Administration" icon="Administration" visible="false">
+    <dynamic property="visible">app.isSUMode()</dynamic>
+    ...
+</page>
+----
+
+Auch dies wird in Version 12 über einen Helper umgesetzt.
+Vorerst gibt es keinen Super User Modus mehr, stattdessen können versteckte Abschnitte über die Einstellungen eingeblendet werden ("Darstellung" Tab, die Einstellung hat ID `ApplicationPreferences.SHOW_HIDDEN_SECTIONS`).
+Die Umsetzung im Helper kann dann wie folgt aussehen:
+
+[source,java]
+----
+//Preferences laden
+IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+
+//MSection über ihre ID aus dem MDetail holen
+MSection debugSection = mDetail.getPage("Debug");
+
+// Initial Sichtbarkeit entsprechend der Einstellung setzten
+debugSection.setVisible(preferences.getBoolean(ApplicationPreferences.SHOW_HIDDEN_SECTIONS, false));
+
+// Bei einer Änderung der Einstellung Sichtbarkeit anpassen
+preferences.addPreferenceChangeListener(event -> {
+	if (event.getKey().equals(ApplicationPreferences.SHOW_HIDDEN_SECTIONS)) {
+		debugSection.setVisible(event.getNewValue().equals("true"));
+	}
+});
+----
 
 
 === TODO, muss noch implementiert und dokumentiert werden
 
-* Felder ein-/ausblenden -> Wie werden Werte ans CAS geschickt? Werden ausgeblendete Felder komplett ignoriert?
-* Ganze Sections ein-/ausblenden
-* Buttons aktivieren/deaktivieren
 * Anwendungsspezifische Einstellungen
 * Umwandeln von JavaScript zu Code im Helper
 
+[[Bauen]]
 == Bauen des Plugins
 
-Aktuell können die Plugins einfach mit der RCP-Anwendung gebaut werden, da sie im gleichen Repository liegen. In Zukunft wird der Bauprozess anders funktionieren müssen (siehe  link:https://github.com/minova-afis/aero.minova.rcp/issues/749[#749]).
+Das Plugin kann gebaut werden, indem der `mvn clean verify` Befehl in dem `client` Ordner des entsprechenden Repositories ausgeführt wird. Das gebaute .jar File liegt dann im `target`-Ordner des jeweiligen Plugins.
 
+image:images/jarExample.png[]
+
+Alternativ kann auch ein Github-Workflow angelegt werden, der zusätzlich zum Bauen einen Tag und Release erstellt. Beispiel für Workingtime link:https://github.com/minova-afis/aero.minova.workingtime/blob/main/.github/workflows/tagAndRelease.yml[hier].
+
+Dieser kann dann über ``Actions -> Tag and Release Workingtime - PlugIn`` automatisch ausgeführt werden.
+
+image::images/automaticRelease.png[]
+
+Das .jar File ist dann im Release als Asset verfügbar.
+
+[[Ausliefern]]
 == Ausliefern/Hochladen aufs CAS
 
 Das gebaute .jar muss vom CAS zur Verfügung gestellt werden.

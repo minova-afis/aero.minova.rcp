@@ -10,7 +10,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
-import aero.minova.rcp.core.ui.PartsID;
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -25,11 +25,11 @@ public class SelectDetailPart {
 
 	@Execute
 	public void execute(MPerspective mPerspective) {
-		List<MPart> findElements = model.findElements(mPerspective, PartsID.DETAIL_PART, MPart.class);
+		List<MPart> findElements = model.findElements(mPerspective, Constants.DETAIL_PART, MPart.class);
 		MPart part = findElements.get(0);
 		partService.activate(part);
 		WFCDetailPart detailPart = (WFCDetailPart) part.getObject();
 		MField field = detailPart.getDetail().getMSectionList().get(0).getTabList().get(0);
-		((AbstractValueAccessor)field.getValueAccessor()).getControl().setFocus();
+		((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
 	}
 }

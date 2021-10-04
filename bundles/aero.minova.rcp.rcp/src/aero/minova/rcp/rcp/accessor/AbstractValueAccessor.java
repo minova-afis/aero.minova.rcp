@@ -13,7 +13,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.IValueAccessor;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public abstract class AbstractValueAccessor implements IValueAccessor {
 
@@ -51,8 +51,8 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public void setMessageText(String message) {
-		if (control instanceof Lookup) {
-			((Lookup) control).setMessage(message);
+		if (control instanceof LookupComposite) {
+			((LookupComposite) control).setMessage(message);
 		} else if (control instanceof Text) {
 			((Text) control).setMessage(message);
 		}
@@ -64,8 +64,8 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 			editable = false;
 		}
 
-		if (control instanceof Lookup) {
-			((Lookup) control).setEditable(editable);
+		if (control instanceof LookupComposite) {
+			((LookupComposite) control).setEditable(editable);
 		} else if (control instanceof Text) {
 			((Text) control).setEditable(editable);
 		} else if (control instanceof TextAssist) {

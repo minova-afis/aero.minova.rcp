@@ -4,11 +4,9 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -98,29 +96,19 @@ public class DateUtil {
 		DateUtil.shortcuts = day + month + year + week;
 	}
 
-	public static Instant getDate(Instant today, String input) {
-		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
-	}
-
-	public static Instant getDate(String input, Locale locale) {
-		Instant date = getDate(input);
-		LocalDate ld;
-		if (date == null && !input.isEmpty()) {
-			try {
-				ld = LocalDate.parse(input, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
-				date = ld.atStartOfDay().toInstant(ZoneOffset.UTC);
-			} catch (DateTimeParseException dtpe) {
-				date = null;
-			}
-		}
-		return date;
-	}
-
 	public static Instant getDate(String input) {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale, String dateUtilPref) {
+	public static Instant getDate(Instant today, String input) {
+		return getDate(today, input, Locale.getDefault(Category.FORMAT), defaultPattern);
+	}
+
+	public static Instant getDate(String input, Locale locale, String datePattern) {
+		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input, locale, datePattern);
+	}
+
+	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
 
@@ -133,7 +121,7 @@ public class DateUtil {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
 					// Es beginnt mit eine Tagesangabe
-					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++]), ZoneId.of("UTC")).atStartOfDay();
+					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
@@ -143,11 +131,11 @@ public class DateUtil {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
-		
+
 		if (!input.isEmpty() && startOfToday == null) {
-			if (!dateUtilPref.equals("")) {
+			if (!datePattern.equals("")) {
 				try {
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtilPref, locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern(datePattern, locale);
 					LocalDate ld = LocalDate.parse(input, dtf);
 					startOfToday = ld.atStartOfDay();
 				} catch (Exception e) {
@@ -173,13 +161,12 @@ public class DateUtil {
 
 	}
 
-	public static String getDateString(Instant instant, Locale locale) {
-		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale));
-	}
-
-	public static String getDateTimeString(Instant instant, Locale locale, ZoneId zoneId) {
-		return LocalDate.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)) + " "
-				+ LocalTime.ofInstant(instant, zoneId).format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale));
+	public static String getDateString(Instant instant, Locale locale, String dateUtilPref) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+		if (dateUtilPref != null && !dateUtilPref.isBlank()) {
+			dtf = DateTimeFormatter.ofPattern(dateUtilPref);
+		}
+		return LocalDate.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
 	}
 
 	public static String[] splitInput(String input) {
@@ -187,6 +174,7 @@ public class DateUtil {
 		String regex;
 		Pattern pattern;
 		Matcher matcher;
+		input = input.replaceAll("[\\.,/\\s]", "");
 
 		input = input.toLowerCase();
 		regex = "[0-9]+|[+]+|[-]+";
@@ -230,7 +218,7 @@ public class DateUtil {
 		}
 	}
 
-	static Instant getNumericDate(Instant now, String input) {
+	static Instant getNumericDate(Instant now, String input, String datePattern) {
 		int day;
 		int month;
 		int year;

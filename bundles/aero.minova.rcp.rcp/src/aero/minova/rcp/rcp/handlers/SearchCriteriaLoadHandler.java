@@ -19,11 +19,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.osgi.service.prefs.BackingStoreException;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
 public class SearchCriteriaLoadHandler {
-
 
 	@Inject
 	@Preference
@@ -39,7 +39,7 @@ public class SearchCriteriaLoadHandler {
 			data = ((WFCSearchPart) part).getData();
 		}
 
-		if(data != null) {
+		if (data != null) {
 			try {
 				String[] keys = prefs.keys();
 				List<String> keyList = new ArrayList<>();
@@ -48,10 +48,11 @@ public class SearchCriteriaLoadHandler {
 				}
 				Collections.sort(keyList);
 				for (String s : keyList) {
-					if(s.endsWith(".table") && s.startsWith(data.getName()+".")) {
+					if (s.endsWith(".table") && s.startsWith(data.getName() + ".")) {
 						MHandledMenuItem item = createMenuItem(service, s);
-						prefs.get(s, null);
+						if (!item.getLabel().equals(Constants.LAST_STATE)) { // Last_State ist nur zum wiederherstellen der UI
 							items.add(item);
+						}
 					}
 				}
 			} catch (BackingStoreException e) {
@@ -69,19 +70,19 @@ public class SearchCriteriaLoadHandler {
 		// vWorkingTime.erlanger Heute
 		// erlanger Heute
 		String displayName = criteriaTableName.replace(".table", "");
-		displayName = displayName.substring(displayName.indexOf(".") + 1, displayName.length());
+		displayName = displayName.substring(displayName.lastIndexOf(".") + 1, displayName.length());
 		mi.setLabel(displayName);
 
 		final MCommand cmd = MCommandsFactory.INSTANCE.createCommand();
 		cmd.setElementId("aero.minova.rcp.rcp.command.searchCriteria");
 		mi.setCommand(cmd);
 
-		//action
+		// action
 		MParameter param = MCommandsFactory.INSTANCE.createParameter();
 		param.setName("aero.minova.rcp.rcp.commandparameter.criteriaaction");
 		param.setValue("LOAD");
 		mi.getParameters().add(param);
-		//Name
+		// Name
 		param = MCommandsFactory.INSTANCE.createParameter();
 		param.setName("aero.minova.rcp.rcp.commandparameter.criterianame");
 		param.setValue(displayName);

@@ -1,12 +1,12 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -37,13 +37,11 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
 	private Locale locale;
-	private TranslationService translationService;
 	private Form form;
 	private Map<String, aero.minova.rcp.form.model.xsd.Column> formColumns;
 
-	public MinovaDisplayConfiguration(List<Column> columns, TranslationService translationService, Form form) {
+	public MinovaDisplayConfiguration(List<Column> columns, Form form) {
 		this.columns = columns;
-		this.translationService = translationService;
 		this.form = form;
 		initFormFields();
 	}
@@ -54,6 +52,16 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 		for (aero.minova.rcp.form.model.xsd.Column column2 : column) {
 			formColumns.put(column2.getName(), column2);
 		}
+	}
+
+	public List<Integer> getHiddenColumns() {
+		List<Integer> hiddenCols = new ArrayList<>();
+		for (Column c : columns) {
+			if (!c.isVisible()) {
+				hiddenCols.add(columns.indexOf(c));
+			}
+		}
+		return hiddenCols;
 	}
 
 	@Override
@@ -80,10 +88,8 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 				configureDateTimeCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
 				configureDateTimeCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.DOUBLE)) {
-				configureDoubleCell(configRegistry, i, formColumns.get(column.getName()),
-						SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
-				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()),
-						ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+				configureDoubleCell(configRegistry, i, formColumns.get(column.getName()), SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
+				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()), ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INTEGER)) {
 				configureIntegerCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
 				configureIntegerCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
@@ -239,8 +245,7 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 			locale = Locale.getDefault();
 		}
 		DateTimeDisplayConverter dateTimeDisplayConverter = new DateTimeDisplayConverter(locale);
-		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, dateTimeDisplayConverter, DisplayMode.NORMAL,
-				configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, dateTimeDisplayConverter, DisplayMode.NORMAL, configLabel + columnIndex);
 
 	}
 
@@ -281,21 +286,20 @@ public class MinovaDisplayConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Column column, String configLabel) {
-		
-		
+
 		int decimals = 0;
-		if (column.getNumber() !=null) {
+		if (column.getNumber() != null) {
 			decimals = column.getNumber().getDecimals();
 		}
 
-		if (column.getPercentage() !=null) {
+		if (column.getPercentage() != null) {
 			decimals = column.getPercentage().getDecimals();
-		
+
 		}
-		if (column.getMoney()!=null) {
+		if (column.getMoney() != null) {
 			decimals = column.getMoney().getDecimals();
 		}
-		
+
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);

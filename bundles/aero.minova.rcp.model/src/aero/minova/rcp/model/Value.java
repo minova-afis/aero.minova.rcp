@@ -7,6 +7,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.extensions.Preference;
+
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.TimeUtil;
@@ -16,6 +21,14 @@ public class Value implements Serializable {
 
 	private final DataType type;
 	private final Object value;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DATE_UTIL)
+	String datePattern;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
+	String timePattern;
 
 	public Value(Object valueNew) {
 		if (valueNew instanceof Integer) {
@@ -31,7 +44,7 @@ public class Value implements Serializable {
 		} else if (valueNew instanceof ZonedDateTime) {
 			type = DataType.ZONED;
 		} else {
-			throw new RuntimeException();
+			throw new RuntimeException("Class " + valueNew.getClass() + " not supported for Value");
 		}
 		this.value = valueNew;
 	}
@@ -50,16 +63,16 @@ public class Value implements Serializable {
 			ZonedDateTime z = (ZonedDateTime) value;
 			Instant i = z.toInstant();
 			if (z.getYear() == 1900 && z.getDayOfMonth() == 1 && z.getMonthValue() == 1) {
-				return TimeUtil.getTimeString(i, locale);
+				return TimeUtil.getTimeString(i, locale, timePattern);
 			}
-			return DateTimeUtil.getDateTimeString(i, locale);
+			return DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern);
 		case INSTANT:
 			Instant i2 = (Instant) value;
 			LocalDateTime d1 = LocalDateTime.ofEpochSecond(i2.getEpochSecond(), i2.getNano(), ZoneOffset.UTC);
 			if (d1.getYear() == 1900 && d1.getDayOfMonth() == 1 && d1.getMonthValue() == 1) {
-				return TimeUtil.getTimeString(i2, locale);
+				return TimeUtil.getTimeString(i2, locale, timePattern);
 			}
-			return DateTimeUtil.getDateTimeString(i2, locale);
+			return DateTimeUtil.getDateTimeString(i2, locale, datePattern, timePattern);
 		default:
 			break;
 		}
@@ -78,13 +91,13 @@ public class Value implements Serializable {
 			Instant i = z.toInstant();
 			switch (dateTimeType) {
 			case TIME:
-				returnValue = TimeUtil.getTimeString(i, locale);
+				returnValue = TimeUtil.getTimeString(i, locale, timePattern);
 				break;
 			case DATE:
-				returnValue = DateUtil.getDateString(i, locale);
+				returnValue = DateUtil.getDateString(i, locale, datePattern);
 				break;
 			case DATETIME:
-				returnValue = DateTimeUtil.getDateTimeString(i, locale);
+				returnValue = DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern);
 				break;
 			}
 			break;
@@ -92,13 +105,13 @@ public class Value implements Serializable {
 			Instant i2 = (Instant) value;
 			switch (dateTimeType) {
 			case TIME:
-				returnValue = TimeUtil.getTimeString(i2, locale);
+				returnValue = TimeUtil.getTimeString(i2, locale, timePattern);
 				break;
 			case DATE:
-				returnValue = DateUtil.getDateString(i2, locale);
+				returnValue = DateUtil.getDateString(i2, locale, datePattern);
 				break;
 			case DATETIME:
-				returnValue = DateTimeUtil.getDateTimeString(i2, locale);
+				returnValue = DateTimeUtil.getDateTimeString(i2, locale, datePattern, timePattern);
 				break;
 			}
 			break;
@@ -175,7 +188,7 @@ public class Value implements Serializable {
 		return type == DataType.DOUBLE ? (Double) value : null;
 	}
 
-	public Object getBigDecimalValue() {
+	public Double getBigDecimalValue() {
 		return type == DataType.BIGDECIMAL ? (Double) value : null;
 	}
 

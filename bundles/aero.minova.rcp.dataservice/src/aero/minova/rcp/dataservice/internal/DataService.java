@@ -2,7 +2,9 @@ package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -12,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -198,16 +201,24 @@ public class DataService implements IDataService {
 
 	private void init() {
 
-		Authenticator authentication = new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, password.toCharArray());
-			}
-		};
-		// TODO: fix certificate-problems
-		httpClient = HttpClient.newBuilder()//
-				.sslContext(disabledSslVerificationContext())//
-				.authenticator(authentication).build();
+		try {
+			// Damit Umlaute in Username und Passwort genutzt werden können muss mit ISO_8859_1 encoded werden
+			String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
+			String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
+			Authenticator authentication = new Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
+				}
+			};
+			// TODO: fix certificate-problems
+			httpClient = HttpClient.newBuilder()//
+					.sslContext(disabledSslVerificationContext())//
+					.authenticator(authentication).build();
+
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
@@ -251,21 +262,21 @@ public class DataService implements IDataService {
 	}
 
 	/**
-	 * Laden einer PDF Datei
+	 * Laden einer XML Datei
 	 *
 	 * @param tablename
 	 * @param detailTable
 	 * @return
 	 */
 	@Override
-	public CompletableFuture<Path> getPDFAsync(String tablename, Table detailTable) {
+	public CompletableFuture<Path> getXMLAsync(String tablename, Table detailTable, String rootElement) {
 		String body = gson.toJson(detailTable);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
-		Path path = getStoragePath().resolve("PDF/" + tablename + detailTable.getRows().get(0).getValue(0).getIntegerValue().toString() + ".pdf");
+		Path path = getStoragePath().resolve("reports/" + tablename + detailTable.getRows().get(0).getValue(0).getStringValue() + ".xml");
 		try {
 			Files.createDirectories(path.getParent());
 			createFile(path.toString());
@@ -274,17 +285,31 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		log("CAS Request PDF Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
 
-		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "PDF Detail", true);
+			handleCASError(ex, "XML Detail", true);
 			return null;
 		});
 
 		return sendRequest.thenApply(t -> {
-			log("CAS Answer PDF Detail:\n" + t.body());
+			log("CAS Answer XML Detail:\n" + t.body());
+			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+			try {
+				FileWriter fw = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
+				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+				fw.write("<" + rootElement + ">");
+				for (Row r : fromJson.getResultSet().getRows()) {
+					String s = r.getValue(0).getStringValue();
+					fw.write(s + "\n");
+				}
+				fw.write("</" + rootElement + ">");
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			return path;
 		});
 	}
@@ -655,7 +680,7 @@ public class DataService implements IDataService {
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
-					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(field.getLookupDescription(), DataType.STRING)//
 					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
 					.create();
 			Row row = RowBuilder.newRow() //
@@ -796,7 +821,7 @@ public class DataService implements IDataService {
 			Table t = TableBuilder.newTable(tableName) //
 					.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
-					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(field.getLookupDescription(), DataType.STRING)//
 					.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
 					.create();
 			Row row = RowBuilder.newRow() //
@@ -893,6 +918,32 @@ public class DataService implements IDataService {
 		}
 	}
 
+	@Override
+	public CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType) {
+
+		Table t = TableBuilder.newTable(tablename) //
+				.withColumn(requestColumn, requestValue.getType())//
+				.withColumn(resultColumn, resultType)//
+				.create();
+		Row row = RowBuilder.newRow() //
+				.withValue(requestValue) //
+				.withValue(null) //
+				.create();
+		t.addRow(row);
+
+		CompletableFuture<Table> tableFuture = getIndexDataAsync(t.getName(), t, false);
+
+		return tableFuture.thenApply(ta -> {
+			Value v = null;
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					v = r.getValue(1);
+				}
+			}
+			return v;
+		});
+	}
+
 	private CompletableFuture<?> getRequestedTable(int keyLong, String keyText, MField field, String purpose) {
 		MDetail detail = field.getDetail();
 		String tableName;
@@ -908,7 +959,7 @@ public class DataService implements IDataService {
 		if (isTable) {
 			tableBuilder = tableBuilder.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
 					.withColumn(TABLE_KEYTEXT, DataType.STRING)//
-					.withColumn(TABLE_DESCRIPTION, DataType.STRING)//
+					.withColumn(field.getLookupDescription(), DataType.STRING)//
 					.withColumn(TABLE_LASTACTION, DataType.INTEGER);//
 			if (keyLong == 0) {
 				rowBuilder = rowBuilder.withValue(null);

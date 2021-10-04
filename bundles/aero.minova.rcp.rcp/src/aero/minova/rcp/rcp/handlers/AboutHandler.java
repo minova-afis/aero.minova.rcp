@@ -22,7 +22,6 @@ public class AboutHandler {
 				+ LocalDateTime.ofEpochSecond(lastModified / 1000, 0, ZoneOffset.UTC) + " "+ "Java Runntime: "
 				+ runtimeVersion;
 
-		// MessageDialog.openInformation(shell, "About", versionString);
 
 		final AboutDialog ad = new AboutDialog(shell, versionString);
 		ad.create();

@@ -27,9 +27,11 @@ Fall True (Default):
 Der eingetragene oder ausgewählte Wert wird festgesetzt und der Benutzer springt ins erste Pflichtfeld der Maske.
 
 Position vor dem Betätigen von ENTER:
+
 image::images/enter_selects_first_required_start.png[Position vor drücken von ENTER,550,300]
 
 Position nach dem Betätigen von ENTER mit EnterSelectsFirstRequired = true:
+
 image::images/enter_selects_first_required_true.png[Position nach drücken von ENTER bei der Option true,550,300]
 
 [%hardbreaks]
@@ -38,9 +40,11 @@ Fall False:
 Der eingetragene oder ausgewählte Wert wird festgesetzt und der Benutzer springt ins nächste Pflichtfeld.
 
 Position vor dem Betätigen von ENTER:
+
 image::images/enter_selects_first_required_start.png[Position vor drücken von ENTER,550,300]
 
 Position nach dem Betätigen von ENTER mit EnterSelectsFirstRequired = false:
+
 image::images/enter_selects_first_required_false.png[Position nach drücken von ENTER mit der Option false,550,300]
 
 
@@ -52,18 +56,22 @@ Fall True (Default):
 Der in der LookupComboBox ausgewählte Wert wird festgesetzt und der Benutzer springt ins nächste Pflichtfeld.
 
 Position vor dem Betätigen von ENTER im LookupControl:
+
 image::images/lookup_enter_selects_next_required_start.png[Start,550,300]
 
 Position nach dem Betätigen von ENTER im LookupControl mit LookupEnterSelectsNextRequired = true:
+
 image::images/lookup_enter_selects_next_required_true.png[True,550,300]
 
 Fall False:
 Der in der LookupComboBox ausgewählte Wert wird festgesetzt und der Benutzer bleibt im Feld.
 
 Position vor dem Betätigen von ENTER im LookupControl:
+
 image::images/lookup_enter_selects_next_required_start.png[Start,550,300]
 
 Position nach dem Betätigen von ENTER im LookupControl mit LookupEnterSelectsNextRequired = false:
+
 image::images/lookup_enter_selects_next_required_false.png[False,550,300]
 
 [%hardbreaks]
@@ -74,18 +82,22 @@ Fall True (Default):
 Der Benutzer kann mit TAB in die Controls(Speichern, Neu, ...) navigieren.
 
 Position vor dem Betätigen von TAB:
+
 image::images/select_all_controls_start.png[Start,550,300]
 
 Position nach dem Betätigen von TAB mit SelectAllControls = true:
+
 image::images/select_all_controls_true.png[True,550,300]
 	
 Fall False:
 Der Benutzer kann mit TAB nicht in die Controls(Speichern, Neu, ...) navigieren.
 	 
 Position vor dem Betätigen von TAB:
+
 image::images/select_all_controls_start.png[Start,550,300]
 
 Position nach dem Betätigen von TAB mit SelectAllControls = false:
+
 image::images/select_all_controls_false.png[False,550,300]
 
 [%hardbreaks]
@@ -116,37 +128,55 @@ Bestimmt die Zeitzone des Anwenders. Der Server arbeitet immer in der Zeitzone U
 Bestimmt die Schriftgröße der Anwendung.
 
 Schriftgröße ist auf M gesetzt:
+
 image::images/fontsize_M.png[M,550,300]
 
 Schriftgröße ist auf L gesetzt:
+
 image::images/fontsize_L.png[L,550,300]
 
 
 [%hardbreaks]
 
-===== Symbole [Menü, Detail]
+===== Datums-/Zeitformat
 
-Bestimmt die Größe der Symbole für Menü, Detail, usw.
+===== Date Pattern
 
-Die Größe der Symbole ist auf 24x24 gesetzt:
-image::images/symbol_size_small_24x24.png[24x24,550,300]
+Das Pattern bestimmt die Formatierung des Datums. Dabei bestimmt dieses nur die Darstellung des Datums, aber nicht die Reihenfolge von Tag, Monat und Jahr. 
 
-Die Größe der Symbole ist auf 32x32 gesetzt:
-image::images/symbol_size_small_32x32.png[32x32,550,300]
+**Beispiel:**
+|===
+| **Pattern** | **Eingabe** | **Ausgabe**
+| dd.MM.y | 120220 | 12.02.2020
+| dd/MMM/yy | 120220 | 12/Feb./20
+| MM.dd.yyyy | 120220 | 12.02.2020
+|===
 
-[%hardbreaks]
+Die Message im Text Feld, stellt das Standard Pattern für das ausgewählte Locale da.
 
-===== Symbole [Toolbar]
+===== Time Pattern
 
-Bestimmt die Größe der Symbole in den ToolBars.
+Das Pattern bestimmt die Formatierung der Zeit. Dabei bestimmt die Eingabe nicht nur die Darstellung, sondern auch, ob das 12-Stunden oder das 24-Stunden Format verwendet wird.
+Bei dem Pattern mit kleinem **h** wird das 12-Stunden Format verwendet und bei großen **H** wird das 24-Stunden Format verwendet. **Beachten: Wenn im Pattern kein a hinzugefügt wird, wird AM/PM nicht mit dargestellt!!**
+Das AM/PM wird in die entsprechende Sprache übersetzt.
 
-Die Größe der Symbole ist auf 32x32 gesetzt:
-image::images/symbol_size_big_32x32.png[32x32,550,300]
+**Beispiel:**
+|===
+| **Pattern** | **Eingabe** | **Ausgabe**
+| hh:mm | 2345 | 11:45
+| hh:mm a | 2345 | 11:45 PM
+| HH:mm | 2345 | 23:45
+| H:mm | 726 | 7:26
+| HH:mm | 726 | 07:26
+|===
 
-Die Größe der Symbole ist auf 48x48 gesetzt:
-image::images/symbol_size_big_48x48.png[48x48,550,300]
+Die Message im Text Feld, stellt das Standard Pattern für das ausgewählte Locale da.
 
-[%hardbreaks]
+===== Experten Modus - Zeige versteckte Abschnitte an
+
+Manche Abschnitte sind nur sichtbar, wenn diese Option gewählt ist. 
+Das ein-/ausblenden wird über die Helper der einzelnen Masken geregelt.
+Ersatz für Teil des SuperUser Modus von Version 11.
 
 ==== Erweitert Tab
 
@@ -173,10 +203,24 @@ Das Meldungsfenster für Fehler wird an die Menüleiste angebunden.
 Blendet den Text von Schaltflächen in den Toolbars ein.
 
 Schaltflächen in den Toolbars mit ShowButtonText = false:
+
 image::images/show_button_text_false.png[false,550,300]
 
 Schaltflächen in den Toolbars mit ShowButtonText = true:
+
 image::images/show_button_text_true.png[true,550,300]
+
+
+===== TODO: Masken Puffer benutzen
+
+===== Nachricht bei ungespeicherten Änderungen anzeigen
+
+Zeigt eine Nachricht an, wenn ungespeicherte Änderungen durch das Laden eines Datensatzes im Index verworfen werden.
+
+===== Bestätigungsdialog vor Löschen
+
+Zeigt einen Bestätigungsdialog an, bevor ein Datensatz gelöscht wird. Der Default-Wert für diese Einstellung wird aus der XBS ausgelesen (ShowDeleteDialog).
+Die Entscheidung der Nutzer übertrifft aber die XBS-Einstellung.
 
 [%hardbreaks]
 
@@ -228,9 +272,11 @@ Bestimmt die Schriftart des Inhaltsverzeichnisses beim Drucken.
 Optimiert die Breiten der Spalten beim Drucken.
 
 Druckvorschau im Index mit OptimizeWidth = true:
+
 image::images/optimize_width_true.png[True,650,200]
 
 Druckvorschau im Index mit OptimizeWidth = false:
+
 image::images/optimize_width_false.png[False,650,200]
 
 [%hardbreaks]
@@ -240,9 +286,11 @@ image::images/optimize_width_false.png[False,650,200]
 Verbirgt beim Drucken die leeren Spalten. 
 
 Druckvorschau im Index mit HideEmptyCols = true:
+
 image::images/hide_empty_cols_true.png[True,650,200]
 
 Druckvorschau im Index mit HideEmptyCols = false:
+
 image::images/hide_empty_cols_false.png[False,650,200]
 
 [%hardbreaks]
@@ -252,9 +300,11 @@ image::images/hide_empty_cols_false.png[False,650,200]
 Verbirgt beim Drucken die Spalten, die die Gruppen bilden.
 
 Druckvorschau im Index mit HideGroupCols = true:
+
 image::images/hide_group_cols_true.png[True,650,200]
 
 Druckvorschau im Index mit HideGroupCols = false:
+
 image::images/hide_group_cols_false.png[False,650,200]
 
 [%hardbreaks]
@@ -264,9 +314,11 @@ image::images/hide_group_cols_false.png[False,650,200]
 Verbirgt beim Drucken die Suchkriterien.
 
 Druckvorschau im Index mit HideSearchCriterias = true:
+
 image::images/hide_search_criterias_true.png[True,650,200]
 
 Druckvorschau im Index mit HideSearchCriterias = false:
+
 image::images/hide_search_criterias_false.png[False,650,200]
 
 [%hardbreaks]

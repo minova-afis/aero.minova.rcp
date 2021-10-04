@@ -31,22 +31,22 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.core.ui.PartsID;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.dialogs.NotificationPopUp;
 import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.EventParam;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
+import aero.minova.rcp.form.model.xsd.Head;
+import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Row;
@@ -59,16 +59,16 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.model.form.MParamStringField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
-import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.accessor.TextValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.widgets.MinovaNotifier;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -198,7 +198,7 @@ public class WFCDetailCASRequestsUtil {
 					Table opFormTable = createReadTableFromForm(opForm, row);
 					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
 					opFuture.thenAccept(t -> sync.asyncExec(() -> {
-						selectedOptionPages.put(opForm.getTitle(), t.getOutputParameters());
+						selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
 						updateSelectedEntry();
 					}));
 				}
@@ -213,24 +213,24 @@ public class WFCDetailCASRequestsUtil {
 			RowBuilder gridRowBuilder = RowBuilder.newRow();
 			Grid grid = g.getGrid();
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			boolean firstPrimary = true;
 			for (Field f : grid.getField()) {
 				if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 					aero.minova.rcp.model.Column column = dataFormService.createColumnFromField(f, "");
 					gridRequestTable.addColumn(column);
 
 					boolean found = false;
-					if (!sg.getKeysToIndex().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
-						if (sg.getKeysToIndex().containsKey(f.getName())) {
+					if (!sg.getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
+						if (sg.getFieldnameToValue().containsKey(f.getName())) {
 							found = true;
-							int index = sg.getKeysToIndex().get(f.getName());
-							Value v = mDetail.getPrimaryFields().get(index).getValue();
+							String fieldNameInMain = sg.getFieldnameToValue().get(f.getName());
+							Value v = mDetail.getField(fieldNameInMain).getValue();
 							gridRowBuilder.withValue(v);
 						}
 
 					} else { // Default Verhalten, entsprechenden Wert im Index finden
 						for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-							if (indexColumns.get(i).getName().equals(f.getName())
-									|| (f.getSqlIndex().intValue() == 0 && indexColumns.get(i).getName().equals("KeyLong"))) {
+							if (indexColumns.get(i).getName().equals(f.getName()) || (firstPrimary && indexColumns.get(i).getName().equals("KeyLong"))) {
 								found = true;
 								gridRowBuilder.withValue(row.getValue(i).getValue());
 							}
@@ -240,6 +240,7 @@ public class WFCDetailCASRequestsUtil {
 					if (!found) {
 						gridRowBuilder.withValue(null);
 					}
+					firstPrimary = false;
 				}
 			}
 			Row gridRow = gridRowBuilder.create();
@@ -247,7 +248,7 @@ public class WFCDetailCASRequestsUtil {
 
 			CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
 			gridFuture.thenAccept(t -> sync.asyncExec(() -> {
-				if (t != null) {
+				if (t != null && t.getResultSet() != null) {
 					Table result = t.getResultSet();
 					if (result.getName().equals(g.getDataTable().getName())) {
 						selectedGrids.put(g.getProcedureSuffix(), result.copy());
@@ -259,8 +260,8 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private Table createReadTableFromForm(Form tableForm, Row row) {
-		Map<String, Integer> keysToIndex = mDetail.getOptionPageKeys(tableForm.getTitle());
-		boolean useColumnName = tableForm.equals(form) || keysToIndex == null; // Hauptmaske oder keine key-zu-Index Map in xbs gegeben
+		Map<String, String> keysToValue = mDetail.getOptionPageKeys(tableForm.getDetail().getProcedureSuffix());
+		boolean useColumnName = tableForm.equals(form) || keysToValue == null; // Hauptmaske oder keine key-zu-value Map in xbs gegeben
 
 		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
 		RowBuilder builder = RowBuilder.newRow();
@@ -276,8 +277,8 @@ public class WFCDetailCASRequestsUtil {
 				// Spalte mit Feld vergleichen
 				if (useColumnName) {
 					found = indexColumns.get(i).getName().equals(f.getName());
-				} else if (keysToIndex.containsKey(f.getName())) {
-					MField correspondingField = mDetail.getPrimaryFields().get(keysToIndex.get(f.getName()));
+				} else if (keysToValue.containsKey(f.getName())) {
+					MField correspondingField = mDetail.getField(keysToValue.get(f.getName()));
 					found = correspondingField.getName().equals(indexColumns.get(i).getName());
 				}
 
@@ -314,12 +315,12 @@ public class WFCDetailCASRequestsUtil {
 	public void updateSelectedEntry() {
 		// Hauptmaske
 		if (selectedTable != null) {
-			setFieldsFromTable(selectedTable);
+			setFieldsFromTable(null, selectedTable);
 		}
 
 		// Option Pages
-		for (Table t : selectedOptionPages.values()) {
-			setFieldsFromTable(t);
+		for (Entry<String, Table> e : selectedOptionPages.entrySet()) {
+			setFieldsFromTable(e.getKey(), e.getValue());
 		}
 
 		// Grids
@@ -332,9 +333,9 @@ public class WFCDetailCASRequestsUtil {
 	/*
 	 * Updatet die Felder mit der übergebenen Tabelle
 	 */
-	private void setFieldsFromTable(Table table) {
+	private void setFieldsFromTable(String opName, Table table) {
 		for (int i = 0; i < table.getColumnCount(); i++) {
-			String name = table.getColumnName(i);
+			String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
 			MField c = mDetail.getField(name);
 			if (c != null && c.getConsumer() != null) {
 				try {
@@ -352,8 +353,9 @@ public class WFCDetailCASRequestsUtil {
 			MGrid mGrid = mDetail.getGrid(gridEntry.getKey());
 			GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
 			SectionGrid sectionGrid = gVA.getSectionGrid();
-			sectionGrid.setDataTable(gridEntry.getValue().copy());
+			Table t = sectionGrid.setDataTable(gridEntry.getValue().copy());
 			sectionGrid.clearDataChanges();
+			selectedGrids.put(gridEntry.getKey(), t);
 		}
 	}
 
@@ -391,7 +393,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private Table createInsertUpdateTableFromForm(Form buildForm) {
 
-		Map<String, Integer> keysToIndex = mDetail.getOptionPageKeys(buildForm.getTitle());
+		Map<String, String> keysToIndex = mDetail.getOptionPageKeys(buildForm.getDetail().getProcedureSuffix());
 		Table formTable = getInsertUpdateTable(buildForm);
 		RowBuilder rb = RowBuilder.newRow();
 
@@ -403,7 +405,7 @@ public class WFCDetailCASRequestsUtil {
 				rb.withValue(null);
 			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) {
 				// Für OPs Keywert aus Hauptmaske nutzen
-				MField correspondingField = mDetail.getPrimaryFields().get(keysToIndex.get(f.getName()));
+				MField correspondingField = mDetail.getField(keysToIndex.get(f.getName()));
 				rb.withValue(getKeys().get(correspondingField.getName()));
 			} else if (getKeys().containsKey(f.getName())) {
 				rb.withValue(getKeys().get(f.getName()));
@@ -414,7 +416,8 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		while (valuePosition < formTable.getColumnCount()) {
-			MField field = mDetail.getField(formTable.getColumnName(valuePosition));
+			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + formTable.getColumnName(valuePosition);
+			MField field = mDetail.getField(fieldname);
 			rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
 			valuePosition++;
 		}
@@ -433,7 +436,8 @@ public class WFCDetailCASRequestsUtil {
 			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
 			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
 			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
-				if (mDetail.getField(c.getName()).isPrimary()) {
+				String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+				if (mDetail.getField(fieldname).isPrimary()) {
 					c.setOutputType(OutputType.OUTPUT);
 				}
 			}
@@ -604,7 +608,7 @@ public class WFCDetailCASRequestsUtil {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
 			// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, PartsID.SEARCH_PART, MPart.class);
+			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
 			partService.activate(findElements.get(0));
 
 			MessageDialog.openError(shell, ERROR, getTranslation(message));
@@ -633,7 +637,7 @@ public class WFCDetailCASRequestsUtil {
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
 			// Fokus auf den Search Part legen, damit Fehlermeldungen von Lookups nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, PartsID.SEARCH_PART, MPart.class);
+			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
 			partService.activate(findElements.get(0));
 
 			if (et.getT() == null) {
@@ -679,18 +683,19 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
 	 */
-	private Table createDeleteTableFromForm(Form form) {
-		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-			tablename = form.getDetail().getProcedurePrefix();
+	private Table createDeleteTableFromForm(Form deleteForm) {
+		String tablename = deleteForm.getIndexView() != null ? "sp" : "op";
+		if ((!"sp".equals(deleteForm.getDetail().getProcedurePrefix()) && !"op".equals(deleteForm.getDetail().getProcedurePrefix()))) {
+			tablename = deleteForm.getDetail().getProcedurePrefix();
 		}
 		tablename += "Delete";
-		tablename += form.getDetail().getProcedureSuffix();
+		tablename += deleteForm.getDetail().getProcedureSuffix();
 		TableBuilder tb = TableBuilder.newTable(tablename);
 		RowBuilder rb = RowBuilder.newRow();
-		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
-			tb.withColumn(f.getName(), mDetail.getField(f.getName()).getDataType());
-			rb.withValue(mDetail.getField(f.getName()).getValue());
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(deleteForm)) {
+			String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + f.getName();
+			tb.withColumn(f.getName(), mDetail.getField(fieldName).getDataType());
+			rb.withValue(mDetail.getField(fieldName).getValue());
 		}
 		Table t = tb.create();
 		Row r = rb.create();
@@ -759,33 +764,27 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Versendet eine Ticketanfrage an den CAS, der Value wird immer ohne vorangegangenes '#' übergeben
-	 *
-	 * @param ticketvalue
+	 * Ruft eine Prozedur mit der übergebenen Tabelle auf. Über den Broker kann auf die Ergebnisse gehört werden
+	 * 
+	 * @param table
 	 */
 	@Inject
 	@Optional
-	public void buildTicketTable(@UIEventTopic(Constants.BROKER_RESOLVETICKET) Value ticketvalue) {
+	public void callProcedureWithTable(@UIEventTopic(Constants.BROKER_PROCEDUREWITHTABLE) Table table) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-		if (activePerspective.equals(perspective) && ticketvalue.getValue() != null) {
-			System.out.println("Nachfrage an den CAS mit Ticket: #" + ticketvalue.getStringValue());
-			Table ticketTable = TableBuilder.newTable("Ticket").withColumn(Constants.TABLE_TICKETNUMBER, DataType.INTEGER, OutputType.OUTPUT).create();
-			Row r = RowBuilder.newRow().withValue(ticketvalue).create();
-			ticketTable.addRow(r);
+		if (activePerspective.equals(perspective) && table != null) {
 
-			ticketFieldsUpdate("...waiting for #" + ticketvalue.getStringValue(), false);
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(table.getName(), table);
 
-			// Fehler abfangen, Felder wieder freigeben
+			// Fehler abfangen
 			tableFuture.exceptionally(ex -> {
-				// Im Display Thread ausführen
-				Display.getDefault().syncExec(() -> ticketFieldsUpdate("...", true));
+				broker.send(Constants.BROKER_PROCEDUREWITHTABLEERROR, ex);
 				return null;
 			});
 
 			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
 			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-				ticketFieldsUpdate("...", true);
+				broker.send(Constants.BROKER_PROCEDUREWITHTABLESUCCESS, ta);
 				if (ta != null && ta.getResultSet() != null && ERROR.equals(ta.getResultSet().getName())) {
 					ErrorObject e = new ErrorObject(ta.getResultSet(), "USER");
 					showErrorMessage(e);
@@ -794,69 +793,11 @@ public class WFCDetailCASRequestsUtil {
 					if (!selectedTable.getRows().isEmpty()) {
 						updateSelectedEntry();
 					} else {
-						showErrorMessage("msg.TicketNotFound");
+						broker.send(Constants.BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE, ta);
 					}
 				}
-				updatePossibleLookupEntries();
+				broker.send(Constants.BROKER_PROCEDUREWITHTABLESUCCESSFINISHED, ta);
 			}));
-		}
-	}
-
-	/**
-	 * Für die Felder, die von einem Ticket gefüllt werden können (Service, ServiceObject, OrderReciever, ServiceContract, Description), wird die Message und
-	 * Editability gesetzt
-	 */
-	private void ticketFieldsUpdate(String messageText, boolean editable) {
-		MField field = mDetail.getField("Description");
-		field.getValueAccessor().setEditable(editable);
-		// Text mit Style SWT.MULTI unterstützt .setMessageText() nicht, deshalb workaround
-		if (editable) {
-			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-			((TextValueAccessor) field.getValueAccessor()).setText("");
-		} else {
-			((TextValueAccessor) field.getValueAccessor()).setColor(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
-			((TextValueAccessor) field.getValueAccessor()).setText(messageText);
-		}
-
-		field = mDetail.getField("OrderReceiverKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-
-		field = mDetail.getField("ServiceKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-
-		field = mDetail.getField("ServiceContractKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-
-		field = mDetail.getField("ServiceObjectKey");
-		field.getValueAccessor().setEditable(editable);
-		field.getValueAccessor().setMessageText(messageText);
-	}
-
-	/**
-	 * Wenn ein Lookup keinen Wert enthält, nachdem das Ticket aufgelöst wurde, werden die möglichen Werte aktualisiert
-	 */
-	private void updatePossibleLookupEntries() {
-		MField field = mDetail.getField("OrderReceiverKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
-		}
-
-		field = mDetail.getField("ServiceKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
-		}
-
-		field = mDetail.getField("ServiceContractKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
-		}
-
-		field = mDetail.getField("ServiceObjectKey");
-		if (field.getValue() == null) {
-			((LookupValueAccessor) field.getValueAccessor()).updatePossibleValues();
 		}
 	}
 
@@ -867,8 +808,7 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void openNotificationPopup(String message) {
 		if (!shell.getDisplay().isDisposed()) {
-			NotificationPopUp notificationPopUp = new NotificationPopUp(shell.getDisplay(), message, getTranslation("Notification"), shell);
-			notificationPopUp.open();
+			MinovaNotifier.show(shell, message, getTranslation("Notification"));
 		}
 	}
 
@@ -1019,9 +959,10 @@ public class WFCDetailCASRequestsUtil {
 	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
 	 */
 	private boolean checkFieldsWithTable(Table t, Form f) {
+		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
 		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < t.getColumnCount(); i++) {
-			MField c = mDetail.getField(t.getColumnName(i));
+			MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
 			checkedFields.add(c);
 			Value sV = t.getRows().get(0).getValue(i);
 			if (c == null) {
@@ -1045,7 +986,7 @@ public class WFCDetailCASRequestsUtil {
 
 		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
 		for (Field field : dataFormService.getFieldsFromForm(f)) {
-			MField mfield = mDetail.getField(field.getName());
+			MField mfield = mDetail.getField(fieldPrefix + field.getName());
 			if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
 				return true;
 			}
@@ -1055,12 +996,12 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private boolean checkOPs() {
-
 		// Sind die OP Felder leer?
 		if (selectedOptionPages.isEmpty()) {
 			for (Form opform : mDetail.getOptionPages()) {
 				for (Field field : dataFormService.getFieldsFromForm(opform)) {
-					if (mDetail.getField(field.getName()).getValue() != null) {
+					String fieldName = opform.getDetail().getProcedureSuffix() + "." + field.getName();
+					if (mDetail.getField(fieldName).getValue() != null) {
 						return true;
 					}
 				}
@@ -1119,4 +1060,102 @@ public class WFCDetailCASRequestsUtil {
 		t.addRow(r);
 		dataService.getDetailDataAsync(t.getName(), t);
 	}
+
+	/**
+	 * Zeichnet alle Felder der MSection neu. Falls Param-String Felder enthalten sind werden die aktuellen MFields dieser gezeichnet, alte Felder werden
+	 * entfernt
+	 * 
+	 * @param sectionID
+	 */
+	public void redrawSection(MSection mSection) {
+
+		// SubFelder von Param-String Feldern entfernen
+		List<MField> toRemove = new ArrayList<>();
+		for (MField mField : mDetail.getFields()) {
+			if (mField instanceof MParamStringField && mField.getmSection().equals(mSection)) {
+				toRemove.addAll(((MParamStringField) mField).getSubMFields());
+				((MParamStringField) mField).clearSubMFields();
+			}
+		}
+		mSection.getTabList().removeAll(toRemove);
+		mDetail.getFields().removeAll(toRemove);
+
+		List<MField> visibleMFields = new ArrayList<>();
+
+		List<MField> toTraverse = new ArrayList<>();
+		toTraverse.addAll(mSection.getTabList());
+		for (MField f : toTraverse) {
+			visibleMFields.add(f);
+
+			if (f instanceof MParamStringField) {
+				String name = f.getName();
+				String suffix = name.contains("\\.") ? name.substring(name.lastIndexOf("\\."), name.length()) : "";
+
+				MParamStringField mParamString = (MParamStringField) f;
+				for (Field subField : mParamString.getSubFields()) {
+					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
+					visibleMFields.add(subMField);
+					mParamString.addSubMField(subMField);
+
+				}
+
+			}
+		}
+
+		// Ganzen Body/ Client Area der Section entfernen
+		mSection.getSection().getClient().dispose();
+
+		// Neuen Body erstellen
+		Composite clientComposite = wfcDetailPart.getFormToolkit().createComposite(mSection.getSection());
+		clientComposite.setLayout(new FormLayout());
+		wfcDetailPart.getFormToolkit().paintBordersFor(clientComposite);
+		mSection.getSection().setClient(clientComposite);
+
+		// Felder zeichnen
+		wfcDetailPart.createUIFields(visibleMFields, clientComposite);
+
+		// Sortieren der Fields nach Tab-Index.
+		wfcDetailPart.sortTabList(mSection);
+		// Setzen der TabListe für die einzelnen Sections.
+		clientComposite.setTabList(wfcDetailPart.getTabListForSectionComposite(mSection, clientComposite));
+		// Setzen der TabListe der Sections im Part.
+		clientComposite.getParent().setTabList(wfcDetailPart.getTabListForSection(clientComposite.getParent(), mSection));
+
+		mSection.getSection().requestLayout();
+		wfcDetailPart.translate(clientComposite);
+
+	}
+
+	/**
+	 * Das übergebene MParamStringField wird mit den Feldern aus der Maske mit formName geladen. Dafür wird die gesamte Section neu gezeichnet
+	 * 
+	 * @param mParamString
+	 * @param formName
+	 */
+	public void updateParamStringField(MParamStringField mParamString, String formName) {
+		Form f = dataFormService.getForm(formName);
+
+		List<Field> subfields = new ArrayList<>();
+
+		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
+			if (o instanceof Head) {
+				for (Object fieldOrGrid : ((Head) o).getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						subfields.add((Field) fieldOrGrid);
+					}
+				}
+			} else if (o instanceof Page) {
+				for (Object fieldOrGrid : ((Page) o).getFieldOrGrid()) {
+					if (fieldOrGrid instanceof Field) {
+						subfields.add((Field) fieldOrGrid);
+					}
+				}
+			}
+		}
+
+		mParamString.getSubFields().clear();
+		mParamString.getSubFields().addAll(subfields);
+		redrawSection(mParamString.getmSection());
+	}
+
 }

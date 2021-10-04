@@ -5,9 +5,16 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.MApplication;
 
+import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.form.setup.util.XBSUtil;
+import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomTimeZone;
 
@@ -15,11 +22,20 @@ public class PreferenceWindowModel {
 
 	private Locale locale;
 
+	@Inject
+	MApplication mApplication;
+
+	// Allgemeine Einstellungen aus XBS Datei
+	private Map<String, String> xbsPreferences;
+
 	public PreferenceWindowModel(Locale locale) {
 		this.locale = locale;
 	}
 
 	public List<PreferenceTabDescriptor> createModel(TranslationService translationService) {
+
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
+		xbsPreferences = XBSUtil.getMainMap(preferences);
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
@@ -78,19 +94,20 @@ public class PreferenceWindowModel {
 
 		psd = new PreferenceSectionDescriptor("Themes", translationService.translate("@Preferences.Themes", null), 0.2);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
 				"M", "S", "M", "L", "XL"));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.ICON_SIZE, translationService.translate("@Preferences.IconSize", null), 0.2, DisplayType.COMBO,
-				"24x24", "16x16", "24x24", "32x32", "48x48", "64x64"));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.ICON_SIZE_BIG, translationService.translate("@Preferences.IconSizeBig", null), 0.3,
-				DisplayType.COMBO, "32x32", "16x16", "24x24", "32x32", "48x48", "64x64"));
-
 		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), 0.1,
 				DisplayType.DATE_UTIL, ""));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilPattern", null), 0.2,
 				DisplayType.TIME_UTIL, ""));
+
+		psd = new PreferenceSectionDescriptor("ExpertMode", translationService.translate("@Preferences.ExpertMode", null), 0.4);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_HIDDEN_SECTIONS, //
+				translationService.translate("@Preferences.ShowHiddenSections", null), 0.1, DisplayType.CHECK, false));
+
 		return ptd;
 	}
 
@@ -116,6 +133,10 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndex", null), 0.6, DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX,
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndexExplanation", null), 0.7, DisplayType.CHECKEXPLANATION, false));
+
+		boolean xbsShowDelete = Boolean.parseBoolean(xbsPreferences.get(Constants.XBS_SHOW_DELETE_DIALOG)); // Default aus xbs nehmen
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DELETE_WARNING, translationService.translate("@Preferences.ShowDeleteWarning", null), 0.8,
+				DisplayType.CHECK, xbsShowDelete));
 
 		psd = new PreferenceSectionDescriptor("Buffer", translationService.translate("@Preferences.Buffer", null), 0.2);
 		ptd.add(psd);

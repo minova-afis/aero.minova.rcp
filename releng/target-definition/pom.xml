@@ -5,13 +5,13 @@
 	 <parent>
     	<groupId>aero.minova.rcp</groupId>
  		<artifactId>aero.minova.rcp.releng</artifactId>
-    	<version>12.0.24-SNAPSHOT</version>
+    	<version>12.0.27-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     
 	
 	<groupId>aero.minova.rcp</groupId>
-	<artifactId>eclipse-2021-03</artifactId>
+	<artifactId>eclipse-2021-09</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>eclipse-target-definition</packaging>
 	

@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.widgets;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
@@ -18,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import aero.minova.rcp.rcp.util.ImageUtil;
+import aero.minova.rcp.dataservice.ImageUtil;
 
 public class AboutDialog extends TitleAreaDialog {
 	private Font lizenzFont;
@@ -29,9 +30,10 @@ public class AboutDialog extends TitleAreaDialog {
 	public AboutDialog(Shell parentShell, String versionString) {
 		super(parentShell);
 		this.version = versionString;
-		lizenzFont = new Font(parentShell.getDisplay(), new FontData("Arial", 12, SWT.NORMAL));
-		infoFont = new Font(parentShell.getDisplay(), new FontData("Arial", 14, SWT.NORMAL));
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parentShell);
+		lizenzFont = resManager.createFont(FontDescriptor.createFrom(new FontData("Arial", 12, SWT.NORMAL)));
+		infoFont = resManager.createFont(FontDescriptor.createFrom(new FontData("Arial", 14, SWT.NORMAL)));
+		
 	}
 
 	@Override

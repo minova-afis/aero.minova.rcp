@@ -1,5 +1,7 @@
 package aero.minova.rcp.preferencewindow.pages;
 
+import static org.eclipse.jface.dialogs.PlainMessageDialog.getBuilder;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -10,6 +12,7 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
@@ -20,7 +23,7 @@ import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -97,6 +100,8 @@ public class ApplicationPreferenceWindowHandler {
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
 		pwm = new PreferenceWindowModel(s);
+		ContextInjectionFactory.inject(pwm, application.getContext()); // In Context injected, damit TranslationService genutzt werden kann
+
 		this.workbench = workbench;
 
 		// Shell des Windows der Application finden
@@ -105,7 +110,7 @@ public class ApplicationPreferenceWindowHandler {
 		// Die Shell des Windows deaktivieren
 		shell.setEnabled(false);
 
-		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
+		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_ICON_SIZE, DisplayType.COMBO, "M", s);
 		boolean curentSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS,
 				DisplayType.CHECK, true, s);
 		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
@@ -172,14 +177,17 @@ public class ApplicationPreferenceWindowHandler {
 
 		boolean newSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
 				true, s);
-		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_SIZE, DisplayType.COMBO, "M", s);
+		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_ICON_SIZE, DisplayType.COMBO, "M", s);
 		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
 
-			boolean openConfirm = MessageDialog.openConfirm(activeShell, translationService.translate("@Action.Restart", null),
-					translationService.translate("@Preferences.RestartMessage", null));
-
-			if (openConfirm) {
+			
+			PlainMessageDialog confirmRestart = getBuilder(activeShell, translationService.translate("@Action.Restart", null))
+					.buttonLabels(List.of(translationService.translate("@Action.Restart", null), translationService.translate("@Abort", null)))
+					.message(translationService.translate("@Preferences.RestartMessage", null)).build();
+			
+			int openConfirm = confirmRestart.open();
+			if (openConfirm== 0) {
 				if (!currentTheme.equals(newTheme)) {
 					updateTheme(newTheme, themeEngine, workbench);
 				} else {

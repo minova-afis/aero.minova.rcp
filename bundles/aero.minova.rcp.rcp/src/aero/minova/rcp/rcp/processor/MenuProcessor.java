@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
@@ -31,8 +32,6 @@ import aero.minova.rcp.form.setup.xbs.Preferences;
 
 public class MenuProcessor {
 
-	public static final String MDI_FILE_NAME = "application.mdi";
-	public static final String XBS_FILE_NAME = "application.xbs";
 	private EModelService modelService;
 	private MApplication mApplication;
 
@@ -47,7 +46,7 @@ public class MenuProcessor {
 		this.mApplication = mApplication;
 
 		try {
-			CompletableFuture<String> exceptionally = dataService.getHashedFile(MDI_FILE_NAME);
+			CompletableFuture<String> exceptionally = dataService.getHashedFile(Constants.MDI_FILE_NAME);
 			String void1 = exceptionally.get();
 			processXML(void1);
 		} catch (Exception e) {
@@ -55,17 +54,16 @@ public class MenuProcessor {
 			handleNoMDI(dataService);
 		}
 
-		File application = new File(dataService.getStoragePath() + "/" + MDI_FILE_NAME);
+		File application = new File(dataService.getStoragePath() + "/" + Constants.MDI_FILE_NAME);
 		if (!application.exists()) {
 			handleNoMDI(dataService);
 		}
 
-		// TODO: Verschieben?
 		try {
-			CompletableFuture<String> xbsFuture = dataService.getHashedFile(XBS_FILE_NAME);
+			CompletableFuture<String> xbsFuture = dataService.getHashedFile(Constants.XBS_FILE_NAME);
 			String xbsContent = xbsFuture.get();
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
-			mApplication.getTransientData().put(XBS_FILE_NAME, preferences);
+			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
 		} catch (InterruptedException | ExecutionException | JAXBException e) {
 			e.printStackTrace();
 		}
@@ -184,7 +182,8 @@ public class MenuProcessor {
 
 		handledMenuItem.setLabel(actionMDI.getText());
 
-		handledMenuItem.setIconURI(actionMDI.getIcon());
+		String retrieveIcon = ImageUtil.retrieveIcon(actionMDI.getIcon(), false);
+		handledMenuItem.setIconURI(retrieveIcon);
 
 		return handledMenuItem;
 	}
@@ -192,7 +191,7 @@ public class MenuProcessor {
 	private void handleNoMDI(IDataService dataService) {
 		// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
 		try {
-			processXML(dataService.getCachedFileContent(MDI_FILE_NAME).get());
+			processXML(dataService.getCachedFileContent(Constants.MDI_FILE_NAME).get());
 			showConnectionErrorMessage(usingLocalMenu);
 		} catch (InterruptedException | ExecutionException e1) {
 			showConnectionErrorMessage(couldntLoadMenu);

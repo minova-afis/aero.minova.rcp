@@ -37,7 +37,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
-import aero.minova.rcp.rcp.widgets.Lookup;
+import aero.minova.rcp.widgets.LookupComposite;
 
 /**
  * Dieser Handler reagiert auf das Enter KeyBinding im DetailPart. Er sucht das nächste leere Pflichtfeld und selktiert es. Sobald kein leeres Feld mehr
@@ -73,8 +73,8 @@ public class TraverseEnterHandler {
 				Control focussedControl = mDetail.getSelectedControl();
 
 				// Ist ein Popup offen?
-				if (focussedControl instanceof Lookup) {
-					Lookup lookup = (Lookup) focussedControl;
+				if (focussedControl instanceof LookupComposite) {
+					LookupComposite lookup = (LookupComposite) focussedControl;
 					// Wir holen uns den Status des Popup des Lookup
 					popupOpen = lookup.popupIsOpen();
 				}
@@ -138,7 +138,7 @@ public class TraverseEnterHandler {
 
 		Control focussedControl = null;
 
-		if (control.getParent() instanceof TextAssist || control.getParent() instanceof Lookup) {
+		if (control.getParent() instanceof TextAssist || control.getParent() instanceof LookupComposite) {
 			focussedControl = control.getParent();
 		} else {
 			focussedControl = control;
@@ -157,6 +157,16 @@ public class TraverseEnterHandler {
 			fcSection = ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSection();
 		}
 
+		if (focussedControl instanceof LookupComposite) {
+			LookupComposite lookup = (LookupComposite) focussedControl;
+			// Wir holen uns den Status des Popup des Lookup
+			popupOpen = lookup.popupIsOpen();
+		}
+
+		if (focussedControl instanceof TextAssist) {
+			popupOpen = false;
+		}
+
 		if (fcSection.getChildren()[0] instanceof Twistie) {
 			comp = (Composite) fcSection.getChildren()[2];
 		} else {
@@ -166,8 +176,8 @@ public class TraverseEnterHandler {
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
 			focussedControl.setFocus();
-			if (focussedControl instanceof Lookup) {
-				Lookup lookup = (Lookup) focussedControl;
+			if (focussedControl instanceof LookupComposite) {
+				LookupComposite lookup = (LookupComposite) focussedControl;
 				lookup.closePopup();
 				MField field = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
 				setLookupValue(field, lookup);
@@ -182,11 +192,10 @@ public class TraverseEnterHandler {
 				cellSelected = getNextRequiredNatTableCell(focussedControl, true);
 			}
 
-			Lookup lookup = null;
-
-			if (focussedControl instanceof Lookup) {
-				lookup = (Lookup) focussedControl;
+			LookupComposite lookup = null;
+			if (focussedControl instanceof LookupComposite) {
 				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				lookup = (LookupComposite) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
 				} else {
@@ -218,19 +227,18 @@ public class TraverseEnterHandler {
 
 				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
 				if (fc != null) {
-					if (focussedControl instanceof Lookup) {
-						lookup = (Lookup) focussedControl;
+					if (focussedControl instanceof LookupComposite) {
+						lookup = (LookupComposite) focussedControl;
 						lookup.closePopup();
 					}
 					return;
 				}
 			}
 		} else {
-			Lookup lookup = null;
-
-			if (focussedControl instanceof Lookup) {
-				lookup = (Lookup) focussedControl;
+			LookupComposite lookup = null;
+			if (focussedControl instanceof LookupComposite) {
 				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+				lookup = (LookupComposite) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
 				} else {
@@ -248,8 +256,8 @@ public class TraverseEnterHandler {
 				List<Control> tabList = arrayToList(compo.getTabList());
 				fc = getNextRequiredControl(tabList);
 				if (fc != null) {
-					if (focussedControl instanceof Lookup) {
-						lookup = (Lookup) focussedControl;
+					if (focussedControl instanceof LookupComposite) {
+						lookup = (LookupComposite) focussedControl;
 						lookup.closePopup();
 					}
 					return;
@@ -394,7 +402,7 @@ public class TraverseEnterHandler {
 		return tabList;
 	}
 
-	private void setLookupValue(MField field, Lookup lookup) {
+	private void setLookupValue(MField field, LookupComposite lookup) {
 		LookupValue lv = null;
 		if (lookup.getTable().getSelectionIndex() > 0) {
 			lv = lookup.getPopupValues().get(lookup.getTable().getSelectionIndex());
