@@ -90,6 +90,7 @@ import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -732,5 +733,20 @@ public class SectionGrid {
 			}
 		}
 
+	}
+
+	public Table getSelectedRows() {
+		TableBuilder tb = TableBuilder.newTable("");
+		for (Column c : dataTable.getColumns()) {
+			tb.withColumn(c.getName(), c.getType());
+		}
+		Table selected = tb.create();
+
+		for (Range r : selectionLayer.getSelectedRowPositions()) {
+			for (int i = r.start; i < r.end; i++) {
+				selected.addRow(sortedList.get(i));
+			}
+		}
+		return selected;
 	}
 }

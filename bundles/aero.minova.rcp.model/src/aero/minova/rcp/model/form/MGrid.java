@@ -192,4 +192,8 @@ public class MGrid {
 			listener.gridChange(event);
 		}
 	}
+
+	public Table getSelectedRows() {
+		return gridAccessor.getSelectedRows();
+	}
 }
