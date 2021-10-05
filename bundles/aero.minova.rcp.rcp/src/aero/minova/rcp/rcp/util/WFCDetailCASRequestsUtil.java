@@ -271,6 +271,11 @@ public class WFCDetailCASRequestsUtil {
 		updateSelectedGrids();
 	}
 
+	public void addGridRows(MGrid g, List<Row> rows) {
+		g.addRows(rows);
+		setGridContent(g, g.getDataTable());
+	}
+
 	private Table createReadTableFromForm(Form tableForm, Row row) {
 		Map<String, String> keysToValue = mDetail.getOptionPageKeys(tableForm.getDetail().getProcedureSuffix());
 		boolean useColumnName = tableForm.equals(form) || keysToValue == null; // Hauptmaske oder keine key-zu-value Map in xbs gegeben
@@ -380,9 +385,11 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
+			sendEventToHelper(ActionCode.BEFORESAVE);
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
 			sendSaveRequest(formTable);
+			sendEventToHelper(ActionCode.AFTERSAVE);
 		}
 	}
 
