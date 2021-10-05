@@ -62,8 +62,11 @@ public class ShortTimeField {
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
 				Instant time = TimeUtil.getTime(entry);
-				if (time == null && !entry.isEmpty()) {
+				if (time == null || entry.isEmpty()) {
 					result.add("!Error converting");
+					field.setValue(null, true);
+				} else if (entry.isBlank()) {
+					result.add("");
 					field.setValue(null, true);
 				} else {
 					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -85,6 +88,13 @@ public class ShortTimeField {
 			@Override
 			public void focusGained(FocusEvent e) {
 				text.selectAll();
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (text.getText().isEmpty() || text.getText().isBlank()) {
+					field.setValue(null, true);
+				}
 			}
 		});
 		text.setData(Constants.CONTROL_FIELD, field);

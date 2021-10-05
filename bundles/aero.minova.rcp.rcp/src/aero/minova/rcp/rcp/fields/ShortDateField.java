@@ -86,6 +86,13 @@ public class ShortDateField {
 			public void focusGained(FocusEvent e) {
 				text.selectAll();
 			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (text.getText().isEmpty() || text.getText().isBlank()) {
+					field.setValue(null, true);
+				}
+			}
 		});
 		text.setData(Constants.CONTROL_FIELD, field);
 
