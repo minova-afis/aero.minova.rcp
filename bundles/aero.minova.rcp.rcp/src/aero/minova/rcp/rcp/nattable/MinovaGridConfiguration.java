@@ -291,14 +291,15 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 
-		if (isReadOnly) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
-					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-			readOnlyColumns.add(configLabel + columnIndex);
-		} else if (isRequired) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
-					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-		}
+		// TODO: read-only und required Darstellung
+//		if (isReadOnly) {
+//			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+//					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+//			readOnlyColumns.add(configLabel + columnIndex);
+//		} else if (isRequired) {
+//			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+//					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+//		}
 	}
 
 	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Field field, String configLabel,
