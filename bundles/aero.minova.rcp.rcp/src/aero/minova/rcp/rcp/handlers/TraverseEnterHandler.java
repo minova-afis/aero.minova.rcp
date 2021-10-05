@@ -203,6 +203,11 @@ public class TraverseEnterHandler {
 				}
 			}
 
+			if (!cellSelected && focussedControl instanceof NatTable) {
+				NatTable natTable = (NatTable) focussedControl;
+				((SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER)).clear();
+			}
+
 			if (!cellSelected) {
 				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
 				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
@@ -357,6 +362,7 @@ public class TraverseEnterHandler {
 		SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
 		int irs = 0;
 		int ics = 1;
+		((NatTable) focussedControl).commitAndCloseActiveCellEditor();
 
 		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
 		if (natTable.isFocusControl() && countFromSelectedCell) {
