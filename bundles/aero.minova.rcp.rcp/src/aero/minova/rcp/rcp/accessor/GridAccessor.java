@@ -1,5 +1,8 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.util.List;
+
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
@@ -30,5 +33,15 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	@Override
 	public Table getSelectedRows() {
 		return sg.getSelectedRows();
+	}
+
+	@Override
+	public void deleteCurrentRows() {
+		sg.deleteCurrentRows();
+	}
+
+	@Override
+	public void addRows(List<Row> rows) {
+		sg.addRows(rows);
 	}
 }

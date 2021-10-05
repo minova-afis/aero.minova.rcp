@@ -196,4 +196,12 @@ public class MGrid {
 	public Table getSelectedRows() {
 		return gridAccessor.getSelectedRows();
 	}
+
+	public void deleteCurrentRows() {
+		gridAccessor.deleteCurrentRows();
+	}
+
+	public void addRows(List<Row> rows) {
+		gridAccessor.addRows(rows);
+	}
 }

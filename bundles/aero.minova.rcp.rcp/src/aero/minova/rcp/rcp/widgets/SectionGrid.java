@@ -579,6 +579,14 @@ public class SectionGrid {
 		updateNatTable();
 	}
 
+	public void addRows(List<Row> rows) {
+		for (Row r : rows) {
+			rowsToInsert.add(r);
+			dataTable.addRow(r);
+		}
+		updateNatTable();
+	}
+
 	public Map<String, String> getFieldnameToValue() {
 		return fieldnameToValue;
 	}
@@ -749,4 +757,5 @@ public class SectionGrid {
 		}
 		return selected;
 	}
+
 }
