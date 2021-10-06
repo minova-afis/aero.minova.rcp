@@ -680,6 +680,7 @@ public class WFCDetailCASRequestsUtil {
 	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective && getKeys() != null) {
 
+			sendEventToHelper(ActionCode.BEFOREDEL);
 			// Hauptmaske
 			Table t = createDeleteTableFromForm(form);
 			if (t.getRows() != null) {
@@ -845,7 +846,7 @@ public class WFCDetailCASRequestsUtil {
 		if (!discardChanges()) {
 			return;
 		}
-
+		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		sendEventToHelper(ActionCode.NEW);
