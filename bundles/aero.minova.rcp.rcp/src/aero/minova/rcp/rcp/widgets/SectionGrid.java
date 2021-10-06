@@ -375,6 +375,7 @@ public class SectionGrid {
 				if (selectionLayer.getSelectedCells().isEmpty()) {
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
 				}
+				selectionLayer.clear();
 			}
 
 			@Override
