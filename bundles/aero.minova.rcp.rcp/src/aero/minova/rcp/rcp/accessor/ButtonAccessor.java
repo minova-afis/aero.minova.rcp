@@ -38,7 +38,6 @@ public class ButtonAccessor implements IButtonAccessor {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		System.out.println("Button " + mButton.getId() + " " + (enabled && canBeEnabled));
 		button.setEnabled(enabled && canBeEnabled);
 		this.enabled = enabled;
 	}
