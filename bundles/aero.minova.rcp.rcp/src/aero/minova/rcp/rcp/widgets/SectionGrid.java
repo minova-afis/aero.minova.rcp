@@ -91,6 +91,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.IButtonAccessor;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -139,8 +140,8 @@ public class SectionGrid {
 
 	private LocalResourceManager resManager;
 
-	private ToolItem deleteToolItem;
-	private ToolItem insertToolItem;
+	private IButtonAccessor deleteToolItemAccessor;
+	private IButtonAccessor insertToolItemAccessor;
 
 	private GridAccessor gridAccessor;
 
@@ -196,7 +197,7 @@ public class SectionGrid {
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(true);
-			insertToolItem = createToolItem(bar, btnInsert, grid.getId() + "." + btnInsert.getId());
+			createToolItem(bar, btnInsert, grid.getId() + "." + btnInsert.getId());
 		}
 
 		if (grid.isButtonDeleteVisible()) {
@@ -205,7 +206,7 @@ public class SectionGrid {
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
 			btnDel.setEnabled(false);
-			deleteToolItem = createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
+			createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
@@ -251,6 +252,12 @@ public class SectionGrid {
 		mButton.setButtonAccessor(bA);
 		mDetail.putButton(mButton);
 
+		if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_INSERT)) {
+			insertToolItemAccessor = bA;
+		} else if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
+			deleteToolItemAccessor = bA;
+		}
+
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -268,6 +275,7 @@ public class SectionGrid {
 			Image buttonImage = resManager.createImage(buttonImageDescriptor);
 			item.setImage(buttonImage);
 		}
+
 		return item;
 	}
 
@@ -308,10 +316,11 @@ public class SectionGrid {
 		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
-		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
+		// Delete Button updaten (nur aktiviert, wenn eine Zelle gewählt ist)
 		selectionLayer.addLayerListener(event -> {
-			if (deleteToolItem != null) {
-				deleteToolItem.setEnabled(selectionLayer.getSelectedCellPositions().length > 0);
+			if (deleteToolItemAccessor != null) {
+				deleteToolItemAccessor.setCanBeEnabled(selectionLayer.getSelectedCellPositions().length > 0);
+				deleteToolItemAccessor.updateEnabled();
 			}
 		});
 

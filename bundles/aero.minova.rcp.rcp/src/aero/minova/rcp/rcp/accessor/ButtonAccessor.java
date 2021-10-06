@@ -11,6 +11,10 @@ public class ButtonAccessor implements IButtonAccessor {
 	private MButton mButton;
 	private ToolItem button;
 
+	// Wenn canBeEnabled false ist, darf der Button nicht enabled werden
+	private boolean canBeEnabled = true;
+	private boolean enabled;
+
 	public ButtonAccessor(MButton mButton, ToolItem button) {
 		this.mButton = mButton;
 		this.button = button;
@@ -34,7 +38,9 @@ public class ButtonAccessor implements IButtonAccessor {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		button.setEnabled(enabled);
+		System.out.println("Button " + mButton.getId() + " " + (enabled && canBeEnabled));
+		button.setEnabled(enabled && canBeEnabled);
+		this.enabled = enabled;
 	}
 
 	@Override
@@ -50,6 +56,21 @@ public class ButtonAccessor implements IButtonAccessor {
 	@Override
 	public void removeSelectionListener(SelectionListener listener) {
 		button.removeSelectionListener(listener);
+	}
+
+	@Override
+	public boolean isCanBeEnabled() {
+		return canBeEnabled;
+	}
+
+	@Override
+	public void setCanBeEnabled(boolean canBeEnabled) {
+		this.canBeEnabled = canBeEnabled;
+	}
+
+	@Override
+	public void updateEnabled() {
+		setEnabled(enabled);
 	}
 
 }
