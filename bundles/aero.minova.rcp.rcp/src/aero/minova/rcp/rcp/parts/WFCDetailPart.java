@@ -877,11 +877,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		} else if (field instanceof MNumberField) {
 			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
+			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortDateField) {
-			ShortDateField.create(composite, field, row, column, locale, timezone, mPerspective);
+			ShortDateField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortTimeField) {
-			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective);
+			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MLookupField) {
 			LookupField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {

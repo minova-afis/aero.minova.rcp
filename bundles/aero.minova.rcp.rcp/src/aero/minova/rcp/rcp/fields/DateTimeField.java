@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -45,7 +46,8 @@ import aero.minova.rcp.util.DateTimeUtil;
 
 public class DateTimeField {
 
-	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective,
+			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
@@ -62,7 +64,7 @@ public class DateTimeField {
 				ArrayList<String> result = new ArrayList<>();
 				Instant date = DateTimeUtil.getDateTime(Instant.now(), entry, locale);
 				if (date == null && !entry.isEmpty()) {
-					result.add("!Error converting");
+					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
 					result.add(DateTimeUtil.getDateTimeString(date, locale, dateUtil, timeUtil));
 					field.setValue(new Value(date), true);

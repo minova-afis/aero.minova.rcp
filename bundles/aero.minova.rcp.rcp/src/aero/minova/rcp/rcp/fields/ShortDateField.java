@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -49,7 +50,8 @@ public class ShortDateField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective,
+			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 
@@ -67,7 +69,7 @@ public class ShortDateField {
 				ArrayList<String> result = new ArrayList<>();
 				Instant date = DateUtil.getDate(entry, locale, dateUtil);
 				if (date == null && !entry.isEmpty()) {
-					result.add("!Error converting");
+					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
 					result.add(DateUtil.getDateString(date, locale, dateUtil));
 					field.setValue(new Value(date), true);

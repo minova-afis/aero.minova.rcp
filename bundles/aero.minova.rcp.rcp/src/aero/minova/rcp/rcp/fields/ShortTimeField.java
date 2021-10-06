@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -49,7 +50,8 @@ public class ShortTimeField {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective) {
+	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective,
+			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 
@@ -62,12 +64,8 @@ public class ShortTimeField {
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
 				Instant time = TimeUtil.getTime(entry);
-				if (time == null || entry.isEmpty()) {
-					result.add("!Error converting");
-					field.setValue(null, true);
-				} else if (entry.isBlank()) {
-					result.add("");
-					field.setValue(null, true);
+				if (time == null && !entry.isEmpty()) {
+					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
 					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
