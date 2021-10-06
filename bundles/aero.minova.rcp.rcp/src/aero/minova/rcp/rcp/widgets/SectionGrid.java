@@ -196,7 +196,7 @@ public class SectionGrid {
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(true);
-			insertToolItem = createToolItem(bar, btnInsert);
+			insertToolItem = createToolItem(bar, btnInsert, grid.getId() + "." + btnInsert.getId());
 		}
 
 		if (grid.isButtonDeleteVisible()) {
@@ -205,12 +205,12 @@ public class SectionGrid {
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
 			btnDel.setEnabled(false);
-			deleteToolItem = createToolItem(bar, btnDel);
+			deleteToolItem = createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
 		for (Button btn : grid.getButton()) {
-			createToolItem(bar, btn);
+			createToolItem(bar, btn, btn.getId());
 		}
 
 		// Standard
@@ -219,23 +219,23 @@ public class SectionGrid {
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
 		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
-		createToolItem(bar, btnOptimizeHigh);
+		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
 		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
-		createToolItem(bar, btnOptimizeWidth);
+		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
 
 		section.setTextClient(bar);
 	}
 
-	public ToolItem createToolItem(ToolBar bar, Button btn) {
-		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND);
+	public ToolItem createToolItem(ToolBar bar, Button btn, String buttonID) {
+		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND, buttonID);
 	}
 
-	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
+	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName, String buttonID) {
 		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 		item.setData(btn);
 		item.setData("org.eclipse.swtbot.widget.key", btn.getId());
@@ -244,7 +244,7 @@ public class SectionGrid {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
 		}
 
-		MButton mButton = new MButton(btn.getId());
+		MButton mButton = new MButton(buttonID);
 		mButton.setIcon(btn.getIcon());
 		mButton.setText(btn.getText());
 		ButtonAccessor bA = new ButtonAccessor(mButton, item);
@@ -257,7 +257,7 @@ public class SectionGrid {
 				// TODO: Andere procedures/bindings/instances auswerten
 				Map<String, String> parameter = new HashMap<>();
 				parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btn.getId());
-				parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+				parameter.put(Constants.CONTROL_GRID_ID, grid.getId());
 				ParameterizedCommand command = commandService.createCommand(commandName, parameter);
 				handlerService.executeHandler(command);
 			}
@@ -427,7 +427,7 @@ public class SectionGrid {
 	public void execButtonHandler(String btnId, String commandName) {
 		Map<String, String> parameter = new HashMap<>();
 		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
-		parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+		parameter.put(Constants.CONTROL_GRID_ID, grid.getId());
 		ParameterizedCommand command = commandService.createCommand(commandName, parameter);
 		handlerService.executeHandler(command);
 	}
