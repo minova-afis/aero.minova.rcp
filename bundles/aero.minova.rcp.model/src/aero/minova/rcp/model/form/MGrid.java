@@ -14,12 +14,12 @@ import aero.minova.rcp.model.event.GridChangeListener;
 
 public class MGrid {
 
-	public MGrid(String procedureSuffix) {
-		super();
-		this.procedureSuffix = procedureSuffix;
+	public MGrid(String id) {
+		this.id = id;
 	}
 
 	private String title;
+	private String id;
 	private String procedureSuffix;
 	private String procedurePrefix;
 	private String helperClass;
@@ -39,6 +39,14 @@ public class MGrid {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getProcedureSuffix() {

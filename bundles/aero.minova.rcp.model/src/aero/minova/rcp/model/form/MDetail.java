@@ -65,7 +65,7 @@ public class MDetail {
 		if (g == null) {
 			return;
 		}
-		grids.put(g.getProcedureSuffix(), g);
+		grids.put(g.getId(), g);
 	}
 
 	public Collection<MGrid> getGrids() {
@@ -73,7 +73,7 @@ public class MDetail {
 	}
 
 	/**
-	 * Liefert das MGrid mit dem Procedure-Suffix.
+	 * Liefert das MGrid mit der ID
 	 *
 	 * @param name
 	 *            Name des Grids

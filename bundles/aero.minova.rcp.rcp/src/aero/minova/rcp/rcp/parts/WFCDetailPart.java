@@ -433,7 +433,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 */
 	private void addKeysFromXBSToGrid(Grid grid, Node node) throws NoSuchFieldException {
 		// OP-Feldnamen zu Values Map aus .xbs setzten
-		MGrid opMGrid = mDetail.getGrid(grid.getProcedureSuffix());
+		MGrid opMGrid = mDetail.getGrid(grid.getId());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
 		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(node);
 		sg.setFieldnameToValue(keynamesToValues);
@@ -700,9 +700,15 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private MGrid createMGrid(Grid grid, MSection section) {
-		MGrid mgrid = new MGrid(grid.getProcedureSuffix());
+
+		if (grid.getId() == null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Grid " + grid.getProcedureSuffix() + " has no ID!");
+		}
+
+		MGrid mgrid = new MGrid(grid.getId());
 		mgrid.setTitle(grid.getTitle());
 		mgrid.setFill(grid.getFill());
+		mgrid.setProcedureSuffix(grid.getProcedureSuffix());
 		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
 		mgrid.setmSection(section);
 		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(grid.getIcon(), false);
@@ -715,7 +721,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				MField mF = ModelToViewModel.convert(f);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
-				showErrorMissingSQLIndex(f, grid.getProcedureSuffix() + "." + f.getName(), e);
+				showErrorMissingSQLIndex(f, grid.getId() + "." + f.getName(), e);
 			}
 		}
 		mgrid.setGrid(grid);

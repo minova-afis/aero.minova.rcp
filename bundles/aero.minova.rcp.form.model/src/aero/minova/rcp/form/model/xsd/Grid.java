@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="group-by" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="icon" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="data-handler" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
+ *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="helper-class" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="fill"&gt;
  *         &lt;simpleType&gt;
@@ -119,7 +119,7 @@ public class Grid {
     protected String icon;
     @XmlAttribute(name = "data-handler")
     protected String dataHandler;
-    @XmlAttribute(name = "id")
+    @XmlAttribute(name = "id", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String id;

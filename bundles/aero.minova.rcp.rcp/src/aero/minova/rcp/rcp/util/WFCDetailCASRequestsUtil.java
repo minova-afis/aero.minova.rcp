@@ -267,7 +267,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	public void setGridContent(MGrid g, Table data) {
-		selectedGrids.put(g.getProcedureSuffix(), data.copy());
+		selectedGrids.put(g.getId(), data.copy());
 		updateSelectedGrids();
 	}
 
