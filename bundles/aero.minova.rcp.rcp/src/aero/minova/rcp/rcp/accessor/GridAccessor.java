@@ -56,4 +56,14 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	public void removeSelectionListener(ILayerListener listener) {
 		sg.removeSelectionListener(listener);
 	}
+
+	@Override
+	public Table getDataTable() {
+		return sg.getDataTable();
+	}
+
+	@Override
+	public void setDataTable(Table dataTable) {
+		sg.setDataTable(dataTable);
+	}
 }

@@ -31,7 +31,6 @@ public class MGrid {
 	private Grid grid;
 	private List<MField> fields;
 	private MSection mSection;
-	private Table dataTable;
 	private ArrayList<GridChangeListener> listeners;
 
 	public String getTitle() {
@@ -107,11 +106,11 @@ public class MGrid {
 	}
 
 	public Table getDataTable() {
-		return dataTable;
+		return gridAccessor.getDataTable();
 	}
 
 	public void setDataTable(Table dataTable) {
-		this.dataTable = dataTable;
+		gridAccessor.setDataTable(dataTable);
 	}
 
 	public MSection getmSection() {
@@ -139,6 +138,7 @@ public class MGrid {
 	}
 
 	public boolean isValid() {
+		Table dataTable = gridAccessor.getDataTable();
 		for (Column c : dataTable.getColumns()) {
 			if (c.isRequired()) {
 				// TODO: Weitere Eigenschaften prüfen? (Textlänge, ...)
@@ -156,7 +156,7 @@ public class MGrid {
 	 * Diese Methode muss aufgerufen werden, wenn sich an der unterliegenden Tabelle etwas geändert hat, damit die GridChangedEvents verschickt werden
 	 */
 	public void dataTableChanged() {
-		fire(new GridChangeEvent(this, dataTable));
+		fire(new GridChangeEvent(this, gridAccessor.getDataTable()));
 	}
 
 	/**

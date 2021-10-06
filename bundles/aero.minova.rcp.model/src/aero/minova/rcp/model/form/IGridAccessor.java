@@ -19,4 +19,8 @@ public interface IGridAccessor {
 
 	void removeSelectionListener(ILayerListener listener);
 
+	Table getDataTable();
+
+	void setDataTable(Table dataTable);
+
 }

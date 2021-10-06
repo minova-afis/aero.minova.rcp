@@ -268,12 +268,7 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setGridContent(MGrid g, Table data) {
 		selectedGrids.put(g.getId(), data.copy());
-		updateSelectedGrids();
-	}
-
-	public void addGridRows(MGrid g, List<Row> rows) {
-		g.addRows(rows);
-		setGridContent(g, g.getDataTable());
+		updateSelectedGrid(g.getId());
 	}
 
 	private Table createReadTableFromForm(Form tableForm, Row row) {
@@ -340,9 +335,6 @@ public class WFCDetailCASRequestsUtil {
 			setFieldsFromTable(e.getKey(), e.getValue());
 		}
 
-		// Grids
-		updateSelectedGrids();
-
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 	}
@@ -366,14 +358,18 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	public void updateSelectedGrids() {
-		for (Entry<String, Table> gridEntry : selectedGrids.entrySet()) {
-			MGrid mGrid = mDetail.getGrid(gridEntry.getKey());
-			GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
-			SectionGrid sectionGrid = gVA.getSectionGrid();
-			Table t = sectionGrid.setDataTable(gridEntry.getValue().copy());
-			sectionGrid.clearDataChanges();
-			selectedGrids.put(gridEntry.getKey(), t);
+		for (String gridID : selectedGrids.keySet()) {
+			updateSelectedGrid(gridID);
 		}
+	}
+
+	public void updateSelectedGrid(String gridID) {
+		MGrid mGrid = mDetail.getGrid(gridID);
+		GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
+		SectionGrid sectionGrid = gVA.getSectionGrid();
+		Table t = sectionGrid.setDataTable(selectedGrids.get(gridID).copy());
+		sectionGrid.clearDataChanges();
+		selectedGrids.put(gridID, t);
 	}
 
 	/**
@@ -917,6 +913,7 @@ public class WFCDetailCASRequestsUtil {
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			updateSelectedEntry();
+			updateSelectedGrids();
 		}
 	}
 
