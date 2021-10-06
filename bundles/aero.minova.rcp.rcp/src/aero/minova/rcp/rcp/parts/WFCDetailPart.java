@@ -112,7 +112,9 @@ import aero.minova.rcp.model.form.ModelToViewModel;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
+import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
+import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
@@ -195,6 +197,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mApplication = mApp;
 		getForm();
 		layoutForm(parent);
+		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
@@ -503,14 +506,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		});
 
 		// Wir erstellen die Section des Details.
-		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText(), sectionControl, section);
+		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
+		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
 
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
-
-		// MSection wird zum MDetail hinzugefügt.
-		mDetail.addPage(mSection);
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
@@ -527,7 +528,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Setzen der TabListe für die einzelnen Sections.
 		clientComposite.setTabList(getTabListForSectionComposite(mSection, clientComposite));
 		// Setzen der TabListe der Sections im Part.
-		clientComposite.getParent().setTabList(getTabListForSection(clientComposite.getParent(), mSection));
+		clientComposite.getParent().setTabList(getTabListForSection(section, mSection));
+
+		// MSection wird zum MDetail hinzugefügt.
+		mDetail.addMSection(mSection);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,21 +17,30 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.LookupValue;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
-import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
+import aero.minova.rcp.rcp.accessor.DetailAccessor;
+import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.widgets.LookupComposite;
 
@@ -62,10 +72,10 @@ public class TraverseEnterHandler {
 		boolean popupOpen = false;
 
 		if (part.getObject() instanceof WFCDetailPart) {
-			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
-			if (detail.getSelectedField() != null) {
+			MDetail mDetail = ((WFCDetailPart) part.getObject()).getDetail();
+			if (((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != null) {
 				// aktuell selektiertes Feld holen
-				Control focussedControl = detail.getSelectedField();
+				Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
 
 				// Ist ein Popup offen?
 				if (focussedControl instanceof LookupComposite) {
@@ -74,7 +84,7 @@ public class TraverseEnterHandler {
 					popupOpen = lookup.popupIsOpen();
 				}
 				// nächstes Pflichtfeld suchen und fokussieren
-				getNextRequired(focussedControl, detail);
+				getNextRequired(focussedControl, mDetail, popupOpen);
 			}
 		}
 
@@ -93,17 +103,38 @@ public class TraverseEnterHandler {
 	}
 
 	/**
-	 * Ermittelt das in der Tab Reihenfolge nachfolgende Pflichtfeld und selektiert dieses.
-	 * <p>
-	 * Wenn LookupEnterSelectsNextRequired gesetzt ist und das Lookup offen ist, wird der ausgewählte Wert festgesetzt und das nächste Pflichtfeld wird
-	 * selektiert. Wenn LookupEnterSelectsNextRequired nicht gesetzt ist, wird der Wert fesetgesetzt und der Benutzer bleibt im Feld.
-	 * <p>
-	 * Wenn EnterSelectsFirstRequired gesetzt ist, wird das erste nicht ausgefüllte Pflichtfeld ermittelt und selektiert.
-	 *
-	 * @param focussedControl
-	 *            das aktuell selektierte Feld
+	 * Diese Methode ermittelt das nächste leere Pflichtfeld nach folgendem Muster: <br>
+	 * <br>
+	 * 1. Prüfen, ob LookupEnterSelectsNextRequired gesetzt ist und ein Lookup mit offenen Popup selektiert ist:<br>
+	 * <br>
+	 * LookupEnterSelectsNextRequired ist nicht gesetzt: <br>
+	 * Bei einem Lookup mit offenen Popup wird der ausgewählte Wert festgesetzt und das Lookup bleibt selektiert. <br>
+	 * <br>
+	 * LookupEnterSelectsNextRequired ist gesetzt:<br>
+	 * Bei einem Lookup mit offenen Popup wird der ausgewählte Wert festgesetzt und das nächste leere Pflichtfeld selektiert. <br>
+	 * <br>
+	 * 2. Prüfen, ob EnterSelectsFirstRequired gesetzt ist und kein Lookup mit offenem Popup selektiert ist: <br>
+	 * <br>
+	 * EnterSelectsFirstRequired ist gesetzt: <br>
+	 * Begonnen mit der ersten Section, wird das erste leere Pflichtfeld ermittelt und selektiert. <br>
+	 * <br>
+	 * EnterSelectsFirstRequired ist nicht gesetzt und es ist kein Lookup mit offenem Popup selektiert: <br>
+	 * - Beginnend mit der Section, in der das aktuell selektierte Control sich befindet, wird das nächste leere Pflichtfeld ermittelt. Dabei werden nur die
+	 * Controls nach dem aktuell selektiertem geprüft.<br>
+	 * - Wenn kein Pflichtfeld gefunden wurde, werden die Sections, die nach der Section des selektierten Controls kommen, durchsucht.<br>
+	 * - Falls am Ende des Parts angekommen und immer noch kein Pflichtfeld selektiert wurde, wird mit den Sections vor dem des selektierten Control weiter
+	 * gemacht. Beginnend mit der ersten section <br>
+	 * - Bei der Section des aktuell selektierten Controls angekommen ohne ein Pflichtfeld selktiert zu haben, werden nun die Controls in der Section und vor
+	 * dem selktierten Control durchsucht. <br>
+	 * <br>
+	 * Wenn kein Pflichtfeld gefunden wird, bleibt das aktuelle Pflichtfeld selektiert.
+	 * 
+	 * @param control
+	 *            fokussiertes Control
+	 * @param mDetail
+	 * @param popupOpen
 	 */
-	private void getNextRequired(Control control, MDetail detail) {
+	private void getNextRequired(Control control, MDetail mDetail, boolean popupOpen) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
 				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
@@ -118,19 +149,29 @@ public class TraverseEnterHandler {
 			focussedControl = control;
 		}
 
-		boolean popupOpen = false;
+		// Wir holen uns das MField des selektierten Felds.
+		Control fc = null;
+		Composite comp = null;
+		Section fcSection = null;
+
+		if (focussedControl instanceof NatTable) {
+			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
+		} else {
+			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSectionAccessor()).getSection();
+		}
+
 		if (focussedControl instanceof LookupComposite) {
 			LookupComposite lookup = (LookupComposite) focussedControl;
 			// Wir holen uns den Status des Popup des Lookup
 			popupOpen = lookup.popupIsOpen();
 		}
-		if (focussedControl instanceof TextAssist) {
-			popupOpen = false;
-		}
 
-		// Wir holen uns das MField des selektierten Felds.
-		List<MSection> sectionList = detail.getPageList();
-		MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+		for (Control children : fcSection.getChildren()) {
+			if (children instanceof Composite && !(children instanceof ToolBar)) {
+				comp = (Composite) children;
+				break;
+			}
+		}
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
@@ -144,12 +185,16 @@ public class TraverseEnterHandler {
 			return;
 		}
 
-		// Wir prüfen ob die Preference EnterSelectsFirstRequired gesetzt ist.
 		if (!enterSelectsFirstRequired || popupOpen) {
-			Control fc = null;
+
+			boolean cellSelected = false;
+			if (focussedControl instanceof NatTable) {
+				cellSelected = getNextRequiredNatTableCell(focussedControl, true);
+			}
 
 			LookupComposite lookup = null;
 			if (focussedControl instanceof LookupComposite) {
+				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
 				lookup = (LookupComposite) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
@@ -158,38 +203,47 @@ public class TraverseEnterHandler {
 				}
 			}
 
-			List<MField> tabListFromSelectedFieldSection = selectedField.getmSection().getTabList();
-			// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
-			// Size = 10
-			int indexOfSelectedField = tabListFromSelectedFieldSection.indexOf(selectedField);
-			// Sind auf der selben Section nach meinem Feld noch unausgefüllte Required Fields?
-			fc = getNextRequiredFieldWhichNull(tabListFromSelectedFieldSection.subList(indexOfSelectedField + 1, tabListFromSelectedFieldSection.size()));
-			if (fc != null) {
-				return;
+			if (!cellSelected && focussedControl instanceof NatTable) {
+				NatTable natTable = (NatTable) focussedControl;
+				((SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER)).clear();
 			}
 
-			int indexOfSection = sectionList.indexOf(selectedField.getmSection());
+			if (!cellSelected) {
+				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
+				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
+				List<Section> sectionList = ((DetailAccessor) mDetail.getDetailAccessor()).getSectionList();
 
-			fc = getNextControlFromSectionIfNull(selectedField, sectionList.subList(indexOfSection + 1, sectionList.size()));
-			if (fc != null) {
-				return;
-			}
-			fc = getNextControlFromSectionIfNull(selectedField, sectionList.subList(0, indexOfSection));
-			if (fc != null) {
-				return;
-			}
-			// Sind auf der selben Section vor meinem Feld noch unausgefüllte Required Fields?
-			fc = getNextRequiredFieldWhichNull(tabListFromSelectedFieldSection.subList(0, indexOfSelectedField));
-			if (fc == null) {
-				if (focussedControl instanceof LookupComposite) {
-					lookup.closePopup();
+				// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
+				int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
+				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(indexFocussedControl + 1, tabListFromFocussedControlSection.size()));
+				if (fc != null) {
+					return;
 				}
-				return;
-			}
 
+				int indexFocussedControlSection = sectionList.indexOf(fcSection);
+				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
+				if (fc != null) {
+					return;
+				}
+
+				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection + 1));
+				if (fc != null) {
+					return;
+				}
+
+				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
+				if (fc != null) {
+					if (focussedControl instanceof LookupComposite) {
+						lookup = (LookupComposite) focussedControl;
+						lookup.closePopup();
+					}
+					return;
+				}
+			}
 		} else {
 			LookupComposite lookup = null;
 			if (focussedControl instanceof LookupComposite) {
+				MField selectedField = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
 				lookup = (LookupComposite) focussedControl;
 				if (popupOpen) {
 					setLookupValue(selectedField, lookup);
@@ -198,75 +252,164 @@ public class TraverseEnterHandler {
 				}
 			}
 
-			for (MSection mSection : sectionList) {
-				List<MField> tabList = mSection.getTabList();
-				for (MField field : tabList) {
-					if (field.isRequired() && field.getValue() == null && !field.isReadOnly()) {
-						if (field instanceof MLookupField && ((MLookupField) field).getWrittenText() != null) {
-							continue;
-						}
-						Section section = field.getmSection().getSection();
-						// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
-						if (!section.isExpanded()) {
-							//Section öffnen
-							section.setExpanded(true);
-						}
-						focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
-						focussedControl.setFocus();
-						return;
+			for (MSection mSection : mDetail.getMSectionList()) {
+				Composite compo = null;
+				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
+				for (Control children : section.getChildren()) {
+					if (children instanceof Composite && !(children instanceof ToolBar || children instanceof Twistie)) {
+						compo = (Composite) children;
+						break;
 					}
 				}
+				List<Control> tabList = arrayToList(compo.getTabList());
+				fc = getNextRequiredControl(tabList);
+				if (fc != null) {
+					if (focussedControl instanceof LookupComposite) {
+						lookup = (LookupComposite) focussedControl;
+						lookup.closePopup();
+					}
+					return;
+				} else {
+					continue;
+				}
 			}
 		}
-		return;
 	}
 
-	private Control getNextControlFromSectionIfNull(MField selectedField, List<MSection> sectionList) {
-		Control focussedControl = null;
-		for (MSection section : sectionList) {
-			List<MField> tabList = section.getTabList();
+	/**
+	 * Ermittelt das erste leere Pflichtfeld aus der übergebenen Liste von Controls.
+	 * 
+	 * @param tabList
+	 *            Liste der Controls in einer Section.
+	 * @return
+	 */
+	private Control getNextRequiredControl(List<Control> tabList) {
+		Control fc = null;
 
-			if (selectedField.getmSection().equals(section)) {
-				int indexOfSelectedField = tabList.indexOf(selectedField);
-
-				focussedControl = getNextRequiredFieldWhichNull(tabList.subList(indexOfSelectedField, tabList.size() - 1));
-				if (focussedControl != null) {
-					return focussedControl;
-				}
-				focussedControl = getNextRequiredFieldWhichNull(tabList.subList(0, indexOfSelectedField));
-				if (focussedControl != null) {
-					return focussedControl;
+		for (Control control : tabList) {
+			if (!(control instanceof NatTable)) {
+				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
+				if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
+					Section section = ((SectionAccessor) field.getmSection().getSectionAccessor()).getSection();
+					// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
+					if (!section.isExpanded()) {
+						// Section öffnen
+						section.setExpanded(true);
+					}
+					fc = control;
+					fc.setFocus();
+					return fc;
 				}
 			} else {
-				focussedControl = getNextRequiredFieldWhichNull(tabList);
-				if (focussedControl != null) {
-					return focussedControl;
+				boolean natTableSelected = getNextRequiredNatTableCell(control, false);
+				if (natTableSelected) {
+					Section section = (Section) control.getData(Constants.GRID_DATA_SECTION);
+					if (!section.isExpanded()) {
+						// Section öffnen
+						section.setExpanded(true);
+					}
+					fc = control;
+					fc.setFocus();
+					return fc;
 				}
 			}
 		}
-		return focussedControl;
+
+		return fc;
 	}
 
-	private Control getNextRequiredFieldWhichNull(List<MField> tabListAfter) {
-		Control focussedControl = null;
-		for (MField field : tabListAfter) {
-			// 1. mein Feld kommt nach dem aktuellen INIT_FIELD ##
-			// 2. Mein Feld kommt nach dem aktuellen INIT_FIELD, auf nächster Section ##
-			// 3. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf vorheriger Section ##
-			// 4. Mein Feld kommt vor dem aktuellen INIT_FIELD, auf gleicher Section ##
-			if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
-				focussedControl = ((AbstractValueAccessor) field.getValueAccessor()).getControl();
-				Section section = field.getmSection().getSection();
-				// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
-				if (!section.isExpanded()) {
-					// Section öffnen
-					section.setExpanded(true);
+	/**
+	 * Emittelt das erste leere Pflichtfeld in einer der Section aus der übergebenen Liste.
+	 * 
+	 * @param focussedControl
+	 *            das fokussierte Control
+	 * @param sectionList
+	 *            Liste mit Sections
+	 * @return
+	 */
+	private Control getNextRequiredControlOtherSection(Control focussedControl, List<Section> sectionList) {
+		Control fc = null;
+		Composite compo = null;
+		for (Section section : sectionList) {
+			for (Control children : section.getChildren()) {
+				if (children instanceof Composite && !(children instanceof Label || children instanceof ToolBar)) {
+					compo = (Composite) children;
 				}
-				focussedControl.setFocus();
-				return focussedControl;
+			}
+			List<Control> tabList = arrayToList(compo.getTabList());
+			fc = getNextRequiredControl(tabList);
+			if (fc != null) {
+				return fc;
 			}
 		}
-		return focussedControl;
+
+		return fc;
+	}
+
+	/**
+	 * Sucht die übergebene NatTable nach einem leeren Pflichtfeld durch. Wenn eins gefunden wird, wird es selektiert und der Fokus auf die NatTable gesetzt. Im
+	 * Fall, dass die NatTable fokussiert ist und countFromSelectedCell = true ist, wird von der Position der selektierten Zelle begonnen.
+	 * 
+	 * @param focussedControl
+	 *            die NatTable, die nach einem Pflichtfeld geprüft werden soll
+	 * @param countFromSelectedCell
+	 *            bestimmt, ob von der selektierten Zelle aus nach dem nächsten Pflichtfeld gesucht werden soll
+	 * @return true, wenn eine Zelle selektiert wurde
+	 */
+	private boolean getNextRequiredNatTableCell(Control focussedControl, boolean countFromSelectedCell) {
+		NatTable natTable = (NatTable) focussedControl;
+		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
+		SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
+		int irs = 0;
+		int ics = 1;
+		((NatTable) focussedControl).commitAndCloseActiveCellEditor();
+
+		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
+		if (natTable.isFocusControl() && countFromSelectedCell) {
+			// Selektierte Zelle suchen und die Row und Column Position setzen
+			irs = selectionLayer.getLastSelectedCellPosition().getRowPosition() + 1;
+			ics = selectionLayer.getLastSelectedCellPosition().getColumnPosition() + 1;
+
+			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
+			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
+				if (selectEmptyRequiredCell(natTable, dataTable, irs, ic))
+					return true;
+			}
+		}
+
+		// Leeres Pflichtfeld ermitteln
+		// irs kann 0 oder der Rowindex der selektierten Zelle sein
+		for (int ir = irs + 1; ir < natTable.getRowCount(); ir++) {
+			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
+				if (selectEmptyRequiredCell(natTable, dataTable, ir, ic))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean selectEmptyRequiredCell(NatTable natTable, Table dataTable, int irs, int ic) {
+		for (Column column : dataTable.getColumns()) {
+			if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
+				if (dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
+						|| dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
+					SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
+					natTable.setFocus();
+					int ici = ic - 1;
+					int iri = irs - 1;
+					return natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
+				}
+			}
+		}
+		return false;
+	}
+
+	private List<Control> arrayToList(Control[] tabListArray) {
+		List<Control> tabList = new ArrayList<>();
+		for (Control control : tabListArray) {
+			tabList.add(control);
+		}
+		return tabList;
 	}
 
 	private void setLookupValue(MField field, LookupComposite lookup) {
