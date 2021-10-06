@@ -2,6 +2,8 @@ package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
 
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MGrid;
@@ -43,5 +45,15 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	@Override
 	public void addRows(List<Row> rows) {
 		sg.addRows(rows);
+	}
+
+	@Override
+	public void addSelectionListener(ILayerListener listener) {
+		sg.addSelectionListener(listener);
+	}
+
+	@Override
+	public void removeSelectionListener(ILayerListener listener) {
+		sg.removeSelectionListener(listener);
 	}
 }

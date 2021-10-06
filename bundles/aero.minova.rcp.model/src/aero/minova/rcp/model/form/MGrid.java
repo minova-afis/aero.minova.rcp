@@ -3,6 +3,7 @@ package aero.minova.rcp.model.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.swt.graphics.Image;
 
 import aero.minova.rcp.form.model.xsd.Grid;
@@ -211,5 +212,13 @@ public class MGrid {
 
 	public void addRows(List<Row> rows) {
 		gridAccessor.addRows(rows);
+	}
+
+	public void addSelectionListener(ILayerListener listener) {
+		gridAccessor.addSelectionListener(listener);
+	}
+
+	public void removeSelectionListener(ILayerListener listener) {
+		gridAccessor.removeSelectionListener(listener);
 	}
 }

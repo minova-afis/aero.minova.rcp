@@ -47,11 +47,13 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
+import org.eclipse.nebula.widgets.nattable.selection.event.ISelectionEvent;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
@@ -318,7 +320,7 @@ public class SectionGrid {
 
 		// Delete Button updaten (nur aktiviert, wenn eine Zelle gewählt ist)
 		selectionLayer.addLayerListener(event -> {
-			if (deleteToolItemAccessor != null) {
+			if (deleteToolItemAccessor != null && event instanceof ISelectionEvent) {
 				deleteToolItemAccessor.setCanBeEnabled(selectionLayer.getSelectedCellPositions().length > 0);
 				deleteToolItemAccessor.updateEnabled();
 			}
@@ -765,6 +767,14 @@ public class SectionGrid {
 			}
 		}
 		return selected;
+	}
+
+	public void addSelectionListener(ILayerListener listener) {
+		selectionLayer.addLayerListener(listener);
+	}
+
+	public void removeSelectionListener(ILayerListener listener) {
+		selectionLayer.removeLayerListener(listener);
 	}
 
 }
