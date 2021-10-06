@@ -87,7 +87,7 @@ public class DateTimeField {
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (text.getText().isEmpty() || text.getText().isBlank()) {
+				if (text.getText().isBlank()) {
 					field.setValue(null, true);
 				}
 			}
