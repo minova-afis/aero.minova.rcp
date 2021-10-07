@@ -155,8 +155,8 @@ public class MGrid {
 	/*
 	 * Diese Methode muss aufgerufen werden, wenn sich an der unterliegenden Tabelle etwas geändert hat, damit die GridChangedEvents verschickt werden
 	 */
-	public void dataTableChanged() {
-		fire(new GridChangeEvent(this, gridAccessor.getDataTable()));
+	public void dataTableChanged(GridChangeEvent event) {
+		fire(event);
 	}
 
 	/**

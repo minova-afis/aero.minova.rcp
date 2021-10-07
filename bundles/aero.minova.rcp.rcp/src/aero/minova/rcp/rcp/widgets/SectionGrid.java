@@ -80,6 +80,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.constants.GridChangeType;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -93,6 +94,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.form.IButtonAccessor;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
@@ -207,7 +209,7 @@ public class SectionGrid {
 			btnDel.setId(Constants.CONTROL_GRID_BUTTON_DELETE);
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
-			btnDel.setEnabled(false);
+			btnDel.setEnabled(true);
 			createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
 		}
 
@@ -300,9 +302,16 @@ public class SectionGrid {
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
 			@Override
 			protected boolean doCommand(UpdateDataCommand command) {
+				Row r = sortedList.get(command.getRowPosition());
+				int col = command.getColumnPosition();
+				int row = dataTable.getRows().indexOf(r);
+
+				Value oldVal = dataTable.getRows().get(row).getValue(col);
+
 				if (super.doCommand(command)) {
-					gridAccessor.getMGrid().dataTableChanged();
-					Row r = sortedList.get(command.getRowPosition());
+					Value newVal = dataTable.getRows().get(row).getValue(col);
+					fireChange(new GridChangeEvent(gridAccessor.getMGrid(), col, row, oldVal, newVal, true));
+
 					if (!rowsToUpdate.contains(r) && !rowsToInsert.contains(r)) {
 						rowsToUpdate.add(r);
 					}
@@ -451,14 +460,23 @@ public class SectionGrid {
 		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
 
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), false));
 		return addRowsFromTable(newDataTable);
 	}
 
 	public void addRows(Table t) {
-		for (Row r : t.getRows()) {
-			rowsToInsert.add(r);
-		}
+
+		List<Row> originalRows = new ArrayList<>();
+		originalRows.addAll(dataTable.getRows());
+
 		addRowsFromTable(t);
+
+		for (Row r : dataTable.getRows()) {
+			if (!originalRows.contains(r)) {
+				rowsToInsert.add(r);
+				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().indexOf(r), false, GridChangeType.INSERT));
+			}
+		}
 	}
 
 	private Table addRowsFromTable(Table rowsToAdd) {
@@ -514,7 +532,6 @@ public class SectionGrid {
 	public void updateNatTable() {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
-		gridAccessor.getMGrid().dataTableChanged();
 		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
 	}
 
@@ -598,6 +615,7 @@ public class SectionGrid {
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
 		rowsToInsert.add(newRow);
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
 		updateNatTable();
 	}
 
@@ -643,6 +661,7 @@ public class SectionGrid {
 		dataTable.getRows().clear();
 		updateNatTable();
 		clearDataChanges();
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), false));
 	}
 
 	public void deleteCurrentRows() {
@@ -651,9 +670,14 @@ public class SectionGrid {
 			for (int i = r.start; i < r.end; i++) {
 				dataTable.deleteRow(sortedList.get(i));
 				rowsToDelete.add(sortedList.get(i));
+				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), i, false, GridChangeType.DELETE));
 			}
 		}
 		updateNatTable();
+	}
+
+	private void fireChange(GridChangeEvent event) {
+		gridAccessor.getMGrid().dataTableChanged(event);
 	}
 
 	public void setGridAccessor(GridAccessor gridAccessor) {

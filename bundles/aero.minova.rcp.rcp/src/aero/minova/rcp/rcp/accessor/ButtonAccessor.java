@@ -13,7 +13,7 @@ public class ButtonAccessor implements IButtonAccessor {
 
 	// Wenn canBeEnabled false ist, darf der Button nicht enabled werden
 	private boolean canBeEnabled = true;
-	private boolean enabled;
+	private boolean enabled = true;
 
 	public ButtonAccessor(MButton mButton, ToolItem button) {
 		this.mButton = mButton;
