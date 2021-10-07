@@ -27,6 +27,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.widgets.BooleanCheckBoxPainter;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
@@ -34,7 +35,7 @@ import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
-	private Locale locale;
+	private Locale locale = CustomLocale.getLocale();
 	private Form form;
 	private Map<String, aero.minova.rcp.form.model.xsd.Column> formColumns;
 
