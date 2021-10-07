@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -15,6 +14,7 @@ import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.handlers.PrintIndexHandler;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 import aero.minova.rcp.rcp.print.ReportCreationException.Cause;
@@ -241,7 +241,7 @@ public class TableXSLCreator extends CommonPrint {
 				final FilterValue v = (FilterValue) v1;
 				String value = v.getOperatorValue();
 				if (v.getFilterValue() != null) {
-					value += " " + v.getFilterValue().getValueString(Locale.getDefault(), ci.column.getDateTimeType());
+					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale(), ci.column.getDateTimeType());
 				}
 
 				searchCriteria = getTemplate("SearchCriteria");
@@ -276,7 +276,7 @@ public class TableXSLCreator extends CommonPrint {
 				final FilterValue v = (FilterValue) v1;
 				String value = v.getOperatorValue();
 				if (v.getFilterValue() != null) {
-					value += " " + v.getFilterValue().getValueString(Locale.getDefault());
+					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale());
 				}
 
 				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));

@@ -11,7 +11,6 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -48,6 +47,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
@@ -299,7 +299,7 @@ public class PrintIndexHandler {
 		// Viewport layer umgehen, damit in addSumRow() auf alle Zeilen zugegriffen werden kann
 		ILayer layer = indexPart.getBodyLayerStack().getUnderlyingLayerByPosition(2, 4).getUnderlyingLayerByPosition(2, 4);
 
-		NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+		NumberFormat numberFormat = NumberFormat.getInstance(CustomLocale.getLocale());
 		numberFormat.setMinimumFractionDigits(2);
 		numberFormat.setMaximumFractionDigits(2);
 
@@ -338,7 +338,7 @@ public class PrintIndexHandler {
 							Object colVal = gbo.getDescriptor().get(i);
 							colValString = colVal.toString();
 							if (colVal instanceof Instant) {
-								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, Locale.getDefault(), dateUtilPref, timeUtilPref);
+								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, CustomLocale.getLocale(), dateUtilPref, timeUtilPref);
 							}
 							tableTitle += colName + ": " + colValString + ", ";
 						}
@@ -394,13 +394,13 @@ public class PrintIndexHandler {
 						}
 						xml.append(numberFormat.format(r.getValue(d).getDoubleValue()));
 					} else if (r.getValue(d).getType() == DataType.INTEGER) {
-						xml.append(r.getValue(d).getValueString(Locale.getDefault()));
+						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale()));
 					} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
 						xml.append(1);
 					} else {
 						// Information über Instant Formatierung wird übergeben
 						xml.append("<![CDATA[");
-						xml.append(r.getValue(d).getValueString(Locale.getDefault(), c.getDateTimeType()));
+						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), c.getDateTimeType()));
 						xml.append("]]>");
 					}
 				}
@@ -473,8 +473,8 @@ public class PrintIndexHandler {
 		xml.append("<Site>\n" + "<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>\n" + "<Address2><![CDATA[Tröltschstraße 4]]></Address2>\n"
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
-		xml.append("<PrintDate><![CDATA[" + DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), Locale.getDefault(), dateUtilPref, timeUtilPref)
-				+ "]]></PrintDate>\n");
+		xml.append("<PrintDate><![CDATA["
+				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), CustomLocale.getLocale(), dateUtilPref, timeUtilPref) + "]]></PrintDate>\n");
 	}
 
 }

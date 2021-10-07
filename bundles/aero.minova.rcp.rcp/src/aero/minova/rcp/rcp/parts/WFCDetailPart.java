@@ -716,7 +716,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		List<MField> mFields = new ArrayList<>();
 		for (Field f : grid.getField()) {
 			try {
-				MField mF = ModelToViewModel.convert(f);
+				MField mF = ModelToViewModel.convert(f, locale);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
 				showErrorMissingSQLIndex(f, grid.getProcedureSuffix() + "." + f.getName(), e);
@@ -791,7 +791,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	public MField createMField(Field field, MSection mSection, String suffix) {
 		String fieldName = suffix + field.getName();
 		try {
-			MField f = ModelToViewModel.convert(field);
+			MField f = ModelToViewModel.convert(field, locale);
 			f.addValueChangeListener(this);
 			f.setName(fieldName);
 

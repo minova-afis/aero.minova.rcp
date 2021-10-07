@@ -16,7 +16,6 @@ import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultDoubleDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultIntegerDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -34,13 +33,14 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
 import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
-	private Locale locale;
+	private Locale locale = CustomLocale.getLocale();
 	private Grid grid;
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
 	private IDataService dataService;

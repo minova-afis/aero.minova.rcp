@@ -24,7 +24,7 @@ public class ParamStringUtil {
 	 * @param values
 	 * @return
 	 */
-	public static String convertValuesToStringParameter(List<Value> values) {
+	public static String convertValuesToStringParameter(List<Value> values, Locale locale) {
 		if (values == null) {
 			return null;
 		}
@@ -54,7 +54,7 @@ public class ParamStringUtil {
 					break;
 				case INSTANT:
 					Instant instantv = v.getInstantValue();
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN).withLocale(Locale.getDefault()).withZone(ZoneId.systemDefault());
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN).withLocale(locale).withZone(ZoneId.systemDefault());
 					String dateString = formatter.format(instantv);
 					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateString.length() + "}" + dateString);
 
@@ -85,7 +85,7 @@ public class ParamStringUtil {
 
 	}
 
-	public static List<Value> convertStringParameterToValues(String value) {
+	public static List<Value> convertStringParameterToValues(String value, Locale locale) {
 		List<Value> values = new ArrayList<>();
 		if (value == null || value.length() == 0) {
 			return values;
@@ -117,12 +117,11 @@ public class ParamStringUtil {
 				break;
 			case IVariantType.VARIANT_OBJECT:
 				if (length == 14) {
-					newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, Locale.getDefault())).atZone(ZoneId.systemDefault())
-							.toInstant();
+					newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, locale)).atZone(ZoneId.systemDefault()).toInstant();
 				}
 				break;
 			case IVariantType.VARIANT_DATE:
-				newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, Locale.getDefault())).atZone(ZoneId.systemDefault()).toInstant();
+				newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, locale)).atZone(ZoneId.systemDefault()).toInstant();
 				break;
 			case IVariantType.VARIANT_EMPTY:
 				newVar = null;

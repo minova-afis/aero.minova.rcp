@@ -5,7 +5,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.util.IOUtil;
 import aero.minova.rcp.util.Tools;
@@ -144,7 +144,7 @@ public class ExportIndexHandler {
 					}
 					csv.append(brackets);
 					if (r.getValue(d) != null) {
-						csv.append(r.getValue(d).getValueString(Locale.getDefault()));
+						csv.append(r.getValue(d).getValueString(CustomLocale.getLocale()));
 					}
 
 					csv.append(brackets);

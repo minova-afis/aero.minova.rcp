@@ -1,13 +1,15 @@
 package aero.minova.rcp.model.form;
 
+import java.util.Locale;
+
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.KeyType;
 
 public class ModelToViewModel {
 
-	public static MField convert(Field field) {
-		MField f = initializeModelField(field);
+	public static MField convert(Field field, Locale locale) {
+		MField f = initializeModelField(field, locale);
 
 		f.setName(field.getName());
 		f.setLabel(field.getLabel());
@@ -30,7 +32,7 @@ public class ModelToViewModel {
 		return f;
 	}
 
-	private static MField initializeModelField(Field field) {
+	private static MField initializeModelField(Field field, Locale locale) {
 		if (field.getBoolean() != null) {
 			return new MBooleanField();
 		}
@@ -92,7 +94,7 @@ public class ModelToViewModel {
 		}
 
 		if (field.getParamString() != null) {
-			MParamStringField f = new MParamStringField();
+			MParamStringField f = new MParamStringField(locale);
 			f.setSubFields(field.getParamString().getField());
 			return f;
 		}
