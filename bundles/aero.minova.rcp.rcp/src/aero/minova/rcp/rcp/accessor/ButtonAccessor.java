@@ -11,7 +11,7 @@ public class ButtonAccessor implements IButtonAccessor {
 	private MButton mButton;
 	private ToolItem button;
 
-	// Wenn canBeEnabled false ist, darf der Button nicht enabled werden
+	// Wenn canBeEnabled false ist, darf der Button nicht enabled werden (z.B.: Löschen in Grids wenn keine Zellen ausgewählt)
 	private boolean canBeEnabled = true;
 	private boolean enabled = true;
 
