@@ -1,10 +1,7 @@
 package aero.minova.rcp.rcp.accessor;
 
-import java.util.List;
-
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 
-import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
@@ -43,7 +40,7 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	}
 
 	@Override
-	public void addRows(List<Row> rows) {
+	public void addRows(Table rows) {
 		sg.addRows(rows);
 	}
 

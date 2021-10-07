@@ -210,7 +210,7 @@ public class MGrid {
 		gridAccessor.deleteCurrentRows();
 	}
 
-	public void addRows(List<Row> rows) {
+	public void addRows(Table rows) {
 		gridAccessor.addRows(rows);
 	}
 

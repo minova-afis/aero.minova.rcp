@@ -451,15 +451,26 @@ public class SectionGrid {
 		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
 
-		for (Row rowInNewTable : newDataTable.getRows()) {
+		return addRowsFromTable(newDataTable);
+	}
+
+	public void addRows(Table t) {
+		for (Row r : t.getRows()) {
+			rowsToInsert.add(r);
+		}
+		addRowsFromTable(t);
+	}
+
+	private Table addRowsFromTable(Table rowsToAdd) {
+		for (Row rowInNewTable : rowsToAdd.getRows()) {
 			Row rowInOriginal = this.dataTable.addRow();
 
 			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
 			for (Column originalColumn : this.dataTable.getColumns()) {
 
-				for (Column newColumn : newDataTable.getColumns()) {
+				for (Column newColumn : rowsToAdd.getColumns()) {
 					if (originalColumn.getName().equals(newColumn.getName())) {
-						Value v = rowInNewTable.getValue(newDataTable.getColumns().indexOf(newColumn));
+						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
 						int index = this.dataTable.getColumns().indexOf(originalColumn);
 						rowInOriginal.setValue(v, index);
 					}
@@ -587,14 +598,6 @@ public class SectionGrid {
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
 		rowsToInsert.add(newRow);
-		updateNatTable();
-	}
-
-	public void addRows(List<Row> rows) {
-		for (Row r : rows) {
-			rowsToInsert.add(r);
-			dataTable.addRow(r);
-		}
 		updateNatTable();
 	}
 
