@@ -40,7 +40,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.EventParam;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Form;
@@ -143,6 +142,8 @@ public class WFCDetailCASRequestsUtil {
 
 	private WFCDetailPart wfcDetailPart;
 
+	private Table currentKeyTable;
+
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective, WFCDetailPart wfcDetailPart) {
 		this.mDetail = detail;
 		this.perspective = perspective;
@@ -168,59 +169,54 @@ public class WFCDetailCASRequestsUtil {
 	 * @param rows
 	 */
 	@Inject
-	public void changeSelectedEntry(@Optional @Named(Constants.BROKER_ACTIVEROWS) List<Row> rows) {
-		if (rows == null || rows.isEmpty()) {
+	public void readData(@Optional @Named(Constants.BROKER_ACTIVEROWS) Table table) {
+		if (table == null || table.getRows().isEmpty()) {
 			return;
 		}
 
+		currentKeyTable = table;
 		Display.getDefault().asyncExec(() -> {
 			if (showDiscardDialogIndex && !discardChanges()) {
 				broker.send(Constants.BROKER_CLEARSELECTION, perspective);
 				return;
 			}
 
-			Row row = rows.get(0);
-			if (row.getValue(0).getValue() != null) {
-				sendEventToHelper(ActionCode.BEFOREREAD);
+			sendEventToHelper(ActionCode.BEFOREREAD);
 
-				// Hauptfelder
-				Table rowIndexTable = createReadTableFromForm(form, row);
-				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
-				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
-					if (t != null) {
-						selectedTable = t.getOutputParameters();
-						updateSelectedEntry();
-						sendEventToHelper(ActionCode.AFTERREAD);
-						// Grids auslesen, wenn Daten der Hauptmaske geladen sind
+			// Hauptfelder
+			Table rowIndexTable = createReadTableFromForm(form, table);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+			tableFuture.thenAccept(t -> sync.asyncExec(() -> {
+				if (t != null) {
+					selectedTable = t.getOutputParameters();
+					updateSelectedEntry();
+					sendEventToHelper(ActionCode.AFTERREAD);
 
-						for (MGrid g : mDetail.getGrids()) {
-							readGrid(g);
-						}
+					// Grids auslesen, wenn Daten der Hauptmaske geladen sind
+					for (MGrid g : mDetail.getGrids()) {
+						readGrid(g, table);
 					}
-				}));
-
-				// Option Pages
-				selectedOptionPages.clear();
-				for (Form opForm : mDetail.getOptionPages()) {
-					Table opFormTable = createReadTableFromForm(opForm, row);
-					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
-					opFuture.thenAccept(t -> sync.asyncExec(() -> {
-						selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
-						updateSelectedEntry();
-					}));
 				}
+			}));
+
+			// Option Pages
+			selectedOptionPages.clear();
+			for (Form opForm : mDetail.getOptionPages()) {
+				Table opFormTable = createReadTableFromForm(opForm, table);
+				CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+				opFuture.thenAccept(t -> sync.asyncExec(() -> {
+					selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
+					updateSelectedEntry();
+				}));
 			}
+
 		});
 	}
 
-	public void readGrid(MGrid g) {
+	public void readGrid(MGrid g, Table keyTable) {
 
-		// Aktive Row aus Kontext auslesen
-		List<Row> rowList = (List<Row>) perspective.getContext().get(Constants.BROKER_ACTIVEROWS);
-		Row row = rowList.get(0);
-
-		List<Column> indexColumns = form.getIndexView().getColumn();
 		Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
+
 		RowBuilder gridRowBuilder = RowBuilder.newRow();
 		Grid grid = g.getGrid();
 		SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
@@ -240,13 +236,17 @@ public class WFCDetailCASRequestsUtil {
 					}
 
 				} else { // Default Verhalten, entsprechenden Wert im Index finden
-					for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
-						if (indexColumns.get(i).getName().equals(f.getName()) || (firstPrimary && indexColumns.get(i).getName().equals("KeyLong"))) {
-							found = true;
-							gridRowBuilder.withValue(row.getValue(i).getValue());
-						}
+
+					int index = keyTable.getColumnIndex(f.getName());
+					if (firstPrimary) {
+						index = keyTable.getColumnIndex("KeyLong");
 					}
 
+					if (index >= 0) {
+						found = true;
+						Row row = keyTable.getRows().get(0);
+						gridRowBuilder.withValue(row.getValue(index).getValue());
+					}
 				}
 				if (!found) {
 					gridRowBuilder.withValue(null);
@@ -254,6 +254,7 @@ public class WFCDetailCASRequestsUtil {
 				firstPrimary = false;
 			}
 		}
+
 		Row gridRow = gridRowBuilder.create();
 		gridRequestTable.addRow(gridRow);
 
@@ -273,41 +274,40 @@ public class WFCDetailCASRequestsUtil {
 		updateSelectedGrid(g.getId());
 	}
 
-	private Table createReadTableFromForm(Form tableForm, Row row) {
+	/**
+	 * Die Primary-Keys werden aus der übergebenen Tabelle gelesen. Nur die erste Zeile wird betrachtet
+	 * 
+	 * @param tableForm
+	 * @param keyTable
+	 * @return
+	 */
+	private Table createReadTableFromForm(Form tableForm, Table keyTable) {
 		Map<String, String> keysToValue = mDetail.getOptionPageKeys(tableForm.getDetail().getProcedureSuffix());
 		boolean useColumnName = tableForm.equals(form) || keysToValue == null; // Hauptmaske oder keine key-zu-value Map in xbs gegeben
 
-		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
 		RowBuilder builder = RowBuilder.newRow();
 
-		List<Field> allFields = dataFormService.getFieldsFromForm(tableForm);
-		List<Column> indexColumns = form.getIndexView().getColumn();
 		Map<String, Value> newKeys = new HashMap<>();
 
-		for (Field f : allFields) {
-			boolean found = false;
-			for (int i = 0; i < form.getIndexView().getColumn().size(); i++) {
+		Row row = keyTable.getRows().get(0);
 
-				// Spalte mit Feld vergleichen
-				if (useColumnName) {
-					found = indexColumns.get(i).getName().equals(f.getName());
-				} else if (keysToValue.containsKey(f.getName())) {
-					MField correspondingField = mDetail.getField(keysToValue.get(f.getName()));
-					found = correspondingField.getName().equals(indexColumns.get(i).getName());
-				}
+		for (Field f : dataFormService.getFieldsFromForm(tableForm)) {
 
-				// Wert in Zeile setzten
-				if (found) {
-					if ("primary".equals(f.getKeyType())) {
-						builder.withValue(row.getValue(i).getValue());
-						newKeys.put(indexColumns.get(i).getName(), row.getValue(i));
-					} else {
-						builder.withValue(null);
-					}
-					break;
-				}
+			int indexInRow = -1;
+
+			// Spalte für Feld finden
+			if (useColumnName) {
+				indexInRow = keyTable.getColumnIndex(f.getName());
+			} else if (keysToValue.containsKey(f.getName())) {
+				MField correspondingField = mDetail.getField(keysToValue.get(f.getName()));
+				indexInRow = keyTable.getColumnIndex(correspondingField.getName());
 			}
-			if (!found) {
+
+			// Wert in Zeile setzten
+			if (indexInRow >= 0 && "primary".equals(f.getKeyType())) {
+				builder.withValue(row.getValue(indexInRow).getValue());
+				newKeys.put(f.getName(), row.getValue(indexInRow));
+			} else {
 				builder.withValue(null);
 			}
 
@@ -318,6 +318,7 @@ public class WFCDetailCASRequestsUtil {
 			setKeys(newKeys);
 		}
 
+		Table rowIndexTable = dataFormService.getTableFromFormDetail(tableForm, Constants.READ_REQUEST);
 		Row r = builder.create();
 		rowIndexTable.addRow(r);
 		return rowIndexTable;
@@ -384,9 +385,11 @@ public class WFCDetailCASRequestsUtil {
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			sendEventToHelper(ActionCode.BEFORESAVE);
+
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
 			sendSaveRequest(formTable);
+
 			sendEventToHelper(ActionCode.AFTERSAVE);
 		}
 	}
@@ -526,7 +529,7 @@ public class WFCDetailCASRequestsUtil {
 				return null;
 			});
 		} else {
-			openNotificationPopup(getTranslation("msg.ActionAborted"));
+			openNotificationPopup("msg.ActionAborted");
 		}
 	}
 
@@ -545,8 +548,8 @@ public class WFCDetailCASRequestsUtil {
 		} else {
 			setKeysFromTable(response.getOutputParameters());
 			updateOPsAndGrids();
-			openNotificationPopup(getTranslation("msg.DataSaved"));
-			handleUserAction(Constants.INSERT_REQUEST);
+			openNotificationPopup("msg.DataSaved");
+			handleUserAction(Constants.INSERT_REQUEST, response.getOutputParameters());
 
 			if (autoReloadIndex) {
 				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
@@ -583,8 +586,8 @@ public class WFCDetailCASRequestsUtil {
 			showErrorMessage(e);
 		} else {
 			updateOPsAndGrids();
-			openNotificationPopup(getTranslation("msg.DataUpdated"));
-			handleUserAction(Constants.UPDATE_REQUEST);
+			openNotificationPopup("msg.DataUpdated");
+			handleUserAction(Constants.UPDATE_REQUEST, currentKeyTable);
 
 			if (autoReloadIndex) {
 				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
@@ -594,14 +597,20 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Ruft den Helper auf, löscht die Felder im Detail nach der Eingabe
+	 * Ruft den Helper auf, löscht die Felder im Detail oder lädt Datensatz neu nach der Eingabe
 	 *
 	 * @param updateRequest
 	 */
-	private void handleUserAction(String updateRequest) {
+	private void handleUserAction(String updateRequest, Table keyTable) {
 		Map<MPerspective, String> map = new HashMap<>();
 		map.put(perspective, updateRequest);
-		clearFields(map);
+
+		if (mDetail.isClearAfterSave()) {
+			clearFields(map);
+		} else {
+			reloadFields(keyTable);
+		}
+
 		sendEventToHelper(ActionCode.SAVE);
 		focusFirstEmptyField();
 	}
@@ -613,8 +622,10 @@ public class WFCDetailCASRequestsUtil {
 	 * @return
 	 */
 	private String getTranslation(String translate) {
-		String messageproperty = "@" + translate;
-		return translationService.translate(messageproperty, null);
+		if (!translate.startsWith("@")) {
+			translate = "@" + translate;
+		}
+		return translationService.translate(translate, null);
 	}
 
 	@Inject
@@ -668,7 +679,17 @@ public class WFCDetailCASRequestsUtil {
 	public void showNotification(@UIEventTopic(Constants.BROKER_SHOWNOTIFICATION) String message) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
-			openNotificationPopup(getTranslation(message));
+			openNotificationPopup(message);
+		}
+	}
+
+	@Inject
+	@Optional
+	public void reloadIndex(@UIEventTopic(Constants.BROKER_RELOADINDEX) String message) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+			handlerService.executeHandler(cmd);
 		}
 	}
 
@@ -735,7 +756,7 @@ public class WFCDetailCASRequestsUtil {
 				handlerService.executeHandler(cmd);
 			}
 			deleteOPsAndGrids();
-			openNotificationPopup(getTranslation("msg.DataDeleted"));
+			openNotificationPopup("msg.DataDeleted");
 			Map<MPerspective, String> map = new HashMap<>();
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
@@ -823,14 +844,8 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void openNotificationPopup(String message) {
 		if (!shell.getDisplay().isDisposed()) {
-			MinovaNotifier.show(shell, message, getTranslation("Notification"));
+			MinovaNotifier.show(shell, getTranslation(message), getTranslation("Notification"));
 		}
-	}
-
-	@Optional
-	@Inject
-	public void notifyUser(@UIEventTopic(Constants.BROKER_NOTIFYUSER) String message) {
-		openNotificationPopup(message);
 	}
 
 	/**
@@ -904,6 +919,23 @@ public class WFCDetailCASRequestsUtil {
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 		// Auswahl im Index entfernen
 		broker.send(Constants.BROKER_CLEARSELECTION, perspective);
+	}
+
+	/**
+	 * Lädt den aktuellen Datensatz neu
+	 * 
+	 * @param message
+	 */
+	@Inject
+	@Optional
+	public void reloadFields(@UIEventTopic(Constants.BROKER_RELOADFIELDS) Table keyTable) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(perspective)) {
+			if (keyTable == null) {
+				keyTable = currentKeyTable;
+			}
+			readData(keyTable);
+		}
 	}
 
 	/**
