@@ -135,8 +135,8 @@ public class LifeCycle {
 			workspaceHandler.checkConnection(username, pw, workspaceLocation.toString(), true);
 			workspaceHandler.open();
 
-			dataService.setCredentials(username, pw, url, workspaceLocation);
 			dataService.setLogger(logger);
+			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
 			workspaceDialog = new WorkspaceDialog(null, logger, sync, sPrefs.name());
 			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
@@ -176,8 +176,8 @@ public class LifeCycle {
 		if (argPW != null && argURL != null && argUser != null) {
 			try {
 				URI workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-				dataService.setCredentials(argUser, argPW, argURL, workspaceLocation);
 				dataService.setLogger(logger);
+				dataService.setCredentials(argUser, argPW, argURL, workspaceLocation);
 				return true;
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
@@ -273,11 +273,11 @@ public class LifeCycle {
 			e.printStackTrace();
 		}
 		Objects.requireNonNull(workspaceLocation);
+		dataService.setLogger(logger);
 		dataService.setCredentials(workspaceDialog.getUsername(), //
 				workspaceDialog.getPassword(), //
 				workspaceDialog.getConnection(), //
 				workspaceLocation);
-		dataService.setLogger(logger);
 
 		return workspaceLocation;
 	}
