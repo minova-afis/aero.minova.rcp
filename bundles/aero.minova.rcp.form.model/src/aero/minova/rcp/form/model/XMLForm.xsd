@@ -586,7 +586,7 @@
 		<xs:attribute name="import" type="xs:NCName" />
 		<!-- /Entweder oder -->
 		<!-- optional -->
-		<xs:attribute name="clear-after-save" type="xs:boolean" />
+		<xs:attribute default="false" name="clear-after-save" type="xs:boolean" />
 		<xs:attribute default="true" name="button-delete-visible" type="xs:boolean" />
 		<xs:attribute default="true" name="button-new-visible" type="xs:boolean" />
 		<xs:attribute default="false" name="button-block-visible" type="xs:boolean" />

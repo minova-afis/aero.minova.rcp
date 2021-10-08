@@ -198,6 +198,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		getForm();
 		layoutForm(parent);
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
+		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());

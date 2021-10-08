@@ -29,6 +29,8 @@ public class MDetail {
 
 	private IDetailAccessor detailAccessor;
 
+	private boolean clearAfterSave;
+
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
 	 * <ul>
@@ -187,5 +189,13 @@ public class MDetail {
 
 	public void setDetailAccessor(IDetailAccessor detailAccessor) {
 		this.detailAccessor = detailAccessor;
+	}
+
+	public boolean isClearAfterSave() {
+		return clearAfterSave;
+	}
+
+	public void setClearAfterSave(boolean clearAfterSave) {
+		this.clearAfterSave = clearAfterSave;
 	}
 }
