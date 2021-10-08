@@ -27,6 +27,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -157,6 +158,8 @@ public class DataService implements IDataService {
 
 	private URI workspacePath;
 
+	private Map<String, String> siteParameters;
+
 	@Override
 	public void setCredentials(String username, String password, String server, URI workspacePath) {
 		this.username = username;
@@ -173,6 +176,8 @@ public class DataService implements IDataService {
 			bundleContext.registerService(IDummyService.class.getName(), new IDummyService(), null);
 
 		}
+
+		initSiteParameters();
 	}
 
 	/**
@@ -225,6 +230,32 @@ public class DataService implements IDataService {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
+
+	}
+
+	private void initSiteParameters() {
+		siteParameters = new HashMap<>();
+		Table requestTable = TableBuilder.newTable("tSiteParameter") //
+				.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn("Value", DataType.STRING)//
+				.withColumn(TABLE_LASTACTION, DataType.INTEGER).create();
+		Row row = RowBuilder.newRow() //
+				.withValue(null) //
+				.withValue(null) //
+				.withValue(fv) //
+				.create();
+
+		requestTable.addRow(row);
+		CompletableFuture<Table> tableCF = getIndexDataAsync(requestTable.getName(), requestTable);
+		try {
+			Table paramTable = tableCF.get();
+			if (paramTable != null) {
+				for (Row r : paramTable.getRows()) {
+					siteParameters.put(r.getValue(0).getStringValue(), r.getValue(1).getStringValue());
+				}
+			}
+		} catch (InterruptedException | ExecutionException e) {}
+
 	}
 
 	@Override
@@ -1077,5 +1108,13 @@ public class DataService implements IDataService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getSiteParameter(String key, String defaultVal) {
+		if (siteParameters.containsKey(key)) {
+			return siteParameters.get(key);
+		}
+		return defaultVal;
 	}
 }
