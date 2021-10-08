@@ -1,6 +1,5 @@
 package aero.minova.rcp.uitests;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,8 +29,10 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
+import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.uitests.util.UITestUtil;
+
 @ExtendWith(SWTBotJunit5Extension.class)
 public class OpenServiceContractTest {
 
@@ -158,7 +159,7 @@ public class OpenServiceContractTest {
 		assertEquals(size, 5);
 		gridNattable.click(4, 0);
 
-		Control textClient = grid.getmSection().getSection().getTextClient();
+		Control textClient = ((SectionAccessor) grid.getmSection().getSectionAccessor()).getSection().getTextClient();
 		assertTrue(textClient instanceof ToolBar);
 
 		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);

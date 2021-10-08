@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.forms.widgets.Section;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -66,6 +67,7 @@ import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
+import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.MinovaNotifier;
@@ -927,7 +929,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private void focusFirstEmptyField() {
-		for (MSection section : mDetail.getPageList()) {
+		for (MSection section : mDetail.getMSectionList()) {
 			for (MField field : section.getTabList()) {
 				if (field.getValue() == null) {
 					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
@@ -937,7 +939,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
-		((AbstractValueAccessor) mDetail.getPageList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
+		((AbstractValueAccessor) mDetail.getMSectionList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
 	}
 
 	public Table getSelectedTable() {
@@ -1096,6 +1098,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 		mSection.getTabList().removeAll(toRemove);
+		Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
 		mDetail.getFields().removeAll(toRemove);
 
 		List<MField> visibleMFields = new ArrayList<>();
@@ -1121,13 +1124,13 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Ganzen Body/ Client Area der Section entfernen
-		mSection.getSection().getClient().dispose();
+		section.getClient().dispose();
 
 		// Neuen Body erstellen
-		Composite clientComposite = wfcDetailPart.getFormToolkit().createComposite(mSection.getSection());
+		Composite clientComposite = wfcDetailPart.getFormToolkit().createComposite(section);
 		clientComposite.setLayout(new FormLayout());
 		wfcDetailPart.getFormToolkit().paintBordersFor(clientComposite);
-		mSection.getSection().setClient(clientComposite);
+		section.setClient(clientComposite);
 
 		// Felder zeichnen
 		wfcDetailPart.createUIFields(visibleMFields, clientComposite);
@@ -1139,7 +1142,7 @@ public class WFCDetailCASRequestsUtil {
 		// Setzen der TabListe der Sections im Part.
 		clientComposite.getParent().setTabList(wfcDetailPart.getTabListForSection(clientComposite.getParent(), mSection));
 
-		mSection.getSection().requestLayout();
+		section.requestLayout();
 		wfcDetailPart.translate(clientComposite);
 
 	}

@@ -143,7 +143,7 @@ public class MGrid {
 			if (c.isRequired()) {
 				// TODO: Weitere Eigenschaften prüfen? (Textlänge, ...)
 				for (Row r : dataTable.getRows()) {
-					if (r.getValue(dataTable.getColumns().indexOf(c)).getValue() == null) {
+					if (r.getValue(dataTable.getColumns().indexOf(c)) == null || r.getValue(dataTable.getColumns().indexOf(c)).getValue() == null) {
 						return false;
 					}
 				}
