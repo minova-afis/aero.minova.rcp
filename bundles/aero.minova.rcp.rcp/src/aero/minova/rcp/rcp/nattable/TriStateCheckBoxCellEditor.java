@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.widgets;
+package aero.minova.rcp.rcp.nattable;
 
 import java.util.List;
 

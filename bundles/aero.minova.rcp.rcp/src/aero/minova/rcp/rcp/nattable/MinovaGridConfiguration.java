@@ -34,8 +34,6 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
