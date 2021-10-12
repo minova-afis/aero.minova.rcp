@@ -56,6 +56,7 @@
       <parameters xmi:id="_laMxpbbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formName" name="FormName" optional="false"/>
       <parameters xmi:id="_laMxprbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.formId" name="Form ID"/>
       <parameters xmi:id="_laMxp7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel" name="Perspective Label"/>
+      <parameters xmi:id="_znoR0CsqEeyFvu-Rgy7Gcw" elementId="aero.minova.rcp.perspectiveswitcher.parameters.perspectiveIcon" name="Form Icon"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_laMxqLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.closeperspective" commandName="ClosePerspectiveCommand">
       <persistedState key="persistState" value="false"/>

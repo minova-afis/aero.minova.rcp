@@ -178,9 +178,9 @@ public class MenuProcessor {
 
 		// set the perspective icon as parameter
 		MParameter mParameterPerspectiveIcon = modelService.createModelElement(MParameter.class);
-		mParameterPerspectiveName.setElementId("parameter.PerspectiveIcon." + entryMDI.getId()); // not used
-		mParameterPerspectiveName.setName(Constants.FORM_ICON);
-		mParameterPerspectiveName.setValue(actionMDI.getIcon());
+		mParameterPerspectiveIcon.setElementId("parameter.PerspectiveIcon." + entryMDI.getId()); // not used
+		mParameterPerspectiveIcon.setName(Constants.FORM_ICON);
+		mParameterPerspectiveIcon.setValue(actionMDI.getIcon());
 		handledMenuItem.getParameters().add(mParameterPerspectiveIcon);
 
 		handledMenuItem.setElementId("menuItemFor." + actionMDI.getId());

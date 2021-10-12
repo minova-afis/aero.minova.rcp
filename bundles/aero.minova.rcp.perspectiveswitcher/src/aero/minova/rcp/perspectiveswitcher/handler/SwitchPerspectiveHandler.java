@@ -92,6 +92,7 @@ public class SwitchPerspectiveHandler {
 			perspective = (MPerspective) element;
 			perspective.getPersistedState().put(Constants.FORM_NAME, formName);
 			perspective.setLabel(perspectiveName);
+			perspective.setIconURI(perspectiveIcon);
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);
 
