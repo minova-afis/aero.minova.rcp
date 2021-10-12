@@ -71,6 +71,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.BackingStoreException;
@@ -660,7 +661,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (Control child : composite.getChildren()) {
 			if (child instanceof ToolBar && selectAllControls && !mSection.isHead()) {
 				tabList.add(1, child);
-			} else if ((child instanceof Twistie && !selectAllControls) || child instanceof Label) {
+			} else if ((child instanceof Twistie && !selectAllControls) || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
 				// Die sollen nicht in die Tabliste
 			} else {
 				tabList.add(child);
@@ -670,15 +671,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private Control[] getTabListForPart(Composite composite) {
-		List<Control> tabList = new ArrayList<>();
-
 		if (selectAllControls) {
-			for (Control c : composite.getChildren()) {
-				tabList.add(c);
-			}
+			return composite.getChildren();
 		}
-
-		return tabList.toArray(new Control[0]);
+		return new Control[0];
 	}
 
 	/**
