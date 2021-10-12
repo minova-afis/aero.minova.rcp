@@ -71,7 +71,6 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.BackingStoreException;
@@ -123,6 +122,7 @@ import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.LookupComposite;
 
@@ -283,7 +283,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				icon = ((Page) headOrPageOrGrid).getIcon();
 			} else {
 				id = ((Grid) headOrPageOrGrid).getId();
-				id = ((Grid) headOrPageOrGrid).getIcon();
+				icon = ((Grid) headOrPageOrGrid).getIcon();
 			}
 		}
 
@@ -472,13 +472,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPageOrGrid) {
 		RowData headLayoutData = new RowData();
-		Section section;
-		Control sectionControl = null;
+		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
-			section = getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			section = getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
-			sectionControl = section.getChildren()[0];
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		// Alten Zustand wiederherstellen
@@ -492,11 +490,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 		section.setLayoutData(headLayoutData);
 
-		ImageHyperlink eci = getFormToolkit().createImageHyperlink(section, SWT.NULL);
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
-		eci.setImage(resManager.createImage(imageDescriptor));
-		section.setTextClient(eci);
-		System.out.println("--" + section.getTextClientHeightDifference());
+		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
+			section.setImage(resManager.createImage(imageDescriptor));
+		}
 
 		section.addExpansionListener(new IExpansionListener() {
 			@Override
@@ -607,8 +604,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
 				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
-				Image buttonImage = resManager.createImage(buttonImageDescriptor);
-				item.setImage(buttonImage);
+				if (!buttonImageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
+					item.setImage(resManager.createImage(buttonImageDescriptor));
+				}
 			}
 		}
 		section.setTextClient(bar);
@@ -866,13 +864,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
-	private int getExtraHeight(Field field) {
-		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
-			return Integer.parseInt(field.getNumberRowsSpanned()) - 1;
-		}
-		return 0;
-	}
-
 	private void addBottonMargin(Composite composite, int row, int column) {
 		// Abstand nach unten
 		Label spacing = new Label(composite, SWT.NONE);
@@ -917,7 +908,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				String value = translationService.translate(property, null);
 				if (control instanceof ExpandableComposite) {
 					ExpandableComposite expandableComposite = (ExpandableComposite) control;
-					// expandableComposite.setText(value);
+					expandableComposite.setText(value);
 					translate((Composite) expandableComposite.getClient());
 				} else if (control instanceof Label) {
 					Label l = ((Label) control);
