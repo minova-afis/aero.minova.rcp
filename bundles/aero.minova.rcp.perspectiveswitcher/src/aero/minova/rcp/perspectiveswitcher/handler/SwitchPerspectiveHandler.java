@@ -11,10 +11,12 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -32,6 +34,9 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	EModelService modelService;
+
+	@Inject
+	private TranslationService translationService;
 
 	@Execute
 	public void execute(IEclipseContext context, //
@@ -95,8 +100,6 @@ public class SwitchPerspectiveHandler {
 			perspective.setIconURI(perspectiveIcon);
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);
-
-			ImageUtil.updateModelIcons(element, modelService);
 		}
 		return perspective;
 	}
@@ -108,7 +111,13 @@ public class SwitchPerspectiveHandler {
 	 */
 	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
 		if (element instanceof MPerspective) {
-			partService.switchPerspective(perspectiveID);
+			MPerspective mPerspective = partService.switchPerspective(perspectiveID).get();
+
+			ImageUtil.updateModelIcons(element, modelService);
+
+			MPart detailPart = partService.findPart(Constants.DETAIL_PART);
+			detailPart.setIconURI(ImageUtil.retrieveIcon(mPerspective.getIconURI(), false));
+			detailPart.setLabel(translationService.translate(mPerspective.getLabel(), null));
 		} else {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		}
