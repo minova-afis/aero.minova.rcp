@@ -24,6 +24,7 @@ Getestet mit Server xxxxxx
 
 ## Workspace-Ordner
 - [ ] Der aktuelle Workspace-Ordner wird in den Einstellungen angezeigt
+- [ ] Der aktuelle Workspace-Ordner kann über die Einstellungen geöffnet werden (im File Explorer des jeweiligen Betriebssystems)
 - [ ] Der aktuelle Workspace-Ordner kann über die Einstellungen gelöscht werden
 - [ ] Das Löschen eines Profils in der Login-Maske löscht auch den entsprechenden Workspace-Ordner
 

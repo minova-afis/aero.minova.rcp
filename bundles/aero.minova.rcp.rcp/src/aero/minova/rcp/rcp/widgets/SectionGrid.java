@@ -106,6 +106,7 @@ import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
+import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;

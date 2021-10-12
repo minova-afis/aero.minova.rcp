@@ -16,7 +16,6 @@ import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultDoubleDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.data.convert.DefaultIntegerDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -34,8 +33,6 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
@@ -292,11 +289,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		}
 
 		if (isReadOnly) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyTriStateCheckBoxPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 			readOnlyColumns.add(configLabel + columnIndex);
 		} else if (isRequired) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredTriStateCheckBoxPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 	}
