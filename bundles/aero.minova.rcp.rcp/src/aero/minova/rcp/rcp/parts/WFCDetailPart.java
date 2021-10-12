@@ -8,7 +8,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +71,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.BackingStoreException;
@@ -268,6 +268,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		private String formTitle;
 		public String formSuffix;
 		public String id;
+		public String icon;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -276,8 +277,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				id = "Head";
 			} else if (headOrPageOrGrid instanceof Page) {
 				id = ((Page) headOrPageOrGrid).getId();
+				icon = ((Page) headOrPageOrGrid).getIcon();
 			} else {
 				id = ((Grid) headOrPageOrGrid).getId();
+				id = ((Grid) headOrPageOrGrid).getIcon();
 			}
 		}
 
@@ -485,7 +488,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 		section.setLayoutData(headLayoutData);
-		section.setText(headOrPageOrGrid.getTranslationText());
+
+		ImageHyperlink eci = getFormToolkit().createImageHyperlink(section, SWT.NULL);
+		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
+		eci.setImage(resManager.createImage(imageDescriptor));
+		section.setTextClient(eci);
+		System.out.println("--" + section.getTextClientHeightDifference());
 
 		section.addExpansionListener(new IExpansionListener() {
 			@Override
@@ -594,7 +602,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon().replace(".ico", ""), false);
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
 				Image buttonImage = resManager.createImage(buttonImageDescriptor);
 				item.setImage(buttonImage);
 			}
@@ -705,7 +713,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mgrid.setFill(grid.getFill());
 		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
 		mgrid.setmSection(section);
-		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(grid.getIcon(), false);
+		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptor(grid.getIcon(), false);
 		Image gridImage = resManager.createImage(gridImageDescriptor);
 		mgrid.setIcon(gridImage);
 		mgrid.setHelperClass(grid.getHelperClass());
@@ -905,7 +913,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				String value = translationService.translate(property, null);
 				if (control instanceof ExpandableComposite) {
 					ExpandableComposite expandableComposite = (ExpandableComposite) control;
-					expandableComposite.setText(value);
+					// expandableComposite.setText(value);
 					translate((Composite) expandableComposite.getClient());
 				} else if (control instanceof Label) {
 					Label l = ((Label) control);
@@ -928,11 +936,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				control.setData(TRANSLATE_LOCALE, locale);
 			}
 		}
-	}
-
-	private int getWidth(Field field) {
-		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
-		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
 
 	public MDetail getDetail() {
