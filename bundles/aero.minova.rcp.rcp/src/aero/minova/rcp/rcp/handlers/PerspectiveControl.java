@@ -199,7 +199,7 @@ public class PerspectiveControl {
 
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspectiveId);
-			ImageDescriptor descriptor = ImageUtil.getImageDescriptorFromImagesBundle(iconURI, true);
+			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
 
 			if (descriptor != null) {
 				Image icon = descriptor.createImage();
