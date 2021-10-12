@@ -211,7 +211,7 @@ class GridTest {
 	}
 
 	private void reloadIndex() {
-		SWTBotView indexPart = bot.partByTitle("@Form.Index");
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
 
 		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();

@@ -56,9 +56,9 @@ class OpenStundenerfassungsTest {
 		stundenErfassung.click();
 
 		// Parts finden
-		searchPart = bot.partByTitle(Constants.SEARCH_PART);
+		searchPart = bot.partById(Constants.SEARCH_PART);
 		assertNotNull(searchPart);
-		indexPart = bot.partByTitle(Constants.INDEX_PART);
+		indexPart = bot.partById(Constants.INDEX_PART);
 		assertNotNull(indexPart);
 		detailPart = bot.partById(Constants.DETAIL_PART);
 		assertNotNull(detailPart);
