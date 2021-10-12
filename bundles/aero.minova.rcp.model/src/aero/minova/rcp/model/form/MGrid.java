@@ -221,4 +221,8 @@ public class MGrid {
 	public void removeSelectionListener(ILayerListener listener) {
 		gridAccessor.removeSelectionListener(listener);
 	}
+
+	public void closeEditor() {
+		gridAccessor.closeEditor();
+	}
 }

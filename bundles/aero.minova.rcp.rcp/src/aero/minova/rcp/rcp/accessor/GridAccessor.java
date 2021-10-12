@@ -63,4 +63,9 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	public void setDataTable(Table dataTable) {
 		sg.setDataTable(dataTable);
 	}
+
+	@Override
+	public void closeEditor() {
+		sg.closeEditor();
+	}
 }

@@ -20,4 +20,6 @@ public interface IGridAccessor {
 
 	void setDataTable(Table dataTable);
 
+	void closeEditor();
+
 }
