@@ -201,15 +201,12 @@ public class PerspectiveControl {
 			shortcut.setData(perspectiveId);
 			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
 
-			if (descriptor != null) {
-				Image icon = descriptor.createImage();
-				shortcut.setImage(icon);
-			}
-
-			if (descriptor == null) {
-				// Kein Icon, oder explizit gewünscht, Label wird als Text übernommen
+			if (descriptor != null && !descriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
+				shortcut.setImage(descriptor.createImage());
+			} else {
 				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
+
 			shortcut.setToolTipText(localizedTooltip);
 			shortcut.addSelectionListener(new SelectionAdapter() {
 				@Override
