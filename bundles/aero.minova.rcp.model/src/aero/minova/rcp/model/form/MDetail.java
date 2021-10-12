@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.swt.widgets.Control;
-
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.helper.IHelper;
 
@@ -22,15 +20,14 @@ public class MDetail {
 	private List<MField> primaryFields = new ArrayList<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
 	private HashMap<String, MButton> buttons = new HashMap<>();
-
-	private List<MSection> pageList = new ArrayList<>();
+	private List<MSection> mSectionList = new ArrayList<>();
 
 	private IHelper helper;
 
-	private Control selectedField;
-
 	private Map<String, Form> optionPages = new HashMap<>();
 	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
+
+	private IDetailAccessor detailAccessor;
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -117,12 +114,8 @@ public class MDetail {
 		return fields.values();
 	}
 
-	public List<MSection> getPageList() {
-		return pageList;
-	}
-
 	public MSection getPage(String id) {
-		for (MSection m : pageList) {
+		for (MSection m : mSectionList) {
 			if (m.getId().equals(id)) {
 				return m;
 			}
@@ -130,12 +123,16 @@ public class MDetail {
 		return null;
 	}
 
-	public void setPageList(List<MSection> pageList) {
-		this.pageList = pageList;
+	public List<MSection> getMSectionList() {
+		return mSectionList;
 	}
 
-	public void addPage(MSection page) {
-		this.pageList.add(page);
+	public void setMSectionList(List<MSection> mSectionList) {
+		this.mSectionList = mSectionList;
+	}
+
+	public void addMSection(MSection mSection) {
+		this.mSectionList.add(mSection);
 	}
 
 	public void addOptionPage(Form op) {
@@ -180,15 +177,15 @@ public class MDetail {
 		return true;
 	}
 
-	public Control getSelectedField() {
-		return selectedField;
-	}
-
-	public void setSelectedField(Control selectedField) {
-		this.selectedField = selectedField;
-	}
-
 	public List<MField> getPrimaryFields() {
 		return primaryFields;
+	}
+
+	public IDetailAccessor getDetailAccessor() {
+		return detailAccessor;
+	}
+
+	public void setDetailAccessor(IDetailAccessor detailAccessor) {
+		this.detailAccessor = detailAccessor;
 	}
 }

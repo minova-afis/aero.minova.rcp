@@ -57,6 +57,7 @@ import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -65,6 +66,7 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -94,6 +96,7 @@ import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
+import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
@@ -369,13 +372,17 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				// TODO Auto-generated method stub
+				if (selectionLayer.getSelectedCells().isEmpty()) {
+					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
+				}
+				selectionLayer.clear();
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (selectionLayer.getSelectedCells().isEmpty()) {
 					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(getNatTable());
 				}
 			}
 		});
@@ -384,6 +391,9 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
+				selectionLayer.clear();
+				e.doit = true;
+				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
 				selectionLayer.clear();
 				e.doit = true;
@@ -419,7 +429,22 @@ public class SectionGrid {
 			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
 			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 		});
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), new IKeyAction() {
 
+			@Override
+			public void run(NatTable natTable, KeyEvent event) {
+				Map<String, String> parameter = new HashMap<>();
+				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
+				handlerService.executeHandler(command);
+
+			}
+		});
+
+		getNatTable().setData(Constants.GRID_DATA_SECTION, section);
+		getNatTable().setData(Constants.GRID_DATA_SELECTIONLAYER, selectionLayer);
+		getNatTable().setData(Constants.GRID_DATA_DATATABLE, dataTable);
+		getNatTable().setData("EHandlerService", handlerService);
+		getNatTable().setData("ECommandService", commandService);
 		return getNatTable();
 	}
 

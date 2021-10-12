@@ -108,7 +108,7 @@ public class SwitchPerspectiveHandler {
 	 */
 	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
 		if (element instanceof MPerspective) {
-			partService.switchPerspective(element.getElementId());
+			partService.switchPerspective(perspectiveID);
 		} else {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		}
