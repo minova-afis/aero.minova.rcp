@@ -78,6 +78,11 @@ import aero.minova.rcp.model.util.ErrorObject;
 @Component
 public class DataService implements IDataService {
 
+	/**
+	 * Wenn true wird ein String geloggt, mit dem Aufrufe direkt in der Datenbank ausgeführt werden können
+	 */
+	private boolean logSQLString = true;
+
 	EventAdmin eventAdmin;
 
 	Logger logger;
@@ -240,7 +245,7 @@ public class DataService implements IDataService {
 				.method("GET", BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
-		log("CAS Request Index:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request Index:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), seachTable, false);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
@@ -326,7 +331,7 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
-		log("CAS Request Detail Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request Detail Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), detailTable, true);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
@@ -380,7 +385,7 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
-		log("CAS Request Grid Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request Grid Data:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), detailTable, true);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
@@ -453,6 +458,24 @@ public class DataService implements IDataService {
 		if (LOG_CACHE) {
 			System.out.println(message);
 		}
+	}
+
+	private void log(String body, Table table, boolean procedure) {
+		String sqlString = "";
+		try {
+			if (procedure) {
+				sqlString = SQLStringUtil.prepareProcedureString(table);
+			} else {
+				sqlString = SQLStringUtil.prepareViewString(table);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (logSQLString) {
+			body = body + "\n" + sqlString;
+		}
+		log(body);
 	}
 
 	private void log(String body) {
