@@ -58,7 +58,7 @@ public class LookupFieldFocusListener implements FocusListener {
 		row.addValue(new Value(tracNumber, DataType.STRING));
 		ticketTable.addRow(row);
 
-		CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(ticketTable.getName(), ticketTable);
+		CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(ticketTable);
 		tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 			if (t.getResultSet() != null) {
 				broker.post(Constants.RECEIVED_TICKET, t.getResultSet());

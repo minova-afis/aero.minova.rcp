@@ -237,7 +237,7 @@ public class SQLStringUtil {
 			}
 			sb.append("\n");
 		}
-		return sb.toString();
+		return sb.toString().strip();
 	}
 
 }
