@@ -116,7 +116,7 @@ public class LookupField {
 		ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
-		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, false, "%");
+		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, false);
 		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> lookup.getContentProvider().setValues(l)));
 	}
 
