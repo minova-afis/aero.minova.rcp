@@ -920,8 +920,6 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Lädt den aktuellen Datensatz neu
-	 * 
-	 * @param message
 	 */
 	@Inject
 	@Optional
