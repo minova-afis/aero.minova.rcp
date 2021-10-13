@@ -19,6 +19,8 @@ import aero.minova.rcp.model.Value;
  */
 public class SQLStringUtil {
 
+	private SQLStringUtil() {}
+
 	private static final String AND_FIELD_NAME = "&";
 
 	public static String prepareViewString(Table params) throws IllegalArgumentException {
@@ -69,12 +71,10 @@ public class SQLStringUtil {
 			}
 		}
 		sb.append(params.getName());
-		boolean whereClauseExists = false;
-		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
+		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 			if (!where.trim().equals("")) {
-				whereClauseExists = true;
 				sb.append(")");
 			}
 		}
@@ -93,7 +93,6 @@ public class SQLStringUtil {
 	private static String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuffer where = new StringBuffer();
 		final boolean hasAndClause;
-		// TODO Check size
 		List<Column> andFields = params.getColumns().stream()//
 				.filter(c -> Objects.equals(c.getName(), AND_FIELD_NAME))//
 				.collect(Collectors.toList());
@@ -108,7 +107,6 @@ public class SQLStringUtil {
 		int andFieldIndex = params.getColumns().indexOf(andField);
 		for (int rowI = 0; rowI < params.getRows().size(); rowI++) {
 			final Row r = params.getRows().get(rowI);
-			// TODO Nicht annehmen, dass die spezielle &-Spalte die letzte Spalte ist.
 			final boolean and;
 			if (hasAndClause) {
 				and = r.getValues().get(andFieldIndex).getBooleanValue();
@@ -118,20 +116,14 @@ public class SQLStringUtil {
 
 			// Eine where Zeile aufbauen
 			final StringBuffer clause = new StringBuffer();
-			COLS: for (int colI = 0; colI < r.getValues().size(); ++colI) {
+			for (int colI = 0; colI < r.getValues().size(); ++colI) {
 				Value def = r.getValues().get(colI);
 				Column col = params.getColumns().get(colI);
-				if (AND_FIELD_NAME.equalsIgnoreCase(col.getName())) {
-					continue COLS;
-				}
-				if (r.getValues().get(colI) == null) {
-					continue COLS;
+				if (AND_FIELD_NAME.equalsIgnoreCase(col.getName()) || r.getValues().get(colI) == null || r.getValues().get(colI).getValue() == null) {
+					continue;
 				}
 
 				final Object valObj = r.getValues().get(colI).getValue();
-				if (valObj == null) {
-					continue;
-				}
 				String strValue = valObj.toString().trim();
 				String ruleValue = "";
 
@@ -209,11 +201,8 @@ public class SQLStringUtil {
 	}
 
 	private static String ruleToString(String rule) {
-		if (rule.contains("null")) {
-
-		} else if (rule.contains("!~")) {
+		if (rule.contains("!~")) {
 			rule = "not like";
-
 		} else if (rule.contains("~")) {
 			rule = "like";
 		}
