@@ -545,11 +545,11 @@ public class DataService implements IDataService {
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
-			System.err.println("UseCache: " + tableName);
+			System.out.println("UseCache: " + tableName);
 			list.addAll(map.values());
 			return CompletableFuture.supplyAsync(() -> list);
 		} else if (useCache && map.containsKey(keyLong)) {
-			System.err.println("UseCache: " + tableName + " (" + keyLong + ")");
+			System.out.println("UseCache: " + tableName + " (" + keyLong + ")");
 			list.add(map.get(keyLong));
 			return CompletableFuture.supplyAsync(() -> list);
 		}
@@ -596,11 +596,11 @@ public class DataService implements IDataService {
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
-			System.err.println("UseCache: " + hashName);
+			System.out.println("UseCache: " + hashName);
 			list.addAll(map.values());
 			return CompletableFuture.supplyAsync(() -> list);
 		} else if (useCache && map.containsKey(keyLong)) {
-			System.err.println("UseCache: " + hashName + " (" + keyLong + ")");
+			System.out.println("UseCache: " + hashName + " (" + keyLong + ")");
 			list.add(map.get(keyLong));
 			return CompletableFuture.supplyAsync(() -> list);
 		}
