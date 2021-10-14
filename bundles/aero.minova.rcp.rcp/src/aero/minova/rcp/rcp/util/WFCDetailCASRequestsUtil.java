@@ -1129,7 +1129,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 		mSection.getTabList().removeAll(toRemove);
-		Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
+		Section section = mSection.getSectionAccessor().getSection();
 		mDetail.getFields().removeAll(toRemove);
 
 		List<MField> visibleMFields = new ArrayList<>();

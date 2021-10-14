@@ -159,7 +159,7 @@ public class OpenServiceContractTest {
 		assertEquals(size, 5);
 		gridNattable.click(4, 0);
 
-		Control textClient = ((SectionAccessor) grid.getmSection().getSectionAccessor()).getSection().getTextClient();
+		Control textClient = grid.getmSection().getSectionAccessor().getSection().getTextClient();
 		assertTrue(textClient instanceof ToolBar);
 
 		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);
