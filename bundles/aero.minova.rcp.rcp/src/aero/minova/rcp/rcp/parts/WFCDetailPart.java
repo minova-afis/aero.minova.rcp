@@ -1011,4 +1011,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return formToolkit;
 	}
 
+	public Composite getComposite() {
+		return composite;
+	}
+
 }
