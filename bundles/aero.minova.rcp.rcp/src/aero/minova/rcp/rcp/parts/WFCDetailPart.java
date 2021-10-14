@@ -605,9 +605,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
 				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
-				if (!buttonImageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
-					item.setImage(resManager.createImage(buttonImageDescriptor));
-				}
+				item.setImage(resManager.createImage(buttonImageDescriptor));
 			}
 		}
 		section.setTextClient(bar);
