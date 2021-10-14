@@ -19,7 +19,10 @@ import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
+import org.eclipse.nebula.widgets.nattable.painter.cell.AbstractCellPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ComboBoxPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.LineBorderDecorator;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -42,6 +45,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
 	private IDataService dataService;
 	private List<String> readOnlyColumns;
+	private IConfigRegistry configRegistry;
 
 	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService) {
 		this.columns = columns;
@@ -60,6 +64,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	@Override
 	public void configureRegistry(IConfigRegistry configRegistry) {
+		this.configRegistry = configRegistry;
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, new IEditableRule() {
 
 			@Override
@@ -367,5 +372,49 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+	}
+
+	/**
+	 * Updatet die CellPainter, damit required-Felder entsprechend dargestellt werden
+	 * 
+	 * @param columnIndex
+	 * @param required
+	 */
+	public void setColumnRequired(int columnIndex, boolean required) {
+
+		// Read-Only Darstellung hat Vorrang
+		if (readOnlyColumns.contains(ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex)) {
+			return;
+		}
+
+		AbstractCellPainter newPainter = null;
+		Column c = columns.get(columnIndex);
+		if (required) {
+			if (c.getType().equals(DataType.BOOLEAN)) {
+				newPainter = new RequiredTriStateCheckBoxPainter();
+			} else if (c.isLookup()) {
+				newPainter = new RequiredLookupPainter();
+			} else {
+				newPainter = new RequiredValuePainter();
+			}
+
+		} else {
+			if (c.getType().equals(DataType.BOOLEAN)) {
+				newPainter = new TriStateCheckBoxPainter();
+			} else if (c.isLookup()) {
+				newPainter = new PaddingDecorator(new ComboBoxPainter(), 0, 0, 0, 2);
+			} else {
+				newPainter = new LineBorderDecorator(new TextPainter());
+			}
+
+		}
+
+		configRegistry.registerConfigAttribute(CELL_PAINTER, newPainter, DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+
+	}
+
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		// TODO Auto-generated method stub
+
 	}
 }

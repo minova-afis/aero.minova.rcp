@@ -68,4 +68,9 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	public void closeEditor() {
 		sg.closeEditor();
 	}
+
+	@Override
+	public void setGridRequired(boolean required) {
+		sg.setGridRequired(required);
+	}
 }

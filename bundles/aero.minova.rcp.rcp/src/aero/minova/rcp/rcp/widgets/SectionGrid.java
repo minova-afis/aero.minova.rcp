@@ -13,11 +13,13 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -134,6 +136,8 @@ public class SectionGrid {
 	private Form form;
 	@Inject
 	private MWindow mwindow;
+	@Inject
+	private IEventBroker broker;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -169,6 +173,8 @@ public class SectionGrid {
 	private DataLayer bodyDataLayer;
 
 	private SortHeaderLayer sortHeaderLayer;
+
+	private MinovaGridConfiguration gridConfiguration;
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -376,9 +382,9 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		MinovaGridConfiguration mgc = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
-		getNatTable().addConfiguration(mgc);
-		columnHideShowLayer.hideColumnPositions(mgc.getHiddenColumns());
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
+		getNatTable().addConfiguration(gridConfiguration);
+		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		getNatTable().addConfiguration(new DefaultEditBindings() {
@@ -830,6 +836,21 @@ public class SectionGrid {
 
 	public void removeSelectionListener(ILayerListener listener) {
 		selectionLayer.removeLayerListener(listener);
+	}
+
+	public void setColumnRequired(int columnIndex, boolean required) {
+		dataTable.getColumns().get(columnIndex).setRequired(required);
+		gridConfiguration.setColumnRequired(columnIndex, required);
+
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
+	}
+
+	public void setGridRequired(boolean required) {
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			if (!gridConfiguration.getHiddenColumns().contains(i)) {
+				setColumnRequired(i, required);
+			}
+		}
 	}
 
 }

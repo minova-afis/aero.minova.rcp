@@ -22,4 +22,6 @@ public interface IGridAccessor {
 
 	void closeEditor();
 
+	void setGridRequired(boolean required);
+
 }

@@ -225,4 +225,8 @@ public class MGrid {
 	public void closeEditor() {
 		gridAccessor.closeEditor();
 	}
+
+	public void setGridRequired(boolean required) {
+		gridAccessor.setGridRequired(required);
+	}
 }
