@@ -1,7 +1,6 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -147,33 +146,6 @@ public class DataService implements IDataService {
 			BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
 			// allow to trigger components after the service has been initialized, see WFCTranslationDownloadService#getDummyService
 			bundleContext.registerService(IDummyService.class.getName(), new IDummyService(), null);
-
-		}
-
-	}
-
-	/**
-	 * Erstellt eine Datei falls sie existiert, wird sie geleert.
-	 *
-	 * @param path
-	 */
-	public void createFile(String path) {
-		try {
-			File file = new File(path);
-			if (!file.exists()) {
-				file.createNewFile();
-			} else {
-				if (file.delete()) {
-					file.createNewFile();
-					return;
-				}
-				FileOutputStream writer = new FileOutputStream(path);
-				writer.write(("").getBytes());
-				writer.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-
 		}
 	}
 
@@ -226,7 +198,6 @@ public class DataService implements IDataService {
 				}
 			}
 		} catch (InterruptedException | ExecutionException e) {}
-
 	}
 
 	private static SSLContext disabledSslVerificationContext() {
