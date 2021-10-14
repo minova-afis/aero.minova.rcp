@@ -70,7 +70,27 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	}
 
 	@Override
+	public void resetReadOnlyAndRequiredColumns() {
+		sg.resetReadOnlyAndRequiredColumns();
+	}
+
+	@Override
+	public void setColumnRequired(int columnIndex, boolean required) {
+		sg.setColumnRequired(columnIndex, required);
+	}
+
+	@Override
 	public void setGridRequired(boolean required) {
 		sg.setGridRequired(required);
+	}
+
+	@Override
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		sg.setColumnReadOnly(columnIndex, readOnly);
+	}
+
+	@Override
+	public void setGridReadOnly(boolean readOnly) {
+		sg.setGridReadOnly(readOnly);
 	}
 }
