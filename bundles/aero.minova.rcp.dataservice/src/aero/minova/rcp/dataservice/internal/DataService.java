@@ -140,6 +140,7 @@ public class DataService implements IDataService {
 		this.server = server;
 		this.workspacePath = workspacePath;
 		init();
+		initSiteParameters();
 
 		// im Falle der Unit tests haben wir keinen bundle context
 		if (FrameworkUtil.getBundle(this.getClass()) != null) {
@@ -149,7 +150,6 @@ public class DataService implements IDataService {
 
 		}
 
-		initSiteParameters();
 	}
 
 	/**
