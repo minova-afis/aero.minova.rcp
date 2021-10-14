@@ -2,13 +2,17 @@ package aero.minova.rcp.rcp.accessor;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.services.IStylingEngine;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.IValueAccessor;
@@ -24,6 +28,9 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Inject
 	IStylingEngine engine;
+
+	@Inject
+	IEventBroker broker;
 
 	public AbstractValueAccessor(MField field, Control control) {
 		super();
@@ -70,6 +77,8 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 			((Text) control).setEditable(editable);
 		} else if (control instanceof TextAssist) {
 			((TextAssist) control).setEditable(editable);
+		} else if (control instanceof Button) {
+			((Button) control).setEnabled(editable);
 		}
 	}
 
@@ -122,6 +131,11 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 		if (engine != null && !control.isDisposed()) {
 			engine.setClassname(control, classname);
 		}
+	}
+
+	@Override
+	public void updateSaveButton() {
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
 	}
 
 }

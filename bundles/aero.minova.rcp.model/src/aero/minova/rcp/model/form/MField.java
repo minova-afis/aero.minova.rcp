@@ -39,7 +39,9 @@ public abstract class MField {
 	private List<String> lookupParameters;
 	private final DataType dataType;
 	private MDetail detail;
+	private boolean originalRequired;
 	private boolean required;
+	private boolean originalReadOnly;
 	private boolean readOnly;
 	private int tabIndex;
 	private MSection mSection;
@@ -122,11 +124,6 @@ public abstract class MField {
 		}
 		fire(new ValueChangeEvent(this, oldValue, value, user));
 
-		if (value == null) {
-			updateCssClass(cssClass);
-		} else {
-			updateCssClass(Constants.CSS_STANDARD);
-		}
 		isValid();
 	}
 
@@ -300,6 +297,16 @@ public abstract class MField {
 		this.detail = detail;
 	}
 
+	public void setOriginalRequired(boolean originalRequired) {
+		this.originalRequired = originalRequired;
+		this.required = originalRequired;
+	}
+
+	public void setOriginalReadOnly(boolean originalReadOnly) {
+		this.originalReadOnly = originalReadOnly;
+		this.readOnly = originalReadOnly;
+	}
+
 	public boolean isRequired() {
 		return required;
 	}
@@ -307,8 +314,15 @@ public abstract class MField {
 	public void setRequired(boolean required) {
 		this.required = required;
 		// Readonly hat Vorrang
-		if (required && !cssClass.equals(Constants.CSS_READONLY)) {
+		if (required && !readOnly) {
 			cssClass = Constants.CSS_REQUIRED;
+		} else if (!required && !readOnly) {
+			cssClass = Constants.CSS_STANDARD;
+		}
+
+		isValid(); // Überprüfen und Farbe entsprechend setzen
+		if (valueAccessor != null) {
+			valueAccessor.updateSaveButton(); // Speicherknopf updaten
 		}
 	}
 
@@ -320,7 +334,19 @@ public abstract class MField {
 		this.readOnly = readOnly;
 		if (readOnly) {
 			cssClass = Constants.CSS_READONLY;
+		} else if (!required) {
+			cssClass = Constants.CSS_STANDARD;
 		}
+
+		isValid(); // Überprüfen und Farbe entsprechend setzen
+		if (valueAccessor != null) {
+			valueAccessor.setEditable(!readOnly); // Editierbarkeit entsprechend updaten
+		}
+	}
+
+	public void resetReadOnlyAndRequired() {
+		setReadOnly(originalReadOnly);
+		setRequired(originalRequired);
 	}
 
 	public int getTabIndex() {
@@ -373,6 +399,13 @@ public abstract class MField {
 			setInvalidColor();
 			return false;
 		}
+
+		if (fieldValue == null) {
+			updateCssClass(cssClass);
+		} else {
+			updateCssClass(Constants.CSS_STANDARD);
+		}
+
 		if (!isRequired() || mSection == null) {
 			return true;
 		}

@@ -23,4 +23,6 @@ public interface IValueAccessor {
 	void setEditable(boolean editable);
 
 	void setCSSClass(String classname);
+
+	void updateSaveButton();
 }
