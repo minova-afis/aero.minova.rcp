@@ -31,8 +31,7 @@ public class GridButtonHandler {
 		WFCDetailPart wfcdetailpart = (WFCDetailPart) part.getObject();
 		if (wfcdetailpart != null) {
 			MGrid mGrid = wfcdetailpart.getDetail().getGrid(gridID);
-			GridAccessor valueAccessor = (GridAccessor) mGrid.getGridAccessor();
-			sectionGrid = valueAccessor.getSectionGrid();
+			sectionGrid = ((GridAccessor) mGrid.getGridAccessor()).getSectionGrid();
 			if (sectionGrid == null) {
 				return;
 			}

@@ -368,8 +368,7 @@ public class WFCDetailCASRequestsUtil {
 
 	public void updateSelectedGrid(String gridID) {
 		MGrid mGrid = mDetail.getGrid(gridID);
-		GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
-		SectionGrid sectionGrid = gVA.getSectionGrid();
+		SectionGrid sectionGrid = ((GridAccessor) mGrid.getGridAccessor()).getSectionGrid();
 		Table t = sectionGrid.setDataTable(selectedGrids.get(gridID).copy());
 		sectionGrid.clearDataChanges();
 		selectedGrids.put(gridID, t);
