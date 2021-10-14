@@ -51,7 +51,7 @@ public class LoadIndexHandler {
 		((WFCSearchPart) findElements.get(0).getObject()).saveNattable();
 		((WFCSearchPart) findElements.get(0).getObject()).updateUserInput();
 		Table searchTable = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
-		CompletableFuture<Table> tableFuture = dataService.getIndexDataAsync(searchTable.getName(), searchTable);
+		CompletableFuture<Table> tableFuture = dataService.getTableAsync(searchTable);
 
 		tableFuture.thenAccept(t -> {
 			loading = false;

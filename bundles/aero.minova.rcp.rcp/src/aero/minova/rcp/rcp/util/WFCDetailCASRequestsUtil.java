@@ -184,7 +184,7 @@ public class WFCDetailCASRequestsUtil {
 
 				// Hauptfelder
 				Table rowIndexTable = createReadTableFromForm(form, row);
-				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(rowIndexTable.getName(), rowIndexTable);
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(rowIndexTable);
 				tableFuture.thenAccept(t -> sync.asyncExec(() -> {
 					if (t != null) {
 						selectedTable = t.getOutputParameters();
@@ -198,7 +198,7 @@ public class WFCDetailCASRequestsUtil {
 				selectedOptionPages.clear();
 				for (Form opForm : mDetail.getOptionPages()) {
 					Table opFormTable = createReadTableFromForm(opForm, row);
-					CompletableFuture<SqlProcedureResult> opFuture = dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+					CompletableFuture<SqlProcedureResult> opFuture = dataService.callProcedureAsync(opFormTable);
 					opFuture.thenAccept(t -> sync.asyncExec(() -> {
 						selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
 						updateSelectedEntry();
@@ -248,7 +248,7 @@ public class WFCDetailCASRequestsUtil {
 			Row gridRow = gridRowBuilder.create();
 			gridRequestTable.addRow(gridRow);
 
-			CompletableFuture<SqlProcedureResult> gridFuture = dataService.getGridDataAsync(gridRequestTable.getName(), gridRequestTable);
+			CompletableFuture<SqlProcedureResult> gridFuture = dataService.callProcedureAsync(gridRequestTable);
 			gridFuture.thenAccept(t -> sync.asyncExec(() -> {
 				if (t != null && t.getResultSet() != null) {
 					Table result = t.getResultSet();
@@ -380,7 +380,7 @@ public class WFCDetailCASRequestsUtil {
 		// Option Pages
 		for (Form opForm : mDetail.getOptionPages()) {
 			Table opFormTable = createInsertUpdateTableFromForm(opForm);
-			dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+			dataService.callProcedureAsync(opFormTable);
 		}
 
 		// Grids
@@ -478,22 +478,22 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			if (!gridDeleteTable.getRows().isEmpty()) {
-				dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+				dataService.callProcedureAsync(gridDeleteTable);
 			}
 
 			if (!gridInsertTable.getRows().isEmpty()) {
-				dataService.getGridDataAsync(gridInsertTable.getName(), gridInsertTable);
+				dataService.callProcedureAsync(gridInsertTable);
 			}
 
 			if (!gridUpdateTable.getRows().isEmpty()) {
-				dataService.getGridDataAsync(gridUpdateTable.getName(), gridUpdateTable);
+				dataService.callProcedureAsync(gridUpdateTable);
 			}
 		}
 	}
 
 	private void sendSaveRequest(Table t) {
 		if (t.getRows() != null) {
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(t);
 
 			tableFuture.thenAccept(tr -> sync.asyncExec(() -> {
 				// Speichern wieder aktivieren
@@ -672,7 +672,7 @@ public class WFCDetailCASRequestsUtil {
 			// Hauptmaske
 			Table t = createDeleteTableFromForm(form);
 			if (t.getRows() != null) {
-				CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+				CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(t);
 				tableFuture.thenAccept(ta -> sync.asyncExec(() -> {
 					if (ta != null) {
 						deleteEntry(ta);
@@ -741,7 +741,7 @@ public class WFCDetailCASRequestsUtil {
 		// Option Pages
 		for (Form opForm : mDetail.getOptionPages()) {
 			Table opFormTable = createDeleteTableFromForm(opForm);
-			dataService.getDetailDataAsync(opFormTable.getName(), opFormTable);
+			dataService.callProcedureAsync(opFormTable);
 		}
 
 		// In allen Grids alle Zeilen löschen
@@ -760,7 +760,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			if (!gridDeleteTable.getRows().isEmpty()) {
-				dataService.getGridDataAsync(gridDeleteTable.getName(), gridDeleteTable);
+				dataService.callProcedureAsync(gridDeleteTable);
 			}
 		}
 	}
@@ -776,7 +776,7 @@ public class WFCDetailCASRequestsUtil {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective) && table != null) {
 
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.getDetailDataAsync(table.getName(), table);
+			CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(table);
 
 			// Fehler abfangen
 			tableFuture.exceptionally(ex -> {
@@ -1060,7 +1060,7 @@ public class WFCDetailCASRequestsUtil {
 			r.addValue(f.getValue());
 		}
 		t.addRow(r);
-		dataService.getDetailDataAsync(t.getName(), t);
+		dataService.callProcedureAsync(t);
 	}
 
 	/**
