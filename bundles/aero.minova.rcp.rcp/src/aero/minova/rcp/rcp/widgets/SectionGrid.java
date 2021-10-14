@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -157,11 +158,17 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
+	/**
+	 * Zuordnung von Name in Grid zu Name in Detail, aus .xbs
+	 */
 	private Map<String, String> fieldnameToValue;
 
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
+
+	private Map<Integer, Boolean> originalReadOnlyColumns;
+	private Map<Integer, Boolean> originalRequiredColumns;
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
@@ -187,6 +194,9 @@ public class SectionGrid {
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
 
+		originalReadOnlyColumns = new HashMap<>();
+		originalRequiredColumns = new HashMap<>();
+
 		setFieldnameToValue(new HashMap<>());
 	}
 
@@ -195,6 +205,11 @@ public class SectionGrid {
 		dataTable = dataFormService.getTableFromGrid(grid);
 		createNatTable();
 		loadState();
+
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			originalReadOnlyColumns.put(i, dataTable.getColumns().get(i).isReadOnly());
+			originalRequiredColumns.put(i, dataTable.getColumns().get(i).isRequired());
+		}
 	}
 
 	/**
@@ -838,17 +853,40 @@ public class SectionGrid {
 		selectionLayer.removeLayerListener(listener);
 	}
 
+	public void resetReadOnlyAndRequiredColumns() {
+		for (Entry<Integer, Boolean> e : originalReadOnlyColumns.entrySet()) {
+			setColumnReadOnly(e.getKey(), e.getValue());
+		}
+
+		for (Entry<Integer, Boolean> e : originalRequiredColumns.entrySet()) {
+			setColumnRequired(e.getKey(), e.getValue());
+		}
+	}
+
 	public void setColumnRequired(int columnIndex, boolean required) {
 		dataTable.getColumns().get(columnIndex).setRequired(required);
 		gridConfiguration.setColumnRequired(columnIndex, required);
 
-		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
 	}
 
 	public void setGridRequired(boolean required) {
 		for (int i = 0; i < dataTable.getColumnCount(); i++) {
 			if (!gridConfiguration.getHiddenColumns().contains(i)) {
 				setColumnRequired(i, required);
+			}
+		}
+	}
+
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		dataTable.getColumns().get(columnIndex).setReadOnly(readOnly);
+		gridConfiguration.setColumnReadOnly(columnIndex, readOnly);
+	}
+
+	public void setGridReadOnly(boolean readOnly) {
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			if (!gridConfiguration.getHiddenColumns().contains(i)) {
+				setColumnReadOnly(i, readOnly);
 			}
 		}
 	}

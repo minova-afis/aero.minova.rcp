@@ -7,6 +7,8 @@ public class Constants {
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
 
+	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
+
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
 
