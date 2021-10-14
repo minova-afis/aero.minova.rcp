@@ -261,6 +261,8 @@ r.addValue(bookingDateValue);
 t.addRow(r);
 WFCDetailCASRequestsUtil casUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 casUtil.setSelectedTable(t);
+
+broker.post(Constants.BROKER_CHECKDIRTY, ""); // Check über IEventBroker anstoßen
 ----
 
 
