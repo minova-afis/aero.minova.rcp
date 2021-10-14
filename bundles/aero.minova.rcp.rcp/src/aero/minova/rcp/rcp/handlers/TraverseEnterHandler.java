@@ -73,7 +73,7 @@ public class TraverseEnterHandler {
 
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail mDetail = ((WFCDetailPart) part.getObject()).getDetail();
-			if (((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != null) {
+			if ((mDetail.getDetailAccessor()).getSelectedControl() != null) {
 				// aktuell selektiertes Feld holen
 				Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
 
@@ -211,7 +211,7 @@ public class TraverseEnterHandler {
 			if (!cellSelected) {
 				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
 				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
-				List<Section> sectionList = ((DetailAccessor) mDetail.getDetailAccessor()).getSectionList();
+				List<Section> sectionList = mDetail.getDetailAccessor().getSectionList();
 
 				// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 				int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
