@@ -1,7 +1,17 @@
 package aero.minova.rcp.model.form;
 
+import org.eclipse.ui.forms.widgets.Section;
+
 public interface ISectionAccessor {
 
-	public void setVisible(boolean visible);
+	void setVisible(boolean visible);
+
+	MSection getMSection();
+
+	void setMSection(MSection mSection);
+
+	Section getSection();
+
+	void setSection(Section section);
 
 }

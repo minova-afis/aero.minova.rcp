@@ -15,18 +15,22 @@ public class SectionAccessor implements ISectionAccessor {
 		this.section = section;
 	}
 
+	@Override
 	public MSection getMSection() {
 		return mSection;
 	}
 
+	@Override
 	public void setMSection(MSection mSection) {
 		this.mSection = mSection;
 	}
 
+	@Override
 	public Section getSection() {
 		return section;
 	}
 
+	@Override
 	public void setSection(Section section) {
 		this.section = section;
 	}

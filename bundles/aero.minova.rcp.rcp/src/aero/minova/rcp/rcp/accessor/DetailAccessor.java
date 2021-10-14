@@ -19,18 +19,21 @@ public class DetailAccessor implements IDetailAccessor {
 		this.mDetail = mDetail;
 	}
 
+	@Override
 	public Control getSelectedControl() {
 		return selectedControl;
 	}
 
+	@Override
 	public void setSelectedControl(Control selectedControl) {
 		this.selectedControl = selectedControl;
 	}
 
+	@Override
 	public List<Section> getSectionList() {
 		List<Section> sectionList = new ArrayList<>();
 		for (MSection mSection : mDetail.getMSectionList()) {
-			sectionList.add(((SectionAccessor) mSection.getSectionAccessor()).getSection());
+			sectionList.add(mSection.getSectionAccessor().getSection());
 		}
 		return sectionList;
 	}

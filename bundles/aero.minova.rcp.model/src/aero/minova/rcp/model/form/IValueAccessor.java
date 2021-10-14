@@ -1,5 +1,7 @@
 package aero.minova.rcp.model.form;
 
+import org.eclipse.swt.widgets.Control;
+
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 
@@ -23,4 +25,11 @@ public interface IValueAccessor {
 	void setEditable(boolean editable);
 
 	void setCSSClass(String classname);
+
+	void setFocussed(boolean focussed);
+
+	Value getDisplayValue();
+
+	Control getControl();
+
 }

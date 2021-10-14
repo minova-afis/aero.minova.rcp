@@ -25,6 +25,7 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 		return sg;
 	}
 
+	@Override
 	public MGrid getMGrid() {
 		return mgrid;
 	}

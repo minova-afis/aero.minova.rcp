@@ -1,6 +1,7 @@
 package aero.minova.rcp.model.form;
 
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.ToolItem;
 
 public interface IButtonAccessor {
 
@@ -17,5 +18,9 @@ public interface IButtonAccessor {
 	void setCanBeEnabled(boolean canBeEnabled);
 
 	void updateEnabled();
+
+	ToolItem getButton();
+
+	void setButton(ToolItem button);
 
 }
