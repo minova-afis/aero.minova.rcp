@@ -167,7 +167,6 @@ public class MenuProcessor {
 		mParameterId.setElementId("parameter.formId." + entryMDI.getId()); // not used
 		mParameterId.setName(Constants.FORM_ID);
 		mParameterId.setValue(actionMDI.getId());
-
 		handledMenuItem.getParameters().add(mParameterId);
 
 		// set the perspective name as parameter
@@ -175,8 +174,14 @@ public class MenuProcessor {
 		mParameterPerspectiveName.setElementId("parameter.PerspectiveLabel." + entryMDI.getId()); // not used
 		mParameterPerspectiveName.setName(Constants.FORM_LABEL);
 		mParameterPerspectiveName.setValue(actionMDI.getText());
-
 		handledMenuItem.getParameters().add(mParameterPerspectiveName);
+
+		// set the perspective icon as parameter
+		MParameter mParameterPerspectiveIcon = modelService.createModelElement(MParameter.class);
+		mParameterPerspectiveIcon.setElementId("parameter.PerspectiveIcon." + entryMDI.getId()); // not used
+		mParameterPerspectiveIcon.setName(Constants.FORM_ICON);
+		mParameterPerspectiveIcon.setValue(actionMDI.getIcon());
+		handledMenuItem.getParameters().add(mParameterPerspectiveIcon);
 
 		handledMenuItem.setElementId("menuItemFor." + actionMDI.getId());
 

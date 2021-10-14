@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.uitests.util.UITestUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
@@ -55,11 +56,11 @@ class OpenStundenerfassungsTest {
 		stundenErfassung.click();
 
 		// Parts finden
-		searchPart = bot.partByTitle("@Form.Search");
+		searchPart = bot.partById(Constants.SEARCH_PART);
 		assertNotNull(searchPart);
-		indexPart = bot.partByTitle("@Form.Index");
+		indexPart = bot.partById(Constants.INDEX_PART);
 		assertNotNull(indexPart);
-		detailPart = bot.partByTitle("@Form.Details");
+		detailPart = bot.partById(Constants.DETAIL_PART);
 		assertNotNull(detailPart);
 
 		// Nattables finden

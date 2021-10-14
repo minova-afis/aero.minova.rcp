@@ -73,9 +73,9 @@ class GridTest {
 		assertNotNull(stundenErfassung);
 		stundenErfassung.click();
 
-		searchPart = bot.partByTitle("@Form.Search");
-		indexPart = bot.partByTitle("@Form.Index");
-		detailPart = bot.partByTitle("@Form.Details");
+		searchPart = bot.partById(Constants.SEARCH_PART);
+		indexPart = bot.partById(Constants.INDEX_PART);
+		detailPart = bot.partById(Constants.DETAIL_PART);
 
 		swtNatTableBot = new SWTNatTableBot();
 		searchNattable = swtNatTableBot.nattable(0);
@@ -120,13 +120,13 @@ class GridTest {
 	void ensureToolbarsAreNotEmpty() {
 
 		// Toolbarbuttons finden
-		SWTBotView searchPart = bot.partByTitle("@Form.Search");
+		SWTBotView searchPart = bot.partById(Constants.SEARCH_PART);
 		assertFalse(searchPart.getToolbarButtons().isEmpty());
 
-		SWTBotView indexPart = bot.partByTitle("@Form.Index");
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
 		assertFalse(indexPart.getToolbarButtons().isEmpty());
 
-		SWTBotView detailPart = bot.partByTitle("@Form.Details");
+		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
 		assertFalse(detailPart.getToolbarButtons().isEmpty());
 
 	}
@@ -157,7 +157,7 @@ class GridTest {
 		// Do not start on Linux
 		Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Linux"));
 
-		SWTBotView detailPart = bot.partByTitle("@Form.Details");
+		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
 		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
@@ -191,7 +191,7 @@ class GridTest {
 		}
 
 		// Eintrag wieder löschen
-		detailPart = bot.partByTitle("@Form.Details");
+		detailPart = bot.partById(Constants.DETAIL_PART);
 		detailPart.getToolbarButtons().get(2).click();
 		UITestUtil.sleep();
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
@@ -201,7 +201,7 @@ class GridTest {
 	 * Speichert das aktuelle Detail und lädt es wieder
 	 */
 	private void saveDetail() {
-		SWTBotView detailPart = bot.partByTitle("@Form.Details");
+		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
 		List<SWTBotToolbarButton> detailToolbarButtons = detailPart.getToolbarButtons();
 
 		detailToolbarButtons.get(0).click();
@@ -211,7 +211,7 @@ class GridTest {
 	}
 
 	private void reloadIndex() {
-		SWTBotView indexPart = bot.partByTitle("@Form.Index");
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
 
 		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();

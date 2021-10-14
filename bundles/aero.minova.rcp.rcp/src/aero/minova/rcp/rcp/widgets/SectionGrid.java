@@ -285,7 +285,7 @@ public class SectionGrid {
 		});
 
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon(), false);
+			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon(), false);
 			Image buttonImage = resManager.createImage(buttonImageDescriptor);
 			item.setImage(buttonImage);
 		}
