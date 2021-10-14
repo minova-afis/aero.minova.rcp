@@ -124,6 +124,7 @@ public class Constants {
 	public static final String FORM_NAME = "aero.minova.rcp.perspectiveswitcher.parameters.formName"; //$NON-NLS-1$
 	public static final String FORM_ID = "aero.minova.rcp.perspectiveswitcher.parameters.formId"; //$NON-NLS-1$
 	public static final String FORM_LABEL = "aero.minova.rcp.perspectiveswitcher.parameters.perspectiveLabel"; //$NON-NLS-1$
+	public static final String FORM_ICON = "aero.minova.rcp.perspectiveswitcher.parameters.perspectiveIcon";
 
 	public static final String PERSPECTIVE_TOOLBAR = "perspectivetoolbar";
 	public static final String PREFERENCES_KEPTPERSPECTIVES = "aero.minova.rcp.preferences.keptperspectives";

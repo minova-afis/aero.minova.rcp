@@ -8,7 +8,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +71,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.BackingStoreException;
@@ -123,6 +123,7 @@ import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
+import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.LookupComposite;
 
@@ -271,6 +272,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		private String formTitle;
 		public String formSuffix;
 		public String id;
+		public String icon;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
@@ -279,8 +281,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				id = "Head";
 			} else if (headOrPageOrGrid instanceof Page) {
 				id = ((Page) headOrPageOrGrid).getId();
+				icon = ((Page) headOrPageOrGrid).getIcon();
 			} else {
 				id = ((Grid) headOrPageOrGrid).getId();
+				icon = ((Grid) headOrPageOrGrid).getIcon();
 			}
 		}
 
@@ -469,13 +473,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPageOrGrid) {
 		RowData headLayoutData = new RowData();
-		Section section;
-		Control sectionControl = null;
+		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
-			section = getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			section = getFormToolkit().createSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
-			sectionControl = section.getChildren()[0];
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		// Alten Zustand wiederherstellen
@@ -488,7 +490,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 		section.setLayoutData(headLayoutData);
-		section.setText(headOrPageOrGrid.getTranslationText());
+
+		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
+		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
+			section.setImage(resManager.createImage(imageDescriptor));
+		}
 
 		section.addExpansionListener(new IExpansionListener() {
 			@Override
@@ -598,9 +604,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 
 			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon().replace(".ico", ""), false);
-				Image buttonImage = resManager.createImage(buttonImageDescriptor);
-				item.setImage(buttonImage);
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
+				item.setImage(resManager.createImage(buttonImageDescriptor));
 			}
 		}
 		section.setTextClient(bar);
@@ -654,7 +659,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (Control child : composite.getChildren()) {
 			if (child instanceof ToolBar && selectAllControls && !mSection.isHead()) {
 				tabList.add(1, child);
-			} else if ((child instanceof Twistie && !selectAllControls) || child instanceof Label) {
+			} else if ((child instanceof Twistie && !selectAllControls) || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
 				// Die sollen nicht in die Tabliste
 			} else {
 				tabList.add(child);
@@ -664,15 +669,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private Control[] getTabListForPart(Composite composite) {
-		List<Control> tabList = new ArrayList<>();
-
 		if (selectAllControls) {
-			for (Control c : composite.getChildren()) {
-				tabList.add(c);
-			}
+			return composite.getChildren();
 		}
-
-		return tabList.toArray(new Control[0]);
+		return new Control[0];
 	}
 
 	/**
@@ -709,7 +709,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mgrid.setFill(grid.getFill());
 		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
 		mgrid.setmSection(section);
-		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(grid.getIcon(), false);
+		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptor(grid.getIcon(), false);
 		Image gridImage = resManager.createImage(gridImageDescriptor);
 		mgrid.setIcon(gridImage);
 		mgrid.setHelperClass(grid.getHelperClass());
@@ -858,13 +858,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
-	private int getExtraHeight(Field field) {
-		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned().length() > 0) {
-			return Integer.parseInt(field.getNumberRowsSpanned()) - 1;
-		}
-		return 0;
-	}
-
 	private void addBottonMargin(Composite composite, int row, int column) {
 		// Abstand nach unten
 		Label spacing = new Label(composite, SWT.NONE);
@@ -932,11 +925,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				control.setData(TRANSLATE_LOCALE, locale);
 			}
 		}
-	}
-
-	private int getWidth(Field field) {
-		BigInteger numberColumnsSpanned = field.getNumberColumnsSpanned();
-		return numberColumnsSpanned == null ? 2 : numberColumnsSpanned.intValue();
 	}
 
 	public MDetail getDetail() {

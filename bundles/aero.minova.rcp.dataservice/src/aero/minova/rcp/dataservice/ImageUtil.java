@@ -50,8 +50,8 @@ public class ImageUtil {
 	 * @param filename
 	 * @return
 	 */
-	public static ImageDescriptor getImageDescriptorFromImagesBundle(String filename, boolean isToolBar) {
-		if (filename == null) {
+	public static ImageDescriptor getImageDescriptor(String filename, boolean isToolBar) {
+		if (filename == null || filename.equals("")) {
 			return ImageDescriptor.createFromURL(null);
 		}
 

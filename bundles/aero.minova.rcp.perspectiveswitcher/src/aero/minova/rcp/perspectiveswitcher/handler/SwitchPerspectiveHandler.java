@@ -11,10 +11,12 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -33,31 +35,37 @@ public class SwitchPerspectiveHandler {
 	@Inject
 	EModelService modelService;
 
+	@Inject
+	private TranslationService translationService;
+
 	@Execute
 	public void execute(IEclipseContext context, //
 			@Optional @Named(Constants.FORM_NAME) String formName, //
 			@Optional @Named(Constants.FORM_ID) String perspectiveId, //
-			@Optional @Named(Constants.FORM_LABEL) String perspectiveName, MWindow window) {
+			@Optional @Named(Constants.FORM_LABEL) String perspectiveName, //
+			@Optional @Named(Constants.FORM_ICON) String perspectiveIcon, MWindow window) {
 
 		Objects.requireNonNull(formName);
 		Objects.requireNonNull(perspectiveId);
 		Objects.requireNonNull(perspectiveName);
 
-		openPerspective(context, perspectiveId, window, formName, perspectiveName);
+		openPerspective(context, perspectiveId, window, formName, perspectiveName, perspectiveIcon);
 	}
 
 	/**
 	 * Opens the perspective with the given identifier.
-	 *
+	 * 
+	 * @param perspectiveIcon
 	 * @param perspectiveId
 	 *            The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException
 	 *             If the perspective could not be opened.
 	 */
-	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName, String perspectiveName) {
+	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName, String perspectiveName,
+			String perspectiveIcon) {
 		MUIElement element = modelService.find(perspectiveID, application);
 		if (element == null) {
-			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID, formName, perspectiveName);
+			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID, formName, perspectiveName, perspectiveIcon);
 		} else {
 			switchTo(element, perspectiveID, window);
 		}
@@ -69,9 +77,10 @@ public class SwitchPerspectiveHandler {
 	 * @param window
 	 * @param perspectiveStack
 	 * @param perspectiveID
+	 * @param perspectiveIcon
 	 * @return die neue Perspektive
 	 */
-	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID, String formName, String perspectiveName) {
+	private MPerspective createNewPerspective(IEclipseContext context, String perspectiveID, String formName, String perspectiveName, String perspectiveIcon) {
 		MWindow window = context.get(MWindow.class);
 
 		@SuppressWarnings("unchecked")
@@ -88,10 +97,9 @@ public class SwitchPerspectiveHandler {
 			perspective = (MPerspective) element;
 			perspective.getPersistedState().put(Constants.FORM_NAME, formName);
 			perspective.setLabel(perspectiveName);
+			perspective.setIconURI(perspectiveIcon);
 			perspectiveStack.getChildren().add(perspective);
 			switchTo(perspective, perspectiveID, window);
-
-			ImageUtil.updateModelIcons(element, modelService);
 		}
 		return perspective;
 	}
@@ -103,7 +111,13 @@ public class SwitchPerspectiveHandler {
 	 */
 	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
 		if (element instanceof MPerspective) {
-			partService.switchPerspective(perspectiveID);
+			MPerspective mPerspective = partService.switchPerspective(perspectiveID).get();
+
+			ImageUtil.updateModelIcons(element, modelService);
+
+			MPart detailPart = partService.findPart(Constants.DETAIL_PART);
+			detailPart.setIconURI(ImageUtil.retrieveIcon(mPerspective.getIconURI(), false));
+			detailPart.setLabel(translationService.translate(mPerspective.getLabel(), null));
 		} else {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		}
