@@ -207,6 +207,9 @@ public class WFCDetailCASRequestsUtil {
 					updateSelectedEntry();
 				}));
 			}
+
+			sendEventToHelper(ActionCode.AFTERREAD);
+
 		});
 	}
 
@@ -370,6 +373,7 @@ public class WFCDetailCASRequestsUtil {
 		Table t = sectionGrid.setDataTable(selectedGrids.get(gridID).copy());
 		sectionGrid.clearDataChanges();
 		selectedGrids.put(gridID, t);
+		broker.send(Constants.BROKER_CHECKDIRTY, "");
 	}
 
 	/**

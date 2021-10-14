@@ -35,6 +35,7 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -1008,6 +1009,15 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
 		checkDirtyFlag();
+	}
+
+	@Inject
+	@Optional
+	public void checkDirtyFromBroker(@UIEventTopic(Constants.BROKER_CHECKDIRTY) String message) {
+		MPerspective activePerspective = eModelService.getActivePerspective(mwindow);
+		if (activePerspective.equals(mPerspective)) {
+			checkDirtyFlag();
+		}
 	}
 
 	private void checkDirtyFlag() {

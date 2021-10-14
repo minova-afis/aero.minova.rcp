@@ -79,6 +79,7 @@ public class Constants {
 	public static final String BROKER_RESIZETABLE = "aero/minova/rcp/ResizeTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
+	public static final String BROKER_CHECKDIRTY = "aero/minova/rcp/checkDirty";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
 	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
