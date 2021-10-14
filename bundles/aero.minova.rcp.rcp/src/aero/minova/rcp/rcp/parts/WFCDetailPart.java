@@ -34,6 +34,7 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -199,6 +200,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		getForm();
 		layoutForm(parent);
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
+		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
@@ -440,7 +442,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 */
 	private void addKeysFromXBSToGrid(Grid grid, Node node) throws NoSuchFieldException {
 		// OP-Feldnamen zu Values Map aus .xbs setzten
-		MGrid opMGrid = mDetail.getGrid(grid.getProcedureSuffix());
+		MGrid opMGrid = mDetail.getGrid(grid.getId());
 		SectionGrid sg = ((GridAccessor) opMGrid.getGridAccessor()).getSectionGrid();
 		Map<String, String> keynamesToValues = XBSUtil.getKeynamesToValues(node);
 		sg.setFieldnameToValue(keynamesToValues);
@@ -704,9 +706,15 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private MGrid createMGrid(Grid grid, MSection section) {
-		MGrid mgrid = new MGrid(grid.getProcedureSuffix());
+
+		if (grid.getId() == null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Grid " + grid.getProcedureSuffix() + " has no ID!");
+		}
+
+		MGrid mgrid = new MGrid(grid.getId());
 		mgrid.setTitle(grid.getTitle());
 		mgrid.setFill(grid.getFill());
+		mgrid.setProcedureSuffix(grid.getProcedureSuffix());
 		mgrid.setProcedurePrefix(grid.getProcedurePrefix());
 		mgrid.setmSection(section);
 		final ImageDescriptor gridImageDescriptor = ImageUtil.getImageDescriptor(grid.getIcon(), false);
@@ -719,7 +727,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				MField mF = ModelToViewModel.convert(f);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
-				showErrorMissingSQLIndex(f, grid.getProcedureSuffix() + "." + f.getName(), e);
+				showErrorMissingSQLIndex(f, grid.getId() + "." + f.getName(), e);
 			}
 		}
 		mgrid.setGrid(grid);
@@ -989,6 +997,15 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
 		checkDirtyFlag();
+	}
+
+	@Inject
+	@Optional
+	public void checkDirtyFromBroker(@UIEventTopic(Constants.BROKER_CHECKDIRTY) String message) {
+		MPerspective activePerspective = eModelService.getActivePerspective(mwindow);
+		if (activePerspective.equals(mPerspective)) {
+			checkDirtyFlag();
+		}
 	}
 
 	private void checkDirtyFlag() {

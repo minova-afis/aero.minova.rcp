@@ -122,4 +122,13 @@ public interface IDataService {
 
 	Path getStoragePath();
 
+	/**
+	 * Liefert den Wert aus der Tabelle tSiteParameter wenn der Key existiert, ansonsten den Default-Wert
+	 * 
+	 * @param key
+	 * @param defaultVal
+	 * @return
+	 */
+	String getSiteParameter(String key, String defaultVal);
+
 }

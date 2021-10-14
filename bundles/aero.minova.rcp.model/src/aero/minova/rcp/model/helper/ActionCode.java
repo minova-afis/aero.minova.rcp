@@ -1,5 +1,14 @@
 package aero.minova.rcp.model.helper;
 
 public enum ActionCode {
-	DEL, NEW, SAVE, BEFORESAVE, AFTERSAVE, REVERT;
+	BEFOREDEL, //
+	DEL, //
+	NEW, //
+	BEFORENEW, //
+	SAVE, //
+	BEFORESAVE, //
+	AFTERSAVE, //
+	REVERT, //
+	BEFOREREAD, //
+	AFTERREAD,
 }

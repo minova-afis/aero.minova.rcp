@@ -184,4 +184,20 @@ public class Table {
 		return "Table " + name;
 	}
 
+	public void setValue(String columnName, int rowIndex, Value newValue) {
+		setValue(getColumnIndex(columnName), rowIndex, newValue);
+	}
+
+	public void setValue(String columnName, Row r, Value newValue) {
+		r.setValue(newValue, getColumnIndex(columnName));
+	}
+
+	public void setValue(int columnIndex, int rowIndex, Value newValue) {
+		rows.get(rowIndex).setValue(newValue, columnIndex);
+	}
+
+	public Value getValue(String columnName, Row r) {
+		return r.getValue(getColumnIndex(columnName));
+	}
+
 }

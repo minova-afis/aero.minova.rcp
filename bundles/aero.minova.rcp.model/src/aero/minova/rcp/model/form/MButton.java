@@ -57,4 +57,12 @@ public class MButton {
 		buttonAccessor.removeSelectionListener(listener);
 	}
 
+	public boolean isCanBeEnabled() {
+		return buttonAccessor.isCanBeEnabled();
+	}
+
+	public void setCanBeEnabled(boolean canBeEnabled) {
+		buttonAccessor.setCanBeEnabled(canBeEnabled);
+	}
+
 }

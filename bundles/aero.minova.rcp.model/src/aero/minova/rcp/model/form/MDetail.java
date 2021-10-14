@@ -29,6 +29,8 @@ public class MDetail {
 
 	private IDetailAccessor detailAccessor;
 
+	private boolean clearAfterSave;
+
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
 	 * <ul>
@@ -62,7 +64,7 @@ public class MDetail {
 		if (g == null) {
 			return;
 		}
-		grids.put(g.getProcedureSuffix(), g);
+		grids.put(g.getId(), g);
 	}
 
 	public Collection<MGrid> getGrids() {
@@ -70,7 +72,7 @@ public class MDetail {
 	}
 
 	/**
-	 * Liefert das MGrid mit dem Procedure-Suffix.
+	 * Liefert das MGrid mit der ID
 	 *
 	 * @param name
 	 *            Name des Grids
@@ -187,5 +189,13 @@ public class MDetail {
 
 	public void setDetailAccessor(IDetailAccessor detailAccessor) {
 		this.detailAccessor = detailAccessor;
+	}
+
+	public boolean isClearAfterSave() {
+		return clearAfterSave;
+	}
+
+	public void setClearAfterSave(boolean clearAfterSave) {
+		this.clearAfterSave = clearAfterSave;
 	}
 }

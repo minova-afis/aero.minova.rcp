@@ -73,14 +73,14 @@ public class ExportIndexHandler {
 				csv = setNatTableDatatToStringBuffer(wfcPart);
 				Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clip.setContents(new StringSelection(csv.toString()), null);
-				broker.post(Constants.BROKER_NOTIFYUSER, translationService.translate("@msg.ExportIntoClipboardSuccess", null));
+				broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.ExportIntoClipboardSuccess");
 				break;
 			case FILE:
 				// Dateinamen fragen...
 				String fileName = null;
 				fileName = askFileName(shell, fileName);
 				if (fileName == null) {
-					broker.post(Constants.BROKER_NOTIFYUSER, translationService.translate("@msg.ActionAborted", null));
+					broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.ActionAborted");
 				} else {
 					if (!fileName.endsWith(".csv")) {
 						fileName = fileName + ".csv";
@@ -89,11 +89,11 @@ public class ExportIndexHandler {
 					// Datei speichern mit dem gegebenen Inhalt
 					try {
 						IOUtil.saveLoud(csv.toString(), fileName, "UTF-8");
-						broker.post(Constants.BROKER_NOTIFYUSER, translationService.translate("@msg.ExportSuccess", null));
+						broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.ExportSuccess");
 						// Datei direkt öffnen
 						Tools.openURL(fileName);
 					} catch (final Exception e) {
-						broker.post(Constants.BROKER_NOTIFYUSER, translationService.translate("@msg.ExportError", null));
+						broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.ExportError");
 					}
 				}
 				break;

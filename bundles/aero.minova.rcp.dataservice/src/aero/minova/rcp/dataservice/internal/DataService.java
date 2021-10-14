@@ -26,8 +26,10 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,6 +119,8 @@ public class DataService implements IDataService {
 
 	private URI workspacePath;
 
+	private Map<String, String> siteParameters;
+
 	EventAdmin eventAdmin;
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
@@ -135,6 +139,7 @@ public class DataService implements IDataService {
 		this.server = server;
 		this.workspacePath = workspacePath;
 		init();
+		initSiteParameters();
 
 		// im Falle der Unit tests haben wir keinen bundle context
 		if (FrameworkUtil.getBundle(this.getClass()) != null) {
@@ -168,6 +173,31 @@ public class DataService implements IDataService {
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.setPrettyPrinting() //
 				.create();
+	}
+
+	private void initSiteParameters() {
+		siteParameters = new HashMap<>();
+		Table requestTable = TableBuilder.newTable("tSiteParameter") //
+				.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn("Value", DataType.STRING)//
+				.withColumn(TABLE_LASTACTION, DataType.INTEGER).create();
+		Row row = RowBuilder.newRow() //
+				.withValue(null) //
+				.withValue(null) //
+				.withValue(fv) //
+				.create();
+
+		requestTable.addRow(row);
+		CompletableFuture<Table> tableCF = getTableAsync(requestTable);
+
+		try {
+			Table paramTable = tableCF.get();
+			if (paramTable != null) {
+				for (Row r : paramTable.getRows()) {
+					siteParameters.put(r.getValue(0).getStringValue(), r.getValue(1).getStringValue());
+				}
+			}
+		} catch (InterruptedException | ExecutionException e) {}
 	}
 
 	private static SSLContext disabledSslVerificationContext() {
@@ -670,6 +700,14 @@ public class DataService implements IDataService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getSiteParameter(String key, String defaultVal) {
+		if (siteParameters.containsKey(key)) {
+			return siteParameters.get(key);
+		}
+		return defaultVal;
 	}
 
 	private void handleCASError(Throwable ex, String method, boolean showErrorMessage) {

@@ -35,7 +35,7 @@ public class Constants {
 	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
-	public static final String CONTROL_GRID_PROCEDURE_SUFFIX = "grid_procedure_suffix";
+	public static final String CONTROL_GRID_ID = "grid_id";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
@@ -63,10 +63,12 @@ public class Constants {
 	public static final String BROKER_DELETEENTRY = "aero/minova/rcp/DeleteEntry";
 	public static final String BROKER_NEWENTRY = "aero/minova/rcp/NewFields";
 	public static final String BROKER_CLEARFIELDS = "aero/minova/rcp/ClearFields";
+	public static final String BROKER_RELOADFIELDS = "aero/minova/rcp/ReloadFields";
 	public static final String BROKER_CLEARSELECTION = "aero/minova/rcp/ClearSelection";
 	public static final String BROKER_REVERTENTRY = "aero/minova/rcp/RevertEntry";
 	public static final String BROKER_WFCLOADALLLOOKUPVALUES = "aero/minova/rcp/WFCLoadAllLookUpValues";
 	public static final String BROKER_LOADINDEXTABLE = "aero/minova/rcp/LoadIndexTable";
+	public static final String BROKER_RELOADINDEX = "aero/minova/rcp/ReloadIndex";
 	public static final String BROKER_COLLAPSEINDEX = "aero/minova/rcp/CollapseIndex";
 	public static final String BROKER_EXPANDINDEX = "aero/minova/rcp/ExpandIndex";
 	public static final String BROKER_CLEARSEARCHTABLE = "aero/minova/rcp/ClearSearchTable";
@@ -77,9 +79,9 @@ public class Constants {
 	public static final String BROKER_RESIZETABLE = "aero/minova/rcp/ResizeTable";
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
+	public static final String BROKER_CHECKDIRTY = "aero/minova/rcp/checkDirty";
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
 	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
-	public static final String BROKER_NOTIFYUSER = "aero/minova/rcp/NotifyUser";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
 	public static final String BROKER_SHOWCONNECTIONERRORMESSAGE = "aero/minova/rcp/ShowConnectionErrorMessage";
 	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
@@ -147,6 +149,7 @@ public class Constants {
 	// Commands
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_PRINTDETAIL = "aero.minova.rcp.rcp.command.printdetail";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";

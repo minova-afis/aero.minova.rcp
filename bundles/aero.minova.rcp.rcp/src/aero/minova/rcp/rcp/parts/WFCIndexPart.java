@@ -700,10 +700,15 @@ public class WFCIndexPart extends WFCFormPart {
 				return;
 			}
 
-			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
-			List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			List<Row> c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List<Row> collection = c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+
+			Table t = dataFormService.getTableFromFormIndex(form);
+			for (Row r : collection) {
+				t.addRow(r);
+			}
 			if (!collection.isEmpty()) {
-				context.set(Constants.BROKER_ACTIVEROWS, collection);
+				context.set(Constants.BROKER_ACTIVEROWS, t);
 			}
 		}
 	}
