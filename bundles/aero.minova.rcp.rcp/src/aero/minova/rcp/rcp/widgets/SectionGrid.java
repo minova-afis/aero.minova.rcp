@@ -696,6 +696,8 @@ public class SectionGrid {
 			for (int i = r.start; i < r.end; i++) {
 				dataTable.deleteRow(sortedList.get(i));
 				rowsToDelete.add(sortedList.get(i));
+				rowsToUpdate.remove(sortedList.get(i));
+				rowsToInsert.remove(sortedList.get(i));
 				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), i, false, GridChangeType.DELETE));
 			}
 		}
