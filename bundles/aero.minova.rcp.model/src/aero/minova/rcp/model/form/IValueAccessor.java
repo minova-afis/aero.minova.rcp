@@ -1,5 +1,8 @@
 package aero.minova.rcp.model.form;
 
+import java.util.function.Predicate;
+
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 
@@ -25,4 +28,11 @@ public interface IValueAccessor {
 	void setCSSClass(String classname);
 
 	void updateSaveButton();
+
+	/**
+	 * Setzt einen Filter für den Content Provider des Lookups. Für Nicht-Lookup Felder hat die Methode keine Auswirkung
+	 * 
+	 * @param filter
+	 */
+	void setFilterForLookupContentProvider(Predicate<LookupValue> filter);
 }

@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.accessor;
 
+import java.util.function.Predicate;
+
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -13,6 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.IValueAccessor;
@@ -138,4 +141,8 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
 	}
 
+	@Override
+	public void setFilterForLookupContentProvider(Predicate<LookupValue> filter) {
+		// Tut nichts für Felder außer Lookups, ist im LookupValueAccessor überschrieben
+	}
 }
