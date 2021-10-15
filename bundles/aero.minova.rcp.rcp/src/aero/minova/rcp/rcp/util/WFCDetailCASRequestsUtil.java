@@ -194,6 +194,8 @@ public class WFCDetailCASRequestsUtil {
 					for (MGrid g : mDetail.getGrids()) {
 						readGrid(g, table);
 					}
+
+					sendEventToHelper(ActionCode.AFTERREAD);
 				}
 			}));
 
@@ -207,9 +209,6 @@ public class WFCDetailCASRequestsUtil {
 					updateSelectedEntry();
 				}));
 			}
-
-			sendEventToHelper(ActionCode.AFTERREAD);
-
 		});
 	}
 
