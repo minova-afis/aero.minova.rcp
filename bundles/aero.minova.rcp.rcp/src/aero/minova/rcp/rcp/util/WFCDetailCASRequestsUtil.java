@@ -389,8 +389,6 @@ public class WFCDetailCASRequestsUtil {
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
 			sendSaveRequest(formTable);
-
-			sendEventToHelper(ActionCode.AFTERSAVE);
 		}
 	}
 
@@ -611,8 +609,8 @@ public class WFCDetailCASRequestsUtil {
 			reloadFields(keyTable);
 		}
 
-		sendEventToHelper(ActionCode.SAVE);
 		focusFirstEmptyField();
+		sendEventToHelper(ActionCode.AFTERSAVE);
 	}
 
 	/**
@@ -761,7 +759,7 @@ public class WFCDetailCASRequestsUtil {
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
 			// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
-			sendEventToHelper(ActionCode.DEL);
+			sendEventToHelper(ActionCode.AFTERDEL);
 			focusFirstEmptyField();
 		}
 
@@ -866,7 +864,7 @@ public class WFCDetailCASRequestsUtil {
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
-		sendEventToHelper(ActionCode.NEW);
+		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
 	}
 
@@ -947,6 +945,7 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 			updateSelectedEntry();
 			updateSelectedGrids();
+			sendEventToHelper(ActionCode.REVERT);
 		}
 	}
 
