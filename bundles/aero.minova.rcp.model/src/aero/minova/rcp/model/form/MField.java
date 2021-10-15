@@ -299,12 +299,12 @@ public abstract class MField {
 
 	public void setOriginalRequired(boolean originalRequired) {
 		this.originalRequired = originalRequired;
-		this.required = originalRequired;
+		setRequired(originalRequired);
 	}
 
 	public void setOriginalReadOnly(boolean originalReadOnly) {
 		this.originalReadOnly = originalReadOnly;
-		this.readOnly = originalReadOnly;
+		setReadOnly(originalReadOnly);
 	}
 
 	public boolean isRequired() {
