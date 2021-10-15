@@ -464,9 +464,9 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		});
 
-		MinovaIndexConfiguration mdc = new MinovaIndexConfiguration(table.getColumns(), form);
-		natTable.addConfiguration(mdc);
-		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mdc.getHiddenColumns());
+		MinovaIndexConfiguration mic = new MinovaIndexConfiguration(table.getColumns(), form);
+		natTable.addConfiguration(mic);
+		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mic.getHiddenColumns());
 
 		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
