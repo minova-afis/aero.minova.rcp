@@ -106,7 +106,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
+import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -464,7 +464,7 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		});
 
-		MinovaDisplayConfiguration mdc = new MinovaDisplayConfiguration(table.getColumns(), form);
+		MinovaIndexConfiguration mdc = new MinovaIndexConfiguration(table.getColumns(), form);
 		natTable.addConfiguration(mdc);
 		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mdc.getHiddenColumns());
 
