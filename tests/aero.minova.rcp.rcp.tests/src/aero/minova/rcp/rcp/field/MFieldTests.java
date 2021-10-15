@@ -88,7 +88,7 @@ public class MFieldTests {
 	public void booleanFieldsetValueNull() {
 		booleanFieldsetValue();
 		mBooleanField.setValue(null, false);
-		assertEquals(null, new Value(false));
+		assertEquals(new Value(false), mBooleanField.getValue());
 	}
 
 	@Test
