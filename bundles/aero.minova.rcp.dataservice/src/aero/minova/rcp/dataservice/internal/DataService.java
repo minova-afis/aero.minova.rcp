@@ -81,6 +81,12 @@ public class DataService implements IDataService {
 	 */
 	private boolean logSQLString = true;
 
+	/**
+	 * Kann zum debuggen auf false gesetzt werden, dann werden lokale Änderungen an z.B. Masken nicht überschrieben. <br>
+	 * ACHTUNG: Für Anwender MUSS das auf true gesetzt sein
+	 */
+	private boolean updateFiles = true;
+
 	Logger logger;
 
 	HashMap<String, String> serverHashes = new HashMap<>();
@@ -361,7 +367,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
-			if (checkIfUpdateIsRequired(filename)) {
+			if (updateFiles && checkIfUpdateIsRequired(filename)) {
 				logCache(filename + " need to download / update the file ");
 				// File löschen, damit es komplett aktualisiert wird
 				getStoragePath().resolve(filename).toFile().delete();
