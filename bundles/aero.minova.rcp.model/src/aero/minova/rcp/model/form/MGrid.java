@@ -225,4 +225,28 @@ public class MGrid {
 	public void closeEditor() {
 		gridAccessor.closeEditor();
 	}
+
+	/**
+	 * Setzt alle Spalten auf ihren ursprünglichen read-only und required Zustand zurück
+	 */
+	public void resetReadOnlyAndRequiredColumns() {
+		gridAccessor.resetReadOnlyAndRequiredColumns();
+	}
+
+	public void setColumnRequired(int columnIndex, boolean required) {
+		gridAccessor.setColumnRequired(columnIndex, required);
+	}
+
+	public void setGridRequired(boolean required) {
+		gridAccessor.setGridRequired(required);
+	}
+
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		gridAccessor.setColumnReadOnly(columnIndex, readOnly);
+	}
+
+	public void setGridReadOnly(boolean readOnly) {
+		gridAccessor.setGridReadOnly(readOnly);
+	}
+
 }

@@ -194,6 +194,8 @@ public class WFCDetailCASRequestsUtil {
 					for (MGrid g : mDetail.getGrids()) {
 						readGrid(g, table);
 					}
+
+					sendEventToHelper(ActionCode.AFTERREAD);
 				}
 			}));
 
@@ -207,9 +209,6 @@ public class WFCDetailCASRequestsUtil {
 					updateSelectedEntry();
 				}));
 			}
-
-			sendEventToHelper(ActionCode.AFTERREAD);
-
 		});
 	}
 
@@ -390,8 +389,6 @@ public class WFCDetailCASRequestsUtil {
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
 			sendSaveRequest(formTable);
-
-			sendEventToHelper(ActionCode.AFTERSAVE);
 		}
 	}
 
@@ -612,8 +609,8 @@ public class WFCDetailCASRequestsUtil {
 			reloadFields(keyTable);
 		}
 
-		sendEventToHelper(ActionCode.SAVE);
 		focusFirstEmptyField();
+		sendEventToHelper(ActionCode.AFTERSAVE);
 	}
 
 	/**
@@ -762,7 +759,7 @@ public class WFCDetailCASRequestsUtil {
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
 			// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
-			sendEventToHelper(ActionCode.DEL);
+			sendEventToHelper(ActionCode.AFTERDEL);
 			focusFirstEmptyField();
 		}
 
@@ -867,7 +864,7 @@ public class WFCDetailCASRequestsUtil {
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
-		sendEventToHelper(ActionCode.NEW);
+		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
 	}
 
@@ -946,8 +943,10 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
+			sendEventToHelper(ActionCode.BEFOREREVERT);
 			updateSelectedEntry();
 			updateSelectedGrids();
+			sendEventToHelper(ActionCode.AFTERREVERT);
 		}
 	}
 

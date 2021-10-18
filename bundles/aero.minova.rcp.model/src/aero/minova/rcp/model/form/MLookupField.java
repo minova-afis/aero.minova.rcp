@@ -1,6 +1,9 @@
 package aero.minova.rcp.model.form;
 
+import java.util.function.Predicate;
+
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 
@@ -47,8 +50,7 @@ public class MLookupField extends MField {
 	}
 
 	/**
-	 * Diese Methode liefert den Text zurück, welcher in dem textAssist (Text) Feld
-	 * angezeigt wird
+	 * Diese Methode liefert den Text zurück, welcher in dem textAssist (Text) Feld angezeigt wird
 	 *
 	 * @return
 	 */
@@ -58,5 +60,14 @@ public class MLookupField extends MField {
 
 	public void setWrittenText(String writtenText) {
 		this.writtenText = writtenText;
+	}
+
+	/**
+	 * Setzt einen Filter für den Content-Provider, mit dem Werte vom Anzeigen ausgeschlossen werden können
+	 * 
+	 * @param filter
+	 */
+	public void setFilterForContentProvider(Predicate<LookupValue> filter) {
+		this.getValueAccessor().setFilterForLookupContentProvider(filter);
 	}
 }
