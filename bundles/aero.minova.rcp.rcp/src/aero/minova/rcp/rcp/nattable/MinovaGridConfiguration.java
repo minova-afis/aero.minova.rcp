@@ -64,6 +64,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	@Override
 	public void configureRegistry(IConfigRegistry configRegistry) {
 		this.configRegistry = configRegistry;
+
+		// EDITABLE_RULE anpassen, damit Read-Only Spalten nicht bearbeitet werden können
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, new IEditableRule() {
 
 			@Override
@@ -109,7 +111,6 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private void configureCells(IConfigRegistry configRegistry) {
 		int i = 0;
 		for (Column column : columns) {
-
 			if (column.isLookup()) {
 				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired(),
 						column.getLookupTable());
@@ -308,13 +309,9 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		int decimals = 0;
 		if (field.getNumber() != null) {
 			decimals = field.getNumber().getDecimals();
-		}
-
-		if (field.getPercentage() != null) {
+		} else if (field.getPercentage() != null) {
 			decimals = field.getPercentage().getDecimals();
-
-		}
-		if (field.getMoney() != null) {
+		} else if (field.getMoney() != null) {
 			decimals = field.getMoney().getDecimals();
 		}
 
