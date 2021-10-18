@@ -358,21 +358,26 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		part.getParent().setTabList(tabList.toArray(new Control[0]));
 
 		// Helper-Klasse initialisieren
-		if (form.getHelperClass() != null) {
-			String helperClass = form.getHelperClass();
-			IHelper iHelper = null;
-			for (IHelper h : helperlist) {
-				if (Objects.equals(helperClass, h.getClass().getName())) {
-					iHelper = h;
-				}
-			}
+		initializeHelper(form.getHelperClass());
+	}
 
-			if (iHelper == null) {
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
-			} else {
-				getDetail().setHelper(iHelper);
-				ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
+	private void initializeHelper(String helperName) {
+		if (helperName == null) {
+			return;
+		}
+
+		IHelper iHelper = null;
+		for (IHelper h : helperlist) {
+			if (Objects.equals(helperName, h.getClass().getName())) {
+				iHelper = h;
 			}
+		}
+
+		if (iHelper == null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
+		} else {
+			getDetail().setHelper(iHelper);
+			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
 
@@ -841,6 +846,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mGrid.setGridAccessor(gA);
 		mSection.getmDetail().putGrid(mGrid);
 		sectionGrids.add(sg);
+		initializeHelper(((Grid) fieldOrGrid).getHelperClass());
 
 		ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 		sg.createGrid();
