@@ -137,16 +137,23 @@ Da die Tests aber nicht zur Laufzeit wichtig sind muss die Checkbox "Activate th
 [[Klasse_erstellen]]
 == Erstellen der Klasse
 
-Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein:
+Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein, entweder in der Form am Anfang oder in einem Grid. 
+ACHTUNG: Aktuell kann nur ein Helper geladen werden, wenn in der Form und in einem Grid ein Helper vermerkt ist wird der des Grids genutzt.
 
 [source,xml]
 ----
+<!-- Vermerk in form-Tag, am Anfang der Maske -->
 <form icon="JobDefinition" title="@tJobDefinition.Administration" 
   helper-class="aero.minova.jobdefinition.helper.JobDefinitionHelper" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
   ....
 </form>
+
+<!-- Vermerk in einem grid-Tag -->
+<grid  id="GraduationStep" delete-requires-all-params="true" procedure-suffix="GraduationStep" helper-class="aero.minova.graduation.helper.GraduationStepHelper">
+	....
+</grid>
 ----
 
 Die Helperklassen müssen die Klasse ``IHelper`` implementieren. Dafür muss das Package ``aero.minova.rcp.model`` zu den benötigten Plug-Ins hinzugefügt werden.
