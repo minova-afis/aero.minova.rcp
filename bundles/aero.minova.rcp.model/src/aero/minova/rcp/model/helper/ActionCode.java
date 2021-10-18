@@ -10,7 +10,8 @@ public enum ActionCode {
 	BEFORESAVE, //
 	AFTERSAVE, //
 
-	REVERT, //
+	BEFOREREVERT, //
+	AFTERREVERT,
 
 	BEFOREREAD, //
 	AFTERREAD,

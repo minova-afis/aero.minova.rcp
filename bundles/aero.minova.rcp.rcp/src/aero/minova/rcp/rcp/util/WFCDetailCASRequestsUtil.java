@@ -943,9 +943,10 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
+			sendEventToHelper(ActionCode.BEFOREREVERT);
 			updateSelectedEntry();
 			updateSelectedGrids();
-			sendEventToHelper(ActionCode.REVERT);
+			sendEventToHelper(ActionCode.AFTERREVERT);
 		}
 	}
 
