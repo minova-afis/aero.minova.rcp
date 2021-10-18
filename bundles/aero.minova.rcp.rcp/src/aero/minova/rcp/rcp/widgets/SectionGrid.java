@@ -504,11 +504,10 @@ public class SectionGrid {
 	}
 
 	public Table setDataTable(Table newDataTable) {
-		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
-
+		addRowsFromTable(newDataTable);
 		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), false));
-		return addRowsFromTable(newDataTable);
+		return dataTable.copy();
 	}
 
 	public void addRows(Table t) {
@@ -526,7 +525,7 @@ public class SectionGrid {
 		}
 	}
 
-	private Table addRowsFromTable(Table rowsToAdd) {
+	private void addRowsFromTable(Table rowsToAdd) {
 		for (Row rowInNewTable : rowsToAdd.getRows()) {
 			Row rowInOriginal = this.dataTable.addRow();
 
@@ -543,7 +542,6 @@ public class SectionGrid {
 			}
 		}
 		updateNatTable();
-		return dataTable.copy();
 	}
 
 	public NatTable getNatTable() {
