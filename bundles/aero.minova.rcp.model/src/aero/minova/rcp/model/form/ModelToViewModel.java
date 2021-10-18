@@ -13,8 +13,8 @@ public class ModelToViewModel {
 		f.setLabel(field.getLabel());
 		f.setUnitText(field.getUnitText());
 		f.setSqlIndex(field.getSqlIndex().intValue());
-		f.setRequired(field.isRequired());
-		f.setReadOnly(field.isReadOnly());
+		f.setOriginalRequired(field.isRequired());
+		f.setOriginalReadOnly(field.isReadOnly());
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 		}

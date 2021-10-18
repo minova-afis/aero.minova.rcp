@@ -290,9 +290,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
-		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle) {
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix) {
 			this(headOrPageOrGrid);
-			this.formTitle = formTitle;
 			this.formSuffix = formSuffix;
 			this.isOP = isOP;
 			if (headOrPageOrGrid instanceof Head && !isOP) {
@@ -300,6 +299,16 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			} else {
 				isHead = false;
 			}
+
+			if (headOrPageOrGrid instanceof Head && isOP) {
+				id = formSuffix + ".Head";
+			}
+		}
+
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle, String icon) {
+			this(headOrPageOrGrid, isOP, formSuffix);
+			this.formTitle = formTitle;
+			this.icon = icon;
 		}
 
 		public String getTranslationText() {
@@ -407,7 +416,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mDetail.addOptionPageKeys(opForm.getDetail().getProcedureSuffix(), keynamesToValues);
 
 		for (Object headOrPage : opForm.getDetail().getHeadAndPageAndGrid()) {
-			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle());
+			HeadOrPageOrGridWrapper wrapper;
+			if (headOrPage instanceof Head) {
+				// Head in der OP braucht titel und icon der Form
+				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle(), opForm.getIcon());
+			} else {
+				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix());
+			}
 			layoutSection(parent, wrapper);
 		}
 

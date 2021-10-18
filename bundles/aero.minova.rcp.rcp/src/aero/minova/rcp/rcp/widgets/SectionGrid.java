@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -13,11 +14,13 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -134,6 +137,8 @@ public class SectionGrid {
 	private Form form;
 	@Inject
 	private MWindow mwindow;
+	@Inject
+	private IEventBroker broker;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -153,11 +158,17 @@ public class SectionGrid {
 
 	private GridAccessor gridAccessor;
 
+	/**
+	 * Zuordnung von Name in Grid zu Name in Detail, aus .xbs
+	 */
 	private Map<String, String> fieldnameToValue;
 
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
+
+	private Map<Integer, Boolean> originalReadOnlyColumns;
+	private Map<Integer, Boolean> originalRequiredColumns;
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
@@ -170,6 +181,8 @@ public class SectionGrid {
 
 	private SortHeaderLayer sortHeaderLayer;
 
+	private MinovaGridConfiguration gridConfiguration;
+
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
@@ -181,6 +194,9 @@ public class SectionGrid {
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
 
+		originalReadOnlyColumns = new HashMap<>();
+		originalRequiredColumns = new HashMap<>();
+
 		setFieldnameToValue(new HashMap<>());
 	}
 
@@ -189,6 +205,11 @@ public class SectionGrid {
 		dataTable = dataFormService.getTableFromGrid(grid);
 		createNatTable();
 		loadState();
+
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			originalReadOnlyColumns.put(i, dataTable.getColumns().get(i).isReadOnly());
+			originalRequiredColumns.put(i, dataTable.getColumns().get(i).isRequired());
+		}
 	}
 
 	/**
@@ -376,9 +397,9 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		MinovaGridConfiguration mgc = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
-		getNatTable().addConfiguration(mgc);
-		columnHideShowLayer.hideColumnPositions(mgc.getHiddenColumns());
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
+		getNatTable().addConfiguration(gridConfiguration);
+		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		getNatTable().addConfiguration(new DefaultEditBindings() {
@@ -830,6 +851,44 @@ public class SectionGrid {
 
 	public void removeSelectionListener(ILayerListener listener) {
 		selectionLayer.removeLayerListener(listener);
+	}
+
+	public void resetReadOnlyAndRequiredColumns() {
+		for (Entry<Integer, Boolean> e : originalReadOnlyColumns.entrySet()) {
+			setColumnReadOnly(e.getKey(), e.getValue());
+		}
+
+		for (Entry<Integer, Boolean> e : originalRequiredColumns.entrySet()) {
+			setColumnRequired(e.getKey(), e.getValue());
+		}
+	}
+
+	public void setColumnRequired(int columnIndex, boolean required) {
+		dataTable.getColumns().get(columnIndex).setRequired(required);
+		gridConfiguration.setColumnRequired(columnIndex, required);
+
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
+	}
+
+	public void setGridRequired(boolean required) {
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			if (!gridConfiguration.getHiddenColumns().contains(i)) {
+				setColumnRequired(i, required);
+			}
+		}
+	}
+
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		dataTable.getColumns().get(columnIndex).setReadOnly(readOnly);
+		gridConfiguration.setColumnReadOnly(columnIndex, readOnly);
+	}
+
+	public void setGridReadOnly(boolean readOnly) {
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			if (!gridConfiguration.getHiddenColumns().contains(i)) {
+				setColumnReadOnly(i, readOnly);
+			}
+		}
 	}
 
 }

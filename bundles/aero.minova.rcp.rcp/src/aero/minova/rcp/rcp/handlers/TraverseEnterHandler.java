@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.service.prefs.Preferences;
@@ -167,7 +168,7 @@ public class TraverseEnterHandler {
 		}
 
 		for (Control children : fcSection.getChildren()) {
-			if (children instanceof Composite && !(children instanceof ToolBar)) {
+			if (children instanceof Composite && !(children instanceof ToolBar) && !(children instanceof ImageHyperlink)) {
 				comp = (Composite) children;
 				break;
 			}
@@ -256,7 +257,7 @@ public class TraverseEnterHandler {
 				Composite compo = null;
 				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
 				for (Control children : section.getChildren()) {
-					if (children instanceof Composite && !(children instanceof ToolBar || children instanceof Twistie)) {
+					if (children instanceof Composite && !(children instanceof ToolBar || children instanceof Twistie || children instanceof ImageHyperlink)) {
 						compo = (Composite) children;
 						break;
 					}
@@ -332,7 +333,7 @@ public class TraverseEnterHandler {
 		Composite compo = null;
 		for (Section section : sectionList) {
 			for (Control children : section.getChildren()) {
-				if (children instanceof Composite && !(children instanceof Label || children instanceof ToolBar)) {
+				if (children instanceof Composite && !(children instanceof Label || children instanceof ToolBar || children instanceof ImageHyperlink)) {
 					compo = (Composite) children;
 				}
 			}
