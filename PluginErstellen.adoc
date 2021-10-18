@@ -213,7 +213,7 @@ Beim Betätigen einer Aktion im Detail wird automatisch die Methode ``handleDeta
 * BEFORE-/ AFTERNEW: Vor/Nach Erstellen eines neuen Eintrags, also leeren der Felder. Da hier keine Prozedur aufgerufen wird folgen die Events kurz nacheinander
 * BEFORE-/ AFTERSAVE: Vor/Nach dem Speichern/Updaten eines Eintrages
 * BEFORE-/ AFTERREVERT: Vor/Nach dem Zurücksetzten des Eintrages. Auch hier wird keine Prozedur aufgerufen
-* BEFORE-/ AFTERREAD: Vor/Nach dem Lesen eines Datensatzes
+* BEFORE-/ AFTERREAD: Vor/Nach dem Lesen eines Datensatzes, Achtung: AFTERREAD wird verschickt, sobald die HAUPT-Maske komplett geladen ist. Option Pages und Grids sind eventuell noch nicht geladen
 
 ACHTUNG bei den Aktionen VOR Löschen/Speichern/Lesen/..., die Aufrufe sind asynchron, es wird also nicht auf eine Antwort des Helpers gewartet bevor die eigentlichen Prozeduren ausgeführt werden. 
 
