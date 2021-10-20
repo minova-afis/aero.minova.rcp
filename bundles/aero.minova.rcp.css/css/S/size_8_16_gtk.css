@@ -1,6 +1,0 @@
-@import url("platform:/plugin/aero.minova.rcp.css/css/S/size_8.css");
-@import url("platform:/plugin/aero.minova.rcp.css/css/S/size_8_gtk.css");
-
-CTabFolder {
-	swt-tab-height: 26px;
-}
