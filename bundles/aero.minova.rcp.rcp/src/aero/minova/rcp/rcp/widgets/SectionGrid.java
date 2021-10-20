@@ -339,7 +339,6 @@ public class SectionGrid {
 				int row = dataTable.getRows().indexOf(r);
 
 				Value oldVal = dataTable.getRows().get(row).getValue(col);
-				System.out.println("editing " + col + " " + row);
 
 				if (super.doCommand(command)) {
 					Value newVal = dataTable.getRows().get(row).getValue(col);
