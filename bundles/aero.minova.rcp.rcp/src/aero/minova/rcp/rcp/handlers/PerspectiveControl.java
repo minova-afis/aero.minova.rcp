@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -24,12 +23,13 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -71,9 +71,6 @@ public class PerspectiveControl {
 	private EHandlerService handlerService;
 
 	@Inject
-	private IResourceUtilities<?> resourceUtilities;
-
-	@Inject
 	MWindow window;
 
 	@Inject
@@ -90,19 +87,15 @@ public class PerspectiveControl {
 	Preferences prefsToolbarOrder = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_TOOLBARORDER);
 	List<String> openToolbarItems;
 
-	/*
-	 * Clear the Toolbar to prevent NullPointerExceptions
-	 */
-	@PreDestroy
-	void cleanUp() {
-		disposeToolBarImages();
-	}
+	private LocalResourceManager localResourceManager;
 
 	/*
 	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
 	 */
 	@PostConstruct
 	public void createGui(Composite parent, MWindow window) {
+		localResourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
+
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		composite.setLayout(rowLayout);
@@ -121,8 +114,6 @@ public class PerspectiveControl {
 				logger.debug("No item found or item is null");
 			}
 		});
-
-		toolBar.addDisposeListener(event -> disposeToolBarImages());
 
 		List<String> oldToolbarOrder = readOldToolbarOrder();
 		openToolbarItems = new ArrayList<>();
@@ -200,9 +191,9 @@ public class PerspectiveControl {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspectiveId);
 			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
-
+			
 			if (descriptor != null && !descriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
-				shortcut.setImage(descriptor.createImage());
+				shortcut.setImage(localResourceManager.createImage(descriptor));
 			} else {
 				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
@@ -274,20 +265,6 @@ public class PerspectiveControl {
 		}
 
 		return toolItem;
-	}
-
-	private void disposeToolBarImages() {
-		if (toolBar == null || toolBar.isDisposed()) {
-			return;
-		}
-
-		for (ToolItem item : toolBar.getItems()) {
-			Image icon = item.getImage();
-			if (icon != null) {
-				item.setImage(null);
-				icon.dispose();
-			}
-		}
 	}
 
 	public void setSelectedElement(MPerspective perspective) {
