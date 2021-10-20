@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +16,9 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -27,11 +30,14 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 
 public class ImageUtil {
 
-	private ImageUtil() {}
+	private ImageUtil() {
+	}
 
 	/**
-	 * Liefert einen ImageDescriptor für ein Bild, das im "icons" Ordner im aero.minova.rcp.images Plugin liegt. Diese gibt es nur ein einer Größe<br>
-	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
+	 * Liefert einen ImageDescriptor für ein Bild, das im "icons" Ordner im
+	 * aero.minova.rcp.images Plugin liegt. Diese gibt es nur ein einer Größe<br>
+	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden,
+	 * damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
 	 *
 	 * @param filename
 	 * @return
@@ -44,8 +50,10 @@ public class ImageUtil {
 
 	/**
 	 * Liefert einen ImageDescriptor für das Bild. <br>
-	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht. <br>
-	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
+	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird
+	 * es dort nicht gefunden wird im vom Server geladenen Ordner gesucht. <br>
+	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden,
+	 * damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
 	 * <br>
 	 *
 	 * @param filename
@@ -69,7 +77,8 @@ public class ImageUtil {
 
 	/**
 	 * Liefert einen String mit der Location des Bildes. <br>
-	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht.
+	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird
+	 * es dort nicht gefunden wird im vom Server geladenen Ordner gesucht.
 	 *
 	 * @param filename
 	 * @return
@@ -81,7 +90,8 @@ public class ImageUtil {
 		}
 
 		String iconWithoutExtension = icon.replace(".png", "").replace(".ico", "").toLowerCase();
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE)
+				.get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
@@ -90,12 +100,14 @@ public class ImageUtil {
 		if (localURL != null) {
 			try {
 				return localURL.toURI().toString();
-			} catch (URISyntaxException e) {}
+			} catch (URISyntaxException e) {
+			}
 		}
 
 		// Ansonsten im heruntergelandenen Images Ordner suchen
 		bundle = FrameworkUtil.getBundle(ImageUtil.class);
-		ServiceReference<IDataService> serviceReference = bundle.getBundleContext().getServiceReference(IDataService.class);
+		ServiceReference<IDataService> serviceReference = bundle.getBundleContext()
+				.getServiceReference(IDataService.class);
 		IDataService service = bundle.getBundleContext().getService(serviceReference);
 		Objects.requireNonNull(service);
 		java.nio.file.Path storagePath = service.getStoragePath().resolve("Images");
@@ -120,37 +132,37 @@ public class ImageUtil {
 	}
 
 	/**
-	 * Updated die Größe der Model-Icons (Icons der Parts und der Part-Toolbars) entsprechend der Einstellungen
+	 * Updated die Größe der Model-Icons (Icons der Parts und der Part-Toolbars)
+	 * entsprechend der Einstellungen
 	 * 
 	 * @param element
 	 * @param modelService
 	 */
-	public static void updateModelIcons(MUIElement element, EModelService modelService) {
+	public static void updateIconsForToolbarItems(MToolBar toolbar) {
+		for (MToolBarElement mToolBarElement : toolbar.getChildren()) {
+			MHandledToolItem ti = (MHandledToolItem) mToolBarElement;
 
-		// Finden der Parts
-		List<MPart> mParts = modelService.findElements(element, null, MPart.class);
-		for (MPart mPart : mParts) {
-			// Part-Icons
-			mPart.setIconURI(getNewIconString(mPart.getIconURI()));
-
-			// Part-Toolbars
-			if (mPart.getToolbar() != null) {
-				List<MToolBarElement> children = mPart.getToolbar().getChildren();
-				for (MToolBarElement mToolBarElement : children) {
-					MHandledToolItem ti = (MHandledToolItem) mToolBarElement;
-					ti.setIconURI(getNewIconString(ti.getIconURI()));
-
-					// Menüs der Part-Toolbar-Items
-					if (ti.getMenu() != null) {
-						for (MMenuElement mMenuElement : ti.getMenu().getChildren()) {
-							mMenuElement.setIconURI(getNewIconString(mMenuElement.getIconURI()));
-						}
-					}
+			// Menüs der Part-Toolbar-Items
+			if (ti.getMenu() != null) {
+				for (MMenuElement mMenuElement : ti.getMenu().getChildren()) {
+					mMenuElement.setIconURI(getNewIconString(mMenuElement.getIconURI()));
 				}
 			}
+			String newIconString = getNewIconString(ti.getIconURI());
+			ti.setIconURI(newIconString);
 		}
 	}
-
+	/**
+	 * Updated die Größe der Model-Icons (Icons der Parts und der Part-Toolbars)
+	 * entsprechend der Einstellungen
+	 * 
+	 * @param element
+	 * @param modelService
+	 */
+	public static void updateIconsForPart(MPart part) {
+		 part.setIconURI(getNewIconString(part.getIconURI()));
+	}
+	
 	/**
 	 * Ersetzt im Icon String die Größe entsprechend der Einstellungen
 	 * 
@@ -162,7 +174,8 @@ public class ImageUtil {
 			return oldIconString;
 		}
 
-		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
+		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE)
+				.get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		int indexOfLastSlash = oldIconString.lastIndexOf("/");
 		String newIconString = oldIconString.substring(0, indexOfLastSlash + 1);

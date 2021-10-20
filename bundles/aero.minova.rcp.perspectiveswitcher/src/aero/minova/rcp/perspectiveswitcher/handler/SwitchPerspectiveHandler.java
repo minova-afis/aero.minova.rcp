@@ -113,8 +113,6 @@ public class SwitchPerspectiveHandler {
 		if (element instanceof MPerspective) {
 			MPerspective mPerspective = partService.switchPerspective(perspectiveID).get();
 
-			ImageUtil.updateModelIcons(element, modelService);
-
 			MPart detailPart = partService.findPart(Constants.DETAIL_PART);
 			detailPart.setIconURI(ImageUtil.retrieveIcon(mPerspective.getIconURI(), false));
 			detailPart.setLabel(translationService.translate(mPerspective.getLabel(), null));
