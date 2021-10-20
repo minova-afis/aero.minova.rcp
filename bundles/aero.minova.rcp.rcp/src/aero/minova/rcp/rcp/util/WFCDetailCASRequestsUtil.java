@@ -55,6 +55,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
@@ -989,7 +990,11 @@ public class WFCDetailCASRequestsUtil {
 		// Prüfung der mFields ob es einen Value ≠ null gibt
 		if (getSelectedTable() == null || getSelectedTable().getRows().isEmpty()) {
 			for (MField mfield : mDetail.getFields()) {
-				if (mfield.getValue() != null) {
+				if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
+					if (mfield.getValue().getBooleanValue()) {
+						return true;
+					}
+				} else if (mfield.getValue() != null) {
 					return true;
 				}
 			}
@@ -1023,6 +1028,14 @@ public class WFCDetailCASRequestsUtil {
 						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
 					return true;
 				}
+			} else if (c instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> spezielle Prüfung
+				if (sV == null && !c.getValue().getBooleanValue()) { // TableValue null -> Booleanfeld Wert soll false sein
+					continue;
+				}
+
+				if (!c.getValue().equals(sV)) {
+					return true;
+				}
 			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
 				return true;
 			}
@@ -1031,7 +1044,12 @@ public class WFCDetailCASRequestsUtil {
 		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
 		for (Field field : dataFormService.getFieldsFromForm(f)) {
 			MField mfield = mDetail.getField(fieldPrefix + field.getName());
-			if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
+
+			if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
+				if (!checkedFields.contains(mfield) && mfield.getValue().getBooleanValue()) {
+					return true;
+				}
+			} else if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
 				return true;
 			}
 		}
