@@ -51,6 +51,7 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
@@ -326,7 +327,7 @@ public class SectionGrid {
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 		bodyDataLayer = new DataLayer(bodyDataProvider);
-		// bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
+		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
