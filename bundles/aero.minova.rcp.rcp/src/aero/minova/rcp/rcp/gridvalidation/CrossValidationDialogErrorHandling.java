@@ -21,7 +21,7 @@ public class CrossValidationDialogErrorHandling extends DialogErrorHandling {
 		if (!isWarningDialogActive() && dialogMessage != null) {
 			MessageDialog warningDialog = new MessageDialog(Display.getCurrent().getActiveShell(), dialogTitle, null,
 					translationService.translate(dialogMessage, null), MessageDialog.WARNING,
-					new String[] { getChangeButtonLabel(), getDiscardButtonLabel(), "Commit" }, 0);
+					new String[] { getChangeButtonLabel(), getDiscardButtonLabel(), "Commit" }, 2);
 
 			// if discard was selected close the editor
 			int returnCode = warningDialog.open();
