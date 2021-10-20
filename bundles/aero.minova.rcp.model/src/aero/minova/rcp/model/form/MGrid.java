@@ -34,6 +34,7 @@ public class MGrid {
 	private ArrayList<GridChangeListener> listeners;
 
 	private IGridValidator validator;
+	private List<Integer> columnsToValidate;
 
 	public String getTitle() {
 		return title;
@@ -143,11 +144,11 @@ public class MGrid {
 		Table dataTable = gridAccessor.getDataTable();
 		for (Column c : dataTable.getColumns()) {
 
-			if (validator != null) {
+			if (validator != null && columnsToValidate.contains(dataTable.getColumns().indexOf(c))) {
 				for (Row r : dataTable.getRows()) {
-//					if (!validator.checkValid(dataTable.getColumns().indexOf(c), dataTable.getRows().indexOf(r))) {
-//						return false;
-//					}
+					if (!validator.checkValid(dataTable.getColumns().indexOf(c), dataTable.getRows().indexOf(r))) {
+						return false;
+					}
 				}
 			}
 
@@ -268,6 +269,7 @@ public class MGrid {
 	 */
 	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
 		this.validator = validator;
+		this.columnsToValidate = columnsToValidate;
 		gridAccessor.addValidation(validator, columnsToValidate);
 	}
 }
