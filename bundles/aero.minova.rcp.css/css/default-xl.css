@@ -1,5 +1,6 @@
-@import url("platform:/plugin/aero.minova.rcp.css/css/XL/size_20_32.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/XL/size_20.css");
 
-NatTable {
-	font-size: 20px;
+
+CTabFolder {
+	swt-tab-height: 60px;
 }

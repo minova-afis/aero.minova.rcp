@@ -3,6 +3,11 @@
 @import url("platform:/plugin/aero.minova.rcp.css/css/common.css");
 @import url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
 
+CTabFolder {
+	swt-tab-height: 24px;
+}
+
+
 Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie {
 	font-size: 8px;
 }
