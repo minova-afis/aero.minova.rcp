@@ -51,7 +51,6 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
-import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
@@ -101,6 +100,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.form.IButtonAccessor;
+import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -108,6 +108,7 @@ import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
+import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -182,6 +183,10 @@ public class SectionGrid {
 	private SortHeaderLayer sortHeaderLayer;
 
 	private MinovaGridConfiguration gridConfiguration;
+
+	private ViewportLayer viewportLayer;
+
+	private GlazedListsEventLayer eventLayer;
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -321,7 +326,7 @@ public class SectionGrid {
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 		bodyDataLayer = new DataLayer(bodyDataProvider);
-		bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
+		// bodyDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
 
 		bodyDataLayer.unregisterCommandHandler(UpdateDataCommand.class);
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
@@ -332,6 +337,7 @@ public class SectionGrid {
 				int row = dataTable.getRows().indexOf(r);
 
 				Value oldVal = dataTable.getRows().get(row).getValue(col);
+				System.out.println("editing " + col + " " + row);
 
 				if (super.doCommand(command)) {
 					Value newVal = dataTable.getRows().get(row).getValue(col);
@@ -346,7 +352,7 @@ public class SectionGrid {
 			}
 		});
 
-		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
+		eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
@@ -360,7 +366,7 @@ public class SectionGrid {
 			}
 		});
 
-		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
+		viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
@@ -887,6 +893,12 @@ public class SectionGrid {
 				setColumnReadOnly(i, readOnly);
 			}
 		}
+	}
+
+	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
+		this.bodyDataLayer.setConfigLabelAccumulator(new CrossValidationLabelAccumulator(bodyDataLayer, validator, columnsToValidate));
+		// this.natTable.addConfiguration(new CrossValidationConfiguration(validator, translationService));
+		// this.natTable.configure();
 	}
 
 }

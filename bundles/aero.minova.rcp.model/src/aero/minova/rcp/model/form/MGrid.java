@@ -33,6 +33,8 @@ public class MGrid {
 	private MSection mSection;
 	private ArrayList<GridChangeListener> listeners;
 
+	private IGridValidator validator;
+
 	public String getTitle() {
 		return title;
 	}
@@ -140,6 +142,15 @@ public class MGrid {
 	public boolean isValid() {
 		Table dataTable = gridAccessor.getDataTable();
 		for (Column c : dataTable.getColumns()) {
+
+			if (validator != null) {
+				for (Row r : dataTable.getRows()) {
+//					if (!validator.checkValid(dataTable.getColumns().indexOf(c), dataTable.getRows().indexOf(r))) {
+//						return false;
+//					}
+				}
+			}
+
 			if (c.isRequired()) {
 				// TODO: Weitere Eigenschaften prüfen? (Textlänge, ...)
 				for (Row r : dataTable.getRows()) {
@@ -249,4 +260,14 @@ public class MGrid {
 		gridAccessor.setGridReadOnly(readOnly);
 	}
 
+	/**
+	 * Fügt Validierung zum Grid hinzu, über die Methoden des IGridValidator. Nur die Spalten in columnsToValidate werden überprüft
+	 * 
+	 * @param validator
+	 * @param columnsToValidate
+	 */
+	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
+		this.validator = validator;
+		gridAccessor.addValidation(validator, columnsToValidate);
+	}
 }
