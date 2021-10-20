@@ -109,6 +109,7 @@ import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
+import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
@@ -897,9 +898,9 @@ public class SectionGrid {
 	}
 
 	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
-		this.bodyDataLayer.setConfigLabelAccumulator(new CrossValidationLabelAccumulator(bodyDataLayer, validator, columnsToValidate));
-		// this.natTable.addConfiguration(new CrossValidationConfiguration(validator, translationService));
-		// this.natTable.configure();
+		this.bodyDataLayer.setConfigLabelAccumulator(new CrossValidationLabelAccumulator(bodyDataLayer, validator, columnsToValidate, sortedList, dataTable));
+		this.natTable.addConfiguration(new CrossValidationConfiguration(validator, translationService));
+		this.natTable.configure();
 	}
 
 }
