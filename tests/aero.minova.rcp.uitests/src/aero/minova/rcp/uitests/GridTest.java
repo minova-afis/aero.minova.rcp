@@ -183,11 +183,11 @@ class GridTest {
 
 		// Unter Mac werden die Werte die in Nattables geschrieben werden angehängt
 		if (System.getProperty("os.name").startsWith("Mac OS")) {
-			assertEquals(211, table.getRows().get(0).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
-			assertEquals(411, table.getRows().get(1).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
 		} else {
-			assertEquals(1, table.getRows().get(0).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
-			assertEquals(1, table.getRows().get(1).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(1, table.getRows().get(0).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(1, table.getRows().get(1).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
 		}
 
 		// Eintrag wieder löschen
@@ -270,16 +270,16 @@ class GridTest {
 		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 		SWTBotNatTable gridNattable = swtNatTableBot.nattable(2);
 
-		gridNattable.setCellDataValueByPosition(0, 1, "11");
+		gridNattable.setCellDataValueByPosition(0, 1, "1");
 		gridNattable.setCellDataValueByPosition(0, 2, "12");
 
-		gridNattable.setCellDataValueByPosition(1, 1, "21");
+		gridNattable.setCellDataValueByPosition(1, 1, "2");
 		gridNattable.setCellDataValueByPosition(1, 2, "22");
 
-		gridNattable.setCellDataValueByPosition(2, 1, "31");
+		gridNattable.setCellDataValueByPosition(2, 1, "3");
 		gridNattable.setCellDataValueByPosition(2, 2, "32");
 
-		gridNattable.setCellDataValueByPosition(3, 1, "41");
+		gridNattable.setCellDataValueByPosition(3, 1, "4");
 		gridNattable.setCellDataValueByPosition(3, 2, "42");
 
 		UITestUtil.sleep();
@@ -297,23 +297,23 @@ class GridTest {
 		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 		SWTBotNatTable gridNattable = swtNatTableBot.nattable(2);
 
-		// Löscht Zeile mit Werten 11, 12
+		// Löscht Zeile mit Werten 1, 12
 		gridNattable.click(1, 0);
 		btnDelete.click();
 
 		UITestUtil.sleep(500);
 
-		// Löscht Zeile mit Werten 31, 32
+		// Löscht Zeile mit Werten 3, 32
 		gridNattable.click(2, 0);
 		btnDelete.click();
 
 		UITestUtil.sleep(500);
 
-		// Ändert Zeile 21, 22
-		gridNattable.setCellDataValueByPosition(1, 1, "1");
+		// Ändert Zeile 2, 22
+		gridNattable.setCellDataValueByPosition(1, 2, "1");
 
-		// Ändert Zeile 41, 42
-		gridNattable.setCellDataValueByPosition(2, 1, "1");
+		// Ändert Zeile 4, 42
+		gridNattable.setCellDataValueByPosition(2, 2, "1");
 
 		bot.text().setFocus();
 		UITestUtil.sleep();
