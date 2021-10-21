@@ -10,6 +10,7 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 
@@ -271,5 +272,11 @@ public class MGrid {
 		this.validator = validator;
 		this.columnsToValidate = columnsToValidate;
 		gridAccessor.addValidation(validator, columnsToValidate);
+	}
+
+	public void setValue(int columnIndex, int rowIndex, Value newValue) {
+		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, columnIndex, rowIndex, getDataTable().getValue(columnIndex, rowIndex), newValue, false);
+		getDataTable().setValue(columnIndex, rowIndex, newValue);
+		fire(gridChangeEvent);
 	}
 }
