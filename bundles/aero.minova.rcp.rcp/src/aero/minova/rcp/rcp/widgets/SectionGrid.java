@@ -897,8 +897,11 @@ public class SectionGrid {
 	}
 
 	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
+		// Für Rot-Zeichnen der Zellen
 		this.bodyDataLayer.setConfigLabelAccumulator(new CrossValidationLabelAccumulator(bodyDataLayer, validator, columnsToValidate, sortedList, dataTable));
-		this.natTable.addConfiguration(new CrossValidationConfiguration(validator, translationService));
+
+		// Anzeigen der Fehlermeldung
+		this.natTable.addConfiguration(new CrossValidationConfiguration(validator, broker));
 		this.natTable.configure();
 	}
 
