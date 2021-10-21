@@ -1,9 +1,11 @@
 package aero.minova.rcp.uitests;
 
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -21,6 +23,9 @@ public class ExitHandlerTest {
 
 	private static SWTBot bot;
 
+	@Inject
+	TranslationService ts;
+
 	@BeforeEach
 	public void beforeClass() throws Exception {
 		bot = new SWTBot();
@@ -32,7 +37,7 @@ public class ExitHandlerTest {
 		Assumptions.assumeFalse(SWTUtils.isMac());
 		SWTBotMenu fileMenu = bot.menu("File");
 		assertNotNull(fileMenu);
-		SWTBotMenu exitMenu = fileMenu.menu("Exit");
+		SWTBotMenu exitMenu = fileMenu.menu(ts.translate("@Exit", null));
 		assertNotNull(exitMenu);
 		exitMenu.click();
 		SWTBotShell shell = bot.shell("Confirmation");
