@@ -22,7 +22,7 @@ import aero.minova.rcp.dataservice.IMinovaPluginService;
 @Component(immediate = true)
 public class MinovaPluginService implements IMinovaPluginService {
 
-	boolean DEBUG = true;
+	boolean DEBUG = false;
 
 	private IDataService dataService;
 	private boolean downloadPlugins = true;
