@@ -366,6 +366,15 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			return;
 		}
 
+		pluginService.activatePlugin(helperName);
+		// Kurzer Sleep, damit aktiviertes Plugin in der helperlist vorhanden ist
+		// TODO: kann man das besser lösen?
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		IHelper iHelper = null;
 		for (IHelper h : helperlist) {
 			if (Objects.equals(helperName, h.getClass().getName())) {

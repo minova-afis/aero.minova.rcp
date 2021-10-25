@@ -34,9 +34,6 @@ public abstract class WFCFormPart {
 			form = dataFormService.getForm(formName);
 			// Form in den Context injected, damit überall darauf zugegriffen werden kann
 			ctx.set(Form.class, form);
-			if (form.getHelperClass() != null) {
-				pluginService.activatePlugin(form.getHelperClass());
-			}
 		}
 
 		return form;
