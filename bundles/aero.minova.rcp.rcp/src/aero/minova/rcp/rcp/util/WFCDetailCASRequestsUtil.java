@@ -55,6 +55,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
@@ -194,6 +195,8 @@ public class WFCDetailCASRequestsUtil {
 					for (MGrid g : mDetail.getGrids()) {
 						readGrid(g, table);
 					}
+
+					sendEventToHelper(ActionCode.AFTERREAD);
 				}
 			}));
 
@@ -207,9 +210,6 @@ public class WFCDetailCASRequestsUtil {
 					updateSelectedEntry();
 				}));
 			}
-
-			sendEventToHelper(ActionCode.AFTERREAD);
-
 		});
 	}
 
@@ -389,8 +389,6 @@ public class WFCDetailCASRequestsUtil {
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
 			sendSaveRequest(formTable);
-
-			sendEventToHelper(ActionCode.AFTERSAVE);
 		}
 	}
 
@@ -611,8 +609,8 @@ public class WFCDetailCASRequestsUtil {
 			reloadFields(keyTable);
 		}
 
-		sendEventToHelper(ActionCode.SAVE);
 		focusFirstEmptyField();
+		sendEventToHelper(ActionCode.AFTERSAVE);
 	}
 
 	/**
@@ -761,7 +759,7 @@ public class WFCDetailCASRequestsUtil {
 			map.put(perspective, Constants.DELETE_REQUEST);
 			clearFields(map);
 			// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
-			sendEventToHelper(ActionCode.DEL);
+			sendEventToHelper(ActionCode.AFTERDEL);
 			focusFirstEmptyField();
 		}
 
@@ -866,7 +864,7 @@ public class WFCDetailCASRequestsUtil {
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
-		sendEventToHelper(ActionCode.NEW);
+		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
 	}
 
@@ -945,8 +943,10 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
+			sendEventToHelper(ActionCode.BEFOREREVERT);
 			updateSelectedEntry();
 			updateSelectedGrids();
+			sendEventToHelper(ActionCode.AFTERREVERT);
 		}
 	}
 
@@ -989,7 +989,11 @@ public class WFCDetailCASRequestsUtil {
 		// Prüfung der mFields ob es einen Value ≠ null gibt
 		if (getSelectedTable() == null || getSelectedTable().getRows().isEmpty()) {
 			for (MField mfield : mDetail.getFields()) {
-				if (mfield.getValue() != null) {
+				if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
+					if (mfield.getValue().getBooleanValue()) {
+						return true;
+					}
+				} else if (mfield.getValue() != null) {
 					return true;
 				}
 			}
@@ -1023,6 +1027,14 @@ public class WFCDetailCASRequestsUtil {
 						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
 					return true;
 				}
+			} else if (c instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> spezielle Prüfung
+				if (sV == null && !c.getValue().getBooleanValue()) { // TableValue null -> Booleanfeld Wert soll false sein
+					continue;
+				}
+
+				if (!c.getValue().equals(sV)) {
+					return true;
+				}
 			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
 				return true;
 			}
@@ -1031,7 +1043,12 @@ public class WFCDetailCASRequestsUtil {
 		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
 		for (Field field : dataFormService.getFieldsFromForm(f)) {
 			MField mfield = mDetail.getField(fieldPrefix + field.getName());
-			if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
+
+			if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
+				if (!checkedFields.contains(mfield) && mfield.getValue().getBooleanValue()) {
+					return true;
+				}
+			} else if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
 				return true;
 			}
 		}

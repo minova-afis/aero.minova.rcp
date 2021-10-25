@@ -83,12 +83,18 @@ Wenn das gesamte Repository in Eclipse geladen werden soll muss auch der Rootord
 	</projects>
 	<buildSpec>
 		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
 			<name>org.eclipse.m2e.core.maven2Builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
 </projectDescription>
@@ -131,16 +137,23 @@ Da die Tests aber nicht zur Laufzeit wichtig sind muss die Checkbox "Activate th
 [[Klasse_erstellen]]
 == Erstellen der Klasse
 
-Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein:
+Damit eine Helperklasse geladen werden kann, muss dies in der zugehörigen Maske vermerkt sein, entweder in der Form am Anfang oder in einem Grid. 
+ACHTUNG: Aktuell kann nur ein Helper geladen werden, wenn in der Form und in einem Grid ein Helper vermerkt ist wird der des Grids genutzt.
 
 [source,xml]
 ----
+<!-- Vermerk in form-Tag, am Anfang der Maske -->
 <form icon="JobDefinition" title="@tJobDefinition.Administration" 
   helper-class="aero.minova.jobdefinition.helper.JobDefinitionHelper" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
   ....
 </form>
+
+<!-- Vermerk in einem grid-Tag -->
+<grid  id="GraduationStep" delete-requires-all-params="true" procedure-suffix="GraduationStep" helper-class="aero.minova.graduation.helper.GraduationStepHelper">
+	....
+</grid>
 ----
 
 Die Helperklassen müssen die Klasse ``IHelper`` implementieren. Dafür muss das Package ``aero.minova.rcp.model`` zu den benötigten Plug-Ins hinzugefügt werden.
@@ -209,15 +222,17 @@ MField startDate = mDetail.getField("StartDate");
 
 Beim Betätigen einer Aktion im Detail wird automatisch die Methode ``handleDetailAction`` aufgerufen. Mögliche Aktionen sind:
 
-* DEL: Löschen eines Eintrages
-* NEW: Neuer Eintrag
-* SAVE: Speichern/Updaten eines Eintrages, nachdem die Anfrage erfolgreich funktioniert hat
-* BEFORESAVE: Speichern/Updaten, bevor die Anfrage verschickt wird
-* REVERT: Zurücksetzten des Eintrages
+* BEFORE-/ AFTERDEL: Vor/Nach dem Löschen eines Eintrages
+* BEFORE-/ AFTERNEW: Vor/Nach Erstellen eines neuen Eintrags, also leeren der Felder. Da hier keine Prozedur aufgerufen wird folgen die Events kurz nacheinander
+* BEFORE-/ AFTERSAVE: Vor/Nach dem Speichern/Updaten eines Eintrages
+* BEFORE-/ AFTERREVERT: Vor/Nach dem Zurücksetzten des Eintrages. Auch hier wird keine Prozedur aufgerufen
+* BEFORE-/ AFTERREAD: Vor/Nach dem Lesen eines Datensatzes, Achtung: AFTERREAD wird verschickt, sobald die HAUPT-Maske komplett geladen ist. Option Pages und Grids sind eventuell noch nicht geladen
 
-Hier können dann z.B. Werte vorbelegt werden.
+ACHTUNG bei den Aktionen VOR Löschen/Speichern/Lesen/..., die Aufrufe sind asynchron, es wird also nicht auf eine Antwort des Helpers gewartet bevor die eigentlichen Prozeduren ausgeführt werden. 
 
-=== Belegen von Werten
+Wenn für die Aktion eine Prozedur aufgerufen wird erfolgt das AFTER-Event nur nach erfolgreichem Durchführen dieser.
+
+=== Belegen von Werten in Feldern
 
 Einzelne Felder können aus dem ``MDetail`` geholt und über die ``setValue`` Methode mit Werten belegt werden. Dabei ist darauf zu achten, dass als Wert ein ``Value``-Objekt zu verwenden ist, und der Datentyp zu dem Feld passen muss. Das ist besonders wichtig für ``Lookup``-Values. Als Nutzer wird ``false`` angegeben.
 
@@ -265,6 +280,89 @@ casUtil.setSelectedTable(t);
 broker.post(Constants.BROKER_CHECKDIRTY, ""); // Check über IEventBroker anstoßen
 ----
 
+=== Belegen von Werten in Grids
+
+Einzelne Werte in Grids können direkt in die zugrundeliegende Tabelle gesetzt werden, das Grid wird automatisch aktualisiert.
+Die Klasse ``aero.minova.rcp.model.Table`` enthält einige Methoden die das Setzen von Werten weiter vereinfachen, etwa kann statt dem Spaltenindex auch der Spaltenname angegeben werden.
+
+[source,java]
+----
+//setValue(int columnIndex, int rowIndex, Value newValue)
+mDetail.getGrid("InvoicePosition").setValue(4, 5, new Value("neuer Wert"))
+----
+
+Um ganze Zeilen hinzuzufügen wird eine Tabelle verwendet. 
+Die Spaltennamen in der übergebenen Tabelle müssen mit denen des Grids übereinstimmen, da diese genutzt werden um die Werte an die richtige Stelle zu schreiben.
+Die Reihenfolge der Spalten muss also NICHT übereinstimmen und es muss auch nicht die gleiche Anzahl sein. 
+Wenn eine Spalte des Grids in der übergebenen Tabelle nicht gefunden wurde bleibt die entsprechende Zelle im Grid leer.
+
+[source,java]
+----
+mDetail.getGrid("InvoicePosition").addRows(tableWithNewRows);
+----
+
+Wenn die Daten eines Grids komplett ersetzt werden sollen und auch das Dirtyflag nicht anspringen soll muss das Setzen über die Klasse ``WFCDetailCASRequestsUtil`` geschehen. 
+Wie für die Zeilen müssen die Spaltennamen übereinstimmen, Reihenfolge ist aber egal.
+
+[source,java]
+----
+WFCDetailCASRequestsUtil casUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
+casUtil.setGridContent(mDetail.getGrid("InvoicePosition"), newDataTable);
+----
+
+=== Grids Validieren
+
+Es ist möglich, Eingaben in Grids direkt zu validieren. 
+Dafür muss eine Klasse das Interface ``IGridValidator`` implementieren.
+Über die Methode ``MGrid#addValidation(IGridValidator validator, List<Integer> columnsToValidate)`` wird die Validierung hinzugefügt.
+
+Die Methode ``checkValid()`` wird genutzt, um ungültige Zellen rot zu färben und das Speichern zu verhindern.
+
+Mit ``validateThrowingException()`` wird die Eingabe überprüft, bevor sie ins Grid eingetragen wird. 
+Bei dem Aufruf steht der neue Wert also noch nicht in der Tabelle!
+Wenn der neue Wert nicht gültig ist, muss eine ``ValidationFailedException`` geworfen werden. 
+Deren Text wird übersetzt und als Notification-Popup unten links angezeigt.
+
+Die Spalten- und Zeilenindices entsprechen den Positionen in der Tabelle, die dem Grid zugrunde liegt.
+Auf die Werte kann also wie gewohnt über das MGrid zugegriffen werden.
+
+Die beiden Methoden werden nur für Werte aufgerufen, die in einer Spalte stehen deren Index in den ``columnsToValidate``steht.
+Hier sollte darauf geachtet werden, dass die meisten Grids unsichtbare Spalten haben, in denen die Keys stehen, die nicht validiert werden sollten.
+
+In dem folgenden Beispiel werden die Werte der Spalte 2 (eine Integer Spalte) darauf überprüft, ob sie kleiner als 10 sind:
+
+[source,java]
+----
+@Component
+public class GraduationStepHelper implements IHelper, IGridValidator {
+
+	private MGrid graduationSteps;
+
+	@Override
+	public void setControls(MDetail mDetail) {
+		graduationSteps = mDetail.getGrid("GraduationStep");
+		List<Integer> columnsToValidate = List.of(2); // Es soll nur Spalte 2 überprüft werden
+		graduationSteps.addValidation(this, columnsToValidate); 
+	}
+
+	@Override
+	public void handleDetailAction(ActionCode code) {
+		// Es werden nur Einträge ins Grid überprüft, nicht die Aktionen
+	}
+
+	@Override
+	public boolean checkValid(int columnIndex, int rowIndex) {
+		return graduationSteps.getDataTable().getValue(columnIndex, rowIndex).getIntegerValue() <= 10;
+	}
+
+	@Override
+	public void validateThrowingException(int columnIndex, int rowIndex, Object newValue) throws ValidationFailedException {
+		if ((Integer) newValue > 10) {
+			throw new ValidationFailedException("Wert darf nicht größer als 10 sein!");
+		}
+	}
+}
+----
 
 === Reagieren auf Wert-Änderungen 
 
@@ -288,6 +386,17 @@ public class TicketHelper implements ValueChangeListener {
 }
 ----
 
+==== GridChangeEvent
+
+Es gibt vier verschiedene Typen von GridChangeEvents. 
+Jedes GridChangeEvent hat einen GridChangeType und entsprechend sind die Attribute (nicht) gesetzt.
+
+* RESET: Die Tabelle wurde komplett geändert (z.B. nach dem Laden eines neuen Datensatzes)
+* INSERT: Eine neue Zeile wurde ins Grid eingefügt. Der Index der neuen Zeile wird mitgegeben
+* DELETE: Eine Zeile des Grids wurde gelöscht. Der Index den die alte Zeile hatte wird mitgegeben
+* UPDATE: Ein einzelner Wert im Grid wurde geändert. Zeilen- und Spaltenindex sowie der alte und neue Wert wird mitgegeben
+
+
 === Buttons
 
 In Version 11 konnten Buttons über die Maske de-/aktiviert werden, je nachdem ob ein gewisses Feld einen Wert hat:
@@ -300,7 +409,8 @@ In Version 11 konnten Buttons über die Maske de-/aktiviert werden, je nachdem o
 </button>
 ----
 
-Da wir kein JavaScript mehr in der Maske wollen kann der entsprechende Code im Helper bei einer Änderung im "KeyLong"-Feld etwa wie folgt aussehen. 
+Da wir kein JavaScript mehr in der Maske wollen kann der entsprechende Code etwa wie folgt aussehen. 
+Damit der Button immer aktuell bleibt sollte das De-/Aktivieren mit einem ValueChangeListener auf das entsprechende Feld verbunden werden.
 
 [source,java]
 ----
@@ -359,11 +469,112 @@ preferences.addPreferenceChangeListener(event -> {
 });
 ----
 
+=== Felder und Grids auf read-only oder required
+
+Felder und Grids können über die Helper auf read-only oder required gesetzt werden. Das Verhalten (kein Speichern ohne Value bei required und kein Bearbeiten von read-only Feldern) sowie die Darstellung wird automatisch angepasst.
+In Grids können aktuell nur ganze Spalten geändert werden.
+Für Grids gibt es die Möglichkeit, das ganze Grid auf einmal zu ändern.
+Zudem bietet das MDetail Methoden, mit dem alle Felder oder alle Felder und Grids auf einmal angepasst werden können.
+Auch das Zurücksetzen auf den Originalzustand (wie in der Maske definiert) ist möglich.
+
+[source,java]
+----
+// Felder
+mDetail.getField("Description").setReadOnly(true);
+mDetail.getField("Description").setRequired(true);
+mDetail.getField("Description").resetReadOnlyAndRequired();
+
+// Grids, äquivalent für required möglich
+mDetail.getGrid("InvoicePosition").setColumnReadOnly(4, true);
+mDetail.getGrid("InvoicePosition").setGridReadOnly(true);
+mDetail.getGrid("InvoicePosition").resetReadOnlyAndRequiredColumns();
+
+// Über mDetail alle Felder / Grids ändern
+mDetail.setAllFieldsReadOnly(true);
+mDetail.setAllGridsAndFieldsReadOnly(true);
+mDetail.resetAllGridsAndFieldsReadOnlyAndRequired();
+----
+
+=== Param-String Felder
+
+In der alten Version wurden die Felder, die in Param-String Feldern dargestellt werden über JavaScript in der Maske gesetzt:
+
+[source,xml]
+----
+<!-- Alte Maske -->
+<jscript>
+	tools.setProp('ExecutionParameter', 'xml-file', 'SQL2FileParameter.op.xml');
+</jscript>
+----
+
+In Version 12 muss dies über einen Helper geschehen, indem die entsprechende Methode der Klasse ``WFCDetailCASRequestsUtil`` aufgerufen wird.
+Wenn noch nicht geschehen wird die Maske automatisch runtergeladen und ausgelesen, die entsprechenden Felder werden im Detail erstellt.
+Der äquivalente Code kann so aussehen:
+
+[source,java]
+----
+WFCDetailCASRequestsUtil casUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class); 
+casUtil.updateParamStringField((MParamStringField) mDetail.getField("ExecutionParameter"), "SQL2FileParameter.op.xml");
+----
+
+=== tools.getSQLValue() Methode 
+
+In der alten Version wurden über JavaScript Werte aus der Datenbank geholt:
+
+[source,xml]
+----
+<!-- Alte Maske -->
+<jscript>
+	tools.getSQLValue('vJobDefinitionParameter', 'JobExecutorKey', JobExecutorKey, 'ClassName');
+</jscript>
+----
+
+Dies kann in der neuen Version wie folgt abgebildet werden (Der ``IDataService`` kann injected werden):
+
+[source,java]
+----
+Value jobExecuterKey = mDetail.getField("JobExecutorKey").getValue();
+dataService.getSQLValue("vJobDefinitionParameter", "JobExecutorKey", jobExecuterKey, "ClassName", mDetail.getField("ClassName").getDataType());
+----
+
+Die Methode getSQLValue() nimmt folgende Parameter:
+
+* String tablename: der Name der angefragten Tabelle/ View
+* String requestColumn: der Name der Spalte für die der Wert gegeben ist
+* Value requestValue: der Wert nach dem gesucht werden soll (in der gegebenen Spalte)
+* String resultColumn: der Name der Spalte, für die der Wert zurückgegeben werden soll
+* DataType resultType: der Typ des angefragten Werts
+
+=== Filtern von Optionen für Lookup Felder
+
+Manchmal kann es gewünscht sein, dass für Lookup-Felder nicht alle Optionen, die von der Datenbank geliefert werden, auch angezeigt werden.
+Entsprechend kann Lookup Feldern ein Filter gegeben werden.
+Dieser muss von die Klasse ``Predicate<LookupValue>`` haben.
+In dem Beispiel wird das LookupValue mit KeyText "AUTOCREDIT" aus den angezeigten Optionen entfernt.
+
+[source,java]
+----
+MLookupField invoiceTypeKey = (MLookupField) mDetail.getField("InvoiceTypeKey");
+invoiceTypeKey.setFilterForContentProvider(value -> !value.getKeyText().equals("AUTOCREDIT"));
+----
+
+=== SiteParameter anfragen
+
+Auch in Version 12 gibt es eine Tabelle ``tSiteParameter``.
+Deren Werte können über den ``IDataService`` (der injected werden kann) angefragt werden. 
+Als Parameter wird der Key sowie der Defaultwert (falls der Key nicht existiert) benötigt.
+Es wird immer ein String zurückgegeben.
+
+[source,java]
+----
+String defaultCurrency = dataService.getSiteParameter("InvoiceDefaultCurrency", "2");
+----
+
+
 
 === TODO, muss noch implementiert und dokumentiert werden
 
 * Anwendungsspezifische Einstellungen
-* Umwandeln von JavaScript zu Code im Helper
 
 [[Bauen]]
 == Bauen des Plugins

@@ -25,4 +25,14 @@ public interface IGridAccessor {
 	MGrid getMGrid();
 	
 
+	void setGridRequired(boolean required);
+
+	void resetReadOnlyAndRequiredColumns();
+
+	void setColumnRequired(int columnIndex, boolean required);
+
+	void setColumnReadOnly(int columnIndex, boolean readOnly);
+
+	void setGridReadOnly(boolean readOnly);
+
 }

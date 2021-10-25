@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.text.NumberFormat;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Locale;
 
@@ -27,6 +26,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 	private DataType datatype;
 	private DateTimeType datetimetype;
 	private ZoneId zoneId;
+	private int decimals;
 
 	public FilterDisplayConverter(DataType datatype, Locale locale, DateTimeType datetimetype, ZoneId zoneId) {
 		this.locale = locale;
@@ -41,9 +41,10 @@ public class FilterDisplayConverter extends DisplayConverter {
 		this.datetimetype = datetimetype;
 	}
 
-	public FilterDisplayConverter(DataType datatype, Locale locale) {
+	public FilterDisplayConverter(DataType datatype, Locale locale, int decimals) {
 		this.locale = locale;
 		this.datatype = datatype;
+		this.decimals = decimals;
 	}
 
 	public FilterDisplayConverter(DataType datatype) {
@@ -66,26 +67,29 @@ public class FilterDisplayConverter extends DisplayConverter {
 			case INSTANT:
 				switch (datetimetype) {
 				case DATE:
-					val = DateUtil.getDateString((Instant) cv.getFilterValue().getValue(), locale, dateUtil);
+					val = DateUtil.getDateString(cv.getFilterValue().getInstantValue(), locale, dateUtil);
 					break;
 				case TIME:
-					val = TimeUtil.getTimeString((Instant) cv.getFilterValue().getValue(), locale, timeUtil);
+					val = TimeUtil.getTimeString(cv.getFilterValue().getInstantValue(), locale, timeUtil);
 					break;
 				case DATETIME:
-					val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, dateUtil, timeUtil);
+					val = DateTimeUtil.getDateTimeString(cv.getFilterValue().getInstantValue(), locale, dateUtil, timeUtil);
 					break;
 				}
 				break;
 			case ZONED:
-				val = DateTimeUtil.getDateTimeString((Instant) cv.getFilterValue().getValue(), locale, dateUtil, timeUtil);
+				val = DateTimeUtil.getDateTimeString(cv.getFilterValue().getInstantValue(), locale, dateUtil, timeUtil);
+				break;
+			case DOUBLE:
+				NumberFormat formatter = NumberFormat.getInstance(locale);
+				formatter.setMaximumFractionDigits(decimals);
+				formatter.setMinimumFractionDigits(decimals);
+				val = formatter.format(cv.getFilterValue().getDoubleValue());
 				break;
 			default:
 				val = cv.getFilterValue().getValue().toString();
 			}
 
-			if (cv.getValue().toString().contains("null")) {
-				return cv.getValue().toString();
-			}
 			return cv.getValue().toString() + " " + val;
 		}
 		return null;
@@ -143,10 +147,6 @@ public class FilterDisplayConverter extends DisplayConverter {
 					break;
 				case DOUBLE:
 					filterValue = Double.parseDouble(filterValueString);
-					NumberFormat formatter = NumberFormat.getInstance(locale);
-					formatter.setMaximumFractionDigits(2);
-					formatter.setMinimumFractionDigits(2);
-					filterValue = formatter.format((double) filterValue);
 					break;
 				case BOOLEAN:
 					filterValue = Boolean.parseBoolean(filterValueString);

@@ -198,4 +198,59 @@ public class MDetail {
 	public void setClearAfterSave(boolean clearAfterSave) {
 		this.clearAfterSave = clearAfterSave;
 	}
+
+	public void setAllFieldsRequired(boolean required) {
+		for (MField f : fields.values()) {
+			f.setRequired(required);
+		}
+	}
+
+	public void setAllFieldsReadOnly(boolean readOnly) {
+		for (MField f : fields.values()) {
+			f.setReadOnly(readOnly);
+		}
+	}
+
+	public void resetAllFieldsReadOnlyAndRequired() {
+		for (MField f : fields.values()) {
+			f.resetReadOnlyAndRequired();
+		}
+	}
+
+	/**
+	 * Setzt für alle Felder und Grids Required auf den gegebenen Wert
+	 * 
+	 * @param required
+	 */
+	public void setAllGridsAndFieldsRequired(boolean required) {
+		setAllFieldsRequired(required);
+
+		for (MGrid g : grids.values()) {
+			g.setGridRequired(required);
+		}
+	}
+
+	/**
+	 * Setzt für alle Felder und Grids ReadOnly auf den gegebenen Wert
+	 * 
+	 * @param readOnly
+	 */
+	public void setAllGridsAndFieldsReadOnly(boolean readOnly) {
+		setAllFieldsReadOnly(readOnly);
+
+		for (MGrid g : grids.values()) {
+			g.setGridReadOnly(readOnly);
+		}
+	}
+
+	/**
+	 * Setzt für alle Felder und Grids die ReadOnly und Required Werte auf die ursprünglichen (aus der .xbs)
+	 */
+	public void resetAllGridsAndFieldsReadOnlyAndRequired() {
+		resetAllFieldsReadOnlyAndRequired();
+
+		for (MGrid g : grids.values()) {
+			g.resetReadOnlyAndRequiredColumns();
+		}
+	}
 }

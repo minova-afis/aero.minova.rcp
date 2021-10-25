@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -138,6 +139,13 @@ public class ImageUtil {
 				for (MToolBarElement mToolBarElement : children) {
 					MHandledToolItem ti = (MHandledToolItem) mToolBarElement;
 					ti.setIconURI(getNewIconString(ti.getIconURI()));
+
+					// Menüs der Part-Toolbar-Items
+					if (ti.getMenu() != null) {
+						for (MMenuElement mMenuElement : ti.getMenu().getChildren()) {
+							mMenuElement.setIconURI(getNewIconString(mMenuElement.getIconURI()));
+						}
+					}
 				}
 			}
 		}
@@ -150,6 +158,10 @@ public class ImageUtil {
 	 * @return
 	 */
 	private static String getNewIconString(String oldIconString) {
+		if (oldIconString == null || oldIconString.isBlank()) {
+			return oldIconString;
+		}
+
 		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		int indexOfLastSlash = oldIconString.lastIndexOf("/");
