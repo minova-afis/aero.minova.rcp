@@ -30,6 +30,6 @@ public class SelectDetailPart {
 		partService.activate(part);
 		WFCDetailPart detailPart = (WFCDetailPart) part.getObject();
 		MField field = detailPart.getDetail().getMSectionList().get(0).getTabList().get(0);
-		((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
+		field.getValueAccessor().getControl().setFocus();
 	}
 }
