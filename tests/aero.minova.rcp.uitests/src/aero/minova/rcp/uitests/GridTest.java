@@ -136,7 +136,12 @@ class GridTest {
 		// Do not start on Linux
 		Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Linux"));
 
-		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
+		// Auf "Optimieren" Klicken, damit mehr Einträge im Index angezeigt werden können
+        SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
+        List<SWTBotToolbarButton> detailToolbarButtons = detailPart.getToolbarButtons();
+        detailToolbarButtons.get(5).click();
+
+        wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
 		UITestUtil.loadIndex(indexPart.getToolbarButtons());
 
