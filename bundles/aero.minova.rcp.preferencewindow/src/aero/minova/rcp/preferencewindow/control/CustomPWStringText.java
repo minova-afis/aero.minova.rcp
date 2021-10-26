@@ -10,9 +10,10 @@ public class CustomPWStringText extends CustomPWText {
 	 * 
 	 * @param label associated label
 	 * @param propertyKey associated key
+	 * @param key 
 	 */
-	public CustomPWStringText(final String label, final String propertyKey) {
-		super(label, propertyKey);
+	public CustomPWStringText(final String label, final String tooltip, final String propertyKey) {
+		super(label, tooltip, propertyKey);
 	}
 
 	/**

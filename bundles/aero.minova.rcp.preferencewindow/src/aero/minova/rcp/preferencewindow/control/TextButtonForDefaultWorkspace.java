@@ -35,8 +35,8 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public TextButtonForDefaultWorkspace(final String label, final String propertyKey, final TranslationService translationService) {
-		super(label, propertyKey, 2, false);
+	public TextButtonForDefaultWorkspace(final String label, final String tooltip, final String propertyKey, final TranslationService translationService) {
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 	}
 

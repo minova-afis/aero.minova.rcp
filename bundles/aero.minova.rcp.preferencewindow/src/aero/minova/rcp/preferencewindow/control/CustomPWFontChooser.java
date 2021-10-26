@@ -18,8 +18,8 @@ public class CustomPWFontChooser extends CustomPWChooser {
 	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public CustomPWFontChooser(final String label, final String propertyKey, TranslationService translationService) {
-		super(label, propertyKey, translationService);
+	public CustomPWFontChooser(final String label, final String tooltip, final String propertyKey, TranslationService translationService) {
+		super(label, tooltip, propertyKey, translationService);
 	}
 
 	/**

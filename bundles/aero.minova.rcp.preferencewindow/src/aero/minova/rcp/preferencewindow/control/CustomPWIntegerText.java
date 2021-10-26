@@ -19,8 +19,8 @@ public class CustomPWIntegerText extends CustomPWText {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWIntegerText(final String label, final String propertyKey) {
-		super(label, propertyKey);
+	public CustomPWIntegerText(final String label, final String tooltip, final String propertyKey) {
+		super(label, tooltip, propertyKey);
 	}
 
 	@Override

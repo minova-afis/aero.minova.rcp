@@ -33,8 +33,8 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public DateFormattingWidget(final String label, final String propertyKey, final TranslationService translationService, Locale locale) {
-		super(label, propertyKey, 2, false);
+	public DateFormattingWidget(final String label,final String tooltip, final String propertyKey, final TranslationService translationService, Locale locale) {
+		super(label, propertyKey, tooltip, 2, false);
 		this.translationService = translationService;
 		this.locale = locale;
 	}

@@ -45,8 +45,8 @@ public class PWLocale extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
-		super(label, propertyKey, label == null ? 1 : 2, false);
+	public PWLocale(final String label,final String tooltip, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
+		super(label, tooltip, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
 		this.translationService = translationService;
 		Locale l = context.get(Locale.class);

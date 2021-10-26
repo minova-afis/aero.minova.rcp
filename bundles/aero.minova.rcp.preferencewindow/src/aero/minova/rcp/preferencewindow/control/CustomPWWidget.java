@@ -16,10 +16,12 @@ import org.eclipse.swt.widgets.Label;
  */
 public abstract class CustomPWWidget extends PWWidget {
 	private final String propertyKey;
+	private final String tooltip;
 
-	protected CustomPWWidget(String label, String propertyKey, int numberOfColumns, boolean singleWidget) {
+	protected CustomPWWidget(String label, String tooltip, String propertyKey, int numberOfColumns, boolean singleWidget) {
 		super(label, propertyKey, numberOfColumns, singleWidget);
 		this.propertyKey = propertyKey;
+		this.tooltip = tooltip;
 	}
 
 	@Override
@@ -30,6 +32,10 @@ public abstract class CustomPWWidget extends PWWidget {
 
 	public String getCustomPropertyKey() {
 		return this.propertyKey;
+	}
+	
+	public String getTooltip() {
+		return this.tooltip;
 	}
 	
 	@Override

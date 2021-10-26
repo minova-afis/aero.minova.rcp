@@ -15,7 +15,6 @@ public enum DisplayType {
 	ZONEID, //
 	LOCALE, //
 	CUSTOMCHECK, //
-	CHECKEXPLANATION, //
 	DATE_UTIL, //
 	TIME_UTIL, //
 	SENDLOGSBUTTON

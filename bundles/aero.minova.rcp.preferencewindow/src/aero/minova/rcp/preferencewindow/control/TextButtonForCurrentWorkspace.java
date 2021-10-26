@@ -54,9 +54,9 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	 * @param iEclipseContext
 	 * @param dataService2
 	 */
-	public TextButtonForCurrentWorkspace(final String label, final String propertyKey, final TranslationService translationService, IDataService dataService,
+	public TextButtonForCurrentWorkspace(final String label,final String tooltip, final String propertyKey, final TranslationService translationService, IDataService dataService,
 			IEclipseContext context, IWorkbench workbench) {
-		super(label, propertyKey, 2, false);
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.dataService = dataService;
 		this.context = context;

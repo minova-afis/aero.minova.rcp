@@ -15,8 +15,8 @@ public class SendLogsButton extends CustomPWWidget {
 	private TranslationService translationService;
 	private IDataService dataService;
 
-	public SendLogsButton(String label, String propertyKey, TranslationService translationService, IDataService dataService) {
-		super(label, propertyKey, 2, false);
+	public SendLogsButton(String label,final String tooltip, String propertyKey, TranslationService translationService, IDataService dataService) {
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.dataService = dataService;
 	}

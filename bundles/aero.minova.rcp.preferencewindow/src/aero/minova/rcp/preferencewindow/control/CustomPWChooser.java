@@ -22,8 +22,8 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWChooser(final String label, final String propertyKey, @Optional TranslationService translationService) {
-		super(label, propertyKey, 3, false);
+	public CustomPWChooser(final String label,final String tooltip, final String propertyKey, @Optional TranslationService translationService) {
+		super(label, tooltip, propertyKey, 3, false);
 		this.translationService = translationService;
 		setGrabExcessSpace(false);
 	}

@@ -33,8 +33,9 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public TimeFormattingWidget(final String label, final String propertyKey, final TranslationService translationService, Locale locale) {
-		super(label, propertyKey, 2, false);
+	public TimeFormattingWidget(final String label, final String tooltip, final String propertyKey, final TranslationService translationService,
+			Locale locale) {
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.locale = locale;
 	}
