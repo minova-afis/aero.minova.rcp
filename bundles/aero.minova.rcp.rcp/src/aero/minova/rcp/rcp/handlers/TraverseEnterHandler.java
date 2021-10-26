@@ -76,7 +76,7 @@ public class TraverseEnterHandler {
 			MDetail mDetail = ((WFCDetailPart) part.getObject()).getDetail();
 			if ((mDetail.getDetailAccessor()).getSelectedControl() != null) {
 				// aktuell selektiertes Feld holen
-				Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
+				Control focussedControl = mDetail.getDetailAccessor().getSelectedControl();
 
 				// Ist ein Popup offen?
 				if (focussedControl instanceof LookupComposite) {
@@ -255,7 +255,7 @@ public class TraverseEnterHandler {
 
 			for (MSection mSection : mDetail.getMSectionList()) {
 				Composite compo = null;
-				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
+				Section section = mSection.getSectionAccessor().getSection();
 				for (Control children : section.getChildren()) {
 					if (children instanceof Composite && !(children instanceof ToolBar || children instanceof Twistie || children instanceof ImageHyperlink)) {
 						compo = (Composite) children;
