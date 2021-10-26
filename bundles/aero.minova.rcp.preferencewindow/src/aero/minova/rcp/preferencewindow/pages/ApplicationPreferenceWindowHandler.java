@@ -52,6 +52,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.preferencewindow.control.CustomPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -258,7 +259,7 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
 			break;
 		case CHECK:
-			widget = new PWCheckbox(pref.getLabel(), key).setIndent(25).setAlignment(SWT.FILL);
+			widget = new CustomPWCheckbox(pref.getLabel(), pref.getTooltip(), key).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		case URL:
 			widget = new PWURLText(pref.getLabel(), key);
