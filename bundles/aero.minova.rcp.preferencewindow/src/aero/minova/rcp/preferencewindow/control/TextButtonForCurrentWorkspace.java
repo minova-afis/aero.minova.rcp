@@ -85,6 +85,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
+		text.setToolTipText(getTooltip());
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		textGridData.widthHint = 250;

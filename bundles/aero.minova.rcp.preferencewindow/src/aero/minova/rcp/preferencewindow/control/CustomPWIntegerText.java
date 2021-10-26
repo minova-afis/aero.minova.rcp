@@ -43,6 +43,7 @@ public class CustomPWIntegerText extends CustomPWText {
 			final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			textGridData.widthHint = 150;
 			text.setLayoutData(textGridData);
+			text.setToolTipText(getTooltip());
 			addControl(text);
 			
 			addVerifyListeners();
@@ -61,6 +62,7 @@ public class CustomPWIntegerText extends CustomPWText {
 		} else {
 			buildLabel(parent, GridData.CENTER);
 			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
+			text.setToolTipText(getTooltip());
 			addControl(text);
 			addVerifyListeners();
 			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());

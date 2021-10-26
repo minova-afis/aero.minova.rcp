@@ -91,6 +91,7 @@ public class PWLocale extends CustomPWWidget {
 		addControl(languageLabel);
 
 		comboLanguage = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
+		comboLanguage.setToolTipText(getTooltip());
 		addControl(comboLanguage);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
@@ -127,6 +128,7 @@ public class PWLocale extends CustomPWWidget {
 		comboCountries = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
 		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		comboCountries.setLayoutData(countryData);
+		comboCountries.setToolTipText(translationService.translate("Preferences.Country.Tooltip", null));
 		addControl(comboCountries);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert

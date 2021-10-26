@@ -34,7 +34,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 *            associated key
 	 */
 	public DateFormattingWidget(final String label,final String tooltip, final String propertyKey, final TranslationService translationService, Locale locale) {
-		super(label, propertyKey, tooltip, 2, false);
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.locale = locale;
 	}
@@ -63,6 +63,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER);
+		text.setToolTipText(getTooltip());
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
@@ -113,14 +114,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 */
 	@Override
 	public void check() {
-		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		if (value == null) {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
-		} else {
-			if (!(value instanceof String)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
-			}
-		}
+		// not needed
 	}
 
 }

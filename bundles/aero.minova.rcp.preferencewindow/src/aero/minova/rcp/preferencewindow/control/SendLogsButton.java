@@ -31,6 +31,7 @@ public class SendLogsButton extends CustomPWWidget {
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
+		label.setToolTipText(getTooltip());
 
 		return ButtonFactory.newButton(SWT.PUSH)//
 				.text(translationService.translate("@Action.Send", null))//

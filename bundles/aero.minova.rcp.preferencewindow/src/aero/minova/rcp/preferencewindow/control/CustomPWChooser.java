@@ -46,6 +46,7 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 		label.setLayoutData(labelGridData);
 
 		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
+		text.setToolTipText(getTooltip());
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(textGridData);
