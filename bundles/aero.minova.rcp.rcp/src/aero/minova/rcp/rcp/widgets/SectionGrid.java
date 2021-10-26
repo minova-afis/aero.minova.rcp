@@ -728,6 +728,10 @@ public class SectionGrid {
 	private void fireChange(GridChangeEvent event) {
 		gridAccessor.getMGrid().dataTableChanged(event);
 	}
+	
+	public GridAccessor getGridAccessor() {
+		return gridAccessor;
+	}
 
 	public void setGridAccessor(GridAccessor gridAccessor) {
 		this.gridAccessor = gridAccessor;
