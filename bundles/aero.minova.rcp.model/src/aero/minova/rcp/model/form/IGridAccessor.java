@@ -21,9 +21,8 @@ public interface IGridAccessor {
 	void setDataTable(Table dataTable);
 
 	void closeEditor();
-	
+
 	MGrid getMGrid();
-	
 
 	void setGridRequired(boolean required);
 
@@ -34,5 +33,10 @@ public interface IGridAccessor {
 	void setColumnReadOnly(int columnIndex, boolean readOnly);
 
 	void setGridReadOnly(boolean readOnly);
+
+	/**
+	 * Es gibt keine getSectionGrid Methode im IGridAccessor, da es zu Cycle Fehlern führen würde. Das Project .rcp.model ist bereits als Dependencie in
+	 * .rcp.rcp eingebunden. Für das SectionGrid müssten wir .rcp.rcp als Dependencie im .model.rcp einbinden, dies würde zu den erwähnten Cycle Fehlern führen.
+	 */
 
 }
