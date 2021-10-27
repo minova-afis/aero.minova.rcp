@@ -7,3 +7,5 @@ aero.minova.rcp.dataservice/debug=false
 aero.minova.rcp.dataservice/debug/server=false
 # Turn on tracing for hashing and caching files
 aero.minova.rcp.dataservice/debug/cache=false
+
+aero.minova.rcp.dataservice/debug/uselocalhelper=false
