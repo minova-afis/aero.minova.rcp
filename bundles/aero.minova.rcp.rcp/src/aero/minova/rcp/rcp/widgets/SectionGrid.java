@@ -454,12 +454,17 @@ public class SectionGrid {
 		});
 
 		FormData fd = new FormData();
-		fd.width = DEFAULT_WIDTH;
+
+		String prefsWidthKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
+		String widthString = prefsDetailSections.get(prefsWidthKey, null);
+		fd.width = widthString != null ? Integer.parseInt(widthString) : DEFAULT_WIDTH;
+
 		default_height = natTable.getRowHeightByPosition(0) * 5;
 		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
 		String heightString = prefsDetailSections.get(prefsHeightKey, null);
 		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
 		prevHeight = fd.height;
+
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
