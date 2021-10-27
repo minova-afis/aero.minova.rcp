@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +30,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -75,6 +73,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
@@ -149,10 +151,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private IEclipsePreferences prefs;
 
 	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
-
-	@Inject
-	@Service
-	private List<IHelper> helperlist;
 
 	private FormToolkit formToolkit;
 
@@ -366,20 +364,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			return;
 		}
 
-		pluginService.activatePlugin(helperName);
-		// Kurzer Sleep, damit aktiviertes Plugin in der helperlist vorhanden ist
-		// TODO: kann man das besser lösen?
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		IHelper iHelper = null;
-		for (IHelper h : helperlist) {
-			if (Objects.equals(helperName, h.getClass().getName())) {
-				iHelper = h;
+
+		pluginService.activatePlugin(helperName);
+		BundleContext bundleContext = FrameworkUtil.getBundle(WFCDetailPart.class).getBundleContext();
+		try {
+			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IHelper.class.getName(), null);
+			for (ServiceReference<?> serviceReference : allServiceReferences) {
+				String property = (String) serviceReference.getProperty("component.name");
+				if (property.equals(helperName)) {
+					iHelper = (IHelper) bundleContext.getService(serviceReference);
+				}
 			}
+		} catch (InvalidSyntaxException e1) {
+			e1.printStackTrace();
 		}
 
 		if (iHelper == null) {
