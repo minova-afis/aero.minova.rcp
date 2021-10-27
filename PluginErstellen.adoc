@@ -288,7 +288,7 @@ Die Klasse ``aero.minova.rcp.model.Table`` enthält einige Methoden die das Setz
 [source,java]
 ----
 //setValue(int columnIndex, int rowIndex, Value newValue)
-mDetail.getGrid("InvoicePosition").getDataTable().setValue(4, 5, new Value("neuer Wert"))
+mDetail.getGrid("InvoicePosition").setValue(4, 5, new Value("neuer Wert"))
 ----
 
 Um ganze Zeilen hinzuzufügen wird eine Tabelle verwendet. 
@@ -308,6 +308,60 @@ Wie für die Zeilen müssen die Spaltennamen übereinstimmen, Reihenfolge ist ab
 ----
 WFCDetailCASRequestsUtil casUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 casUtil.setGridContent(mDetail.getGrid("InvoicePosition"), newDataTable);
+----
+
+=== Grids Validieren
+
+Es ist möglich, Eingaben in Grids direkt zu validieren. 
+Dafür muss eine Klasse das Interface ``IGridValidator`` implementieren.
+Über die Methode ``MGrid#addValidation(IGridValidator validator, List<Integer> columnsToValidate)`` wird die Validierung hinzugefügt.
+
+Die Methode ``checkValid()`` wird genutzt, um ungültige Zellen rot zu färben und das Speichern zu verhindern.
+
+Mit ``validateThrowingException()`` wird die Eingabe überprüft, bevor sie ins Grid eingetragen wird. 
+Bei dem Aufruf steht der neue Wert also noch nicht in der Tabelle!
+Wenn der neue Wert nicht gültig ist, muss eine ``ValidationFailedException`` geworfen werden. 
+Deren Text wird übersetzt und als Notification-Popup unten links angezeigt.
+
+Die Spalten- und Zeilenindices entsprechen den Positionen in der Tabelle, die dem Grid zugrunde liegt.
+Auf die Werte kann also wie gewohnt über das MGrid zugegriffen werden.
+
+Die beiden Methoden werden nur für Werte aufgerufen, die in einer Spalte stehen deren Index in den ``columnsToValidate``steht.
+Hier sollte darauf geachtet werden, dass die meisten Grids unsichtbare Spalten haben, in denen die Keys stehen, die nicht validiert werden sollten.
+
+In dem folgenden Beispiel werden die Werte der Spalte 2 (eine Integer Spalte) darauf überprüft, ob sie kleiner als 10 sind:
+
+[source,java]
+----
+@Component
+public class GraduationStepHelper implements IHelper, IGridValidator {
+
+	private MGrid graduationSteps;
+
+	@Override
+	public void setControls(MDetail mDetail) {
+		graduationSteps = mDetail.getGrid("GraduationStep");
+		List<Integer> columnsToValidate = List.of(2); // Es soll nur Spalte 2 überprüft werden
+		graduationSteps.addValidation(this, columnsToValidate); 
+	}
+
+	@Override
+	public void handleDetailAction(ActionCode code) {
+		// Es werden nur Einträge ins Grid überprüft, nicht die Aktionen
+	}
+
+	@Override
+	public boolean checkValid(int columnIndex, int rowIndex) {
+		return graduationSteps.getDataTable().getValue(columnIndex, rowIndex).getIntegerValue() <= 10;
+	}
+
+	@Override
+	public void validateThrowingException(int columnIndex, int rowIndex, Object newValue) throws ValidationFailedException {
+		if ((Integer) newValue > 10) {
+			throw new ValidationFailedException("Wert darf nicht größer als 10 sein!");
+		}
+	}
+}
 ----
 
 === Reagieren auf Wert-Änderungen 
@@ -341,6 +395,7 @@ Jedes GridChangeEvent hat einen GridChangeType und entsprechend sind die Attribu
 * INSERT: Eine neue Zeile wurde ins Grid eingefügt. Der Index der neuen Zeile wird mitgegeben
 * DELETE: Eine Zeile des Grids wurde gelöscht. Der Index den die alte Zeile hatte wird mitgegeben
 * UPDATE: Ein einzelner Wert im Grid wurde geändert. Zeilen- und Spaltenindex sowie der alte und neue Wert wird mitgegeben
+
 
 === Buttons
 
@@ -514,6 +569,8 @@ Es wird immer ein String zurückgegeben.
 ----
 String defaultCurrency = dataService.getSiteParameter("InvoiceDefaultCurrency", "2");
 ----
+
+
 
 === TODO, muss noch implementiert und dokumentiert werden
 

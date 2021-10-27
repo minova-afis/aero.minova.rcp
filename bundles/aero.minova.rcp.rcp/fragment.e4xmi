@@ -199,15 +199,15 @@
       <persistedState key="persistState" value="false"/>
       <children xsi:type="menu:Menu" xmi:id="_SIyywLcnEeuenNA9OtBfHw" elementId="org.eclipse.ui.file.menu" label="File">
         <persistedState key="persistState" value="false"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywbcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handledmenuitem.preferences" label="Preferences" command="_laMxs7bdEeuZF8ZS2_h9rA"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywrcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handleditem.exit" label="Exit" command="_laMxobbdEeuZF8ZS2_h9rA"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywbcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handledmenuitem.preferences" label="@Preferences" command="_laMxs7bdEeuZF8ZS2_h9rA"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_SIyywrcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.handleditem.exit" label="@Exit" command="_laMxobbdEeuZF8ZS2_h9rA"/>
       </children>
     </elements>
     <elements xsi:type="menu:MenuContribution" xmi:id="_zk8NIL3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.menucontribution.help" positionInParent="last" parentId="org.eclipse.ui.main.menu">
       <persistedState key="persistState" value="false"/>
       <children xsi:type="menu:Menu" xmi:id="_zk8NJL3wEeuFCqPujFNcsA" elementId="org.eclipse.ui.help.menu" label="Help">
         <persistedState key="persistState" value="false"/>
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_zk8NJb3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.handleditem.about" label="About" command="_laMxorbdEeuZF8ZS2_h9rA"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_zk8NJb3wEeuFCqPujFNcsA" elementId="aero.minova.rcp.rcp.handleditem.about" label="@About" command="_laMxorbdEeuZF8ZS2_h9rA"/>
       </children>
     </elements>
   </fragments>
