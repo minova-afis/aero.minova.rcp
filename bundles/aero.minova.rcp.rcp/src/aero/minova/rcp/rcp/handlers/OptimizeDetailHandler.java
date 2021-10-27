@@ -47,7 +47,7 @@ public class OptimizeDetailHandler {
 		MPartSashContainer element = emservice
 				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partsashcontainer.main", MPartSashContainer.class).get(0);
 		for (MPartSashContainerElement e : element.getChildren()) {
-			if (e.getElementId().equalsIgnoreCase("aero.minova.rcp.rcp.partstack.details")) {
+			if (e.getElementId() != null && e.getElementId().equalsIgnoreCase("aero.minova.rcp.rcp.partstack.details")) {
 				e.setContainerData(Integer.toString((int) (detailSize * size)));
 			} else {
 				e.setContainerData(Integer.toString((int) (leftSize * size)));
