@@ -131,4 +131,6 @@ public interface IDataService {
 	 */
 	String getSiteParameter(String key, String defaultVal);
 
+	CompletableFuture<Path> getPDFAsync(Table table);
+
 }

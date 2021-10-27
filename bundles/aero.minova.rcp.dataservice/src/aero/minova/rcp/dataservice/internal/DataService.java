@@ -364,6 +364,37 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public CompletableFuture<Path> getPDFAsync(Table table) {
+		String body = gson.toJson(table);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
+
+		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getStringValue() + ".pdf");
+		try {
+			Files.createDirectories(path.getParent());
+			FileUtil.createFile(path.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "PDF", true);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer PDF:\n" + t.body());
+			return path;
+		});
+	}
+
+	@Override
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
