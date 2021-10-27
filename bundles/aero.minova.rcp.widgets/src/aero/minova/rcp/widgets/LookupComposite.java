@@ -200,9 +200,8 @@ public class LookupComposite extends Composite {
 			popup.setVisible(false);
 			firstValue = null;
 			if (contentProvider.getValuesSize() == 0) {
-				MinovaNotifier.show(Display.getCurrent().getActiveShell(),
-						translationService.translate("@msg.NoLookupEntries", null),
-						translationService.translate("@Notification", null) );
+				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.NoLookupEntries", null),
+						translationService.translate("@Notification", null));
 			}
 			return;
 		}
@@ -520,15 +519,14 @@ public class LookupComposite extends Composite {
 				ServiceReference<?> serviceReference = bundleContext.getServiceReference(IDataService.class.getName());
 				IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
-				CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false, "%");
+				CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false);
 				setLastState();
 				listLookup.thenAccept(l -> {
 					Display.getDefault().asyncExec(() -> contentProvider.setValues(l));
 					gettingData = false;
 				});
 			} else {
-				MinovaNotifier.show(Display.getCurrent().getActiveShell(),
-						translationService.translate("@msg.ActiveRequest", null),
+				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.ActiveRequest", null),
 						translationService.translate("@Notification", null));
 			}
 		} else {

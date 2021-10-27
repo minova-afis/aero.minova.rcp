@@ -82,10 +82,13 @@ public class MFieldTests {
 	}
 
 	@Test
+	/**
+	 * Boolean Felder dürfen keinen null Value haben (kann nicht dargestellt werden)
+	 */
 	public void booleanFieldsetValueNull() {
 		booleanFieldsetValue();
 		mBooleanField.setValue(null, false);
-		assertEquals(mBooleanField.getValue(), null);
+		assertEquals(new Value(false), mBooleanField.getValue());
 	}
 
 	@Test

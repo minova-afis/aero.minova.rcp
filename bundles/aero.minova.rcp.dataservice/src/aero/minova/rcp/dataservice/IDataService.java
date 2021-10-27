@@ -22,20 +22,22 @@ public interface IDataService {
 	/**
 	 * Anfrage an den Server ein Table object zu bekommen, mit den Suchkriterium definiert über den searchTab
 	 *
-	 * @param tableName
 	 * @param seachTable
+	 *            Suchkriterien
 	 * @return
 	 */
-	CompletableFuture<Table> getIndexDataAsync(String tableName, Table seachTable);
-
-	CompletableFuture<SqlProcedureResult> getDetailDataAsync(String tableName, Table detailTable);
-
-	CompletableFuture<SqlProcedureResult> getGridDataAsync(String tableName, Table detailTable);
-
-	CompletableFuture<Path> getXMLAsync(String tableName, Table detailTable, String rootElement);
+	CompletableFuture<Table> getTableAsync(Table searchTable);
 
 	/**
-	 * Diese Methode löst einen Wert auf.
+	 * Anfrage an den Server um eine Prozedur aufzurufen. Die Parameter sind über die Tabelle definiert, als Prozedur-Name wird der Name der Tabelle verwendet
+	 * 
+	 * @param detailTable
+	 * @return
+	 */
+	CompletableFuture<SqlProcedureResult> callProcedureAsync(Table detailTable);
+
+	/**
+	 * Diese Methode löst einen Wert auf. Für den gegebenen keyLong und/oder keyText wird das entsprechende LookupValue angefragt
 	 *
 	 * @param field
 	 *            Über dieser Feld werden alle erforderlichen Konfigurationswerte geselesen.
@@ -43,9 +45,9 @@ public interface IDataService {
 	 *            Wenn dieser Wert true ist, werden die Daten zuerst im Cache gesucht. Werden sie dort gefunden, wird die Suche beendet. Wenn der Wert nicht im
 	 *            Cache gefunden wird, oder dieser Wert false ist, wird die Datenbank / der CAS angefragt.
 	 * @param keyLong
-	 *            Wenn dieser Wert nicht leer (null) ist, wird nach genau diesem Wert gesucht. Der Wert von KeyText wird ignoriert.
+	 *            Wenn dieser Wert nicht leer (null) ist, wird nach genau diesem Wert gesucht
 	 * @param keyText
-	 *            Der Keytext muss vollständig angegeben sein (Groß-/Kleinschreibung wir ignoriert). Er wird nur verwendet, wenn der KeyLong null ist.
+	 *            Der Keytext muss vollständig angegeben sein (Groß-/Kleinschreibung wir ignoriert)
 	 * @return
 	 */
 	CompletableFuture<List<LookupValue>> resolveLookup(MLookupField field, boolean useCache, Integer keyLong, String keyText);
@@ -53,21 +55,39 @@ public interface IDataService {
 	CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache);
 
 	/**
-	 * Diese Methode liefert alle möglichen Werte für den angegebenen Filtertext.
+	 * Diese Methode liefert alle möglichen Werte für das gegebene Lookup.
 	 *
 	 * @param field
 	 *            Über dieser Feld werden alle erforderlichen Konfigurationswerte geselesen.
 	 * @param useCache
 	 *            Wenn dieser Wert true ist, werden die Daten zuerst im Cache gesucht. Werden sie dort gefunden, wird die Suche beendet. Wenn der Wert nicht im
 	 *            Cache gefunden wird, oder dieser Wert false ist, wird die Datenbank / der CAS angefragt.
-	 * @param filterText
-	 *            Der Text, nach dem gefiltert werden soll. Wenn nichts angegeben wird, sollen alle möglichen Werte zurückgegeben werden. Als Wildcard sind "%"
-	 *            und "_" erlaubt, wie es im SQL-Server Standard ist.
 	 * @return
 	 */
-	CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache, String filterText);
+	CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache);
 
-	Path getStoragePath();
+	/**
+	 * Laden einer XML Datei. Diese wird im reports Ordner des Workspaces abgelegt
+	 * 
+	 * @param table
+	 *            Eine Spalte und eine Zeile, der KeyLong für die die xml Datei angefragt werden soll
+	 * @param rootElement
+	 *            Sollte aus .xbs ausgelesen werden
+	 * @return
+	 */
+	CompletableFuture<Path> getXMLAsync(Table table, String rootElement);
+
+	/**
+	 * Ersatz für die alte JavaScript Methode getSQLValue() aus Masken.
+	 * 
+	 * @param tablename
+	 * @param requestColumn
+	 * @param requestValue
+	 * @param resultColumn
+	 * @param resultType
+	 * @return
+	 */
+	CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType);
 
 	CompletableFuture<String> getHashedFile(String filename);
 
@@ -76,27 +96,23 @@ public interface IDataService {
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
-	 * @param localPath
-	 *            Lokaler Pfad für die Datei. Der Pfad vom #filename wird noch mit angehängt.
-	 * @param filename
+	 * @param serverFileName
 	 *            relativer Pfad und Dateiname auf dem Server
-	 * @return Die Datei, wenn sie geladen werden konnte; ansonsten null
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-
 	void downloadFile(String serverFileName) throws IOException, InterruptedException;
+
+	CompletableFuture<String> getCachedFileContent(String filename);
+
+	/**
+	 * returns true if zip file could be downloaded
+	 */
+	boolean getHashedZip(String zipname);
 
 	String getUserName();
 
 	void setLogger(Logger logger);
-
-	CompletableFuture<String> getCachedFileContent(String filename);
-
-	/*
-	 * returns true if zip file could be downloaded
-	 */
-	boolean getHashedZip(String zipname);
 
 	void setTimeout(int timeout);
 
@@ -104,6 +120,15 @@ public interface IDataService {
 
 	void sendLogs();
 
-	CompletableFuture<Value> getSQLValue(String tablename, String requestColumn, Value requestValue, String resultColumn, DataType resultType);
+	Path getStoragePath();
+
+	/**
+	 * Liefert den Wert aus der Tabelle tSiteParameter wenn der Key existiert, ansonsten den Default-Wert
+	 * 
+	 * @param key
+	 * @param defaultVal
+	 * @return
+	 */
+	String getSiteParameter(String key, String defaultVal);
 
 }

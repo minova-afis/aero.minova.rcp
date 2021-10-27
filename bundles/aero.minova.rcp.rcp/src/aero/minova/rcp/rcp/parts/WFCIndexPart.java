@@ -106,7 +106,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.nattable.MinovaDisplayConfiguration;
+import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -464,9 +464,9 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		});
 
-		MinovaDisplayConfiguration mdc = new MinovaDisplayConfiguration(table.getColumns(), form);
-		natTable.addConfiguration(mdc);
-		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mdc.getHiddenColumns());
+		MinovaIndexConfiguration mic = new MinovaIndexConfiguration(table.getColumns(), form);
+		natTable.addConfiguration(mic);
+		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mic.getHiddenColumns());
 
 		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
@@ -700,10 +700,15 @@ public class WFCIndexPart extends WFCFormPart {
 				return;
 			}
 
-			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
-			List collection = (List) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			List<Row> c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List<Row> collection = c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+
+			Table t = dataFormService.getTableFromFormIndex(form);
+			for (Row r : collection) {
+				t.addRow(r);
+			}
 			if (!collection.isEmpty()) {
-				context.set(Constants.BROKER_ACTIVEROWS, collection);
+				context.set(Constants.BROKER_ACTIVEROWS, t);
 			}
 		}
 	}

@@ -40,7 +40,7 @@ public class SaveDetailHandler implements ValueChangeListener, GridChangeListene
 	public void execute(@Optional MPerspective perspective) {
 		saving = true;
 		// canExecute() Methode wird aufgerufen, damit Knopf deaktiviert wird
-		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
 		broker.post(Constants.BROKER_SAVEENTRY, perspective);
 	}
 
@@ -68,13 +68,13 @@ public class SaveDetailHandler implements ValueChangeListener, GridChangeListene
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
 		// canExecute() Methode wird aufgerufen
-		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
 	}
 
 	@Override
 	public void gridChange(GridChangeEvent evt) {
 		// canExecute() Methode wird aufgerufen
-		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.save");
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
 	}
 
 	// Speichern wieder aktivieren

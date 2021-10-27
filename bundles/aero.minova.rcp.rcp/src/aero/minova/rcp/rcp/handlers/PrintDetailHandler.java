@@ -31,8 +31,8 @@ import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
-import aero.minova.rcp.form.setup.xbs.Map.Entry;
 import aero.minova.rcp.form.setup.util.XBSUtil;
+import aero.minova.rcp.form.setup.xbs.Map.Entry;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.DataType;
@@ -174,7 +174,7 @@ public class PrintDetailHandler {
 			table.addRow(row);
 
 			// XML-Dateil vom CAS laden
-			CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table.getName(), table, rootElements.get(maskName));
+			CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElements.get(maskName));
 			tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
 				try {
 					// Aus xml und xsl Datei PDF erstellen

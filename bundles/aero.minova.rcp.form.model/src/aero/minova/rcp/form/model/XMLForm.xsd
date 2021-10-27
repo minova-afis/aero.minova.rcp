@@ -586,7 +586,7 @@
 		<xs:attribute name="import" type="xs:NCName" />
 		<!-- /Entweder oder -->
 		<!-- optional -->
-		<xs:attribute name="clear-after-save" type="xs:boolean" />
+		<xs:attribute default="false" name="clear-after-save" type="xs:boolean" />
 		<xs:attribute default="true" name="button-delete-visible" type="xs:boolean" />
 		<xs:attribute default="true" name="button-new-visible" type="xs:boolean" />
 		<xs:attribute default="false" name="button-block-visible" type="xs:boolean" />
@@ -1418,7 +1418,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="id" type="xs:NCName">
+			<xs:attribute name="id" type="xs:NCName" use="required">
 				<xs:annotation>
 					<xs:documentation>ID, die für die Referenzierung verwendet werden
 						kann

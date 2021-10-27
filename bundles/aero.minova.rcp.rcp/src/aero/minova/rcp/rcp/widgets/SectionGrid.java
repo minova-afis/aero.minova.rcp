@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -13,11 +14,13 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -47,11 +50,13 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
+import org.eclipse.nebula.widgets.nattable.selection.event.ISelectionEvent;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
@@ -80,6 +85,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.constants.GridChangeType;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -92,6 +98,9 @@ import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.event.GridChangeEvent;
+import aero.minova.rcp.model.form.IButtonAccessor;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -100,6 +109,7 @@ import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
+import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -127,6 +137,8 @@ public class SectionGrid {
 	private Form form;
 	@Inject
 	private MWindow mwindow;
+	@Inject
+	private IEventBroker broker;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -141,16 +153,22 @@ public class SectionGrid {
 
 	private LocalResourceManager resManager;
 
-	private ToolItem deleteToolItem;
-	private ToolItem insertToolItem;
+	private IButtonAccessor deleteToolItemAccessor;
+	private IButtonAccessor insertToolItemAccessor;
 
 	private GridAccessor gridAccessor;
 
+	/**
+	 * Zuordnung von Name in Grid zu Name in Detail, aus .xbs
+	 */
 	private Map<String, String> fieldnameToValue;
 
 	private List<Row> rowsToInsert;
 	private List<Row> rowsToUpdate;
 	private List<Row> rowsToDelete;
+
+	private Map<Integer, Boolean> originalReadOnlyColumns;
+	private Map<Integer, Boolean> originalRequiredColumns;
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
@@ -163,6 +181,8 @@ public class SectionGrid {
 
 	private SortHeaderLayer sortHeaderLayer;
 
+	private MinovaGridConfiguration gridConfiguration;
+
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
@@ -174,6 +194,9 @@ public class SectionGrid {
 		rowsToUpdate = new ArrayList<>();
 		rowsToDelete = new ArrayList<>();
 
+		originalReadOnlyColumns = new HashMap<>();
+		originalRequiredColumns = new HashMap<>();
+
 		setFieldnameToValue(new HashMap<>());
 	}
 
@@ -182,6 +205,11 @@ public class SectionGrid {
 		dataTable = dataFormService.getTableFromGrid(grid);
 		createNatTable();
 		loadState();
+
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			originalReadOnlyColumns.put(i, dataTable.getColumns().get(i).isReadOnly());
+			originalRequiredColumns.put(i, dataTable.getColumns().get(i).isRequired());
+		}
 	}
 
 	/**
@@ -198,7 +226,7 @@ public class SectionGrid {
 			btnInsert.setIcon("NewRecord.Command");
 			btnInsert.setText(translationService.translate("@Action.New", null));
 			btnInsert.setEnabled(true);
-			insertToolItem = createToolItem(bar, btnInsert);
+			createToolItem(bar, btnInsert, grid.getId() + "." + btnInsert.getId());
 		}
 
 		if (grid.isButtonDeleteVisible()) {
@@ -206,13 +234,13 @@ public class SectionGrid {
 			btnDel.setId(Constants.CONTROL_GRID_BUTTON_DELETE);
 			btnDel.setIcon("DeleteRecord.Command");
 			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
-			btnDel.setEnabled(false);
-			deleteToolItem = createToolItem(bar, btnDel);
+			btnDel.setEnabled(true);
+			createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
 		}
 
 		// hier müssen die in der Maske definierten Buttons erstellt werden
 		for (Button btn : grid.getButton()) {
-			createToolItem(bar, btn);
+			createToolItem(bar, btn, btn.getId());
 		}
 
 		// Standard
@@ -221,23 +249,23 @@ public class SectionGrid {
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
 		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
-		createToolItem(bar, btnOptimizeHigh);
+		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
 		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
-		createToolItem(bar, btnOptimizeWidth);
+		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
 
 		section.setTextClient(bar);
 	}
 
-	public ToolItem createToolItem(ToolBar bar, Button btn) {
-		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND);
+	public ToolItem createToolItem(ToolBar bar, Button btn, String buttonID) {
+		return createToolItem(bar, btn, Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND, buttonID);
 	}
 
-	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName) {
+	public ToolItem createToolItem(ToolBar bar, Button btn, String commandName, String buttonID) {
 		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 		item.setData(btn);
 		item.setData("org.eclipse.swtbot.widget.key", btn.getId());
@@ -246,12 +274,18 @@ public class SectionGrid {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
 		}
 
-		MButton mButton = new MButton(btn.getId());
+		MButton mButton = new MButton(buttonID);
 		mButton.setIcon(btn.getIcon());
 		mButton.setText(btn.getText());
 		ButtonAccessor bA = new ButtonAccessor(mButton, item);
 		mButton.setButtonAccessor(bA);
 		mDetail.putButton(mButton);
+
+		if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_INSERT)) {
+			insertToolItemAccessor = bA;
+		} else if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
+			deleteToolItemAccessor = bA;
+		}
 
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -259,17 +293,18 @@ public class SectionGrid {
 				// TODO: Andere procedures/bindings/instances auswerten
 				Map<String, String> parameter = new HashMap<>();
 				parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btn.getId());
-				parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+				parameter.put(Constants.CONTROL_GRID_ID, grid.getId());
 				ParameterizedCommand command = commandService.createCommand(commandName, parameter);
 				handlerService.executeHandler(command);
 			}
 		});
 
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptorFromImagesBundle(btn.getIcon(), false);
+			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon(), false);
 			Image buttonImage = resManager.createImage(buttonImageDescriptor);
 			item.setImage(buttonImage);
 		}
+
 		return item;
 	}
 
@@ -292,9 +327,16 @@ public class SectionGrid {
 		bodyDataLayer.registerCommandHandler(new UpdateDataCommandHandler(bodyDataLayer) {
 			@Override
 			protected boolean doCommand(UpdateDataCommand command) {
+				Row r = sortedList.get(command.getRowPosition());
+				int col = command.getColumnPosition();
+				int row = dataTable.getRows().indexOf(r);
+
+				Value oldVal = dataTable.getRows().get(row).getValue(col);
+
 				if (super.doCommand(command)) {
-					gridAccessor.getMGrid().dataTableChanged();
-					Row r = sortedList.get(command.getRowPosition());
+					Value newVal = dataTable.getRows().get(row).getValue(col);
+					fireChange(new GridChangeEvent(gridAccessor.getMGrid(), col, row, oldVal, newVal, true));
+
 					if (!rowsToUpdate.contains(r) && !rowsToInsert.contains(r)) {
 						rowsToUpdate.add(r);
 					}
@@ -310,10 +352,11 @@ public class SectionGrid {
 		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
-		// Delete Button updaten (nur aktiviert, wenn eine ganze Zeile gewählt ist)
+		// Delete Button updaten (nur aktiviert, wenn eine Zelle gewählt ist)
 		selectionLayer.addLayerListener(event -> {
-			if (deleteToolItem != null) {
-				deleteToolItem.setEnabled(selectionLayer.getSelectedCellPositions().length > 0);
+			if (deleteToolItemAccessor != null && event instanceof ISelectionEvent) {
+				deleteToolItemAccessor.setCanBeEnabled(selectionLayer.getSelectedCellPositions().length > 0);
+				deleteToolItemAccessor.updateEnabled();
 			}
 		});
 
@@ -354,9 +397,9 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		MinovaGridConfiguration mgc = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
-		getNatTable().addConfiguration(mgc);
-		columnHideShowLayer.hideColumnPositions(mgc.getHiddenColumns());
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
+		getNatTable().addConfiguration(gridConfiguration);
+		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
 		// Hinzufügen von BindingActions, damit in der TriStateCheckBoxPainter der Mouselistener anschlägt!
 		getNatTable().addConfiguration(new DefaultEditBindings() {
@@ -451,7 +494,7 @@ public class SectionGrid {
 	public void execButtonHandler(String btnId, String commandName) {
 		Map<String, String> parameter = new HashMap<>();
 		parameter.put(Constants.CONTROL_GRID_BUTTON_ID, btnId);
-		parameter.put(Constants.CONTROL_GRID_PROCEDURE_SUFFIX, grid.getProcedureSuffix());
+		parameter.put(Constants.CONTROL_GRID_ID, grid.getId());
 		ParameterizedCommand command = commandService.createCommand(commandName, parameter);
 		handlerService.executeHandler(command);
 	}
@@ -464,15 +507,35 @@ public class SectionGrid {
 		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
 
-		for (Row rowInNewTable : newDataTable.getRows()) {
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), false));
+		return addRowsFromTable(newDataTable);
+	}
+
+	public void addRows(Table t) {
+
+		List<Row> originalRows = new ArrayList<>();
+		originalRows.addAll(dataTable.getRows());
+
+		addRowsFromTable(t);
+
+		for (Row r : dataTable.getRows()) {
+			if (!originalRows.contains(r)) {
+				rowsToInsert.add(r);
+				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().indexOf(r), false, GridChangeType.INSERT));
+			}
+		}
+	}
+
+	private Table addRowsFromTable(Table rowsToAdd) {
+		for (Row rowInNewTable : rowsToAdd.getRows()) {
 			Row rowInOriginal = this.dataTable.addRow();
 
 			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
 			for (Column originalColumn : this.dataTable.getColumns()) {
 
-				for (Column newColumn : newDataTable.getColumns()) {
+				for (Column newColumn : rowsToAdd.getColumns()) {
 					if (originalColumn.getName().equals(newColumn.getName())) {
-						Value v = rowInNewTable.getValue(newDataTable.getColumns().indexOf(newColumn));
+						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
 						int index = this.dataTable.getColumns().indexOf(originalColumn);
 						rowInOriginal.setValue(v, index);
 					}
@@ -516,7 +579,6 @@ public class SectionGrid {
 	public void updateNatTable() {
 		sortedList.clear();
 		sortedList.addAll(dataTable.getRows());
-		gridAccessor.getMGrid().dataTableChanged();
 		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
 	}
 
@@ -600,6 +662,7 @@ public class SectionGrid {
 	public void addNewRow() {
 		Row newRow = dataTable.addRow();
 		rowsToInsert.add(newRow);
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
 		updateNatTable();
 	}
 
@@ -645,6 +708,7 @@ public class SectionGrid {
 		dataTable.getRows().clear();
 		updateNatTable();
 		clearDataChanges();
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), false));
 	}
 
 	public void deleteCurrentRows() {
@@ -653,9 +717,16 @@ public class SectionGrid {
 			for (int i = r.start; i < r.end; i++) {
 				dataTable.deleteRow(sortedList.get(i));
 				rowsToDelete.add(sortedList.get(i));
+				rowsToUpdate.remove(sortedList.get(i));
+				rowsToInsert.remove(sortedList.get(i));
+				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), i, false, GridChangeType.DELETE));
 			}
 		}
 		updateNatTable();
+	}
+
+	private void fireChange(GridChangeEvent event) {
+		gridAccessor.getMGrid().dataTableChanged(event);
 	}
 
 	public void setGridAccessor(GridAccessor gridAccessor) {
@@ -758,4 +829,66 @@ public class SectionGrid {
 		}
 
 	}
+
+	public Table getSelectedRows() {
+		TableBuilder tb = TableBuilder.newTable("");
+		for (Column c : dataTable.getColumns()) {
+			tb.withColumn(c.getName(), c.getType());
+		}
+		Table selected = tb.create();
+
+		for (Range r : selectionLayer.getSelectedRowPositions()) {
+			for (int i = r.start; i < r.end; i++) {
+				selected.addRow(sortedList.get(i));
+			}
+		}
+		return selected;
+	}
+
+	public void addSelectionListener(ILayerListener listener) {
+		selectionLayer.addLayerListener(listener);
+	}
+
+	public void removeSelectionListener(ILayerListener listener) {
+		selectionLayer.removeLayerListener(listener);
+	}
+
+	public void resetReadOnlyAndRequiredColumns() {
+		for (Entry<Integer, Boolean> e : originalReadOnlyColumns.entrySet()) {
+			setColumnReadOnly(e.getKey(), e.getValue());
+		}
+
+		for (Entry<Integer, Boolean> e : originalRequiredColumns.entrySet()) {
+			setColumnRequired(e.getKey(), e.getValue());
+		}
+	}
+
+	public void setColumnRequired(int columnIndex, boolean required) {
+		dataTable.getColumns().get(columnIndex).setRequired(required);
+		gridConfiguration.setColumnRequired(columnIndex, required);
+
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
+	}
+
+	public void setGridRequired(boolean required) {
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			if (!gridConfiguration.getHiddenColumns().contains(i)) {
+				setColumnRequired(i, required);
+			}
+		}
+	}
+
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		dataTable.getColumns().get(columnIndex).setReadOnly(readOnly);
+		gridConfiguration.setColumnReadOnly(columnIndex, readOnly);
+	}
+
+	public void setGridReadOnly(boolean readOnly) {
+		for (int i = 0; i < dataTable.getColumnCount(); i++) {
+			if (!gridConfiguration.getHiddenColumns().contains(i)) {
+				setColumnReadOnly(i, readOnly);
+			}
+		}
+	}
+
 }

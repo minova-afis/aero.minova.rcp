@@ -70,7 +70,7 @@ public class LookupCASRequestUtil {
 					MField parameterControl = detail.getField(param);
 					tableBuilder.withColumn(param, parameterControl.getDataType());
 					if (parameterControl.getValue() != null) {
-					rowBuilder.withValue(parameterControl.getValue().getValue());
+						rowBuilder.withValue(parameterControl.getValue().getValue());
 					} else {
 						rowBuilder.withValue(null);
 					}
@@ -82,9 +82,9 @@ public class LookupCASRequestUtil {
 		t.addRow(row);
 		CompletableFuture<?> tableFuture;
 		if (field.getLookupTable() != null) {
-			tableFuture = dataService.getIndexDataAsync(t.getName(), t);
+			tableFuture = dataService.getTableAsync(t);
 		} else {
-			tableFuture = dataService.getDetailDataAsync(t.getName(), t);
+			tableFuture = dataService.callProcedureAsync(t);
 		}
 
 		return tableFuture;

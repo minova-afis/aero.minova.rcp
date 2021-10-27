@@ -12,4 +12,10 @@ public interface IButtonAccessor {
 
 	public void removeSelectionListener(SelectionListener listener);
 
+	boolean isCanBeEnabled();
+
+	void setCanBeEnabled(boolean canBeEnabled);
+
+	void updateEnabled();
+
 }

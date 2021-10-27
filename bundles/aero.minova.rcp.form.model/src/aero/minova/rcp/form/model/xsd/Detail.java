@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="procedure-suffix" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="sp" /&gt;
  *       &lt;attribute name="import" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
- *       &lt;attribute name="clear-after-save" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="clear-after-save" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="button-delete-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="button-new-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="button-block-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -245,8 +245,12 @@ public class Detail {
      *     {@link java.lang.Boolean }
      *     
      */
-    public java.lang.Boolean isClearAfterSave() {
-        return clearAfterSave;
+    public boolean isClearAfterSave() {
+        if (clearAfterSave == null) {
+            return false;
+        } else {
+            return clearAfterSave;
+        }
     }
 
     /**

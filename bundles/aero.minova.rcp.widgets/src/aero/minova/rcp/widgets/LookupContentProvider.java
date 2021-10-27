@@ -3,6 +3,7 @@ package aero.minova.rcp.widgets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,8 @@ import aero.minova.rcp.model.form.MLookupField;
 public class LookupContentProvider {
 	private LookupComposite lookup;
 	protected List<LookupValue> values = new ArrayList<>();
+
+	private Predicate<LookupValue> filter;
 
 	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupcontentprovider"));
 
@@ -37,6 +40,11 @@ public class LookupContentProvider {
 		List<LookupValue> result = values.stream()
 				.filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
 				.collect(Collectors.toList());
+
+		// Wenn gegeben, weiteren Filter anwenden
+		if (getFilter() != null) {
+			result = values.stream().filter(lv -> getFilter().test(lv)).collect(Collectors.toList());
+		}
 
 		// Groß- und Kleinschreibung ignorieren
 		result.sort(new SortIgnoreCase());
@@ -91,6 +99,14 @@ public class LookupContentProvider {
 
 	public int getValuesSize() {
 		return values.size();
+	}
+
+	public Predicate<LookupValue> getFilter() {
+		return filter;
+	}
+
+	public void setFilter(Predicate<LookupValue> filter) {
+		this.filter = filter;
 	}
 
 	public class SortIgnoreCase implements Comparator<Object> {

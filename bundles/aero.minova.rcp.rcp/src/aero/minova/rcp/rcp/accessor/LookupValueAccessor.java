@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
@@ -135,7 +136,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 	public void updatePossibleValues() {
 		LookupComposite up = ((LookupComposite) control);
-		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true, "%");
+		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true);
 		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> {
 			try {
 				up.getContentProvider().setValuesOnly(l);
@@ -153,5 +154,10 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		if (!control.isFocusControl()) {
 			control.setFocus();
 		}
+	}
+
+	@Override
+	public void setFilterForLookupContentProvider(Predicate<LookupValue> filter) {
+		((LookupComposite) control).getContentProvider().setFilter(filter);
 	}
 }

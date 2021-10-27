@@ -25,12 +25,12 @@ public class GridButtonHandler {
 
 	@Execute
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CONTROL_GRID_BUTTON_ID) String buttonId,
-			@Optional @Named(Constants.CONTROL_GRID_PROCEDURE_SUFFIX) String gridPS, MPart part) {
+			@Optional @Named(Constants.CONTROL_GRID_ID) String gridID, MPart part) {
 
 		SectionGrid sectionGrid = null;
 		WFCDetailPart wfcdetailpart = (WFCDetailPart) part.getObject();
 		if (wfcdetailpart != null) {
-			MGrid mGrid = wfcdetailpart.getDetail().getGrid(gridPS);
+			MGrid mGrid = wfcdetailpart.getDetail().getGrid(gridID);
 			GridAccessor valueAccessor = (GridAccessor) mGrid.getGridAccessor();
 			sectionGrid = valueAccessor.getSectionGrid();
 			if (sectionGrid == null) {

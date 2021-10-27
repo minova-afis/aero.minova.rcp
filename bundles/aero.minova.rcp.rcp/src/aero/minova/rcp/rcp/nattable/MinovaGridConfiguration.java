@@ -19,7 +19,9 @@ import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.editor.EditorSelectionEnum;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
+import org.eclipse.nebula.widgets.nattable.painter.cell.AbstractCellPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ComboBoxPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -34,8 +36,6 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
@@ -45,6 +45,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
 	private IDataService dataService;
 	private List<String> readOnlyColumns;
+	private IConfigRegistry configRegistry;
 
 	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService) {
 		this.columns = columns;
@@ -63,6 +64,9 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	@Override
 	public void configureRegistry(IConfigRegistry configRegistry) {
+		this.configRegistry = configRegistry;
+
+		// EDITABLE_RULE anpassen, damit Read-Only Spalten nicht bearbeitet werden können
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, new IEditableRule() {
 
 			@Override
@@ -108,7 +112,6 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private void configureCells(IConfigRegistry configRegistry) {
 		int i = 0;
 		for (Column column : columns) {
-
 			if (column.isLookup()) {
 				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired(),
 						column.getLookupTable());
@@ -292,11 +295,11 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		}
 
 		if (isReadOnly) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyValuePainter(), DisplayMode.NORMAL,
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new ReadOnlyTriStateCheckBoxPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 			readOnlyColumns.add(configLabel + columnIndex);
 		} else if (isRequired) {
-			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
+			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredTriStateCheckBoxPainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
 	}
@@ -307,13 +310,9 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		int decimals = 0;
 		if (field.getNumber() != null) {
 			decimals = field.getNumber().getDecimals();
-		}
-
-		if (field.getPercentage() != null) {
+		} else if (field.getPercentage() != null) {
 			decimals = field.getPercentage().getDecimals();
-
-		}
-		if (field.getMoney() != null) {
+		} else if (field.getMoney() != null) {
 			decimals = field.getMoney().getDecimals();
 		}
 
@@ -370,5 +369,86 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			configRegistry.registerConfigAttribute(CELL_PAINTER, new RequiredValuePainter(), DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 		}
+	}
+
+	/**
+	 * Updatet die CellPainter, damit required-Felder entsprechend dargestellt werden
+	 * 
+	 * @param columnIndex
+	 * @param required
+	 */
+	public void setColumnRequired(int columnIndex, boolean required) {
+
+		// Read-Only Darstellung hat Vorrang
+		if (readOnlyColumns.contains(ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex)) {
+			return;
+		}
+
+		// Cellpainter ermitteln
+		AbstractCellPainter newPainter = null;
+		Column c = columns.get(columnIndex);
+		if (required) {
+			if (c.getType().equals(DataType.BOOLEAN)) {
+				newPainter = new RequiredTriStateCheckBoxPainter();
+			} else if (c.isLookup()) {
+				newPainter = new RequiredLookupPainter();
+			} else {
+				newPainter = new RequiredValuePainter();
+			}
+
+		} else {
+			if (c.getType().equals(DataType.BOOLEAN)) {
+				newPainter = new TriStateCheckBoxPainter();
+			} else if (c.isLookup()) {
+				newPainter = new PaddingDecorator(new ComboBoxPainter(), 0, 0, 0, 2);
+			} else {
+				newPainter = new PaddingDecorator(new TextPainter(), 0, 2, 0, 2);
+			}
+
+		}
+
+		// Cellpainter registrieren
+		configRegistry.registerConfigAttribute(CELL_PAINTER, newPainter, DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
+	}
+
+	/**
+	 * Updatet die CellPainter, damit readOnly-Felder entsprechend dargestellt werden <br>
+	 * Außerdem wird die Spalte zu den readOnlyColumns hinzugefügt, damit die Felder nicht bearbeitet werden können
+	 * 
+	 * @param columnIndex
+	 * @param required
+	 */
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+
+		// Zu readOnlyColumns hinzufügen oder entfernen
+		String configLabel = ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex;
+		if (readOnly && !readOnlyColumns.contains(configLabel)) {
+			readOnlyColumns.add(configLabel);
+		} else if (!readOnly) {
+			readOnlyColumns.remove(configLabel);
+		}
+
+		// Cellpainter ermitteln
+		AbstractCellPainter newPainter = null;
+		Column c = columns.get(columnIndex);
+		if (readOnly) {
+			if (c.getType().equals(DataType.BOOLEAN)) {
+				newPainter = new ReadOnlyTriStateCheckBoxPainter();
+			} else {
+				newPainter = new ReadOnlyValuePainter();
+			}
+		} else {
+			if (c.getType().equals(DataType.BOOLEAN)) {
+				newPainter = new TriStateCheckBoxPainter();
+			} else if (c.isLookup()) {
+				newPainter = new PaddingDecorator(new ComboBoxPainter(), 0, 0, 0, 2);
+			} else {
+				newPainter = new PaddingDecorator(new TextPainter(), 0, 2, 0, 2);
+			}
+		}
+
+		// Cellpainter registrieren
+		configRegistry.registerConfigAttribute(CELL_PAINTER, newPainter, DisplayMode.NORMAL, configLabel);
+
 	}
 }

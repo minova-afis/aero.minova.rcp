@@ -3,6 +3,7 @@ package aero.minova.rcp.model.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.swt.graphics.Image;
 
 import aero.minova.rcp.form.model.xsd.Grid;
@@ -14,12 +15,12 @@ import aero.minova.rcp.model.event.GridChangeListener;
 
 public class MGrid {
 
-	public MGrid(String procedureSuffix) {
-		super();
-		this.procedureSuffix = procedureSuffix;
+	public MGrid(String id) {
+		this.id = id;
 	}
 
 	private String title;
+	private String id;
 	private String procedureSuffix;
 	private String procedurePrefix;
 	private String helperClass;
@@ -30,7 +31,6 @@ public class MGrid {
 	private Grid grid;
 	private List<MField> fields;
 	private MSection mSection;
-	private Table dataTable;
 	private ArrayList<GridChangeListener> listeners;
 
 	public String getTitle() {
@@ -39,6 +39,14 @@ public class MGrid {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getProcedureSuffix() {
@@ -98,11 +106,11 @@ public class MGrid {
 	}
 
 	public Table getDataTable() {
-		return dataTable;
+		return gridAccessor.getDataTable();
 	}
 
 	public void setDataTable(Table dataTable) {
-		this.dataTable = dataTable;
+		gridAccessor.setDataTable(dataTable);
 	}
 
 	public MSection getmSection() {
@@ -130,6 +138,7 @@ public class MGrid {
 	}
 
 	public boolean isValid() {
+		Table dataTable = gridAccessor.getDataTable();
 		for (Column c : dataTable.getColumns()) {
 			if (c.isRequired()) {
 				// TODO: Weitere Eigenschaften prüfen? (Textlänge, ...)
@@ -146,8 +155,8 @@ public class MGrid {
 	/*
 	 * Diese Methode muss aufgerufen werden, wenn sich an der unterliegenden Tabelle etwas geändert hat, damit die GridChangedEvents verschickt werden
 	 */
-	public void dataTableChanged() {
-		fire(new GridChangeEvent(this, dataTable));
+	public void dataTableChanged(GridChangeEvent event) {
+		fire(event);
 	}
 
 	/**
@@ -192,4 +201,52 @@ public class MGrid {
 			listener.gridChange(event);
 		}
 	}
+
+	public Table getSelectedRows() {
+		return gridAccessor.getSelectedRows();
+	}
+
+	public void deleteCurrentRows() {
+		gridAccessor.deleteCurrentRows();
+	}
+
+	public void addRows(Table rows) {
+		gridAccessor.addRows(rows);
+	}
+
+	public void addSelectionListener(ILayerListener listener) {
+		gridAccessor.addSelectionListener(listener);
+	}
+
+	public void removeSelectionListener(ILayerListener listener) {
+		gridAccessor.removeSelectionListener(listener);
+	}
+
+	public void closeEditor() {
+		gridAccessor.closeEditor();
+	}
+
+	/**
+	 * Setzt alle Spalten auf ihren ursprünglichen read-only und required Zustand zurück
+	 */
+	public void resetReadOnlyAndRequiredColumns() {
+		gridAccessor.resetReadOnlyAndRequiredColumns();
+	}
+
+	public void setColumnRequired(int columnIndex, boolean required) {
+		gridAccessor.setColumnRequired(columnIndex, required);
+	}
+
+	public void setGridRequired(boolean required) {
+		gridAccessor.setGridRequired(required);
+	}
+
+	public void setColumnReadOnly(int columnIndex, boolean readOnly) {
+		gridAccessor.setColumnReadOnly(columnIndex, readOnly);
+	}
+
+	public void setGridReadOnly(boolean readOnly) {
+		gridAccessor.setGridReadOnly(readOnly);
+	}
+
 }

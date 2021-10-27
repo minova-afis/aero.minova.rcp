@@ -29,8 +29,6 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.widgets.BooleanCheckBoxPainter;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxCellEditor;
-import aero.minova.rcp.rcp.widgets.TriStateCheckBoxPainter;
 
 public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 
@@ -85,7 +83,7 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getDateTime() != null) {
 				configureDateTimeCell(configRegistry, i++);
 			} else if (column.getType().equals(DataType.DOUBLE)) {
-				configureDoubleCell(configRegistry, i++);
+				configureDoubleCell(configRegistry, i++, formColumns.get(column.getName()));
 			} else if (column.getType().equals(DataType.INTEGER)) {
 				configureIntegerCell(configRegistry, i++);
 			} else {
@@ -108,7 +106,6 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.INTEGER);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, fdc, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-
 	}
 
 	private void configureDateTimeCell(IConfigRegistry configRegistry, int columnIndex) {
@@ -130,7 +127,6 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.INSTANT, locale, DateTimeType.DATETIME, z);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, fdc, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-
 	}
 
 	private void configureShortTimeCell(IConfigRegistry configRegistry, int columnIndex) {
@@ -149,7 +145,6 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.INSTANT, locale, DateTimeType.TIME);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, fdc, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-
 	}
 
 	private void configureShortDateCell(IConfigRegistry configRegistry, int columnIndex) {
@@ -171,7 +166,6 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 	}
 
 	private void configureBooleanCell(IConfigRegistry configRegistry, int columnIndex, Boolean tristate) {
-
 		if (tristate == null || tristate) {
 			// visuelle anpassung [x] oder [_] oder [-]
 			configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new TriStateCheckBoxPainter(), DisplayMode.NORMAL,
@@ -196,7 +190,17 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		}
 	}
 
-	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex) {
+	private void configureDoubleCell(IConfigRegistry configRegistry, int columnIndex, aero.minova.rcp.form.model.xsd.Column column) {
+
+		int decimals = 0;
+		if (column.getNumber() != null) {
+			decimals = column.getNumber().getDecimals();
+		} else if (column.getPercentage() != null) {
+			decimals = column.getPercentage().getDecimals();
+		} else if (column.getMoney() != null) {
+			decimals = column.getMoney().getDecimals();
+		}
+
 		MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
 		attributeValue.setSelectionMode(EditorSelectionEnum.START);
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
@@ -210,10 +214,9 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
-		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.DOUBLE, locale);
+		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.DOUBLE, locale, decimals);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, fdc, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
-
 	}
 
 	private void configureTextCell(IConfigRegistry configRegistry, int columnIndex) {
