@@ -109,13 +109,15 @@ public class Constants {
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
 	public static final String REQUIRED_CELL_LABEL = "REQUIRED_CELL";
+	public static final String READ_ONLY_CELL_LABEL = "READ_ONLY_CELL";
+	public static final String INVALID_CELL_LABEL = "INVALID_CELL";
+	public static final String VALIDATION_CELL_LABEL = "VALIDATION_CELL";
 	public static final String SELECTED_ANCHOR_LABEL = "selectionAnchor";
 
 	// NatTable Data
 	public static final String GRID_DATA_SECTION = "Section";
 	public static final String GRID_DATA_SELECTIONLAYER = "Selectionlayer";
 	public static final String GRID_DATA_DATATABLE = "DataTable";
-	public static final String READ_ONLY_CELL_LABEL = "READ_ONLY_CELL";
 
 	// CSS Klassennamen
 	public static final String CSS_STANDARD = "Standard";
@@ -150,6 +152,7 @@ public class Constants {
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_PRINTDETAIL = "aero.minova.rcp.rcp.command.printdetail";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL = "aero.minova.rcp.rcp.command.savedetail";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";

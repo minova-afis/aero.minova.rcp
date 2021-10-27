@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.osgi,
  javax.inject,
  org.eclipse.e4.core.di.extensions,
  aero.minova.rcp.preferences,
- aero.minova.rcp.preferences
+ aero.minova.rcp.preferences,
+ org.eclipse.nebula.widgets.nattable.core
 Bundle-ActivationPolicy: lazy
 Import-Package: aero.minova.rcp.form.model.xsd,
  org.eclipse.jface.wizard,

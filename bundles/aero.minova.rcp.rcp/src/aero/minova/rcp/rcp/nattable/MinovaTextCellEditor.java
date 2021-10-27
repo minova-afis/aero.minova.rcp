@@ -16,6 +16,8 @@ import org.eclipse.jface.fieldassist.IContentProposalListener;
 import org.eclipse.jface.fieldassist.IContentProposalListener2;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
+import org.eclipse.nebula.widgets.nattable.data.convert.ConversionFailedException;
+import org.eclipse.nebula.widgets.nattable.data.convert.IDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.config.RenderErrorHandling;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
@@ -713,5 +715,44 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 */
 	public void setCommitWithCtrlKey(boolean commitWithCtrlKey) {
 		this.commitWithCtrlKey = commitWithCtrlKey;
+	}
+
+	/**
+	 * Converts the given display value using the configured {@link IDisplayConverter}. If there is no {@link IDisplayConverter} registered for this editor, the
+	 * value itself will be returned. Will use the specified {@link IEditErrorHandler} for handling conversion errors.
+	 *
+	 * @param displayValue
+	 *            The display value that needs to be converted.
+	 * @param conversionErrorHandler
+	 *            The error handler that will be activated in case of conversion errors.
+	 * @return The canonical value after converting the current value or the value itself if no {@link IDisplayConverter} is configured.
+	 * @throws RuntimeException
+	 *             for conversion failures. As the {@link IDisplayConverter} interface does not specify throwing checked Exceptions on converting data, only
+	 *             unchecked Exceptions can occur. This is needed to stop further commit processing if the conversion failed.
+	 * @see IDisplayConverter
+	 */
+	@Override
+	protected Object handleConversion(Object displayValue, IEditErrorHandler conversionErrorHandler) {
+		Object canonicalValue;
+		try {
+			if (this.displayConverter != null) {
+				// always do the conversion to check for valid entered data
+				canonicalValue = this.displayConverter.displayToCanonicalValue(this.layerCell, this.configRegistry, displayValue);
+			} else {
+				canonicalValue = displayValue;
+			}
+
+			// if the conversion succeeded, remove error rendering if exists
+			conversionErrorHandler.removeError(this);
+		} catch (ConversionFailedException e) {
+			// conversion failed, return null!
+			conversionErrorHandler.displayError(this, e);
+			return null;
+		} catch (Exception e) {
+			// conversion failed
+			conversionErrorHandler.displayError(this, e);
+			throw new ConversionFailedException(e.getMessage(), e);
+		}
+		return canonicalValue;
 	}
 }

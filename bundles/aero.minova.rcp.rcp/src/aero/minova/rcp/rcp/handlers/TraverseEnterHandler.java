@@ -8,7 +8,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -91,15 +90,9 @@ public class TraverseEnterHandler {
 
 		// Bei offenem Lookup-Popup wollen wir nicht speichern
 		if (!popupOpen) {
-			// SaveDetailHandler holen
-			IHandler handler = commandService.getCommand("aero.minova.rcp.rcp.command.savedetail").getHandler();
-			// prüfen, ob der SaveDetailHandler enabled ist
-			if (handler.isEnabled()) {
-				// ParameterizedCommand des SaveDetailsHandlers erstellen und ausführen
-				ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.savedetail", null);
-				handlerService.executeHandler(cmd);
-				return;
-			}
+			// ParameterizedCommand des SaveDetailsHandlers erstellen und ausführen
+			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL, null);
+			handlerService.executeHandler(cmd);
 		}
 	}
 

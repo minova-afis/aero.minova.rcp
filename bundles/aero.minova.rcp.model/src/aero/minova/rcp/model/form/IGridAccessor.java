@@ -1,5 +1,7 @@
 package aero.minova.rcp.model.form;
 
+import java.util.List;
+
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 
 import aero.minova.rcp.model.Table;
@@ -31,5 +33,7 @@ public interface IGridAccessor {
 	void setColumnReadOnly(int columnIndex, boolean readOnly);
 
 	void setGridReadOnly(boolean readOnly);
+
+	void addValidation(IGridValidator validator, List<Integer> columnsToValidate);
 
 }

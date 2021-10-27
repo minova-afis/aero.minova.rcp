@@ -253,4 +253,10 @@ public class MDetail {
 			g.resetReadOnlyAndRequiredColumns();
 		}
 	}
+
+	public void commitAndCloseGridEditors() {
+		for (MGrid g : grids.values()) {
+			g.closeEditor();
+		}
+	}
 }

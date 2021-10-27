@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -46,19 +45,14 @@ public class PreferenceWindowModel {
 		xbsPreferences = XBSUtil.getMainMap(preferences);
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
-				
+
 		cprf.add(buildAnwendungsTab(translationService));
-		
 		cprf.add(buildDarstellungsTab(translationService));
-
 		cprf.add(buildErweiterungTab(translationService));
-
 		cprf.add(buildDruckenTab(translationService));
-
 		cprf.add(buildConsoleTab(translationService));
 
 		IExtensionPoint point = extensionRegistry.getExtensionPoint("minova.preferencepage");
-		
 		for (IExtension extension : point.getExtensions()) {
 			// find the category first
 			for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -68,15 +62,11 @@ public class PreferenceWindowModel {
 				} catch (CoreException e1) {
 					e1.printStackTrace();
 				}
-
 			}
 		}
-	
-	
-		
+
 		return cprf;
 	}
-
 
 	private PreferenceTabDescriptor buildAnwendungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Application.png", "applicationTab",
@@ -103,7 +93,6 @@ public class PreferenceWindowModel {
 		return ptd;
 	}
 
-
 	private PreferenceTabDescriptor buildDarstellungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
 		PreferenceSectionDescriptor psd;
@@ -119,8 +108,8 @@ public class PreferenceWindowModel {
 
 		psd = new PreferenceSectionDescriptor("Themes", translationService.translate("@Preferences.Themes", null), 0.2);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
-				"M", "S", "M", "L", "XL"));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1,
+				DisplayType.COMBO, "M", "S", "M", "L", "XL"));
 		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), 0.1,
@@ -234,6 +223,5 @@ public class PreferenceWindowModel {
 
 		return ptd;
 	}
-
 
 }

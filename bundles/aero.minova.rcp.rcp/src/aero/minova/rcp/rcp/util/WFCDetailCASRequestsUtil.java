@@ -610,8 +610,8 @@ public class WFCDetailCASRequestsUtil {
 			reloadFields(keyTable);
 		}
 
-		focusFirstEmptyField();
 		sendEventToHelper(ActionCode.AFTERSAVE);
+		focusFirstEmptyField();
 	}
 
 	/**

@@ -20,7 +20,6 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -48,7 +47,6 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
@@ -127,7 +125,7 @@ public class PrintIndexHandler {
 
 	@Execute
 	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window, EModelService modelService,
-			EPartService partService, @Optional Preview preview) {
+			EPartService partService) {
 
 		String xmlRootTag = null;
 		String title = null;
@@ -228,7 +226,7 @@ public class PrintIndexHandler {
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(window, modelService, partService, preview);
+				PrintUtil.checkPreview(window, modelService, partService);
 
 				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
@@ -240,7 +238,7 @@ public class PrintIndexHandler {
 				if (disablePreview) {
 					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
-					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
+					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService));
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
