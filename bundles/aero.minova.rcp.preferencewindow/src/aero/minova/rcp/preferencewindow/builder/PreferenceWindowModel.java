@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -46,19 +45,14 @@ public class PreferenceWindowModel {
 		xbsPreferences = XBSUtil.getMainMap(preferences);
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
-				
+
 		cprf.add(buildAnwendungsTab(translationService));
-		
 		cprf.add(buildDarstellungsTab(translationService));
-
 		cprf.add(buildErweiterungTab(translationService));
-
 		cprf.add(buildDruckenTab(translationService));
-
 		cprf.add(buildConsoleTab(translationService));
 
 		IExtensionPoint point = extensionRegistry.getExtensionPoint("minova.preferencepage");
-		
 		for (IExtension extension : point.getExtensions()) {
 			// find the category first
 			for (IConfigurationElement element : extension.getConfigurationElements()) {
@@ -68,15 +62,11 @@ public class PreferenceWindowModel {
 				} catch (CoreException e1) {
 					e1.printStackTrace();
 				}
-
 			}
 		}
-	
-	
-		
+
 		return cprf;
 	}
-
 
 	private PreferenceTabDescriptor buildAnwendungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/Application.png", "applicationTab",
@@ -102,7 +92,6 @@ public class PreferenceWindowModel {
 				DisplayType.CHECK, true));
 		return ptd;
 	}
-
 
 	private PreferenceTabDescriptor buildDarstellungsTab(TranslationService translationService) {
 		PreferenceTabDescriptor ptd;
