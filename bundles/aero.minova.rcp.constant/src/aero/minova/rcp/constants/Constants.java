@@ -19,8 +19,6 @@ public class Constants {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
-	public static final String TABLE_TICKETNUMBER = "TicketNumber";
-
 	public static final String CONTROL_FIELD = "field";
 	public static final String CONTROL_OPTIONS = "options";
 	public static final String CONTROL_CONSUMER = "consumer";
