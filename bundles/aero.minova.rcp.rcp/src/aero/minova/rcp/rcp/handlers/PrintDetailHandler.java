@@ -17,7 +17,6 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -42,7 +41,6 @@ import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.PrintUtil;
 
@@ -154,8 +152,7 @@ public class PrintDetailHandler {
 	}
 
 	@Execute
-	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, MPerspective mPerspective,
-			@Optional Preview preview) {
+	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, MPerspective mPerspective) {
 		try {
 
 			if (!(mpart.getObject() instanceof WFCDetailPart)) {
@@ -183,10 +180,10 @@ public class PrintDetailHandler {
 					String xmlString = Files.readString(xmlPath);
 
 					// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-					PrintUtil.checkPreview(window, modelService, partService, preview);
+					PrintUtil.checkPreview(window, modelService, partService);
 
 					PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve("reports/" + reportNames.get(maskName)).toFile());
-					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService, preview));
+					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService));
 				} catch (IOException | SAXException | TransformerException e) {
 					e.printStackTrace();
 					broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
