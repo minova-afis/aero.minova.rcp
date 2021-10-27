@@ -94,8 +94,8 @@ public class PreferenceWindowModel {
 
 		psd = new PreferenceSectionDescriptor("Themes", translationService.translate("@Preferences.Themes", null), 0.2);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1, DisplayType.COMBO,
-				"M", "S", "M", "L", "XL"));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), 0.1,
+				DisplayType.COMBO, "M", "S", "M", "L", "XL"));
 		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), 0.1,
@@ -218,7 +218,12 @@ public class PreferenceWindowModel {
 		psd = new PreferenceSectionDescriptor("user", translationService.translate("@Preferences.WorkingTime.UserPreselect", null), 0.1);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR,
-				translationService.translate("@Preferences.WorkingTime.UserPreselectDescription", null), 0.1, DisplayType.STRING, "bauer"));
+				translationService.translate("@Preferences.WorkingTime.UserPreselectDescription", null), 0.1, DisplayType.STRING, ""));
+
+		psd = new PreferenceSectionDescriptor("invoice", translationService.translate("@Preferences.Invoice", null), 0.1);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_PDF_WHEN_INVOICE_CLOSED,
+				translationService.translate("@Preferences.Invoice.ShowPDFWhenInvoiceClosed", null), 0.2, DisplayType.CHECK, true));
 
 		return ptd;
 	}
