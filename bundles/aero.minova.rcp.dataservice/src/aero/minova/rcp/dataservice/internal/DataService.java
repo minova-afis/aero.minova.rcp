@@ -364,14 +364,14 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Path> getPDFAsync(Table table) {
+	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
 		String body = gson.toJson(table);
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
-		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getStringValue() + ".pdf");
+		Path path = getStoragePath().resolve(fileName);
 		try {
 			Files.createDirectories(path.getParent());
 			FileUtil.createFile(path.toString());

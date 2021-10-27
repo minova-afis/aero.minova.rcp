@@ -78,6 +78,17 @@ public interface IDataService {
 	CompletableFuture<Path> getXMLAsync(Table table, String rootElement);
 
 	/**
+	 * Fragt eine PDF vom CAS an und speichert sie in den Workspace Ordner
+	 * 
+	 * @param table
+	 *            Die Tabelle über die die Prozedur angefragt wird
+	 * @param fileName
+	 *            gewünschter Name des Files, kann auch mit weiterem Ordner angegeben werden. z.B. "reports/Report.pdf", "pdf/File.pdf", "Rechnung1.pdf";
+	 * @return
+	 */
+	CompletableFuture<Path> getPDFAsync(Table table, String fileName);
+
+	/**
 	 * Ersatz für die alte JavaScript Methode getSQLValue() aus Masken.
 	 * 
 	 * @param tablename
@@ -130,7 +141,5 @@ public interface IDataService {
 	 * @return
 	 */
 	String getSiteParameter(String key, String defaultVal);
-
-	CompletableFuture<Path> getPDFAsync(Table table);
 
 }
