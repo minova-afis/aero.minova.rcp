@@ -12,16 +12,25 @@
     <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
     <booleanAttribute key="default" value="false"/>
     <setAttribute key="deselected_workspace_bundles">
+        <setEntry value="Test2"/>
+        <setEntry value="aaaa"/>
+        <setEntry value="aero.minova.graduation.helper"/>
+        <setEntry value="aero.minova.invoice.helper"/>
+        <setEntry value="aero.minova.jobdefinition.helper"/>
+        <setEntry value="aero.minova.journaltemplate.helper"/>
         <setEntry value="aero.minova.test.saw.rcp"/>
         <setEntry value="aero.minova.translation"/>
+        <setEntry value="aero.minova.workingtime.helper"/>
+        <setEntry value="aero.minova.workingtime.helper.tests"/>
+        <setEntry value="test"/>
     </setAttribute>
     <booleanAttribute key="includeOptional" value="true"/>
     <stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-        <listEntry value="/aero.minova.rcp.uitests"/>
+        <listEntry value="/aero.minova.rcp.uitests/src/aero/minova/rcp/uitests/OpenServiceContractTest.java"/>
     </listAttribute>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-        <listEntry value="4"/>
+        <listEntry value="1"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
     <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
@@ -31,7 +40,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
-    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="aero.minova.rcp.uitests.OpenServiceContract"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="aero.minova.rcp.uitests.OpenServiceContractTest"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="aero.minova.rcp.uitests"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
@@ -380,12 +389,6 @@
         <setEntry value="org.w3c.dom.svg@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
-        <setEntry value="Test2@default:default"/>
-        <setEntry value="aaaa@default:default"/>
-        <setEntry value="aero.minova.graduation.helper@default:default"/>
-        <setEntry value="aero.minova.invoice.helper@default:default"/>
-        <setEntry value="aero.minova.jobdefinition.helper@default:default"/>
-        <setEntry value="aero.minova.journaltemplate.helper@default:default"/>
         <setEntry value="aero.minova.libs.fop@default:default"/>
         <setEntry value="aero.minova.libs.jtds@default:default"/>
         <setEntry value="aero.minova.rcp.constant@default:default"/>
@@ -410,9 +413,6 @@
         <setEntry value="aero.minova.rcp.workspace@default:default"/>
         <setEntry value="aero.minova.rcp.xml.tests@default:default"/>
         <setEntry value="aero.minova.servicecontract.helper@default:default"/>
-        <setEntry value="aero.minova.workingtime.helper.tests@default:default"/>
-        <setEntry value="aero.minova.workingtime.helper@default:default"/>
-        <setEntry value="test@default:default"/>
     </setAttribute>
     <booleanAttribute key="show_selected_only" value="false"/>
     <booleanAttribute key="tracing" value="false"/>
