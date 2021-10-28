@@ -200,7 +200,9 @@ public class DataService implements IDataService {
 			Table paramTable = tableCF.get();
 			if (paramTable != null) {
 				for (Row r : paramTable.getRows()) {
-					siteParameters.put(r.getValue(0).getStringValue(), r.getValue(1).getStringValue());
+					if (r.getValue(0) != null && r.getValue(1) != null) {
+						siteParameters.put(r.getValue(0).getStringValue(), r.getValue(1).getStringValue());
+					}
 				}
 			}
 		} catch (InterruptedException | ExecutionException e) {}
