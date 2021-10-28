@@ -102,7 +102,7 @@ class OpenStundenerfassungsTest {
 		searchNattable.click(2, 3);
 		UITestUtil.sleep();
 		searchToolbar.get(1).click();
-		UITestUtil.sleep(5000);
+		UITestUtil.sleep();
 
 		// TODO: Das funktioniert manchmal nicht, wir lassen den Test dann eh neu laufen
 		// bis es geht
@@ -115,7 +115,7 @@ class OpenStundenerfassungsTest {
 
 		// Suche zurücksetzten
 		searchToolbar.get(0).click();
-		UITestUtil.sleep(5000);
+		UITestUtil.sleep();
 		assertEquals(2, searchNattable.rowCount());
 
 		// Sind alle Spalten leer?
@@ -139,7 +139,7 @@ class OpenStundenerfassungsTest {
 	@DisplayName("Index mit SuchPart filtern")
 	public void filterIndex() {
 		open();
-		
+
 		searchNattable.setCellDataValueByPosition(1, 3, "avm");
 		UITestUtil.loadIndex(indexToolbar);
 
@@ -151,7 +151,7 @@ class OpenStundenerfassungsTest {
 		// Suche zurücksetzten
 		searchToolbar.get(0).click();
 	}
- 
+
 	@Test
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	void loadIndex() {
