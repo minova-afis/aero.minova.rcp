@@ -81,6 +81,12 @@ public class DataService implements IDataService {
 	 */
 	private boolean logSQLString = true;
 
+	/**
+	 * Kann zum debuggen auf false gesetzt werden, dann werden lokale Änderungen an z.B. Masken nicht überschrieben. <br>
+	 * ACHTUNG: Für Anwender MUSS das auf true gesetzt sein
+	 */
+	private boolean updateFiles = true;
+
 	Logger logger;
 
 	HashMap<String, String> serverHashes = new HashMap<>();
@@ -358,10 +364,41 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
+		String body = gson.toJson(table);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
+
+		Path path = getStoragePath().resolve(fileName);
+		try {
+			Files.createDirectories(path.getParent());
+			FileUtil.createFile(path.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "PDF", true);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer PDF:\n" + t.body());
+			return path;
+		});
+	}
+
+	@Override
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
-			if (checkIfUpdateIsRequired(filename)) {
+			if (updateFiles && checkIfUpdateIsRequired(filename)) {
 				logCache(filename + " need to download / update the file ");
 				// File löschen, damit es komplett aktualisiert wird
 				getStoragePath().resolve(filename).toFile().delete();

@@ -87,8 +87,6 @@ public class Manager {
 		preferences.putBoolean(ApplicationPreferences.DISABLE_PREVIEW, deactivateinternpreview);
 		int maxCharacter = preferences.getInt(ApplicationPreferences.MAX_CHARS, 24000);
 		preferences.putInt(ApplicationPreferences.MAX_CHARS, maxCharacter);
-		String user = preferences.get(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, System.getProperty("user.name"));
-		preferences.put(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR, user);
 		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
 		if ("".equals(fd))
 			fd = null;

@@ -200,4 +200,7 @@ public class Table {
 		return r.getValue(getColumnIndex(columnName));
 	}
 
+	public Value getValue(int col, int row) {
+		return rows.get(row).getValue(col);
+	}
 }

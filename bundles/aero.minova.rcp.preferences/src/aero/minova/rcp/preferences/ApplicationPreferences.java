@@ -216,13 +216,6 @@ public class ApplicationPreferences {
 	public static final String USE_FORM_BUFFER = "UseFormBuffer";
 
 	/**
-	 * Bestimmt welcher Benutzer in den Detail Bereich eingetragen wird. ENTFERNEN? Über den Login regeln?
-	 * 
-	 * @see ApplicationPreferences#PREFERENCES_NODE
-	 */
-	public static final String USER_PRESELECT_DESCRIPTOR = "UserPreselectDescription";
-
-	/**
 	 * Bestimmt das Land, das für das Locale genutzt wird.
 	 * 
 	 * @see ApplicationPreferences#PREFERENCES_NODE
