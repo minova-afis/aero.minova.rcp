@@ -166,6 +166,6 @@ class OpenStundenerfassungsTest {
 
 	@AfterEach
 	void sleep() {
-		bot.sleep(10000);
+		bot.sleep(1000);
 	}
 }
