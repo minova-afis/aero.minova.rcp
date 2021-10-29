@@ -18,6 +18,9 @@ public class ModelToViewModel {
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 		}
+		if (field.getEditor() != null) { // Contact Editor braucht immer 4 Spalten
+			f.setNumberColumnsSpanned(4);
+		}
 		if (field.getNumberRowsSpanned() != null) {
 			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
 		}
@@ -47,6 +50,13 @@ public class ModelToViewModel {
 			for (TypeParam typeParam : field.getLookup().getParam()) {
 				f.addLookupParameter(typeParam.getFieldName());
 			}
+			return f;
+		}
+
+		if (field.getEditor() != null) {
+			MField f = new MLookupField();
+			f.setLookupTable("tContact");
+			f.setLookupDescription("LastName");
 			return f;
 		}
 
@@ -97,14 +107,7 @@ public class ModelToViewModel {
 			return f;
 		}
 
-		if (field.getEditor() != null) {
-			System.err.println("Field " + field.getName() + " is of Type Editor, which isn't implemented yet");
-		} else {
-			throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
-		}
-
-		// Filler Feld zurückgeben, damit restliche Maske gebaut werden kann
-		return new MTextField();
+		throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
 	}
 
 }
