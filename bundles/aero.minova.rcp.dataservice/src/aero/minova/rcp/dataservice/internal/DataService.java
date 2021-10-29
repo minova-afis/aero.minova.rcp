@@ -76,17 +76,6 @@ import aero.minova.rcp.model.util.ErrorObject;
 @Component
 public class DataService implements IDataService {
 
-	/**
-	 * Wenn true wird ein String geloggt, mit dem Aufrufe direkt in der Datenbank ausgeführt werden können
-	 */
-	private boolean logSQLString = true;
-
-	/**
-	 * Kann zum debuggen auf false gesetzt werden, dann werden lokale Änderungen an z.B. Masken nicht überschrieben. <br>
-	 * ACHTUNG: Für Anwender MUSS das auf true gesetzt sein
-	 */
-	private boolean updateFiles = true;
-
 	Logger logger;
 
 	HashMap<String, String> serverHashes = new HashMap<>();
@@ -115,6 +104,8 @@ public class DataService implements IDataService {
 
 	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
 	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
+	private static final boolean LOG_SQL_STRING = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/logsqlstring"));
+	private static final boolean DISABLE_FILE_UPDATE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/disablefileupdate"));
 
 	private HttpClient httpClient;
 	private Gson gson;
@@ -400,7 +391,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
-			if (updateFiles && checkIfUpdateIsRequired(filename)) {
+			if (checkIfUpdateIsRequired(filename)) {
 				logCache(filename + " need to download / update the file ");
 				// File löschen, damit es komplett aktualisiert wird
 				getStoragePath().resolve(filename).toFile().delete();
@@ -456,8 +447,12 @@ public class DataService implements IDataService {
 	@Override
 	public boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException {
 		File file = getStoragePath().resolve(fileName).toFile();
-		if (!file.exists()) {
+		if (!file.exists()) { // Wenn es das file nicht gibt muss es immer geladen werden
 			return true;
+		}
+
+		if (DISABLE_FILE_UPDATE) { // Wenn diese Option gesetzt ist sollen Files nicht geupdated werden
+			return false;
 		}
 
 		String serverHash;
@@ -805,7 +800,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		if (logSQLString) {
+		if (LOG_SQL_STRING) {
 			body = body + "\n" + sqlString;
 		}
 		log(body);
