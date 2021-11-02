@@ -223,6 +223,10 @@ public class MGrid {
 		gridAccessor.deleteCurrentRows();
 	}
 
+	public Row addRow() {
+		return gridAccessor.addRow();
+	}
+
 	public void addRows(Table rows) {
 		gridAccessor.addRows(rows);
 	}
