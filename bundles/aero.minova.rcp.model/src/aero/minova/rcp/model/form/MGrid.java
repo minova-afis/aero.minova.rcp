@@ -223,6 +223,10 @@ public class MGrid {
 		gridAccessor.deleteCurrentRows();
 	}
 
+	public Row addRow() {
+		return gridAccessor.addRow();
+	}
+
 	public void addRows(Table rows) {
 		gridAccessor.addRows(rows);
 	}
@@ -278,5 +282,25 @@ public class MGrid {
 		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, columnIndex, rowIndex, getDataTable().getValue(columnIndex, rowIndex), newValue, false);
 		getDataTable().setValue(columnIndex, rowIndex, newValue);
 		fire(gridChangeEvent);
+	}
+
+	public void setValue(String columnName, int rowIndex, Value newValue) {
+		setValue(getDataTable().getColumnIndex(columnName), rowIndex, newValue);
+	}
+
+	public void setValue(String columnName, Row r, Value newValue) {
+		setValue(getDataTable().getColumnIndex(columnName), getDataTable().getRows().indexOf(r), newValue);
+	}
+
+	public Value getValue(String columnName, Row r) {
+		return getDataTable().getValue(columnName, r);
+	}
+
+	public Value getValue(String columnName, int rowIndex) {
+		return getDataTable().getValue(columnName, rowIndex);
+	}
+
+	public Value getValue(int col, int row) {
+		return getDataTable().getValue(col, row);
 	}
 }

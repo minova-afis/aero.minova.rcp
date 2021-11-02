@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MGrid;
@@ -40,6 +41,11 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	@Override
 	public void deleteCurrentRows() {
 		sg.deleteCurrentRows();
+	}
+
+	@Override
+	public Row addRow() {
+		return sg.addNewRow();
 	}
 
 	@Override

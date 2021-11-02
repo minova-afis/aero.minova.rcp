@@ -669,11 +669,12 @@ public class SectionGrid {
 		}
 	}
 
-	public void addNewRow() {
+	public Row addNewRow() {
 		Row newRow = dataTable.addRow();
 		rowsToInsert.add(newRow);
 		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
 		updateNatTable();
+		return newRow;
 	}
 
 	public Map<String, String> getFieldnameToValue() {
