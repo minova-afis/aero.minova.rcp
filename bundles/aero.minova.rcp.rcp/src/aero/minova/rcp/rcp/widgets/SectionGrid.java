@@ -430,8 +430,10 @@ public class SectionGrid {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty()) {
-					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
+					getNatTable()
+							.doCommand(new SelectCellCommand(selectionLayer, selectionLayer.getColumnPositionByIndex(viewportLayer.getColumnIndexByPosition(0)),
+									selectionLayer.getRowPositionByIndex(viewportLayer.getRowIndexByPosition(0)), false, false));
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(getNatTable());
 				}
 			}
