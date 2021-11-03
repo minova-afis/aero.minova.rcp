@@ -14,6 +14,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -77,9 +78,16 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.setup.util.XBSUtil;
+import aero.minova.rcp.form.setup.xbs.Map;
+import aero.minova.rcp.form.setup.xbs.Map.Entry;
+import aero.minova.rcp.form.setup.xbs.Node;
+import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
@@ -142,18 +150,54 @@ public class WFCIndexPartStatistic {
 	private SelectionThread selectionThread;
 
 	@PostConstruct
-	public void createComposite(Composite parent, EModelService modelService, MPerspective mPerspective) {
+	public void createComposite(Composite parent, EModelService modelService, MPerspective mPerspective, MApplication mApplication) {
 		new FormToolkit(parent.getDisplay());
 
 		parent.setLayout(new GridLayout());
 
-		data = TableBuilder.newTable("statistsic").withColumn("Name", DataType.STRING).withColumn("Typ", DataType.STRING)
-				.withColumn("Beschreibung", DataType.STRING).create();
+		createStatisticDataFromXBS(mApplication);
 
 //		loadPrefs(Constants.LAST_STATE, autoLoadIndex);
 
 		natTable = createNatTable(parent, null, getData(), selectionService, mPerspective.getContext());
 
+	}
+
+	/**
+	 * Diese Methode erstellt aus der ausgelesenen XBS die Statistsic Einträge und speichert sie in das Table Objekt.
+	 *
+	 * @param mApplication
+	 */
+	private void createStatisticDataFromXBS(MApplication mApplication) {
+		String name = translationService.translate("@Name", null);
+		String type = translationService.translate("@Type", null);
+		String description = translationService.translate("@Description", null);
+
+		data = TableBuilder.newTable("statistsic").withColumn(name, DataType.STRING).withColumn(type, DataType.STRING).withColumn(description, DataType.STRING)
+				.create();
+
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
+		Node statisticNode = XBSUtil.getNodeWithName(preferences, "Statistic");
+		for (Node n : statisticNode.getNode()) {
+			Map map = n.getMap();
+			Row row = RowBuilder.newRow().withValue("").withValue("").withValue("").create();
+			for (Entry e : map.getEntry()) {
+				switch (e.getKey().toLowerCase()) {
+				case "":
+					row.setValue(new Value(translationService.translate(e.getValue(), null)), 0);
+					break;
+				case "group":
+					row.setValue(new Value(translationService.translate(e.getValue(), null)), 1);
+					break;
+				case "description":
+					row.setValue(new Value(translationService.translate(e.getValue(), null)), 2);
+					break;
+				default:
+					break;
+				}
+			}
+			getData().addRow(row);
+		}
 	}
 
 	public NatTable getNattable() {
