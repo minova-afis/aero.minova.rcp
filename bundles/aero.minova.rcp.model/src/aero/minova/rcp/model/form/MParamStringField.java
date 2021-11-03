@@ -2,6 +2,7 @@ package aero.minova.rcp.model.form;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.model.DataType;
@@ -12,14 +13,16 @@ import aero.minova.rcp.model.util.ParamStringUtil;
 
 public class MParamStringField extends MField implements ValueChangeListener {
 
-	protected MParamStringField() {
+	protected MParamStringField(Locale locale) {
 		super(DataType.STRING);
 		this.subMFields = new ArrayList<>();
 		this.subFields = new ArrayList<>();
+		this.locale = locale;
 	}
 
 	private List<MField> subMFields;
 	private List<Field> subFields;
+	private Locale locale;
 
 	public List<MField> getSubMFields() {
 		return subMFields;
@@ -63,7 +66,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 		}
 
 		// String parsen
-		List<Value> values = ParamStringUtil.convertStringParameterToValues(value.getStringValue());
+		List<Value> values = ParamStringUtil.convertStringParameterToValues(value.getStringValue(), locale);
 
 		// Unterfelder füllen
 		for (int i = 0; i < subMFields.size(); i++) {
@@ -81,7 +84,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 			values.add(subMField.getValue());
 		}
 
-		String paramString = ParamStringUtil.convertValuesToStringParameter(values);
+		String paramString = ParamStringUtil.convertValuesToStringParameter(values, locale);
 
 		return new Value(paramString);
 	}

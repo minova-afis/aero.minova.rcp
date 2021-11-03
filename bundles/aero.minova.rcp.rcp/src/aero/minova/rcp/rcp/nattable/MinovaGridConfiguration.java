@@ -35,11 +35,12 @@ import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
-	private Locale locale;
+	private Locale locale = CustomLocale.getLocale();
 	private Grid grid;
 	private Map<String, aero.minova.rcp.form.model.xsd.Field> gridFields;
 	private IDataService dataService;
