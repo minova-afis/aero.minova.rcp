@@ -23,7 +23,7 @@ public class LookupDisplayConverter extends DisplayConverter {
 				}
 			}
 		}
-		return null;
+		return "";
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class LookupDisplayConverter extends DisplayConverter {
 			}
 		} else if (displayValue instanceof String) {
 			for (LookupValue lv : contentProvider.getValues()) {
-				if (lv.getKeyText().equals(displayValue)) {
+				if (lv.getKeyText().equalsIgnoreCase((String) displayValue)) {
 					return lv;
 				}
 			}

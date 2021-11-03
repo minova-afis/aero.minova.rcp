@@ -76,11 +76,6 @@ import aero.minova.rcp.model.util.ErrorObject;
 @Component
 public class DataService implements IDataService {
 
-	/**
-	 * Wenn true wird ein String geloggt, mit dem Aufrufe direkt in der Datenbank ausgeführt werden können
-	 */
-	private boolean logSQLString = true;
-
 	Logger logger;
 
 	HashMap<String, String> serverHashes = new HashMap<>();
@@ -109,6 +104,8 @@ public class DataService implements IDataService {
 
 	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
 	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
+	private static final boolean LOG_SQL_STRING = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/logsqlstring"));
+	private static final boolean DISABLE_FILE_UPDATE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/disablefileupdate"));
 
 	private HttpClient httpClient;
 	private Gson gson;
@@ -194,7 +191,9 @@ public class DataService implements IDataService {
 			Table paramTable = tableCF.get();
 			if (paramTable != null) {
 				for (Row r : paramTable.getRows()) {
-					siteParameters.put(r.getValue(0).getStringValue(), r.getValue(1).getStringValue());
+					if (r.getValue(0) != null && r.getValue(1) != null) {
+						siteParameters.put(r.getValue(0).getStringValue(), r.getValue(1).getStringValue());
+					}
 				}
 			}
 		} catch (InterruptedException | ExecutionException e) {}
@@ -358,6 +357,37 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
+		String body = gson.toJson(table);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
+
+		Path path = getStoragePath().resolve(fileName);
+		try {
+			Files.createDirectories(path.getParent());
+			FileUtil.createFile(path.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+
+		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "PDF", true);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer PDF:\n" + t.body());
+			return path;
+		});
+	}
+
+	@Override
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
@@ -417,8 +447,12 @@ public class DataService implements IDataService {
 	@Override
 	public boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException {
 		File file = getStoragePath().resolve(fileName).toFile();
-		if (!file.exists()) {
+		if (!file.exists()) { // Wenn es das file nicht gibt muss es immer geladen werden
 			return true;
+		}
+
+		if (DISABLE_FILE_UPDATE) { // Wenn diese Option gesetzt ist sollen Files nicht geupdated werden
+			return false;
 		}
 
 		String serverHash;
@@ -766,7 +800,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		if (logSQLString) {
+		if (LOG_SQL_STRING) {
 			body = body + "\n" + sqlString;
 		}
 		log(body);

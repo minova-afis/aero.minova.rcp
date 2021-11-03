@@ -7,3 +7,9 @@ aero.minova.rcp.dataservice/debug=false
 aero.minova.rcp.dataservice/debug/server=false
 # Turn on tracing for hashing and caching files
 aero.minova.rcp.dataservice/debug/cache=false
+# Turn on to use eclipse version of helper-plugins
+aero.minova.rcp.dataservice/debug/uselocalhelper=false
+# Turn on to prevent updates of files
+aero.minova.rcp.dataservice/debug/disablefileupdate=false
+# Turn on to log SQL equivalent of procedure calls
+aero.minova.rcp.dataservice/debug/logsqlstring=false

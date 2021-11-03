@@ -85,8 +85,13 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 			}
 		});
 
-		// RequiredValue Style
+		// Invalid Style
 		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, Constants.INVALID_CELL_LABEL);
+
+		// RequiredValue Style
+		cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.getColor(252, 210, 103));
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, Constants.REQUIRED_CELL_LABEL);
 
@@ -146,6 +151,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 		if (!isReadOnly) {
 			MinovaComboBoxCellEditor comboBoxCellEditor = new MinovaComboBoxCellEditor(contentProvider.getValues());
+			comboBoxCellEditor.setFreeEdit(true);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.NORMAL, configLabel + columnIndex);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, comboBoxCellEditor, DisplayMode.EDIT, configLabel + columnIndex);
 		}
