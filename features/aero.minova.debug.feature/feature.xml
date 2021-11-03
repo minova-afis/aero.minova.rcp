@@ -17,20 +17,6 @@
    </license>
 
    <plugin
-         id="org.eclipse.e4.tools.model.spy"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.e4.tools.spy"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.emf.edit"
          download-size="0"
          install-size="0"
@@ -46,13 +32,6 @@
 
    <plugin
          id="org.eclipse.emf.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.e4.tools.emf.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -94,6 +73,34 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.text"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.spy.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.spy.css"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.pde.spy.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="com.ibm.icu"
          download-size="0"
          install-size="0"
@@ -101,7 +108,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.text"
+         id="org.eclipse.e4.tools.emf.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
