@@ -22,13 +22,13 @@ public class UITestUtil {
 		} catch (InterruptedException e) {}
 	}
 
-	public static void loadIndex(List<SWTBotToolbarButton> indexToolbar) {
-		indexToolbar.get(0).click();
+	public static void loadIndex(SWTBotToolbarButton loadToolbarButton) {
+		loadToolbarButton.click();
 
 		// Warten bis Daten geladen sind
 		do {
 			sleep(500);
-		} while (!indexToolbar.get(0).isEnabled());
+		} while (!loadToolbarButton.isEnabled());
 	}
 
 	public static IEclipseContext getEclipseContext(Class c) {

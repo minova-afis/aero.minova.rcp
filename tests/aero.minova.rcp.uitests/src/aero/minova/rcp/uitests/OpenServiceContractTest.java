@@ -113,7 +113,8 @@ public class OpenServiceContractTest {
 	@Disabled("Currently broken")
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden!")
 	public void loadIndex() {
-		UITestUtil.loadIndex(indexToolbar);
+		
+		reloadIndex();
 
 		// Überprüfen, ob Daten geladen wurden
 		assertTrue(indexNattable.rowCount() > 3);
@@ -125,7 +126,7 @@ public class OpenServiceContractTest {
 	@DisplayName("Detail Laden und Überprüfen, ob Daten geladen wurden!")
 	public void loadDetail() {
 
-		UITestUtil.loadIndex(indexToolbar);
+		reloadIndex() ;
 		indexNattable.click(4, 1);
 
 		UITestUtil.sleep();
@@ -146,7 +147,7 @@ public class OpenServiceContractTest {
 	@DisplayName("Detail Laden, eine Zeile aus dem Grid löschen, 2 Neue hinzufügen!")
 	public void loadDetailGrid() {
 
-		UITestUtil.loadIndex(indexToolbar);
+		reloadIndex();
 		indexNattable.click(4, 1);
 
 		UITestUtil.sleep();
@@ -182,5 +183,15 @@ public class OpenServiceContractTest {
 	@AfterEach
 	public void sleep() {
 		bot.sleep(10000);
+	}
+	
+	private void reloadIndex() {
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
+
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
+		indexNattable.click(indexNattable.preferredRowCount() - 1, 3);
+		UITestUtil.sleep();
 	}
 }
