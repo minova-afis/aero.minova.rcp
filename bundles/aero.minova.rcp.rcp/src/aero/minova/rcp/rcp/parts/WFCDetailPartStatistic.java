@@ -251,6 +251,13 @@ public class WFCDetailPartStatistic {
 		return mfield;
 	}
 
+	private Control[] getTabListForPart(Composite composite) {
+		if (selectAllControls) {
+			return composite.getChildren();
+		}
+		return new Control[0];
+	}
+
 	/**
 	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten) oder
 	 * eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
@@ -272,6 +279,13 @@ public class WFCDetailPartStatistic {
 		// Wir erstellen die Section des Details.
 		mSection = new MSection(true, "open", mDetail, "Statistic", section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
+
+		Composite part = parent.getParent();
+		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
+		part.setTabList(getTabListForPart(part));
+		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
+		List<Control> tabList = new ArrayList<>();
+		part.getParent().setTabList(tabList.toArray(new Control[0]));
 
 		// layoutSectionClient(headOrPageOrGrid, section, mSection);
 	}
