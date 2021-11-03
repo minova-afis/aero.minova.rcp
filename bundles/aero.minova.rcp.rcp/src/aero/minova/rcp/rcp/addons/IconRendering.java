@@ -20,33 +20,32 @@ import aero.minova.rcp.dataservice.ImageUtil;
 
 public class IconRendering {
 
-	@Inject 
-	@Optional 
+	@Inject
+	@Optional
 	EModelService modelService;
-	
+
 	@Inject
 	@Optional
 	void subscribeTopicChildrenChanged(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
 
 		// only care of added elements
-				if (!UIEvents.isADD(event)) {
-					return;
-				} 
+		if (!UIEvents.isADD(event)) {
+			return;
+		}
 		// Ensure that this event is for a MMenuItem or MToolBar
 		if (!(objElement instanceof MMenuElement && !(objElement instanceof MPopupMenu))
 				&& !(objElement instanceof MToolBar)) {
 			return;
 		}
-		
-		
+
 		// Ensure that it's a View part's menu or toolbar
 		MUIElement uiElement = (MUIElement) objElement;
 		MUIElement parent = modelService.getContainer(uiElement);
 		if (!(parent instanceof MPart)) {
 			return;
-		} 
-		
+		}
+
 		MPart part = (MPart) parent;
 		ImageUtil.updateIconsForPart(part);
 		if (uiElement instanceof MToolBar) {
