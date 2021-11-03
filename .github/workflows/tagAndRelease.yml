@@ -58,6 +58,13 @@ jobs:
     - name: Build with Maven 
       run: mvn --batch-mode --update-snapshots verify --file pom.xml
     
+    # Test reports
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      if: always()
+      with:
+        files: /**/surefire-reports/*.xml
+ 
     # Zips hochladen
     - name: Copy .zip to Stage area
       run: mkdir staging && cp releng/aero.minova.rcp.product/target/products/*.zip staging
