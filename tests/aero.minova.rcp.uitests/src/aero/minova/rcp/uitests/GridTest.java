@@ -2,6 +2,7 @@ package aero.minova.rcp.uitests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
@@ -79,6 +80,10 @@ class GridTest {
 		gridNattable = swtNatTableBot.nattable(2);
 		assertNotNull(gridNattable);
 
+		
+		assertNotNull(indexPart.getToolbarButtons());
+		assertNotEquals(0, indexPart.getToolbarButtons().size());
+		
 		// Ensure that the number of visible entries in the nattable is less and
 		// possible
 		while (indexNattable.rowCount() >= 8) {
