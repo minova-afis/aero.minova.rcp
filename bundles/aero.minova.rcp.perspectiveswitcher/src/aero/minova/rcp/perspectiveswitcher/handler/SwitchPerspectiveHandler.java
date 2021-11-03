@@ -54,7 +54,7 @@ public class SwitchPerspectiveHandler {
 
 	/**
 	 * Opens the perspective with the given identifier.
-	 * 
+	 *
 	 * @param perspectiveIcon
 	 * @param perspectiveId
 	 *            The perspective to open; must not be <code>null</code>
@@ -87,7 +87,12 @@ public class SwitchPerspectiveHandler {
 		MElementContainer<MUIElement> perspectiveStack = (MElementContainer<MUIElement>) modelService.find("aero.minova.rcp.rcp.perspectivestack", application);
 
 		MPerspective perspective = null;
-		MUIElement element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
+		MUIElement element;
+		if (perspectiveID.equalsIgnoreCase("statistic")) {
+			element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.statistic", window);
+		} else {
+			element = modelService.cloneSnippet(window, "aero.minova.rcp.rcp.perspective.main", window);
+		}
 
 		if (element == null) {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);

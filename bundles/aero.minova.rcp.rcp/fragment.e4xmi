@@ -193,6 +193,29 @@
         </children>
       </children>
     </elements>
+    <elements xsi:type="advanced:Perspective" xmi:id="_7PCtgDyhEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.perspective.statistic" selectedElement="_BG_YUDyiEeyQpp8OXdi0BA" label="Statistic Snippet">
+      <children xsi:type="basic:PartSashContainer" xmi:id="_BG_YUDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.partsashcontainer.statistic" selectedElement="_GwG8-zyiEeyQpp8OXdi0BA" horizontal="true">
+        <children xsi:type="basic:PartStack" xmi:id="_GwG8-zyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_GwG8_DyiEeyQpp8OXdi0BA">
+          <children xsi:type="basic:Part" xmi:id="_GwG8_DyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCIndexPartStatistic" label="@Form.Index" iconURI="platform:/plugin/aero.minova.rcp.images/images/Index/32x32.png" bindingContexts="_uvkSkOOgEeuITvUQkIW3uw">
+            <handlers xmi:id="_GwG8_TyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.expandorcollapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandOrCollapseIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_GwG8_jyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_laMxtrbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_GwG8_zyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
+            <toolbar xmi:id="_GwG9ADyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.index.toolbar"/>
+          </children>
+          <children xsi:type="basic:Part" xmi:id="_GwG9ATyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.formpreview" visible="false" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.Preview" label="@Form.Preview" iconURI="platform:/plugin/aero.minova.rcp.images/images/PrintPreview/32x32.png" closeable="true"/>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_H1a_MDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_H1a_MTyiEeyQpp8OXdi0BA">
+          <children xsi:type="basic:Part" xmi:id="_H1a_MTyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCDetailPartStatistic" label="@Form.Details" iconURI="platform:/plugin/aero.minova.rcp.images/images/Information/32x32.png" bindingContexts="_p68tAOOgEeuITvUQkIW3uw">
+            <handlers xmi:id="_H1a_MjyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_laMxurbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_MzyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_laMxv7bdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_laMxwLbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NTyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_laMxwbbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NjyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.traverseenter" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.TraverseEnterHandler" command="__iku8L_AEeuboN5m_phYZw"/>
+            <toolbar xmi:id="_H1a_NzyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.details.toolbar"/>
+          </children>
+        </children>
+      </children>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MW0NELcnEeuenNA9OtBfHw" featurename="menuContributions" parentElementId="xpath:/" positionInList="last">
     <elements xsi:type="menu:MenuContribution" xmi:id="_Pg3HMLcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.menucontribution.file" positionInParent="before=additions" parentId="org.eclipse.ui.main.menu">
