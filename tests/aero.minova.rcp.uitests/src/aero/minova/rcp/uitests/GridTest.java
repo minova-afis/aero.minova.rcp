@@ -37,15 +37,9 @@ class GridTest {
 
 	private SWTWorkbenchBot bot;
 
-//	private List<SWTBotToolbarButton> searchToolbar;
-//	private List<SWTBotToolbarButton> indexToolbar;
-//	private List<SWTBotToolbarButton> detailToolbar;
-//
 	private WFCDetailPart wfcPart;
 
 	boolean asyncOperationDone = false;
-
-	private SWTNatTableBot swtNatTableBot;
 
 	private SWTBotNatTable indexNattable;
 
@@ -77,7 +71,7 @@ class GridTest {
 		indexPart = bot.partById(Constants.INDEX_PART);
 		detailPart = bot.partById(Constants.DETAIL_PART);
 
-		swtNatTableBot = new SWTNatTableBot();
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 		searchNattable = swtNatTableBot.nattable(0);
 		assertNotNull(searchNattable);
 		indexNattable = swtNatTableBot.nattable(1);
@@ -88,17 +82,15 @@ class GridTest {
 		// Ensure that the number of visible entries in the nattable is less and
 		// possible
 		while (indexNattable.rowCount() >= 8) {
-			UITestUtil.loadIndex(indexPart.getToolbarButtons());
-
+		
 			indexNattable.click(indexNattable.rowCount() - 1, 1);
 			detailPart.getToolbarButtons().get(2).click();
+			SWTBotToolbarButton load = indexPart.getToolbarButtons().get(0);
+
+			UITestUtil.loadIndex(load);
 		}
 	}
 
-	@AfterEach
-	void tearDown() {
-
-	}
 
 	@Test
 	void ensurePartsAreAvailable() {
@@ -143,7 +135,7 @@ class GridTest {
 
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
 
 		int numberEntries = indexNattable.rowCount();
 
@@ -168,7 +160,7 @@ class GridTest {
 		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
 
 		// Testeintrag erstellen
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
+		reloadIndex();
 		int numberEntries = indexNattable.rowCount();
 		createEntry();
 		saveDetail();
@@ -199,7 +191,7 @@ class GridTest {
 		detailPart = bot.partById(Constants.DETAIL_PART);
 		detailPart.getToolbarButtons().get(2).click();
 		UITestUtil.sleep();
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
+		reloadIndex();
 	}
 
 	/**
@@ -217,11 +209,7 @@ class GridTest {
 
 	private void reloadIndex() {
 		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
-
-		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
-		indexNattable.click(indexNattable.preferredRowCount() - 1, 3);
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
 		UITestUtil.sleep();
 	}
 

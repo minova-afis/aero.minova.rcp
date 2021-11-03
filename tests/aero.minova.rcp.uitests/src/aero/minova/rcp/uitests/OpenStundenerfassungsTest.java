@@ -141,8 +141,7 @@ class OpenStundenerfassungsTest {
 		open();
 
 		searchNattable.setCellDataValueByPosition(1, 3, "avm");
-		UITestUtil.loadIndex(indexToolbar);
-
+		reloadIndex();
 		// Ist Mitarbeiter immer AVM?
 		for (int i = 3; i < indexNattable.rowCount(); i++) {
 			assertEquals("AVM", indexNattable.getCellDataValueByPosition(i, 2));
@@ -156,7 +155,7 @@ class OpenStundenerfassungsTest {
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	void loadIndex() {
 		open();
-		UITestUtil.loadIndex(indexToolbar);
+		reloadIndex();
 
 		// Überprüfen, ob Daten geladen wurden
 		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
@@ -167,5 +166,15 @@ class OpenStundenerfassungsTest {
 	@AfterEach
 	void sleep() {
 		bot.sleep(1000);
+	}
+	
+	private void reloadIndex() {
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
+
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
+		indexNattable.click(indexNattable.preferredRowCount() - 1, 3);
+		UITestUtil.sleep();
 	}
 }
