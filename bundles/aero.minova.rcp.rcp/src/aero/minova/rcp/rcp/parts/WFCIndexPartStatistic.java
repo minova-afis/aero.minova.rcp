@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -12,6 +11,7 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -79,7 +79,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.setup.util.XBSUtil;
-import aero.minova.rcp.form.setup.xbs.Map;
 import aero.minova.rcp.form.setup.xbs.Map.Entry;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
@@ -137,6 +136,9 @@ public class WFCIndexPartStatistic {
 	@Inject
 	MPart mpart;
 
+	@Inject
+	IEventBroker broker;
+
 	private SortHeaderLayer sortHeaderLayer;
 
 	private GroupByHeaderLayer groupByHeaderLayer;
@@ -173,24 +175,24 @@ public class WFCIndexPartStatistic {
 		String type = translationService.translate("@Type", null);
 		String description = translationService.translate("@Description", null);
 
-		data = TableBuilder.newTable("statistsic").withColumn(name, DataType.STRING).withColumn(type, DataType.STRING).withColumn(description, DataType.STRING)
-				.create();
+		data = TableBuilder.newTable("statistic").withColumn("MatchCode", DataType.STRING).withColumn(name, DataType.STRING).withColumn(type, DataType.STRING)
+				.withColumn(description, DataType.STRING).create();
 
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node statisticNode = XBSUtil.getNodeWithName(preferences, "Statistic");
 		for (Node n : statisticNode.getNode()) {
-			Map map = n.getMap();
-			Row row = RowBuilder.newRow().withValue("").withValue("").withValue("").create();
-			for (Entry e : map.getEntry()) {
+			Row row = RowBuilder.newRow().withValue("").withValue("").withValue("").withValue("").create();
+			row.setValue(new Value(n.getName()), 0);
+			for (Entry e : n.getMap().getEntry()) {
 				switch (e.getKey().toLowerCase()) {
 				case "":
-					row.setValue(new Value(translationService.translate(e.getValue(), null)), 0);
-					break;
-				case "group":
 					row.setValue(new Value(translationService.translate(e.getValue(), null)), 1);
 					break;
-				case "description":
+				case "group":
 					row.setValue(new Value(translationService.translate(e.getValue(), null)), 2);
+					break;
+				case "description":
+					row.setValue(new Value(translationService.translate(e.getValue(), null)), 3);
 					break;
 				default:
 					break;
@@ -343,15 +345,7 @@ public class WFCIndexPartStatistic {
 			}
 
 			List<Row> c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
-			List<Row> collection = c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
-
-//			Table t = dataFormService.getTableFromFormIndex(form);
-//			for (Row r : collection) {
-//				t.addRow(r);
-//			}
-//			if (!collection.isEmpty()) {
-//				context.set(Constants.BROKER_ACTIVEROWS, t);
-//			}
+			broker.post(Constants.BROKER_SELECTSTATISTIC, c.get(0));
 		}
 	}
 
@@ -441,6 +435,9 @@ public class WFCIndexPartStatistic {
 
 		MinovaIndexStatisticConfiguration mic = new MinovaIndexStatisticConfiguration(table.getColumns());
 		natTable.addConfiguration(mic);
+
+		// Wir brauchen die erste Spalte mit dem Namen der Statistik nicht für den Anwender sondern nur Intern!
+		bodyLayerStack.columnHideShowLayer.hideColumnPositions(0);
 
 		// add group by configuration
 		natTable.addConfiguration(new GroupByHeaderMenuConfiguration(natTable, getGroupByHeaderLayer()));
