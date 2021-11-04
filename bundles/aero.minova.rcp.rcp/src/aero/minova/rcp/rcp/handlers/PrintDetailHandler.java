@@ -1,19 +1,13 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.xml.transform.TransformerException;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -26,7 +20,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
@@ -154,7 +147,6 @@ public class PrintDetailHandler {
 	@Execute
 	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, MPerspective mPerspective) {
 		try {
-
 			if (!(mpart.getObject() instanceof WFCDetailPart)) {
 				return;
 			}
@@ -170,25 +162,8 @@ public class PrintDetailHandler {
 			Row row = RowBuilder.newRow().withValue("" + integerValue).create();
 			table.addRow(row);
 
-			// XML-Dateil vom CAS laden
-			CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElements.get(maskName));
-			tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
-				try {
-					// Aus xml und xsl Datei PDF erstellen
-					Path pdfPath = dataService.getStoragePath().resolve("reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
-					URL pdfFile = pdfPath.toFile().toURI().toURL();
-					String xmlString = Files.readString(xmlPath);
-
-					// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-					PrintUtil.checkPreview(window, modelService, partService);
-
-					PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve("reports/" + reportNames.get(maskName)).toFile());
-					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService));
-				} catch (IOException | SAXException | TransformerException e) {
-					e.printStackTrace();
-					broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
-				}
-			}));
+			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
+					"reports/" + reportNames.get(maskName), "reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
