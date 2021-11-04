@@ -15,11 +15,11 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 
 import aero.minova.rcp.model.Column;
 
-public class MinovaIndexStatisticConfiguration extends AbstractRegistryConfiguration {
+public class MinovaStatisticConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
 
-	public MinovaIndexStatisticConfiguration(List<Column> columns) {
+	public MinovaStatisticConfiguration(List<Column> columns) {
 		this.columns = columns;
 	}
 
@@ -27,13 +27,11 @@ public class MinovaIndexStatisticConfiguration extends AbstractRegistryConfigura
 	public void configureRegistry(IConfigRegistry configRegistry) {
 		configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, IEditableRule.NEVER_EDITABLE);
 		configureCells(configRegistry);
-
 	}
 
 	private void configureCells(IConfigRegistry configRegistry) {
-		int i = 0;
-		for (Column column : columns) {
-			configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
+		for (int i = 0; i < columns.size(); i++) {
+			configureTextCell(configRegistry, i, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 		}
 	}
 

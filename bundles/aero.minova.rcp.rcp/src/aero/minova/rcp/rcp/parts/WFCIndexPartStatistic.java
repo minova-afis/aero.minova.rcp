@@ -77,7 +77,7 @@ import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.rcp.nattable.MinovaIndexStatisticConfiguration;
+import aero.minova.rcp.rcp.nattable.MinovaStatisticConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -227,7 +227,7 @@ public class WFCIndexPartStatistic {
 			}
 		});
 
-		MinovaIndexStatisticConfiguration mic = new MinovaIndexStatisticConfiguration(table.getColumns());
+		MinovaStatisticConfiguration mic = new MinovaStatisticConfiguration(table.getColumns());
 		natTable.addConfiguration(mic);
 
 		// Wir brauchen die erste Spalte mit dem Namen der Statistik nicht für den Anwender sondern nur Intern!
