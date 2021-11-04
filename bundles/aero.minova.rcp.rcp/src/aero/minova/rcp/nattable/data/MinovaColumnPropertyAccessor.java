@@ -115,6 +115,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 			translateForm(translationService);
 		} else if (grid != null) {
 			translateGrid(translationService);
+		} else {
+			translateTable(translationService);
 		}
 	}
 
@@ -129,6 +131,13 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		for (Field field : grid.getField()) {
 			String translate = translationService.translate(field.getText().toString(), null);
 			getTableHeadersMap().put(field.getName(), translate);
+		}
+	}
+
+	private void translateTable(TranslationService translationService) {
+		for (aero.minova.rcp.model.Column column : table.getColumns()) {
+			String translate = translationService.translate(column.getLabel(), null);
+			getTableHeadersMap().put(column.getName(), translate);
 		}
 	}
 
