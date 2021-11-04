@@ -260,7 +260,7 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new CustomPWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
 			break;
 		case COMBO:
-			widget = new CustomPWCombo(pref.getLabel(), key, values).setWidth(200);
+			widget = new CustomPWCombo(pref.getLabel(), key, values).setWidth(50);
 			break;
 		case CHECK:
 			widget = new PWCheckbox(pref.getLabel(), key).setIndent(25).setAlignment(SWT.FILL);
