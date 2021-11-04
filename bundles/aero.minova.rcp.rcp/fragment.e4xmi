@@ -209,7 +209,7 @@
             <handlers xmi:id="_H1a_MjyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_laMxurbdEeuZF8ZS2_h9rA"/>
             <handlers xmi:id="_H1a_MzyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_laMxv7bdEeuZF8ZS2_h9rA"/>
             <handlers xmi:id="_H1a_NDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_laMxwLbdEeuZF8ZS2_h9rA"/>
-            <handlers xmi:id="_H1a_NTyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.printdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintDetailHandler" command="_laMxwbbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NTyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.printstatistic" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintStatisticHandler" command="_laMxurbdEeuZF8ZS2_h9rA"/>
             <handlers xmi:id="_H1a_NjyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.traverseenter" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.TraverseEnterHandler" command="__iku8L_AEeuboN5m_phYZw"/>
             <toolbar xmi:id="_H1a_NzyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.statisticdetails.toolbar"/>
           </children>
@@ -349,7 +349,7 @@
       <children xsi:type="menu:HandledToolItem" xmi:id="__t-Pgj1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="@Action.New" iconURI="platform:/plugin/aero.minova.rcp.images/images/NewRecord.Command/32x32.png" tooltip="@Action.New" command="_laMxu7bdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
-      <children xsi:type="menu:HandledToolItem" xmi:id="__t-PiD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.PrintDetail" iconURI="platform:/plugin/aero.minova.rcp.images/images/Print.Command/32x32.png" tooltip="@Action.PrintDetail" command="_laMxwbbdEeuZF8ZS2_h9rA">
+      <children xsi:type="menu:HandledToolItem" xmi:id="__t-PiD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.PrintStatistic" iconURI="platform:/plugin/aero.minova.rcp.images/images/Print.Command/32x32.png" tooltip="@Action.PrintStatistic" command="_laMxurbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="__t-PiT1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/ResizeLayout.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxsLbdEeuZF8ZS2_h9rA">

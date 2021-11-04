@@ -95,6 +95,7 @@ public class WFCStatisticDetailPart {
 	private LocalResourceManager resManager;
 	private MinovaSection section;
 	private MSection mSection;
+	private Row currentRow;
 
 	@Inject
 	TranslationService translationService;
@@ -133,7 +134,7 @@ public class WFCStatisticDetailPart {
 	 */
 	private void layoutSection() {
 		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
-		section.setData(TRANSLATE_PROPERTY, STATISTIC);
+		section.setData(TRANSLATE_PROPERTY, "@" + STATISTIC);
 		RowData rowData = new RowData();
 		rowData.width = SECTION_WIDTH;
 		section.setLayoutData(rowData);
@@ -151,6 +152,8 @@ public class WFCStatisticDetailPart {
 		Composite cTabFolder = parent.getParent();
 		cTabFolder.setTabList(TabUtil.getTabListForPart(cTabFolder, selectAllControls));
 		cTabFolder.getParent().setTabList(new Control[0]);
+
+		TranslateUtil.translate(parent, translationService, locale);
 	}
 
 	/**
@@ -162,7 +165,7 @@ public class WFCStatisticDetailPart {
 	@Inject
 	@Optional
 	public void createStatisticDetail(@UIEventTopic(Constants.BROKER_SELECTSTATISTIC) Row row) {
-
+		currentRow = row;
 		mDetail.getFields().clear();
 		mSection.getTabList().clear();
 
@@ -213,6 +216,7 @@ public class WFCStatisticDetailPart {
 
 		// Auslesen des Titles
 		section.setText(row.getValue(1).getStringValue());
+		section.setData(TRANSLATE_PROPERTY, row.getValue(1).getStringValue());
 
 		// Sortieren der Felder und Erstellen im UI
 		mFields.sort((m1, m2) -> m1.getSqlIndex().compareTo(m2.getSqlIndex()));
@@ -340,6 +344,14 @@ public class WFCStatisticDetailPart {
 
 	public Composite getComposite() {
 		return parent;
+	}
+
+	public Row getCurrentRow() {
+		return currentRow;
+	}
+
+	public MDetail getMDetail() {
+		return mDetail;
 	}
 
 }
