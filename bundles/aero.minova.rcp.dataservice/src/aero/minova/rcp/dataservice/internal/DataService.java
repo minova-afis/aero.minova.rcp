@@ -327,7 +327,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
