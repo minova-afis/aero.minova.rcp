@@ -5,11 +5,9 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,8 +45,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,21 +54,17 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Twistie;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
@@ -125,10 +117,11 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.util.TabUtil;
+import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
-import aero.minova.rcp.widgets.LookupComposite;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
@@ -205,7 +198,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
 		mPerspective.getContext().set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
-		translate(composite);
+		TranslateUtil.translate(composite, translationService, locale);
 
 		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
 		if (mDetail.getHelper() != null) {
@@ -350,10 +343,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Holen des Parts
 		Composite part = parent.getParent();
 		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
-		part.setTabList(getTabListForPart(part));
+		part.setTabList(TabUtil.getTabListForPart(part, selectAllControls));
 		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
-		List<Control> tabList = new ArrayList<>();
-		part.getParent().setTabList(tabList.toArray(new Control[0]));
+		part.getParent().setTabList(new Control[0]);
 
 		// Helper-Klasse initialisieren
 		initializeHelper(form.getHelperClass());
@@ -559,11 +551,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Erstellen der Field des Section.
 		createFields(clientComposite, headOrPageOrGrid, mSection, section);
 		// Sortieren der Fields nach Tab-Index.
-		sortTabList(mSection);
+		TabUtil.sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections.
-		clientComposite.setTabList(getTabListForSectionComposite(mSection, clientComposite));
+		clientComposite.setTabList(TabUtil.getTabListForSectionComposite(mSection, clientComposite));
 		// Setzen der TabListe der Sections im Part.
-		clientComposite.getParent().setTabList(getTabListForSection(section, mSection));
+		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(section, mSection, selectAllControls));
 
 		// MSection wird zum MDetail hinzugefügt.
 		mDetail.addMSection(mSection);
@@ -650,86 +642,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 		// TODO: Onbinder und ValueChange implementieren
 		return null;
-	}
-
-	/**
-	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
-	 *
-	 * @param mSection
-	 *            die Section in der die Fields sortiert werden müssen
-	 * @param traverseListener
-	 *            der zuzuweisende TraverseListener für die Fields
-	 */
-	public void sortTabList(MSection mSection) {
-		List<MField> tabList = mSection.getTabList();
-		Collections.sort(tabList, (f1, f2) -> {
-			if (f1.getTabIndex() == f2.getTabIndex()) {
-				return 0;
-			} else if (f1.getTabIndex() < f2.getTabIndex()) {
-				return -1;
-			} else {
-				return 1;
-			}
-		});
-		mSection.setTabList(tabList);
-	}
-
-	/**
-	 * Gibt einen Array mit den Controls für die TabListe der Section zurück. Wenn SelectAllControls gesetzt ist, wird das SectionControl(der Twistie) mit in
-	 * den Array gesetzt.
-	 *
-	 * @param composite
-	 *            die Setion, von der die TabListe gesetzt werden soll.
-	 * @param mSection
-	 * @return Array mit Controls
-	 */
-	public Control[] getTabListForSection(Composite composite, MSection mSection) {
-		List<Control> tabList = new ArrayList<>();
-		for (Control child : composite.getChildren()) {
-			if (child instanceof ToolBar && selectAllControls && !mSection.isHead()) {
-				tabList.add(1, child);
-			} else if ((child instanceof Twistie && !selectAllControls) || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
-				// Die sollen nicht in die Tabliste
-			} else {
-				tabList.add(child);
-			}
-		}
-		return tabList.toArray(new Control[0]);
-	}
-
-	private Control[] getTabListForPart(Composite composite) {
-		if (selectAllControls) {
-			return composite.getChildren();
-		}
-		return new Control[0];
-	}
-
-	/**
-	 * Gibt einen Array mit den Controls für die TabListe des Composites der Section zurück.
-	 *
-	 * @param mSection
-	 *            der Section
-	 * @param composite
-	 *            der Section
-	 * @return Array mit Controls
-	 */
-	public Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
-
-		List<Control> tabList = new ArrayList<>();
-
-		Control[] compositeChilds = composite.getChildren();
-		for (Control control : compositeChilds) {
-			if (control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text) {
-				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
-				if (!field.isReadOnly()) {
-					tabList.add(control);
-				}
-			} else if (control instanceof NatTable) {
-				tabList.add(control);
-			}
-		}
-
-		return tabList.toArray(new Control[0]);
 	}
 
 	private MGrid createMGrid(Grid grid, MSection section) {
@@ -927,39 +839,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
 		this.locale = s;
 		if (translationService != null && composite != null) {
-			translate(composite);
-		}
-	}
-
-	public void translate(Composite composite) {
-		for (Control control : composite.getChildren()) {
-			if (control.getData(TRANSLATE_PROPERTY) != null) {
-				String property = (String) control.getData(TRANSLATE_PROPERTY);
-				String value = translationService.translate(property, null);
-				if (control instanceof ExpandableComposite) {
-					ExpandableComposite expandableComposite = (ExpandableComposite) control;
-					expandableComposite.setText(value);
-					translate((Composite) expandableComposite.getClient());
-				} else if (control instanceof Label) {
-					Label l = ((Label) control);
-					Object data = l.getData(LookupField.AERO_MINOVA_RCP_LOOKUP);
-					if (data != null) {
-						// TODO aus den Preferences Laden
-						value = value + " ▼";
-					}
-					((Label) control).setText(value);
-				} else if (control instanceof Button) {
-					((Button) control).setText(value);
-				}
-				if (control instanceof Composite) {
-					translate((Composite) control);
-				}
-			}
-		}
-		for (Control control : composite.getChildren()) {
-			if (control.getData(TRANSLATE_LOCALE) != null) {
-				control.setData(TRANSLATE_LOCALE, locale);
-			}
+			TranslateUtil.translate(composite, translationService, locale);
 		}
 	}
 
@@ -1058,6 +938,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	public Composite getComposite() {
 		return composite;
+	}
+
+	public Locale getLocale() {
+		return locale;
+	}
+
+	public boolean isSelectAllControls() {
+		return selectAllControls;
 	}
 
 }
