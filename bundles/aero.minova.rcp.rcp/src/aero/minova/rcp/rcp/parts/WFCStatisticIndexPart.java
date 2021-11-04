@@ -55,6 +55,8 @@ import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
+import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
+import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
@@ -84,7 +86,7 @@ import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TransformedList;
 
-public class WFCIndexPartStatistic {
+public class WFCStatisticIndexPart {
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
@@ -109,6 +111,8 @@ public class WFCIndexPartStatistic {
 
 	@Inject
 	MApplication mApplication;
+
+	private boolean expandGroups;
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -283,6 +287,20 @@ public class WFCIndexPartStatistic {
 			return;
 		}
 		NatTableUtil.resize(natTable);
+	}
+
+	@Inject
+	@Optional
+	private void collapseGroups(@UIEventTopic(Constants.BROKER_COLLAPSEINDEX) String s) {
+		natTable.doCommand(new TreeCollapseAllCommand());
+		expandGroups = false;
+	}
+
+	@Inject
+	@Optional
+	private void expandGroups(@UIEventTopic(Constants.BROKER_EXPANDINDEX) String s) {
+		natTable.doCommand(new TreeExpandAllCommand());
+		expandGroups = true;
 	}
 
 	/**
