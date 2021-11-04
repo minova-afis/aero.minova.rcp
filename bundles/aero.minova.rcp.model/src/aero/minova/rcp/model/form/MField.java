@@ -245,7 +245,7 @@ public abstract class MField {
 	}
 
 	public String getLookupDescription() {
-		return lookupDescription;
+		return lookupDescription == null ? Constants.TABLE_DESCRIPTION : lookupDescription;
 	}
 
 	public void setLookupDescription(String lookupDescription) {
