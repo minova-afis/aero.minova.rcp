@@ -10,6 +10,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -32,6 +33,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -57,6 +59,7 @@ import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
@@ -71,7 +74,7 @@ import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.widgets.MinovaSection;
 
 @SuppressWarnings("restriction")
-public class WFCDetailPartStatistic {
+public class WFCStatisticDetailPart {
 
 	private static final int MARGIN_SECTION = 8;
 	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
@@ -86,7 +89,7 @@ public class WFCDetailPartStatistic {
 	boolean selectAllControls;
 
 	private FormToolkit formToolkit;
-	private Composite composite;
+	private Composite parent;
 	private MDetail mDetail;
 	private Locale locale;
 	private LocalResourceManager resManager;
@@ -113,12 +116,13 @@ public class WFCDetailPartStatistic {
 
 	@PostConstruct
 	public void postConstruct(Composite parent) {
-		composite = parent;
+		this.parent = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		mDetail = new MDetail();
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
-		layoutSection(parent, STATISTIC);
+		parent.setLayout(new RowLayout(SWT.VERTICAL));
+		layoutSection();
 	}
 
 	/**
@@ -127,9 +131,9 @@ public class WFCDetailPartStatistic {
 	 * @param parent
 	 * @param title
 	 */
-	private void layoutSection(Composite parent, String title) {
+	private void layoutSection() {
 		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
-		section.setData(TRANSLATE_PROPERTY, title);
+		section.setData(TRANSLATE_PROPERTY, STATISTIC);
 		RowData rowData = new RowData();
 		rowData.width = SECTION_WIDTH;
 		section.setLayoutData(rowData);
@@ -158,9 +162,13 @@ public class WFCDetailPartStatistic {
 	@Inject
 	@Optional
 	public void createStatisticDetail(@UIEventTopic(Constants.BROKER_SELECTSTATISTIC) Row row) {
+
+		mDetail.getFields().clear();
+		mSection.getTabList().clear();
+
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node statisticNode = XBSUtil.getNodeWithName(preferences, row.getValue(0).getStringValue());
-		List<MField> mfields = new ArrayList<>();
+		List<MField> mFields = new ArrayList<>();
 		for (Node n : statisticNode.getNode()) {
 			String displayFormat = "";
 			boolean required = true;
@@ -191,24 +199,28 @@ public class WFCDetailPartStatistic {
 				}
 			}
 
-			MField mfield = getFieldFromDisplayFormat(displayFormat);
-			mfield.setName(fieldName);
-			mfield.setLabel(label);
-			mfield.setLookupTable(tableName);
-			mfield.setRequired(required);
-			mfield.setSqlIndex(Integer.parseInt(n.getName().substring(5, n.getName().length())));
-			mfield.setNumberColumnsSpanned(4);
-			mfield.setNumberRowsSpanned(1);
-			mfield.setDetail(mDetail);
-			mfields.add(mfield);
+			MField mField = getFieldFromDisplayFormat(displayFormat);
+			mField.setName(fieldName);
+			mField.setLabel(label);
+			mField.setLookupTable(tableName);
+			mField.setRequired(required);
+			mField.setSqlIndex(Integer.parseInt(n.getName().substring(5, n.getName().length())));
+			mField.setNumberColumnsSpanned(4);
+			mField.setNumberRowsSpanned(1);
+			mField.setDetail(mDetail);
+			mFields.add(mField);
 		}
 
 		// Auslesen des Titles
 		section.setText(row.getValue(1).getStringValue());
 
 		// Sortieren der Felder und Erstellen im UI
-		mfields.sort((m1, m2) -> m1.getSqlIndex().compareTo(m2.getSqlIndex()));
-		layoutSectionClient(mfields);
+		mFields.sort((m1, m2) -> m1.getSqlIndex().compareTo(m2.getSqlIndex()));
+		for (MField f : mFields) {
+			mDetail.putField(f);
+			mSection.addTabField(f);
+		}
+		layoutSectionClient(mFields);
 	}
 
 	private MField getFieldFromDisplayFormat(String displayFormat) {
@@ -232,14 +244,12 @@ public class WFCDetailPartStatistic {
 		return mField;
 	}
 
-	private void layoutSectionClient(List<MField> mfields) {
+	private void layoutSectionClient(List<MField> mFields) {
 
-		// Alten Felder löschen (in UI UND Model)
+		// Alten Felder im UI löschen
 		if (section.getClient() != null) {
 			section.getClient().dispose();
 		}
-		mDetail.getFields().clear();
-		mSection.getTabList().clear();
 
 		// Client Area neu erstellen
 		Composite clientComposite = formToolkit.createComposite(section);
@@ -247,7 +257,7 @@ public class WFCDetailPartStatistic {
 		formToolkit.paintBordersFor(clientComposite);
 		section.setClient(clientComposite);
 
-		createUIFields(mfields, clientComposite);
+		createUIFields(mFields, clientComposite);
 
 		// Tab-Liste
 		TabUtil.sortTabList(mSection);
@@ -255,7 +265,7 @@ public class WFCDetailPartStatistic {
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(section, mSection, selectAllControls));
 
 		// Übersetzen und zeichen
-		TranslateUtil.translate(composite, translationService, locale);
+		TranslateUtil.translate(parent, translationService, locale);
 		section.requestLayout();
 	}
 
@@ -278,30 +288,30 @@ public class WFCDetailPartStatistic {
 		addBottonMargin(clientComposite, row + 1, column);
 	}
 
-	private void createField(Composite composite, MField field, int row, int column) {
+	private void createField(Composite clientComposite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
-			BooleanField.create(composite, field, row, column, locale, mPerspective);
+			BooleanField.create(clientComposite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective);
+			NumberField.create(clientComposite, (MNumberField) field, row, column, locale, mPerspective);
 		} else if (field instanceof MDateTimeField) {
-			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
+			DateTimeField.create(clientComposite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortDateField) {
-			ShortDateField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
+			ShortDateField.create(clientComposite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortTimeField) {
-			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
+			ShortTimeField.create(clientComposite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MLookupField) {
-			LookupField.create(composite, field, row, column, locale, mPerspective);
+			LookupField.create(clientComposite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
-			TextField.create(composite, field, row, column, mPerspective);
+			TextField.create(clientComposite, field, row, column, mPerspective);
 		}
 	}
 
-	private void addBottonMargin(Composite composite, int row, int column) {
+	private void addBottonMargin(Composite clientComposite, int row, int column) {
 		// Abstand nach unten
-		Label spacing = new Label(composite, SWT.NONE);
+		Label spacing = new Label(clientComposite, SWT.NONE);
 		FormData spacingFormData = new FormData();
-		spacingFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
-		spacingFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
+		spacingFormData.top = new FormAttachment(clientComposite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
+		spacingFormData.left = new FormAttachment(clientComposite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
 		spacingFormData.height = 0;
 		spacing.setLayoutData(spacingFormData);
 	}
@@ -310,9 +320,26 @@ public class WFCDetailPartStatistic {
 	@Optional
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
 		this.locale = s;
-		if (translationService != null && composite != null) {
-			TranslateUtil.translate(composite, translationService, locale);
+		if (translationService != null && parent != null) {
+			TranslateUtil.translate(parent, translationService, locale);
 		}
+	}
+
+	@Optional
+	@Inject
+	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
+		if (map.keySet().iterator().next() != mPerspective) {
+			return;
+		}
+
+		for (MField f : mDetail.getFields()) {
+			f.setValue(null, false);
+		}
+		((AbstractValueAccessor) mSection.getTabList().get(0).getValueAccessor()).getControl().setFocus();
+	}
+
+	public Composite getComposite() {
+		return parent;
 	}
 
 }
