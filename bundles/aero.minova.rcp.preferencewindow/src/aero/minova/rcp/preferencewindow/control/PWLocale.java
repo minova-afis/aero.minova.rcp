@@ -85,6 +85,7 @@ public class PWLocale extends CustomPWWidget {
 		// Label für Sprachauswahl erstellen
 		final Label languageLabel = new Label(parent, SWT.NONE);
 		languageLabel.setText(translationService.translate("@Preferences.LocalLanguage", null));
+		languageLabel.setToolTipText(getTooltip());
 		final GridData labelLGridData = new GridData(GridData.END, getAlignment(), false, false);
 		labelLGridData.horizontalIndent = getIndent();
 		languageLabel.setLayoutData(labelLGridData);
@@ -119,6 +120,7 @@ public class PWLocale extends CustomPWWidget {
 		// Label für Landauswahl erstellen
 		final Label countryLabel = new Label(parent, SWT.NONE);
 		countryLabel.setText(translationService.translate("@Preferences.Country", null));
+		countryLabel.setToolTipText(getTooltip());
 		final GridData labelCGridData = new GridData(GridData.END, getAlignment(), false, false);
 		labelCGridData.horizontalIndent = getIndent();
 		countryLabel.setLayoutData(labelCGridData);

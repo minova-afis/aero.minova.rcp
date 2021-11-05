@@ -43,6 +43,7 @@ public abstract class CustomPWWidget extends PWWidget {
 		if (getLabel() != null) {
 			final Label label = new Label(parent, SWT.NONE);
 			label.setText(getLabel());
+			label.setToolTipText(getTooltip());
 			final GridData labelGridData = new GridData(GridData.END, verticalAlignment, false, false);
 			labelGridData.horizontalIndent = 25;
 			label.setLayoutData(labelGridData);

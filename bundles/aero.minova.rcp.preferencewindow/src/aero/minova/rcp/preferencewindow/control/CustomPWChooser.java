@@ -34,12 +34,8 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("You need to set a label for a directory or a dialog chooser");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = 25;

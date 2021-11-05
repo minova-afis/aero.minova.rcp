@@ -33,7 +33,8 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public DateFormattingWidget(final String label,final String tooltip, final String propertyKey, final TranslationService translationService, Locale locale) {
+	public DateFormattingWidget(final String label, final String tooltip, final String propertyKey, final TranslationService translationService,
+			Locale locale) {
 		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.locale = locale;
@@ -45,12 +46,8 @@ public class DateFormattingWidget extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("Test");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();

@@ -54,8 +54,8 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	 * @param iEclipseContext
 	 * @param dataService2
 	 */
-	public TextButtonForCurrentWorkspace(final String label,final String tooltip, final String propertyKey, final TranslationService translationService, IDataService dataService,
-			IEclipseContext context, IWorkbench workbench) {
+	public TextButtonForCurrentWorkspace(final String label, final String tooltip, final String propertyKey, final TranslationService translationService,
+			IDataService dataService, IEclipseContext context, IWorkbench workbench) {
 		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.dataService = dataService;
@@ -69,12 +69,8 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();

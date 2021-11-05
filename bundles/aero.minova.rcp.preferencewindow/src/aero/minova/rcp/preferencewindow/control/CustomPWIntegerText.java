@@ -30,6 +30,7 @@ public class CustomPWIntegerText extends CustomPWText {
 		if (translatedLabel.contains("[")) {
 			final Label label = new Label(parent, SWT.NONE);
 			label.setText(translatedLabel.substring(0, translatedLabel.lastIndexOf("[") - 1));
+			label.setToolTipText(getTooltip());
 			final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 			labelGridData.horizontalIndent = 25;
 			label.setLayoutData(labelGridData);
