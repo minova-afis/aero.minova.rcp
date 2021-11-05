@@ -10,6 +10,7 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.event.GridChangeListener;
 
@@ -32,6 +33,9 @@ public class MGrid {
 	private List<MField> fields;
 	private MSection mSection;
 	private ArrayList<GridChangeListener> listeners;
+
+	private IGridValidator validator;
+	private List<Integer> columnsToValidate;
 
 	public String getTitle() {
 		return title;
@@ -140,6 +144,15 @@ public class MGrid {
 	public boolean isValid() {
 		Table dataTable = gridAccessor.getDataTable();
 		for (Column c : dataTable.getColumns()) {
+
+			if (validator != null && columnsToValidate.contains(dataTable.getColumns().indexOf(c))) {
+				for (Row r : dataTable.getRows()) {
+					if (!validator.checkValid(dataTable.getColumns().indexOf(c), dataTable.getRows().indexOf(r))) {
+						return false;
+					}
+				}
+			}
+
 			if (c.isRequired()) {
 				// TODO: Weitere Eigenschaften prüfen? (Textlänge, ...)
 				for (Row r : dataTable.getRows()) {
@@ -210,6 +223,10 @@ public class MGrid {
 		gridAccessor.deleteCurrentRows();
 	}
 
+	public Row addRow() {
+		return gridAccessor.addRow();
+	}
+
 	public void addRows(Table rows) {
 		gridAccessor.addRows(rows);
 	}
@@ -249,4 +266,41 @@ public class MGrid {
 		gridAccessor.setGridReadOnly(readOnly);
 	}
 
+	/**
+	 * Fügt Validierung zum Grid hinzu, über die Methoden des IGridValidator. Nur die Spalten in columnsToValidate werden überprüft
+	 * 
+	 * @param validator
+	 * @param columnsToValidate
+	 */
+	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
+		this.validator = validator;
+		this.columnsToValidate = columnsToValidate;
+		gridAccessor.addValidation(validator, columnsToValidate);
+	}
+
+	public void setValue(int columnIndex, int rowIndex, Value newValue) {
+		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, columnIndex, rowIndex, getDataTable().getValue(columnIndex, rowIndex), newValue, false);
+		getDataTable().setValue(columnIndex, rowIndex, newValue);
+		fire(gridChangeEvent);
+	}
+
+	public void setValue(String columnName, int rowIndex, Value newValue) {
+		setValue(getDataTable().getColumnIndex(columnName), rowIndex, newValue);
+	}
+
+	public void setValue(String columnName, Row r, Value newValue) {
+		setValue(getDataTable().getColumnIndex(columnName), getDataTable().getRows().indexOf(r), newValue);
+	}
+
+	public Value getValue(String columnName, Row r) {
+		return getDataTable().getValue(columnName, r);
+	}
+
+	public Value getValue(String columnName, int rowIndex) {
+		return getDataTable().getValue(columnName, rowIndex);
+	}
+
+	public Value getValue(int col, int row) {
+		return getDataTable().getValue(col, row);
+	}
 }

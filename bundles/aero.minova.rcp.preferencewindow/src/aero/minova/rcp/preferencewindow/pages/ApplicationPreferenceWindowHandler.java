@@ -10,9 +10,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
@@ -98,7 +100,7 @@ public class ApplicationPreferenceWindowHandler {
 	IWorkbench workbench;
 
 	@Execute
-	public void execute(IThemeEngine themeEngine, IWorkbench workbench) {
+	public void execute(IThemeEngine themeEngine, IWorkbench workbench, IEclipseContext context) {
 		pwm = new PreferenceWindowModel(s);
 		ContextInjectionFactory.inject(pwm, application.getContext()); // In Context injected, damit TranslationService genutzt werden kann
 
@@ -113,7 +115,7 @@ public class ApplicationPreferenceWindowHandler {
 		String currentTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_ICON_SIZE, DisplayType.COMBO, "M", s);
 		boolean curentSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS,
 				DisplayType.CHECK, true, s);
-		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(translationService);
+		List<PreferenceTabDescriptor> preferenceTabs = pwm.createModel(context);
 		Map<String, Object> data = fillData(preferenceTabs);
 		PreferenceWindow window = PreferenceWindow.create(shell, data);
 

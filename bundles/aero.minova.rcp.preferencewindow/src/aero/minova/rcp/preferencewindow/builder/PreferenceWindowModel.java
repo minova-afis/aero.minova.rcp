@@ -9,6 +9,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 
@@ -32,24 +38,32 @@ public class PreferenceWindowModel {
 		this.locale = locale;
 	}
 
-	public List<PreferenceTabDescriptor> createModel(TranslationService translationService) {
-
+	public List<PreferenceTabDescriptor> createModel(IEclipseContext context) {
+		TranslationService translationService = context.get(TranslationService.class);
+		IExtensionRegistry extensionRegistry = context.get(IExtensionRegistry.class);
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		xbsPreferences = XBSUtil.getMainMap(preferences);
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
 		cprf.add(buildAnwendungsTab(translationService));
-
 		cprf.add(buildDarstellungsTab(translationService));
-
 		cprf.add(buildErweiterungTab(translationService));
-
 		cprf.add(buildDruckenTab(translationService));
-
 		cprf.add(buildConsoleTab(translationService));
 
-		cprf.add(buildSISTab(translationService));
+		IExtensionPoint point = extensionRegistry.getExtensionPoint("minova.preferencepage");
+		for (IExtension extension : point.getExtensions()) {
+			// find the category first
+			for (IConfigurationElement element : extension.getConfigurationElements()) {
+				try {
+					PreferenceTabDescriptor createExecutableExtension = (PreferenceTabDescriptor) element.createExecutableExtension("class");
+					cprf.add(createExecutableExtension);
+				} catch (CoreException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 
 		return cprf;
 	}
@@ -218,19 +232,4 @@ public class PreferenceWindowModel {
 
 		return ptd;
 	}
-
-	private PreferenceTabDescriptor buildSISTab(TranslationService translationService) {
-		PreferenceTabDescriptor ptd;
-		PreferenceSectionDescriptor psd;
-		ptd = new PreferenceTabDescriptor("aero.minova.rcp.preferencewindow", "icons/SIS.png", "sisTab",
-				translationService.translate("@Preferences.WorkingTime", null), 0.6);
-		psd = new PreferenceSectionDescriptor("user", translationService.translate("@Preferences.WorkingTime.UserPreselect", null), 0.1);
-		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.USER_PRESELECT_DESCRIPTOR,
-				translationService.translate("@Preferences.WorkingTime.UserPreselectDescription", null),
-				translationService.translate("@Preferences.WorkingTime.UserPreselectDescription.Tooltip", null), 0.1, DisplayType.STRING, "bauer"));
-
-		return ptd;
-	}
-
 }

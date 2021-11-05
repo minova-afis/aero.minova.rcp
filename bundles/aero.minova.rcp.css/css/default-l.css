@@ -1,5 +1,36 @@
-@import url("platform:/plugin/aero.minova.rcp.css/css/L/size_14_32.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/colors.css");
+
+@import url("platform:/plugin/aero.minova.rcp.css/css/margin.css");
+
+@import url("platform:/plugin/aero.minova.rcp.css/css/common.css");
+
+@import
+	url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
+
+CTabFolder {
+	swt-tab-height: 40px;
+}
+
+Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie, CCombo
+	{
+	font-size: 14px;
+}
+
+Text, Label.DescriptionLabel, LookupText, TextAssist, ImageHyperlink {
+	font-size: 14px;
+}
 
 NatTable {
-	font-size: 14px;
+	font-size: 14;
+	padding: 4;
+	/*row-height: 34;*/
+}
+
+NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
+	.selectionAnchor:select, .SummaryRow, .ROW_HEADER, .TREE_EXPANDED,
+	.TREE_EXPANDED:select, .TREE_COLLAPSED, .TREE_COLLAPSED:select,
+	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {
+	font-size: 14;
+	padding: 4;
+	/*row-height: 34;*/
 }

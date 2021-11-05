@@ -2,6 +2,7 @@ package aero.minova.rcp.uitests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
@@ -37,15 +38,9 @@ class GridTest {
 
 	private SWTWorkbenchBot bot;
 
-//	private List<SWTBotToolbarButton> searchToolbar;
-//	private List<SWTBotToolbarButton> indexToolbar;
-//	private List<SWTBotToolbarButton> detailToolbar;
-//
 	private WFCDetailPart wfcPart;
 
 	boolean asyncOperationDone = false;
-
-	private SWTNatTableBot swtNatTableBot;
 
 	private SWTBotNatTable indexNattable;
 
@@ -77,7 +72,7 @@ class GridTest {
 		indexPart = bot.partById(Constants.INDEX_PART);
 		detailPart = bot.partById(Constants.DETAIL_PART);
 
-		swtNatTableBot = new SWTNatTableBot();
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 		searchNattable = swtNatTableBot.nattable(0);
 		assertNotNull(searchNattable);
 		indexNattable = swtNatTableBot.nattable(1);
@@ -85,20 +80,22 @@ class GridTest {
 		gridNattable = swtNatTableBot.nattable(2);
 		assertNotNull(gridNattable);
 
+		
+		assertNotNull(indexPart.getToolbarButtons());
+		assertNotEquals(0, indexPart.getToolbarButtons().size());
+		
 		// Ensure that the number of visible entries in the nattable is less and
 		// possible
 		while (indexNattable.rowCount() >= 8) {
-			UITestUtil.loadIndex(indexPart.getToolbarButtons());
-
+		
 			indexNattable.click(indexNattable.rowCount() - 1, 1);
 			detailPart.getToolbarButtons().get(2).click();
+			SWTBotToolbarButton load = indexPart.getToolbarButtons().get(0);
+
+			UITestUtil.loadIndex(load);
 		}
 	}
 
-	@AfterEach
-	void tearDown() {
-
-	}
 
 	@Test
 	void ensurePartsAreAvailable() {
@@ -136,9 +133,14 @@ class GridTest {
 		// Do not start on Linux
 		Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Linux"));
 
+		// Auf "Optimieren" Klicken, damit mehr Einträge im Index angezeigt werden können
+		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
+		List<SWTBotToolbarButton> detailToolbarButtons = detailPart.getToolbarButtons();
+		detailToolbarButtons.get(5).click();
+
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
 
 		int numberEntries = indexNattable.rowCount();
 
@@ -163,7 +165,7 @@ class GridTest {
 		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
 
 		// Testeintrag erstellen
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
+		reloadIndex();
 		int numberEntries = indexNattable.rowCount();
 		createEntry();
 		saveDetail();
@@ -183,18 +185,18 @@ class GridTest {
 
 		// Unter Mac werden die Werte die in Nattables geschrieben werden angehängt
 		if (System.getProperty("os.name").startsWith("Mac OS")) {
-			assertEquals(211, table.getRows().get(0).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
-			assertEquals(411, table.getRows().get(1).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
 		} else {
-			assertEquals(1, table.getRows().get(0).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
-			assertEquals(1, table.getRows().get(1).getValue(2).getIntegerValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(1, table.getRows().get(0).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(1, table.getRows().get(1).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
 		}
 
 		// Eintrag wieder löschen
 		detailPart = bot.partById(Constants.DETAIL_PART);
 		detailPart.getToolbarButtons().get(2).click();
 		UITestUtil.sleep();
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
+		reloadIndex();
 	}
 
 	/**
@@ -212,11 +214,7 @@ class GridTest {
 
 	private void reloadIndex() {
 		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
-		UITestUtil.loadIndex(indexPart.getToolbarButtons());
-
-		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
-		indexNattable.click(indexNattable.preferredRowCount() - 1, 3);
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
 		UITestUtil.sleep();
 	}
 
@@ -270,16 +268,16 @@ class GridTest {
 		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 		SWTBotNatTable gridNattable = swtNatTableBot.nattable(2);
 
-		gridNattable.setCellDataValueByPosition(0, 1, "11");
+		gridNattable.setCellDataValueByPosition(0, 1, "1");
 		gridNattable.setCellDataValueByPosition(0, 2, "12");
 
-		gridNattable.setCellDataValueByPosition(1, 1, "21");
+		gridNattable.setCellDataValueByPosition(1, 1, "2");
 		gridNattable.setCellDataValueByPosition(1, 2, "22");
 
-		gridNattable.setCellDataValueByPosition(2, 1, "31");
+		gridNattable.setCellDataValueByPosition(2, 1, "3");
 		gridNattable.setCellDataValueByPosition(2, 2, "32");
 
-		gridNattable.setCellDataValueByPosition(3, 1, "41");
+		gridNattable.setCellDataValueByPosition(3, 1, "4");
 		gridNattable.setCellDataValueByPosition(3, 2, "42");
 
 		UITestUtil.sleep();
@@ -297,23 +295,23 @@ class GridTest {
 		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
 		SWTBotNatTable gridNattable = swtNatTableBot.nattable(2);
 
-		// Löscht Zeile mit Werten 11, 12
+		// Löscht Zeile mit Werten 1, 12
 		gridNattable.click(1, 0);
 		btnDelete.click();
 
 		UITestUtil.sleep(500);
 
-		// Löscht Zeile mit Werten 31, 32
+		// Löscht Zeile mit Werten 3, 32
 		gridNattable.click(2, 0);
 		btnDelete.click();
 
 		UITestUtil.sleep(500);
 
-		// Ändert Zeile 21, 22
-		gridNattable.setCellDataValueByPosition(1, 1, "1");
+		// Ändert Zeile 2, 22
+		gridNattable.setCellDataValueByPosition(1, 2, "1");
 
-		// Ändert Zeile 41, 42
-		gridNattable.setCellDataValueByPosition(2, 1, "1");
+		// Ändert Zeile 4, 42
+		gridNattable.setCellDataValueByPosition(2, 2, "1");
 
 		bot.text().setFocus();
 		UITestUtil.sleep();

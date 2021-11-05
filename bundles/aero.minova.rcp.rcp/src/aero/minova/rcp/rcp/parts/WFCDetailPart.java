@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +30,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -75,6 +73,10 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
@@ -149,10 +151,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private IEclipsePreferences prefs;
 
 	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
-
-	@Inject
-	@Service
-	private List<IHelper> helperlist;
 
 	private FormToolkit formToolkit;
 
@@ -358,21 +356,35 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		part.getParent().setTabList(tabList.toArray(new Control[0]));
 
 		// Helper-Klasse initialisieren
-		if (form.getHelperClass() != null) {
-			String helperClass = form.getHelperClass();
-			IHelper iHelper = null;
-			for (IHelper h : helperlist) {
-				if (Objects.equals(helperClass, h.getClass().getName())) {
-					iHelper = h;
+		initializeHelper(form.getHelperClass());
+	}
+
+	private void initializeHelper(String helperName) {
+		if (helperName == null) {
+			return;
+		}
+
+		IHelper iHelper = null;
+
+		pluginService.activatePlugin(helperName);
+		BundleContext bundleContext = FrameworkUtil.getBundle(WFCDetailPart.class).getBundleContext();
+		try {
+			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IHelper.class.getName(), null);
+			for (ServiceReference<?> serviceReference : allServiceReferences) {
+				String property = (String) serviceReference.getProperty("component.name");
+				if (property.equals(helperName)) {
+					iHelper = (IHelper) bundleContext.getService(serviceReference);
 				}
 			}
+		} catch (InvalidSyntaxException e1) {
+			e1.printStackTrace();
+		}
 
-			if (iHelper == null) {
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
-			} else {
-				getDetail().setHelper(iHelper);
-				ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
-			}
+		if (iHelper == null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
+		} else {
+			getDetail().setHelper(iHelper);
+			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
 
@@ -739,7 +751,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		List<MField> mFields = new ArrayList<>();
 		for (Field f : grid.getField()) {
 			try {
-				MField mF = ModelToViewModel.convert(f);
+				MField mF = ModelToViewModel.convert(f, locale);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
 				showErrorMissingSQLIndex(f, grid.getId() + "." + f.getName(), e);
@@ -814,7 +826,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	public MField createMField(Field field, MSection mSection, String suffix) {
 		String fieldName = suffix + field.getName();
 		try {
-			MField f = ModelToViewModel.convert(field);
+			MField f = ModelToViewModel.convert(field, locale);
 			f.addValueChangeListener(this);
 			f.setName(fieldName);
 
@@ -841,6 +853,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mGrid.setGridAccessor(gA);
 		mSection.getmDetail().putGrid(mGrid);
 		sectionGrids.add(sg);
+		initializeHelper(((Grid) fieldOrGrid).getHelperClass());
 
 		ContextInjectionFactory.inject(sg, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 		sg.createGrid();

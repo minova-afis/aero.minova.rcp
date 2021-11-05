@@ -28,11 +28,12 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 
 public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 
 	private List<Column> columns;
-	private Locale locale;
+	private Locale locale = CustomLocale.getLocale();
 	private Form form;
 	private Map<String, aero.minova.rcp.form.model.xsd.Column> formColumns;
 

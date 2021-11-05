@@ -48,6 +48,9 @@ class OpenStundenerfassungsTest {
 		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
 
+	}
+
+	private void open() {
 		// Stundenerfassung über das Menü öffnen
 		SWTBotMenu adminMenu = bot.menu("Administration");
 		assertNotNull(adminMenu);
@@ -84,7 +87,9 @@ class OpenStundenerfassungsTest {
 	void deleteRowAndRevertSearch() {
 		Assumptions.assumeFalse(SWT.getPlatform().equals("gtk"));
 
-		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue Zeile wird nicht eingefügt)
+		open();
+		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue
+		// Zeile wird nicht eingefügt)
 		searchNattable.setCellDataValueByPosition(1, 3, "row1");
 		searchNattable.setCellDataValueByPosition(1, 4, "row1");
 		searchNattable.setCellDataValueByPosition(2, 3, "row2");
@@ -97,21 +102,25 @@ class OpenStundenerfassungsTest {
 		searchNattable.click(2, 3);
 		UITestUtil.sleep();
 		searchToolbar.get(1).click();
-		UITestUtil.sleep(5000);
+		UITestUtil.sleep();
 
-		// TODO: Das funktioniert manchmal nicht, wir lassen den Test dann eh neu laufen bis es geht
+		// TODO: Das funktioniert manchmal nicht, wir lassen den Test dann eh neu laufen
+		// bis es geht
 		boolean almostRight = searchNattable.rowCount() == 4 || searchNattable.rowCount() == 5;
 		assertTrue(almostRight);
-		// assertEquals("\"f-~-s-row1%\"", searchNattable.getCellDataValueByPosition(1, 3));
-		// assertEquals("\"f-~-s-row3%\"", searchNattable.getCellDataValueByPosition(2, 3));
+		// assertEquals("\"f-~-s-row1%\"", searchNattable.getCellDataValueByPosition(1,
+		// 3));
+		// assertEquals("\"f-~-s-row3%\"", searchNattable.getCellDataValueByPosition(2,
+		// 3));
 
 		// Suche zurücksetzten
 		searchToolbar.get(0).click();
-		UITestUtil.sleep(5000);
+		UITestUtil.sleep();
 		assertEquals(2, searchNattable.rowCount());
 
 		// Sind alle Spalten leer?
-		// Es können nur sichtbare Zellen überprüft werden. Deshalb scrollen wir durch die Tabelle und überprüfen, ob wir in der nächsten Spalte sind
+		// Es können nur sichtbare Zellen überprüft werden. Deshalb scrollen wir durch
+		// die Tabelle und überprüfen, ob wir in der nächsten Spalte sind
 		int columnToCheck = 1;
 		String prevColumn = "";
 		for (int i = 2; i < searchNattable.preferredColumnCount(); i++) {
@@ -129,9 +138,10 @@ class OpenStundenerfassungsTest {
 	@Test
 	@DisplayName("Index mit SuchPart filtern")
 	public void filterIndex() {
-		searchNattable.setCellDataValueByPosition(1, 3, "avm");
-		UITestUtil.loadIndex(indexToolbar);
+		open();
 
+		searchNattable.setCellDataValueByPosition(1, 3, "avm");
+		reloadIndex();
 		// Ist Mitarbeiter immer AVM?
 		for (int i = 3; i < indexNattable.rowCount(); i++) {
 			assertEquals("AVM", indexNattable.getCellDataValueByPosition(i, 2));
@@ -144,7 +154,8 @@ class OpenStundenerfassungsTest {
 	@Test
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	void loadIndex() {
-		UITestUtil.loadIndex(indexToolbar);
+		open();
+		reloadIndex();
 
 		// Überprüfen, ob Daten geladen wurden
 		String numberEntriesString = indexNattable.getCellDataValueByPosition(2, 1);
@@ -154,6 +165,16 @@ class OpenStundenerfassungsTest {
 
 	@AfterEach
 	void sleep() {
-		bot.sleep(10000);
+		bot.sleep(1000);
+	}
+	
+	private void reloadIndex() {
+		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
+		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
+
+		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+		SWTBotNatTable indexNattable = swtNatTableBot.nattable(1);
+		indexNattable.click(indexNattable.preferredRowCount() - 1, 3);
+		UITestUtil.sleep();
 	}
 }

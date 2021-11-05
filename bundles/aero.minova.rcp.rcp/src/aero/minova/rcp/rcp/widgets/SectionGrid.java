@@ -101,6 +101,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.event.GridChangeEvent;
 import aero.minova.rcp.model.form.IButtonAccessor;
+import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
@@ -108,6 +109,8 @@ import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
+import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
+import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -182,6 +185,10 @@ public class SectionGrid {
 	private SortHeaderLayer sortHeaderLayer;
 
 	private MinovaGridConfiguration gridConfiguration;
+
+	private ViewportLayer viewportLayer;
+
+	private GlazedListsEventLayer eventLayer;
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -346,7 +353,7 @@ public class SectionGrid {
 			}
 		});
 
-		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
+		eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
@@ -360,7 +367,7 @@ public class SectionGrid {
 			}
 		});
 
-		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
+		viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);
 
 		// build the column header layer
@@ -423,8 +430,10 @@ public class SectionGrid {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty()) {
-					getNatTable().doCommand(new SelectCellCommand(selectionLayer, 0, 0, false, false));
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
+					getNatTable()
+							.doCommand(new SelectCellCommand(selectionLayer, selectionLayer.getColumnPositionByIndex(viewportLayer.getColumnIndexByPosition(0)),
+									selectionLayer.getRowPositionByIndex(viewportLayer.getRowIndexByPosition(0)), false, false));
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(getNatTable());
 				}
 			}
@@ -447,12 +456,17 @@ public class SectionGrid {
 		});
 
 		FormData fd = new FormData();
-		fd.width = DEFAULT_WIDTH;
+
+		String prefsWidthKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
+		String widthString = prefsDetailSections.get(prefsWidthKey, null);
+		fd.width = widthString != null ? Integer.parseInt(widthString) : DEFAULT_WIDTH;
+
 		default_height = natTable.getRowHeightByPosition(0) * 5;
 		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
 		String heightString = prefsDetailSections.get(prefsHeightKey, null);
 		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
 		prevHeight = fd.height;
+
 		getNatTable().setLayoutData(fd);
 
 		getNatTable().configure();
@@ -504,11 +518,10 @@ public class SectionGrid {
 	}
 
 	public Table setDataTable(Table newDataTable) {
-		// Da die dataTable von SectionGrid und dem zugehörigen MGrid die selben sind können wir sie nicht einfach ersetzen
 		this.dataTable.getRows().clear();
-
+		addRowsFromTable(newDataTable);
 		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), false));
-		return addRowsFromTable(newDataTable);
+		return dataTable.copy();
 	}
 
 	public void addRows(Table t) {
@@ -526,7 +539,7 @@ public class SectionGrid {
 		}
 	}
 
-	private Table addRowsFromTable(Table rowsToAdd) {
+	private void addRowsFromTable(Table rowsToAdd) {
 		for (Row rowInNewTable : rowsToAdd.getRows()) {
 			Row rowInOriginal = this.dataTable.addRow();
 
@@ -543,7 +556,6 @@ public class SectionGrid {
 			}
 		}
 		updateNatTable();
-		return dataTable.copy();
 	}
 
 	public NatTable getNatTable() {
@@ -659,11 +671,12 @@ public class SectionGrid {
 		}
 	}
 
-	public void addNewRow() {
+	public Row addNewRow() {
 		Row newRow = dataTable.addRow();
 		rowsToInsert.add(newRow);
 		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
 		updateNatTable();
+		return newRow;
 	}
 
 	public Map<String, String> getFieldnameToValue() {
@@ -889,6 +902,15 @@ public class SectionGrid {
 				setColumnReadOnly(i, readOnly);
 			}
 		}
+	}
+
+	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
+		// Für Rot-Zeichnen der Zellen
+		this.bodyDataLayer.setConfigLabelAccumulator(new CrossValidationLabelAccumulator(bodyDataLayer, validator, columnsToValidate, sortedList, dataTable));
+
+		// Anzeigen der Fehlermeldung
+		this.natTable.addConfiguration(new CrossValidationConfiguration(validator, broker));
+		this.natTable.configure();
 	}
 
 }

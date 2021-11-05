@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -22,7 +23,7 @@ import aero.minova.rcp.dataservice.IMinovaPluginService;
 @Component(immediate = true)
 public class MinovaPluginService implements IMinovaPluginService {
 
-	boolean DEBUG = false;
+	private static final boolean USE_LOCAL_HELPER = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/uselocalhelper"));
 
 	private IDataService dataService;
 	private boolean downloadPlugins = true;
@@ -41,8 +42,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 
 	@Override
 	public void activatePlugin(String helperClass) {
-		if (DEBUG) {
-			System.out.println("\n\nDEBUG - Using the local versions of the helpers plug-ins requires that you add them to the launch configuration\n\n");
+		if (USE_LOCAL_HELPER) {
 			return;
 		}
 		if (downloadPlugins) {

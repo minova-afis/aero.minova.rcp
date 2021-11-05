@@ -1,13 +1,15 @@
 package aero.minova.rcp.model.form;
 
+import java.util.Locale;
+
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.KeyType;
 
 public class ModelToViewModel {
 
-	public static MField convert(Field field) {
-		MField f = initializeModelField(field);
+	public static MField convert(Field field, Locale locale) {
+		MField f = initializeModelField(field, locale);
 
 		f.setName(field.getName());
 		f.setLabel(field.getLabel());
@@ -17,6 +19,9 @@ public class ModelToViewModel {
 		f.setOriginalReadOnly(field.isReadOnly());
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
+		}
+		if (field.getEditor() != null) { // Contact Editor braucht immer 4 Spalten
+			f.setNumberColumnsSpanned(4);
 		}
 		if (field.getNumberRowsSpanned() != null) {
 			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
@@ -30,7 +35,7 @@ public class ModelToViewModel {
 		return f;
 	}
 
-	private static MField initializeModelField(Field field) {
+	private static MField initializeModelField(Field field, Locale locale) {
 		if (field.getBoolean() != null) {
 			return new MBooleanField();
 		}
@@ -47,6 +52,13 @@ public class ModelToViewModel {
 			for (TypeParam typeParam : field.getLookup().getParam()) {
 				f.addLookupParameter(typeParam.getFieldName());
 			}
+			return f;
+		}
+
+		if (field.getEditor() != null) {
+			MField f = new MLookupField();
+			f.setLookupTable("tContact");
+			f.setLookupDescription("LastName");
 			return f;
 		}
 
@@ -92,19 +104,12 @@ public class ModelToViewModel {
 		}
 
 		if (field.getParamString() != null) {
-			MParamStringField f = new MParamStringField();
+			MParamStringField f = new MParamStringField(locale);
 			f.setSubFields(field.getParamString().getField());
 			return f;
 		}
 
-		if (field.getEditor() != null) {
-			System.err.println("Field " + field.getName() + " is of Type Editor, which isn't implemented yet");
-		} else {
-			throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
-		}
-
-		// Filler Feld zurückgeben, damit restliche Maske gebaut werden kann
-		return new MTextField();
+		throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");
 	}
 
 }
