@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
@@ -30,12 +31,14 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.event.ValueChangeEvent;
+import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.parts.WFCStatisticDetailPart;
 import aero.minova.rcp.rcp.util.PrintUtil;
 
-public class PrintStatisticHandler {
+public class PrintStatisticHandler implements ValueChangeListener {
 
 	@Inject
 	protected IDataService dataService;
@@ -70,13 +73,20 @@ public class PrintStatisticHandler {
 	@CanExecute
 	public boolean canExecute(MPart mpart, MPerspective mPerspective) {
 
+		MDetail detail = ((WFCStatisticDetailPart) mpart.getObject()).getMDetail();
+
 		// Wurde reports Ordner geladen?
 		if (!reportsFolderExists) {
 			return false;
 		}
 
+		// Handler als Listener hinzufügen, damit auf Änderungen reagiert werden kann
+		for (MField f : detail.getFields()) {
+			f.removeValueChangeListener(this);
+			f.addValueChangeListener(this);
+		}
+
 		// Sind alle Pflichtfelder gefüllt?
-		MDetail detail = ((WFCStatisticDetailPart) mpart.getObject()).getMDetail();
 		if (!detail.allFieldsAndGridsValid()) {
 			return false;
 		}
@@ -138,4 +148,9 @@ public class PrintStatisticHandler {
 		}
 	}
 
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		// canExecute() Methode wird aufgerufen
+		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, Constants.SAVE_DETAIL_BUTTON);
+	}
 }
