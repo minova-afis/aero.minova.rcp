@@ -361,7 +361,7 @@ public abstract class MField {
 		return mSection;
 	}
 
-	public void setmPage(MSection mSection) {
+	public void setMSection(MSection mSection) {
 		this.mSection = mSection;
 	}
 

@@ -745,7 +745,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			getDetail().putField(f);
 
 			if (field.isVisible()) {
-				f.setmPage(mSection);
+				f.setMSection(mSection);
 				mSection.addTabField(f);
 			}
 

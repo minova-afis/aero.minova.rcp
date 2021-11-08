@@ -211,6 +211,7 @@ public class WFCStatisticDetailPart {
 			mField.setNumberColumnsSpanned(4);
 			mField.setNumberRowsSpanned(1);
 			mField.setDetail(mDetail);
+			mField.setMSection(mSection);
 			mFields.add(mField);
 		}
 
