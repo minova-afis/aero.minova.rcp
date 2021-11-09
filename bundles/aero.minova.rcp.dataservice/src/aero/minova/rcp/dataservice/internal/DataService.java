@@ -627,10 +627,12 @@ public class DataService implements IDataService {
 			row.addValue(null);
 			t.addColumn(new Column(TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(true));
-			for (String paramName : field.getLookupParameters()) {
-				MField paramField = field.getDetail().getField(paramName);
-				t.addColumn(new Column(paramName, paramField.getDataType()));
-				row.addValue(paramField.getValue());
+			if (field.getLookupParameters() != null) {
+				for (String paramName : field.getLookupParameters()) {
+					MField paramField = field.getDetail().getField(paramName);
+					t.addColumn(new Column(paramName, paramField.getDataType()));
+					row.addValue(paramField.getValue());
+				}
 			}
 		}
 
