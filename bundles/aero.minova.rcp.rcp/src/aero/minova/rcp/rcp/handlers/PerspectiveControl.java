@@ -28,8 +28,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -86,14 +84,11 @@ public class PerspectiveControl {
 	Preferences prefsToolbarOrder = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_TOOLBARORDER);
 	List<String> openToolbarItems;
 
-	private LocalResourceManager localResourceManager;
-
 	/*
 	 * Create the ToolControl with a Toolbar for the Perspective Shortcuts
 	 */
 	@PostConstruct
 	public void createGui(Composite parent, MWindow window) {
-		localResourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
@@ -190,9 +185,9 @@ public class PerspectiveControl {
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspectiveId);
 			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
-			
+
 			if (descriptor != null && !descriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
-				shortcut.setImage(localResourceManager.createImage(descriptor));
+				shortcut.setImage(descriptor.createImage());
 			} else {
 				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
