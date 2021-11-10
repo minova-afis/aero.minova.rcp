@@ -68,6 +68,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
+import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.widgets.MinovaNotifier;
@@ -1184,14 +1185,14 @@ public class WFCDetailCASRequestsUtil {
 		wfcDetailPart.createUIFields(visibleMFields, clientComposite);
 
 		// Sortieren der Fields nach Tab-Index.
-		wfcDetailPart.sortTabList(mSection);
+		TabUtil.sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections.
-		clientComposite.setTabList(wfcDetailPart.getTabListForSectionComposite(mSection, clientComposite));
+		clientComposite.setTabList(TabUtil.getTabListForSectionComposite(mSection, clientComposite));
 		// Setzen der TabListe der Sections im Part.
-		clientComposite.getParent().setTabList(wfcDetailPart.getTabListForSection(clientComposite.getParent(), mSection));
+		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
 
 		section.requestLayout();
-		wfcDetailPart.translate(clientComposite);
+		TranslateUtil.translate(clientComposite, translationService, wfcDetailPart.getLocale());
 
 	}
 

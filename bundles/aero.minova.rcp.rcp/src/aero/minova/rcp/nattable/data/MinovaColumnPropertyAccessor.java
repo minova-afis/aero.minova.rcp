@@ -37,6 +37,12 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		tableHeadersMap = new HashMap<>();
 	}
 
+	public MinovaColumnPropertyAccessor(Table table) {
+		this.table = table;
+		propertyNames = new String[table.getColumnCount()];
+		tableHeadersMap = new HashMap<>();
+	}
+
 	@Override
 	public Object getDataValue(Row rowObject, int columnIndex) {
 		Value value = rowObject.getValue(columnIndex);
@@ -62,6 +68,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 			initPropertyNamesForm(translationService);
 		} else if (grid != null) {
 			initPropertyNamesGrid(translationService);
+		} else if (table != null) {
+			initPropertyNamesTable(translationService);
 		}
 	}
 
@@ -89,12 +97,26 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		}
 	}
 
+	private void initPropertyNamesTable(TranslationService translationService) {
+		int i = 0;
+		for (aero.minova.rcp.model.Column c : table.getColumns()) {
+			String translate = c.getName();
+			if (c.getLabel() != null) {
+				translate = translationService.translate(c.getLabel(), null);
+			}
+			getTableHeadersMap().put(c.getName(), translate);
+			propertyNames[i++] = c.getName();
+		}
+	}
+
 	public void translate(TranslationService translationService) {
 		getTableHeadersMap().clear();
 		if (form != null) {
 			translateForm(translationService);
 		} else if (grid != null) {
 			translateGrid(translationService);
+		} else {
+			translateTable(translationService);
 		}
 	}
 
@@ -109,6 +131,13 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		for (Field field : grid.getField()) {
 			String translate = translationService.translate(field.getText().toString(), null);
 			getTableHeadersMap().put(field.getName(), translate);
+		}
+	}
+
+	private void translateTable(TranslationService translationService) {
+		for (aero.minova.rcp.model.Column column : table.getColumns()) {
+			String translate = translationService.translate(column.getLabel(), null);
+			getTableHeadersMap().put(column.getName(), translate);
 		}
 	}
 

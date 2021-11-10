@@ -193,6 +193,29 @@
         </children>
       </children>
     </elements>
+    <elements xsi:type="advanced:Perspective" xmi:id="_7PCtgDyhEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.perspective.statistic" selectedElement="_BG_YUDyiEeyQpp8OXdi0BA" label="Statistic Snippet">
+      <children xsi:type="basic:PartSashContainer" xmi:id="_BG_YUDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.partsashcontainer.main" selectedElement="_GwG8-zyiEeyQpp8OXdi0BA" horizontal="true">
+        <children xsi:type="basic:PartStack" xmi:id="_GwG8-zyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.partstack.index" selectedElement="_GwG8_DyiEeyQpp8OXdi0BA">
+          <children xsi:type="basic:Part" xmi:id="_GwG8_DyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.index" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCStatisticIndexPart" label="@Form.Index" iconURI="platform:/plugin/aero.minova.rcp.images/images/Index/32x32.png" bindingContexts="_uvkSkOOgEeuITvUQkIW3uw">
+            <handlers xmi:id="_GwG8_TyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.expandorcollapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandOrCollapseIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_GwG8_jyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_laMxtrbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_GwG8_zyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
+            <toolbar xmi:id="_GwG9ADyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.statisticindex.toolbar"/>
+          </children>
+          <children xsi:type="basic:Part" xmi:id="_GwG9ATyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.formpreview" visible="false" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.Preview" label="@Form.Preview" iconURI="platform:/plugin/aero.minova.rcp.images/images/PrintPreview/32x32.png" closeable="true"/>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_H1a_MDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.partstack.details" selectedElement="_H1a_MTyiEeyQpp8OXdi0BA">
+          <children xsi:type="basic:Part" xmi:id="_H1a_MTyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.details" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.WFCStatisticDetailPart" label="@Form.Details" iconURI="platform:/plugin/aero.minova.rcp.images/images/Information/32x32.png" bindingContexts="_p68tAOOgEeuITvUQkIW3uw">
+            <handlers xmi:id="_H1a_MjyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.savedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SaveDetailHandler" command="_laMxurbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_MzyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.deletedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.DeleteDetailHandler" command="_laMxv7bdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NDyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.revertdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.RevertDetailHandler" command="_laMxwLbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NTyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.printstatistic" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintStatisticHandler" command="_laMxurbdEeuZF8ZS2_h9rA"/>
+            <handlers xmi:id="_H1a_NjyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.handler.traverseenter" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.TraverseEnterHandler" command="__iku8L_AEeuboN5m_phYZw"/>
+            <toolbar xmi:id="_H1a_NzyiEeyQpp8OXdi0BA" elementId="aero.minova.rcp.rcp.part.statisticdetails.toolbar"/>
+          </children>
+        </children>
+      </children>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_MW0NELcnEeuenNA9OtBfHw" featurename="menuContributions" parentElementId="xpath:/" positionInList="last">
     <elements xsi:type="menu:MenuContribution" xmi:id="_Pg3HMLcnEeuenNA9OtBfHw" elementId="aero.minova.rcp.rcp.menucontribution.file" positionInParent="before=additions" parentId="org.eclipse.ui.main.menu">
@@ -297,6 +320,30 @@
         <persistedState key="persistState" value="false"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/ResizeLayout.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxsLbdEeuZF8ZS2_h9rA">
+        <persistedState key="persistState" value="false"/>
+      </children>
+    </elements>
+    <elements xsi:type="menu:ToolBarContribution" xmi:id="_5K7ZQD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.toolbarcontribution.statisticindex" parentId="aero.minova.rcp.rcp.part.statisticindex.toolbar">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_5K7ZQj1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.expand" label="@Action.NodesExpand" iconURI="platform:/plugin/aero.minova.rcp.images/images/ExpandTree.Command/32x32.png" tooltip="@Action.NodesExpand" command="_laMxtLbdEeuZF8ZS2_h9rA">
+        <persistedState key="persistState" value="false"/>
+        <parameters xmi:id="_5K7ZQz1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.parameter.expandindex" name="aero.minova.rcp.rcp.commandparameter.expandorcollapseindex" value="EXPAND"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_5K7ZRD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.collapse" label="@Action.NodesCollapse" iconURI="platform:/plugin/aero.minova.rcp.images/images/CollapseTree.Command/32x32.png" tooltip="@Action.NodesCollapse" command="_laMxtLbdEeuZF8ZS2_h9rA">
+        <persistedState key="persistState" value="false"/>
+        <parameters xmi:id="_5K7ZRT1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.parameter.collapseindex" name="aero.minova.rcp.rcp.commandparameter.expandorcollapseindex" value="COLLAPSE"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_5K7ZUD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.resize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/ExpandSectionHorizontal.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxubbdEeuZF8ZS2_h9rA">
+        <persistedState key="persistState" value="false"/>
+      </children>
+    </elements>
+    <elements xsi:type="menu:ToolBarContribution" xmi:id="__t-PgD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.toolbarcontribution.statisticdetails" parentId="aero.minova.rcp.rcp.part.statisticdetails.toolbar">
+      <children xsi:type="menu:HandledToolItem" xmi:id="__t-Pgj1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.new" label="@Action.New" iconURI="platform:/plugin/aero.minova.rcp.images/images/NewRecord.Command/32x32.png" tooltip="@Action.New" command="_laMxu7bdEeuZF8ZS2_h9rA">
+        <persistedState key="persistState" value="false"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="__t-PiD1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.PrintStatistic" iconURI="platform:/plugin/aero.minova.rcp.images/images/Print.Command/32x32.png" tooltip="@Action.PrintStatistic" command="_laMxurbdEeuZF8ZS2_h9rA">
+        <persistedState key="persistState" value="false"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="__t-PiT1oEeyGWYBecLt7JA" elementId="aero.minova.rcp.rcp.handledtoolitem.optimize" label="@Action.Optimize" iconURI="platform:/plugin/aero.minova.rcp.images/images/ResizeLayout.Command/32x32.png" tooltip="@Action.Optimize" command="_laMxsLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
     </elements>

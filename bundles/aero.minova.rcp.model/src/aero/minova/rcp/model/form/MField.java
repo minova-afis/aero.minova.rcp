@@ -245,7 +245,7 @@ public abstract class MField {
 	}
 
 	public String getLookupDescription() {
-		return lookupDescription;
+		return lookupDescription == null ? Constants.TABLE_DESCRIPTION : lookupDescription;
 	}
 
 	public void setLookupDescription(String lookupDescription) {
@@ -361,7 +361,7 @@ public abstract class MField {
 		return mSection;
 	}
 
-	public void setmPage(MSection mSection) {
+	public void setMSection(MSection mSection) {
 		this.mSection = mSection;
 	}
 
