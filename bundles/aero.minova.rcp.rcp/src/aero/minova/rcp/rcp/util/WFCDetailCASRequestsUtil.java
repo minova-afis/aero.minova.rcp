@@ -207,20 +207,22 @@ public class WFCDetailCASRequestsUtil {
 				Table opFormTable = createReadTableFromForm(opForm, table);
 				CompletableFuture<SqlProcedureResult> opFuture = dataService.callProcedureAsync(opFormTable);
 				opFuture.thenAccept(t -> sync.asyncExec(() -> {
-					selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
-					updateSelectedEntry();
+					if (t != null) {
+						selectedOptionPages.put(opForm.getDetail().getProcedureSuffix(), t.getOutputParameters());
+						updateSelectedEntry();
+					}
 				}));
 			}
 		});
 	}
 
 	public void readGrid(MGrid g, Table keyTable) {
-
 		Table gridRequestTable = TableBuilder.newTable(g.getProcedurePrefix() + "Read" + g.getProcedureSuffix()).create();
-
 		RowBuilder gridRowBuilder = RowBuilder.newRow();
 		Grid grid = g.getGrid();
 		SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+		// Daten neu Laden, ggf. haben sich die möglichen Werte in den Lookups geändert
+		sg.updateGridLookupValues();
 		boolean firstPrimary = true;
 		for (Field f : grid.getField()) {
 			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
@@ -277,7 +279,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Die Primary-Keys werden aus der übergebenen Tabelle gelesen. Nur die erste Zeile wird betrachtet
-	 * 
+	 *
 	 * @param tableForm
 	 * @param keyTable
 	 * @return
@@ -407,7 +409,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Erstellt eine Update oder Insert Tabelle aus der übergebenen Form, je nachdem ob Keys zur verfügung stehen.
-	 * 
+	 *
 	 * @param buildForm
 	 * @return
 	 */
@@ -560,7 +562,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Setzt die Primary Keys anhand der übergebenen Tabelle
-	 * 
+	 *
 	 * @param t
 	 */
 	private void setKeysFromTable(Table t) {
@@ -801,7 +803,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Ruft eine Prozedur mit der übergebenen Tabelle auf. Über den Broker kann auf die Ergebnisse gehört werden
-	 * 
+	 *
 	 * @param table
 	 */
 	@Inject
@@ -872,7 +874,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Fragt den Nutzer ob ungespeicherte Änderungen verworfen werden sollen. Wenn es keine Änderungen gibt wird true zurückgegeben
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean discardChanges() {
@@ -1133,7 +1135,7 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Zeichnet alle Felder der MSection neu. Falls Param-String Felder enthalten sind werden die aktuellen MFields dieser gezeichnet, alte Felder werden
 	 * entfernt
-	 * 
+	 *
 	 * @param sectionID
 	 */
 	public void redrawSection(MSection mSection) {
@@ -1198,7 +1200,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Das übergebene MParamStringField wird mit den Feldern aus der Maske mit formName geladen. Dafür wird die gesamte Section neu gezeichnet
-	 * 
+	 *
 	 * @param mParamString
 	 * @param formName
 	 */
