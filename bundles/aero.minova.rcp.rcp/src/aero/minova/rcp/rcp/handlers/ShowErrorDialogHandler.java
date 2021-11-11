@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.rcp.handlers;
 
 import java.util.ArrayList;
 import java.util.List;

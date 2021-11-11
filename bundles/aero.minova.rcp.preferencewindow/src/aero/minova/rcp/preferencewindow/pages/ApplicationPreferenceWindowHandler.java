@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -29,8 +28,6 @@ import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
@@ -55,6 +52,7 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.preferencewindow.control.CustomPWCheckbox;
+import aero.minova.rcp.preferencewindow.control.CustomPWCombo;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
@@ -255,10 +253,10 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new PWDirectoryChooser(pref.getLabel(), key).setIndent(25);
 			break;
 		case ZONEID:
-			widget = new PWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			widget = new CustomPWCombo(pref.getLabel(), pref.getTooltip(), key, values).setAlignment(GridData.FILL);
 			break;
 		case COMBO:
-			widget = new PWCombo(pref.getLabel(), key, values).setWidth(200);
+			widget = new CustomPWCombo(pref.getLabel(), pref.getTooltip(), key, values).setWidth(50);
 			break;
 		case CHECK:
 			widget = new CustomPWCheckbox(pref.getLabel(), pref.getTooltip(), key).setIndent(25).setAlignment(SWT.FILL);

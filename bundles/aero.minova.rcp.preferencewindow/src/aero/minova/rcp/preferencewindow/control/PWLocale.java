@@ -7,11 +7,12 @@ import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -32,8 +33,8 @@ public class PWLocale extends CustomPWWidget {
 	Preferences preferences = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
 
 	private final List<String> dataL;
-	private Combo comboCountries;
-	private Combo comboLanguage;
+	private CCombo comboCountries;
+	private CCombo comboLanguage;
 	private IEclipseContext context;
 	TranslationService translationService;
 
@@ -45,12 +46,13 @@ public class PWLocale extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public PWLocale(final String label,final String tooltip, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
+	public PWLocale(final String label, @Optional String tooltip, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
 		super(label, tooltip, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
 		this.translationService = translationService;
 		Locale l = context.get(Locale.class);
-		if (l == null) l = Locale.getDefault();
+		if (l == null)
+			l = Locale.getDefault();
 		dataL = CustomLocale.getLanguages(l, CustomLocale.getLanguageTagListOfi18n(dataService));
 	}
 
@@ -91,7 +93,7 @@ public class PWLocale extends CustomPWWidget {
 		languageLabel.setLayoutData(labelLGridData);
 		addControl(languageLabel);
 
-		comboLanguage = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
+		comboLanguage = new CCombo(parent, SWT.BORDER | SWT.READ_ONLY);
 		comboLanguage.setToolTipText(getTooltip());
 		addControl(comboLanguage);
 
@@ -107,7 +109,8 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboLanguage.addListener(SWT.Modify, event -> {
-			PreferenceWindow.getInstance().setValue(ApplicationPreferences.LOCALE_LANGUAGE, PWLocale.this.dataL.get(comboLanguage.getSelectionIndex()));
+			PreferenceWindow.getInstance().setValue(ApplicationPreferences.LOCALE_LANGUAGE,
+					PWLocale.this.dataL.get(comboLanguage.indexOf(comboLanguage.getText())));
 			// erneuert Liste mit Ländern
 			comboCountries.removeAll();
 			for (String country : getCountries()) {
@@ -127,7 +130,7 @@ public class PWLocale extends CustomPWWidget {
 		addControl(countryLabel);
 
 		// Combo Box für Landauswahl erstellen
-		comboCountries = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
+		comboCountries = new CCombo(parent, SWT.BORDER | SWT.READ_ONLY);
 		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		comboCountries.setLayoutData(countryData);
 		comboCountries.setToolTipText(translationService.translate("Preferences.Country.Tooltip", null));
@@ -144,8 +147,9 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboCountries.addListener(SWT.Modify, event -> {
-			if (!comboCountries.getItem(comboCountries.getSelectionIndex()).isEmpty())
-				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY, comboCountries.getItem(comboCountries.getSelectionIndex()));
+			if (!comboCountries.getText().equals(null) && !comboCountries.getText().equals(""))
+				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY,
+						comboCountries.getItem(comboCountries.indexOf(comboCountries.getText())));
 		});
 
 		return comboLanguage;

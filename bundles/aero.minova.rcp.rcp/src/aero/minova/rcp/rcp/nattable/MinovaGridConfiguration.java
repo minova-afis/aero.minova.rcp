@@ -46,12 +46,14 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private IDataService dataService;
 	private List<String> readOnlyColumns;
 	private IConfigRegistry configRegistry;
+	private List<GridLookupContentProvider> contentProviderList;
 
 	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService) {
 		this.columns = columns;
 		this.grid = grid;
 		this.dataService = dataService;
 		this.readOnlyColumns = new ArrayList<>();
+		contentProviderList = new ArrayList<>();
 		initGridFields();
 	}
 
@@ -139,6 +141,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		}
 	}
 
+	public void updateConteProvider() {
+		contentProviderList.stream().forEach(GridLookupContentProvider::update);
+	}
+
 	private void configureLookupCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired,
 			String lookupTable) {
 		Style cellStyle = new Style();
@@ -148,6 +154,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new LookupDisplayConverter(contentProvider), DisplayMode.NORMAL,
 				configLabel + columnIndex);
+
+		contentProviderList.add(contentProvider);
 
 		if (!isReadOnly) {
 			MinovaComboBoxCellEditor comboBoxCellEditor = new MinovaComboBoxCellEditor(contentProvider.getValues());
@@ -379,7 +387,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
 	/**
 	 * Updatet die CellPainter, damit required-Felder entsprechend dargestellt werden
-	 * 
+	 *
 	 * @param columnIndex
 	 * @param required
 	 */
@@ -420,7 +428,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	/**
 	 * Updatet die CellPainter, damit readOnly-Felder entsprechend dargestellt werden <br>
 	 * Außerdem wird die Spalte zu den readOnlyColumns hinzugefügt, damit die Felder nicht bearbeitet werden können
-	 * 
+	 *
 	 * @param columnIndex
 	 * @param required
 	 */

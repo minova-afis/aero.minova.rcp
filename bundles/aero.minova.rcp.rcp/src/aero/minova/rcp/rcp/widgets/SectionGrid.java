@@ -190,6 +190,7 @@ public class SectionGrid {
 
 	private GlazedListsEventLayer eventLayer;
 
+
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
@@ -911,6 +912,10 @@ public class SectionGrid {
 		// Anzeigen der Fehlermeldung
 		this.natTable.addConfiguration(new CrossValidationConfiguration(validator, broker));
 		this.natTable.configure();
+	}
+
+	public void updateGridLookupValues() {
+		gridConfiguration.updateConteProvider();
 	}
 
 }

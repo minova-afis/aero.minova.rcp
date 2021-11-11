@@ -11,6 +11,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.rcp.parts.WFCStatisticDetailPart;
 
 public class OptimizeDetailHandler {
 
@@ -22,17 +23,27 @@ public class OptimizeDetailHandler {
 		if (mwindow.getHeight() < 900) {
 			mwindow.setHeight(900);
 
-			MPartStack searchPartStack = emservice
-					.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.search", MPartStack.class).get(0);
-			searchPartStack.setContainerData("35");
-			MPartStack indexPartStack = emservice.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.index", MPartStack.class)
-					.get(0);
-			indexPartStack.setContainerData("65");
+			try {
+				MPartStack searchPartStack = emservice
+						.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.search", MPartStack.class).get(0);
+				searchPartStack.setContainerData("35");
+				MPartStack indexPartStack = emservice
+						.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.index", MPartStack.class).get(0);
+				indexPartStack.setContainerData("65");
+			} catch (IndexOutOfBoundsException e) {
+				// In "Statistic" Ansicht haben wir keinen Search part
+			}
 		}
 
 		Integer defaultSectionWidth = WFCDetailPart.SECTION_WIDTH;
-		WFCDetailPart wfcDetailPart = (WFCDetailPart) detail.getObject();
-		Composite detailComposite = wfcDetailPart.getComposite();
+		Composite detailComposite;
+		if (detail.getObject() instanceof WFCDetailPart) {
+			WFCDetailPart wfcDetailPart = (WFCDetailPart) detail.getObject();
+			detailComposite = wfcDetailPart.getComposite();
+		} else {
+			WFCStatisticDetailPart wfcStatisticDetailPart = (WFCStatisticDetailPart) detail.getObject();
+			detailComposite = wfcStatisticDetailPart.getComposite();
+		}
 		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, mwindow.getHeight()).x;
 
 		// Standardbreite defaultSectionWidth (für Index/Suche) + Benötigte Breite für Detail (können mehrere Sections nebeneinander sein) + 25 Pixel

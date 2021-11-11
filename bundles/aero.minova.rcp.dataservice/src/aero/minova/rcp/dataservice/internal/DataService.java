@@ -318,7 +318,7 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
-		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getStringValue() + ".xml");
+		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getValue().toString() + ".xml");
 		try {
 			Files.createDirectories(path.getParent());
 			FileUtil.createFile(path.toString());
@@ -327,7 +327,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
@@ -344,12 +344,13 @@ public class DataService implements IDataService {
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 				fw.write("<" + rootElement + ">");
 				for (Row r : fromJson.getResultSet().getRows()) {
-					String s = r.getValue(0).getStringValue();
-					fw.write(s + "\n");
+					if (r.getValue(0) != null) {
+						fw.write(r.getValue(0).getStringValue() + "\n");
+					}
 				}
 				fw.write("</" + rootElement + ">");
 				fw.close();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return path;
@@ -627,10 +628,12 @@ public class DataService implements IDataService {
 			row.addValue(null);
 			t.addColumn(new Column(TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(true));
-			for (String paramName : field.getLookupParameters()) {
-				MField paramField = field.getDetail().getField(paramName);
-				t.addColumn(new Column(paramName, paramField.getDataType()));
-				row.addValue(paramField.getValue());
+			if (field.getLookupParameters() != null) {
+				for (String paramName : field.getLookupParameters()) {
+					MField paramField = field.getDetail().getField(paramName);
+					t.addColumn(new Column(paramName, paramField.getDataType()));
+					row.addValue(paramField.getValue());
+				}
 			}
 		}
 
