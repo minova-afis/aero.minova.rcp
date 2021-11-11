@@ -203,7 +203,7 @@ Der Ordner `OSGI-INF` sollte jetzt noch zu dem Build hinzugefügt werden (`Manif
 
 Damit der neue Helper entwickelt werden kann, ohne dass dieser erst gebaut und auf dem CAS ausgeliefert werden muss sind folgende Schritte nötig:
 
-* In der Klasse `MinovaPluginService` die Variable `DEBUG` auf true setzten. Damit wird nicht mehr versucht, die Helperplugins vom Server zu laden und zu aktivieren
+* In der Debug Configuration -> Tracing -> aero.minova.rcp.dataservice -> debug/uselocalhelper aktivieren
 * Das neue Plugin in die Debug-Configuration von Eclipse aufnehmen, damit die lokale Version genutzt wird (kleiner Pfeil neben Debug-Icon -> Plug-ins -> entsprechendes Plug-in auswählen)
 
 [[Funktionalitäten]]
@@ -571,10 +571,88 @@ String defaultCurrency = dataService.getSiteParameter("InvoiceDefaultCurrency", 
 ----
 
 
+=== Ausführen von Handlern (z.B. zum Speichern)
 
-=== TODO, muss noch implementiert und dokumentiert werden
+Alle Handler können auch aus dem Code aufgerufen werden. 
+Dafür müssen der ``ECommandService`` und der ``EHandlerService`` injected werden.
+Wenn die ``canExecute()`` Methode des jeweiligen Handlers false zurückgibt wir der Handler auch nicht ausgeführt.
 
-* Anwendungsspezifische Einstellungen
+[source,java]
+----
+//Beispielhafes Ausführen des Handlers zum Speichern des Details
+String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL
+ParameterizedCommand cmd = commandService.createCommand(commandID, null);
+handlerService.executeHandler(cmd);
+----
+
+=== Benachrichtigungen an Nutzer:in
+
+Es gibt prinzipiell zwei Möglichkeiten, Nachrichten anzeigen zu lassen. 
+Zum einen kann ein kleines Popup erstellt werden, das auch ohne Interaktion wieder verschwindet. 
+Die andere Möglichkeit ist als Fehlermeldung, die aktiv weggeklickt werden muss.
+
+Beide Methoden werden über den ``IEventBroker`` aufgerufen.
+Der Nachrichtstring wird automatisch übersetzt, ob mit oder ohne "@" am Anfang.
+
+[source,java]
+----
+broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.notification"); // Popup
+broker.send(Constants.BROKER_SHOWERRORMESSAGE, "msg.errormessage"); // Fehlermeldung
+----
+
+
+=== Maskenspezifische Einstellungen
+
+Es ist möglich, für eine Masken ein zusätzliches Tab in den Einstellungen hinzuzufügen (z.B. um den/die Mitarbeiter:in in der Stundenerfassung vorzubelegen). 
+Dafür muss eine neue Klasse definiert werden, die die Klasse ``PreferenceTabDescriptor``erweitert.
+Das verwendete Icon muss aktuell im ``icons`` Ordner des ``aero.minova.rcp.preferencewindow``-Plugins liegen.
+In dem Beispiel ist auch gezeigt, wie man an den TranslationService kommt.
+Die Einstellungen werden dann wie auch die Haupteinstellungen aufgebaut, siehe auch Klasse ``PreferenceWindowModel``.
+Auf die eingestellten Werte kann dann wie für alle anderen Einstellungen auch zugegriffen werden.
+
+[source,java]
+----
+public class WorkingTimePreferencePage extends PreferenceTabDescriptor {
+
+	public WorkingTimePreferencePage() {
+		super("aero.minova.rcp.preferencewindow", "icons/SIS.png", "sisTab", getTranslationService().translate("@Preferences.WorkingTime", null), 0.6);
+		
+		TranslationService translationService = getTranslationService();
+		
+		PreferenceSectionDescriptor psd;
+		psd = new PreferenceSectionDescriptor("user", translationService.translate("@Preferences.WorkingTime.UserPreselect", null), 0.1);
+		this.add(psd);
+		psd.add(new PreferenceDescriptor(Constants.USER_PRESELECT_DESCRIPTOR,
+				translationService.translate("@Preferences.WorkingTime.UserPreselectDescription", null), 0.1, DisplayType.STRING,
+				System.getProperty("user.name")));
+	}
+
+	/**
+	 * Translation Service aus dem Kontext holen
+	 */
+	private static TranslationService getTranslationService() {
+		IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(WorkingTimePreferencePage.class).getBundleContext());
+		return serviceContext.get(IWorkbench.class).getApplication().getContext().get(TranslationService.class);
+	}
+}
+----
+
+Wenn die Klasse erstellt ist muss sie noch in der ``Manifest.MF`` Datei eingetragen werden. 
+Unter ``Extensions`` wird ``minova.preferencepage`` ausgewählt und die eben erstellte Klasse wird als page eingetragen. 
+Atomatisch wird ein ``plugin.xml`` file erstellt, das folgenden Inhalt haben sollte (als Klasse natürlich die eben erstellte):
+
+[source,xml]
+----
+<plugin>
+   <extension
+         point="minova.preferencepage">
+      <page
+            class="aero.minova.workingtime.preferencepage.WorkingTimePreferencePage">
+      </page>
+   </extension>
+</plugin>
+----
+
 
 [[Bauen]]
 == Bauen des Plugins
