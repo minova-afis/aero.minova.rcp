@@ -373,7 +373,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
 		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
 
