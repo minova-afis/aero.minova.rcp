@@ -193,6 +193,7 @@ public class WFCDetailCASRequestsUtil {
 					selectedTable = t.getOutputParameters();
 					updateSelectedEntry();
 					// Grids auslesen, wenn Daten der Hauptmaske geladen sind
+					updateGridLookupValues();
 					for (MGrid g : mDetail.getGrids()) {
 						readGrid(g, table);
 					}
@@ -221,8 +222,6 @@ public class WFCDetailCASRequestsUtil {
 		RowBuilder gridRowBuilder = RowBuilder.newRow();
 		Grid grid = g.getGrid();
 		SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
-		// Daten neu Laden, ggf. haben sich die möglichen Werte in den Lookups geändert
-		sg.updateGridLookupValues();
 		boolean firstPrimary = true;
 		for (Field f : grid.getField()) {
 			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
@@ -389,6 +388,8 @@ public class WFCDetailCASRequestsUtil {
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			sendEventToHelper(ActionCode.BEFORESAVE);
+
+			updateGridLookupValues();
 
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
@@ -706,6 +707,8 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective && getKeys() != null) {
 
 			sendEventToHelper(ActionCode.BEFOREDEL);
+			updateGridLookupValues();
+
 			// Hauptmaske
 			Table t = createDeleteTableFromForm(form);
 			if (t.getRows() != null) {
@@ -867,6 +870,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
+		updateGridLookupValues();
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
@@ -1228,6 +1232,13 @@ public class WFCDetailCASRequestsUtil {
 		mParamString.getSubFields().clear();
 		mParamString.getSubFields().addAll(subfields);
 		redrawSection(mParamString.getmSection());
+	}
+
+	private void updateGridLookupValues() {
+		for (MGrid g : mDetail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.updateGridLookupValues();
+		}
 	}
 
 }
