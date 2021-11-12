@@ -595,7 +595,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
 			if (btn.getText() != null) {
-				item.setText(translationService.translate(btn.getText(), null));
 				item.setToolTipText(translationService.translate(btn.getText(), null));
 			}
 
