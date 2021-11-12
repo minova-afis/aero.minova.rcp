@@ -1,5 +1,7 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import org.eclipse.e4.core.di.annotations.Optional;
+
 public class PreferenceDescriptor {
 
 	final String key;

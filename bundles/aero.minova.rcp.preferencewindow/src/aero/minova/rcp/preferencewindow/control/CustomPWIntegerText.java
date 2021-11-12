@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -19,7 +20,7 @@ public class CustomPWIntegerText extends CustomPWText {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWIntegerText(final String label, final String tooltip, final String propertyKey) {
+	public CustomPWIntegerText(final String label, @Optional String tooltip, final String propertyKey) {
 		super(label, tooltip, propertyKey);
 	}
 
@@ -30,12 +31,13 @@ public class CustomPWIntegerText extends CustomPWText {
 		if (translatedLabel.contains("[")) {
 			final Label label = new Label(parent, SWT.NONE);
 			label.setText(translatedLabel.substring(0, translatedLabel.lastIndexOf("[") - 1));
-			label.setToolTipText(getTooltip());
+			if (getTooltip() != null && !getTooltip().isBlank())
+				label.setToolTipText(getTooltip());
 			final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 			labelGridData.horizontalIndent = 25;
 			label.setLayoutData(labelGridData);
 			addControl(label);
-			
+
 			Composite cmp = new Composite(parent, SWT.NONE);
 			cmp.setLayout(new GridLayout(2, false));
 			addControl(cmp);
@@ -44,9 +46,10 @@ public class CustomPWIntegerText extends CustomPWText {
 			final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			textGridData.widthHint = 150;
 			text.setLayoutData(textGridData);
-			text.setToolTipText(getTooltip());
+			if (getTooltip() != null && !getTooltip().isBlank())
+				text.setToolTipText(getTooltip());
 			addControl(text);
-			
+
 			addVerifyListeners();
 			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
 			text.addListener(SWT.Modify, event -> {
@@ -59,11 +62,12 @@ public class CustomPWIntegerText extends CustomPWText {
 			final GridData unitGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			unit.setLayoutData(unitGridData);
 			addControl(unit);
-			
+
 		} else {
 			buildLabel(parent, GridData.CENTER);
 			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
-			text.setToolTipText(getTooltip());
+			if (getTooltip() != null && !getTooltip().isBlank())
+				text.setToolTipText(getTooltip());
 			addControl(text);
 			addVerifyListeners();
 			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());

@@ -13,8 +13,10 @@ public abstract class CustomPWText extends CustomPWWidget {
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
-	 * @param propertyKey associated property key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated property key
 	 */
 	public CustomPWText(final String label, final String tooltip, final String propertyKey) {
 		super(label, tooltip, propertyKey, label == null ? 1 : 2, false);
@@ -31,7 +33,8 @@ public abstract class CustomPWText extends CustomPWWidget {
 		addControl(text);
 		addVerifyListeners();
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		text.setToolTipText(getTooltip());
+		if (getTooltip() != null && !getTooltip().isBlank())
+			text.setToolTipText(getTooltip());
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
 		});

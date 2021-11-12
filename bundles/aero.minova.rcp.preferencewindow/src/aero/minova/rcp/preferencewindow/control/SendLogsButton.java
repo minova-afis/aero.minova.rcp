@@ -25,12 +25,14 @@ public class SendLogsButton extends CustomPWWidget {
 	protected Control build(Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
-		label.setToolTipText(getTooltip());
+		if (getTooltip() != null && !getTooltip().isBlank())
+			label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
-		label.setToolTipText(getTooltip());
+		if (getTooltip() != null && !getTooltip().isBlank())
+			label.setToolTipText(getTooltip());
 
 		return ButtonFactory.newButton(SWT.PUSH)//
 				.text(translationService.translate("@Action.Send", null))//
