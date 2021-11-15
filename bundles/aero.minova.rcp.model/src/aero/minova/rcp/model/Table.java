@@ -207,4 +207,16 @@ public class Table {
 	public Value getValue(int col, int row) {
 		return rows.get(row).getValue(col);
 	}
+
+	public void addColumns(List<Column> columns) {
+		for (Column c : columns) {
+			addColumn(c);
+		}
+	}
+
+	public void addRows(List<Row> rows) {
+		for (Row r : rows) {
+			addRow(r);
+		}
+	}
 }
