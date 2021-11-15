@@ -306,7 +306,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			// Wert in Zeile setzten
-			if (indexInRow >= 0 && "primary".equals(f.getKeyType())) {
+			if (indexInRow >= 0 && "primary".equals(f.getKeyType()) && row.getValue(indexInRow) != null) {
 				builder.withValue(row.getValue(indexInRow).getValue());
 				newKeys.put(f.getName(), row.getValue(indexInRow));
 			} else {
