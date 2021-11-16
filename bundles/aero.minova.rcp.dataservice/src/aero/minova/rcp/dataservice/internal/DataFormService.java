@@ -171,7 +171,7 @@ public class DataFormService implements IDataFormService {
 			} else if (f.getPercentage() != null) {
 				decimals = f.getPercentage().getDecimals();
 			}
-		} else if (f.getNumber() != null || f.getLookup() != null || f.getEditor() != null) {
+		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
 		} else if (f.getMoney() != null) {
 			type = DataType.BIGDECIMAL;
