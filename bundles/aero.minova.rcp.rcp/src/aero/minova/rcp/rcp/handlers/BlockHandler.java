@@ -33,7 +33,6 @@ public class BlockHandler implements ValueChangeListener {
 	IDataService dataService;
 
 	HandledToolItemImpl blockedToolItem;
-
 	WFCDetailPart detail;
 	MPart mPart;
 	MField keyLong;
@@ -54,7 +53,6 @@ public class BlockHandler implements ValueChangeListener {
 
 	@CanExecute
 	public boolean canExecute(MPart part, @Named(IServiceConstants.ACTIVE_SELECTION) @Optional Object selection) {
-
 		if (firstCall) {
 			init(part);
 		}
@@ -81,6 +79,11 @@ public class BlockHandler implements ValueChangeListener {
 
 	@Execute
 	public void execute() {
+
+		// Dirty-Flag verhindern
+		Table selectedTable = detail.getRequestUtil().getSelectedTable();
+		selectedTable.setValue("Blocked", 0, new Value(blockedToolItem.isSelected()));
+
 		// Blocked-Feld entsprechend mit Wert belegen
 		blocked.setValue(new Value(blockedToolItem.isSelected()), false);
 
@@ -105,5 +108,4 @@ public class BlockHandler implements ValueChangeListener {
 		}
 		blockedToolItem.setSelected(blockedV);
 	}
-
 }
