@@ -76,7 +76,5 @@ public class CopyHandler {
 			sg.getDataTable().getRows().clear();
 			sg.addRows(newTable);
 		}
-
 	}
-
 }
