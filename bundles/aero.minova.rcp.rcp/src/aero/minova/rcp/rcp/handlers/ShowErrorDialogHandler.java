@@ -12,12 +12,11 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ShowErrorDialogHandler {
 	@Execute
-	public static void execute(final Shell shell, String title, String message, Throwable t) { // create exception on purpose to demonstrate ErrorDialog
+	public static void execute(final Shell shell, String title, String message, Throwable t) {
 		MultiStatus status;
 		status = createMultiStatus(t);
 		// show error dialog
 		ErrorDialog.openError(shell, title, message, status);
-
 	}
 
 	private static MultiStatus createMultiStatus(Throwable t) {
