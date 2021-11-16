@@ -77,6 +77,10 @@ public class LookupField {
 		} else {
 			descriptionLabelFormData.width = 0;
 		}
+		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned() > 1) { // ZB für Contact Lookups
+			descriptionLabelFormData.height = field.getNumberRowsSpanned() * FieldUtil.COLUMN_HEIGHT;
+			descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.TOP);
+		}
 
 		label.setData(FieldUtil.TRANSLATE_PROPERTY, labelText);
 		label.setData(AERO_MINOVA_RCP_LOOKUP, lookupControl);
