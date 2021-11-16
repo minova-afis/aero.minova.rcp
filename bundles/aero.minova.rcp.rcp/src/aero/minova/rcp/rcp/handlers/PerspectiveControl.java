@@ -372,6 +372,11 @@ public class PerspectiveControl {
 		} else {
 			ShowErrorDialogHandler.execute(shell, "Error", translate, et.getT());
 		}
+
+		// Wenn möglich Search-Part aktivieren, um wiederkehrende Fehler zu vermeiden
+		String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART;
+		ParameterizedCommand cmd = commandService.createCommand(commandID, null);
+		handlerService.executeHandler(cmd);
 	}
 
 	@Inject

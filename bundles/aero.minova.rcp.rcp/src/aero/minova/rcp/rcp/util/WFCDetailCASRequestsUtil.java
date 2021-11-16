@@ -24,7 +24,6 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -637,8 +636,9 @@ public class WFCDetailCASRequestsUtil {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
 			// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
-			partService.activate(findElements.get(0));
+			String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART;
+			ParameterizedCommand cmd = commandService.createCommand(commandID, null);
+			handlerService.executeHandler(cmd);
 
 			MessageDialog.openError(shell, ERROR, getTranslation(message));
 		}
@@ -666,8 +666,9 @@ public class WFCDetailCASRequestsUtil {
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
 			// Fokus auf den Search Part legen, damit Fehlermeldungen von Lookups nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
-			partService.activate(findElements.get(0));
+			String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART;
+			ParameterizedCommand cmd = commandService.createCommand(commandID, null);
+			handlerService.executeHandler(cmd);
 
 			if (et.getT() == null) {
 				MessageDialog.openError(shell, ERROR, value);
