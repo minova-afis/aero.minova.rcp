@@ -226,7 +226,7 @@ public class PrintIndexHandler {
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(window, modelService, partService);
+				PrintUtil.checkPreview(activePerspective, modelService, partService);
 
 				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
@@ -238,7 +238,7 @@ public class PrintIndexHandler {
 				if (disablePreview) {
 					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
-					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService));
+					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(activePerspective, modelService, partService));
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();

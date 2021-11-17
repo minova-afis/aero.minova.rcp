@@ -13,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -32,7 +33,8 @@ public class PrintUtil {
 	private PrintUtil() {}
 
 	public static void getXMLAndShowPDF(IDataService dataService, EModelService modelService, EPartService partService, TranslationService translationService,
-			MWindow window, IEventBroker broker, UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath) {
+			MWindow window, IEventBroker broker, UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath,
+			MPerspective mPerspective) {
 
 		CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElement);
 		tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
@@ -43,10 +45,10 @@ public class PrintUtil {
 				String xmlString = Files.readString(xmlPath);
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(window, modelService, partService);
+				PrintUtil.checkPreview(mPerspective, modelService, partService);
 
 				PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPath).toFile());
-				PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(window, modelService, partService));
+				PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(mPerspective, modelService, partService));
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
 				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
@@ -67,10 +69,10 @@ public class PrintUtil {
 	 * @author wild
 	 * @since 11.0.0
 	 */
-	public static Preview checkPreview(MWindow window, EModelService modelService, EPartService partService) {
+	public static Preview checkPreview(MPerspective mPerspective, EModelService modelService, EPartService partService) {
 
 		// Wir suchen mal nach dem Druck-Part und aktivieren ihn
-		MPart previewPart = (MPart) modelService.find(Preview.PART_ID, window);
+		MPart previewPart = (MPart) modelService.find(Preview.PART_ID, mPerspective);
 		if (previewPart.getObject() == null) {
 			partService.showPart(previewPart, PartState.CREATE);
 		}
@@ -127,6 +129,22 @@ public class PrintUtil {
 	 * @return String
 	 */
 	public static String prepareTranslation(Column c) {
+		if (c != null && c.getLabel() != null) {
+			return c.getLabel();
+		} else if (c != null && c.getName() != null) {
+			return "@" + c.getName();
+		}
+		return "";
+	}
+
+	/**
+	 * Sucht den zu übersetzenden Text raus. Label, @+Name oder ""
+	 *
+	 * @param c
+	 *            aero.minova.rcp.form.model.xsd.Column
+	 * @return String
+	 */
+	public static String prepareTranslation(aero.minova.rcp.form.model.xsd.Column c) {
 		if (c != null && c.getLabel() != null) {
 			return c.getLabel();
 		} else if (c != null && c.getName() != null) {
