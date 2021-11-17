@@ -231,7 +231,7 @@ class GridTest {
 			f.setValue(new Value("Testing the UI"), false);
 
 			f = wfcPart.getDetail().getField("OrderReceiverKey");
-			f.setValue(new LookupValue(2, "AFIS", "AFIS GmbH & CO. KG"), false);
+			f.setValue(new LookupValue(1, "MIN", "MINOVA Information Services GmbH"), false);
 
 			f = wfcPart.getDetail().getField("UnitKey");
 			f.setValue(new LookupValue(19, "100L", "100 Liter"), false);

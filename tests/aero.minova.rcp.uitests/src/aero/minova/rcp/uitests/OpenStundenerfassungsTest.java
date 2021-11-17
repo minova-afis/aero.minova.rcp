@@ -17,7 +17,6 @@ import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class OpenStundenerfassungsTest {
 
 	private void open() {
 		// Stundenerfassung über das Menü öffnen
-		SWTBotMenu adminMenu = bot.menu("Administration");
+		SWTBotMenu adminMenu = bot.menu("Verwaltung");
 		assertNotNull(adminMenu);
 		SWTBotMenu stundenErfassung = adminMenu.menu("Stundenerfassung");
 		assertNotNull(stundenErfassung);
@@ -84,7 +83,6 @@ class OpenStundenerfassungsTest {
 	}
 
 	@Test
-	@Ignore
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten (Nicht Ubuntu)")
 	void deleteRowAndRevertSearch() {
 		Assumptions.assumeFalse(SWT.getPlatform().equals("gtk"));
@@ -138,7 +136,6 @@ class OpenStundenerfassungsTest {
 	}
 
 	@Test
-	@Ignore
 	@DisplayName("Index mit SuchPart filtern")
 	public void filterIndex() {
 		open();
@@ -155,7 +152,6 @@ class OpenStundenerfassungsTest {
 	}
 
 	@Test
-	@Ignore
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	void loadIndex() {
 		open();

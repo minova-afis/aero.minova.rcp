@@ -116,7 +116,7 @@ class CasCommunicationIntegrationTest {
 				+ "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n"
 				+ "            \"name\": \"KeyText\",\n" + "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n"
 				+ "            \"name\": \"FilterLastAction\",\n" + "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n" + "    \"rows\": [\n"
-				+ "        {\n" + "            \"values\" : [\n" + "                \"n-2\"\n" + "                , null\n" + "                , \"b-0\"\n"
+				+ "        {\n" + "            \"values\" : [\n" + "                \"n-1\"\n" + "                , null\n" + "                , \"b-0\"\n"
 				+ "            ]\n" + "        }\n" + "    ]\n" + "}";
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
