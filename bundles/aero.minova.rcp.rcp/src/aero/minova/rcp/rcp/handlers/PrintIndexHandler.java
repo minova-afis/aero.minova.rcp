@@ -47,7 +47,6 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
@@ -106,9 +105,9 @@ public class PrintIndexHandler {
 	@PostConstruct
 	public void downloadPFDZip() {
 		try {
-			dataService.getHashedZip("PDF.zip");
+			dataService.getHashedZip("pdf.zip");
 		} catch (Exception e) {}
-		File pdfFolder = dataService.getStoragePath().resolve("PDF/").toFile();
+		File pdfFolder = dataService.getStoragePath().resolve("pdf/").toFile();
 		pdfFolderExists = pdfFolder.exists();
 	}
 
@@ -136,7 +135,7 @@ public class PrintIndexHandler {
 		MPerspective activePerspective = modelService.getActivePerspective(window);
 		title = translationService.translate(activePerspective.getLabel(), activePerspective.getLabel());
 
-		Path path_reports = dataService.getStoragePath().resolve("PDF/");
+		Path path_reports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
 		if (o instanceof WFCIndexPart) {
 
@@ -150,7 +149,7 @@ public class PrintIndexHandler {
 			// Gruppierung
 			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
-			List<Integer> groupByIndicesReordered = new ArrayList<Integer>();
+			List<Integer> groupByIndicesReordered = new ArrayList<>();
 
 			// Optimalen Spaltenbreiten ermitteln
 			int[] widths = new int[columnReorderLayer.getColumnCount()];
@@ -214,13 +213,13 @@ public class PrintIndexHandler {
 			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 			try {
-				Path pathPDF = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+				Path pathPDF = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.pdf");
 				Files.createDirectories(pathPDF.getParent());
 				createFile(pathPDF.toString());
 				URL urlPDF = pathPDF.toFile().toURI().toURL();
 
-				Path pathXML = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
-				Path pathXSL = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
+				Path pathXML = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xml");
+				Path pathXSL = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xsl");
 				createFile(pathXML.toString());
 				createFile(pathXSL.toString());
 				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");

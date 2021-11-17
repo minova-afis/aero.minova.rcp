@@ -26,7 +26,7 @@ public class MinovaImageService {
 
 	@Activate
 	public void activatePlugin() {
-		dataService.getHashedZip("Images.zip");
+		dataService.getHashedZip("images.zip");
 	}
 
 }
