@@ -172,16 +172,20 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Inject
 	public void readData(@Optional @Named(Constants.BROKER_ACTIVEROWS) Table table) {
+		readData(table, true); // Wenn aus dem Index oder aus Helper soll prinzipiell die Discard-Message angezeigt werden
+	}
+
+	public void readData(@Optional @Named(Constants.BROKER_ACTIVEROWS) Table table, boolean showDiscard) {
 		if (table == null || table.getRows().isEmpty()) {
 			return;
 		}
 
-		currentKeyTable = table;
 		Display.getDefault().asyncExec(() -> {
-			if (showDiscardDialogIndex && !discardChanges()) {
+			if (showDiscardDialogIndex && showDiscard && !discardChanges()) {
 				broker.send(Constants.BROKER_CLEARSELECTION, perspective);
 				return;
 			}
+			currentKeyTable = table;
 
 			sendEventToHelper(ActionCode.BEFOREREAD);
 
@@ -938,7 +942,7 @@ public class WFCDetailCASRequestsUtil {
 			if (keyTable == null) {
 				keyTable = currentKeyTable;
 			}
-			readData(keyTable);
+			readData(keyTable, false); // Nach Speichern soll discard-Nachricht nicht angezeigt werden
 		}
 	}
 
