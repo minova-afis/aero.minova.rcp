@@ -12,19 +12,17 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ShowErrorDialogHandler {
 	@Execute
-	public static void execute(final Shell shell, String title, String message, Throwable t) { // create exception on purpose to demonstrate ErrorDialog
+	public static void execute(final Shell shell, String title, String message, Throwable t) {
 		MultiStatus status;
-		status = createMultiStatus(t.getLocalizedMessage(), t);
+		status = createMultiStatus(t);
 		// show error dialog
 		ErrorDialog.openError(shell, title, message, status);
-
 	}
 
-	private static MultiStatus createMultiStatus(String msg, Throwable t) {
+	private static MultiStatus createMultiStatus(Throwable t) {
 		MultiStatus ms;
 		List<Status> childStatuses = new ArrayList<>();
-		StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
-		for (StackTraceElement stackTrace : stackTraces) {
+		for (StackTraceElement stackTrace : t.getStackTrace()) {
 			Status status = new Status(IStatus.ERROR, "aero.minova.rcp.rcp", stackTrace.toString());
 			childStatuses.add(status);
 		}
