@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.util.Tools;
@@ -116,6 +117,22 @@ public class PrintUtil {
 	 */
 	public static void generatePDF(URL pdf, String xmlString, File stylesheet) throws IOException, SAXException, TransformerException {
 		PDFGenerator.createPdfFile(xmlString, stylesheet, pdf);
+	}
+
+	/**
+	 * Sucht den zu übersetzenden Text raus. Label, @+Name oder ""
+	 *
+	 * @param c
+	 *            Column
+	 * @return String
+	 */
+	public static String prepareTranslation(Column c) {
+		if (c != null && c.getLabel() != null) {
+			return c.getLabel();
+		} else if (c != null && c.getName() != null) {
+			return "@" + c.getName();
+		}
+		return "";
 	}
 
 }

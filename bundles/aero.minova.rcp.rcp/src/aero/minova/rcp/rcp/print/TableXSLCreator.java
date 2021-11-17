@@ -18,6 +18,7 @@ import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.handlers.PrintIndexHandler;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 import aero.minova.rcp.rcp.print.ReportCreationException.Cause;
+import aero.minova.rcp.rcp.util.PrintUtil;
 import aero.minova.rcp.util.IOUtil;
 
 public class TableXSLCreator extends CommonPrint {
@@ -37,7 +38,7 @@ public class TableXSLCreator extends CommonPrint {
 
 	/**
 	 * Erzeugt ein XSL-Template mittels einer Such- und Datentabelle
-	 * 
+	 *
 	 * @param groupByIndicesReordered
 	 * @throws ReportCreationException
 	 */
@@ -58,7 +59,7 @@ public class TableXSLCreator extends CommonPrint {
 
 		// Gruppierungsspalten entfernen
 		if (printHandler.hideGroupCols) {
-			List<ColumnInfo> toRemove = new ArrayList<ColumnInfo>();
+			List<ColumnInfo> toRemove = new ArrayList<>();
 			for (ColumnInfo colInf : cols) {
 				if (groupByIndicesReordered.contains(colInf.index)) {
 					toRemove.add(colInf);
@@ -124,7 +125,8 @@ public class TableXSLCreator extends CommonPrint {
 		String text;
 		for (int i = 0; i < cols.size(); i++) {
 			final ColumnInfo ci = cols.get(i);
-			final String name = ci.column == null ? "" : translationService.translate(ci.column.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "");
+			final String name = ci.column == null ? ""
+					: translationService.translate(PrintUtil.prepareTranslation(ci.column), null).replaceAll("[^a-zA-Z0-9]", "");
 
 			if (ci.column == null) {
 				text = getTemplate("CellEmptyDefinition");
@@ -300,7 +302,7 @@ public class TableXSLCreator extends CommonPrint {
 		String toRet = "";
 		for (final ColumnInfo ci : cols) {
 			if (ci != null && ci.column != null) {
-				final String colName = translationService.translate(ci.column.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "");
+				final String colName = translationService.translate(PrintUtil.prepareTranslation(ci.column), null).replaceAll("[^a-zA-Z0-9]", "");
 				final String scValues = getSearchCriteriaValue(ci);
 				if (scValues != null && scValues != "") {
 					if (toRet != "") {
@@ -328,7 +330,7 @@ public class TableXSLCreator extends CommonPrint {
 		boolean isFirstRow = true;
 		for (ColumnInfo ci : cols) {
 			final boolean lastColumn = (ci == cols.get(cols.size() - 1));
-			text = ci.column == null ? "" : translationService.translate(ci.column.getLabel(), null);
+			text = translationService.translate(PrintUtil.prepareTranslation(ci.column), null);
 			boolean isNumber = false;
 			if (ci.column != null && (ci.column.getType() == DataType.DOUBLE || ci.column.getType() == DataType.INTEGER)) {
 				isNumber = true;
@@ -412,7 +414,7 @@ public class TableXSLCreator extends CommonPrint {
 		if (!printHandler.hideSearchCriterias) {
 			for (final ColumnInfo ci : cols) {
 				if (ci != null && ci.column != null) {
-					final String colName = translationService.translate(ci.column.getLabel(), null);
+					final String colName = translationService.translate(PrintUtil.prepareTranslation(ci.column), null);
 					xslData = xslData.replace("%%SearchCriteria#" + colName + "%%", getSearchCriteria(ci));
 					xslData = xslData.replace("%%SearchCriteriaValue#" + colName + "%%", getSearchCriteriaValue(ci));
 				}

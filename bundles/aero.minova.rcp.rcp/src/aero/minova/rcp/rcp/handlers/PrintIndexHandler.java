@@ -47,7 +47,6 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
@@ -150,7 +149,7 @@ public class PrintIndexHandler {
 			// Gruppierung
 			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
-			List<Integer> groupByIndicesReordered = new ArrayList<Integer>();
+			List<Integer> groupByIndicesReordered = new ArrayList<>();
 
 			// Optimalen Spaltenbreiten ermitteln
 			int[] widths = new int[columnReorderLayer.getColumnCount()];
@@ -280,7 +279,7 @@ public class PrintIndexHandler {
 
 	/**
 	 * Schreibt die XML Datei aus den Daten der NatTable
-	 * 
+	 *
 	 * @param indexPart
 	 * @param groupByIndices
 	 * @param treeList
@@ -383,7 +382,7 @@ public class PrintIndexHandler {
 			xml.append("<Row>\n");
 			for (final Integer d : columnReorderList) {
 				Column c = colConfig.get(colIndex).column;
-				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				if (r.getValue(d) != null) {
 					if (r.getValue(d).getType() == DataType.DOUBLE) {
 						// Definierte Nachkommastellen für diese Spalte werden gedruckt
@@ -403,7 +402,7 @@ public class PrintIndexHandler {
 						xml.append("]]>");
 					}
 				}
-				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 				colIndex++;
 			}
 			xml.append("</Row>\n");
@@ -429,9 +428,9 @@ public class PrintIndexHandler {
 				}
 
 				Column c = colConfig.get(i).column;
-				sumRow += "<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
+				sumRow += "<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
 				sumRow += summary;
-				sumRow += "</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
+				sumRow += "</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
 			}
 		}
 
@@ -451,9 +450,9 @@ public class PrintIndexHandler {
 			}
 			if (summary != null) {
 				Column c = colConfig.get(i).column;
-				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				xml.append(summary);
-				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 			}
 		}
 
