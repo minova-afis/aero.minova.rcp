@@ -455,11 +455,11 @@ public class TableXSLCreator extends CommonPrint {
 	 * Lokalisiert statische Werte im Report
 	 */
 	public String localize(String text) {
-		text = text.replace("%%tAddress.Phone%%", translationService.translate("@Phone", "Tel."));
-		text = text.replace("%%tAddress.Fax%%", translationService.translate("@tAddress.Fax", "Fax"));
-		text = text.replace("%%tAddress.Page%%", translationService.translate("@tAddress.Page", "Seite"));
-		text = text.replace("%%tAddress.Index%%", translationService.translate("@tAddress.Index", "Index"));
-		text = text.replace("%%tDate%%", translationService.translate("@tDate", "Datum"));
+		text = text.replace("%%tAddress.Phone%%", translationService.translate("Phone", null));
+		text = text.replace("%%tAddress.Fax%%", translationService.translate("@Fax", null));
+		text = text.replace("%%tAddress.Page%%", translationService.translate("@Page", null));
+		text = text.replace("%%tAddress.Index%%", translationService.translate("@Form.Index", null));
+		text = text.replace("%%tDate%%", translationService.translate("@Date", null));
 		return text;
 	}
 
