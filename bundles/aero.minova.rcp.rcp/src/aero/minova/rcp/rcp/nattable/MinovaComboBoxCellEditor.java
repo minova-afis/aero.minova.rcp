@@ -1,13 +1,11 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.nebula.widgets.nattable.data.convert.IDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
@@ -25,15 +23,15 @@ import org.eclipse.swt.widgets.Control;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
+	private GridLookupContentProvider contentProvider;
+
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
 	 * the combo.
-	 *
-	 * @param canonicalValues
-	 *            Array of items to be shown in the drop down box. These will be converted using the {@link IDisplayConverter} for display purposes
 	 */
-	public MinovaComboBoxCellEditor(List<?> canonicalValues) {
-		super(canonicalValues, NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
+	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
+		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
+		this.contentProvider = contentProvider;
 	}
 
 	private EHandlerService getHandlerService(Control control) {
@@ -87,6 +85,15 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					// in a dialog
 					combo.hideDropdownControl();
 				}
+			}
+		});
+
+		// Bei Klick auf den Pfeil Lookup Content aktualisieren (Zelle muss deaktiviert werden damit neue Werte angezeigt werden)
+		Control arrow = combo.getChildren()[1];
+		arrow.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				contentProvider.update();
 			}
 		});
 
