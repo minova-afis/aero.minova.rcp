@@ -134,7 +134,7 @@ class CasCommunicationIntegrationTest {
 		Table newTable = sql.getResultSet();
 		assertNotNull(newTable);
 		assertEquals(3, newTable.getColumnCount());
-		assertEquals(Integer.valueOf(2), newTable.getRows().get(0).getValue(0).getIntegerValue());
+		assertEquals(Integer.valueOf(1), newTable.getRows().get(0).getValue(0).getIntegerValue());
 		assertEquals("ZPROGRAM", newTable.getRows().get(0).getValue(1).getStringValue());
 		assertEquals(null, newTable.getRows().get(0).getValue(2));
 	}
