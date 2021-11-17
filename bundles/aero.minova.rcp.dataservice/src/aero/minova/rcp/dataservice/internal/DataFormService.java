@@ -95,10 +95,8 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public Table getTableFromFormDetail(Form form, String prefix) {
 		Table dataTable = new Table();
-		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-			tablename = form.getDetail().getProcedurePrefix();
-		}
+		String tablename = form.getDetail().getProcedurePrefix();
+
 		if (prefix != null) {
 			tablename += prefix;
 		}

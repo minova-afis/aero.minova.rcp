@@ -48,6 +48,7 @@ public class Constants {
 	public static final String INSERT_REQUEST = "Insert";
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
+	public static final String BLOCK_REQUEST = "Block";
 
 	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden müssen
 	public static final String FORM_BOOKINGDATE = "BookingDate";

@@ -86,7 +86,7 @@ class DataServiceTest {
 	}
 
 	@Test
-	@DisplayName("Ensure we can download aero.minova.workingtime.helper")
+	@DisplayName("Ensure we can download aero.minova.invoice.helper")
 	void ensureDownloadOfPlugin() {
 		boolean hashedZip = dataService.getHashedZip("plugins.zip");
 		// TODO Check that really the hash version was used, maybe Mockito can be used
@@ -97,7 +97,7 @@ class DataServiceTest {
 		boolean exists = Files.exists(path, LinkOption.NOFOLLOW_LINKS);
 		assertTrue(exists, "Unzipped directory not available on the local file system");
 		try (Stream<Path> list = Files.list(path)) {
-			long count = list.filter(f -> f.toString().contains("aero.minova.workingtime.helper")).count();
+			long count = list.filter(f -> f.toString().contains("aero.minova.invoice.helper")).count();
 			assertEquals(1, count, "Jar file nicht oder mehrfach vorhanden");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -107,10 +107,10 @@ class DataServiceTest {
 	@Test
 	@DisplayName("Split String from class to plugin name")
 	void validateThatPluginForHelperClassIsNamedCorretly() {
-		String className = "aero.minova.workingtime.helper.WorkingTimeHelper";
+		String className = "aero.minova.invoice.helper.InvoiceHelper";
 		int lastIndexOf = className.lastIndexOf('.');
 		String pluginName = className.substring(0, lastIndexOf);
 
-		assertEquals("aero.minova.workingtime.helper", pluginName, "Hey looks like we do not know how to split strings");
+		assertEquals("aero.minova.invoice.helper", pluginName, "Hey looks like we do not know how to split strings");
 	}
 }
