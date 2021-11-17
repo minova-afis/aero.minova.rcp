@@ -17,6 +17,7 @@ import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,6 +84,7 @@ class OpenStundenerfassungsTest {
 	}
 
 	@Test
+	@Ignore
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten (Nicht Ubuntu)")
 	void deleteRowAndRevertSearch() {
 		Assumptions.assumeFalse(SWT.getPlatform().equals("gtk"));
@@ -136,6 +138,7 @@ class OpenStundenerfassungsTest {
 	}
 
 	@Test
+	@Ignore
 	@DisplayName("Index mit SuchPart filtern")
 	public void filterIndex() {
 		open();
@@ -152,6 +155,7 @@ class OpenStundenerfassungsTest {
 	}
 
 	@Test
+	@Ignore
 	@DisplayName("Index Laden und Überprüfen, ob Daten geladen wurden")
 	void loadIndex() {
 		open();
@@ -167,7 +171,7 @@ class OpenStundenerfassungsTest {
 	void sleep() {
 		bot.sleep(1000);
 	}
-	
+
 	private void reloadIndex() {
 		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
 		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
