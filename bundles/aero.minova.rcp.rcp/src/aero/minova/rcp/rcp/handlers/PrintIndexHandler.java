@@ -226,7 +226,7 @@ public class PrintIndexHandler {
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(window, modelService, partService);
+				PrintUtil.checkPreview(activePerspective, modelService, partService);
 
 				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
@@ -238,7 +238,7 @@ public class PrintIndexHandler {
 				if (disablePreview) {
 					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
-					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService));
+					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(activePerspective, modelService, partService));
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
@@ -279,7 +279,7 @@ public class PrintIndexHandler {
 
 	/**
 	 * Schreibt die XML Datei aus den Daten der NatTable
-	 * 
+	 *
 	 * @param indexPart
 	 * @param groupByIndices
 	 * @param treeList
@@ -382,7 +382,7 @@ public class PrintIndexHandler {
 			xml.append("<Row>\n");
 			for (final Integer d : columnReorderList) {
 				Column c = colConfig.get(colIndex).column;
-				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				if (r.getValue(d) != null) {
 					if (r.getValue(d).getType() == DataType.DOUBLE) {
 						// Definierte Nachkommastellen für diese Spalte werden gedruckt
@@ -402,7 +402,7 @@ public class PrintIndexHandler {
 						xml.append("]]>");
 					}
 				}
-				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 				colIndex++;
 			}
 			xml.append("</Row>\n");
@@ -428,9 +428,9 @@ public class PrintIndexHandler {
 				}
 
 				Column c = colConfig.get(i).column;
-				sumRow += "<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
+				sumRow += "<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
 				sumRow += summary;
-				sumRow += "</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
+				sumRow += "</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
 			}
 		}
 
@@ -450,9 +450,9 @@ public class PrintIndexHandler {
 			}
 			if (summary != null) {
 				Column c = colConfig.get(i).column;
-				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				xml.append(summary);
-				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 			}
 		}
 

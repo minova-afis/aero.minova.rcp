@@ -70,7 +70,7 @@ public class PrintDetailHandler {
 
 	/**
 	 * Button nur anzeigen, wenn in xbs definiert ist, dass gedruckt werden kann
-	 * 
+	 *
 	 * @param part
 	 * @return
 	 */
@@ -178,7 +178,7 @@ public class PrintDetailHandler {
 			table.addRow(row);
 
 			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
-					"reports/" + reportNames.get(maskName), "reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
+					"reports/" + reportNames.get(maskName), "reports/" + maskName.replace(".xml", "") + "_Detail.pdf", mPerspective);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
