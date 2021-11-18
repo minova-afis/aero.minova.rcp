@@ -6,6 +6,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import javax.xml.transform.TransformerException;
@@ -25,6 +26,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.util.Tools;
 
@@ -47,13 +49,42 @@ public class PrintUtil {
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
 				PrintUtil.checkPreview(mPerspective, modelService, partService);
 
-				PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPath).toFile());
+				String xslPathNew = getXSLPathWithLocale(dataService, xslPath);
+
+				PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPathNew).toFile());
 				PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(mPerspective, modelService, partService));
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
 				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
 			}
 		}));
+	}
+
+	/**
+	 * Diese Methode liefert den Pfad zur XSL Datei mit dem korrekten kürzel (locale) Sollte die Sprache für die Kombination aus Sprache und Land nicht
+	 * existieren, reduzieren wir es auf die Sprache. Ansonsten wird nur der Name + ".xsl" zurückgegeben.
+	 *
+	 * @param dataService
+	 * @param xslPath
+	 * @return
+	 */
+	public static String getXSLPathWithLocale(IDataService dataService, String xslPath) {
+		String xslPathNew = xslPath;
+		Locale locale = CustomLocale.getLocale();
+		if (locale != null) {
+			String xslPathDummy = xslPath.replace(".xsl", "_" + locale + ".xsl");
+			File file = dataService.getStoragePath().resolve(xslPathDummy).toFile();
+			if (file.exists()) {
+				xslPathNew = xslPathDummy;
+			} else {
+				xslPathDummy = xslPath.replace(".xsl", "_" + locale.getLanguage() + ".xsl");
+				file = dataService.getStoragePath().resolve(xslPathDummy).toFile();
+				if (file.exists()) {
+					xslPathNew = xslPathDummy;
+				}
+			}
+		}
+		return xslPathNew;
 	}
 
 	/**
