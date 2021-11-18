@@ -1318,9 +1318,9 @@
 				</xs:choice>
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events" />
 			</xs:sequence>
-			<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="op">
+			<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="xpcor">
 				<xs:annotation>
-					<xs:documentation>Prozedurprefix (z.B. 'op', 'sp' usw.)
+					<xs:documentation>Prozedurprefix (z.B. 'xpcor', 'xpcas' usw.)
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
