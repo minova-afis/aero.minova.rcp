@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +96,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.KeyType;
+import aero.minova.rcp.model.ReferenceValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -189,7 +191,6 @@ public class SectionGrid {
 	private ViewportLayer viewportLayer;
 
 	private GlazedListsEventLayer eventLayer;
-
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -688,14 +689,16 @@ public class SectionGrid {
 		this.fieldnameToValue = fieldnameToValue;
 	}
 
-	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
+	public void setPrimaryKeys(Collection<String> primaryKeys) {
+
 		for (Row r : dataTable.getRows()) {
 
 			if (!getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen
 
 				for (Field f : grid.getField()) {
 					if (getFieldnameToValue().containsKey(f.getName())) {
-						Value v = mDetail.getField(getFieldnameToValue().get(f.getName())).getValue();
+
+						ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, getFieldnameToValue().get(f.getName()));
 						r.setValue(v, grid.getField().indexOf(f));
 					}
 				}
@@ -706,10 +709,12 @@ public class SectionGrid {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
-						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
-							r.setValue(primaryKeys.get(f.getName()), index);
+						if (primaryKeys.contains(f.getName())) { // Übereinstimmende Namen nutzen
+							ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, f.getName());
+							r.setValue(v, index);
 						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
-							r.setValue(primaryKeys.get("KeyLong"), index);
+							ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, Constants.TABLE_KEYLONG);
+							r.setValue(v, index);
 						}
 						firstPrimary = false;
 					}
