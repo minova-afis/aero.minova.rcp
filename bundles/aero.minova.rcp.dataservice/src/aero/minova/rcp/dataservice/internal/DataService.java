@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -52,18 +53,22 @@ import org.osgi.service.event.EventConstants;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
 import aero.minova.rcp.dataservice.ZipService;
 import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.ColumnSerializer;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.TransactionEntry;
+import aero.minova.rcp.model.TransactionResultEntry;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
@@ -168,6 +173,7 @@ public class DataService implements IDataService {
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.registerTypeAdapter(Column.class, new ColumnSerializer()) //
 				.setPrettyPrinting() //
 				.create();
 	}
@@ -259,6 +265,38 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public CompletableFuture<List<TransactionResultEntry>> callTransactionAsync(List<TransactionEntry> procedureList) {
+		String body = gson.toJson(procedureList);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/x-procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+
+		// TODO: Log SQL String
+		log("CAS Call Procedure:\n" + request.toString() + "\n" + body);// .replaceAll("\\s", ""));// , table, true);
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "Call Procedure", true);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer Call Procedure:\n" + t.body());
+			Type listType = new TypeToken<ArrayList<TransactionResultEntry>>() {}.getType();
+
+			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
+
+			for (TransactionResultEntry entry : transactionResults) {
+				SqlProcedureResult fromJson = entry.getSQLProcedureResult();
+				checkProcedureResult(fromJson, t.body(), entry.getId());
+			}
+			return transactionResults;
+		});
+	}
+
+	@Override
 	public CompletableFuture<SqlProcedureResult> callProcedureAsync(Table table) {
 		return callProcedureAsync(table, true);
 	}
@@ -282,32 +320,37 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Call Procedure:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			if (fromJson.getReturnCode() == null) {
-				String errorMessage = null;
-				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
-				Matcher m = fullError.matcher(t.body());
-				if (m.find()) {
-					errorMessage = m.group(0);
-				}
-				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
-				errorMessage = cutError.matcher(errorMessage).replaceAll("");
-				errorMessage = errorMessage.replaceAll("\"", "");
-				Table error = new Table();
-				error.setName(ERROR);
-				error.addColumn(new Column("Message", DataType.STRING));
-				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
-				fromJson = new SqlProcedureResult();
-				fromJson.setResultSet(error);
-				// FehlerCode
-				fromJson.setReturnCode(-1);
-			}
-			if (fromJson.getReturnCode() == -1 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
-				ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, table.getName());
-				postError(e);
-				return null;
-			}
-			return fromJson;
+			return checkProcedureResult(fromJson, t.body(), table.getName());
 		});
+	}
+
+	private SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
+		if (fromJson.getReturnCode() == null) {
+			String errorMessage = null;
+			Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
+			Matcher m = fullError.matcher(originalBody);
+			if (m.find()) {
+				errorMessage = m.group(0);
+			}
+			Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
+			errorMessage = cutError.matcher(errorMessage).replaceAll("");
+			errorMessage = errorMessage.replaceAll("\"", "");
+			Table error = new Table();
+			error.setName(ERROR);
+			error.addColumn(new Column("Message", DataType.STRING));
+			error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
+			fromJson = new SqlProcedureResult();
+			fromJson.setResultSet(error);
+			// FehlerCode
+			fromJson.setReturnCode(-1);
+		}
+		if (fromJson.getReturnCode() == -1 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
+			// TODO: Richtige Prozedur bei Transaktionen in Fehlermeldung
+			ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, procedureName);
+			postError(e);
+			return null;
+		}
+		return fromJson;
 	}
 
 	@Override
@@ -821,4 +864,5 @@ public class DataService implements IDataService {
 			logger.info(body);
 		}
 	}
+
 }
