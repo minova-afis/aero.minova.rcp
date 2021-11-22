@@ -8,6 +8,7 @@ public class Constants {
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
 
 	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
+	public static final String REVERT_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.revert";
 
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
@@ -18,6 +19,8 @@ public class Constants {
 	public static final String TABLE_LASTACTION = "LastAction";
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
+
+	public static final String TRANSACTION_PARENT = "transactionParent";
 
 	public static final String CONTROL_FIELD = "field";
 	public static final String CONTROL_OPTIONS = "options";
@@ -148,7 +151,9 @@ public class Constants {
 
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
-	public static final Object OPTION_PAGE_GRID = "OptionPageGrid";
+	public static final String OPTION_PAGE = "OptionPage";
+	public static final String OPTION_PAGE_GRID = "OptionPageGrid";
+	public static final String GRID = "Grid";
 
 	// Commands
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
