@@ -706,7 +706,7 @@ public class SectionGrid {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
-						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
+						if (primaryKeys != null && primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
 							setReferenceOrMainValue(r, primaryKeys, f.getName(), index);
 						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
 							setReferenceOrMainValue(r, primaryKeys, Constants.TABLE_KEYLONG, index);
