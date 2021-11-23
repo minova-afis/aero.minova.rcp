@@ -141,7 +141,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		}
 	}
 
-	public void updateConteProvider() {
+	public void updateContentProvider() {
 		contentProviderList.stream().forEach(GridLookupContentProvider::update);
 	}
 
