@@ -192,7 +192,7 @@ public class PerspectiveControl {
 				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
 
-			shortcut.setToolTipText(localizedTooltip);
+			shortcut.setToolTipText(localizedLabel);
 			shortcut.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
