@@ -401,7 +401,6 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective) {
 
 			sendEventToHelper(ActionCode.BEFORESAVE);
-			updateGridLookupValues();
 
 			// Hauptmaske, OPs und Grids werden in einer Transaktion aktualisiert/gespeichert
 			List<TransactionEntry> procedureList = new ArrayList<>();
