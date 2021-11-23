@@ -272,18 +272,17 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
-		// TODO: Log SQL String
-		log("CAS Call Procedure:\n" + request.toString() + "\n" + body);// .replaceAll("\\s", ""));// , table, true);
+		log("CAS Call Transaction List:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), procedureList);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
 		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "Call Procedure", true);
+			handleCASError(ex, "Call Transaction List", true);
 			return null;
 		});
 
 		return sendRequest.thenApply(t -> {
-			log("CAS Answer Call Procedure:\n" + t.body());
+			log("CAS Answer Call Transaction List:\n" + t.body());
 			Type listType = new TypeToken<ArrayList<TransactionResultEntry>>() {}.getType();
 
 			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
@@ -345,7 +344,6 @@ public class DataService implements IDataService {
 			fromJson.setReturnCode(-1);
 		}
 		if (fromJson.getReturnCode() == -1 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
-			// TODO: Richtige Prozedur bei Transaktionen in Fehlermeldung
 			ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, procedureName);
 			postError(e);
 			return null;
@@ -859,10 +857,29 @@ public class DataService implements IDataService {
 		log(body);
 	}
 
+	private void log(String body, List<TransactionEntry> procedureList) {
+		String sqlString = "";
+		try {
+			for (TransactionEntry e : procedureList) {
+				sqlString += SQLStringUtil.prepareProcedureString(e.getTable()) + "\n";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		sqlString = sqlString.strip();
+
+		if (LOG_SQL_STRING) {
+			body = body + "\n" + sqlString;
+		}
+		log(body);
+
+	}
+
 	private void log(String body) {
 		if (logger != null) {
 			logger.info(body);
 		}
 	}
-
 }
