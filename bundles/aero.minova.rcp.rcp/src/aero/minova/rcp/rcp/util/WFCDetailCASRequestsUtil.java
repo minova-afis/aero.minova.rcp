@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.util;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,7 +214,6 @@ public class WFCDetailCASRequestsUtil {
 
 					for (TransactionResultEntry resEntry : list) {
 						String id = resEntry.getId();
-						System.out.println("ID " + id);
 						SqlProcedureResult res = resEntry.getSQLProcedureResult();
 						if (id.equals(Constants.TRANSACTION_PARENT)) { // Hauptmaske
 							selectedTable = res.getOutputParameters();
@@ -224,7 +222,7 @@ public class WFCDetailCASRequestsUtil {
 							selectedOptionPages.put(opID, res.getOutputParameters());
 						} else if (id.startsWith(Constants.GRID + "_")) { // Grid
 							MGrid g = mDetail.getGrid(id.substring(id.indexOf("_") + 1));
-							if (g != null) {
+							if (g != null && res.getResultSet() != null) {
 								setGridContent(g, res.getResultSet());
 							}
 						}
@@ -250,16 +248,16 @@ public class WFCDetailCASRequestsUtil {
 					gridRequestTable.addColumn(column);
 
 					boolean found = false;
-					if (!sg.getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus Detail nehmen
+					if (!sg.getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus keyTable
 						if (sg.getFieldnameToValue().containsKey(f.getName())) {
 							found = true;
 							String fieldNameInMain = sg.getFieldnameToValue().get(f.getName());
-							Value v = mDetail.getField(fieldNameInMain).getValue();
+							Row row = keyTable.getRows().get(0);
+							Value v = row.getValue(keyTable.getColumnIndex(fieldNameInMain));
 							gridRowBuilder.withValue(v);
 						}
 
-					} else { // Default Verhalten, entsprechenden Wert im Index finden
-
+					} else { // Default Verhalten, entsprechenden Wert über Namen aus keyTable holen, erster Primary bekommt KeyLong
 						int index = keyTable.getColumnIndex(f.getName());
 						if (firstPrimary) {
 							index = keyTable.getColumnIndex("KeyLong");
@@ -439,9 +437,13 @@ public class WFCDetailCASRequestsUtil {
 
 			if (getKeys() == null) {
 				rb.withValue(null);
-			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) {
-				// Für OPs ReferenceValue auf Hauptmasken-Wert setzen
-				rb.withValue(new ReferenceValue(Constants.TRANSACTION_PARENT, keysToIndex.get(f.getName())));
+			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) { // OPs
+				if (getKeys() != null) { // Bei Update Key-Wert aus Hauptmaske
+					MField correspondingField = mDetail.getField(keysToIndex.get(f.getName()));
+					rb.withValue(getKeys().get(correspondingField.getName()));
+				} else { // Bei Insert ReferenceValue auf Hauptmasken-Wert setzen
+					rb.withValue(new ReferenceValue(Constants.TRANSACTION_PARENT, keysToIndex.get(f.getName())));
+				}
 			} else if (getKeys().containsKey(f.getName())) {
 				rb.withValue(getKeys().get(f.getName()));
 			}
@@ -467,6 +469,13 @@ public class WFCDetailCASRequestsUtil {
 			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.UPDATE_REQUEST);
 		} else {
 			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
+			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
+			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
+				String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+				if (mDetail.getField(fieldname).isPrimary()) {
+					c.setOutputType(OutputType.OUTPUT);
+				}
+			}
 		}
 		return formTable;
 	}
@@ -478,11 +487,7 @@ public class WFCDetailCASRequestsUtil {
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.closeEditor();
-			Collection<String> primaryKeys = new ArrayList<>();
-			if (getKeys() != null) {
-				primaryKeys = getKeys().keySet();
-			}
-			sg.setPrimaryKeys(primaryKeys);
+			sg.setPrimaryKeys(getKeys());
 
 			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
 			Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
@@ -524,8 +529,7 @@ public class WFCDetailCASRequestsUtil {
 			transactionResult.thenAccept(tr -> sync.asyncExec(() -> {
 				// Speichern wieder aktivieren
 				broker.post(Constants.BROKER_SAVECOMPLETE, true);
-				checkNewEntryInsert(tr.get(0).getSQLProcedureResult(), getKeys() == null); // TODO: werden Felder NICHT gelehrt, wenn Fehler nicht in ersten
-																							// Prozedur?
+				checkNewEntryInsertUpdate(tr, getKeys() == null);
 			}));
 
 			// Auch bei Fehler Speichern wieder aktivieren
@@ -541,29 +545,33 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Überprüft, ob der neue Eintrag erstellt/geupdatet wurde.
 	 *
-	 * @param response
+	 * @param resultList
 	 */
-	private void checkNewEntryInsert(SqlProcedureResult response, boolean insert) {
-		if (response == null) {
+	private void checkNewEntryInsertUpdate(List<TransactionResultEntry> resultList, boolean insert) {
+		if (resultList == null) {
 			return;
 		}
-		if (response.getReturnCode() == -1) {
-			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
-			showErrorMessage(e);
-		} else {
-			if (insert) {
-				setKeysFromTable(response.getOutputParameters());
-				openNotificationPopup("msg.DataSaved");
-				handleUserAction(Constants.INSERT_REQUEST, response.getOutputParameters());
-			} else {
-				openNotificationPopup("msg.DataUpdated");
-				handleUserAction(Constants.UPDATE_REQUEST, currentKeyTable);
-			}
 
-			if (autoReloadIndex) {
-				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
-				handlerService.executeHandler(cmd);
+		// Überprüfen ob es einen Fehler gab, dann darf Detail nicht geleert/neugeladen werden. Fehlermeldung wird schon vom DataService angezeigt
+		for (TransactionResultEntry entry : resultList) {
+			if (entry.getSQLProcedureResult().getReturnCode() == -1) {
+				return;
 			}
+		}
+
+		SqlProcedureResult mainResult = resultList.get(0).getSQLProcedureResult();
+		if (insert) {
+			setKeysFromTable(mainResult.getOutputParameters());
+			openNotificationPopup("msg.DataSaved");
+			handleUserAction(Constants.INSERT_REQUEST, mainResult.getOutputParameters());
+		} else {
+			openNotificationPopup("msg.DataUpdated");
+			handleUserAction(Constants.UPDATE_REQUEST, currentKeyTable);
+		}
+
+		if (autoReloadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+			handlerService.executeHandler(cmd);
 		}
 	}
 
@@ -725,8 +733,7 @@ public class WFCDetailCASRequestsUtil {
 
 			CompletableFuture<List<TransactionResultEntry>> transactionResult = dataService.callTransactionAsync(procedureList);
 			try {
-				List<TransactionResultEntry> list = transactionResult.get();
-				deleteEntry(list.get(0).getSQLProcedureResult()); // TODO: Werden Felder NICHT gelehrt, wenn Fehler nicht in ersten Prozedur?
+				deleteEntry(transactionResult.get());
 			} catch (InterruptedException | ExecutionException e) {}
 		}
 	}
@@ -759,22 +766,25 @@ public class WFCDetailCASRequestsUtil {
 	 *
 	 * @param response
 	 */
-	public void deleteEntry(SqlProcedureResult response) {
-		if (response.getReturnCode() == -1) {
-			ErrorObject e = new ErrorObject(response.getResultSet(), dataService.getUserName());
-			showErrorMessage(e);
-		} else {
-			if (autoReloadIndex) {
-				ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
-				handlerService.executeHandler(cmd);
+	public void deleteEntry(List<TransactionResultEntry> resultList) {
+
+		// Überprüfen ob es einen Fehler gab, dann darf Detail nicht geleert werden. Fehlermeldung wird schon vom DataService angezeigt
+		for (TransactionResultEntry entry : resultList) {
+			if (entry.getSQLProcedureResult().getReturnCode() == -1) {
+				return;
 			}
-			openNotificationPopup("msg.DataDeleted");
-			Map<MPerspective, String> map = new HashMap<>();
-			map.put(perspective, Constants.DELETE_REQUEST);
-			clearFields(map);
-			sendEventToHelper(ActionCode.AFTERDEL);
-			focusFirstEmptyField();
 		}
+
+		if (autoReloadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+			handlerService.executeHandler(cmd);
+		}
+		openNotificationPopup("msg.DataDeleted");
+		Map<MPerspective, String> map = new HashMap<>();
+		map.put(perspective, Constants.DELETE_REQUEST);
+		clearFields(map);
+		sendEventToHelper(ActionCode.AFTERDEL);
+		focusFirstEmptyField();
 	}
 
 	/**

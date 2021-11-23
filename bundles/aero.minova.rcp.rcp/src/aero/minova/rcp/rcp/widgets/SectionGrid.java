@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -689,7 +688,7 @@ public class SectionGrid {
 		this.fieldnameToValue = fieldnameToValue;
 	}
 
-	public void setPrimaryKeys(Collection<String> primaryKeys) {
+	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
 
 		for (Row r : dataTable.getRows()) {
 
@@ -697,9 +696,7 @@ public class SectionGrid {
 
 				for (Field f : grid.getField()) {
 					if (getFieldnameToValue().containsKey(f.getName())) {
-
-						ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, getFieldnameToValue().get(f.getName()));
-						r.setValue(v, grid.getField().indexOf(f));
+						setReferenceOrMainValue(r, primaryKeys, getFieldnameToValue().get(f.getName()), grid.getField().indexOf(f));
 					}
 				}
 
@@ -709,17 +706,25 @@ public class SectionGrid {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
-						if (primaryKeys.contains(f.getName())) { // Übereinstimmende Namen nutzen
-							ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, f.getName());
-							r.setValue(v, index);
+						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
+							setReferenceOrMainValue(r, primaryKeys, f.getName(), index);
 						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
-							ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, Constants.TABLE_KEYLONG);
-							r.setValue(v, index);
+							setReferenceOrMainValue(r, primaryKeys, Constants.TABLE_KEYLONG, index);
 						}
 						firstPrimary = false;
 					}
 				}
 			}
+		}
+	}
+
+	private void setReferenceOrMainValue(Row r, Map<String, Value> primaryKeys, String mainFieldName, int indexInRow) {
+		if (primaryKeys == null) { // Bei Insert ReferenceValue
+			ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, mainFieldName);
+			r.setValue(v, indexInRow);
+		} else { // Bei Update Wert aus der Hauptmaske
+			Value v = mDetail.getField(mainFieldName).getValue();
+			r.setValue(v, indexInRow);
 		}
 	}
 
@@ -920,7 +925,7 @@ public class SectionGrid {
 	}
 
 	public void updateGridLookupValues() {
-		gridConfiguration.updateConteProvider();
+		gridConfiguration.updateContentProvider();
 	}
 
 }
