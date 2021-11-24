@@ -16,8 +16,10 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -45,16 +47,21 @@ public class CopyHandler {
 	@CanExecute
 	public boolean canExecute(MPart part, @Named(IServiceConstants.ACTIVE_SELECTION) @Optional Object selection) {
 		detail = (WFCDetailPart) part.getObject();
-		return detail.getDetail().getField("KeyLong").getValue() != null;
+		return detail.getDetail().getField(Constants.TABLE_KEYLONG).getValue() != null;
 	}
 
 	@Execute
 	public void execute() {
 
-		detail.getDetail().getField("KeyLong").setValue(null, false);
+		// Alle Primary-Key-Felder leeren
+		for (MField f : detail.getDetail().getFields()) {
+			if (f.isPrimary()) {
+				f.setValue(null, false);
+			}
+		}
 		detail.getRequestUtil().setKeys(null);
 
-		// Die Zeilen der Grids kopieren/neu hinzufügen. Dabei werden nur die sichtbaren Felder übernommen, um Duplikate bei Keys zu vermeiden
+		// Die Zeilen der Grids kopieren/neu hinzufügen. Dabei werden die primary-Key-Zellen geleert
 		for (MGrid g : detail.getDetail().getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 
@@ -63,10 +70,10 @@ public class CopyHandler {
 			for (Row r : sg.getDataTable().getRows()) {
 				Row newRow = new Row();
 				for (Column c : sg.getDataTable().getColumns()) {
-					if (c.isVisible()) {
-						newRow.addValue(sg.getDataTable().getValue(c.getName(), r));
-					} else {
+					if (KeyType.PRIMARY.equals(c.getKeyType())) {
 						newRow.addValue(null);
+					} else {
+						newRow.addValue(sg.getDataTable().getValue(c.getName(), r));
 					}
 				}
 				newRows.add(newRow);
@@ -82,6 +89,10 @@ public class CopyHandler {
 			sg.getDataTable().getRows().clear();
 			sg.addRows(newTable);
 		}
+
+		// SelectedTable und Grids leeren, es soll nicht zurückgesetzt werden können
+		detail.getRequestUtil().setSelectedTable(null);
+		detail.getRequestUtil().clearSelectedGrids();
 
 		broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.CopySuccessful");
 	}
