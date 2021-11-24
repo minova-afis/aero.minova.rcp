@@ -434,7 +434,7 @@ public class WFCDetailCASRequestsUtil {
 
 		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(buildForm)) {
 
-			if (getKeys() == null) {
+			if (getKeys() == null && buildForm.equals(form)) {
 				rb.withValue(null);
 			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) { // OPs
 				if (getKeys() != null) { // Bei Update Key-Wert aus Hauptmaske
