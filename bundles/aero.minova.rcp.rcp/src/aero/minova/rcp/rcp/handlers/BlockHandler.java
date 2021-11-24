@@ -1,5 +1,8 @@
 package aero.minova.rcp.rcp.handlers;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -7,6 +10,7 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Evaluate;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.HandledToolItemImpl;
@@ -16,6 +20,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
@@ -31,6 +36,9 @@ public class BlockHandler implements ValueChangeListener {
 
 	@Inject
 	IDataService dataService;
+
+	@Inject
+	IEventBroker broker;
 
 	HandledToolItemImpl blockedToolItem;
 	WFCDetailPart detail;
@@ -94,7 +102,17 @@ public class BlockHandler implements ValueChangeListener {
 			rb.withValue(detail.getDetail().getField(c.getName()).getValue());
 		}
 		formTable.addRow(rb.create());
-		dataService.callProcedureAsync(formTable);
+		CompletableFuture<SqlProcedureResult> res = dataService.callProcedureAsync(formTable);
+
+		try {
+			SqlProcedureResult sqlProcedureResult = res.get();
+			if (sqlProcedureResult.getReturnCode() >= 0) {
+				String msg = blockedToolItem.isSelected() ? "msg.BlockSuccessful" : "msg.UnblockSuccessful";
+				broker.post(Constants.BROKER_SHOWNOTIFICATION, msg);
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
