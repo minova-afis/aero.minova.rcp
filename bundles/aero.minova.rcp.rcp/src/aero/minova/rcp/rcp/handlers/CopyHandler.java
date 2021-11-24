@@ -83,6 +83,6 @@ public class CopyHandler {
 			sg.addRows(newTable);
 		}
 
-		broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.copySuccessful");
+		broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.CopySuccessful");
 	}
 }

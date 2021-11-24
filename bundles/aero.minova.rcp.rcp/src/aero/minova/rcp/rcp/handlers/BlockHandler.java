@@ -107,7 +107,7 @@ public class BlockHandler implements ValueChangeListener {
 		try {
 			SqlProcedureResult sqlProcedureResult = res.get();
 			if (sqlProcedureResult.getReturnCode() >= 0) {
-				String msg = blockedToolItem.isSelected() ? "msg.blockSuccessful" : "msg.unblockSuccessful";
+				String msg = blockedToolItem.isSelected() ? "msg.BlockSuccessful" : "msg.UnblockSuccessful";
 				broker.post(Constants.BROKER_SHOWNOTIFICATION, msg);
 			}
 		} catch (InterruptedException | ExecutionException e) {
