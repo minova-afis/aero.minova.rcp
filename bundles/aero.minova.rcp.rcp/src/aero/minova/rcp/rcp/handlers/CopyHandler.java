@@ -21,6 +21,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
+import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
@@ -95,5 +96,6 @@ public class CopyHandler {
 		detail.getRequestUtil().clearSelectedGrids();
 
 		broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.CopySuccessful");
+		broker.post(Constants.BROKER_SENDEVENTTOHELPER, ActionCode.AFTERCOPY);
 	}
 }
