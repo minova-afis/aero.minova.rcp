@@ -1122,7 +1122,9 @@ public class WFCDetailCASRequestsUtil {
 		this.selectedGrids.clear();
 	}
 
-	private void sendEventToHelper(ActionCode code) {
+	@Inject
+	@Optional
+	private void sendEventToHelper(@UIEventTopic(Constants.BROKER_SENDEVENTTOHELPER) ActionCode code) {
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().handleDetailAction(code);
 		}
