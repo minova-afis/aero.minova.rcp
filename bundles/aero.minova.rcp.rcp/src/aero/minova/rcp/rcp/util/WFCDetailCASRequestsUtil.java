@@ -133,8 +133,8 @@ public class WFCDetailCASRequestsUtil {
 	private Map<String, Value> keys = null;
 
 	private Table selectedTable;
-	private HashMap<String, Table> selectedOptionPages;
-	private HashMap<String, Table> selectedGrids;
+	private Map<String, Table> selectedOptionPages;
+	private Map<String, Table> selectedGrids;
 
 	@Inject
 	private Form form;
@@ -1116,6 +1116,10 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setSelectedTable(Table table) {
 		this.selectedTable = table;
+	}
+
+	public void clearSelectedGrids() {
+		this.selectedGrids.clear();
 	}
 
 	private void sendEventToHelper(ActionCode code) {
