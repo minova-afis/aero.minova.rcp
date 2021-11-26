@@ -1,8 +1,10 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.Authenticator;
@@ -422,7 +424,7 @@ public class DataService implements IDataService {
 
 		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
-		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+		CompletableFuture<HttpResponse<byte[]>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofByteArray());
 
 		sendRequest.exceptionally(ex -> {
 			handleCASError(ex, "PDF", true);
@@ -430,7 +432,30 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
-			log("CAS Answer PDF:\n" + t.body());
+
+			// Überprüfen, ob ein Fehler geworfen wurde (dann wird SqlProcedureResult zurückgegeben)
+			try {
+				String asString = new String(t.body(), StandardCharsets.UTF_8);
+				SqlProcedureResult fromJson = gson.fromJson(asString, SqlProcedureResult.class);
+				log("CAS Answer PDF:\n" + asString);
+				fromJson = checkProcedureResult(fromJson, asString, table.getName());
+				if (fromJson == null) {
+					return null;
+				}
+			} catch (Exception e) {
+				handleCASError(e, "PDF", true);
+			}
+
+			// Ansonsten byteArray in File schreiben
+			try {
+				OutputStream out = new FileOutputStream(path.toString());
+				out.write(t.body());
+				out.close();
+				log("CAS Answer PDF:\n" + path);
+			} catch (IOException e) {
+				handleCASError(e, "PDF", true);
+			}
+
 			return path;
 		});
 	}
