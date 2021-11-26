@@ -38,4 +38,6 @@ public interface IGridAccessor {
 	void setGridReadOnly(boolean readOnly);
 
 	void addValidation(IGridValidator validator, List<Integer> columnsToValidate);
+
+	void clearGrid();
 }
