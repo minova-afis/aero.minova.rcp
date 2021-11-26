@@ -118,9 +118,8 @@ public class PerspectiveControl {
 				continue;
 			}
 
-			// Perspektive war geöffnet
 			List<MPerspective> perspectives = modelService.findElements(window, id, MPerspective.class);
-			if (!perspectives.isEmpty()) {
+			if (!perspectives.isEmpty()) { // Perspektive war geöffnet
 				MPerspective perspective = perspectives.get(0);
 				if (perspective.isToBeRendered()) {
 					addPerspectiveShortcut(perspective.getElementId(), //
@@ -135,7 +134,7 @@ public class PerspectiveControl {
 					setSelectedElement(perspective);
 				}
 
-			} else { // Perspektive war angeheftet
+			} else if (!prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, "").equals("")) { // Perspektive war angeheftet
 				addPerspectiveShortcut(id, //
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
@@ -178,7 +177,10 @@ public class PerspectiveControl {
 			boolean openAll) {
 		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
-		if (keptPerspective.isBlank() || openAll) {
+		shortcut = getToolItemFor(perspectiveId);
+
+		// Wenn der Shortcut schon existiert soll er nicht nochmal erstellt werden
+		if (shortcut == null && (keptPerspective.isBlank() || openAll)) {
 			openToolbarItems.add(perspectiveId);
 			saveToolbarOrder();
 
@@ -206,8 +208,6 @@ public class PerspectiveControl {
 					handlerService.executeHandler(command);
 				}
 			});
-		} else {
-			shortcut = getToolItemFor(perspectiveId);
 		}
 	}
 
