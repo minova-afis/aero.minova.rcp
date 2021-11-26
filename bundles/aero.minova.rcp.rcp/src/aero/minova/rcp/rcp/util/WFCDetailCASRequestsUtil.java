@@ -137,8 +137,8 @@ public class WFCDetailCASRequestsUtil {
 	private Map<String, Value> keys = null;
 
 	private Table selectedTable;
-	private HashMap<String, Table> selectedOptionPages;
-	private HashMap<String, Table> selectedGrids;
+	private Map<String, Table> selectedOptionPages;
+	private Map<String, Table> selectedGrids;
 
 	@Inject
 	private Form form;
@@ -1095,7 +1095,13 @@ public class WFCDetailCASRequestsUtil {
 		this.selectedTable = table;
 	}
 
-	private void sendEventToHelper(ActionCode code) {
+	public void clearSelectedGrids() {
+		this.selectedGrids.clear();
+	}
+
+	@Inject
+	@Optional
+	private void sendEventToHelper(@UIEventTopic(Constants.BROKER_SENDEVENTTOHELPER) ActionCode code) {
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().handleDetailAction(code);
 		}

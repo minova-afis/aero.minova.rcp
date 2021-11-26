@@ -27,6 +27,7 @@ import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
 public class BlockHandler implements ValueChangeListener {
@@ -106,12 +107,17 @@ public class BlockHandler implements ValueChangeListener {
 
 		try {
 			SqlProcedureResult sqlProcedureResult = res.get();
-			if (sqlProcedureResult.getReturnCode() >= 0) {
+			if (sqlProcedureResult != null && sqlProcedureResult.getReturnCode() >= 0) {
 				String msg = blockedToolItem.isSelected() ? "msg.BlockSuccessful" : "msg.UnblockSuccessful";
 				broker.post(Constants.BROKER_SHOWNOTIFICATION, msg);
+				broker.post(Constants.BROKER_SENDEVENTTOHELPER, ActionCode.AFTERBLOCK);
+			} else {
+				// Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
+				broker.post(Constants.BROKER_RELOADFIELDS, null);
 			}
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			// Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
+			broker.post(Constants.BROKER_RELOADFIELDS, null);
 		}
 	}
 

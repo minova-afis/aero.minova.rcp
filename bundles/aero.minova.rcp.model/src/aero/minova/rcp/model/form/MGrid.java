@@ -231,6 +231,10 @@ public class MGrid {
 		gridAccessor.addRows(rows);
 	}
 
+	public void clearGrid() {
+		gridAccessor.clearGrid();
+	}
+
 	public void addSelectionListener(ILayerListener listener) {
 		gridAccessor.addSelectionListener(listener);
 	}
