@@ -70,20 +70,24 @@ public class PrintUtil {
 	 */
 	public static String getXSLPathWithLocale(IDataService dataService, String xslPath) {
 		String xslPathNew = xslPath;
-		Locale locale = CustomLocale.getLocale();
-		if (locale != null) {
-			String xslPathDummy = xslPath.replace(".xsl", "_" + locale + ".xsl");
-			File file = dataService.getStoragePath().resolve(xslPathDummy).toFile();
-			if (file.exists()) {
-				xslPathNew = xslPathDummy;
-			} else {
-				xslPathDummy = xslPath.replace(".xsl", "_" + locale.getLanguage() + ".xsl");
-				file = dataService.getStoragePath().resolve(xslPathDummy).toFile();
+
+		try {
+			Locale locale = CustomLocale.getLocale();
+			if (locale != null) {
+				String xslPathDummy = xslPath.replace(".xsl", "_" + locale + ".xsl");
+				File file = dataService.getStoragePath().resolve(xslPathDummy).toFile();
 				if (file.exists()) {
 					xslPathNew = xslPathDummy;
+				} else {
+					xslPathDummy = xslPath.replace(".xsl", "_" + locale.getLanguage() + ".xsl");
+					file = dataService.getStoragePath().resolve(xslPathDummy).toFile();
+					if (file.exists()) {
+						xslPathNew = xslPathDummy;
+					}
 				}
 			}
-		}
+		} catch (Exception e) {}
+		
 		return xslPathNew;
 	}
 
