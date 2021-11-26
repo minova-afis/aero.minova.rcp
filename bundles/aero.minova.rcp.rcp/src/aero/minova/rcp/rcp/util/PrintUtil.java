@@ -41,6 +41,10 @@ public class PrintUtil {
 		CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElement);
 		tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
 			try {
+				if (xmlPath == null) {
+					return;// Fehler im DataService, wird dort angezeigt
+				}
+
 				// Aus xml und xsl Datei PDF erstellen
 				Path pdfPath = dataService.getStoragePath().resolve(resultPath);
 				URL pdfFile = pdfPath.toFile().toURI().toURL();

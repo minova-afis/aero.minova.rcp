@@ -380,6 +380,12 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer XML Detail:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+
+			fromJson = checkProcedureResult(fromJson, t.body(), table.getName());
+			if (fromJson == null) {
+				return null;
+			}
+
 			try {
 				FileWriter fw = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
