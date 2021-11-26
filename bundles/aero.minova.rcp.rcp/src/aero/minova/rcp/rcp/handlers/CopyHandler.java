@@ -3,15 +3,18 @@ package aero.minova.rcp.rcp.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Evaluate;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
@@ -21,6 +24,9 @@ import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 public class CopyHandler {
+
+	@Inject
+	IEventBroker broker;
 
 	private WFCDetailPart detail;
 
@@ -76,5 +82,7 @@ public class CopyHandler {
 			sg.getDataTable().getRows().clear();
 			sg.addRows(newTable);
 		}
+
+		broker.post(Constants.BROKER_SHOWNOTIFICATION, "msg.CopySuccessful");
 	}
 }
