@@ -178,6 +178,7 @@ public class PerspectiveControl {
 		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		shortcut = getToolItemFor(perspectiveId);
+
 		// Wenn der Shortcut schon existiert soll er nicht nochmal erstellt werden
 		if (shortcut == null && (keptPerspective.isBlank() || openAll)) {
 			openToolbarItems.add(perspectiveId);
