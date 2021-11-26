@@ -443,7 +443,7 @@ public class DataService implements IDataService {
 					return null;
 				}
 			} catch (Exception e) {
-				handleCASError(e, "PDF", true);
+				// Wenn hier ein Fehler geworfen wird wurde kein SqlProcedureResult geliefert, die Daten können gespeichert werden
 			}
 
 			// Ansonsten byteArray in File schreiben
