@@ -630,7 +630,7 @@ public class WFCDetailCASRequestsUtil {
 			ParameterizedCommand cmd = commandService.createCommand(commandID, null);
 			handlerService.executeHandler(cmd);
 
-			MessageDialog.openError(shell, ERROR, getTranslation(message));
+			MessageDialog.openError(shell, getTranslation(ERROR), getTranslation(message));
 		}
 	}
 
@@ -661,9 +661,9 @@ public class WFCDetailCASRequestsUtil {
 			handlerService.executeHandler(cmd);
 
 			if (et.getT() == null) {
-				MessageDialog.openError(shell, ERROR, value);
+				MessageDialog.openError(shell, getTranslation(ERROR), value);
 			} else {
-				ShowErrorDialogHandler.execute(shell, ERROR, value, et.getT());
+				ShowErrorDialogHandler.execute(shell, getTranslation(ERROR), value, et.getT());
 			}
 		}
 	}
