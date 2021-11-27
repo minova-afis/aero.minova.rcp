@@ -68,7 +68,7 @@ public class LookupComposite extends Composite {
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
 	 */
 	public LookupComposite(Composite parent, int style) {
-		super(parent, style);
+		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
 
 		this.contentProvider = new LookupContentProvider();
