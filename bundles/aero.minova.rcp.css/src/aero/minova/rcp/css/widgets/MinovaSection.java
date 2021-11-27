@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.widgets;
+package aero.minova.rcp.css.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -9,7 +9,11 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.css.ICssStyler;
+import aero.minova.rcp.css.MinovaSectionStyler;
+
 public class MinovaSection extends Section {
+	private ICssStyler cssStyler;
 
 	private final ImageHyperlink imageLink;
 
@@ -17,6 +21,8 @@ public class MinovaSection extends Section {
 
 	public MinovaSection(Composite parent, int style) {
 		super(parent, style);
+
+		cssStyler = new MinovaSectionStyler(this);
 
 		expandable = (style & ExpandableComposite.TWISTIE) != 0;
 
@@ -59,4 +65,11 @@ public class MinovaSection extends Section {
 		this.expandable = expandable;
 	}
 
+	/**
+	 * @return Style-Engine, der man die Properties geben kann
+	 * @author Wilfried Saak
+	 */
+	public ICssStyler getCssStyler() {
+		return cssStyler;
+	}
 }
