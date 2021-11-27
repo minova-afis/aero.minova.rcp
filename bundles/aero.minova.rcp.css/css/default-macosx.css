@@ -1,6 +1,4 @@
-@import url("platform:/plugin/aero.minova.rcp.css/css/macos/colors.css")
-	;
-
+@import url("platform:/plugin/aero.minova.rcp.css/css/macos/colors.css");
 @import	url("platform:/plugin/aero.minova.rcp.css/css/macos/nattable.css");
 
 .MPartStack {
@@ -26,13 +24,13 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 }
 
 MinovaSection {
-	date-width: 64px;
-	date-time-width: 102px;
+	date-width: 66px;
+	date-time-width: 106px;
 	number-width: 90px;
 	row-height: 28px;
 	section-spacing: 5px;
 	text-width: 130px;
-	time-width: 34px;
+	time-width: 36px;
 }
 
 Text, Label, Button {
