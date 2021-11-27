@@ -1,0 +1,53 @@
+/* Background */
+Composite, .MPart, MinovaSection {
+	background-color: #ececec; /* Standard eclipse 2021-09 macos */
+}
+
+CTabItem:selected {
+	background-color: white;
+}
+
+Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {
+	background-color: inherit;
+}
+
+Text.ValueRequired, LookupComposite.ValueRequired, TextAssist.ValueRequired {
+	background-color: #FCD267;
+}
+
+Text.InvalidValue, LookupComposite.InvalidValue, TextAssist.InvalidValue {
+	background-color: red;
+}
+
+Text#Console {
+	background-color: black;
+}
+
+/* Textfarben */
+
+Button.Description, Label.Description, Section.Description  {
+	color: #808080;
+}
+
+Canvas, CTabItem, DetailComposite, ExpandableComposite, LayoutComposite,
+	MinovaSection, NatTable, ScrolledComposite, Section, ToolBar  {
+	color: #444444;
+}
+
+Label#SplashLabel {
+	color: white;
+}
+
+Label, Text {
+	color: black;
+}
+
+Text#Console {
+	color: white;
+}
+
+/* weitere Farben */
+
+Section, MinovaSection {
+	border-color-titlebar: black;
+}

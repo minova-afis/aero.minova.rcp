@@ -42,5 +42,43 @@
              label="Debug">
        </theme>
    </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.core.elementProvider">
+      <provider
+            class="aero.minova.rcp.css.MinovaSectionElementProvider">
+         <widget
+               class="aero.minova.rcp.css.widgets.MinovaSection">
+         </widget>
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.core.propertyHandler">
+      <handler
+            adapter="aero.minova.rcp.css.MinovaSectionAdapter"
+            composite="true"
+            handler="aero.minova.rcp.css.MinovaSectionPropertyHandler">
+         <property-name
+               name="text-width">
+         </property-name>
+         <property-name
+               name="date-width">
+         </property-name>
+         <property-name
+               name="date-time-width">
+         </property-name>
+         <property-name
+               name="number-width">
+         </property-name>
+         <property-name
+               name="row-height">
+         </property-name>
+         <property-name
+               name="section-spacing">
+         </property-name>
+         <property-name
+               name="time-width">
+         </property-name>
+      </handler>
+   </extension>
 
 </plugin>
