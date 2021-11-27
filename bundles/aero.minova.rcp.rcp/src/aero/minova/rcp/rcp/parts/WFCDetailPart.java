@@ -1,10 +1,8 @@
 
 package aero.minova.rcp.rcp.parts;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.ArrayList;
@@ -49,15 +47,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.events.ExpansionEvent;
@@ -71,6 +66,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -119,7 +115,6 @@ import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 @SuppressWarnings("restriction")
@@ -547,6 +542,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		getFormToolkit().paintBordersFor(clientComposite);
 		section.setClient(clientComposite);
 
+
 		// Erstellen der Field des Section.
 		createFields(clientComposite, headOrPageOrGrid, mSection, section);
 		// Sortieren der Fields nach Tab-Index.
@@ -806,12 +802,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void addBottonMargin(Composite composite, int row, int column) {
 		// Abstand nach unten
-		Label spacing = new Label(composite, SWT.NONE);
-		FormData spacingFormData = new FormData();
-		spacingFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
-		spacingFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		spacingFormData.height = 0;
-		spacing.setLayoutData(spacingFormData);
+//		Label spacing = new Label(composite, SWT.NONE);
+//		FormData spacingFormData = new FormData();
+//		spacingFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
+//		spacingFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
+//		spacingFormData.height = 0;
+//		spacing.setLayoutData(spacingFormData);
 	}
 
 	private void createField(Composite composite, MField field, int row, int column) {
