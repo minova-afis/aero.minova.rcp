@@ -107,4 +107,9 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	public void addValidation(IGridValidator validator, List<Integer> columnsToValidate) {
 		sg.addValidation(validator, columnsToValidate);
 	}
+
+	@Override
+	public void clearGrid() {
+		sg.clearGrid();
+	}
 }
