@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Evaluate;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -66,6 +67,20 @@ public class PrintDetailHandler {
 	Map<String, String> rootElements = new HashMap<>();
 
 	boolean reportsFolderExists = false;
+
+	/**
+	 * Button nur anzeigen, wenn in xbs definiert ist, dass gedruckt werden kann
+	 *
+	 * @param part
+	 * @return
+	 */
+	@Evaluate
+	public boolean visible(MPerspective mPerspective) {
+		String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
+		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
+		Node maskNode = XBSUtil.getNodeWithName(preferences, maskName);
+		return maskNode != null;
+	}
 
 	@PostConstruct
 	public void downloadReportsZip() {
@@ -163,7 +178,7 @@ public class PrintDetailHandler {
 			table.addRow(row);
 
 			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
-					"reports/" + reportNames.get(maskName), "reports/" + maskName.replace(".xml", "") + "_Detail.pdf");
+					"reports/" + reportNames.get(maskName), "reports/" + maskName.replace(".xml", "") + "_Detail.pdf", mPerspective);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));

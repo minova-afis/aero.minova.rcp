@@ -52,7 +52,7 @@ class OpenStundenerfassungsTest {
 
 	private void open() {
 		// Stundenerfassung über das Menü öffnen
-		SWTBotMenu adminMenu = bot.menu("Administration");
+		SWTBotMenu adminMenu = bot.menu("Verwaltung");
 		assertNotNull(adminMenu);
 		SWTBotMenu stundenErfassung = adminMenu.menu("Stundenerfassung");
 		assertNotNull(stundenErfassung);
@@ -167,7 +167,7 @@ class OpenStundenerfassungsTest {
 	void sleep() {
 		bot.sleep(1000);
 	}
-	
+
 	private void reloadIndex() {
 		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
 		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));

@@ -67,7 +67,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -368,7 +367,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					iHelper = (IHelper) bundleContext.getService(serviceReference);
 				}
 			}
-		} catch (InvalidSyntaxException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 
@@ -596,7 +595,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
 			if (btn.getText() != null) {
-				item.setText(translationService.translate(btn.getText(), null));
 				item.setToolTipText(translationService.translate(btn.getText(), null));
 			}
 

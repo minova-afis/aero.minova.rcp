@@ -211,7 +211,7 @@ public class LookupComposite extends Composite {
 		for (LookupValue popupValue : popupValues) {
 			final TableItem tableItem = new TableItem(table, SWT.NONE);
 			tableItem.setText(0, popupValue.keyText);
-			tableItem.setText(1, popupValue.description);
+			tableItem.setText(1, popupValue.description.replace("\r\n", "; "));
 			tableItem.setFont(text.getFont());
 		}
 		table.getColumn(0).pack();

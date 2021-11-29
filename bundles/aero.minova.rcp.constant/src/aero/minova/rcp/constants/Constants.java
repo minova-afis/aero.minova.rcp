@@ -48,6 +48,7 @@ public class Constants {
 	public static final String INSERT_REQUEST = "Insert";
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
+	public static final String BLOCK_REQUEST = "Block";
 
 	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden müssen
 	public static final String FORM_BOOKINGDATE = "BookingDate";
@@ -90,6 +91,7 @@ public class Constants {
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
 	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
 	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
+	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
@@ -154,6 +156,7 @@ public class Constants {
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_PRINTDETAIL = "aero.minova.rcp.rcp.command.printdetail";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL = "aero.minova.rcp.rcp.command.savedetail";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART = "aero.minova.rcp.rcp.command.selectsearchpart";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";

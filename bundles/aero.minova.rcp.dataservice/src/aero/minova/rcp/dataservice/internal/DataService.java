@@ -373,7 +373,7 @@ public class DataService implements IDataService {
 			e.printStackTrace();
 		}
 
-		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
 		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
 
@@ -577,14 +577,16 @@ public class DataService implements IDataService {
 		CompletableFuture<Table> tableFuture = getTableAsync(t, false);
 		try {
 			Table ta = tableFuture.get();
-			for (Row r : ta.getRows()) {
-				LookupValue lv = new LookupValue(//
-						r.getValue(0).getIntegerValue(), //
-						r.getValue(1).getStringValue(), //
-						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+			if (ta != null) {
+				for (Row r : ta.getRows()) {
+					LookupValue lv = new LookupValue(//
+							r.getValue(0).getIntegerValue(), //
+							r.getValue(1).getStringValue(), //
+							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
 
-				map.put(lv.keyLong, lv);
-				list.add(lv);
+					map.put(lv.keyLong, lv);
+					list.add(lv);
+				}
 			}
 		} catch (Exception e) {
 			System.out.println("Error, using cache: " + tableName);
@@ -641,14 +643,19 @@ public class DataService implements IDataService {
 
 		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
 		try {
-			Table ta = tableFuture.get().getResultSet();
-			for (Row r : ta.getRows()) {
-				LookupValue lv = new LookupValue(//
-						r.getValue(0).getIntegerValue(), //
-						r.getValue(1).getStringValue(), //
-						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-				map.put(lv.keyLong, lv);
-				list.add(lv);
+			SqlProcedureResult res = tableFuture.get();
+			if (res != null) {
+				Table ta = res.getResultSet();
+				if (ta != null) {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+						map.put(lv.keyLong, lv);
+						list.add(lv);
+					}
+				}
 			}
 		} catch (Exception e) {
 			System.out.println("Error, using Cache: " + hashName);

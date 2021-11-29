@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;/choice&gt;
  *         &lt;element name="events" type="{}events" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="op" /&gt;
+ *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="xpcor" /&gt;
  *       &lt;attribute name="procedure-suffix" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="read-requires-all-params" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="delete-requires-all-params" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -232,7 +232,7 @@ public class Grid {
      */
     public String getProcedurePrefix() {
         if (procedurePrefix == null) {
-            return "op";
+            return "xpcor";
         } else {
             return procedurePrefix;
         }

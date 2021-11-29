@@ -37,8 +37,8 @@ public class LookupContentProvider {
 		}
 
 		String regex = buildRegex(entry);
-		List<LookupValue> result = values.stream()
-				.filter(lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.toUpperCase().matches(regex.toUpperCase()))
+		List<LookupValue> result = values.stream().filter(
+				lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.replace("\r\n", "; ").toUpperCase().matches(regex.toUpperCase()))
 				.collect(Collectors.toList());
 
 		// Wenn gegeben, weiteren Filter anwenden

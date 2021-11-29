@@ -1,4 +1,9 @@
-Version 2.8
+Version 2.9
+
+## Version 2.9 ##
+## 15.11.2021 ##
+## 12.0.27 ##
+Knöpfe Blockieren, Kopieren
 
 ## Version 2.8 ##
 ## 04.11.2021 ##

@@ -24,7 +24,6 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -134,8 +133,8 @@ public class WFCDetailCASRequestsUtil {
 	private Map<String, Value> keys = null;
 
 	private Table selectedTable;
-	private HashMap<String, Table> selectedOptionPages;
-	private HashMap<String, Table> selectedGrids;
+	private Map<String, Table> selectedOptionPages;
+	private Map<String, Table> selectedGrids;
 
 	@Inject
 	private Form form;
@@ -172,16 +171,20 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Inject
 	public void readData(@Optional @Named(Constants.BROKER_ACTIVEROWS) Table table) {
+		readData(table, true); // Wenn aus dem Index oder aus Helper soll prinzipiell die Discard-Message angezeigt werden
+	}
+
+	public void readData(@Optional @Named(Constants.BROKER_ACTIVEROWS) Table table, boolean showDiscard) {
 		if (table == null || table.getRows().isEmpty()) {
 			return;
 		}
 
-		currentKeyTable = table;
 		Display.getDefault().asyncExec(() -> {
-			if (showDiscardDialogIndex && !discardChanges()) {
+			if (showDiscardDialogIndex && showDiscard && !discardChanges()) {
 				broker.send(Constants.BROKER_CLEARSELECTION, perspective);
 				return;
 			}
+			currentKeyTable = table;
 
 			sendEventToHelper(ActionCode.BEFOREREAD);
 
@@ -193,6 +196,7 @@ public class WFCDetailCASRequestsUtil {
 					selectedTable = t.getOutputParameters();
 					updateSelectedEntry();
 					// Grids auslesen, wenn Daten der Hauptmaske geladen sind
+					updateGridLookupValues();
 					for (MGrid g : mDetail.getGrids()) {
 						readGrid(g, table);
 					}
@@ -221,8 +225,6 @@ public class WFCDetailCASRequestsUtil {
 		RowBuilder gridRowBuilder = RowBuilder.newRow();
 		Grid grid = g.getGrid();
 		SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
-		// Daten neu Laden, ggf. haben sich die möglichen Werte in den Lookups geändert
-		sg.updateGridLookupValues();
 		boolean firstPrimary = true;
 		for (Field f : grid.getField()) {
 			if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
@@ -307,7 +309,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			// Wert in Zeile setzten
-			if (indexInRow >= 0 && "primary".equals(f.getKeyType())) {
+			if (indexInRow >= 0 && "primary".equals(f.getKeyType()) && row.getValue(indexInRow) != null) {
 				builder.withValue(row.getValue(indexInRow).getValue());
 				newKeys.put(f.getName(), row.getValue(indexInRow));
 			} else {
@@ -389,6 +391,8 @@ public class WFCDetailCASRequestsUtil {
 	public void buildSaveTable(@UIEventTopic(Constants.BROKER_SAVEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			sendEventToHelper(ActionCode.BEFORESAVE);
+
+			updateGridLookupValues();
 
 			// Zuerst nur die Hauptmaske speichern/updaten. Nur wenn dies erfolgreich war OPs und Grids speichern
 			Table formTable = createInsertUpdateTableFromForm(form);
@@ -636,8 +640,9 @@ public class WFCDetailCASRequestsUtil {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective)) {
 			// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
-			partService.activate(findElements.get(0));
+			String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART;
+			ParameterizedCommand cmd = commandService.createCommand(commandID, null);
+			handlerService.executeHandler(cmd);
 
 			MessageDialog.openError(shell, ERROR, getTranslation(message));
 		}
@@ -665,8 +670,9 @@ public class WFCDetailCASRequestsUtil {
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
 			// Fokus auf den Search Part legen, damit Fehlermeldungen von Lookups nicht mehrmals angezeigt werden
-			List<MPart> findElements = model.findElements(activePerspective, Constants.SEARCH_PART, MPart.class);
-			partService.activate(findElements.get(0));
+			String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART;
+			ParameterizedCommand cmd = commandService.createCommand(commandID, null);
+			handlerService.executeHandler(cmd);
 
 			if (et.getT() == null) {
 				MessageDialog.openError(shell, ERROR, value);
@@ -706,6 +712,8 @@ public class WFCDetailCASRequestsUtil {
 		if (perspective == this.perspective && getKeys() != null) {
 
 			sendEventToHelper(ActionCode.BEFOREDEL);
+			updateGridLookupValues();
+
 			// Hauptmaske
 			Table t = createDeleteTableFromForm(form);
 			if (t.getRows() != null) {
@@ -867,6 +875,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
+		updateGridLookupValues();
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
@@ -934,7 +943,7 @@ public class WFCDetailCASRequestsUtil {
 			if (keyTable == null) {
 				keyTable = currentKeyTable;
 			}
-			readData(keyTable);
+			readData(keyTable, false); // Nach Speichern soll discard-Nachricht nicht angezeigt werden
 		}
 	}
 
@@ -1109,7 +1118,13 @@ public class WFCDetailCASRequestsUtil {
 		this.selectedTable = table;
 	}
 
-	private void sendEventToHelper(ActionCode code) {
+	public void clearSelectedGrids() {
+		this.selectedGrids.clear();
+	}
+
+	@Inject
+	@Optional
+	private void sendEventToHelper(@UIEventTopic(Constants.BROKER_SENDEVENTTOHELPER) ActionCode code) {
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().handleDetailAction(code);
 		}
@@ -1228,6 +1243,13 @@ public class WFCDetailCASRequestsUtil {
 		mParamString.getSubFields().clear();
 		mParamString.getSubFields().addAll(subfields);
 		redrawSection(mParamString.getmSection());
+	}
+
+	private void updateGridLookupValues() {
+		for (MGrid g : mDetail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.updateGridLookupValues();
+		}
 	}
 
 }

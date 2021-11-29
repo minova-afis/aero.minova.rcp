@@ -20,9 +20,6 @@ public class ModelToViewModel {
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 		}
-		if (field.getEditor() != null) { // Contact Editor braucht immer 4 Spalten
-			f.setNumberColumnsSpanned(4);
-		}
 		if (field.getNumberRowsSpanned() != null) {
 			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
 		}
@@ -52,13 +49,6 @@ public class ModelToViewModel {
 			for (TypeParam typeParam : field.getLookup().getParam()) {
 				f.addLookupParameter(typeParam.getFieldName());
 			}
-			return f;
-		}
-
-		if (field.getEditor() != null) {
-			MField f = new MLookupField();
-			f.setLookupTable("tContact");
-			f.setLookupDescription("LastName");
 			return f;
 		}
 
@@ -107,6 +97,10 @@ public class ModelToViewModel {
 			MParamStringField f = new MParamStringField(locale);
 			f.setSubFields(field.getParamString().getField());
 			return f;
+		}
+
+		if (field.getEditor() != null) {
+			throw new RuntimeException("Editor (Field " + field.getName() + ") no longer supported. Please convert to Lookup!");
 		}
 
 		throw new RuntimeException("Typ of field " + field.getName() + " cannot  be determined");

@@ -95,10 +95,8 @@ public class DataFormService implements IDataFormService {
 	@Override
 	public Table getTableFromFormDetail(Form form, String prefix) {
 		Table dataTable = new Table();
-		String tablename = form.getIndexView() != null ? "sp" : "op";
-		if ((!"sp".equals(form.getDetail().getProcedurePrefix()) && !"op".equals(form.getDetail().getProcedurePrefix()))) {
-			tablename = form.getDetail().getProcedurePrefix();
-		}
+		String tablename = form.getDetail().getProcedurePrefix();
+
 		if (prefix != null) {
 			tablename += prefix;
 		}
@@ -171,7 +169,7 @@ public class DataFormService implements IDataFormService {
 			} else if (f.getPercentage() != null) {
 				decimals = f.getPercentage().getDecimals();
 			}
-		} else if (f.getNumber() != null || f.getLookup() != null || f.getEditor() != null) {
+		} else if (f.getNumber() != null || f.getLookup() != null) {
 			type = DataType.INTEGER;
 		} else if (f.getMoney() != null) {
 			type = DataType.BIGDECIMAL;

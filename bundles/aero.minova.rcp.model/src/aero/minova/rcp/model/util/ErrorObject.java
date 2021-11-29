@@ -64,11 +64,12 @@ public class ErrorObject {
 	}
 
 	public String getProcedureOrView() {
-		if (errorTable.getColumnCount() > 1) {
-			return errorTable.getRows().get(0).getValue(1).getStringValue();
-		} else {
+		if (procedureOrView != null) {
 			return procedureOrView;
+		} else if (errorTable.getColumnCount() > 1) {
+			return errorTable.getRows().get(0).getValue(1).getStringValue();
 		}
+		return null;
 	}
 
 	public String getMessage() {

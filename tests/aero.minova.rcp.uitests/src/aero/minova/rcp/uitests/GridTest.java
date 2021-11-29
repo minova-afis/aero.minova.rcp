@@ -17,7 +17,6 @@ import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -80,14 +79,13 @@ class GridTest {
 		gridNattable = swtNatTableBot.nattable(2);
 		assertNotNull(gridNattable);
 
-		
 		assertNotNull(indexPart.getToolbarButtons());
 		assertNotEquals(0, indexPart.getToolbarButtons().size());
-		
+
 		// Ensure that the number of visible entries in the nattable is less and
 		// possible
 		while (indexNattable.rowCount() >= 8) {
-		
+
 			indexNattable.click(indexNattable.rowCount() - 1, 1);
 			detailPart.getToolbarButtons().get(2).click();
 			SWTBotToolbarButton load = indexPart.getToolbarButtons().get(0);
@@ -95,7 +93,6 @@ class GridTest {
 			UITestUtil.loadIndex(load);
 		}
 	}
-
 
 	@Test
 	void ensurePartsAreAvailable() {
@@ -136,7 +133,7 @@ class GridTest {
 		// Auf "Optimieren" Klicken, damit mehr Einträge im Index angezeigt werden können
 		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
 		List<SWTBotToolbarButton> detailToolbarButtons = detailPart.getToolbarButtons();
-		detailToolbarButtons.get(5).click();
+		detailToolbarButtons.get(6);
 
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
@@ -234,7 +231,7 @@ class GridTest {
 			f.setValue(new Value("Testing the UI"), false);
 
 			f = wfcPart.getDetail().getField("OrderReceiverKey");
-			f.setValue(new LookupValue(2, "AFIS", "AFIS GmbH & CO. KG"), false);
+			f.setValue(new LookupValue(1, "MIN", "MINOVA Information Services GmbH"), false);
 
 			f = wfcPart.getDetail().getField("UnitKey");
 			f.setValue(new LookupValue(19, "100L", "100 Liter"), false);
