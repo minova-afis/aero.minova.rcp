@@ -11,6 +11,10 @@ Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {
 	background-color: inherit;
 }
 
+Text.Standard, LookupComposite.Standard, TextAssist.Standard {
+	background-color: white;
+}
+
 Text.ValueRequired, LookupComposite.ValueRequired, TextAssist.ValueRequired {
 	background-color: #FCD267;
 }
