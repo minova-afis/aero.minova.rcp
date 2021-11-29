@@ -50,8 +50,7 @@ public class CustomPWCombo extends CustomPWWidget {
 		buildLabel(parent, GridData.CENTER);
 
 		final CCombo combo = new CCombo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
-		if(getTooltip() != null && getTooltip().isBlank())
-			combo.setToolTipText(getTooltip());
+		setTooltip(combo);
 		addControl(combo);
 
 		for (int i = 0; i < data.size(); i++) {

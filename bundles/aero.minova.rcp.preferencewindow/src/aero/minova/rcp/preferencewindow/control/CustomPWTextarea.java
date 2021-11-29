@@ -32,6 +32,7 @@ public class CustomPWTextarea extends CustomPWWidget {
 		buildLabel(parent, GridData.BEGINNING);
 
 		final Text text = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		setTooltip(text);
 		addControl(text);
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
 		text.addListener(SWT.FocusOut, event -> {

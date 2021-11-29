@@ -30,8 +30,7 @@ public class CustomPWCheckbox extends CustomPWWidget {
 			throw new UnsupportedOperationException("Please specify a label for a checkbox");
 		}
 		final Button button = new Button(parent, SWT.CHECK);
-		if (getTooltip() != null && !getTooltip().isBlank())
-			button.setToolTipText(getTooltip());
+		setTooltip(button);
 		addControl(button);
 		button.setText(getLabel());
 		final boolean originalSelection = (Boolean) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());

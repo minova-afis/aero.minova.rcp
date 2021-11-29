@@ -31,8 +31,7 @@ public class CustomPWIntegerText extends CustomPWText {
 		if (translatedLabel.contains("[")) {
 			final Label label = new Label(parent, SWT.NONE);
 			label.setText(translatedLabel.substring(0, translatedLabel.lastIndexOf("[") - 1));
-			if (getTooltip() != null && !getTooltip().isBlank())
-				label.setToolTipText(getTooltip());
+			setTooltip(label);
 			final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 			labelGridData.horizontalIndent = 25;
 			label.setLayoutData(labelGridData);
@@ -46,8 +45,7 @@ public class CustomPWIntegerText extends CustomPWText {
 			final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			textGridData.widthHint = 150;
 			text.setLayoutData(textGridData);
-			if (getTooltip() != null && !getTooltip().isBlank())
-				text.setToolTipText(getTooltip());
+			setTooltip(text);
 			addControl(text);
 
 			addVerifyListeners();
@@ -66,8 +64,7 @@ public class CustomPWIntegerText extends CustomPWText {
 		} else {
 			buildLabel(parent, GridData.CENTER);
 			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
-			if (getTooltip() != null && !getTooltip().isBlank())
-				text.setToolTipText(getTooltip());
+			setTooltip(text);
 			addControl(text);
 			addVerifyListeners();
 			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
