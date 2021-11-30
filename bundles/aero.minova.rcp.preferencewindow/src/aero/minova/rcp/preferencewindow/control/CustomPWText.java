@@ -33,7 +33,7 @@ public abstract class CustomPWText extends CustomPWWidget {
 		addControl(text);
 		addVerifyListeners();
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		setTooltip(text);
+		text.setToolTipText(getTooltip());
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
 		});
