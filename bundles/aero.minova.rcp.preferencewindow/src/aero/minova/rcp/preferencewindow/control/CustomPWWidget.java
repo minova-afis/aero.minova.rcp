@@ -49,10 +49,11 @@ public abstract class CustomPWWidget extends PWWidget {
 			addControl(label);
 		}
 	}
-	
+
 	protected void setTooltip(Control control) {
-		if (getTooltip() != null && getTooltip().isBlank())
+		if (getTooltip() != null) {
 			control.setToolTipText(getTooltip());
+		}
 	}
 
 }
