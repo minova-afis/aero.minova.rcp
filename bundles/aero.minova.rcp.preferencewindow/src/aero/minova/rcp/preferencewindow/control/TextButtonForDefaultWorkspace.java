@@ -47,7 +47,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
-		label.setToolTipText(getTooltip());
+		setTooltip(label);
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
@@ -58,7 +58,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
-		text.setToolTipText(getTooltip());
+		setTooltip(text);
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		textGridData.widthHint = 250;

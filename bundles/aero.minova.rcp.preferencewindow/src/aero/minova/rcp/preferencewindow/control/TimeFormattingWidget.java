@@ -47,7 +47,9 @@ public class TimeFormattingWidget extends CustomPWWidget {
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
-		label.setToolTipText(getTooltip());
+		label.setToolTipText("H: " + translationService.translate("@Preferences.TimeUtilPattern.24Hour", null) + "\nh: "
+				+ translationService.translate("@Preferences.TimeUtilPattern.12Hour", null) + "\nm: "
+				+ translationService.translate("@Preferences.TimeUtilPattern.Minute", null) + "\na: am/pm");
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
@@ -60,13 +62,12 @@ public class TimeFormattingWidget extends CustomPWWidget {
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER);
-		text.setToolTipText(getTooltip());
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
 		text.setToolTipText("H: " + translationService.translate("@Preferences.TimeUtilPattern.24Hour", null) + "\nh: "
 				+ translationService.translate("@Preferences.TimeUtilPattern.12Hour", null) + "\nm: "
-				+ translationService.translate("@Preferences.TimeUtilPattern.Minute", null) + "\na: AM/PM");
+				+ translationService.translate("@Preferences.TimeUtilPattern.Minute", null) + "\na: am/pm");
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);

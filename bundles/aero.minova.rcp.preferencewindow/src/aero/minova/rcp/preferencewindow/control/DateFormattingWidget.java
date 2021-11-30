@@ -46,8 +46,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText(getLabel());
-		label.setToolTipText(getTooltip());
+		label.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
+		setTooltip(label);
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
@@ -60,7 +62,6 @@ public class DateFormattingWidget extends CustomPWWidget {
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER);
-		text.setToolTipText(getTooltip());
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
