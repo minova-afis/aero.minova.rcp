@@ -442,8 +442,8 @@ public class DataService implements IDataService {
 				if (fromJson == null) {
 					return null;
 				}
-			} catch (IllegalStateException e) {
-				// Wenn hier ein IllegalStateException geworfen wird wurde kein SqlProcedureResult geliefert, die Daten können gespeichert werden
+			} catch (Exception e) {
+				// Wenn hier ein Exception geworfen wird wurde kein SqlProcedureResult/kein Fehler geliefert, die Daten können gespeichert werden
 			}
 
 			// Ansonsten byteArray in File schreiben
