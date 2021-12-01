@@ -35,8 +35,8 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public TextButtonForDefaultWorkspace(final String label, final String propertyKey, final TranslationService translationService) {
-		super(label, propertyKey, 2, false);
+	public TextButtonForDefaultWorkspace(final String label, final String tooltip, final String propertyKey, final TranslationService translationService) {
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 	}
 
@@ -46,12 +46,8 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("Test");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
@@ -62,6 +58,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		addControl(cmp);
 
 		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
+		text.setToolTipText(getTooltip());
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		textGridData.widthHint = 250;

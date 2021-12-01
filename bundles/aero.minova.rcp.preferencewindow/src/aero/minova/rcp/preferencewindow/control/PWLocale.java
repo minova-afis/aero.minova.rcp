@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
@@ -45,8 +46,8 @@ public class PWLocale extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public PWLocale(final String label, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
-		super(label, propertyKey, label == null ? 1 : 2, false);
+	public PWLocale(final String label, @Optional String tooltip, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
+		super(label, tooltip, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
 		this.translationService = translationService;
 		Locale l = context.get(Locale.class);

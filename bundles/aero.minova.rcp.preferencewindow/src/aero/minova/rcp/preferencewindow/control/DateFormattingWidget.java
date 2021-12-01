@@ -33,8 +33,9 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public DateFormattingWidget(final String label, final String propertyKey, final TranslationService translationService, Locale locale) {
-		super(label, propertyKey, 2, false);
+	public DateFormattingWidget(final String label, final String tooltip, final String propertyKey, final TranslationService translationService,
+			Locale locale) {
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		this.locale = locale;
 	}
@@ -45,12 +46,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("Test");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
@@ -113,14 +112,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 */
 	@Override
 	public void check() {
-		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
-		if (value == null) {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
-		} else {
-			if (!(value instanceof String)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a Text");
-			}
-		}
+		// not needed
 	}
 
 }
