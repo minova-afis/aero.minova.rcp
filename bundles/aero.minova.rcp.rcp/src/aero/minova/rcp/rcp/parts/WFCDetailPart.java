@@ -592,7 +592,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
 		List<aero.minova.rcp.form.model.xsd.Button> buttons = null;
-		if (isHead) {
+		if (headOPOGWrapper.isHead) {
 			buttons = ((Head) headOPOGWrapper.headOrPageOrGrid).getButton();
 		} else {
 			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
