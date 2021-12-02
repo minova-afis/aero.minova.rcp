@@ -223,12 +223,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				for (MPerspective mPerspective : pList) {
 					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
 				}
-				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
-						translationService.translate("@msg.ChangesDialog", null), null,
-						translationService.translate("@msg.Close.DirtyMessage", null) + listString,
-						MessageDialog.CONFIRM, new String[] { translationService.translate("@Action.Discard", null),
-								translationService.translate("@Abort", null) },
-						0);
+				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
+						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
+						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
 
 				boolean res = dialog.open() == 0;
 				if (res) {
@@ -246,8 +243,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch
-	 * nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
+	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
 	 * gewählt wurde
 	 */
 	private void openRestoringUIDialog() {
@@ -259,8 +255,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
 
 		if (!neverShow && !shownThisSession && !neverShowContext) {
-			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(
-					Display.getCurrent().getActiveShell(), //
+			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
 					translationService.translate("@RestoringUIDialog.Title", null), //
 					translationService.translate("@RestoringUIDialog.InfoText", null), //
 					translationService.translate("@RestoringUIDialog.NeverShowAgain", null), //
@@ -310,8 +305,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
-		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle,
-				String icon) {
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle, String icon) {
 			this(headOrPageOrGrid, isOP, formSuffix);
 			this.formTitle = formTitle;
 			this.icon = icon;
@@ -379,8 +373,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		pluginService.activatePlugin(helperName);
 		BundleContext bundleContext = FrameworkUtil.getBundle(WFCDetailPart.class).getBundleContext();
 		try {
-			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IHelper.class.getName(),
-					null);
+			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IHelper.class.getName(), null);
 			for (ServiceReference<?> serviceReference : allServiceReferences) {
 				String property = (String) serviceReference.getProperty("component.name");
 				if (property.equals(helperName)) {
@@ -392,8 +385,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		if (iHelper == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
-					translationService.translate("@msg.HelperNotFound", null));
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
 		} else {
 			getDetail().setHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar
@@ -444,8 +436,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			HeadOrPageOrGridWrapper wrapper;
 			if (headOrPage instanceof Head) {
 				// Head in der OP braucht titel und icon der Form
-				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(),
-						opForm.getTitle(), opForm.getIcon());
+				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle(), opForm.getIcon());
 			} else {
 				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix());
 			}
@@ -457,13 +448,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			String opFieldName = opForm.getDetail().getProcedureSuffix() + "." + e.getKey();
 			String mainFieldName = e.getValue();
 			if (mDetail.getField(opFieldName) == null) {
-				throw new NoSuchFieldException("Option Page \"" + opForm.getDetail().getProcedureSuffix()
-						+ "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException(
+						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
 			}
 			if (mDetail.getField(mainFieldName) == null) {
-				throw new NoSuchFieldException(
-						"Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
-								+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
+						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
 			}
 		}
 	}
@@ -476,8 +466,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt
-	 * diese ins Grid und überprüft, ob es alle Felder gibt
+	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt diese ins Grid und überprüft, ob es alle Felder gibt
 	 *
 	 * @param grid
 	 * @param Node
@@ -497,21 +486,19 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 		for (Entry<String, String> e : keynamesToValues.entrySet()) {
 			if (!sgColumnNames.contains(e.getKey())) {
-				throw new NoSuchFieldException("Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \""
-						+ e.getKey() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException(
+						"Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
 			}
 			if (mDetail.getField(e.getValue()) == null) {
-				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue()
-						+ "\", needed for Grid \"" + sg.getDataTable().getName() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \"" + sg.getDataTable().getName()
+						+ "\"! (As defined in .xbs)");
 			}
 		}
 	}
 
 	/**
-	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem
-	 * übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten)
-	 * oder eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich
-	 * wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
+	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten) oder
+	 * eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
 	 * festlegt.
 	 *
 	 * @param parent
@@ -524,8 +511,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			section = new MinovaSection(parent,
-					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		// Alten Zustand wiederherstellen
@@ -546,8 +532,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		section.addExpansionListener(new IExpansionListener() {
 			@Override
-			public void expansionStateChanging(ExpansionEvent e) {
-			}
+			public void expansionStateChanging(ExpansionEvent e) {}
 
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
@@ -561,8 +546,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		});
 
 		// Wir erstellen die Section des Details.
-		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id,
-				section.getText());
+		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
@@ -591,8 +575,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button
-	 * werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
+	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
 	 *
 	 * @param composite2
 	 * @param headOPOGWrapper
@@ -604,7 +587,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			return;
 		}
 
-		boolean isHead = headOPOGWrapper.headOrPageOrGrid instanceof Head;
+		boolean isHead = headOPOGWrapper.isHead && !headOPOGWrapper.isOP;
 
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
@@ -645,8 +628,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			item.setToolTipText(translationService.translate(btn.getText(), null));
 		}
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			final ImageDescriptor buttonImageDescriptor = ImageUtil
-					.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
+			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
 			item.setImage(resManager.createImage(buttonImageDescriptor));
 		}
 
@@ -661,16 +643,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 					for (Object o : binderOrProcedureOrInstances) {
 						if (o instanceof Wizard) {
-							Map<String, String> parameter = Map.of(Constants.CLAZZ, Constants.WIZARD,
-									Constants.PARAMETER, ((Wizard) o).getWizardname());
-							ParameterizedCommand command = commandService
-									.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+							Map<String, String> parameter = Map.of(Constants.CLAZZ, Constants.WIZARD, Constants.PARAMETER, ((Wizard) o).getWizardname());
+							ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
 							handlerService.executeHandler(command);
 						} else if (o instanceof Procedure) {
 							casRequestsUtil.callProcedure((Procedure) o);
 						} else {
-							System.err.println(
-									"Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
+							System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 						}
 					}
 				}
@@ -754,8 +733,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private MGrid createMGrid(Grid grid, MSection section) {
 
 		if (grid.getId() == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
-					"Grid " + grid.getProcedureSuffix() + " has no ID!");
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Grid " + grid.getProcedureSuffix() + " has no ID!");
 		}
 
 		MGrid mgrid = new MGrid(grid.getId());
@@ -785,13 +763,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	/**
 	 * Erstellt die Field einer Section.
 	 *
-	 * @param composite  der parent des Fields
-	 * @param headOrPage bestimmt ob die Fields nach den Regeln des Heads erstellt
-	 *                   werden oder der einer Page.
-	 * @param mSection   die Section deren Fields erstellt werden.
+	 * @param composite
+	 *            der parent des Fields
+	 * @param headOrPage
+	 *            bestimmt ob die Fields nach den Regeln des Heads erstellt werden oder der einer Page.
+	 * @param mSection
+	 *            die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection,
-			Section section) {
+	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, Section section) {
 		IEclipseContext context = mPerspective.getContext();
 		List<MField> visibleMFields = new ArrayList<>();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
@@ -863,8 +842,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return null;
 	}
 
-	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context,
-			Object fieldOrGrid) {
+	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context, Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 		mGrid.addGridChangeListener(this);
@@ -891,8 +869,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	public void showErrorMissingSQLIndex(Field field, String fieldname, NullPointerException e) {
 		if (field.getSqlIndex() == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
-					"Field " + fieldname + " has no SQL-Index!");
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Field " + fieldname + " has no SQL-Index!");
 		} else {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 		}
@@ -989,8 +966,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	public void refreshToolbar() {
-		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0",
-				MTrimBar.class);
+		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
 		MTrimBar tBar = findElements.get(0);
 		Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
 		if (c == null) {
