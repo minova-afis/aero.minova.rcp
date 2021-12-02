@@ -283,9 +283,8 @@ public class SectionGrid {
 		}
 
 		MButton mButton = new MButton(buttonID);
-		mButton.setIcon(btn.getIcon());
 		mButton.setText(btn.getText());
-		ButtonAccessor bA = new ButtonAccessor(mButton, item);
+		ButtonAccessor bA = new ButtonAccessor(item);
 		mButton.setButtonAccessor(bA);
 		mDetail.putButton(mButton);
 

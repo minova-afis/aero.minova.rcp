@@ -13,14 +13,6 @@ public class MButton {
 		this.id = id;
 	}
 
-	public String getIcon() {
-		return icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-
 	public String getText() {
 		return text;
 	}
@@ -33,36 +25,24 @@ public class MButton {
 		return id;
 	}
 
-	public IButtonAccessor getButtonAccessor() {
-		return buttonAccessor;
-	}
-
 	public void setButtonAccessor(IButtonAccessor buttonAccessor) {
 		this.buttonAccessor = buttonAccessor;
+	}
+
+	
+	public IButtonAccessor getButtonAccessor() {
+		return buttonAccessor;
 	}
 
 	public void setEnabled(boolean enabled) {
 		buttonAccessor.setEnabled(enabled);
 	}
-
-	public boolean getEnabled() {
-		return buttonAccessor.getEnabled();
-	}
+	
+	
 
 	public void addSelectionListener(SelectionListener listener) {
 		buttonAccessor.addSelectionListener(listener);
 	}
 
-	public void removeSelectionListener(SelectionListener listener) {
-		buttonAccessor.removeSelectionListener(listener);
-	}
-
-	public boolean isCanBeEnabled() {
-		return buttonAccessor.isCanBeEnabled();
-	}
-
-	public void setCanBeEnabled(boolean canBeEnabled) {
-		buttonAccessor.setCanBeEnabled(canBeEnabled);
-	}
 
 }

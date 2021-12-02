@@ -40,6 +40,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
@@ -129,7 +130,9 @@ import aero.minova.rcp.rcp.widgets.SectionGrid;
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
 	private static final int MARGIN_SECTION = 8;
-	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
+	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten =
+																											// 5
+																											// Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
@@ -195,7 +198,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
 
-		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
+		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
+		// steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
@@ -207,8 +211,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			mDetail.getHelper().setControls(mDetail);
 		}
 
-		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen
-		// Außerdem wird "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
+		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit
+		// ungespeicherten Änderungen zu schließen
+		// Außerdem wird "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false
+		// gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
 		IWindowCloseHandler handler = mWindow -> {
 			@SuppressWarnings("unchecked")
 			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
@@ -217,9 +223,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				for (MPerspective mPerspective : pList) {
 					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
 				}
-				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
-						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
-						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
+				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
+						translationService.translate("@msg.ChangesDialog", null), null,
+						translationService.translate("@msg.Close.DirtyMessage", null) + listString,
+						MessageDialog.CONFIRM, new String[] { translationService.translate("@Action.Discard", null),
+								translationService.translate("@Abort", null) },
+						0);
 
 				boolean res = dialog.open() == 0;
 				if (res) {
@@ -237,18 +246,21 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
+	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch
+	 * nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
 	 * gewählt wurde
 	 */
 	private void openRestoringUIDialog() {
 		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
 		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
-		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
+		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in
+		// LifeCycle gesetzt
 		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
 				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
 
 		if (!neverShow && !shownThisSession && !neverShowContext) {
-			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
+			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(
+					Display.getCurrent().getActiveShell(), //
 					translationService.translate("@RestoringUIDialog.Title", null), //
 					translationService.translate("@RestoringUIDialog.InfoText", null), //
 					translationService.translate("@RestoringUIDialog.NeverShowAgain", null), //
@@ -298,7 +310,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			}
 		}
 
-		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle, String icon) {
+		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid, boolean isOP, String formSuffix, String formTitle,
+				String icon) {
 			this(headOrPageOrGrid, isOP, formSuffix);
 			this.formTitle = formTitle;
 			this.icon = icon;
@@ -344,11 +357,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		parent.setTabList(parent.getChildren());
 		// Holen des Parts
 		Composite part = parent.getParent();
-		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
+		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die
+		// Toolbar mit selektiert wird.
 		part.setTabList(TabUtil.getTabListForPart(part, selectAllControls));
-		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
+		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die
+		// Anwendung mit Tab navigiert werden kann.
 		part.getParent().setTabList(new Control[0]);
 
+//		Object widget = handledToolItem.getWidget();
 		// Helper-Klasse initialisieren
 		initializeHelper(form.getHelperClass());
 	}
@@ -363,7 +379,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		pluginService.activatePlugin(helperName);
 		BundleContext bundleContext = FrameworkUtil.getBundle(WFCDetailPart.class).getBundleContext();
 		try {
-			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IHelper.class.getName(), null);
+			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IHelper.class.getName(),
+					null);
 			for (ServiceReference<?> serviceReference : allServiceReferences) {
 				String property = (String) serviceReference.getProperty("component.name");
 				if (property.equals(helperName)) {
@@ -375,10 +392,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		if (iHelper == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
+					translationService.translate("@msg.HelperNotFound", null));
 		} else {
 			getDetail().setHelper(iHelper);
-			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
+			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar
+																				// ist
 		}
 	}
 
@@ -425,7 +444,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			HeadOrPageOrGridWrapper wrapper;
 			if (headOrPage instanceof Head) {
 				// Head in der OP braucht titel und icon der Form
-				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(), opForm.getTitle(), opForm.getIcon());
+				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix(),
+						opForm.getTitle(), opForm.getIcon());
 			} else {
 				wrapper = new HeadOrPageOrGridWrapper(headOrPage, true, opForm.getDetail().getProcedureSuffix());
 			}
@@ -437,12 +457,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			String opFieldName = opForm.getDetail().getProcedureSuffix() + "." + e.getKey();
 			String mainFieldName = e.getValue();
 			if (mDetail.getField(opFieldName) == null) {
-				throw new NoSuchFieldException(
-						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException("Option Page \"" + opForm.getDetail().getProcedureSuffix()
+						+ "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
 			}
 			if (mDetail.getField(mainFieldName) == null) {
-				throw new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
-						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException(
+						"Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
+								+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
 			}
 		}
 	}
@@ -455,7 +476,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt diese ins Grid und überprüft, ob es alle Felder gibt
+	 * Diese Methode extrahiert die Keyzuordnung für ein Grid aus der XBS, setzt
+	 * diese ins Grid und überprüft, ob es alle Felder gibt
 	 *
 	 * @param grid
 	 * @param Node
@@ -475,19 +497,21 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 		for (Entry<String, String> e : keynamesToValues.entrySet()) {
 			if (!sgColumnNames.contains(e.getKey())) {
-				throw new NoSuchFieldException(
-						"Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException("Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \""
+						+ e.getKey() + "\"! (As defined in .xbs)");
 			}
 			if (mDetail.getField(e.getValue()) == null) {
-				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \"" + sg.getDataTable().getName()
-						+ "\"! (As defined in .xbs)");
+				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue()
+						+ "\", needed for Grid \"" + sg.getDataTable().getName() + "\"! (As defined in .xbs)");
 			}
 		}
 	}
 
 	/**
-	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten) oder
-	 * eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
+	 * Diese Methode bekommt einen Composite übergeben, und erstellt aus dem
+	 * übergenen Objekt ein Section. Diese Sektion ist entweder der Head (Kopfdaten)
+	 * oder eine OptionPage die sich unterhalb der Kopfdaten eingliedert. Zusätzlich
+	 * wird ein TraverseListener übergeben, der das Verhalten für TAB und Enter
 	 * festlegt.
 	 *
 	 * @param parent
@@ -500,7 +524,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
-			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section = new MinovaSection(parent,
+					ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
 
 		// Alten Zustand wiederherstellen
@@ -521,7 +546,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		section.addExpansionListener(new IExpansionListener() {
 			@Override
-			public void expansionStateChanging(ExpansionEvent e) {}
+			public void expansionStateChanging(ExpansionEvent e) {
+			}
 
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
@@ -535,7 +561,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		});
 
 		// Wir erstellen die Section des Details.
-		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
+		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id,
+				section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
@@ -564,7 +591,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
+	 * Erstellt einen oder mehrere Button auf der übergebenen Section. Die Button
+	 * werden in der ausgelesenen Reihelfolge erstellt und in eine Reihe gesetzt.
 	 *
 	 * @param composite2
 	 * @param headOPOGWrapper
@@ -576,109 +604,139 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			return;
 		}
 
+		boolean isHead = headOPOGWrapper.headOrPageOrGrid instanceof Head;
+
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
-		List<aero.minova.rcp.form.model.xsd.Button> buttons = new ArrayList<>();
-		if (headOPOGWrapper.headOrPageOrGrid instanceof Page) {
-			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
-		} else if (headOPOGWrapper.headOrPageOrGrid instanceof Head) {
+		List<aero.minova.rcp.form.model.xsd.Button> buttons = null;
+		if (isHead) {
 			buttons = ((Head) headOPOGWrapper.headOrPageOrGrid).getButton();
+		} else {
+			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
 		}
 
 		MPart mPart = (MPart) eModelService.find("aero.minova.rcp.rcp.part.details", mPerspective);
 
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
-			final ToolItem item = new ToolItem(bar, SWT.PUSH);
-
 			MButton mButton = new MButton(btn.getId());
-			mButton.setIcon(btn.getIcon());
 			mButton.setText(btn.getText());
-			ButtonAccessor bA = new ButtonAccessor(mButton, item);
-			mButton.setButtonAccessor(bA);
+			if (isHead) {
+				MHandledToolItem handledToolItem = createToolItemInPartToolbar(mPart, btn);
+				mButton.setButtonAccessor(new ButtonAccessor(handledToolItem));
+			} else {
+				final ToolItem item = createToolItemInSection(bar, btn);
+				mButton.setButtonAccessor(new ButtonAccessor(item));
+			}
+
 			mDetail.putButton(mButton);
 
-			MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
-			handledToolItem.setLabel(btn.getText());
-			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				handledToolItem.setIconURI(ImageUtil.retrieveIcon(btn.getIcon(), false));
-			}
+		}
 
-			Object event = findEventForID(btn.getId());
-			if (event instanceof Onclick) {
-				Onclick onclick = (Onclick) event;
-				List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
+		section.setTextClient(bar);
+	}
 
-				for (Object o : binderOrProcedureOrInstances) {
-					MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand");
-					handledToolItem.setCommand(command);
-					if (o instanceof Wizard) {
-						MParameter mParameterForm = eModelService.createModelElement(MParameter.class);
-						mParameterForm.setName(Constants.CLAZZ);
-						mParameterForm.setValue(Constants.WIZARD);
-						handledToolItem.getParameters().add(mParameterForm);
+	private ToolItem createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
+		Object event;
+		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 
-						mParameterForm = eModelService.createModelElement(MParameter.class);
-						mParameterForm.setName(Constants.PARAMETER);
-						mParameterForm.setValue(((Wizard) o).getWizardname());
-						handledToolItem.getParameters().add(mParameterForm);
-					} else if (o instanceof Procedure) {
-						Procedure p = (Procedure) o;
-						String procedureID = p.getName() + p.getParam().hashCode();
-						mPart.getContext().set(procedureID, p);
+		item.setData(btn);
+		item.setEnabled(btn.isEnabled());
+		if (btn.getText() != null) {
+			item.setToolTipText(translationService.translate(btn.getText(), null));
+		}
+		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+			final ImageDescriptor buttonImageDescriptor = ImageUtil
+					.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
+			item.setImage(resManager.createImage(buttonImageDescriptor));
+		}
 
-						MParameter mParameterForm = eModelService.createModelElement(MParameter.class);
-						mParameterForm.setName(Constants.CLAZZ);
-						mParameterForm.setValue(Constants.PROCEDURE);
-						handledToolItem.getParameters().add(mParameterForm);
+		event = findEventForID(btn.getId());
+		if (event instanceof Onclick) {
+			Onclick onclick = (Onclick) event;
+			item.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					// TODO: Andere procedures/bindings/instances auswerten
+					List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
 
-						mParameterForm = eModelService.createModelElement(MParameter.class);
-						mParameterForm.setName(Constants.PARAMETER);
-						mParameterForm.setValue(procedureID);
-						handledToolItem.getParameters().add(mParameterForm);
-					} else {
-						System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
-					}
-				}
-			}
-
-			mPart.getToolbar().getChildren().add(handledToolItem);
-
-			item.setData(btn);
-			item.setEnabled(btn.isEnabled());
-			if (btn.getText() != null) {
-				item.setToolTipText(translationService.translate(btn.getText(), null));
-			}
-			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
-				item.setImage(resManager.createImage(buttonImageDescriptor));
-			}
-
-			event = findEventForID(btn.getId());
-			if (event instanceof Onclick) {
-				Onclick onclick = (Onclick) event;
-				item.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						// TODO: Andere procedures/bindings/instances auswerten
-						List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
-
-						for (Object o : binderOrProcedureOrInstances) {
-							if (o instanceof Wizard) {
-								Map<String, String> parameter = Map.of(Constants.CLAZZ, ((Wizard) o).getWizardname());
-								ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
-								handlerService.executeHandler(command);
-							} else if (o instanceof Procedure) {
-								casRequestsUtil.callProcedure((Procedure) o);
-							} else {
-								System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
-							}
+					for (Object o : binderOrProcedureOrInstances) {
+						if (o instanceof Wizard) {
+							Map<String, String> parameter = Map.of(Constants.CLAZZ, Constants.WIZARD,
+									Constants.PARAMETER, ((Wizard) o).getWizardname());
+							ParameterizedCommand command = commandService
+									.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+							handlerService.executeHandler(command);
+						} else if (o instanceof Procedure) {
+							casRequestsUtil.callProcedure((Procedure) o);
+						} else {
+							System.err.println(
+									"Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 						}
 					}
-				});
-			}
-
+				}
+			});
 		}
-		section.setTextClient(bar);
+		return item;
+	}
+
+	private MHandledToolItem createToolItemInPartToolbar(MPart mPart, aero.minova.rcp.form.model.xsd.Button btn) {
+		MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
+		handledToolItem.getPersistedState().put(IWorkbench.PERSIST_STATE, String.valueOf(false));
+		handledToolItem.setLabel(btn.getText());
+		handledToolItem.setTooltip(btn.getText());
+		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+			handledToolItem.setIconURI(ImageUtil.retrieveIcon(btn.getIcon(), false));
+		}
+
+		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand");
+		handledToolItem.setCommand(command);
+
+		MParameter mParameterForm = null;
+
+		Object event = findEventForID(btn.getId());
+		if (event instanceof Onclick) {
+			Onclick onclick = (Onclick) event;
+			List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
+
+			for (Object o : binderOrProcedureOrInstances) {
+				if (o instanceof Wizard) {
+					mParameterForm = eModelService.createModelElement(MParameter.class);
+					mParameterForm.setName(Constants.CLAZZ);
+					mParameterForm.setValue(Constants.WIZARD);
+					handledToolItem.getParameters().add(mParameterForm);
+
+					mParameterForm = eModelService.createModelElement(MParameter.class);
+					mParameterForm.setName(Constants.PARAMETER);
+					mParameterForm.setValue(((Wizard) o).getWizardname());
+					handledToolItem.getParameters().add(mParameterForm);
+				} else if (o instanceof Procedure) {
+					Procedure p = (Procedure) o;
+					String procedureID = p.getName() + p.getParam().hashCode();
+					mPart.getContext().set(procedureID, p);
+
+					mParameterForm = eModelService.createModelElement(MParameter.class);
+
+					mParameterForm.setName(Constants.CLAZZ);
+					mParameterForm.setValue(Constants.PROCEDURE);
+					handledToolItem.getParameters().add(mParameterForm);
+
+					mParameterForm = eModelService.createModelElement(MParameter.class);
+					mParameterForm.setName(Constants.PARAMETER);
+					mParameterForm.setValue(procedureID);
+					handledToolItem.getParameters().add(mParameterForm);
+				} else {
+					System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
+				}
+			}
+		} else {
+			handledToolItem.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
+			mParameterForm = eModelService.createModelElement(MParameter.class);
+			mParameterForm.setName(Constants.PARAMETER);
+			mParameterForm.setValue(btn.getId());
+			handledToolItem.getParameters().add(mParameterForm);
+		}
+		mPart.getToolbar().getChildren().add(handledToolItem);
+		return handledToolItem;
 	}
 
 	private Object findEventForID(String id) {
@@ -696,7 +754,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private MGrid createMGrid(Grid grid, MSection section) {
 
 		if (grid.getId() == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Grid " + grid.getProcedureSuffix() + " has no ID!");
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
+					"Grid " + grid.getProcedureSuffix() + " has no ID!");
 		}
 
 		MGrid mgrid = new MGrid(grid.getId());
@@ -726,14 +785,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	/**
 	 * Erstellt die Field einer Section.
 	 *
-	 * @param composite
-	 *            der parent des Fields
-	 * @param headOrPage
-	 *            bestimmt ob die Fields nach den Regeln des Heads erstellt werden oder der einer Page.
-	 * @param mSection
-	 *            die Section deren Fields erstellt werden.
+	 * @param composite  der parent des Fields
+	 * @param headOrPage bestimmt ob die Fields nach den Regeln des Heads erstellt
+	 *                   werden oder der einer Page.
+	 * @param mSection   die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, Section section) {
+	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection,
+			Section section) {
 		IEclipseContext context = mPerspective.getContext();
 		List<MField> visibleMFields = new ArrayList<>();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
@@ -805,7 +863,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return null;
 	}
 
-	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context, Object fieldOrGrid) {
+	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context,
+			Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 		mGrid.addGridChangeListener(this);
@@ -832,7 +891,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	public void showErrorMissingSQLIndex(Field field, String fieldname, NullPointerException e) {
 		if (field.getSqlIndex() == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Field " + fieldname + " has no SQL-Index!");
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
+					"Field " + fieldname + " has no SQL-Index!");
 		} else {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 		}
@@ -929,7 +989,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	public void refreshToolbar() {
-		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
+		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0",
+				MTrimBar.class);
 		MTrimBar tBar = findElements.get(0);
 		Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
 		if (c == null) {
