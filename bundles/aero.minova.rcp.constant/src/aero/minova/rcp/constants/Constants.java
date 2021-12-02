@@ -29,13 +29,17 @@ public class Constants {
 	public static final String CONTROL_VALUE = "value";
 	public static final String CONTROL_ID = "id";
 	public static final String CONTROL_MDETAIL = "mDetail";
-	public static final String CONTROL_WIZARD = "wizard";
 	public static final String CONTROL_GRID_BUTTON_ID = "grid_button_id";
 	public static final String CONTROL_GRID_BUTTON_INSERT = "grid_button_insert";
 	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
 	public static final String CONTROL_GRID_ID = "grid_id";
+
+	public static final String CLAZZ = "clazz";
+	public static final String PARAMETER = "parameter";
+	public static final String WIZARD = "wizard";
+	public static final String PROCEDURE = "procedure";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";

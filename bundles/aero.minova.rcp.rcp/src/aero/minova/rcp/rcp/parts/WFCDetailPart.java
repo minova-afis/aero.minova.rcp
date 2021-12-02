@@ -33,10 +33,13 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.commands.MCommand;
+import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
@@ -582,6 +585,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			buttons = ((Head) headOPOGWrapper.headOrPageOrGrid).getButton();
 		}
 
+		MPart mPart = (MPart) eModelService.find("aero.minova.rcp.rcp.part.details", mPerspective);
+
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
 			final ToolItem item = new ToolItem(bar, SWT.PUSH);
 
@@ -592,13 +597,63 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			mButton.setButtonAccessor(bA);
 			mDetail.putButton(mButton);
 
+			MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
+			handledToolItem.setLabel(btn.getText());
+			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+				handledToolItem.setIconURI(ImageUtil.retrieveIcon(btn.getIcon(), false));
+			}
+
+			Object event = findEventForID(btn.getId());
+			if (event instanceof Onclick) {
+				Onclick onclick = (Onclick) event;
+				List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
+
+				for (Object o : binderOrProcedureOrInstances) {
+					MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand");
+					handledToolItem.setCommand(command);
+					if (o instanceof Wizard) {
+						MParameter mParameterForm = eModelService.createModelElement(MParameter.class);
+						mParameterForm.setName(Constants.CLAZZ);
+						mParameterForm.setValue(Constants.WIZARD);
+						handledToolItem.getParameters().add(mParameterForm);
+
+						mParameterForm = eModelService.createModelElement(MParameter.class);
+						mParameterForm.setName(Constants.PARAMETER);
+						mParameterForm.setValue(((Wizard) o).getWizardname());
+						handledToolItem.getParameters().add(mParameterForm);
+					} else if (o instanceof Procedure) {
+						Procedure p = (Procedure) o;
+						String procedureID = p.getName() + p.getParam().hashCode();
+						mPart.getContext().set(procedureID, p);
+
+						MParameter mParameterForm = eModelService.createModelElement(MParameter.class);
+						mParameterForm.setName(Constants.CLAZZ);
+						mParameterForm.setValue(Constants.PROCEDURE);
+						handledToolItem.getParameters().add(mParameterForm);
+
+						mParameterForm = eModelService.createModelElement(MParameter.class);
+						mParameterForm.setName(Constants.PARAMETER);
+						mParameterForm.setValue(procedureID);
+						handledToolItem.getParameters().add(mParameterForm);
+					} else {
+						System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
+					}
+				}
+			}
+
+			mPart.getToolbar().getChildren().add(handledToolItem);
+
 			item.setData(btn);
 			item.setEnabled(btn.isEnabled());
 			if (btn.getText() != null) {
 				item.setToolTipText(translationService.translate(btn.getText(), null));
 			}
+			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
+				item.setImage(resManager.createImage(buttonImageDescriptor));
+			}
 
-			Object event = findEventForID(btn.getId());
+			event = findEventForID(btn.getId());
 			if (event instanceof Onclick) {
 				Onclick onclick = (Onclick) event;
 				item.addSelectionListener(new SelectionAdapter() {
@@ -609,7 +664,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 						for (Object o : binderOrProcedureOrInstances) {
 							if (o instanceof Wizard) {
-								Map<String, String> parameter = Map.of(Constants.CONTROL_WIZARD, ((Wizard) o).getWizardname());
+								Map<String, String> parameter = Map.of(Constants.CLAZZ, ((Wizard) o).getWizardname());
 								ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
 								handlerService.executeHandler(command);
 							} else if (o instanceof Procedure) {
@@ -622,10 +677,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				});
 			}
 
-			if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-				final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
-				item.setImage(resManager.createImage(buttonImageDescriptor));
-			}
 		}
 		section.setTextClient(bar);
 	}

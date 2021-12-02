@@ -13,6 +13,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.helper.IMinovaWizard;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -28,19 +29,25 @@ public class DynamicButtonHandler {
 	IMinovaWizard wizard;
 
 	@Execute
-	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CONTROL_WIZARD) String className, MPart part) {
-		try {
+	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CLAZZ) String className,
+			@Optional @Named(Constants.PARAMETER) String parameter, MPart mPart) {
 
-			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
+		if (Constants.WIZARD.equals(className)) {
+			try {
+				MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
 
-			ContextInjectionFactory.inject(wizard, context);
-			wizard.setOriginalMDetail(detail);
+				ContextInjectionFactory.inject(wizard, context);
+				wizard.setOriginalMDetail(detail);
 
-			MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, wizard);
-			wizardDialog.setTranslationService(translationService);
-			wizardDialog.open();
-		} catch (Exception e) {
-			e.printStackTrace();
+				MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, wizard);
+				wizardDialog.setTranslationService(translationService);
+				wizardDialog.open();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (Constants.PROCEDURE.equals(className)) {
+			Procedure p = (Procedure) context.get(parameter);
+			((WFCDetailPart) mPart.getObject()).getRequestUtil().callProcedure(p);
 		}
 	}
 }
