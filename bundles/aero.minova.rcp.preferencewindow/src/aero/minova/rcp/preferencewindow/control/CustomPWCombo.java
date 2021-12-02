@@ -9,8 +9,10 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 
 public class CustomPWCombo extends CustomPWWidget {
 	private final List<Object> data;
@@ -49,7 +51,13 @@ public class CustomPWCombo extends CustomPWWidget {
 	public Control build(final Composite parent) {
 		buildLabel(parent, GridData.CENTER);
 
-		final CCombo combo = new CCombo(parent, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(2, false));
+		final GridData cmpGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		cmp.setLayoutData(cmpGridData);
+		addControl(cmp);
+
+		final CCombo combo = new CCombo(cmp, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
 		combo.setToolTipText(getTooltip());
 		addControl(combo);
 
@@ -64,6 +72,11 @@ public class CustomPWCombo extends CustomPWWidget {
 		combo.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), CustomPWCombo.this.data.get(CustomPWCombo.this.data.indexOf(combo.getText())));
 		});
+
+		Label icon = new Label(cmp, SWT.NONE);
+		if (getTooltip() != null) {
+			createTooltipInfoIcon(icon);
+		}
 
 		return combo;
 	}
