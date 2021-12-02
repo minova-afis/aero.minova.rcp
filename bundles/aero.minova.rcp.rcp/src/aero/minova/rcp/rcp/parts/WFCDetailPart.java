@@ -39,7 +39,10 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -597,7 +600,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		} else {
 			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
 		}
-
+/// Button (Bt, Bt, Bt, ) Button Button
 		MPart mPart = (MPart) eModelService.find("aero.minova.rcp.rcp.part.details", mPerspective);
 
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
@@ -658,6 +661,43 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return item;
 	}
 
+	private List<MParameter> createParameters(List<Object> binderOrProcedureOrInstances, MPart mPart) {
+		List<MParameter> parameter = new ArrayList<>();
+		MParameter mParameterForm = null;
+		for (Object o : binderOrProcedureOrInstances) {
+			if (o instanceof Wizard) {
+				mParameterForm = eModelService.createModelElement(MParameter.class);
+				mParameterForm.setName(Constants.CLAZZ);
+				mParameterForm.setValue(Constants.WIZARD);
+				parameter.add(mParameterForm);
+				// handledToolItem.getParameters().add(mParameterForm);
+
+				mParameterForm = eModelService.createModelElement(MParameter.class);
+				mParameterForm.setName(Constants.PARAMETER);
+				mParameterForm.setValue(((Wizard) o).getWizardname());
+				parameter.add(mParameterForm);
+			} else if (o instanceof Procedure) {
+				Procedure p = (Procedure) o;
+				String procedureID = p.getName() + p.getParam().hashCode();
+				mPart.getContext().set(procedureID, p);
+
+				mParameterForm = eModelService.createModelElement(MParameter.class);
+
+				mParameterForm.setName(Constants.CLAZZ);
+				mParameterForm.setValue(Constants.PROCEDURE);
+				parameter.add(mParameterForm);
+
+				mParameterForm = eModelService.createModelElement(MParameter.class);
+				mParameterForm.setName(Constants.PARAMETER);
+				mParameterForm.setValue(procedureID);
+				parameter.add(mParameterForm);
+			} else {
+				System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
+			}
+		}
+		return parameter;
+	}
+
 	private MHandledToolItem createToolItemInPartToolbar(MPart mPart, aero.minova.rcp.form.model.xsd.Button btn) {
 		MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
 		handledToolItem.getPersistedState().put(IWorkbench.PERSIST_STATE, String.valueOf(false));
@@ -673,40 +713,41 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		MParameter mParameterForm = null;
 
 		Object event = findEventForID(btn.getId());
+		if (btn.getGroup() != null) {
+			MMenu groupMenu = null;
+			String groupName = btn.getGroup();
+			// Suche Gruppe
+			for (MToolBarElement element : mPart.getToolbar().getChildren()) {
+				if(groupName.equalsIgnoreCase(element.getPersistedState().get("GroupName"))) {
+					groupMenu = ((MHandledToolItem) element).getMenu();
+				}else {
+					//Gruppe erstellen
+					groupMenu = eModelService.createModelElement(MMenu.class);
+					element.getPersistedState().put("GroupName", btn.getGroup());
+					handledToolItem.setMenu(groupMenu);
+				}
+				// Eintrag erstellen
+				MHandledMenuItem menuEntry = eModelService.createModelElement(MHandledMenuItem.class);
+				// Parameter holen
+				if (event instanceof Onclick) {
+					Onclick onclick = (Onclick) event;
+					List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
+					// Fallunterscheidung wenn wir Wizzards oder Prozeduren haben
+					menuEntry.getParameters().addAll(createParameters(binderOrProcedureOrInstances, mPart));
+				} else {
+					mParameterForm = eModelService.createModelElement(MParameter.class);
+					mParameterForm.setName(Constants.PARAMETER);
+					mParameterForm.setValue(btn.getId());
+					menuEntry.getParameters().add(mParameterForm);
+				}
+				menuEntry.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
+				groupMenu.getChildren().add(menuEntry);
+			}
+		}
 		if (event instanceof Onclick) {
 			Onclick onclick = (Onclick) event;
 			List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
-
-			for (Object o : binderOrProcedureOrInstances) {
-				if (o instanceof Wizard) {
-					mParameterForm = eModelService.createModelElement(MParameter.class);
-					mParameterForm.setName(Constants.CLAZZ);
-					mParameterForm.setValue(Constants.WIZARD);
-					handledToolItem.getParameters().add(mParameterForm);
-
-					mParameterForm = eModelService.createModelElement(MParameter.class);
-					mParameterForm.setName(Constants.PARAMETER);
-					mParameterForm.setValue(((Wizard) o).getWizardname());
-					handledToolItem.getParameters().add(mParameterForm);
-				} else if (o instanceof Procedure) {
-					Procedure p = (Procedure) o;
-					String procedureID = p.getName() + p.getParam().hashCode();
-					mPart.getContext().set(procedureID, p);
-
-					mParameterForm = eModelService.createModelElement(MParameter.class);
-
-					mParameterForm.setName(Constants.CLAZZ);
-					mParameterForm.setValue(Constants.PROCEDURE);
-					handledToolItem.getParameters().add(mParameterForm);
-
-					mParameterForm = eModelService.createModelElement(MParameter.class);
-					mParameterForm.setName(Constants.PARAMETER);
-					mParameterForm.setValue(procedureID);
-					handledToolItem.getParameters().add(mParameterForm);
-				} else {
-					System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
-				}
-			}
+			handledToolItem.getParameters().addAll(createParameters(binderOrProcedureOrInstances, mPart));
 		} else {
 			handledToolItem.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
 			mParameterForm = eModelService.createModelElement(MParameter.class);
