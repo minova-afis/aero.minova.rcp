@@ -37,19 +37,19 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		String value = valueText.substring(2);
 		switch (typeString) {
 		case "n":
-			return new Value(Integer.parseInt(value));
+			return new Value(Integer.parseInt(value), DataType.INTEGER);
 		case "d":
-			return new Value(Double.parseDouble(value));
+			return new Value(Double.parseDouble(value), DataType.DOUBLE);
 		case "m":
 			return new Value(Double.parseDouble(value), DataType.BIGDECIMAL);
 		case "s":
-			return new Value(value);
+			return new Value(value, DataType.STRING);
 		case "i":
-			return new Value(Instant.parse(value));
+			return new Value(Instant.parse(value), DataType.INSTANT);
 		case "z":
-			return new Value(ZonedDateTime.parse(value));
+			return new Value(ZonedDateTime.parse(value), DataType.ZONED);
 		case "b":
-			return new Value(Boolean.valueOf(value));
+			return new Value(Boolean.valueOf(value), DataType.BOOLEAN);
 		case "f": // Filter
 			String operator = value.substring(0, value.indexOf("-"));
 			String v = value.substring(value.indexOf("-") + 1);
@@ -60,6 +60,16 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			} else {
 				return new FilterValue(operator, deserialize(v).getValue(), "");
 			}
+		case "r":
+			String[] split = value.split("-");
+			String referenceID = split[0];
+			int rowNumber = Integer.parseInt(split[1]);
+			String columnName = split[2]; // Es kann "-" im Columnname enthalten sein
+			for (int i = 3; i < split.length; i++) {
+				columnName += "-" + split[i];
+			}
+
+			return new ReferenceValue(referenceID, rowNumber, columnName);
 		default:
 			System.err.println("Value mit prefix " + typeString + " nicht bekannt");
 			break;

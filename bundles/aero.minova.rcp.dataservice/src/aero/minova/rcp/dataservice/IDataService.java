@@ -12,6 +12,8 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.TransactionEntry;
+import aero.minova.rcp.model.TransactionResultEntry;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MLookupField;
 
@@ -35,6 +37,15 @@ public interface IDataService {
 	 * @return
 	 */
 	CompletableFuture<SqlProcedureResult> callProcedureAsync(Table detailTable);
+
+	/**
+	 * Anfrage an den Server über eine Transaktion. Wenn in einer der Prozeduren ein Fehler auftritt wird die gesamte Transaktion nicht ausgeführt. Evtl werden
+	 * auf CAS-Seite weitere Prozeduren ausgeführt.
+	 * 
+	 * @param procedureList
+	 * @return
+	 */
+	CompletableFuture<List<TransactionResultEntry>> callTransactionAsync(List<TransactionEntry> procedureList);
 
 	/**
 	 * Diese Methode löst einen Wert auf. Für den gegebenen keyLong und/oder keyText wird das entsprechende LookupValue angefragt

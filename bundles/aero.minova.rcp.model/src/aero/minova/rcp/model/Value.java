@@ -208,6 +208,10 @@ public class Value implements Serializable {
 		return type == DataType.FILTER ? (String) value : null;
 	}
 
+	public String getReferenceValue() {
+		return type == DataType.REFERENCE ? (String) value : null;
+	}
+
 	@Override
 	public String toString() {
 		return "Value [type=" + type + ", value=" + value + "]";

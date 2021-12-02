@@ -15,7 +15,8 @@ Require-Bundle: aero.minova.rcp.model;bundle-version="1.2.0",
  org.eclipse.e4.core.services,
  org.eclipse.jface,
  aero.minova.rcp.preferences,
- org.eclipse.e4.ui.workbench
+ org.eclipse.e4.ui.workbench,
+ com.google.gson
 Export-Package: aero.minova.rcp.dataservice,
  aero.minova.rcp.dataservice.internal
 Import-Package: aero.minova.rcp.constants,

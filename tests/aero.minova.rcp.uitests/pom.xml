@@ -13,7 +13,6 @@
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.tests</artifactId>
 		<version>12.0.27-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
 	
 	<properties>
