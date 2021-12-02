@@ -7,6 +7,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -23,8 +25,10 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -37,6 +41,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -47,6 +52,8 @@ import aero.minova.rcp.form.setup.xbs.Map.Entry;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
@@ -58,6 +65,7 @@ import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
 import aero.minova.rcp.model.form.MTextField;
+import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
@@ -69,9 +77,11 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.widgets.MinovaSection;
+import aero.minova.rcp.widgets.MinovaNotifier;
 
 @SuppressWarnings("restriction")
 public class WFCStatisticDetailPart {
@@ -114,6 +124,16 @@ public class WFCStatisticDetailPart {
 
 	@Inject
 	MPerspective mPerspective;
+
+	@Inject
+	EModelService model;
+
+	@Inject
+	IEclipseContext partContext;
+
+	@Inject
+	@Named(IServiceConstants.ACTIVE_SHELL)
+	private Shell shell;
 
 	@PostConstruct
 	public void postConstruct(Composite parent) {
@@ -341,6 +361,66 @@ public class WFCStatisticDetailPart {
 			f.setValue(null, false);
 		}
 		((AbstractValueAccessor) mSection.getTabList().get(0).getValueAccessor()).getControl().setFocus();
+	}
+
+	@Inject
+	@Optional
+	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(mPerspective)) {
+			MessageDialog.openError(shell, getTranslation("Error"), getTranslation(message));
+		}
+	}
+
+	@Inject
+	@Optional
+	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(mPerspective)) {
+			Table errorTable = et.getErrorTable();
+			Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
+			String messageproperty = "@" + vMessageProperty.getStringValue();
+			String value = translationService.translate(messageproperty, null);
+			// Ticket number {0} is not numeric
+			if (errorTable.getColumnCount() > 1) {
+				List<String> params = new ArrayList<>();
+				for (int i = 1; i < errorTable.getColumnCount(); i++) {
+					Value v = errorTable.getRows().get(0).getValue(i);
+					params.add(v.getStringValue());
+				}
+				value = MessageFormat.format(value, params.toArray(new String[0]));
+			}
+			value += "\n\nUser : " + et.getUser();
+			value += "\nProcedure/View: " + et.getProcedureOrView();
+
+			if (et.getT() == null) {
+				MessageDialog.openError(shell, getTranslation("Error"), value);
+			} else {
+				ShowErrorDialogHandler.execute(shell, getTranslation("Error"), value, et.getT());
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	public void showNotification(@UIEventTopic(Constants.BROKER_SHOWNOTIFICATION) String message) {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		if (activePerspective.equals(mPerspective)) {
+			openNotificationPopup(message);
+		}
+	}
+
+	public void openNotificationPopup(String message) {
+		if (!shell.getDisplay().isDisposed()) {
+			MinovaNotifier.show(shell, getTranslation(message), getTranslation("Notification"));
+		}
+	}
+
+	private String getTranslation(String translate) {
+		if (!translate.startsWith("@")) {
+			translate = "@" + translate;
+		}
+		return translationService.translate(translate, null);
 	}
 
 	public Composite getComposite() {

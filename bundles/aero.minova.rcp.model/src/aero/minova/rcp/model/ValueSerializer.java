@@ -58,6 +58,9 @@ public class ValueSerializer implements JsonSerializer<Value> {
 					return new JsonPrimitive("f-" + value.getOperatorValue());
 				return new JsonPrimitive("f-" + value.getOperatorValue() + "-" + serialize(((FilterValue) value).getFilterValue()).getAsString());
 			}
+		case REFERENCE:
+			ReferenceValue rv = (ReferenceValue) value;
+			return new JsonPrimitive("r-" + rv.getReferenceValue() + "-" + rv.getRowNumber() + "-" + rv.getColumnName());
 		default:
 			System.err.println("Value " + value.getType() + " nicht bekannt");
 			return null;
