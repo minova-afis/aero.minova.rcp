@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="icon" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="refers-to" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="group" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -44,6 +45,8 @@ public class Button {
     protected String text;
     @XmlAttribute(name = "refers-to")
     protected String refersTo;
+    @XmlAttribute(name = "group")
+    protected String group;
 
     /**
      * Ruft den Wert der id-Eigenschaft ab.
@@ -167,6 +170,30 @@ public class Button {
      */
     public void setRefersTo(String value) {
         this.refersTo = value;
+    }
+
+    /**
+     * Ruft den Wert der group-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGroup() {
+        return group;
+    }
+
+    /**
+     * Legt den Wert der group-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setGroup(String value) {
+        this.group = value;
     }
 
 }
