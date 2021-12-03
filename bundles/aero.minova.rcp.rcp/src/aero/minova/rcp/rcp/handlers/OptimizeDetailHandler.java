@@ -24,6 +24,7 @@ public class OptimizeDetailHandler {
 			mwindow.setHeight(900);
 
 			try {
+				// Höhe von Suche und Index im Verhältnis 35/65
 				MPartStack searchPartStack = emservice
 						.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.search", MPartStack.class).get(0);
 				searchPartStack.setContainerData("35");
@@ -31,11 +32,13 @@ public class OptimizeDetailHandler {
 						.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.index", MPartStack.class).get(0);
 				indexPartStack.setContainerData("65");
 			} catch (IndexOutOfBoundsException e) {
-				// In "Statistic" Ansicht haben wir keinen Search part
+				// In "Statistic" Ansicht haben wir links nur ein Part -> nichts tun
 			}
 		}
 
 		Integer defaultSectionWidth = WFCDetailPart.SECTION_WIDTH;
+
+		// Detail-Composite finden (Kann auch Statistik-Part sein)
 		Composite detailComposite;
 		if (detail.getObject() instanceof WFCDetailPart) {
 			WFCDetailPart wfcDetailPart = (WFCDetailPart) detail.getObject();
@@ -44,15 +47,17 @@ public class OptimizeDetailHandler {
 			WFCStatisticDetailPart wfcStatisticDetailPart = (WFCStatisticDetailPart) detail.getObject();
 			detailComposite = wfcStatisticDetailPart.getComposite();
 		}
-		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, mwindow.getHeight()).x;
 
-		// Standardbreite defaultSectionWidth (für Index/Suche) + Benötigte Breite für Detail (können mehrere Sections nebeneinander sein) + 25 Pixel
-		if (mwindow.getWidth() < defaultSectionWidth + prefDetailWidth + 25) {
-			mwindow.setWidth(defaultSectionWidth + prefDetailWidth + 25);
+		// Optimale Breite des Details für aktuelle Höhe berechnen (vom Window muss die Höhe für Toolbars, Perspektiven, ... abgezogen werden)
+		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, mwindow.getHeight() - 80).x;
+
+		// Standardbreite defaultSectionWidth (für Index/Suche) + Benötigte Breite für Detail (können mehrere Sections nebeneinander sein) + 50 Pixel
+		if (mwindow.getWidth() < defaultSectionWidth + prefDetailWidth + 50) {
+			mwindow.setWidth(defaultSectionWidth + prefDetailWidth + 50);
 		}
 
 		int size = 10000;
-		float detailSize = (float) (prefDetailWidth + 15.0) / mwindow.getWidth();
+		float detailSize = (float) (prefDetailWidth + 25.0) / mwindow.getWidth();
 		float leftSize = 1.0f - detailSize;
 
 		MPartSashContainer element = emservice
