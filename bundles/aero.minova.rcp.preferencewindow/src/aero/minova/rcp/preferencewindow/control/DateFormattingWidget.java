@@ -91,7 +91,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 			try {
 				LocalDateTime date = LocalDateTime.of(2015, 12, 24, 23, 45);
 				String formatted = DateUtil.getDateString(date.toInstant(ZoneOffset.UTC), locale, pattern);
-				return formatted;
+				String example = "25.März.2024";
+				if (formatted.length() <= example.length()) {
+					return formatted;
+				}
 			} catch (Exception e) {
 				return "Invalid format!";
 			}
@@ -100,7 +103,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 	}
 
 	private boolean validatePattern(String input) {
-		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\\s]{0,1})([dM]{0,3})([\\.,/\\s]{0,1})([dMyu]{0,4})");
+		Pattern pattern = Pattern.compile("([dMyu]{1,3})([\\.,/\s]{1})([dMyu]{1,3})([\\.,/\s]{1})([dMyu]{1,3})");
 		if (pattern.matcher(input).matches()) {
 			return true;
 		}

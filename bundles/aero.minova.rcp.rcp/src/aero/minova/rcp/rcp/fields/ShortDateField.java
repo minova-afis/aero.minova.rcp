@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
@@ -112,7 +113,7 @@ public class ShortDateField {
 
 		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		textFormData.width = COLUMN_WIDTH;
+		textFormData.width = SHORT_DATE_WIDTH;
 
 		label.setLayoutData(labelFormData);
 		text.setLayoutData(textFormData);
