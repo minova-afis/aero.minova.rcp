@@ -32,11 +32,7 @@ public class MinovaSection extends Section {
 		this.imageLink.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
 			public void linkActivated(final HyperlinkEvent e) {
-				if (!isExpanded()) {
-					setExpanded(true);
-				} else if (MinovaSection.this.getExpandable()) {
-					setExpanded(false);
-				}
+				setExpandState();
 			}
 
 		});
@@ -52,15 +48,19 @@ public class MinovaSection extends Section {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.SPACE) {
 					if (expandable) {
-						if (isExpanded()) {
-							internalSetExpanded(false);
-						}  else if (MinovaSection.this.getExpandable()) {
-							setExpanded(false);
-						}
+						setExpandState();
 					}
 				}
 			}
 		});
+	}
+
+	public void setExpandState() {
+		if (!isExpanded()) {
+			internalSetExpanded(true);
+		} else if (MinovaSection.this.getExpandable()) {
+			setExpanded(false);
+		}
 	}
 
 	public void setImage(final Image image) {
