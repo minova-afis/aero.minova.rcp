@@ -1,9 +1,12 @@
 package aero.minova.rcp.preferencewindow.builder;
 
+import org.eclipse.e4.core.di.annotations.Optional;
+
 public class PreferenceDescriptor {
 
 	final String key;
 	String label;
+	String tooltip;
 	double order;
 	PreferenceAccessor valueAccessor;
 	DisplayType displayType;
@@ -11,9 +14,10 @@ public class PreferenceDescriptor {
 	Object defaultValue;
 	
 
-	public PreferenceDescriptor(String key, String label, double order, DisplayType displayType, Object defaultValue, Object... possibleValues) {
+	public PreferenceDescriptor(String key, String label, String tooltip, double order, DisplayType displayType, Object defaultValue, Object... possibleValues) {
 		this.key = key;
 		this.label = label;
+		this.tooltip = tooltip;
 		this.order = order;
 		this.displayType = displayType;
 		this.defaultValue = defaultValue;
@@ -31,6 +35,10 @@ public class PreferenceDescriptor {
 	
 	public String getLabel() {
 		return label;
+	}
+	
+	public String getTooltip() {
+		return tooltip;
 	}
 
 	public double getOrder() {

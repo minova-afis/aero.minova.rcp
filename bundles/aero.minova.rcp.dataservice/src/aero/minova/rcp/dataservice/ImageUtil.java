@@ -78,7 +78,7 @@ public class ImageUtil {
 			return null;
 		}
 
-		String iconWithoutExtension = icon.replace(".png", "").replace(".ico", "").toLowerCase();
+		String iconWithoutExtension = icon.toLowerCase().replace(".png", "").replace(".ico", "");
 		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
 
 		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen

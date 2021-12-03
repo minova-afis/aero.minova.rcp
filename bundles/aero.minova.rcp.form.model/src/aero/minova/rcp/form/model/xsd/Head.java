@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence&gt;
  *         &lt;choice minOccurs="0"&gt;
  *           &lt;element name="button" type="{}button" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *           &lt;element name="button-group" type="{}button-group" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;/choice&gt;
  *         &lt;choice&gt;
  *           &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
@@ -40,11 +41,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "head", propOrder = {
     "button",
+    "buttonGroup",
     "fieldOrGrid"
 })
 public class Head {
 
     protected List<Button> button;
+    @XmlElement(name = "button-group")
+    protected List<ButtonGroup> buttonGroup;
     @XmlElements({
         @XmlElement(name = "field", type = Field.class),
         @XmlElement(name = "grid", type = Grid.class)
@@ -78,6 +82,35 @@ public class Head {
             button = new ArrayList<Button>();
         }
         return this.button;
+    }
+
+    /**
+     * Gets the value of the buttonGroup property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the buttonGroup property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getButtonGroup().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ButtonGroup }
+     * 
+     * 
+     */
+    public List<ButtonGroup> getButtonGroup() {
+        if (buttonGroup == null) {
+            buttonGroup = new ArrayList<ButtonGroup>();
+        }
+        return this.buttonGroup;
     }
 
     /**

@@ -22,8 +22,8 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWChooser(final String label, final String propertyKey, @Optional TranslationService translationService) {
-		super(label, propertyKey, 3, false);
+	public CustomPWChooser(final String label, final String tooltip, final String propertyKey, @Optional TranslationService translationService) {
+		super(label, tooltip, propertyKey, 3, false);
 		this.translationService = translationService;
 		setGrabExcessSpace(false);
 	}
@@ -34,18 +34,15 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("You need to set a label for a directory or a dialog chooser");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = 25;
 		label.setLayoutData(labelGridData);
 
 		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
+		text.setToolTipText(getTooltip());
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(textGridData);

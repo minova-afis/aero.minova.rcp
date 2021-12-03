@@ -43,10 +43,6 @@ public class FilterValue extends Value {
 		}
 	}
 
-	public static FilterValue valueOf(String value) {
-		return null;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		FilterValue v = null;
