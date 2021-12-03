@@ -425,8 +425,8 @@ public class SectionGrid {
 			public void focusLost(FocusEvent e) {
 				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
+					selectionLayer.clear();
 				}
-				selectionLayer.clear();
 			}
 
 			@Override
