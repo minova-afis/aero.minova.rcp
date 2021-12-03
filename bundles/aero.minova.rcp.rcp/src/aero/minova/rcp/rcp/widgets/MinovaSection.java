@@ -47,9 +47,7 @@ public class MinovaSection extends Section {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.SPACE) {
-					if (expandable) {
-						setExpandState();
-					}
+					setExpandState();
 				}
 			}
 		});
