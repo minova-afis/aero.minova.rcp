@@ -226,7 +226,9 @@ public class PrintIndexHandler {
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(activePerspective, modelService, partService);
+				if (!disablePreview) {
+					PrintUtil.checkPreview(activePerspective, modelService, partService);
+				}
 
 				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
