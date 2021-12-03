@@ -445,12 +445,17 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
-				selectionLayer.clear();
-				e.doit = true;
+				if (selectionLayer.getSelectionAnchor().columnPosition == selectionLayer.getColumnCount() - 1
+						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) {
+					selectionLayer.clear();
+					e.doit = true;
+				}
 				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
-				selectionLayer.clear();
-				e.doit = true;
+				if (selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) {
+					selectionLayer.clear();
+					e.doit = true;
+				}
 				break;
 			default:
 				break;
