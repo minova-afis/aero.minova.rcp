@@ -50,33 +50,33 @@ import aero.minova.rcp.model.FilterValue;
  */
 public class MinovaTextCellEditor extends AbstractCellEditor {
 
-	private boolean initText = false;
+	protected boolean initText = false;
 
 	/**
 	 * The Text control which is the editor wrapped by this TextCellEditor.
 	 */
-	private Text text = null;
+	protected Text text = null;
 
 	/**
 	 * Flag to configure if the wrapped text editor control is editable or not.
 	 */
-	private boolean editable = true;
+	protected boolean editable = true;
 
 	/**
 	 * Flag to configure whether the editor should commit and move the selection in the corresponding way if the up or down key is pressed.
 	 */
-	private final boolean commitOnUpDown;
+	protected final boolean commitOnUpDown;
 
 	/**
 	 * Flag to configure whether the editor should commit and move the selection in the corresponding way if the left or right key is pressed on the according
 	 * content edge.
 	 */
-	private final boolean commitOnLeftRight;
+	protected final boolean commitOnLeftRight;
 
 	/**
 	 * Flag to configure whether the selection should move after a value was committed after pressing enter.
 	 */
-	private final boolean moveSelectionOnEnter;
+	protected final boolean moveSelectionOnEnter;
 
 	/**
 	 * The selection mode that should be used on activating the wrapped text control. By default the behaviour is to set the selection at the end of the
@@ -88,7 +88,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * <p>
 	 * Note that on overriding the behaviour, you override both activation cases.
 	 */
-	private EditorSelectionEnum selectionMode;
+	protected EditorSelectionEnum selectionMode;
 
 	/**
 	 * The {@link ControlDecorationProvider} responsible for adding a {@link ControlDecoration} to the wrapped editor control. Can be configured via convenience
@@ -100,13 +100,13 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * The {@link IEditErrorHandler} that is used for showing conversion errors on typing into this editor. By default this is the {@link RenderErrorHandling}
 	 * which will render the content in the editor red to indicate a conversion error.
 	 */
-	private IEditErrorHandler inputConversionErrorHandler = new RenderErrorHandling(this.decorationProvider);
+	protected IEditErrorHandler inputConversionErrorHandler = new RenderErrorHandling(this.decorationProvider);
 
 	/**
 	 * The {@link IEditErrorHandler} that is used for showing validation errors on typing into this editor. By default this is the {@link RenderErrorHandling}
 	 * which will render the content in the editor red to indicate a validation error.
 	 */
-	private IEditErrorHandler inputValidationErrorHandler = new RenderErrorHandling(this.decorationProvider);
+	protected IEditErrorHandler inputValidationErrorHandler = new RenderErrorHandling(this.decorationProvider);
 
 	/**
 	 * Flag to determine whether this editor should try to commit and close on pressing the ENTER key. The default is <code>true</code>. For a multi line text
@@ -152,7 +152,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	/**
 	 * Creates the default TextCellEditor that does not commit on pressing the up/down arrow keys and will not move the selection on committing a value by
 	 * pressing enter.
-	 */
+	 */	
 	public MinovaTextCellEditor() {
 		this(false);
 	}
@@ -388,6 +388,8 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 							&& control.getCaretPosition() == control.getCharCount()) {
 						commit(MoveDirectionEnum.RIGHT);
 					}
+				} else if(event.keyCode == SWT.TAB) {
+					commit(MoveDirectionEnum.RIGHT);	
 				}
 			}
 
