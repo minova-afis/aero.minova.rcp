@@ -1,6 +1,8 @@
 package aero.minova.rcp.rcp.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -30,13 +32,33 @@ public class MinovaSection extends Section {
 		this.imageLink.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
 			public void linkActivated(final HyperlinkEvent e) {
-				if (!isExpanded()) {
-					setExpanded(true);
-				} else if (MinovaSection.this.getExpandable()) {
-					setExpanded(false);
+				setExpandState();
+			}
+
+		});
+
+		this.textLabel.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// Wollen nichts tun
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.SPACE) {
+					setExpandState();
 				}
 			}
 		});
+	}
+
+	public void setExpandState() {
+		if (!isExpanded()) {
+			internalSetExpanded(true);
+		} else if (MinovaSection.this.getExpandable()) {
+			setExpanded(false);
+		}
 	}
 
 	public void setImage(final Image image) {

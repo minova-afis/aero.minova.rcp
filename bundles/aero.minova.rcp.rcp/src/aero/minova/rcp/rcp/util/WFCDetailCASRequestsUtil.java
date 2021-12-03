@@ -434,7 +434,7 @@ public class WFCDetailCASRequestsUtil {
 
 		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(buildForm)) {
 
-			if (getKeys() == null && buildForm.equals(form)) {
+			if (getKeys() == null && buildForm.equals(form)) { // Hauptmaske, keine Keys gegeben (Insert)
 				rb.withValue(null);
 			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) { // OPs
 				if (getKeys() != null) { // Bei Update Key-Wert aus Hauptmaske
@@ -443,8 +443,10 @@ public class WFCDetailCASRequestsUtil {
 				} else { // Bei Insert ReferenceValue auf Hauptmasken-Wert setzen
 					rb.withValue(new ReferenceValue(Constants.TRANSACTION_PARENT, keysToIndex.get(f.getName())));
 				}
-			} else if (getKeys().containsKey(f.getName())) {
+			} else if (getKeys() != null && getKeys().containsKey(f.getName())) { // Hauptmaske, Keys gegeben (Update)
 				rb.withValue(getKeys().get(f.getName()));
+			} else {
+				rb.withValue(null);
 			}
 			valuePosition++;
 		}
