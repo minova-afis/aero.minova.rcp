@@ -423,7 +423,7 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty()) {
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
 				}
 				selectionLayer.clear();
@@ -431,7 +431,8 @@ public class SectionGrid {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null
+						&& ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != getNatTable()) {
 					getNatTable()
 							.doCommand(new SelectCellCommand(selectionLayer, selectionLayer.getColumnPositionByIndex(viewportLayer.getColumnIndexByPosition(0)),
 									selectionLayer.getRowPositionByIndex(viewportLayer.getRowIndexByPosition(0)), false, false));
