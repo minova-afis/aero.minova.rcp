@@ -55,7 +55,7 @@ public class MinovaSection extends Section {
 
 	public void setExpandState() {
 		if (!isExpanded()) {
-			internalSetExpanded(true);
+			setExpanded(true);
 		} else if (MinovaSection.this.getExpandable()) {
 			setExpanded(false);
 		}
