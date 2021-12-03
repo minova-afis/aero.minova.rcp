@@ -595,7 +595,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		final ToolBar bar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT | SWT.NO_FOCUS);
 
 		List<aero.minova.rcp.form.model.xsd.Button> buttons = null;
-		if (headOPOGWrapper.isHead) {
+		if (headOPOGWrapper.headOrPageOrGrid instanceof Head) {
 			buttons = ((Head) headOPOGWrapper.headOrPageOrGrid).getButton();
 		} else {
 			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
@@ -718,10 +718,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			String groupName = btn.getGroup();
 			// Suche Gruppe
 			for (MToolBarElement element : mPart.getToolbar().getChildren()) {
-				if(groupName.equalsIgnoreCase(element.getPersistedState().get("GroupName"))) {
+				if (groupName.equalsIgnoreCase(element.getPersistedState().get("GroupName"))) {
 					groupMenu = ((MHandledToolItem) element).getMenu();
-				}else {
-					//Gruppe erstellen
+				} else {
+					// Gruppe erstellen
 					groupMenu = eModelService.createModelElement(MMenu.class);
 					element.getPersistedState().put("GroupName", btn.getGroup());
 					handledToolItem.setMenu(groupMenu);
