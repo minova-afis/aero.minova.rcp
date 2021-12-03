@@ -45,8 +45,7 @@ public class MinovaSection extends Section {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-
+				// Wollen nichts tun
 			}
 
 			@Override
@@ -55,15 +54,13 @@ public class MinovaSection extends Section {
 					if (expandable) {
 						if (isExpanded()) {
 							internalSetExpanded(false);
-						} else {
-							internalSetExpanded(true);
+						}  else if (MinovaSection.this.getExpandable()) {
+							setExpanded(false);
 						}
 					}
-			}
-
+				}
 			}
 		});
-
 	}
 
 	public void setImage(final Image image) {
