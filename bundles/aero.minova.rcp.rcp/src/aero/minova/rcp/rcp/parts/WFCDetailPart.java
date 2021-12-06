@@ -60,8 +60,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -516,21 +514,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			section.setImage(resManager.createImage(imageDescriptor));
 		}
 
-		section.addExpansionListener(new IExpansionListener() {
-			@Override
-			public void expansionStateChanging(ExpansionEvent e) {}
-
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				prefsDetailSections.put(prefsExpandedString, e.getState() + "");
-				try {
-					prefsDetailSections.flush();
-				} catch (BackingStoreException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
@@ -925,8 +908,22 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@PersistState
 	public void persistState() {
+		// Grids
 		for (SectionGrid sg : sectionGrids) {
 			sg.saveState();
+		}
+
+		// Sections, ein-/ausgeklappt
+		for (MSection s : mDetail.getMSectionList()) {
+			Section section = ((SectionAccessor) s.getSectionAccessor()).getSection();
+			String prefsExpandedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".expanded";
+			prefsDetailSections.put(prefsExpandedString, section.isExpanded() + "");
+		}
+
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e1) {
+			e1.printStackTrace();
 		}
 	}
 
