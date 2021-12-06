@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -106,6 +107,7 @@ import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
@@ -143,6 +145,10 @@ public class SectionGrid {
 	private MWindow mwindow;
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
+	boolean gridTabNavigation;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -445,14 +451,14 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
-				if (selectionLayer.getSelectionAnchor().columnPosition == selectionLayer.getColumnCount() - 1
-						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) {
+				if ((selectionLayer.getSelectionAnchor().columnPosition == selectionLayer.getColumnCount() - 1
+						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) || (gridTabNavigation)) {
 					selectionLayer.clear();
 					e.doit = true;
 				}
 				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
-				if (selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) {
+				if ((selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) || (gridTabNavigation)) {
 					selectionLayer.clear();
 					e.doit = true;
 				}

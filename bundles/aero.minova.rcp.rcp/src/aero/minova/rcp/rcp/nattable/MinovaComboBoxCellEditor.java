@@ -63,8 +63,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					EHandlerService handlerService = getHandlerService(combo);
 					handlerService.executeHandler(command);
 					close();
-				} else if (event.keyCode == SWT.TAB) {
-					commit(MoveDirectionEnum.RIGHT, true);
 				} else if (event.keyCode == SWT.ESC) {
 					if (MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE) {
 						close();
