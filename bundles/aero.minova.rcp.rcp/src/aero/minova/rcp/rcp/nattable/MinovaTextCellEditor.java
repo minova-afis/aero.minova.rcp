@@ -152,7 +152,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	/**
 	 * Creates the default TextCellEditor that does not commit on pressing the up/down arrow keys and will not move the selection on committing a value by
 	 * pressing enter.
-	 */	
+	 */
 	public MinovaTextCellEditor() {
 		this(false);
 	}
@@ -205,7 +205,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		// editor is activated by keypress
 		if (originalCanonicalValue instanceof Character) {
 			this.text.setText(originalCanonicalValue.toString());
-			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.END);
+			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.ALL);
 		}
 		// if there is no initial value, handle the original canonical value to
 		// transfer it to the text control
@@ -252,43 +252,6 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 
 		if (originalCanonicalValue instanceof FilterValue) {
 			this.text.setText(((FilterValue) originalCanonicalValue).getUserInput());
-		}
-
-		// System.out.println("OS-Name:" + System.getProperty("os.name"));
-		if (System.getProperty("os.name").startsWith("Mac")) {
-			initText = true;
-			this.text.addVerifyListener(new VerifyListener() {
-
-				@Override
-				public void verifyText(VerifyEvent e) {
-					Text text1 = (Text) e.getSource();
-					if (initText && !verifyText) {
-						System.out.println("Verify:" + e.text + "," + "text Verify:" + ((Text) e.getSource()).getText() + ", bool=" + initText);
-						// Text schreiben + erstes zeichen
-						verifyText = true;
-						e.doit = false;
-						text1.setText(text1.getText() + e.text);
-						text1.setSelection(text1.getText().length());
-						initText = false;
-						verifyText = false;
-					}
-				}
-			});
-
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						if (!text.isDisposed() && initText) {
-							text.setSelection(text.getText().length());
-							initText = false;
-							System.out.println("Asynch Selection ändern:" + text.getText());
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
 		}
 
 		return this.text;
@@ -388,8 +351,8 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 							&& control.getCaretPosition() == control.getCharCount()) {
 						commit(MoveDirectionEnum.RIGHT);
 					}
-				} else if(event.keyCode == SWT.TAB) {
-					commit(MoveDirectionEnum.RIGHT);	
+				} else if (event.keyCode == SWT.TAB) {
+					commit(MoveDirectionEnum.RIGHT);
 				}
 			}
 
@@ -481,16 +444,17 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * @see Text#setSelection(int, int)
 	 */
 	private void selectText(EditorSelectionEnum selectionMode) {
-		int textLength = this.text.getText().length();
-		if (textLength > 0) {
-			if (selectionMode == EditorSelectionEnum.ALL) {
-				this.text.setSelection(0, textLength);
-			} else if (selectionMode == EditorSelectionEnum.END) {
-				this.text.setSelection(textLength, textLength);
-			} else if (selectionMode == EditorSelectionEnum.START) {
-				this.text.setSelection(0);
-			}
-		}
+		this.text.selectAll();
+//		int textLength = this.text.getText().length();
+//		if (textLength > 0) {
+//			if (selectionMode == EditorSelectionEnum.ALL) {
+//				this.text.setSelection(0, textLength);
+//			} else if (selectionMode == EditorSelectionEnum.END) {
+//				this.text.setSelection(textLength, textLength);
+//			} else if (selectionMode == EditorSelectionEnum.START) {
+//				this.text.setSelection(0);
+//			}
+//		}
 	}
 
 	/**
