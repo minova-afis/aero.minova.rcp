@@ -95,6 +95,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.KeyType;
+import aero.minova.rcp.model.ReferenceValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -189,7 +190,6 @@ public class SectionGrid {
 	private ViewportLayer viewportLayer;
 
 	private GlazedListsEventLayer eventLayer;
-
 
 	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
 		this.section = section;
@@ -541,21 +541,7 @@ public class SectionGrid {
 	}
 
 	private void addRowsFromTable(Table rowsToAdd) {
-		for (Row rowInNewTable : rowsToAdd.getRows()) {
-			Row rowInOriginal = this.dataTable.addRow();
-
-			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
-			for (Column originalColumn : this.dataTable.getColumns()) {
-
-				for (Column newColumn : rowsToAdd.getColumns()) {
-					if (originalColumn.getName().equals(newColumn.getName())) {
-						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
-						int index = this.dataTable.getColumns().indexOf(originalColumn);
-						rowInOriginal.setValue(v, index);
-					}
-				}
-			}
-		}
+		this.dataTable.addRowsFromTable(rowsToAdd);
 		updateNatTable();
 	}
 
@@ -689,14 +675,14 @@ public class SectionGrid {
 	}
 
 	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
+
 		for (Row r : dataTable.getRows()) {
 
 			if (!getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen
 
 				for (Field f : grid.getField()) {
 					if (getFieldnameToValue().containsKey(f.getName())) {
-						Value v = mDetail.getField(getFieldnameToValue().get(f.getName())).getValue();
-						r.setValue(v, grid.getField().indexOf(f));
+						setReferenceOrMainValue(r, primaryKeys, getFieldnameToValue().get(f.getName()), grid.getField().indexOf(f));
 					}
 				}
 
@@ -706,15 +692,25 @@ public class SectionGrid {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
-						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
-							r.setValue(primaryKeys.get(f.getName()), index);
+						if (primaryKeys != null && primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
+							setReferenceOrMainValue(r, primaryKeys, f.getName(), index);
 						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
-							r.setValue(primaryKeys.get("KeyLong"), index);
+							setReferenceOrMainValue(r, primaryKeys, Constants.TABLE_KEYLONG, index);
 						}
 						firstPrimary = false;
 					}
 				}
 			}
+		}
+	}
+
+	private void setReferenceOrMainValue(Row r, Map<String, Value> primaryKeys, String mainFieldName, int indexInRow) {
+		if (primaryKeys == null) { // Bei Insert ReferenceValue
+			ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, mainFieldName);
+			r.setValue(v, indexInRow);
+		} else { // Bei Update Wert aus der Hauptmaske
+			Value v = mDetail.getField(mainFieldName).getValue();
+			r.setValue(v, indexInRow);
 		}
 	}
 
@@ -915,7 +911,7 @@ public class SectionGrid {
 	}
 
 	public void updateGridLookupValues() {
-		gridConfiguration.updateConteProvider();
+		gridConfiguration.updateContentProvider();
 	}
 
 }

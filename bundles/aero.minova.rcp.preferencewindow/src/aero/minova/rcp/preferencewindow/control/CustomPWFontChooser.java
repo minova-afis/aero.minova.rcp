@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.opal.commons.ResourceManager;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -18,8 +19,8 @@ public class CustomPWFontChooser extends CustomPWChooser {
 	 * @param label       associated label
 	 * @param propertyKey associated key
 	 */
-	public CustomPWFontChooser(final String label, final String propertyKey, TranslationService translationService) {
-		super(label, propertyKey, translationService);
+	public CustomPWFontChooser(final String label, @Optional  String tooltip, final String propertyKey, TranslationService translationService) {
+		super(label, tooltip, propertyKey, translationService);
 	}
 
 	/**

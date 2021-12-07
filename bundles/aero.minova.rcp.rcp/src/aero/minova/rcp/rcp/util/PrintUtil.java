@@ -36,23 +36,34 @@ public class PrintUtil {
 
 	public static void getXMLAndShowPDF(IDataService dataService, EModelService modelService, EPartService partService, TranslationService translationService,
 			MWindow window, IEventBroker broker, UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath,
-			MPerspective mPerspective) {
+			MPerspective mPerspective, boolean disablePreview) {
 
 		CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElement);
 		tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
 			try {
+				if (xmlPath == null) {
+					return;// Fehler im DataService, wird dort angezeigt
+				}
+
 				// Aus xml und xsl Datei PDF erstellen
 				Path pdfPath = dataService.getStoragePath().resolve(resultPath);
 				URL pdfFile = pdfPath.toFile().toURI().toURL();
 				String xmlString = Files.readString(xmlPath);
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(mPerspective, modelService, partService);
+				if (!disablePreview) {
+					PrintUtil.checkPreview(mPerspective, modelService, partService);
+				}
 
 				String xslPathNew = getXSLPathWithLocale(dataService, xslPath);
 
 				PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPathNew).toFile());
-				PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(mPerspective, modelService, partService));
+
+				if (disablePreview) {
+					PrintUtil.showFile(pdfFile.toString(), null);
+				} else {
+					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(mPerspective, modelService, partService));
+				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
 				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
@@ -87,7 +98,7 @@ public class PrintUtil {
 				}
 			}
 		} catch (Exception e) {}
-		
+
 		return xslPathNew;
 	}
 

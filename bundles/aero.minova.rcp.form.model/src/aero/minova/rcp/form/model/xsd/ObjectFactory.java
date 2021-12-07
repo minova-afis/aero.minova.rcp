@@ -366,6 +366,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ButtonGroup }
+     * 
+     */
+    public ButtonGroup createButtonGroup() {
+        return new ButtonGroup();
+    }
+
+    /**
      * Create an instance of {@link Field.Msg }
      * 
      */

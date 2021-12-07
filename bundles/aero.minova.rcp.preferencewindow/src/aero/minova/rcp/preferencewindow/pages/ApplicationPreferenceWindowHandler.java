@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -29,8 +28,6 @@ import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCheckbox;
-import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWCombo;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWDirectoryChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWFileChooser;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWPasswordText;
@@ -54,13 +51,13 @@ import aero.minova.rcp.preferencewindow.builder.PreferenceSectionDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceTabDescriptor;
 import aero.minova.rcp.preferencewindow.builder.PreferenceWindowModel;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.preferencewindow.control.CustomPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.CustomPWCombo;
 import aero.minova.rcp.preferencewindow.control.CustomPWFloatText;
 import aero.minova.rcp.preferencewindow.control.CustomPWFontChooser;
 import aero.minova.rcp.preferencewindow.control.CustomPWIntegerText;
 import aero.minova.rcp.preferencewindow.control.CustomPWStringText;
 import aero.minova.rcp.preferencewindow.control.DateFormattingWidget;
-import aero.minova.rcp.preferencewindow.control.ExplanationLabelForPWCheckbox;
 import aero.minova.rcp.preferencewindow.control.PWLocale;
 import aero.minova.rcp.preferencewindow.control.SendLogsButton;
 import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
@@ -184,13 +181,12 @@ public class ApplicationPreferenceWindowHandler {
 		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
 
-			
 			PlainMessageDialog confirmRestart = getBuilder(activeShell, translationService.translate("@Action.Restart", null))
 					.buttonLabels(List.of(translationService.translate("@Action.Restart", null), translationService.translate("@Abort", null)))
 					.message(translationService.translate("@Preferences.RestartMessage", null)).build();
-			
+
 			int openConfirm = confirmRestart.open();
-			if (openConfirm== 0) {
+			if (openConfirm == 0) {
 				if (!currentTheme.equals(newTheme)) {
 					updateTheme(newTheme, themeEngine, workbench);
 				} else {
@@ -242,13 +238,13 @@ public class ApplicationPreferenceWindowHandler {
 		PWWidget widget = null;
 		switch (pref.getDisplayType()) {
 		case STRING:
-			widget = new CustomPWStringText(pref.getLabel(), key);
+			widget = new CustomPWStringText(pref.getLabel(), pref.getTooltip(), key);
 			break;
 		case INTEGER:
-			widget = new CustomPWIntegerText(pref.getLabel(), key);
+			widget = new CustomPWIntegerText(pref.getLabel(), pref.getTooltip(), key);
 			break;
 		case FLOAT:
-			widget = new CustomPWFloatText(pref.getLabel(), key);
+			widget = new CustomPWFloatText(pref.getLabel(), pref.getTooltip(), key);
 			break;
 		case FILE:
 			widget = new PWFileChooser(pref.getLabel(), key).setIndent(25);
@@ -257,13 +253,13 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new PWDirectoryChooser(pref.getLabel(), key).setIndent(25);
 			break;
 		case ZONEID:
-			widget = new CustomPWCombo(pref.getLabel(), key, values).setAlignment(GridData.FILL);
+			widget = new CustomPWCombo(pref.getLabel(), pref.getTooltip(), key, values).setAlignment(GridData.FILL);
 			break;
 		case COMBO:
-			widget = new CustomPWCombo(pref.getLabel(), key, values).setWidth(50);
+			widget = new CustomPWCombo(pref.getLabel(), pref.getTooltip(), key, values).setWidth(50);
 			break;
 		case CHECK:
-			widget = new PWCheckbox(pref.getLabel(), key).setIndent(25).setAlignment(SWT.FILL);
+			widget = new CustomPWCheckbox(pref.getLabel(), pref.getTooltip(), key).setIndent(25).setAlignment(SWT.FILL);
 			break;
 		case URL:
 			widget = new PWURLText(pref.getLabel(), key);
@@ -275,31 +271,28 @@ public class ApplicationPreferenceWindowHandler {
 			widget = new PWTextarea(pref.getLabel(), key);
 			break;
 		case FONT:
-			widget = new CustomPWFontChooser(pref.getLabel(), key, translationService);
+			widget = new CustomPWFontChooser(pref.getLabel(), pref.getTooltip(), key, translationService);
 			break;
 		case LOCALE:
-			widget = new PWLocale(pref.getLabel(), ApplicationPreferences.LOCALE_LANGUAGE, application.getContext(), translationService, dataService)
-					.setAlignment(GridData.FILL);
+			widget = new PWLocale(pref.getLabel(), pref.getTooltip(), ApplicationPreferences.LOCALE_LANGUAGE, application.getContext(), translationService,
+					dataService).setAlignment(GridData.FILL);
 			break;
 		case CUSTOMCHECK:
 			if (pref.getKey().equals("DefaultWorkspace")) {
-				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), key, translationService).setIndent(25);
+				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), pref.getTooltip(), key, translationService).setIndent(25);
 			} else {
-				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), key, translationService, dataService, application.getContext(), workbench)
-						.setIndent(25);
+				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), pref.getTooltip(), key, translationService, dataService, application.getContext(),
+						workbench).setIndent(25);
 			}
 			break;
 		case DATE_UTIL:
-			widget = new DateFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
+			widget = new DateFormattingWidget(pref.getLabel(), pref.getTooltip(), key, translationService, s).setIndent(25);
 			break;
 		case TIME_UTIL:
-			widget = new TimeFormattingWidget(pref.getLabel(), key, translationService, s).setIndent(25);
-			break;
-		case CHECKEXPLANATION:
-			widget = new ExplanationLabelForPWCheckbox(pref.getLabel(), key, translationService).setIndent(25).setAlignment(SWT.FILL);
+			widget = new TimeFormattingWidget(pref.getLabel(), pref.getTooltip(), key, translationService, s).setIndent(25);
 			break;
 		case SENDLOGSBUTTON:
-			widget = new SendLogsButton(pref.getLabel(), key, translationService, dataService);
+			widget = new SendLogsButton(pref.getLabel(), pref.getTooltip(), key, translationService, dataService);
 			break;
 		default:
 			break;
