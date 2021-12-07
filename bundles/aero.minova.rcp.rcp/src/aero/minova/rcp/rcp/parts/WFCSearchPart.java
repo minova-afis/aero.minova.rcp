@@ -278,7 +278,7 @@ public class WFCSearchPart extends WFCFormPart {
 		Table prefTable = mjs.json2Table(string, true);
 
 		getData().getRows().clear();
-		getData().getRows().addAll(prefTable.getRows());
+		getData().addRowsFromTable(prefTable);
 		updateUserInput();
 
 		// Spaltenanordung und -breite
@@ -296,7 +296,7 @@ public class WFCSearchPart extends WFCFormPart {
 			order.add(position);
 			bodyDataLayer.setColumnWidthByPosition(position, width);
 		}
-		// TODO längen prüfen und ggf ergänzen
+
 		if (columnReorderLayer.getColumnIndexOrder().size() < order.size()) {
 			ArrayList<Integer> toDelete = new ArrayList<>();
 			for (int i : order) {

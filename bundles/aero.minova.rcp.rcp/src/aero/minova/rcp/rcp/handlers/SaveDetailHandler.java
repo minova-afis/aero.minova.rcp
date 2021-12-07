@@ -47,20 +47,21 @@ public class SaveDetailHandler implements ValueChangeListener, GridChangeListene
 	@CanExecute
 	public boolean canExecute(MPart part, @Named(IServiceConstants.ACTIVE_SELECTION) @Optional Object selection) {
 		if (part.getObject() instanceof WFCDetailPart && !saving) {
-			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
+			WFCDetailPart detail = ((WFCDetailPart) part.getObject());
+			MDetail mDetail = detail.getDetail();
 
 			// Handler als Listener hinzufügen, damit auf Änderungen reagiert werden kann
 			if (firstCall) {
-				for (MField f : detail.getFields()) {
+				for (MField f : mDetail.getFields()) {
 					f.addValueChangeListener(this);
 				}
-				for (MGrid g : detail.getGrids()) {
+				for (MGrid g : mDetail.getGrids()) {
 					g.addGridChangeListener(this);
 				}
 			}
 			firstCall = false;
 
-			return detail.allFieldsAndGridsValid();
+			return mDetail.allFieldsAndGridsValid() && detail.getDirtyFlag();
 		}
 		return false;
 	}
