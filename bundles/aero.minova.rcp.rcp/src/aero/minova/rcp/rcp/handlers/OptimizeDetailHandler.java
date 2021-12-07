@@ -10,6 +10,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.parts.WFCStatisticDetailPart;
 
@@ -42,14 +43,20 @@ public class OptimizeDetailHandler {
 		Composite detailComposite;
 		if (detail.getObject() instanceof WFCDetailPart) {
 			WFCDetailPart wfcDetailPart = (WFCDetailPart) detail.getObject();
-			detailComposite = wfcDetailPart.getComposite();
+			detailComposite = (Composite) wfcDetailPart.getComposite().getData(Constants.DETAIL_COMPOSITE);
 		} else {
 			WFCStatisticDetailPart wfcStatisticDetailPart = (WFCStatisticDetailPart) detail.getObject();
 			detailComposite = wfcStatisticDetailPart.getComposite();
 		}
 
-		// Optimale Breite des Details für aktuelle Höhe berechnen (vom Window muss die Höhe für Toolbars, Perspektiven, ... abgezogen werden)
-		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, mwindow.getHeight() - 80).x;
+		// Höhe des Detail composites bei Windowhöhe 900 (unter mac und windows)
+		int defaultHeight = 758;
+		if (System.getProperty("os.name").startsWith("Mac")) {
+			defaultHeight = 789;
+		}
+
+		// Optimale Breite des Details für aktuelle Höhe berechnen (wurde das Window vergrößert ist das noch nicht drinnen, deshalb default)
+		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, Math.max(detailComposite.getClientArea().height, defaultHeight)).x;
 
 		// Standardbreite defaultSectionWidth (für Index/Suche) + Benötigte Breite für Detail (können mehrere Sections nebeneinander sein) + 50 Pixel
 		if (mwindow.getWidth() < defaultSectionWidth + prefDetailWidth + 50) {
