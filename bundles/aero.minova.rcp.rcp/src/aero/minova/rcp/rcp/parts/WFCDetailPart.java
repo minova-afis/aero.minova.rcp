@@ -46,6 +46,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -177,6 +178,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	EModelService eModelService;
 	MApplication mApplication;
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
+	private ScrolledComposite scrolled;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -327,13 +329,25 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void layoutForm(Composite parent) {
-		parent.setLayout(new RowLayout(SWT.VERTICAL));
+
+		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
+		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL);
+		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
+		wrap.setLayout(new RowLayout(SWT.VERTICAL));
+		parent.setData(Constants.DETAIL_COMPOSITE, wrap);
+
+		// Abschnitte der Hauptmaske und OPs erstellen
 		for (Object headOrPage : form.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
-			layoutSection(parent, wrapper);
+			layoutSection(wrap, wrapper);
 		}
+		loadOptionPages(wrap);
 
-		loadOptionPages(parent);
+		scrolled.setContent(wrap);
+		scrolled.setExpandHorizontal(true);
+		scrolled.setExpandVertical(true);
+
+		scrolled.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, wrap));
 
 		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
@@ -346,6 +360,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Helper-Klasse initialisieren
 		initializeHelper(form.getHelperClass());
+	}
+
+	private void adjustScrollbar(ScrolledComposite scrolled, Composite wrap) {
+		int height = scrolled.getClientArea().height;
+		scrolled.setMinSize(wrap.computeSize(SWT.DEFAULT, height));
 	}
 
 	private void initializeHelper(String helperName) {
@@ -521,6 +540,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		createButton(headOrPageOrGrid, section);
 
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
+
+		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
