@@ -452,13 +452,13 @@ public class SectionGrid {
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
 				if ((selectionLayer.getSelectionAnchor().columnPosition == selectionLayer.getColumnCount() - 1
-						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) || (gridTabNavigation)) {
+						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) || !gridTabNavigation) {
 					selectionLayer.clear();
 					e.doit = true;
 				}
 				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
-				if ((selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) || (gridTabNavigation)) {
+				if ((selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) || !gridTabNavigation) {
 					selectionLayer.clear();
 					e.doit = true;
 				}
