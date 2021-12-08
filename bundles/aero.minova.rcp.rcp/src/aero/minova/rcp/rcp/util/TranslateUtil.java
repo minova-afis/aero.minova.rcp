@@ -44,6 +44,12 @@ public class TranslateUtil {
 				if (control instanceof Composite) {
 					translate((Composite) control, translationService, locale);
 				}
+			} else {
+				for (Control child : composite.getChildren()) {
+					if (child instanceof Composite) {
+						translate((Composite) child, translationService, locale);
+					}
+				}
 			}
 		}
 		for (Control control : composite.getChildren()) {
