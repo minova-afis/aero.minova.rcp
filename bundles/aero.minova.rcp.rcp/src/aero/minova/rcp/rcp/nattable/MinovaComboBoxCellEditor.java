@@ -19,7 +19,11 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
@@ -41,6 +45,33 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	private ECommandService getCommandService(Control control) {
 		return (ECommandService) control.getParent().getData("ECommandService");
 	}
+	
+	@Override
+    public MinovaNatCombo createEditorControl(Composite parent) {
+        int style = SWT.NONE;
+        if (!this.freeEdit) {
+            style |= SWT.READ_ONLY;
+        }
+        if (this.multiselect) {
+            style |= SWT.MULTI;
+        }
+        if (this.useCheckbox) {
+            style |= SWT.CHECK;
+        }
+        final MinovaNatCombo combo = (this.iconImage == null)
+                ? new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, showDropdownFilter)
+                : new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, iconImage, showDropdownFilter);
+
+        combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
+
+        if (this.multiselect) {
+            combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
+            combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
+        }
+
+        addNatComboListener(combo);
+        return combo;
+    }
 
 	/**
 	 * Registers special listeners to the {@link NatCombo} regarding the {@link EditModeEnum}, that are needed to commit/close or change the visibility state of
@@ -63,8 +94,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					EHandlerService handlerService = getHandlerService(combo);
 					handlerService.executeHandler(command);
 					close();
-				} else if (event.keyCode == SWT.TAB) {
-					commit(MoveDirectionEnum.RIGHT, true);
 				} else if (event.keyCode == SWT.ESC) {
 					if (MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE) {
 						close();
@@ -86,6 +115,13 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					combo.hideDropdownControl();
 				}
 			}
+		});
+		
+		
+
+		Text text = (Text) combo.getChildren()[0];
+		text.addListener(SWT.Modify, event -> {
+			combo.setItems(contentProvider.filterContent(text.getText()));
 		});
 
 		// Bei Klick auf den Pfeil Lookup Content aktualisieren (Zelle muss deaktiviert werden damit neue Werte angezeigt werden)
@@ -115,4 +151,5 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			});
 		}
 	}
+
 }
