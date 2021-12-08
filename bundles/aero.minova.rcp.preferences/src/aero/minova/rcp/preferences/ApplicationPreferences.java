@@ -265,5 +265,7 @@ public class ApplicationPreferences {
 	 */
 	public static final String SHOW_DELETE_WARNING = "ShowDeleteWarning";
 
+	public static final String GRID_TAB_NAVIGATION = "GridTabNavigation";
+
 	private ApplicationPreferences() {}
 }

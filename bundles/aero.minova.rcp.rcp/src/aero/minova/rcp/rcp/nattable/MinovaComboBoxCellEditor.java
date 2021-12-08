@@ -46,6 +46,13 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	private ECommandService getCommandService(Control control) {
 		return (ECommandService) control.getParent().getData("ECommandService");
 	}
+	
+	@Override
+	public boolean commit(MoveDirectionEnum direction) {
+		boolean commited = super.commit(direction);
+		parent.forceFocus();
+		return commited;
+	}
 
 	@Override
 	public MinovaNatCombo createEditorControl(Composite parent) {

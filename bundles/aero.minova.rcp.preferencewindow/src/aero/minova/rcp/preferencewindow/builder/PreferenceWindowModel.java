@@ -89,6 +89,8 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.LookupEnterSelectNextRequired", null),
 				translationService.translate("@Preferences.LookupEnterSelectNextRequired.Tooltip", null), 0.2, DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SELECT_ALL_CONTROLS, translationService.translate("@Preferences.SelectAllControls", null), null,
+				0.3, DisplayType.CHECK, true));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.GRID_TAB_NAVIGATION, translationService.translate("@Preferences.GridTabNavigation", null), null,
 				0.4, DisplayType.CHECK, true));
 		return ptd;
 	}

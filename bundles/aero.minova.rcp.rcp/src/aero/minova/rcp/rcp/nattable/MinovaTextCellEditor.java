@@ -50,33 +50,33 @@ import aero.minova.rcp.model.FilterValue;
  */
 public class MinovaTextCellEditor extends AbstractCellEditor {
 
-	private boolean initText = false;
+	protected boolean initText = false;
 
 	/**
 	 * The Text control which is the editor wrapped by this TextCellEditor.
 	 */
-	private Text text = null;
+	protected Text text = null;
 
 	/**
 	 * Flag to configure if the wrapped text editor control is editable or not.
 	 */
-	private boolean editable = true;
+	protected boolean editable = true;
 
 	/**
 	 * Flag to configure whether the editor should commit and move the selection in the corresponding way if the up or down key is pressed.
 	 */
-	private final boolean commitOnUpDown;
+	protected final boolean commitOnUpDown;
 
 	/**
 	 * Flag to configure whether the editor should commit and move the selection in the corresponding way if the left or right key is pressed on the according
 	 * content edge.
 	 */
-	private final boolean commitOnLeftRight;
+	protected final boolean commitOnLeftRight;
 
 	/**
 	 * Flag to configure whether the selection should move after a value was committed after pressing enter.
 	 */
-	private final boolean moveSelectionOnEnter;
+	protected final boolean moveSelectionOnEnter;
 
 	/**
 	 * The selection mode that should be used on activating the wrapped text control. By default the behaviour is to set the selection at the end of the
@@ -88,7 +88,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * <p>
 	 * Note that on overriding the behaviour, you override both activation cases.
 	 */
-	private EditorSelectionEnum selectionMode;
+	protected EditorSelectionEnum selectionMode;
 
 	/**
 	 * The {@link ControlDecorationProvider} responsible for adding a {@link ControlDecoration} to the wrapped editor control. Can be configured via convenience
@@ -100,13 +100,13 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * The {@link IEditErrorHandler} that is used for showing conversion errors on typing into this editor. By default this is the {@link RenderErrorHandling}
 	 * which will render the content in the editor red to indicate a conversion error.
 	 */
-	private IEditErrorHandler inputConversionErrorHandler = new RenderErrorHandling(this.decorationProvider);
+	protected IEditErrorHandler inputConversionErrorHandler = new RenderErrorHandling(this.decorationProvider);
 
 	/**
 	 * The {@link IEditErrorHandler} that is used for showing validation errors on typing into this editor. By default this is the {@link RenderErrorHandling}
 	 * which will render the content in the editor red to indicate a validation error.
 	 */
-	private IEditErrorHandler inputValidationErrorHandler = new RenderErrorHandling(this.decorationProvider);
+	protected IEditErrorHandler inputValidationErrorHandler = new RenderErrorHandling(this.decorationProvider);
 
 	/**
 	 * Flag to determine whether this editor should try to commit and close on pressing the ENTER key. The default is <code>true</code>. For a multi line text
@@ -205,7 +205,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		// editor is activated by keypress
 		if (originalCanonicalValue instanceof Character) {
 			this.text.setText(originalCanonicalValue.toString());
-			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.END);
+			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.ALL);
 		}
 		// if there is no initial value, handle the original canonical value to
 		// transfer it to the text control
@@ -252,43 +252,6 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 
 		if (originalCanonicalValue instanceof FilterValue) {
 			this.text.setText(((FilterValue) originalCanonicalValue).getUserInput());
-		}
-
-		// System.out.println("OS-Name:" + System.getProperty("os.name"));
-		if (System.getProperty("os.name").startsWith("Mac")) {
-			initText = true;
-			this.text.addVerifyListener(new VerifyListener() {
-
-				@Override
-				public void verifyText(VerifyEvent e) {
-					Text text1 = (Text) e.getSource();
-					if (initText && !verifyText) {
-						System.out.println("Verify:" + e.text + "," + "text Verify:" + ((Text) e.getSource()).getText() + ", bool=" + initText);
-						// Text schreiben + erstes zeichen
-						verifyText = true;
-						e.doit = false;
-						text1.setText(text1.getText() + e.text);
-						text1.setSelection(text1.getText().length());
-						initText = false;
-						verifyText = false;
-					}
-				}
-			});
-
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						if (!text.isDisposed() && initText) {
-							text.setSelection(text.getText().length());
-							initText = false;
-							System.out.println("Asynch Selection ändern:" + text.getText());
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
 		}
 
 		return this.text;
@@ -388,6 +351,8 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 							&& control.getCaretPosition() == control.getCharCount()) {
 						commit(MoveDirectionEnum.RIGHT);
 					}
+				} else if (event.keyCode == SWT.TAB) {
+					commit(MoveDirectionEnum.RIGHT);
 				}
 			}
 
@@ -479,16 +444,17 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * @see Text#setSelection(int, int)
 	 */
 	private void selectText(EditorSelectionEnum selectionMode) {
-		int textLength = this.text.getText().length();
-		if (textLength > 0) {
-			if (selectionMode == EditorSelectionEnum.ALL) {
-				this.text.setSelection(0, textLength);
-			} else if (selectionMode == EditorSelectionEnum.END) {
-				this.text.setSelection(textLength, textLength);
-			} else if (selectionMode == EditorSelectionEnum.START) {
-				this.text.setSelection(0);
-			}
-		}
+		this.text.selectAll();
+//		int textLength = this.text.getText().length();
+//		if (textLength > 0) {
+//			if (selectionMode == EditorSelectionEnum.ALL) {
+//				this.text.setSelection(0, textLength);
+//			} else if (selectionMode == EditorSelectionEnum.END) {
+//				this.text.setSelection(textLength, textLength);
+//			} else if (selectionMode == EditorSelectionEnum.START) {
+//				this.text.setSelection(0);
+//			}
+//		}
 	}
 
 	/**
