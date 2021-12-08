@@ -8,6 +8,7 @@ import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.LetterOrDigitKeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
@@ -45,33 +46,32 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	private ECommandService getCommandService(Control control) {
 		return (ECommandService) control.getParent().getData("ECommandService");
 	}
-	
+
 	@Override
-    public MinovaNatCombo createEditorControl(Composite parent) {
-        int style = SWT.NONE;
-        if (!this.freeEdit) {
-            style |= SWT.READ_ONLY;
-        }
-        if (this.multiselect) {
-            style |= SWT.MULTI;
-        }
-        if (this.useCheckbox) {
-            style |= SWT.CHECK;
-        }
-        final MinovaNatCombo combo = (this.iconImage == null)
-                ? new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, showDropdownFilter)
-                : new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, iconImage, showDropdownFilter);
+	public MinovaNatCombo createEditorControl(Composite parent) {
+		int style = SWT.NONE;
+		if (!this.freeEdit) {
+			style |= SWT.READ_ONLY;
+		}
+		if (this.multiselect) {
+			style |= SWT.MULTI;
+		}
+		if (this.useCheckbox) {
+			style |= SWT.CHECK;
+		}
+		final MinovaNatCombo combo = (this.iconImage == null) ? new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, showDropdownFilter)
+				: new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, iconImage, showDropdownFilter);
 
-        combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
+		combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
-        if (this.multiselect) {
-            combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
-            combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
-        }
+		if (this.multiselect) {
+			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
+			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
+		}
 
-        addNatComboListener(combo);
-        return combo;
-    }
+		addNatComboListener(combo);
+		return combo;
+	}
 
 	/**
 	 * Registers special listeners to the {@link NatCombo} regarding the {@link EditModeEnum}, that are needed to commit/close or change the visibility state of
@@ -100,6 +100,9 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					} else {
 						combo.hideDropdownControl();
 					}
+				} else if (event.keyCode == SWT.ARROW_DOWN || event.keyCode == SWT.UP) {
+					System.out.println("text");
+					event.doit = true;
 				}
 			}
 
@@ -116,12 +119,31 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 				}
 			}
 		});
-		
-		
 
 		Text text = (Text) combo.getChildren()[0];
-		text.addListener(SWT.Modify, event -> {
-			combo.setItems(contentProvider.filterContent(text.getText()));
+		text.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent event) {
+				if (event.keyCode == SWT.ARROW_DOWN || event.keyCode == SWT.ARROW_UP) {
+					System.out.println("text");
+					combo.showDropdownControl();
+
+					// ensure the arrow key events do not have any further
+					// effect
+					event.doit = false;
+				} else if (LetterOrDigitKeyEventMatcher.isLetterOrDigit(event.character) || (event.keyCode == SWT.DEL || event.keyCode == SWT.BS)) {
+					String entry = text.getText() + event.character;
+					if (event.keyCode == SWT.BS) {
+						String cleanedEntry = entry.substring(0, entry.indexOf(SWT.BS) - 1) + entry.substring(entry.indexOf(SWT.BS) + 1);
+						combo.setItems(contentProvider.filterContent(cleanedEntry));
+					} else if (event.keyCode == SWT.DEL) {
+						String cleanedEntry = entry.substring(0, entry.indexOf(SWT.DEL)) + entry.substring(entry.indexOf(SWT.DEL) + 1);
+						combo.setItems(contentProvider.filterContent(cleanedEntry));
+					} else {
+						combo.setItems(contentProvider.filterContent(entry));
+					}
+				}
+			}
 		});
 
 		// Bei Klick auf den Pfeil Lookup Content aktualisieren (Zelle muss deaktiviert werden damit neue Werte angezeigt werden)
