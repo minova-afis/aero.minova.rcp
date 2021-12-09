@@ -121,16 +121,20 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					// effect
 					event.doit = false;
 				} else if (LetterOrDigitKeyEventMatcher.isLetterOrDigit(event.character) || (event.keyCode == SWT.DEL || event.keyCode == SWT.BS)) {
+
 					String entry = text.getText() + event.character;
-					if (event.keyCode == SWT.BS) {
+					if (event.keyCode == SWT.BS && !text.getText().isEmpty()) {
 						String cleanedEntry = entry.substring(0, entry.indexOf(SWT.BS) - 1) + entry.substring(entry.indexOf(SWT.BS) + 1);
 						combo.setItems(contentProvider.filterContent(cleanedEntry));
-					} else if (event.keyCode == SWT.DEL) {
+					} else if (event.keyCode == SWT.DEL && !text.getText().isEmpty()) {
 						String cleanedEntry = entry.substring(0, entry.indexOf(SWT.DEL)) + entry.substring(entry.indexOf(SWT.DEL) + 1);
 						combo.setItems(contentProvider.filterContent(cleanedEntry));
+					} else if (text.getText().isEmpty()) {
+						combo.setItems(contentProvider.getOriginalValueArray());
 					} else {
 						combo.setItems(contentProvider.filterContent(entry));
 					}
+
 				}
 			}
 		});
