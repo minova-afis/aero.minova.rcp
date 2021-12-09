@@ -43,6 +43,14 @@ public class GridLookupContentProvider {
 			values.addAll(originalValues);
 		});
 	}
+	
+	public String[] getOriginalValueArray() {
+		String[] stringValues = new String[originalValues.size()];
+		for (int i = 0; i < originalValues.size(); i++) {
+			stringValues[i] = originalValues.get(i).keyText;
+		}
+		return stringValues;
+	}
 
 	public String[] filterContent(String entry) {
 
