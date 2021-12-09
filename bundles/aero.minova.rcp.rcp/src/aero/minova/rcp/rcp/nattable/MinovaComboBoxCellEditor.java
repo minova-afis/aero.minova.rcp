@@ -14,6 +14,7 @@ import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -101,8 +102,8 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		combo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				commit(MoveDirectionEnum.NONE, (!MinovaComboBoxCellEditor.this.multiselect && MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE));
-				if (!MinovaComboBoxCellEditor.this.multiselect && MinovaComboBoxCellEditor.this.editMode == EditModeEnum.DIALOG) {
+				commit(MoveDirectionEnum.NONE, (!multiselect && editMode == EditModeEnum.INLINE));
+				if (!multiselect && editMode == EditModeEnum.DIALOG) {
 					// hide the dropdown after a value was selected in the combo
 					// in a dialog
 					combo.hideDropdownControl();
@@ -139,6 +140,19 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			}
 		});
 
+		combo.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent e) {}
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (text.getText().isEmpty()) {
+					combo.setItems(contentProvider.getOriginalValueArray());
+				}
+			}
+		});
+		
 		// Bei Klick auf den Pfeil Lookup Content aktualisieren (Zelle muss deaktiviert werden damit neue Werte angezeigt werden)
 		Control arrow = combo.getChildren()[1];
 		arrow.addMouseListener(new MouseAdapter() {
