@@ -540,21 +540,7 @@ public class SectionGrid {
 	}
 
 	private void addRowsFromTable(Table rowsToAdd) {
-		for (Row rowInNewTable : rowsToAdd.getRows()) {
-			Row rowInOriginal = this.dataTable.addRow();
-
-			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
-			for (Column originalColumn : this.dataTable.getColumns()) {
-
-				for (Column newColumn : rowsToAdd.getColumns()) {
-					if (originalColumn.getName().equals(newColumn.getName())) {
-						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
-						int index = this.dataTable.getColumns().indexOf(originalColumn);
-						rowInOriginal.setValue(v, index);
-					}
-				}
-			}
-		}
+		this.dataTable.addRowsFromTable(rowsToAdd);
 		updateNatTable();
 	}
 

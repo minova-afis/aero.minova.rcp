@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -230,7 +231,11 @@ public class SQLStringUtil {
 			for (int i = 0; i < paramCount; i++) {
 				String val = "null";
 				if (r.getValue(i) != null && r.getValue(i).getValue() != null) {
-					val = r.getValue(i).getValue().toString();
+					Value v = r.getValue(i);
+					val = v.getValue().toString();
+					if (v.getValue() instanceof LookupValue) {
+						val = ((LookupValue) v.getValue()).getIntegerValue() + "";
+					}
 					val = "'" + val + "'";
 				}
 				sb.append(i == 0 ? val : "," + val);

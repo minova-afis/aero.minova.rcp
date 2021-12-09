@@ -38,6 +38,7 @@ public class Constants {
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
 	public static final String CONTROL_GRID_ID = "grid_id";
+	public static final String DETAIL_COMPOSITE = "DetailComposite";
 
 	public static final String CLAZZ = "clazz";
 	public static final String PARAMETER = "parameter";

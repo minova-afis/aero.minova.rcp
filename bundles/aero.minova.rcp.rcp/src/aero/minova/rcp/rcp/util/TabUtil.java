@@ -94,7 +94,8 @@ public class TabUtil {
 		for (Control child : composite.getChildren()) {
 			if (child instanceof ToolBar && selectAllControls && !mSection.isHead()) {
 				tabList.add(1, child);
-			} else if ((child instanceof Twistie && !selectAllControls) || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
+			} else 
+			if (child instanceof Twistie || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
 				// Die sollen nicht in die Tabliste
 			} else {
 				tabList.add(child);

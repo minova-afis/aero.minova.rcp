@@ -53,6 +53,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -67,8 +68,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -188,6 +187,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	EModelService eModelService;
 	MApplication mApplication;
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
+	private ScrolledComposite scrolled;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -342,13 +342,25 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void layoutForm(Composite parent) {
-		parent.setLayout(new RowLayout(SWT.VERTICAL));
+
+		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
+		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL);
+		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
+		wrap.setLayout(new RowLayout(SWT.VERTICAL));
+		parent.setData(Constants.DETAIL_COMPOSITE, wrap);
+
+		// Abschnitte der Hauptmaske und OPs erstellen
 		for (Object headOrPage : form.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
-			layoutSection(parent, wrapper);
+			layoutSection(wrap, wrapper);
 		}
+		loadOptionPages(wrap);
 
-		loadOptionPages(parent);
+		scrolled.setContent(wrap);
+		scrolled.setExpandHorizontal(true);
+		scrolled.setExpandVertical(true);
+
+		scrolled.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, wrap));
 
 		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
@@ -364,6 +376,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 //		Object widget = handledToolItem.getWidget();
 		// Helper-Klasse initialisieren
 		initializeHelper(form.getHelperClass());
+	}
+
+	private void adjustScrollbar(ScrolledComposite scrolled, Composite wrap) {
+		int height = scrolled.getClientArea().height;
+		scrolled.setMinSize(wrap.computeSize(SWT.DEFAULT, height));
 	}
 
 	private void initializeHelper(String helperName) {
@@ -533,21 +550,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			section.setImage(resManager.createImage(imageDescriptor));
 		}
 
-		section.addExpansionListener(new IExpansionListener() {
-			@Override
-			public void expansionStateChanging(ExpansionEvent e) {}
-
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				prefsDetailSections.put(prefsExpandedString, e.getState() + "");
-				try {
-					prefsDetailSections.flush();
-				} catch (BackingStoreException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
@@ -555,6 +557,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		createButton(headOrPageOrGrid, section);
 
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
+
+		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
@@ -1054,8 +1058,22 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@PersistState
 	public void persistState() {
+		// Grids
 		for (SectionGrid sg : sectionGrids) {
 			sg.saveState();
+		}
+
+		// Sections, ein-/ausgeklappt
+		for (MSection s : mDetail.getMSectionList()) {
+			Section section = ((SectionAccessor) s.getSectionAccessor()).getSection();
+			String prefsExpandedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".expanded";
+			prefsDetailSections.put(prefsExpandedString, section.isExpanded() + "");
+		}
+
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e1) {
+			e1.printStackTrace();
 		}
 	}
 
