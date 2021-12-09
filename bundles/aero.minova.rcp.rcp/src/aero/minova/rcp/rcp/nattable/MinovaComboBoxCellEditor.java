@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.Text;
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
+	private NatCombo combo;
+	private int selectionIndex;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
@@ -43,34 +45,23 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	private ECommandService getCommandService(Control control) {
 		return (ECommandService) control.getParent().getData("ECommandService");
 	}
-	
+
 	@Override
 	public boolean commit(MoveDirectionEnum direction) {
+		selectionIndex = combo.getSelectionIndex();
+		setCanonicalValue(contentProvider.getValues());
 		boolean commited = super.commit(direction);
 		parent.forceFocus();
 		return commited;
 	}
 
 	@Override
-	public MinovaNatCombo createEditorControl(Composite parent) {
-		int style = SWT.NONE;
-		if (!this.freeEdit) {
-			style |= SWT.READ_ONLY;
-		}
-		if (this.multiselect) {
-			style |= SWT.MULTI;
-		}
-		if (this.useCheckbox) {
-			style |= SWT.CHECK;
-		}
-		final MinovaNatCombo combo = (this.iconImage == null) ? new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, showDropdownFilter)
-				: new MinovaNatCombo(parent, cellStyle, maxVisibleItems, style, iconImage, showDropdownFilter);
-
-		combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
-
-		if (this.multiselect) {
-			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
-			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
+	public Object getCanonicalValue() {
+		// Item selected from list
+		if (selectionIndex > 0) {
+			return contentProvider.getValues().get(selectionIndex);
+		} else {
+			return contentProvider.getValues().get(0);
 		}
 	}
 
@@ -83,6 +74,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	@Override
 	protected void addNatComboListener(final NatCombo combo) {
+		this.combo = combo;
 		combo.addKeyListener(new KeyAdapter() {
 
 			@Override
