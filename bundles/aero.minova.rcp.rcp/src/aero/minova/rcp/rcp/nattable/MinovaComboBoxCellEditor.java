@@ -20,10 +20,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
@@ -75,9 +72,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
 			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
 		}
-
-		addNatComboListener(combo);
-		return combo;
 	}
 
 	/**
@@ -95,21 +89,18 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			public void keyPressed(KeyEvent event) {
 				if ((event.keyCode == SWT.CR) || (event.keyCode == SWT.KEYPAD_CR)) {
 					combo.getParent().forceFocus();
-					commit(MoveDirectionEnum.NONE, false);
+					commit(MoveDirectionEnum.NONE);
 					Map<String, String> parameter = new HashMap<>();
 					ParameterizedCommand command = getCommandService(combo).createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 					EHandlerService handlerService = getHandlerService(combo);
 					handlerService.executeHandler(command);
 					close();
 				} else if (event.keyCode == SWT.ESC) {
-					if (MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE) {
+					if (editMode == EditModeEnum.INLINE) {
 						close();
 					} else {
 						combo.hideDropdownControl();
 					}
-				} else if (event.keyCode == SWT.ARROW_DOWN || event.keyCode == SWT.UP) {
-					System.out.println("text");
-					event.doit = true;
 				}
 			}
 
@@ -132,7 +123,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			@Override
 			public void keyPressed(KeyEvent event) {
 				if (event.keyCode == SWT.ARROW_DOWN || event.keyCode == SWT.ARROW_UP) {
-					System.out.println("text");
 					combo.showDropdownControl();
 
 					// ensure the arrow key events do not have any further
@@ -162,7 +152,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			}
 		});
 
-		if (this.editMode == EditModeEnum.INLINE) {
+		if (editMode == EditModeEnum.INLINE) {
 			combo.addShellListener(new ShellAdapter() {
 				@Override
 				public void shellClosed(ShellEvent e) {
@@ -171,7 +161,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			});
 		}
 
-		if (this.editMode == EditModeEnum.DIALOG) {
+		if (editMode == EditModeEnum.DIALOG) {
 			combo.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusLost(FocusEvent e) {
