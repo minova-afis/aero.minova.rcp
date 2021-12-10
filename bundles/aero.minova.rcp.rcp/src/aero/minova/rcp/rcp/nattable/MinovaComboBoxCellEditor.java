@@ -33,7 +33,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 * the combo.
 	 */
 	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
-		super(contentProvider.getOriginalValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
+		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
 		this.contentProvider = contentProvider;
 	}
 
