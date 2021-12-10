@@ -8,34 +8,32 @@ import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.LetterOrDigitKeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Display;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
-	private NatCombo combo;
-	private int selectionIndex;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
 	 * the combo.
 	 */
 	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
-		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
+		super(contentProvider.getOriginalValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
 		this.contentProvider = contentProvider;
 	}
 
@@ -49,22 +47,37 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	@Override
 	public boolean commit(MoveDirectionEnum direction) {
-		selectionIndex = combo.getSelectionIndex();
-		setCanonicalValue(contentProvider.getValues());
 		boolean commited = super.commit(direction);
 		parent.forceFocus();
 		return commited;
 	}
-
+	
 	@Override
-	public Object getCanonicalValue() {
-		// Item selected from list
-		if (selectionIndex > 0) {
-			return contentProvider.getValues().get(selectionIndex);
-		} else {
-			return contentProvider.getValues().get(0);
-		}
-	}
+    public NatCombo createEditorControl(Composite parent) {
+        int style = SWT.NONE;
+        if (!this.freeEdit) {
+            style |= SWT.READ_ONLY;
+        }
+        if (this.multiselect) {
+            style |= SWT.MULTI;
+        }
+        if (this.useCheckbox) {
+            style |= SWT.CHECK;
+        }
+        final MinovaNatCombo combo = (this.iconImage == null)
+                ? new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.showDropdownFilter)
+                : new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.iconImage, this.showDropdownFilter);
+
+        combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
+
+        if (this.multiselect) {
+            combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
+            combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
+        }
+
+        addNatComboListener(combo);
+        return combo;
+    }
 
 	/**
 	 * Registers special listeners to the {@link NatCombo} regarding the {@link EditModeEnum}, that are needed to commit/close or change the visibility state of
@@ -75,14 +88,13 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	@Override
 	protected void addNatComboListener(final NatCombo combo) {
-		this.combo = combo;
 		combo.addKeyListener(new KeyAdapter() {
 
 			@Override
 			public void keyPressed(KeyEvent event) {
 				if ((event.keyCode == SWT.CR) || (event.keyCode == SWT.KEYPAD_CR)) {
-					combo.getParent().forceFocus();
-					commit(MoveDirectionEnum.NONE);
+					parent.forceFocus();
+					commit(MoveDirectionEnum.NONE, false);
 					Map<String, String> parameter = new HashMap<>();
 					ParameterizedCommand command = getCommandService(combo).createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 					EHandlerService handlerService = getHandlerService(combo);
@@ -111,48 +123,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			}
 		});
 
-		Text text = (Text) combo.getChildren()[0];
-		text.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent event) {
-				if (event.keyCode == SWT.ARROW_DOWN || event.keyCode == SWT.ARROW_UP) {
-					combo.showDropdownControl();
-
-					// ensure the arrow key events do not have any further
-					// effect
-					event.doit = false;
-				} else if (LetterOrDigitKeyEventMatcher.isLetterOrDigit(event.character) || (event.keyCode == SWT.DEL || event.keyCode == SWT.BS)) {
-
-					String entry = text.getText() + event.character;
-					if (event.keyCode == SWT.BS && !text.getText().isEmpty()) {
-						String cleanedEntry = entry.substring(0, entry.indexOf(SWT.BS) - 1) + entry.substring(entry.indexOf(SWT.BS) + 1);
-						combo.setItems(contentProvider.filterContent(cleanedEntry));
-					} else if (event.keyCode == SWT.DEL && !text.getText().isEmpty()) {
-						String cleanedEntry = entry.substring(0, entry.indexOf(SWT.DEL)) + entry.substring(entry.indexOf(SWT.DEL) + 1);
-						combo.setItems(contentProvider.filterContent(cleanedEntry));
-					} else if (text.getText().isEmpty()) {
-						combo.setItems(contentProvider.getOriginalValueArray());
-					} else {
-						combo.setItems(contentProvider.filterContent(entry));
-					}
-
-				}
-			}
-		});
-
-		combo.addFocusListener(new FocusListener() {
-
-			@Override
-			public void focusLost(FocusEvent e) {}
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				if (text.getText().isEmpty()) {
-					combo.setItems(contentProvider.getOriginalValueArray());
-				}
-			}
-		});
-		
 		// Bei Klick auf den Pfeil Lookup Content aktualisieren (Zelle muss deaktiviert werden damit neue Werte angezeigt werden)
 		Control arrow = combo.getChildren()[1];
 		arrow.addMouseListener(new MouseAdapter() {
