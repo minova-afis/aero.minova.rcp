@@ -806,9 +806,16 @@ public class DataService implements IDataService {
 
 			sendRequest.thenApply(response -> {
 				log("CAS Answer Send Logs: " + response.statusCode() + " " + response.body());
-				if (response.statusCode() != 200) {
-					throw new RuntimeException("Server returned " + response.statusCode());
+				if (response.statusCode() != 200) { // Fehlermeldung anzeigen
+					Table error = new Table();
+					error.setName(ERROR);
+					error.addColumn(new Column("Message", DataType.STRING));
+					error.addRow(RowBuilder.newRow().withValue(response.body()).create());
+					ErrorObject eo = new ErrorObject(error, username, "sendingLogs");
+					postError(eo);
+					return null;
 				}
+
 				postNotification("msg.UploadSuccess");
 				return response;
 			});
