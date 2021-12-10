@@ -331,9 +331,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void layoutForm(Composite parent) {
 
 		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
-		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL);
+		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
-		wrap.setLayout(new RowLayout(SWT.VERTICAL));
+		RowLayout rowLayout = new RowLayout(SWT.VERTICAL);
+		rowLayout.wrap = false;
+		wrap.setLayout(rowLayout);
 		parent.setData(Constants.DETAIL_COMPOSITE, wrap);
 
 		// Abschnitte der Hauptmaske und OPs erstellen
@@ -364,7 +366,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void adjustScrollbar(ScrolledComposite scrolled, Composite wrap) {
 		int height = scrolled.getClientArea().height;
-		scrolled.setMinSize(wrap.computeSize(SWT.DEFAULT, height));
+		int width = scrolled.getClientArea().width;
+
+		scrolled.setMinSize(wrap.computeSize(SWT.DEFAULT, height).x, wrap.computeSize(width, SWT.DEFAULT).y);
 	}
 
 	private void initializeHelper(String helperName) {
