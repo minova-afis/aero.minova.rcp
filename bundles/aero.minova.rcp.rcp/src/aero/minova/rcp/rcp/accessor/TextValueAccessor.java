@@ -22,7 +22,6 @@ public class TextValueAccessor extends AbstractValueAccessor {
 		String newText = value == null ? "" : value.getStringValue();
 		String currentText = ((Text) control).getText();
 
-		System.out.println(field.getName() + " " + newText + " " + currentText);
 		if (!newText.equals(currentText)) {
 			((Text) control).setText(newText);
 		}
