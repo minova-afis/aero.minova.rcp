@@ -262,9 +262,9 @@ public class LookupComposite extends Composite {
 			// Der Wert des Feldes soll auf null gesetzt werden, wenn der Text gelöscht oder geändert wird
 			MField field = (MField) text.getParent().getData(Constants.CONTROL_FIELD);
 			if (string.isBlank()) {
-				field.setValue(null, false);
+				field.setValue(null, true);
 			} else if (field.getValue() instanceof LookupValue) {
-				field.setValue(null, false);
+				field.setValue(null, true);
 				// Den Eingetragenen Text wieder ins Textfeld setzten
 				text.setText(string);
 				text.setSelection(text.getText().length());
