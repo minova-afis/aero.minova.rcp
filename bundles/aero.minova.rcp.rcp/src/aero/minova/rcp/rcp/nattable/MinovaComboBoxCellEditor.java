@@ -41,10 +41,10 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	private ECommandService getCommandService(Control control) {
 		return (ECommandService) control.getParent().getData("ECommandService");
 	}
-	
+
 	@Override
-	public boolean commit(MoveDirectionEnum direction) {
-		boolean commited = super.commit(direction);
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit, boolean skipValidation) {
+		boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
 		parent.forceFocus();
 		return commited;
 	}
