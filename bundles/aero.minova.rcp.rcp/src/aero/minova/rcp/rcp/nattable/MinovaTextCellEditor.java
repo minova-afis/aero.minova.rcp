@@ -206,7 +206,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		if (originalCanonicalValue instanceof Character) {
 			this.text.setText(originalCanonicalValue.toString());
 			initText = true;
-			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.END);
+			selectText(EditorSelectionEnum.END);
 		}
 		// if there is no initial value, handle the original canonical value to
 		// transfer it to the text control
@@ -254,17 +254,13 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 			this.text.setText(((FilterValue) originalCanonicalValue).getUserInput());
 		}
 
-		this.text.addVerifyListener(e -> {
-			Text text1 = (Text) e.getSource();
-			if (initText && !verifyText) {
-				// Text schreiben + erstes zeichen
-				verifyText = true;
-				e.doit = false;
-				text1.setText(text1.getText() + e.text);
-				text1.setSelection(text1.getText().length());
-				initText = false;
-				verifyText = false;
-			}
+		Display.getDefault().asyncExec(() -> {
+			try {
+				if (!text.isDisposed() && initText) {
+					text.setSelection(text.getText().length());
+					initText = false;
+				}
+			} catch (Exception e) {}
 		});
 
 		return this.text;
