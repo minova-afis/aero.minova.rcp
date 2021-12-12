@@ -112,6 +112,7 @@ import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
+import aero.minova.rcp.rcp.layouts.DetailData;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -639,18 +640,19 @@ public class SectionGrid {
 		fd.width = newWidth;
 		natTable.requestLayout();
 
-		RowData rd = (RowData) section.getLayoutData();
+		DetailData rd = (DetailData) section.getLayoutData();
+		rd.expanded = !rd.expanded;
 		// Section soll nicht kleiner als Default sein
-		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
+//		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
 		section.requestLayout();
 
 		// Width in den Context setzten, damit wir überall darauf zugreifen können
 		MPart detail = emservice.findElements(perspective, "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
-		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
+//		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
 
 		// Width Speicher, damit beim Neuladen wieder hergestellt wird
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-		prefsDetailSections.put(key, rd.width + "");
+//		prefsDetailSections.put(key, rd.width + "");
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {

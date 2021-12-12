@@ -53,8 +53,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -115,6 +113,8 @@ import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.layouts.DetailData;
+import aero.minova.rcp.rcp.layouts.DetailLayout;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
@@ -333,9 +333,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
 		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
-		RowLayout rowLayout = new RowLayout(SWT.VERTICAL);
-		rowLayout.wrap = false;
-		wrap.setLayout(rowLayout);
+		wrap.setLayout(new DetailLayout());
 		parent.setData(Constants.DETAIL_COMPOSITE, wrap);
 
 		// Abschnitte der Hauptmaske und OPs erstellen
@@ -513,24 +511,24 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 */
 
 	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPageOrGrid) {
-		RowData headLayoutData = new RowData();
+		DetailData headLayoutData = new DetailData();
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
+		section.setLayoutData(headLayoutData);
 
 		// Alten Zustand wiederherstellen
 		String prefsWidthKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".width";
 		String widthString = prefsDetailSections.get(prefsWidthKey, SECTION_WIDTH + "");
-		headLayoutData.width = Integer.parseInt(widthString);
+//		headLayoutData.width = Integer.parseInt(widthString);
 		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
 		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
 		section.setExpanded(Boolean.parseBoolean(expandedString));
 
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
-		section.setLayoutData(headLayoutData);
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
 		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
