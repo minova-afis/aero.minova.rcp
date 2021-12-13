@@ -34,12 +34,11 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		this.contentProvider = contentProvider;
 	}
 
-	private EHandlerService getHandlerService(Control control) {
-		return (EHandlerService) control.getParent().getData("EHandlerService");
-	}
-
-	private ECommandService getCommandService(Control control) {
-		return (ECommandService) control.getParent().getData("ECommandService");
+	@Override
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit, boolean skipValidation) {
+		boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
+		parent.forceFocus();
+		return commited;
 	}
 
 	/**
@@ -57,14 +56,12 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			public void keyPressed(KeyEvent event) {
 				if ((event.keyCode == SWT.CR) || (event.keyCode == SWT.KEYPAD_CR)) {
 					combo.getParent().forceFocus();
-					commit(MoveDirectionEnum.NONE, false);
+					EHandlerService handlerService = (EHandlerService) combo.getParent().getData("EHandlerService");
+					ECommandService commandService = (ECommandService) combo.getParent().getData("ECommandService");
+					commit(MoveDirectionEnum.NONE, true);
 					Map<String, String> parameter = new HashMap<>();
-					ParameterizedCommand command = getCommandService(combo).createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
-					EHandlerService handlerService = getHandlerService(combo);
+					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 					handlerService.executeHandler(command);
-					close();
-				} else if (event.keyCode == SWT.TAB) {
-					commit(MoveDirectionEnum.RIGHT, true);
 				} else if (event.keyCode == SWT.ESC) {
 					if (MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE) {
 						close();
