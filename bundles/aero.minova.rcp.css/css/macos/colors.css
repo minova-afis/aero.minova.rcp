@@ -30,7 +30,7 @@ Text#Console {
 /* Textfarben */
 
 Button.Description, Label.Description, Section.Description  {
-	color: #808080;
+	color: #404040;
 }
 
 Canvas, CTabItem, DetailComposite, ExpandableComposite, LayoutComposite,
