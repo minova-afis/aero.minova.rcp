@@ -27,7 +27,8 @@ import org.eclipse.swt.widgets.Display;
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
-
+	private NatCombo combo;
+	
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
 	 * the combo.
@@ -51,33 +52,38 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		parent.forceFocus();
 		return commited;
 	}
-	
+
 	@Override
-    public NatCombo createEditorControl(Composite parent) {
-        int style = SWT.NONE;
-        if (!this.freeEdit) {
-            style |= SWT.READ_ONLY;
-        }
-        if (this.multiselect) {
-            style |= SWT.MULTI;
-        }
-        if (this.useCheckbox) {
-            style |= SWT.CHECK;
-        }
-        final MinovaNatCombo combo = (this.iconImage == null)
-                ? new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.showDropdownFilter)
-                : new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.iconImage, this.showDropdownFilter);
+	public void close() {
+		combo.getCursor().dispose();
+		super.close();
+	}
 
-        combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
+	@Override
+	public NatCombo createEditorControl(Composite parent) {
+		int style = SWT.NONE;
+		if (!this.freeEdit) {
+			style |= SWT.READ_ONLY;
+		}
+		if (this.multiselect) {
+			style |= SWT.MULTI;
+		}
+		if (this.useCheckbox) {
+			style |= SWT.CHECK;
+		}
+		final MinovaNatCombo combo = (this.iconImage == null) ? new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.showDropdownFilter)
+				: new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.iconImage, this.showDropdownFilter);
 
-        if (this.multiselect) {
-            combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
-            combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
-        }
+		combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
-        addNatComboListener(combo);
-        return combo;
-    }
+		if (this.multiselect) {
+			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
+			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
+		}
+
+		addNatComboListener(combo);
+		return combo;
+	}
 
 	/**
 	 * Registers special listeners to the {@link NatCombo} regarding the {@link EditModeEnum}, that are needed to commit/close or change the visibility state of
@@ -88,6 +94,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	@Override
 	protected void addNatComboListener(final NatCombo combo) {
+		this.combo = combo;
 		combo.addKeyListener(new KeyAdapter() {
 
 			@Override
