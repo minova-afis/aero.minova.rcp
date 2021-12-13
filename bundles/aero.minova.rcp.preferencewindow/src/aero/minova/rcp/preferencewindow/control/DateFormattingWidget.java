@@ -45,11 +45,13 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
+		String tooltipString = "d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null);
+
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
-		label.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
+		label.setToolTipText(tooltipString);
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
@@ -65,9 +67,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		text.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
+		text.setToolTipText(tooltipString);
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
@@ -86,9 +86,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 
 		Label icon = new Label(cmp, SWT.NONE);
 		createTooltipInfoIcon(icon);
-		icon.setToolTipText(translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
+		icon.setToolTipText(tooltipString);
 
 		return text;
 	}
