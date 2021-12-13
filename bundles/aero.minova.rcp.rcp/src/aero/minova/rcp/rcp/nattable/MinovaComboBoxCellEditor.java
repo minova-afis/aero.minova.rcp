@@ -119,6 +119,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					// hide the dropdown after a value was selected in the combo
 					// in a dialog
 					combo.hideDropdownControl();
+					combo.getParent().forceFocus();
 				}
 			}
 		});
