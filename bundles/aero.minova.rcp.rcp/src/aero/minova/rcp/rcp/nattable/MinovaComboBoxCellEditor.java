@@ -28,7 +28,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
 	private NatCombo combo;
-	
+
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
 	 * the combo.
@@ -38,12 +38,11 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		this.contentProvider = contentProvider;
 	}
 
-	private EHandlerService getHandlerService(Control control) {
-		return (EHandlerService) control.getParent().getData("EHandlerService");
-	}
-
-	private ECommandService getCommandService(Control control) {
-		return (ECommandService) control.getParent().getData("ECommandService");
+	@Override
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit, boolean skipValidation) {
+		boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
+		parent.forceFocus();
+		return commited;
 	}
 
 	@Override
@@ -100,13 +99,13 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			@Override
 			public void keyPressed(KeyEvent event) {
 				if ((event.keyCode == SWT.CR) || (event.keyCode == SWT.KEYPAD_CR)) {
-					parent.forceFocus();
-					commit(MoveDirectionEnum.NONE, false);
+					combo.getParent().forceFocus();
+					EHandlerService handlerService = (EHandlerService) combo.getParent().getData("EHandlerService");
+					ECommandService commandService = (ECommandService) combo.getParent().getData("ECommandService");
+					commit(MoveDirectionEnum.NONE, true);
 					Map<String, String> parameter = new HashMap<>();
-					ParameterizedCommand command = getCommandService(combo).createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
-					EHandlerService handlerService = getHandlerService(combo);
+					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 					handlerService.executeHandler(command);
-					close();
 				} else if (event.keyCode == SWT.ESC) {
 					if (editMode == EditModeEnum.INLINE) {
 						close();

@@ -87,6 +87,8 @@ public class Manager {
 		preferences.putBoolean(ApplicationPreferences.DISABLE_PREVIEW, deactivateinternpreview);
 		int maxCharacter = preferences.getInt(ApplicationPreferences.MAX_CHARS, 24000);
 		preferences.putInt(ApplicationPreferences.MAX_CHARS, maxCharacter);
+		boolean gridTabNavigation = preferences.getBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, true);
+		preferences.putBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, gridTabNavigation);
 		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
 		if ("".equals(fd))
 			fd = null;

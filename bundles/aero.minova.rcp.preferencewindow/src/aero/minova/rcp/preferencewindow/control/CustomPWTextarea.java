@@ -4,8 +4,10 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class CustomPWTextarea extends CustomPWWidget {
@@ -30,14 +32,23 @@ public class CustomPWTextarea extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		buildLabel(parent, GridData.BEGINNING);
+		
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(2, false));
+		addControl(cmp);
 
-		final Text text = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		final Text text = new Text(cmp, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		text.setToolTipText(getTooltip());
 		addControl(text);
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
 		text.addListener(SWT.FocusOut, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());
 		});
+		
+		Label icon = new Label(cmp, SWT.NONE);
+		if (getTooltip() != null) {
+			createTooltipInfoIcon(icon);
+		}
 
 		return text;
 	}

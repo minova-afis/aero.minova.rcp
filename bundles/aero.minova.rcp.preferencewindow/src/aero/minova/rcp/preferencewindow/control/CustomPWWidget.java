@@ -1,12 +1,19 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.osgi.framework.Bundle;
 
 /**
  * Diese Klasse gewährt Zugang zu den Methoden aus PWWidget, die package gebunden sind. Ansonsten fungiert sie genau wie PWWidget.
@@ -48,6 +55,17 @@ public abstract class CustomPWWidget extends PWWidget {
 			label.setLayoutData(labelGridData);
 			addControl(label);
 		}
+	}
+
+	public void createTooltipInfoIcon(Label label) {
+		label.setToolTipText(getTooltip());
+		LocalResourceManager resManager = new LocalResourceManager(JFaceResources.getResources());
+		Bundle bundle = Platform.getBundle("aero.minova.rcp.preferencewindow");
+		ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(FileLocator.find(bundle, new Path("icons/Circled-I.png")));
+		label.setImage(resManager.createImage(imageDescriptor));
+
+		GridData iconGD = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		label.setLayoutData(iconGD);
 	}
 
 }

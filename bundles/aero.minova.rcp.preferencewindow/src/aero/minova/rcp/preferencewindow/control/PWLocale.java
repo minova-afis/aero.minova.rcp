@@ -13,6 +13,7 @@ import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -91,8 +92,14 @@ public class PWLocale extends CustomPWWidget {
 		labelLGridData.horizontalIndent = getIndent();
 		languageLabel.setLayoutData(labelLGridData);
 		addControl(languageLabel);
+		
+		Composite cmpL = new Composite(parent, SWT.NONE);
+		cmpL.setLayout(new GridLayout(2, false));
+		final GridData cmpGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		cmpL.setLayoutData(cmpGridData);
+		addControl(cmpL);
 
-		comboLanguage = new CCombo(parent, SWT.BORDER | SWT.READ_ONLY);
+		comboLanguage = new CCombo(cmpL, SWT.BORDER | SWT.READ_ONLY);
 		addControl(comboLanguage);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
@@ -117,6 +124,8 @@ public class PWLocale extends CustomPWWidget {
 			comboCountries.select(0);
 
 		});
+		
+		Label icon = new Label(cmpL, SWT.NONE);
 
 		// Label für Landauswahl erstellen
 		final Label countryLabel = new Label(parent, SWT.NONE);
@@ -125,10 +134,16 @@ public class PWLocale extends CustomPWWidget {
 		labelCGridData.horizontalIndent = getIndent();
 		countryLabel.setLayoutData(labelCGridData);
 		addControl(countryLabel);
+		
+		Composite cmpC = new Composite(parent, SWT.NONE);
+		cmpC.setLayout(new GridLayout(2, false));
+		final GridData cmpCGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		cmpC.setLayoutData(cmpCGridData);
+		addControl(cmpC);
 
 		// Combo Box für Landauswahl erstellen
-		comboCountries = new CCombo(parent, SWT.BORDER | SWT.READ_ONLY);
-		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		comboCountries = new CCombo(cmpC, SWT.BORDER | SWT.READ_ONLY);
+		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		comboCountries.setLayoutData(countryData);
 		addControl(comboCountries);
 
@@ -147,6 +162,8 @@ public class PWLocale extends CustomPWWidget {
 				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY,
 						comboCountries.getItem(comboCountries.indexOf(comboCountries.getText())));
 		});
+		
+		Label iconC = new Label(cmpC, SWT.NONE);
 
 		return comboLanguage;
 	}

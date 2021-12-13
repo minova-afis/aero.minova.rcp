@@ -34,8 +34,6 @@ import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -201,17 +199,20 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	protected Control activateCell(final Composite parent, Object originalCanonicalValue) {
 		this.text = createEditorControl(parent);
 
+		initText = false;
+
 		// If the originalCanonicalValue is a Character it is possible the
 		// editor is activated by keypress
 		if (originalCanonicalValue instanceof Character) {
 			this.text.setText(originalCanonicalValue.toString());
-			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.ALL);
+			initText = true;
+			selectText(EditorSelectionEnum.END);
 		}
 		// if there is no initial value, handle the original canonical value to
 		// transfer it to the text control
 		else {
 			setCanonicalValue(originalCanonicalValue);
-			selectText(this.selectionMode != null ? this.selectionMode : EditorSelectionEnum.ALL);
+			selectText(EditorSelectionEnum.ALL);
 		}
 
 		if (!isEditable()) {
@@ -241,8 +242,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 			((RenderErrorHandling) this.inputValidationErrorHandler).setErrorStyle(validationErrorStyle);
 		}
 
-		// if a IControlContentAdapter is registered, create and register a
-		// ContentProposalAdapter
+		// if a IControlContentAdapter is registered, create and register a ContentProposalAdapter
 		if (this.controlContentAdapter != null) {
 			configureContentProposalAdapter(
 					new ContentProposalAdapter(this.text, this.controlContentAdapter, this.proposalProvider, this.keyStroke, this.autoActivationCharacters));
@@ -253,6 +253,15 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		if (originalCanonicalValue instanceof FilterValue) {
 			this.text.setText(((FilterValue) originalCanonicalValue).getUserInput());
 		}
+
+		Display.getDefault().asyncExec(() -> {
+			try {
+				if (!text.isDisposed() && initText) {
+					text.setSelection(text.getText().length());
+					initText = false;
+				}
+			} catch (Exception e) {}
+		});
 
 		return this.text;
 	}
