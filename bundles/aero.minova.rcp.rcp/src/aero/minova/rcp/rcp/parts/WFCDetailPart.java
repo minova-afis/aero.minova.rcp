@@ -234,17 +234,19 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
+	 * Öffnet den "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
 	 * gewählt wurde
 	 */
 	private void openRestoringUIDialog() {
+		String prefName = form.getIndexView().getSource() + "." + Constants.LAST_STATE + ".index.size";
+		boolean stateToLoad = prefs.get(prefName, null) != null; // Gibt es überhaupt etwaszu laden?
 		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
 		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
 		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
 		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
 				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
 
-		if (!neverShow && !shownThisSession && !neverShowContext) {
+		if (stateToLoad && !neverShow && !shownThisSession && !neverShowContext) {
 			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
 					translationService.translate("@RestoringUIDialog.Title", null), //
 					translationService.translate("@RestoringUIDialog.InfoText", null), //
