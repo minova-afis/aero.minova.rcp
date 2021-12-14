@@ -20,8 +20,6 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -73,7 +71,7 @@ public class LifeCycle {
 			}
 
 			// Das darf für UI-Tests nicht ausgeführt werden!
-			checkModelVersion(workspaceLocation);
+			checkModelVersion(workspaceLocation, workbenchContext);
 			if (deletePrefs) {
 				deleteCustomPrefs(workspaceLocation);
 			}
@@ -191,7 +189,7 @@ public class LifeCycle {
 	 * Vergleicht die ModelVersion mit der Datei die in der Application mitgeliefert wird. Ist diese Datei in der Workspacelocation nicht vorhanden, müssen wir
 	 * in jedem Fall clearPersistedState aufrufen. Ist die Datei vorhanden aber hat eine zu alte Version gilt das Gleiche. Andernfalls machen nichts!
 	 */
-	private void checkModelVersion(URI workspaceLocation) {
+	private void checkModelVersion(URI workspaceLocation, IEclipseContext workbenchContext) {
 		// lese WorkSpaceFile aus der WorkSpaceLocation
 		String readString = null;
 		Path resolve = Path.of(workspaceLocation).resolve("ModelVersion.txt");
@@ -202,15 +200,20 @@ public class LifeCycle {
 		} catch (IOException e) {
 			// es gibt keins oder kann nicht gelesen werden!
 		}
+
 		if (!modelVersionPlugin.equals(readString)) {
 			try {
 				Files.deleteIfExists(resolve);
 				Files.createFile(resolve);
-				// neue Versionsnummer schreiben
 				Files.writeString(resolve, modelVersionPlugin);
-				Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
-				deleteCustomPrefs(workspaceLocation);
-				showUserDialog();
+
+				// Wenn das ModelVersion.txt file nicht existiert ist es ein neuer Workspace -> readString == null -> Meldung nicht anzeigen und workspace nicht
+				// löschen
+				if (readString != null) {
+					Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
+					deleteCustomPrefs(workspaceLocation);
+					workbenchContext.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, true);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -252,12 +255,6 @@ public class LifeCycle {
 			e.printStackTrace();
 		}
 		return "";
-	}
-
-	private void showUserDialog() {
-		MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Reset Workspace",
-				"Due to structural changes, the application area to be loaded is reset!");
-
 	}
 
 	private URI loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
