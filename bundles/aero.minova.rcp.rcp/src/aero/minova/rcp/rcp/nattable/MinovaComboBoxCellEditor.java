@@ -11,6 +11,8 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectio
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -23,11 +25,13 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
-	private MinovaNatCombo combo;
+	private NatCombo combo;
+	private Cursor cursor;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
@@ -36,6 +40,16 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
 		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
 		this.contentProvider = contentProvider;
+	}
+
+	@Override
+	protected Control activateCell(Composite parent, final Object originalCanonicalValue) {
+		Control combo = super.activateCell(parent, originalCanonicalValue);
+		if (this.editMode == EditModeEnum.INLINE && originalCanonicalValue instanceof Character) {
+			((Text) this.combo.getChildren()[0]).setText(originalCanonicalValue.toString());
+		}
+
+		return combo;
 	}
 
 	@Override
@@ -68,7 +82,8 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 				: new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.iconImage, this.showDropdownFilter);
 
 		combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
-
+		this.cursor = combo.getCursor();
+		
 		if (this.multiselect) {
 			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
 			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
