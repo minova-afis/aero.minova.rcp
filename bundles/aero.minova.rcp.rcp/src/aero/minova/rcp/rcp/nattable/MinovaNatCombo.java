@@ -11,7 +11,6 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleUtil;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.nebula.widgets.nattable.style.VerticalAlignmentEnum;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.LetterOrDigitKeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
@@ -77,20 +76,14 @@ public class MinovaNatCombo extends NatCombo {
 					// ensure the arrow key events do not have any further
 					// effect
 					event.doit = false;
-				} else if (LetterOrDigitKeyEventMatcher.isLetterOrDigit(event.character) || (event.keyCode == SWT.DEL || event.keyCode == SWT.BS)) {
+				}
+			}
 
-					String entry = text.getText() + event.character;
-					if (event.keyCode == SWT.BS && !text.getText().isEmpty()) {
-						entry = entry.substring(0, entry.indexOf(SWT.BS) - 1) + entry.substring(entry.indexOf(SWT.BS) + 1);
-					} else if (event.keyCode == SWT.DEL && !text.getText().isEmpty()) {
-						entry = entry.substring(0, entry.indexOf(SWT.DEL)) + entry.substring(entry.indexOf(SWT.DEL) + 1);
-					}
-
-					if (null != dropdownTableViewer && !dropdownTable.isDisposed()) {
-						dropdownTableViewer.refresh();
-						calculateBounds();
-						setDropdownSelection(getEntryArray(entry));
-					}
+			@Override
+			public void keyReleased(KeyEvent event) {
+				if (null != dropdownTableViewer && !dropdownTable.isDisposed()) {
+					dropdownTableViewer.refresh();
+					calculateBounds();
 				}
 			}
 		});
@@ -336,33 +329,9 @@ public class MinovaNatCombo extends NatCombo {
 
 		setDropdownSelection(getTextAsArray());
 	}
-
-	private String[] getEntryArray(String entry) {
-		String transform = entry;
-		if (this.multiselect) {
-			// for multiselect the String is defined by default in
-			// format [a, b, c]
-			// the prefix and suffix for multiselect String
-			// representation need to be removed
-			// in free edit mode we need to check if the format is used
-			int prefixLength = this.multiselectTextPrefix.length();
-			int suffixLength = this.multiselectTextSuffix.length();
-			if (this.freeEdit) {
-				if (!transform.startsWith(this.multiselectTextPrefix)) {
-					prefixLength = 0;
-				}
-				if (!transform.endsWith(this.multiselectTextSuffix)) {
-					suffixLength = 0;
-				}
-			}
-			transform = transform.substring(prefixLength, transform.length() - suffixLength);
-
-			// if the transform value length is still > 0, try to split
-			if (transform.length() > 0) {
-				return transform.split(this.multiselectValueSeparator);
-			}
-		}
-		return new String[] { transform };
+	
+	public Object selectIndex0OfDropdown() {
+		return dropdownTableViewer.getElementAt(0);
 	}
 
 }
