@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Display;
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
-	private NatCombo combo;
+	private MinovaNatCombo combo;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
@@ -53,12 +53,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	}
 
 	@Override
-	public void close() {
-		combo.getCursor().dispose();
-		super.close();
-	}
-
-	@Override
 	public NatCombo createEditorControl(Composite parent) {
 		int style = SWT.NONE;
 		if (!this.freeEdit) {
@@ -81,6 +75,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		}
 
 		addNatComboListener(combo);
+		this.combo = combo;
 		return combo;
 	}
 
@@ -93,7 +88,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	@Override
 	protected void addNatComboListener(final NatCombo combo) {
-		this.combo = combo;
 		combo.addKeyListener(new KeyAdapter() {
 
 			@Override
