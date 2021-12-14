@@ -326,8 +326,8 @@ public class DataService implements IDataService {
 	}
 
 	private SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
-		if (fromJson.getReturnCode() == null) {
-			String errorMessage = null;
+		if ((fromJson.getReturnCode() == null || fromJson.getReturnCode() < 0) && fromJson.getResultSet() == null) {
+			String errorMessage = "";
 			Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
 			Matcher m = fullError.matcher(originalBody);
 			if (m.find()) {
@@ -336,6 +336,9 @@ public class DataService implements IDataService {
 			Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
 			errorMessage = cutError.matcher(errorMessage).replaceAll("");
 			errorMessage = errorMessage.replaceAll("\"", "");
+			if (errorMessage.isBlank()) {
+				errorMessage = "msg.NoErrorMessageAvailable";
+			}
 			Table error = new Table();
 			error.setName(ERROR);
 			error.addColumn(new Column("Message", DataType.STRING));
@@ -345,7 +348,7 @@ public class DataService implements IDataService {
 			// FehlerCode
 			fromJson.setReturnCode(-1);
 		}
-		if (fromJson.getReturnCode() == -1 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
+		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
 			ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, procedureName);
 			postError(e);
 			return null;
