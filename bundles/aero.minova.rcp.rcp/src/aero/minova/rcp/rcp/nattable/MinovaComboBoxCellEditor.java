@@ -150,6 +150,14 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 				}
 			});
 		}
+		
+		combo.addDisposeListener(new DisposeListener() {
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				cursor.dispose();
+			}
+		});
 	}
 
 }
