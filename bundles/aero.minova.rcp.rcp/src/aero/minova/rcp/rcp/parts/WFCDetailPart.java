@@ -881,6 +881,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
+	/**
+	 * True wenn es Änderungen gab, False ansonsten
+	 * 
+	 * @return
+	 */
 	public boolean getDirtyFlag() {
 		return dirtyFlag;
 	}
