@@ -69,7 +69,8 @@ public class LookupField {
 		lookupFormData.left = new FormAttachment((column == 0) ? 25 : 75);
 		lookupFormData.width = FieldUtil.TEXT_WIDTH;
 
-		CssData cssData = new CssData(CssType.TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), field.isFillToRight());
+		// Lookup-Felder sollen immer genau eine Zeile hoch sein
+		CssData cssData = new CssData(CssType.TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), 1, field.isFillToRight());
 		lookupControl.setData(CssData.CSSDATA_KEY, cssData);
 
 		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
