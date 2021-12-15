@@ -24,13 +24,13 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 }
 
 MinovaSection {
-	date-width: 66px;
-	date-time-width: 106px;
+	date-width: 130px;
+	date-time-width: 130px;
 	number-width: 90px;
 	row-height: 24px;
 	section-spacing: 5px;
 	text-width: 130px;
-	time-width: 36px;
+	time-width: 60px;
 }
 
 Text, Label, Button {
