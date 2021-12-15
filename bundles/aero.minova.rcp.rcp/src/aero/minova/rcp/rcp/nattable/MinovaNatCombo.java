@@ -43,6 +43,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class MinovaNatCombo extends NatCombo {
 	
+	private String textValue;
+	
 	public MinovaNatCombo(Composite parent, IStyle cellStyle, int maxVisibleItems, int style, Image iconImage) {
 		super(parent, cellStyle, maxVisibleItems, style, iconImage);
 	}
@@ -84,6 +86,7 @@ public class MinovaNatCombo extends NatCombo {
 				if (null != dropdownTableViewer && !dropdownTable.isDisposed()) {
 					dropdownTableViewer.refresh();
 					calculateBounds();
+					textValue = text.getText();
 				}
 			}
 		});
@@ -328,5 +331,9 @@ public class MinovaNatCombo extends NatCombo {
 		applyDropdownListener();
 
 		setDropdownSelection(getTextAsArray());
+	}
+	
+	public String getTextValue() {
+		return textValue;
 	}
 }
