@@ -35,7 +35,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
 	private Cursor cursor;
-	private List<?> canonicalValues;
+	private List<?> mCanonicalValues;
 	private int selectionIndex;
 	private Object selectedValue;
 
@@ -45,7 +45,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
 		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
-		this.canonicalValues = contentProvider.getValues();
+		this.mCanonicalValues = contentProvider.getValues();
 		this.contentProvider = contentProvider;
 	}
 
@@ -111,16 +111,22 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	public Object getCanonicalValue() {
 		// Item selected from list
 		if (selectionIndex >= 0) {
-			for (Object lv : canonicalValues) {
-				if(((LookupValue) lv).keyText.equals(selectedValue)) {
-					return lv;
+			if (selectedValue != null) {
+				for (Object lv : mCanonicalValues) {
+					if (((LookupValue) lv).keyText.equals(selectedValue)) {
+						this.selectionIndex = 0;
+						this.selectedValue = null;
+						return lv;
+					}
 				}
+			} else {
+				return super.getCanonicalValue();
 			}
 		} else {
 			// if there is no selection in the dropdown, we need to check if
 			// there is a free edit in the NatCombo control
 			if (getEditorControl().getSelection().length > 0) {
-				return super.getCanonicalValue();
+				return getCanonicalValue();
 			}
 		}
 
