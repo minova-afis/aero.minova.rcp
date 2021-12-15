@@ -1,199 +1,171 @@
-/* TODO: sortieren */
+/* Nattable für MacOS */
 NatTable {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	font-size: 12;
-	font-style: normal;
-	font-weight: normal;
 	color: black;
 	cell-background-color: white;
 	table-border-color: auto;
 	render-grid-lines: true;
-	grid-line-color: #404000;
-	grid-line-color: #404000;
+	grid-line-color: black;
 	grid-line-width: 1px;
+	font-weight: normal;
+	font-style: normal;
+	font-family: VERDANA;
 	tree-structure-painter: background tree;
 	row-height: auto;
 }
 
-NatTable > :select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+/** #22441: kann jetzt doch wieder verwendet werden */
+NatTable:select {
+	painter-resolution: false;
+	/*tree-structure-painter: background padding tree;*/
 }
 
 NatTable > .COLUMN_HEADER {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	cell-background-color: RGB(240, 240, 240);
+	cell-background-color: RGB(240, 240, 240);
 	render-grid-lines: true;
 	font-weight: normal;
 	font-style: normal;
-	font-size: 12;
+	font-family: VERDANA;
 	color: black;
 	text-align: left;
 }
 
 NatTable > .COLUMN_HEADER:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	cell-background-color: RGB(240, 240, 240);
+	cell-background-color: RGB(240, 240, 240);
 	render-grid-lines: true;
 	font-weight: normal;
 	font-style: normal;
+	font-family: VERDANA;
 	color: black;
 	text-align: left;
 }
 
 NatTable > .BODY:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	font-size: 12;
-	font-style: normal;
-	font-weight: normal;
-	painter-resolution: false;
+    painter-resolution: false;
 	cell-background-color: yellow;
 	color: black;
+	font-weight: normal;
+	font-style: normal;
+	font-family: VERDANA;
 }
 
 NatTable > .selectionAnchor:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;    painter-resolution: false;
+    painter-resolution: false;
 	cell-background-color: yellow;
 	color: black;
 	font-style: normal;
+	font-family: VERDANA;
 }
 
 
 NatTable > .TREE_EXPANDED {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 }
 NatTable > .TREE_EXPANDED:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 }
 NatTable > .TREE_COLLAPSED {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 }
 NatTable > .TREE_COLLAPSED:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 }
 NatTable > .GROUP_BY_OBJECT {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 }
 NatTable > .GROUP_BY_OBJECT:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 }
 
 
 NatTable > .SummaryRow {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 	font-weight: bold;
 	cell-background-color: RGB(240, 240, 240);
 	text-align: left;
 }
 
 NatTable > .PercentModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	converter: percentage;
+	converter: percentage;
 }
 
 NatTable > .BooleanModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: center;
+	text-align: center;
 	painter: background checkbox2;
 	converter: boolean;
 }
 NatTable > .BooleanModel:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: center;
+	text-align: center;
 	painter: background checkbox2;
 	converter: boolean;
 }
 
+
 NatTable > .DoubleModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 1 5;
 }
 
 NatTable > .Decimal1Model {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 1 1;
 }
 NatTable > .Decimal2Model {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 2 2;
 }
 NatTable > .Decimal3Model {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 3 3;
 }
 NatTable > .Decimal4Model {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 4 4;
 }
 NatTable > .Decimal5Model {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 5 5;
 }
 NatTable > .Decimal6Model {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: double 6 6;
 }
 
 NatTable > .IntegerModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: int;
 }
 NatTable > .BigIntModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: int;
 }
-
 NatTable > .TristateModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: center;
+	text-align: center;
 	painter: background checkbox3;
 }
 NatTable > .TristateModel:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: center;
+	text-align: center;
 	painter: background checkbox3;
 }
 
 NatTable > .NoeditModel {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	color: grey;
+	color: grey;
 }
 NatTable > .NoeditModel:select {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	color: grey;
+	color: grey;
 }
 
 NatTable > .NUMBER_WITH_BACKGROUND {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	text-align: right;
+	text-align: right;
 	converter: int;
 	painter-resolution: false;
 }
 
 NatTable > .TEXT_WITH_BACKGROUND {
-/*	font-family: .AppleSystemUIFont; */
- font-family: VERDANA;	painter-resolution: false;
+	painter-resolution: false;
 }
