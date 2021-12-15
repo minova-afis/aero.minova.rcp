@@ -119,6 +119,14 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 						return lv;
 					}
 				}
+			} else if (((MinovaNatCombo) getEditorControl()).getTextValue() != null) {
+				for (Object lv : mCanonicalValues) {
+					if (((LookupValue) lv).keyText.startsWith(((MinovaNatCombo) getEditorControl()).getTextValue())) {
+						this.selectionIndex = 0;
+						this.selectedValue = null;
+						return lv;
+					}
+				}
 			} else {
 				return super.getCanonicalValue();
 			}
