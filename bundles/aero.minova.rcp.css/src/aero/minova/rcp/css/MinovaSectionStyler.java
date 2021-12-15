@@ -71,6 +71,7 @@ public class MinovaSectionStyler implements ICssStyler {
 	 * 
 	 * @return Horizontaler Abstand zwischen 2 Elementen in px
 	 */
+	@Override
 	public int getSectionSpacing() {
 		return sectionSpacing;
 	}
@@ -113,6 +114,9 @@ public class MinovaSectionStyler implements ICssStyler {
 			case TIME_FIELD:
 				styleTimeField(fd, cd);
 				break;
+			case DATE_TIME_FIELD:
+				styleDateTimeField(fd, cd);
+				break;
 			case LABEL:
 			default:
 				styleLabel(fd, cd);
@@ -136,7 +140,8 @@ public class MinovaSectionStyler implements ICssStyler {
 	}
 
 	private void styleTextField(FormData fd, CssData cd) {
-		if (cd == null) return;
+		if (cd == null)
+			return;
 
 		// Top
 		fd.top.offset = cd.row * rowHeight;
@@ -153,13 +158,19 @@ public class MinovaSectionStyler implements ICssStyler {
 	}
 
 	private void styleTimeField(FormData fd, CssData cd) {
-		if (cd == null) return;
+		if (cd == null)
+			return;
 
 		// Top
 		fd.top.offset = cd.row * rowHeight;
 
 		// Breite
 		fd.width = timeWidth;
+	}
+
+	private void styleDateTimeField(FormData fd, CssData cd) {
+		fd.top.offset = cd.row * rowHeight;
+		fd.width = dateTimeWidth;
 	}
 
 	@Override
