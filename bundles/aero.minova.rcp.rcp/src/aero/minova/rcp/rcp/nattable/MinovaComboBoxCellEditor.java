@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -25,13 +26,18 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+
+import aero.minova.rcp.model.LookupValue;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
-	private NatCombo combo;
 	private Cursor cursor;
+	private List<?> canonicalValues;
+	private int selectionIndex;
+	private Object selectedValue;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
@@ -39,6 +45,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
 		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
+		this.canonicalValues = contentProvider.getValues();
 		this.contentProvider = contentProvider;
 	}
 
@@ -47,22 +54,21 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		this.setFocusOnText(true);
 		Control combo = super.activateCell(parent, originalCanonicalValue);
 		if (this.editMode == EditModeEnum.INLINE && originalCanonicalValue instanceof Character) {
-			((Text) this.combo.getChildren()[0]).setText(originalCanonicalValue.toString());
+			((Text) getEditorControl().getChildren()[0]).setText(originalCanonicalValue.toString());
 		}
-
 		return combo;
 	}
 
 	@Override
 	public boolean commit(MoveDirectionEnum direction) {
-		boolean commited = super.commit(direction);
+		boolean commited = commit(direction, true);
 		parent.forceFocus();
 		return commited;
 	}
 
 	@Override
 	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit) {
-		boolean commited = super.commit(direction, closeAfterCommit);
+		boolean commited = commit(direction, closeAfterCommit, false);
 		parent.forceFocus();
 		return commited;
 	}
@@ -98,8 +104,27 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		}
 
 		addNatComboListener(combo);
-		this.combo = combo;
 		return combo;
+	}
+
+	@Override
+	public Object getCanonicalValue() {
+		// Item selected from list
+		if (selectionIndex >= 0) {
+			for (Object lv : canonicalValues) {
+				if(((LookupValue) lv).keyText.equals(selectedValue)) {
+					return lv;
+				}
+			}
+		} else {
+			// if there is no selection in the dropdown, we need to check if
+			// there is a free edit in the NatCombo control
+			if (getEditorControl().getSelection().length > 0) {
+				return super.getCanonicalValue();
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -135,8 +160,13 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		});
 
 		combo.addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseUp(MouseEvent e) {
+				if (e.widget instanceof Table) {
+					selectionIndex = ((Table) e.widget).getSelectionIndex();
+					selectedValue = ((Table) e.widget).getItem(((Table) e.widget).getSelectionIndex()).getText();
+				}
 				commit(MoveDirectionEnum.RIGHT, (!multiselect && editMode == EditModeEnum.INLINE));
 				if (!multiselect && editMode == EditModeEnum.DIALOG) {
 					// hide the dropdown after a value was selected in the combo
