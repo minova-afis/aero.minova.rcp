@@ -54,15 +54,22 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	}
 
 	@Override
-	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit, boolean skipValidation) {
-		boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
+	public boolean commit(MoveDirectionEnum direction) {
+		boolean commited = super.commit(direction);
 		parent.forceFocus();
 		return commited;
 	}
 
 	@Override
-	public boolean commit(MoveDirectionEnum direction) {
-		boolean commited = super.commit(direction);
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit) {
+		boolean commited = super.commit(direction, closeAfterCommit);
+		parent.forceFocus();
+		return commited;
+	}
+
+	@Override
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit, boolean skipValidation) {
+		boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
 		parent.forceFocus();
 		return commited;
 	}
@@ -84,7 +91,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 		combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 		this.cursor = combo.getCursor();
-		
+
 		if (this.multiselect) {
 			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
 			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
@@ -130,7 +137,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		combo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				commit(MoveDirectionEnum.NONE, (!multiselect && editMode == EditModeEnum.INLINE));
+				commit(MoveDirectionEnum.RIGHT, (!multiselect && editMode == EditModeEnum.INLINE));
 				if (!multiselect && editMode == EditModeEnum.DIALOG) {
 					// hide the dropdown after a value was selected in the combo
 					// in a dialog
@@ -166,9 +173,9 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 				}
 			});
 		}
-		
+
 		combo.addDisposeListener(new DisposeListener() {
-			
+
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				cursor.dispose();
