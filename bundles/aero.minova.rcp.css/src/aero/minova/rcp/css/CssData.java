@@ -8,7 +8,7 @@ package aero.minova.rcp.css;
  */
 public class CssData {
 	/*** Key der Widgets als Data gesetzt werden kann, um CSS-Informationen Minova-intern weiterzugeben ***/
-	public static final String CSSDATA_KEY = "ch.minova.css.data";
+	public static final String CSSDATA_KEY = "aero.minova.css.data";
 
 	/**
 	 * Feldtype
