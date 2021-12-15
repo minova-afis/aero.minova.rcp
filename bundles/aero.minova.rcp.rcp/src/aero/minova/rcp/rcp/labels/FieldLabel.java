@@ -30,7 +30,7 @@ public abstract class FieldLabel {
 	public static void layout(Label label, Control field, int row, int column, int numberRowsSpanned) {
 		FormData fd = new FormData();
 		fd.right = new FormAttachment(field, MARGIN_LEFT * -1, SWT.LEFT);
-		fd.left = new FormAttachment(0);
+		fd.left = new FormAttachment((column == 0) ? 0 : 50);
 		fd.top = new FormAttachment(field, 0, (numberRowsSpanned > 1) ? SWT.TOP : SWT.CENTER);
 		label.setLayoutData(fd);
 
