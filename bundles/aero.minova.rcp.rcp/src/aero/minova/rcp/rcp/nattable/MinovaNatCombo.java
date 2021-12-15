@@ -312,7 +312,7 @@ public class MinovaNatCombo extends NatCombo {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (null != element && element instanceof String) {
-					return ((String) element).toLowerCase().contains(text.getText().toLowerCase());
+					return ((String) element).toLowerCase().startsWith(text.getText().toLowerCase());
 				}
 				return false;
 			}
