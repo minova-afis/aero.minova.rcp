@@ -44,6 +44,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	@Override
 	protected Control activateCell(Composite parent, final Object originalCanonicalValue) {
+		this.setFocusOnText(true);
 		Control combo = super.activateCell(parent, originalCanonicalValue);
 		if (this.editMode == EditModeEnum.INLINE && originalCanonicalValue instanceof Character) {
 			((Text) this.combo.getChildren()[0]).setText(originalCanonicalValue.toString());
