@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 public class MinovaNatCombo extends NatCombo {
-
+	
 	public MinovaNatCombo(Composite parent, IStyle cellStyle, int maxVisibleItems, int style, Image iconImage) {
 		super(parent, cellStyle, maxVisibleItems, style, iconImage);
 	}
@@ -329,9 +329,4 @@ public class MinovaNatCombo extends NatCombo {
 
 		setDropdownSelection(getTextAsArray());
 	}
-	
-	public Object selectIndex0OfDropdown() {
-		return dropdownTableViewer.getElementAt(0);
-	}
-
 }
