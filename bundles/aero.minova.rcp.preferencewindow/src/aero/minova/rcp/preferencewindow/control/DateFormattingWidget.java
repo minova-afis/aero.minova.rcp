@@ -46,8 +46,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		String tooltipString = "d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null);
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\nMMM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.MonthShortcut", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null) + "\n"
+				+ translationService.translate("@Preferences.DateUtilPattern.Longest", null) + "Pattern: dd.MMM.yyyy";
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
