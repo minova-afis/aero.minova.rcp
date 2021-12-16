@@ -31,7 +31,7 @@ public class FieldUtil {
 		size = text.getSize();
 		DATE_TIME_WIDTH = size.x + 5;
 
-		text.setText("00.00.0000");
+		text.setText("25.März.2024");
 		shell.layout();
 		size = text.getSize();
 		SHORT_DATE_WIDTH = size.x + 5;
