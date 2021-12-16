@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.fields;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -16,7 +17,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.BundleContext;
@@ -121,7 +121,11 @@ public class LookupField {
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, false);
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> lookup.getContentProvider().setValues(l)));
+
+		try {
+			List<LookupValue> l = listLookup.get();
+			lookup.getContentProvider().setValues(l);
+		} catch (InterruptedException | ExecutionException e) {}
 	}
 
 	/**

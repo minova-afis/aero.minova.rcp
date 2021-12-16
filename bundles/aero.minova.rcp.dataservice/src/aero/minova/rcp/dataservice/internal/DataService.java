@@ -622,7 +622,7 @@ public class DataService implements IDataService {
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromTable(String tableName, String lookupDescriptionColumnName, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
-		ArrayList<LookupValue> list = new ArrayList<>();
+		List<LookupValue> list = new ArrayList<>();
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
@@ -650,31 +650,31 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<Table> tableFuture = getTableAsync(t, false);
-		try {
-			Table ta = tableFuture.get();
-			if (ta != null) {
-				for (Row r : ta.getRows()) {
-					LookupValue lv = new LookupValue(//
-							r.getValue(0).getIntegerValue(), //
-							r.getValue(1).getStringValue(), //
-							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+		return tableFuture.thenApplyAsync(ta -> {
+			try {
+				if (ta != null) {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
 
-					map.put(lv.keyLong, lv);
-					list.add(lv);
+						map.put(lv.keyLong, lv);
+						list.add(lv);
+					}
 				}
+			} catch (Exception e) {
+				System.out.println("Error, using cache: " + tableName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+				list.addAll(map.values());
 			}
-		} catch (Exception e) {
-			System.out.println("Error, using cache: " + tableName);
-			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-			list.addAll(map.values());
-		}
-
-		return CompletableFuture.supplyAsync(() -> list);
+			return list;
+		});
 	}
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromProcedure(String procedureName, MField field, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
-		ArrayList<LookupValue> list = new ArrayList<>();
+		List<LookupValue> list = new ArrayList<>();
 		String hashName = resolve ? procedureName : CacheUtil.getNameList(field);
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
@@ -717,28 +717,28 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
-		try {
-			SqlProcedureResult res = tableFuture.get();
-			if (res != null) {
-				Table ta = res.getResultSet();
-				if (ta != null) {
-					for (Row r : ta.getRows()) {
-						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-						map.put(lv.keyLong, lv);
-						list.add(lv);
+		return tableFuture.thenApplyAsync(res -> {
+			try {
+				if (res != null) {
+					Table ta = res.getResultSet();
+					if (ta != null) {
+						for (Row r : ta.getRows()) {
+							LookupValue lv = new LookupValue(//
+									r.getValue(0).getIntegerValue(), //
+									r.getValue(1).getStringValue(), //
+									r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+							map.put(lv.keyLong, lv);
+							list.add(lv);
+						}
 					}
 				}
+			} catch (Exception e) {
+				System.out.println("Error, using Cache: " + hashName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+				list.addAll(map.values());
 			}
-		} catch (Exception e) {
-			System.out.println("Error, using Cache: " + hashName);
-			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-			list.addAll(map.values());
-		}
-
-		return CompletableFuture.supplyAsync(() -> list);
+			return list;
+		});
 	}
 
 	@Override

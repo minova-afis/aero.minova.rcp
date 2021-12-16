@@ -27,7 +27,7 @@ public class GridLookupContentProvider {
 
 	public void update() {
 		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tablename, true);
-		listLookup.thenAccept(l -> {
+		listLookup.thenAcceptAsync(l -> {
 			values.clear();
 			values.addAll(l);
 		});
