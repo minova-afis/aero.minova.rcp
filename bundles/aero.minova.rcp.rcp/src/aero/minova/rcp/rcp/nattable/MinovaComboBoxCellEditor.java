@@ -109,8 +109,11 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	@Override
 	public Object getCanonicalValue() {
-		// Item selected from list
-		if (selectionIndex >= 0) {
+
+		//Auswahl des Wertes in dem DropdownMenu
+		Object value = super.getCanonicalValue();
+		if (value == null) {
+			// Selektion mit der Maus
 			if (selectedValue != null) {
 				for (Object lv : mCanonicalValues) {
 					if (((LookupValue) lv).keyText.equals(selectedValue)) {
@@ -119,7 +122,9 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 						return lv;
 					}
 				}
-			} else if (((MinovaNatCombo) getEditorControl()).getTextValue() != null && !((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
+			} 
+			// Wählt den ersten Wert entsprechend der Eingabe aus
+			else if (((MinovaNatCombo) getEditorControl()).getTextValue() != null && !((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
 				for (Object lv : mCanonicalValues) {
 					if (((LookupValue) lv).keyText.startsWith(((MinovaNatCombo) getEditorControl()).getTextValue())) {
 						this.selectionIndex = 0;
@@ -127,12 +132,10 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 						return lv;
 					}
 				}
-			} else {
-				return null;
 			}
-		} 
+		}
 
-		return null;
+		return value;
 	}
 
 	/**
