@@ -138,7 +138,7 @@ public class PreferenceWindowModel {
 				DisplayType.CHECK, false));
 		// TODO Übersetzung anpassen, damit sowohl beim Löschen als auch beim Speichern der Index neugeladen wird.
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_RELOAD_INDEX, translationService.translate("@Preferences.AutoReloadIndex", null),
-				translationService.translate("@Preferences.AutoReloadIndex.Tooltip", null), 0.2, DisplayType.CHECK, false));
+				null, 0.2, DisplayType.CHECK, false));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES,
 				translationService.translate("@Preferences.SheetStylesMessageBoxes", null), null, 0.3, DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DETAIL_BUTTON_TEXT,
@@ -167,8 +167,8 @@ public class PreferenceWindowModel {
 
 		psd = new PreferenceSectionDescriptor("Timeout", translationService.translate("@Preferences.Timeout", null), 0.4);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_CAS, translationService.translate("@Preferences.Timeout.TimeoutCas", null),
-				translationService.translate("@Preferences.Timeout.TimeoutCas.Tooltip", null), 0.1, DisplayType.INTEGER, 15));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_CAS, translationService.translate("@Preferences.Timeout.TimeoutCas", null), null, 0.1,
+				DisplayType.INTEGER, 15));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION,
 				translationService.translate("@Preferences.Timeout.TimeoutOpenNotification", null), null, 0.2, DisplayType.INTEGER, 1));
 
