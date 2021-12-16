@@ -191,6 +191,7 @@ public class WFCDetailCASRequestsUtil {
 			currentKeyTable = table;
 
 			sendEventToHelper(ActionCode.BEFOREREAD);
+			updateGridLookupValues();
 
 			// Hauptfelder, OPs und Grids in einer Transaktion lesen
 			List<TransactionEntry> procedureList = new ArrayList<>();
@@ -697,6 +698,7 @@ public class WFCDetailCASRequestsUtil {
 	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective && getKeys() != null) {
 
+			updateGridLookupValues();
 			sendEventToHelper(ActionCode.BEFOREDEL);
 
 			// Hauptmaske, OPs und Grids werden in einer Transaktion gelöscht
@@ -849,6 +851,7 @@ public class WFCDetailCASRequestsUtil {
 		if (!discardChanges()) {
 			return;
 		}
+		updateGridLookupValues();
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
@@ -1220,4 +1223,10 @@ public class WFCDetailCASRequestsUtil {
 		redrawSection(mParamString.getmSection());
 	}
 
+	private void updateGridLookupValues() {
+		for (MGrid g : mDetail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.updateGridLookupValues();
+		}
+	}
 }
