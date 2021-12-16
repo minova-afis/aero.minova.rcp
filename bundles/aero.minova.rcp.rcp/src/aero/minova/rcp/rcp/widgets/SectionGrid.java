@@ -376,6 +376,7 @@ public class SectionGrid {
 
 		viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);
+		viewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(selectionLayer, ITraversalStrategy.TABLE_TRAVERSAL_STRATEGY));
 
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
