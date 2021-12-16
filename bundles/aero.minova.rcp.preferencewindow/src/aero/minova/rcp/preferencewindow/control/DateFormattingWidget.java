@@ -49,7 +49,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\nMMM: "
 				+ translationService.translate("@Preferences.DateUtilPattern.MonthShortcut", null) + "\ny/u: "
 				+ translationService.translate("@Preferences.DateUtilPattern.Year", null) + "\n"
-				+ translationService.translate("@Preferences.DateUtilPattern.Longest", null) + "Pattern: dd.MMM.yyyy";
+				+ translationService.translate("@Preferences.DateUtilPattern.Longest", null) + " Pattern: dd.MMM.yyyy";
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
