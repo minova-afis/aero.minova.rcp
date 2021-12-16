@@ -119,7 +119,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 						return lv;
 					}
 				}
-			} else if (((MinovaNatCombo) getEditorControl()).getTextValue() != null) {
+			} else if (((MinovaNatCombo) getEditorControl()).getTextValue() != null && !((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
 				for (Object lv : mCanonicalValues) {
 					if (((LookupValue) lv).keyText.startsWith(((MinovaNatCombo) getEditorControl()).getTextValue())) {
 						this.selectionIndex = 0;
@@ -128,15 +128,9 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 					}
 				}
 			} else {
-				return super.getCanonicalValue();
+				return null;
 			}
-		} else {
-			// if there is no selection in the dropdown, we need to check if
-			// there is a free edit in the NatCombo control
-			if (getEditorControl().getSelection().length > 0) {
-				return getCanonicalValue();
-			}
-		}
+		} 
 
 		return null;
 	}
