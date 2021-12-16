@@ -432,8 +432,10 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				// Wir brauchen hier nichts zu tun, da das standard Verhalten optimal funktioniert. Das selectedControl wird beim nächsten Fokus neu gesetzt
-				// oder beim Schließen zurückgesetzt.
+				if(((NatTable)e.getSource()).getChildren().length <= 0) {
+					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
+					selectionLayer.clear();
+				}
 			}
 
 			@Override
