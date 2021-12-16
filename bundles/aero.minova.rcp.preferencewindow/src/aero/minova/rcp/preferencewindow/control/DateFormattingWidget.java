@@ -106,11 +106,11 @@ public class DateFormattingWidget extends CustomPWWidget {
 				return "Invalid format!";
 			}
 		}
-		return "Invalid format!";
+		return "Pattern too long!";
 	}
 
 	private boolean validatePattern(String input) {
-		Pattern pattern = Pattern.compile("([dMyu]{1,3})([\\.,/\s]{1})([dMyu]{1,3})([\\.,/\s]{1})([dMyu]{1,3})");
+		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\s]{0,1})([dMyu]{0,3})([\\.,/\s]{0,1})([dMyu]{0,4})");
 		if (pattern.matcher(input).matches()) {
 			return true;
 		}
