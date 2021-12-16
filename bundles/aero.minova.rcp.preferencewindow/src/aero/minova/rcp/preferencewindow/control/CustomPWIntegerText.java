@@ -38,7 +38,7 @@ public class CustomPWIntegerText extends CustomPWText {
 			addControl(label);
 
 			Composite cmp = new Composite(parent, SWT.NONE);
-			cmp.setLayout(new GridLayout(2, false));
+			cmp.setLayout(new GridLayout(3, false));
 			addControl(cmp);
 
 			text = new Text(cmp, SWT.BORDER | SWT.RIGHT | getStyle());
@@ -61,9 +61,19 @@ public class CustomPWIntegerText extends CustomPWText {
 			unit.setLayoutData(unitGridData);
 			addControl(unit);
 
+			Label icon = new Label(cmp, SWT.NONE);
+			if (getTooltip() != null) {
+				createTooltipInfoIcon(icon);
+			}
+
 		} else {
 			buildLabel(parent, GridData.CENTER);
-			text = new Text(parent, SWT.BORDER | SWT.RIGHT | getStyle());
+
+			Composite cmp = new Composite(parent, SWT.NONE);
+			cmp.setLayout(new GridLayout(2, false));
+			addControl(cmp);
+
+			text = new Text(cmp, SWT.BORDER | SWT.RIGHT | getStyle());
 			text.setToolTipText(getTooltip());
 			addControl(text);
 			addVerifyListeners();
@@ -71,6 +81,11 @@ public class CustomPWIntegerText extends CustomPWText {
 			text.addListener(SWT.Modify, event -> {
 				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
 			});
+
+			Label icon = new Label(cmp, SWT.NONE);
+			if (getTooltip() != null) {
+				createTooltipInfoIcon(icon);
+			}
 		}
 
 		return text;

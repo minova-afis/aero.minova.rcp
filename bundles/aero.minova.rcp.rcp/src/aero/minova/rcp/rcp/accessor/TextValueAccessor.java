@@ -22,10 +22,9 @@ public class TextValueAccessor extends AbstractValueAccessor {
 		String newText = value == null ? "" : value.getStringValue();
 		String currentText = ((Text) control).getText();
 
-		if (newText.equals(currentText))
-			return; // ist ja schon gesetzt
-		else if (((Text) control).getEditable())
+		if (!newText.equals(currentText)) {
 			((Text) control).setText(newText);
+		}
 	}
 
 	public void setText(String text) {

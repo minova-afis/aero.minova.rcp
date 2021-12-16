@@ -133,7 +133,7 @@ public class PrintIndexHandler {
 		StringBuffer xml = new StringBuffer();
 
 		MPerspective activePerspective = modelService.getActivePerspective(window);
-		title = translationService.translate(activePerspective.getLabel(), activePerspective.getLabel());
+		title = translationService.translate(activePerspective.getLabel(), null);
 
 		Path path_reports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
@@ -213,7 +213,7 @@ public class PrintIndexHandler {
 			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 			try {
-				Path pathPDF = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.pdf");
+				Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title + "_Index.pdf");
 				Files.createDirectories(pathPDF.getParent());
 				createFile(pathPDF.toString());
 				URL urlPDF = pathPDF.toFile().toURI().toURL();
@@ -226,7 +226,9 @@ public class PrintIndexHandler {
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(activePerspective, modelService, partService);
+				if (!disablePreview) {
+					PrintUtil.checkPreview(activePerspective, modelService, partService);
+				}
 
 				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 

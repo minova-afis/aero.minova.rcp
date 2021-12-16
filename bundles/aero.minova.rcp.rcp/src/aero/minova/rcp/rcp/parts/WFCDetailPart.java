@@ -46,6 +46,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -60,8 +61,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -179,6 +178,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	EModelService eModelService;
 	MApplication mApplication;
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
+	private ScrolledComposite scrolled;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -234,17 +234,19 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	/**
-	 * Öffnet des "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
+	 * Öffnet den "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
 	 * gewählt wurde
 	 */
 	private void openRestoringUIDialog() {
+		String prefName = form.getIndexView().getSource() + "." + Constants.LAST_STATE + ".index.size";
+		boolean stateToLoad = prefs.get(prefName, null) != null; // Gibt es überhaupt etwaszu laden?
 		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
 		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
 		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
 		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
 				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
 
-		if (!neverShow && !shownThisSession && !neverShowContext) {
+		if (stateToLoad && !neverShow && !shownThisSession && !neverShowContext) {
 			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
 					translationService.translate("@RestoringUIDialog.Title", null), //
 					translationService.translate("@RestoringUIDialog.InfoText", null), //
@@ -329,13 +331,27 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void layoutForm(Composite parent) {
-		parent.setLayout(new RowLayout(SWT.VERTICAL));
+
+		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
+		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
+		RowLayout rowLayout = new RowLayout(SWT.VERTICAL);
+		rowLayout.wrap = false;
+		wrap.setLayout(rowLayout);
+		parent.setData(Constants.DETAIL_COMPOSITE, wrap);
+
+		// Abschnitte der Hauptmaske und OPs erstellen
 		for (Object headOrPage : form.getDetail().getHeadAndPageAndGrid()) {
 			HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(headOrPage);
-			layoutSection(parent, wrapper);
+			layoutSection(wrap, wrapper);
 		}
+		loadOptionPages(wrap);
 
-		loadOptionPages(parent);
+		scrolled.setContent(wrap);
+		scrolled.setExpandHorizontal(true);
+		scrolled.setExpandVertical(true);
+
+		scrolled.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, wrap));
 
 		// Setzen der TabListe der Sections.
 		parent.setTabList(parent.getChildren());
@@ -348,6 +364,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Helper-Klasse initialisieren
 		initializeHelper(form.getHelperClass());
+	}
+
+	private void adjustScrollbar(ScrolledComposite scrolled, Composite wrap) {
+		int height = scrolled.getClientArea().height;
+		int width = scrolled.getClientArea().width;
+
+		scrolled.setMinSize(wrap.computeSize(SWT.DEFAULT, height).x, wrap.computeSize(width, SWT.DEFAULT).y);
 	}
 
 	private void initializeHelper(String helperName) {
@@ -516,21 +539,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			section.setImage(resManager.createImage(imageDescriptor));
 		}
 
-		section.addExpansionListener(new IExpansionListener() {
-			@Override
-			public void expansionStateChanging(ExpansionEvent e) {}
-
-			@Override
-			public void expansionStateChanged(ExpansionEvent e) {
-				prefsDetailSections.put(prefsExpandedString, e.getState() + "");
-				try {
-					prefsDetailSections.flush();
-				} catch (BackingStoreException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
@@ -538,6 +546,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		createButton(headOrPageOrGrid, section);
 
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
+
+		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
@@ -873,6 +883,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 	}
 
+	/**
+	 * True wenn es Änderungen gab, False ansonsten
+	 * 
+	 * @return
+	 */
 	public boolean getDirtyFlag() {
 		return dirtyFlag;
 	}
@@ -925,8 +940,22 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@PersistState
 	public void persistState() {
+		// Grids
 		for (SectionGrid sg : sectionGrids) {
 			sg.saveState();
+		}
+
+		// Sections, ein-/ausgeklappt
+		for (MSection s : mDetail.getMSectionList()) {
+			Section section = ((SectionAccessor) s.getSectionAccessor()).getSection();
+			String prefsExpandedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".expanded";
+			prefsDetailSections.put(prefsExpandedString, section.isExpanded() + "");
+		}
+
+		try {
+			prefsDetailSections.flush();
+		} catch (BackingStoreException e1) {
+			e1.printStackTrace();
 		}
 	}
 

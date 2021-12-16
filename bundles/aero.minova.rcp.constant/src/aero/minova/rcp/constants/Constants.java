@@ -39,6 +39,7 @@ public class Constants {
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
 	public static final String CONTROL_GRID_ID = "grid_id";
+	public static final String DETAIL_COMPOSITE = "DetailComposite";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
@@ -111,6 +112,8 @@ public class Constants {
 	public static final String LAST_STATE = "LAST_STATE";
 	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
 	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
+
+	public static final String SHOW_WORKSPACE_RESET_MESSAGE = "ShowWorkspaceResetMessage";
 
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung

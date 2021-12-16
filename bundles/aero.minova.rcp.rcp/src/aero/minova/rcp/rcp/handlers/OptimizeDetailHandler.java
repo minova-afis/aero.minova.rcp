@@ -10,6 +10,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.parts.WFCStatisticDetailPart;
 
@@ -24,6 +25,7 @@ public class OptimizeDetailHandler {
 			mwindow.setHeight(900);
 
 			try {
+				// Höhe von Suche und Index im Verhältnis 35/65
 				MPartStack searchPartStack = emservice
 						.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.search", MPartStack.class).get(0);
 				searchPartStack.setContainerData("35");
@@ -31,28 +33,38 @@ public class OptimizeDetailHandler {
 						.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.index", MPartStack.class).get(0);
 				indexPartStack.setContainerData("65");
 			} catch (IndexOutOfBoundsException e) {
-				// In "Statistic" Ansicht haben wir keinen Search part
+				// In "Statistic" Ansicht haben wir links nur ein Part -> nichts tun
 			}
 		}
 
 		Integer defaultSectionWidth = WFCDetailPart.SECTION_WIDTH;
+
+		// Detail-Composite finden (Kann auch Statistik-Part sein)
 		Composite detailComposite;
 		if (detail.getObject() instanceof WFCDetailPart) {
 			WFCDetailPart wfcDetailPart = (WFCDetailPart) detail.getObject();
-			detailComposite = wfcDetailPart.getComposite();
+			detailComposite = (Composite) wfcDetailPart.getComposite().getData(Constants.DETAIL_COMPOSITE);
 		} else {
 			WFCStatisticDetailPart wfcStatisticDetailPart = (WFCStatisticDetailPart) detail.getObject();
 			detailComposite = wfcStatisticDetailPart.getComposite();
 		}
-		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, mwindow.getHeight()).x;
 
-		// Standardbreite defaultSectionWidth (für Index/Suche) + Benötigte Breite für Detail (können mehrere Sections nebeneinander sein) + 25 Pixel
-		if (mwindow.getWidth() < defaultSectionWidth + prefDetailWidth + 25) {
-			mwindow.setWidth(defaultSectionWidth + prefDetailWidth + 25);
+		// Höhe des Detail composites bei Windowhöhe 900 (unter mac und windows)
+		int defaultHeight = 758;
+		if (System.getProperty("os.name").startsWith("Mac")) {
+			defaultHeight = 789;
+		}
+
+		// Optimale Breite des Details für aktuelle Höhe berechnen (wurde das Window vergrößert ist das noch nicht drinnen, deshalb default)
+		int prefDetailWidth = detailComposite.computeSize(SWT.DEFAULT, Math.max(detailComposite.getClientArea().height, defaultHeight)).x;
+
+		// Standardbreite defaultSectionWidth (für Index/Suche) + Benötigte Breite für Detail (können mehrere Sections nebeneinander sein) + 50 Pixel
+		if (mwindow.getWidth() < defaultSectionWidth + prefDetailWidth + 50) {
+			mwindow.setWidth(defaultSectionWidth + prefDetailWidth + 50);
 		}
 
 		int size = 10000;
-		float detailSize = (float) (prefDetailWidth + 15.0) / mwindow.getWidth();
+		float detailSize = (float) (prefDetailWidth + 25.0) / mwindow.getWidth();
 		float leftSize = 1.0f - detailSize;
 
 		MPartSashContainer element = emservice

@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -106,6 +107,7 @@ import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
@@ -143,6 +145,10 @@ public class SectionGrid {
 	private MWindow mwindow;
 	@Inject
 	private IEventBroker broker;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
+	boolean gridTabNavigation;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -423,15 +429,16 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty()) {
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
+					selectionLayer.clear();
 				}
-				selectionLayer.clear();
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null
+						&& ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != getNatTable()) {
 					getNatTable()
 							.doCommand(new SelectCellCommand(selectionLayer, selectionLayer.getColumnPositionByIndex(viewportLayer.getColumnIndexByPosition(0)),
 									selectionLayer.getRowPositionByIndex(viewportLayer.getRowIndexByPosition(0)), false, false));
@@ -444,12 +451,17 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
-				selectionLayer.clear();
-				e.doit = true;
+				if ((selectionLayer.getSelectionAnchor().columnPosition == selectionLayer.getColumnCount() - 1
+						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) || !gridTabNavigation) {
+					selectionLayer.clear();
+					e.doit = true;
+				}
 				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
-				selectionLayer.clear();
-				e.doit = true;
+				if ((selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) || !gridTabNavigation) {
+					selectionLayer.clear();
+					e.doit = true;
+				}
 				break;
 			default:
 				break;
@@ -541,21 +553,7 @@ public class SectionGrid {
 	}
 
 	private void addRowsFromTable(Table rowsToAdd) {
-		for (Row rowInNewTable : rowsToAdd.getRows()) {
-			Row rowInOriginal = this.dataTable.addRow();
-
-			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
-			for (Column originalColumn : this.dataTable.getColumns()) {
-
-				for (Column newColumn : rowsToAdd.getColumns()) {
-					if (originalColumn.getName().equals(newColumn.getName())) {
-						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
-						int index = this.dataTable.getColumns().indexOf(originalColumn);
-						rowInOriginal.setValue(v, index);
-					}
-				}
-			}
-		}
+		this.dataTable.addRowsFromTable(rowsToAdd);
 		updateNatTable();
 	}
 
