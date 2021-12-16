@@ -103,10 +103,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 					return formatted;
 				}
 			} catch (Exception e) {
-				return "Invalid format!";
+				return translationService.translate("@Util.InvalidMessage", null);
 			}
 		}
-		return "Pattern too long!";
+		return translationService.translate("@Preferences.DateUtilPattern.PatternToLongMessage", null);
 	}
 
 	private boolean validatePattern(String input) {
