@@ -228,7 +228,7 @@ public class TraverseEnterHandler {
 				}
 
 				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
-				if (fc != null) {
+				if (fc == null) {
 					if (focussedControl instanceof LookupComposite) {
 						lookup = (LookupComposite) focussedControl;
 						lookup.closePopup();
