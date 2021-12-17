@@ -116,7 +116,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 		// Auswahl des Wertes in dem DropdownMenu
 		Object value = super.getCanonicalValue();
-		if ((value == null && selectedValue == null) || ((MinovaNatCombo) getEditorControl()).getTextValue() != null) {
+		if (value == null && selectedValue == null && ((MinovaNatCombo) getEditorControl()).getTextValue() != null) {
 			// Wählt den ersten Wert, der mit Eingabe im TextControl startet. Wir ignorieren Groß- und Kleinschreibung.
 			if (!((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
 				for (Object lv : mCanonicalValues) {
@@ -140,8 +140,8 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			}
 		}
 		// Falls das Feld leer ist. Value darf nicht null sein, da beim Löschen das vorherige Value genommen wird. So wissen wir, dass das Feld geleert wurde.
-		else if (value != null && ((MinovaNatCombo) getEditorControl()).getTextValue() != null
-				&& ((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
+		else if (value != null
+				&& (((MinovaNatCombo) getEditorControl()).getTextValue() == null || ((MinovaNatCombo) getEditorControl()).getTextValue().isBlank())) {
 			return null;
 		}
 
