@@ -12,8 +12,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectio
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -65,16 +63,12 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	@Override
 	public boolean commit(MoveDirectionEnum direction) {
-		boolean commited = commit(direction, true);
-		parent.forceFocus();
-		return commited;
+		return commit(direction, true);
 	}
 
 	@Override
 	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit) {
-		boolean commited = commit(direction, closeAfterCommit, false);
-		parent.forceFocus();
-		return commited;
+		return commit(direction, closeAfterCommit, false);
 	}
 
 	@Override
@@ -167,7 +161,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			@Override
 			public void keyPressed(KeyEvent event) {
 				if ((event.keyCode == SWT.CR) || (event.keyCode == SWT.KEYPAD_CR)) {
-					combo.getParent().forceFocus();
 					EHandlerService handlerService = (EHandlerService) combo.getParent().getData("EHandlerService");
 					ECommandService commandService = (ECommandService) combo.getParent().getData("ECommandService");
 					commit(MoveDirectionEnum.NONE, true);
@@ -229,13 +222,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			});
 		}
 
-		combo.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				cursor.dispose();
-			}
-		});
+		combo.addDisposeListener(e -> cursor.dispose());
 	}
 
 }
