@@ -56,8 +56,9 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			Text textC = ((Text) getEditorControl().getChildren()[0]);
 			if (originalCanonicalValue instanceof Character) {
 				textC.setText(originalCanonicalValue.toString());
+			} else {
+				textC.selectAll();
 			}
-			textC.selectAll();
 		}
 		return combo;
 	}
