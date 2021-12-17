@@ -114,14 +114,13 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	@Override
 	public Object getCanonicalValue() {
 
-		//Auswahl des Wertes in dem DropdownMenu
+		// Auswahl des Wertes in dem DropdownMenu
 		Object value = super.getCanonicalValue();
-		if (value == null) {
-			// Selektion mit der Maus
-			if (selectedValue != null) {
+		if (value == null && selectedValue == null) {
+			// Wählt den ersten Wert, der mit Eingabe im TextControl startet. Wir ignorieren Groß- und Kleinschreibung.
+			if (((MinovaNatCombo) getEditorControl()).getTextValue() != null && !((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
 				for (Object lv : mCanonicalValues) {
-					if (((LookupValue) lv).keyText.equals(selectedValue)) {
-						this.selectionIndex = 0;
+					if (((LookupValue) lv).keyText.toLowerCase().startsWith(((MinovaNatCombo) getEditorControl()).getTextValue().toLowerCase())) {
 						this.selectedValue = null;
 						return lv;
 					}
