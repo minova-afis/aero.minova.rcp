@@ -53,8 +53,12 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	protected Control activateCell(Composite parent, final Object originalCanonicalValue) {
 		this.setFocusOnText(true);
 		Control combo = super.activateCell(parent, originalCanonicalValue);
-		if (this.editMode == EditModeEnum.INLINE && originalCanonicalValue instanceof Character) {
-			((Text) getEditorControl().getChildren()[0]).setText(originalCanonicalValue.toString());
+		if (this.editMode == EditModeEnum.INLINE) {
+			Text textC = ((Text) getEditorControl().getChildren()[0]);
+			if (originalCanonicalValue instanceof Character) {
+				textC.setText(originalCanonicalValue.toString());
+			}
+			textC.selectAll();
 		}
 		return combo;
 	}
