@@ -36,7 +36,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	private GridLookupContentProvider contentProvider;
 	private Cursor cursor;
 	private List<?> mCanonicalValues;
-	private int selectionIndex;
 	private Object selectedValue;
 
 	/**
@@ -125,15 +124,15 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 						return lv;
 					}
 				}
-			} 
-			// Wählt den ersten Wert entsprechend der Eingabe aus
-			else if (((MinovaNatCombo) getEditorControl()).getTextValue() != null && !((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
-				for (Object lv : mCanonicalValues) {
-					if (((LookupValue) lv).keyText.startsWith(((MinovaNatCombo) getEditorControl()).getTextValue())) {
-						this.selectionIndex = 0;
-						this.selectedValue = null;
-						return lv;
-					}
+			}
+
+		}
+		// Selektion mit der Maus
+		else if (selectedValue != null) {
+			for (Object lv : mCanonicalValues) {
+				if (((LookupValue) lv).keyText.equals(selectedValue)) {
+					this.selectedValue = null;
+					return lv;
 				}
 			}
 		}
@@ -183,7 +182,6 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				if (e.widget instanceof Table) {
-					selectionIndex = ((Table) e.widget).getSelectionIndex();
 					selectedValue = ((Table) e.widget).getItem(((Table) e.widget).getSelectionIndex()).getText();
 				}
 				commit(MoveDirectionEnum.RIGHT, (!multiselect && editMode == EditModeEnum.INLINE));
