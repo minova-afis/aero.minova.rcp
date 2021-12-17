@@ -35,8 +35,8 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
 	private Cursor cursor;
-	private List<?> mCanonicalValues;
-	private Object selectedValue;
+	private List<LookupValue> mCanonicalValues;
+	private String selectedValue;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
@@ -114,37 +114,43 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	@Override
 	public Object getCanonicalValue() {
 
-		// Auswahl des Wertes in dem DropdownMenu
-		Object value = super.getCanonicalValue();
-		if (value == null && selectedValue == null && ((MinovaNatCombo) getEditorControl()).getTextValue() != null) {
-			// Wählt den ersten Wert, der mit Eingabe im TextControl startet. Wir ignorieren Groß- und Kleinschreibung.
-			if (!((MinovaNatCombo) getEditorControl()).getTextValue().isBlank()) {
-				for (Object lv : mCanonicalValues) {
-					if (((LookupValue) lv).keyText.toLowerCase().startsWith(((MinovaNatCombo) getEditorControl()).getTextValue().toLowerCase())) {
-						this.selectedValue = null;
-						return lv;
-					}
-				}
-			} else {
-				return null;
-			}
+		// Auswahl mit der Maus
+		if (selectedValue != null) {
+			return getValueWithKeytext(selectedValue);
+		}
 
-		}
-		// Selektion mit der Maus
-		else if (selectedValue != null) {
-			for (Object lv : mCanonicalValues) {
-				if (((LookupValue) lv).keyText.equals(selectedValue)) {
-					this.selectedValue = null;
-					return lv;
-				}
-			}
-		}
-		// Falls das Feld leer ist. Value darf nicht null sein, da beim Löschen das vorherige Value genommen wird. So wissen wir, dass das Feld geleert wurde.
-		else if ((((MinovaNatCombo) getEditorControl()).getTextValue() != null && ((MinovaNatCombo) getEditorControl()).getTextValue().isBlank())) {
+		String valueInEditor = ((MinovaNatCombo) getEditorControl()).getTextValue();
+
+		// Wenn nichts im Feld steht soll auch nicht reingeschrieben werden, damit das komplette Löschen einer Zelle möglich ist
+		if (valueInEditor == null || valueInEditor.isBlank()) {
 			return null;
 		}
 
-		return value;
+		// Nach genauer Übereinstimmung (bis auf Groß-/Kleinschreibung) Suchen
+		LookupValue exact = getValueWithKeytext(valueInEditor);
+		if (exact != null) {
+			return exact;
+		}
+
+		// Ersten Wert setzten, der mit der Eingabe beginnt
+		for (LookupValue lv : mCanonicalValues) {
+			if (lv.keyText.toLowerCase().startsWith(valueInEditor.toLowerCase())) {
+				this.selectedValue = null;
+				return lv;
+			}
+		}
+
+		return null;
+	}
+
+	private LookupValue getValueWithKeytext(String kexText) {
+		for (LookupValue lv : mCanonicalValues) {
+			if (lv.keyText.equalsIgnoreCase(kexText)) {
+				this.selectedValue = null;
+				return lv;
+			}
+		}
+		return null;
 	}
 
 	/**
