@@ -85,7 +85,6 @@ public class TraverseEnterHandler {
 				}
 				// nächstes Pflichtfeld suchen und fokussieren
 				getNextRequired(focussedControl, mDetail, popupOpen);
-				System.out.println("Enter selected");
 			}
 		}
 
