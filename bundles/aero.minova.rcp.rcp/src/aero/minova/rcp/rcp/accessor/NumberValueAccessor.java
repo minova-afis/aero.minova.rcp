@@ -26,6 +26,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 	private boolean verificationActive = false;
 
+	private DecimalFormatSymbols dfs;
+
 	public NumberValueAccessor(MNumberField field, Control control) {
 		super(field, control);
 	}
@@ -84,9 +86,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		String textBefore = control.getText();
 
 		// allegmeine Variablen
-		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+		this.dfs = new DecimalFormatSymbols(locale);
 
-		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs);
+		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore);
 
 		verificationActive = true;
 		field.setValue(r.value, true);
@@ -122,8 +124,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public Result processInput(String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore,
-			DecimalFormatSymbols decimalFormatSymbols) {
+	public Result processInput(String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore) {
 		Result result = new Result();
 		String text;
 		boolean doit = false;
@@ -134,25 +135,24 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 
 		// Prüft ob die Eingabe statt findet oder nicht
-		if (!textBefore.isEmpty() && (textBefore.contains("[" + decimalFormatSymbols.getGroupingSeparator() + "]")
-				|| textBefore.contains("[" + decimalFormatSymbols.getDecimalSeparator() + "]"))) {
-			if (keyCode == SWT.DEL && caretPosition > 0) {
-				if (textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
-						|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()) { // entfernt werden soll
+		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL)) {
+			if (keyCode == SWT.DEL) {
+				if (textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
+						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
 					doit = false;
 				} else {
 					doit = true;
 				}
-			} else if (keyCode == SWT.BS && caretPosition > 0) {
-				if (textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()// prüft ob ein dezimal oder Gruppierungs trennzeichen
-						|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()) {// gelöscht werden soll
+			} else if (keyCode == SWT.BS) {
+				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()// prüft ob ein dezimal oder Gruppierungs trennzeichen
+						|| textBefore.charAt(caretPosition - 1) == dfs.getGroupingSeparator()) {// gelöscht werden soll
 					doit = false;
 				} else {
 					doit = true;
 				}
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (decimalFormatSymbols.getDecimalSeparator() == insertion.charAt(0)) {
+			if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
 				doit = false;
 			} else {
 				doit = true;
@@ -168,11 +168,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			for (char c : textBefore.toCharArray()) {
 				if (c >= '0' && c <= '9')
 					sb.append(c);
-				else if (c == decimalFormatSymbols.getDecimalSeparator())
+				else if (c == dfs.getDecimalSeparator())
 					sb.append(c);
 				else {
 					// wir entfernen das Zeichen
-//					if (caretPosition >= position) caretPosition--; // damit stehen wir auch ein Zeichen weiter vorne
 					if (start > position)
 						start--;
 					if (end > position)
@@ -189,7 +188,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			for (char c : insertion.toCharArray()) {
 				if (c >= '0' && c <= '9')
 					sb.append(c);
-				else if (c == decimalFormatSymbols.getDecimalSeparator())
+				else if (c == dfs.getDecimalSeparator())
 					sb.append(c);
 				else
 					position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
@@ -209,8 +208,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 
 			// text auf dezimal Trennzeichen prüfen
-			if (text.contains("" + decimalFormatSymbols.getDecimalSeparator())) {
-				int decimalOverLength = text.substring(text.lastIndexOf(decimalFormatSymbols.getDecimalSeparator()) + 1).length() - decimals;
+			if (text.contains("" + dfs.getDecimalSeparator())) {
+				int decimalOverLength = text.substring(text.lastIndexOf(dfs.getDecimalSeparator()) + 1).length() - decimals;
 				// schneidet den dezimal Bereich auf die angebene dezimal Länge
 				if (!textBefore.isEmpty() && 0 < decimalOverLength)
 					text = text.substring(0, text.length() - decimalOverLength);
@@ -221,7 +220,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			for (char c : textBefore.toCharArray()) {
 				if (c >= '0' && c <= '9')
 					sb.append(c);
-				else if (c == decimalFormatSymbols.getDecimalSeparator())
+				else if (c == dfs.getDecimalSeparator())
 					sb.append(c);
 			}
 			textBefore = sb.toString();
@@ -231,10 +230,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		if (decimals > 0) {
 			try {
-				result.value = new Value(Double.parseDouble(text.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')));
 				result.text = numberFormat.format(result.value.getDoubleValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition,
-						decimalFormatSymbols, numberFormat);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0.0);
 				result.text = numberFormat.format(result.value.getDoubleValue());
@@ -244,8 +242,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Integer.parseInt(text));
 				result.text = numberFormat.format(result.value.getIntegerValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition,
-						decimalFormatSymbols, numberFormat);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0);
 				result.text = numberFormat.format(result.value.getIntegerValue());
@@ -282,85 +279,97 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * @return
 	 */
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int decimals, int caretPosition,
-			DecimalFormatSymbols decimalFormatSymbols, NumberFormat numberFormat) {
+			NumberFormat numberFormat) {
 
-		if (!"".equals(textBefore) && null != textBefore)
-			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
+		if (textBefore != null && !textBefore.isEmpty())
+			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
 
-		int newCaretPosition;
+		int newCaretPosition = 1;
 		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
-		int decimalCaretPostion = caretPosition + 1; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
-		int countGroupingSeperator = 0;
+		int decimalCaretPostion = text.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int countGroupingSeperator = getGroupingSeperatorCount(text) - getGroupingSeperatorCount(textBefore);
 
-		if (decimals > 0) {
-			decimalCaretPostion = textBefore.length() - decimals;
-		}
-
-		for (Character gs : text.toCharArray()) {
-			if (decimalFormatSymbols.getGroupingSeparator() == gs)
-				countGroupingSeperator++;
-		}
-		for (Character gs : textBefore.toCharArray()) {
-			if (decimalFormatSymbols.getGroupingSeparator() == gs)
-				countGroupingSeperator--;
-		}
-
-		if (8 == keyCode) {
-			if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getGroupingSeparator()
-					|| textBefore.charAt(caretPosition - 1) == decimalFormatSymbols.getDecimalSeparator()) {
-				newCaretPosition = caretPosition - 1;
-			} else if (text.startsWith("0") && text.length() == formatted0.length()) {
-				newCaretPosition = 1;
-			} else {
-				newCaretPosition = caretPosition - 1 + countGroupingSeperator;
-			}
-		} else if (SWT.DEL == keyCode) {
-			if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == decimalFormatSymbols.getGroupingSeparator()
-					|| textBefore.charAt(caretPosition) == decimalFormatSymbols.getDecimalSeparator()) {
-				newCaretPosition = caretPosition + 1;
-			} else if (text.startsWith("0") && text.length() == formatted0.length()) {
-				newCaretPosition = 1;
-			} else {
-				newCaretPosition = caretPosition + countGroupingSeperator;
-			}
-		} else if (!insertion.isEmpty() && insertion.charAt(0) == decimalFormatSymbols.getDecimalSeparator()) { // Fall, dass die Eingabe ein dezimales
-			newCaretPosition = decimalCaretPostion; // Trennzeichen ist
-		} else if (formatted0.equals(textBefore)) {
-			if (caretPosition >= 1) {
-				newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator - 1;
-			} else {
-				newCaretPosition = caretPosition + insertion.length();
-			}
-		} else if ("".equals(textBefore)) {
-			newCaretPosition = insertion.length() + countGroupingSeperator;
-		} else if (decimalCaretPostion <= caretPosition && Character.isDigit(insertion.charAt(0))) {// Prüft ob man sich hinter dem dezimal Trennzeichen
-																									// befindet und die Eingabe eine Zahl ist
-			newCaretPosition = caretPosition + insertion.length();
-			if (newCaretPosition >= text.length())
-				newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
-		} else {
-			if (text.length() == textBefore.length() + insertion.length()) {
-				newCaretPosition = caretPosition + insertion.length();
-			} else {
-				if (start != end) {
-					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(decimalFormatSymbols.getDecimalSeparator(), '.')));
-					if (0 != start) {
-						newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
-					} else {
-						if (insertion.contains("" + decimalFormatSymbols.getDecimalSeparator())) {
-							newCaretPosition = start + formatInsertion.length();
-						} else {
-							newCaretPosition = start + formatInsertion.length() - decimals - 1;
-						}
-					}
-				} else if (caretPosition >= 1) {
-					newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator;
+		// Wenn gelöscht wird
+		if (keyCode == SWT.BS || keyCode == SWT.DEL) {
+			// Wenn mit Backspace gelöscht wird
+			if (keyCode == SWT.BS) {
+				if (start + 1 != end) {
+					int gSCount = getGroupingSeperatorCount(textBefore.substring(start, end));
+					newCaretPosition = start + gSCount;
+				} else if (text.equals(formatted0)) {
+					newCaretPosition = 1;
 				} else {
-					newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator - 1;
+					newCaretPosition = caretPosition - 1 + countGroupingSeperator;
+				}
+			}
+			// Wenn mit ENTF gelöscht wird
+			else if (SWT.DEL == keyCode) {
+				if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()
+						|| textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
+					newCaretPosition = caretPosition + 1;
+				} else if (text.equals(formatted0)) {
+					newCaretPosition = 1;
+				} else {
+					newCaretPosition = caretPosition + countGroupingSeperator;
+				}
+			}
+		} else {
+			// Falls der vorherige Text leer oder 0 ist oder der neue Text 0 ist.
+			if (textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) {
+				if (textBefore.isBlank()) {
+					newCaretPosition = insertion.length();
+				} else if (insertion.equals(dfs.getDecimalSeparator())) {
+					newCaretPosition = decimalCaretPostion;
+				} else if (caretPosition == 1) {
+					newCaretPosition = caretPosition;
+				} else {
+					newCaretPosition = caretPosition + insertion.length();
+				}
+			}
+			// Prüft ob man sich hinter dem dezimal Trennzeichen befindet und die Eingabe eine Zahl ist
+			else if (decimalCaretPostion <= caretPosition && Character.isDigit(insertion.charAt(0))) {
+				newCaretPosition = caretPosition + insertion.length();
+				if (newCaretPosition >= text.length())
+					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
+			} else {
+				if (text.length() == textBefore.length() + insertion.length()) {
+					newCaretPosition = caretPosition + insertion.length();
+				} else {
+					if (start != end) {
+						String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
+						if (0 != start) {
+							newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
+						} else {
+							if (insertion.contains("" + dfs.getDecimalSeparator())) {
+								newCaretPosition = start + formatInsertion.length();
+							} else {
+								newCaretPosition = start + formatInsertion.length() - decimals - 1;
+							}
+						}
+					} else if (caretPosition >= 1) {
+						newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator;
+					} else {
+						newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator - 1;
+					}
 				}
 			}
 		}
 
 		return newCaretPosition;
+	}
+
+	/**
+	 * Zählt die GroupingSeperator im übergebenen String.
+	 * 
+	 * @param text
+	 * @return Anzahl an GroupingSeperatoren
+	 */
+	private int getGroupingSeperatorCount(String text) {
+		int groupingSeperatorCount = 0;
+		for (Character gs : text.toCharArray()) {
+			if (dfs.getGroupingSeparator() == gs)
+				groupingSeperatorCount++;
+		}
+		return groupingSeperatorCount;
 	}
 }
