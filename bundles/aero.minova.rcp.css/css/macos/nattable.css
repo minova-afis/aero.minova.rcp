@@ -1,6 +1,6 @@
 /* Nattable für MacOS */
 NatTable {
-	color: black;
+	color: #404040;
 	cell-background-color: white;
 	table-border-color: auto;
 	render-grid-lines: true;
@@ -25,7 +25,7 @@ NatTable > .COLUMN_HEADER {
 	font-weight: normal;
 	font-style: normal;
 	font-family: VERDANA;
-	color: black;
+	color: #404040;
 	text-align: left;
 }
 
@@ -35,14 +35,14 @@ NatTable > .COLUMN_HEADER:select {
 	font-weight: normal;
 	font-style: normal;
 	font-family: VERDANA;
-	color: black;
+	color: #404040;
 	text-align: left;
 }
 
 NatTable > .BODY:select {
     painter-resolution: false;
 	cell-background-color: yellow;
-	color: black;
+	color: #404040;
 	font-weight: normal;
 	font-style: normal;
 	font-family: VERDANA;
@@ -51,7 +51,7 @@ NatTable > .BODY:select {
 NatTable > .selectionAnchor:select {
     painter-resolution: false;
 	cell-background-color: yellow;
-	color: black;
+	color: #404040;
 	font-style: normal;
 	font-family: VERDANA;
 }
