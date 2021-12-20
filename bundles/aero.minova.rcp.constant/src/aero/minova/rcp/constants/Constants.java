@@ -153,6 +153,7 @@ public class Constants {
 
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
+	public static final String SECTION_WIDTH = "SectionWidth";
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
 	public static final String OPTION_PAGE = "OptionPage";

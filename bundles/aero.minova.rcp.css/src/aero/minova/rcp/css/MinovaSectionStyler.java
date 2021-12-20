@@ -8,6 +8,7 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.widgets.MinovaSection;
 
 /**
@@ -80,7 +81,11 @@ public class MinovaSectionStyler implements ICssStyler {
 	 * setzt die Breite der Section
 	 */
 	private void setSectionWidth() {
-		((RowData) section.getLayoutData()).width = getSectionWidth();
+		if (section.getData(Constants.SECTION_WIDTH) != null) {
+			((RowData) section.getLayoutData()).width = (int) section.getData(Constants.SECTION_WIDTH);
+		} else {
+			((RowData) section.getLayoutData()).width = getSectionWidth();
+		}
 	}
 
 	@Override

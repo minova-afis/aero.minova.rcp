@@ -1,8 +1,8 @@
 
 package aero.minova.rcp.rcp.parts;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
+import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_TIME_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.ArrayList;
@@ -119,8 +119,6 @@ import aero.minova.rcp.rcp.widgets.SectionGrid;
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
-	private static final int MARGIN_SECTION = 8;
-	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
@@ -166,6 +164,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private IEclipseContext appContext;
 
+	private int detailWidth;
+
 	@Inject
 	MWindow mwindow;
 
@@ -191,7 +191,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
-		mPerspective.getContext().set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
+		mPerspective.getContext().set(Constants.DETAIL_WIDTH, detailWidth);
 		TranslateUtil.translate(composite, translationService, locale);
 
 		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
@@ -510,7 +510,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 */
 
 	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPageOrGrid) {
-		RowData headLayoutData = new RowData();
+		RowData layoutData = new RowData();
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
@@ -520,14 +520,14 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Alten Zustand wiederherstellen
 		String prefsWidthKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".width";
-		String widthString = prefsDetailSections.get(prefsWidthKey, SECTION_WIDTH + "");
-		headLayoutData.width = Integer.parseInt(widthString);
+		String widthString = prefsDetailSections.get(prefsWidthKey, section.getCssStyler().getSectionWidth() + "");
+		layoutData.width = Integer.parseInt(widthString);
 		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
 		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
 		section.setExpanded(Boolean.parseBoolean(expandedString));
 
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
-		section.setLayoutData(headLayoutData);
+		section.setLayoutData(layoutData);
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
 		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
@@ -543,15 +543,16 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
 
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
+
+		detailWidth = section.getCssStyler().getSectionWidth();
 	}
 
-	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
+	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, MinovaSection section, MSection mSection) {
 		// Client Area
 		Composite clientComposite = getFormToolkit().createComposite(section);
 		clientComposite.setLayout(new FormLayout());
 		getFormToolkit().paintBordersFor(clientComposite);
 		section.setClient(clientComposite);
-
 
 		// Erstellen der Field des Section.
 		createFields(clientComposite, headOrPageOrGrid, mSection, section);
@@ -688,7 +689,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 * @param mSection
 	 *            die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, Section section) {
+	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, MinovaSection section) {
 		IEclipseContext context = mPerspective.getContext();
 		List<MField> visibleMFields = new ArrayList<>();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
@@ -760,7 +761,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return null;
 	}
 
-	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context, Object fieldOrGrid) {
+	private void createGrid(Composite composite, MSection mSection, MinovaSection section, IEclipseContext context, Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 		mGrid.addGridChangeListener(this);
