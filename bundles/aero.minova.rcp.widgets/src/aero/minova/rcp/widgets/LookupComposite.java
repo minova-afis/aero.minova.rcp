@@ -3,6 +3,7 @@ package aero.minova.rcp.widgets;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -521,10 +522,12 @@ public class LookupComposite extends Composite {
 
 				CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false);
 				setLastState();
-				listLookup.thenAccept(l -> {
-					Display.getDefault().asyncExec(() -> contentProvider.setValues(l));
+
+				try {
+					List<LookupValue> l = listLookup.get();
+					contentProvider.setValues(l);
 					gettingData = false;
-				});
+				} catch (InterruptedException | ExecutionException e) {}
 			} else {
 				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.ActiveRequest", null),
 						translationService.translate("@Notification", null));

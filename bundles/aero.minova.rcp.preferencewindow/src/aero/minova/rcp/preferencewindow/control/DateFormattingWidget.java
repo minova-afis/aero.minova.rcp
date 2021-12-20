@@ -46,8 +46,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		String tooltipString = "d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null);
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\nMMM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.MonthShortcut", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null) + "\n"
+				+ translationService.translate("@Preferences.DateUtilPattern.Longest", null) + " Pattern: dd.MMM.yyyy";
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
@@ -96,16 +98,19 @@ public class DateFormattingWidget extends CustomPWWidget {
 			try {
 				LocalDateTime date = LocalDateTime.of(2015, 12, 24, 23, 45);
 				String formatted = DateUtil.getDateString(date.toInstant(ZoneOffset.UTC), locale, pattern);
-				return formatted;
+				String example = "25.März.2024";
+				if (formatted.length() <= example.length()) {
+					return formatted;
+				}
 			} catch (Exception e) {
-				return "Invalid format!";
+				return translationService.translate("@Util.InvalidMessage", null);
 			}
 		}
-		return "Invalid format!";
+		return translationService.translate("@Preferences.DateUtilPattern.PatternToLongMessage", null);
 	}
 
 	private boolean validatePattern(String input) {
-		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\\s]{0,1})([dM]{0,3})([\\.,/\\s]{0,1})([dMyu]{0,4})");
+		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\s]{0,1})([dMyu]{0,3})([\\.,/\s]{0,1})([dMyu]{0,4})");
 		if (pattern.matcher(input).matches()) {
 			return true;
 		}
