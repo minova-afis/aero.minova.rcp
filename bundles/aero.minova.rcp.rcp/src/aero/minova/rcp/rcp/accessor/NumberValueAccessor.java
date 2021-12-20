@@ -286,7 +286,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		int newCaretPosition = 1;
 		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
-		int decimalCaretPostion = text.length() + 1 - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int decimalCaretPostion = text.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
 		int countGroupingSeperator = getGroupingSeperatorCount(text, dfs) - getGroupingSeperatorCount(textBefore, dfs);
 
 		// Wenn gelöscht wird
@@ -317,7 +317,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else {
 			// Falls der vorherige Text leer oder 0 ist oder der neue Text 0 ist.
 			if ((textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) && caretPosition < decimalCaretPostion) {
-				if (insertion.equals(dfs.getDecimalSeparator())) {
+				if (insertion.equals("" + dfs.getDecimalSeparator())) {
 					newCaretPosition = decimalCaretPostion;
 				} else {
 					newCaretPosition = insertion.length() + countGroupingSeperator;
