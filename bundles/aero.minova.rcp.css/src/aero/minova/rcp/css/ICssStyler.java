@@ -4,13 +4,13 @@ package aero.minova.rcp.css;
  * @author Wilfried Saak
  */
 public interface ICssStyler {
-	int CSS_DATE_WIDTH = 130;
+	int CSS_DATE_WIDTH = 90;
 	int CSS_DATE_TIME_WIDTH = 130;
 	int CSS_NUMBER_WIDTH = 90;
 	int CSS_ROW_HEIGHT = 24;
 	int CSS_SECTION_SPACING = 5;
 	int CSS_TEXT_WIDTH = 130;
-	int CSS_TIME_WIDTH = 60;
+	int CSS_TIME_WIDTH = 65;
 
 	/**
 	 * wendet die aktuellen CSS-Parameter für das Layout des gebundenen Objectes an
