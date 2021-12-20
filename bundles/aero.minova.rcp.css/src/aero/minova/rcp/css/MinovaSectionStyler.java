@@ -153,12 +153,12 @@ public class MinovaSectionStyler implements ICssStyler {
 
 		// Breite
 		if (!cd.fill) {
-			fd.width = textWidth;
+			fd.width = textWidth - sectionSpacing * 2;
 		}
 
 		// Höhe
 		if (cd.numberRowsSpanned > 1) {
-			fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing;
+			fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing * 2;
 		}
 	}
 

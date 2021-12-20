@@ -12,8 +12,6 @@ import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -63,24 +61,21 @@ public class TextField {
 			}
 		});
 
-		text.addTraverseListener(new TraverseListener() {
-
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
-					e.doit = true;
-				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
-					e.doit = false;
-					text.setText(text.getText() + "\t");
-					text.setSelection(text.getText().length());
-				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
-					e.doit = true;
-				}
+		text.addTraverseListener(e -> {
+			if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
+				e.doit = true;
+			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
+				e.doit = false;
+				text.setText(text.getText() + "\t");
+				text.setSelection(text.getText().length());
+			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
+				e.doit = true;
 			}
-
 		});
+
 		text.setData(Constants.CONTROL_FIELD, field);
-		CssData cssData = new CssData(CssType.TEXT_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), field.isFillToRight());
+		CssData cssData = new CssData(CssType.TEXT_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+				field.isFillToRight());
 		text.setData(CssData.CSSDATA_KEY, cssData);
 
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
@@ -95,12 +90,12 @@ public class TextField {
 		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		fd.left = new FormAttachment((column == 0) ? 25 : 75);
 		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2 && field.isFillToRight()) {
-			fd.right = new FormAttachment(100, MARGIN_BORDER);
+			fd.right = new FormAttachment(100, -MARGIN_BORDER);
 		} else {
-			fd.width = TEXT_WIDTH;
+			fd.width = TEXT_WIDTH - MARGIN_BORDER * 2;
 		}
 		if (field.getNumberRowsSpanned() > 1) {
-			fd.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
+			fd.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP * 2;
 		}
 		text.setLayoutData(fd);
 
