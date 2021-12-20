@@ -87,13 +87,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+		if (!insertion.matches("[a-zA-Z]+")) {
+			Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
 
-		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
-
-		verificationActive = true;
-		field.setValue(r.value, true);
-		control.setText(r.text);
-		control.setSelection(r.caretPosition);
+			verificationActive = true;
+			field.setValue(r.value, true);
+			control.setText(r.text);
+			control.setSelection(r.caretPosition);
+		}
 		e.doit = false;
 		verificationActive = false;
 	}
