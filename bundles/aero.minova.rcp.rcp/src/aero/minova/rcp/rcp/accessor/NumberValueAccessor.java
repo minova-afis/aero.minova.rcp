@@ -26,8 +26,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 	private boolean verificationActive = false;
 
-	private DecimalFormatSymbols dfs;
-
 	public NumberValueAccessor(MNumberField field, Control control) {
 		super(field, control);
 	}
@@ -86,9 +84,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		String textBefore = control.getText();
 
 		// allegmeine Variablen
-		this.dfs = new DecimalFormatSymbols(locale);
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
-		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore);
+		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs);
 
 		verificationActive = true;
 		field.setValue(r.value, true);
@@ -124,7 +122,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public Result processInput(String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore) {
+	public Result processInput(String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore,
+			DecimalFormatSymbols dfs) {
 		Result result = new Result();
 		String text;
 		boolean doit = false;
@@ -144,8 +143,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					doit = true;
 				}
 			} else if (keyCode == SWT.BS) {
-				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()// prüft ob ein dezimal oder Gruppierungs trennzeichen
-						|| textBefore.charAt(caretPosition - 1) == dfs.getGroupingSeparator()) {// gelöscht werden soll
+				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichengelöscht werden soll
 					doit = false;
 				} else {
 					doit = true;
@@ -232,7 +230,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')));
 				result.text = numberFormat.format(result.value.getDoubleValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat, dfs);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0.0);
 				result.text = numberFormat.format(result.value.getDoubleValue());
@@ -242,7 +240,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Integer.parseInt(text));
 				result.text = numberFormat.format(result.value.getIntegerValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat, dfs);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0);
 				result.text = numberFormat.format(result.value.getIntegerValue());
@@ -279,23 +277,22 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * @return
 	 */
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int decimals, int caretPosition,
-			NumberFormat numberFormat) {
+			NumberFormat numberFormat, DecimalFormatSymbols dfs) {
 
 		if (textBefore != null && !textBefore.isEmpty())
 			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
 
 		int newCaretPosition = 1;
 		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
-		int decimalCaretPostion = text.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
-		int countGroupingSeperator = getGroupingSeperatorCount(text) - getGroupingSeperatorCount(textBefore);
+		int decimalCaretPostion = text.length() + 1 - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int countGroupingSeperator = getGroupingSeperatorCount(text, dfs) - getGroupingSeperatorCount(textBefore, dfs);
 
 		// Wenn gelöscht wird
 		if (keyCode == SWT.BS || keyCode == SWT.DEL) {
 			// Wenn mit Backspace gelöscht wird
 			if (keyCode == SWT.BS) {
 				if (start + 1 != end) {
-					int gSCount = getGroupingSeperatorCount(textBefore.substring(start, end));
-					newCaretPosition = start + gSCount;
+					newCaretPosition = start;
 				} else if (text.equals(formatted0)) {
 					newCaretPosition = 1;
 				} else {
@@ -304,10 +301,12 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 			// Wenn mit ENTF gelöscht wird
 			else if (SWT.DEL == keyCode) {
-				if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()
+				if (start + 1 != end) {
+					newCaretPosition = start + 1 + countGroupingSeperator;
+				} else if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()
 						|| textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
 					newCaretPosition = caretPosition + 1;
-				} else if (text.equals(formatted0)) {
+				} else if (text.equals(formatted0) && decimals != 0) {
 					newCaretPosition = 1;
 				} else {
 					newCaretPosition = caretPosition + countGroupingSeperator;
@@ -315,15 +314,11 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 		} else {
 			// Falls der vorherige Text leer oder 0 ist oder der neue Text 0 ist.
-			if (textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) {
-				if (textBefore.isBlank()) {
-					newCaretPosition = insertion.length();
-				} else if (insertion.equals(dfs.getDecimalSeparator())) {
+			if ((textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) && caretPosition < decimalCaretPostion) {
+				if (insertion.equals(dfs.getDecimalSeparator())) {
 					newCaretPosition = decimalCaretPostion;
-				} else if (caretPosition == 1) {
-					newCaretPosition = caretPosition;
 				} else {
-					newCaretPosition = caretPosition + insertion.length();
+					newCaretPosition = insertion.length() + countGroupingSeperator;
 				}
 			}
 			// Prüft ob man sich hinter dem dezimal Trennzeichen befindet und die Eingabe eine Zahl ist
@@ -364,7 +359,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * @param text
 	 * @return Anzahl an GroupingSeperatoren
 	 */
-	private int getGroupingSeperatorCount(String text) {
+	private int getGroupingSeperatorCount(String text, DecimalFormatSymbols dfs) {
 		int groupingSeperatorCount = 0;
 		for (Character gs : text.toCharArray()) {
 			if (dfs.getGroupingSeparator() == gs)
