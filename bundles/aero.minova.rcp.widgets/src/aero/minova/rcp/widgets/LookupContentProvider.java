@@ -43,7 +43,7 @@ public class LookupContentProvider {
 
 		// Wenn gegeben, weiteren Filter anwenden
 		if (getFilter() != null) {
-			result = values.stream().filter(lv -> getFilter().test(lv)).collect(Collectors.toList());
+			result = result.stream().filter(lv -> getFilter().test(lv)).collect(Collectors.toList());
 		}
 
 		// Groß- und Kleinschreibung ignorieren
