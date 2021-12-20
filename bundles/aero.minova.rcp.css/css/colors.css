@@ -24,11 +24,7 @@ CTabItem:selected {
 Label, Text, Button, Button.Description, Label.Description, Section.Description  {
 	color: #404040;
 }
-/* Für Winows Farbe der Push-Buttons auf weiß setzten #769*/
-Button[style~='SWT.PUSH'] {
-	color: #404040;
-	background-color: white;
-}
+
 
 /*Verschiedene Feldfarben*/
 Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {
