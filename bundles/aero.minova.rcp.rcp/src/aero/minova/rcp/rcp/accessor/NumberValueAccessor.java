@@ -336,8 +336,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					} else {
 						if (insertion.contains("" + dfs.getDecimalSeparator())) {
 							newCaretPosition = start + formatInsertion.length();
-						} else {
+						} else if (decimals != 0) {
 							newCaretPosition = start + formatInsertion.length() - decimals - 1;
+						} else {
+							newCaretPosition = start + formatInsertion.length();
 						}
 					}
 				} else if (text.length() == textBefore.length() + insertion.length()) {
@@ -364,16 +366,5 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				groupingSeperatorCount++;
 		}
 		return groupingSeperatorCount;
-	}
-
-	private int getInsertionLengthWithGS(int insertionLength) {
-		if (insertionLength >= 4 && insertionLength <= 6) {
-			return insertionLength + 1;
-		} else if (insertionLength >= 7 && insertionLength <= 9) {
-			return insertionLength + 2;
-		} else if (insertionLength >= 10 && insertionLength <= 12) {
-			return insertionLength + 3;
-		}
-		return insertionLength;
 	}
 }
