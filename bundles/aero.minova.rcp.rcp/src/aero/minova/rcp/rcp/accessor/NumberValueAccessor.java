@@ -329,25 +329,21 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				if (newCaretPosition >= text.length())
 					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 			} else {
-				if (text.length() == textBefore.length() + insertion.length()) {
+				if (start != end) {
+					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
+					if (0 != start) {
+						newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
+					} else {
+						if (insertion.contains("" + dfs.getDecimalSeparator())) {
+							newCaretPosition = start + formatInsertion.length();
+						} else {
+							newCaretPosition = start + formatInsertion.length() - decimals - 1;
+						}
+					}
+				} else if (text.length() == textBefore.length() + insertion.length()) {
 					newCaretPosition = caretPosition + insertion.length();
 				} else {
-					if (start != end) {
-						String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
-						if (0 != start) {
-							newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
-						} else {
-							if (insertion.contains("" + dfs.getDecimalSeparator())) {
-								newCaretPosition = start + formatInsertion.length();
-							} else {
-								newCaretPosition = start + formatInsertion.length() - decimals - 1;
-							}
-						}
-					} else if (caretPosition >= 1) {
-						newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator;
-					} else {
-						newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator - 1;
-					}
+					newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator;
 				}
 			}
 		}
@@ -368,5 +364,16 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				groupingSeperatorCount++;
 		}
 		return groupingSeperatorCount;
+	}
+
+	private int getInsertionLengthWithGS(int insertionLength) {
+		if (insertionLength >= 4 && insertionLength <= 6) {
+			return insertionLength + 1;
+		} else if (insertionLength >= 7 && insertionLength <= 9) {
+			return insertionLength + 2;
+		} else if (insertionLength >= 10 && insertionLength <= 12) {
+			return insertionLength + 3;
+		}
+		return insertionLength;
 	}
 }
