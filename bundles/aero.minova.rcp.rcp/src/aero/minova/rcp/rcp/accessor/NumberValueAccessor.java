@@ -136,7 +136,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 
 		// Prüft ob die Eingabe statt findet oder nicht
-		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && !rangeSelected) {
+		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && start + 1 == end) {
 			if (keyCode == SWT.DEL) {
 				if (textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
