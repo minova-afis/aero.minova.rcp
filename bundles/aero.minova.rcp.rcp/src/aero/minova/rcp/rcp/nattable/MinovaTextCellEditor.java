@@ -453,17 +453,16 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 * @see Text#setSelection(int, int)
 	 */
 	private void selectText(EditorSelectionEnum selectionMode) {
-		this.text.selectAll();
-//		int textLength = this.text.getText().length();
-//		if (textLength > 0) {
-//			if (selectionMode == EditorSelectionEnum.ALL) {
-//				this.text.setSelection(0, textLength);
-//			} else if (selectionMode == EditorSelectionEnum.END) {
-//				this.text.setSelection(textLength, textLength);
-//			} else if (selectionMode == EditorSelectionEnum.START) {
-//				this.text.setSelection(0);
-//			}
-//		}
+		int textLength = this.text.getText().length();
+		if (textLength > 0) {
+			if (selectionMode == EditorSelectionEnum.ALL) {
+				this.text.setSelection(0, textLength);
+			} else if (selectionMode == EditorSelectionEnum.END) {
+				this.text.setSelection(textLength, textLength);
+			} else if (selectionMode == EditorSelectionEnum.START) {
+				this.text.setSelection(0);
+			}
+		}
 	}
 
 	/**
