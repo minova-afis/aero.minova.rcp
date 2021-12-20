@@ -2,7 +2,6 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,7 +36,6 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MSection;
-import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
@@ -152,6 +150,7 @@ public class TraverseEnterHandler {
 
 		if (focussedControl instanceof NatTable) {
 			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
+			((NatTable) focussedControl).commitAndCloseActiveCellEditor();
 		} else {
 			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSectionAccessor()).getSection();
 		}
@@ -356,9 +355,8 @@ public class TraverseEnterHandler {
 		NatTable natTable = (NatTable) focussedControl;
 		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
 		SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
-		int irs = - 1;
+		int irs = -1;
 		int ics = 0;
-		((NatTable) focussedControl).commitAndCloseActiveCellEditor();
 
 		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
 		if (natTable.isFocusControl() && countFromSelectedCell) {
