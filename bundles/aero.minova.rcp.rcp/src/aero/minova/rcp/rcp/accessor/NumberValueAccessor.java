@@ -75,10 +75,12 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// Werte vom Text-Widget
 		Text control = (Text) e.getSource();
 		Locale locale = (Locale) control.getData(FieldUtil.TRANSLATE_LOCALE);
+		boolean rangeSelected = false;
 
 		int caretPosition = control.getCaretPosition();
 		if (control.getSelection() != null) {
 			caretPosition = control.getSelection().x;
+			rangeSelected = true;
 		}
 
 		String textBefore = control.getText();
@@ -86,7 +88,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 
-		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs);
+		Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
 
 		verificationActive = true;
 		field.setValue(r.value, true);
@@ -123,7 +125,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 * @return
 	 */
 	public Result processInput(String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore,
-			DecimalFormatSymbols dfs) {
+			DecimalFormatSymbols dfs, boolean rangeSelected) {
 		Result result = new Result();
 		String text;
 		boolean doit = false;
@@ -134,7 +136,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 
 		// Prüft ob die Eingabe statt findet oder nicht
-		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL)) {
+		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && !rangeSelected) {
 			if (keyCode == SWT.DEL) {
 				if (textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
