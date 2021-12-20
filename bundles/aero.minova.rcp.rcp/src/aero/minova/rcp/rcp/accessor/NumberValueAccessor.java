@@ -331,17 +331,12 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			} else {
 				if (start != end) {
 					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
-					if (0 != start) {
-						newCaretPosition = start + 1 + formatInsertion.length() - decimals - 1;
+					if (decimals != 0 && !insertion.contains("" + dfs.getDecimalSeparator())) {
+						newCaretPosition = start + formatInsertion.length() - decimals - 1;
 					} else {
-						if (insertion.contains("" + dfs.getDecimalSeparator())) {
-							newCaretPosition = start + formatInsertion.length();
-						} else if (decimals != 0) {
-							newCaretPosition = start + formatInsertion.length() - decimals - 1;
-						} else {
-							newCaretPosition = start + formatInsertion.length();
-						}
+						newCaretPosition = start + formatInsertion.length();
 					}
+
 				} else if (text.length() == textBefore.length() + insertion.length()) {
 					newCaretPosition = caretPosition + insertion.length();
 				} else {
@@ -351,6 +346,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		}
 
 		return newCaretPosition;
+
 	}
 
 	/**
