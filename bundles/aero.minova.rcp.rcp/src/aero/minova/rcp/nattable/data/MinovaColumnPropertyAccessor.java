@@ -130,7 +130,10 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 
 	private void translateGrid(TranslationService translationService) {
 		for (Field field : grid.getField()) {
-			String translate = translationService.translate(field.getText().toString(), null);
+			String translate = field.getName();
+			if (field.getLabel() != null) {
+				translate = translationService.translate(field.getLabel(), null);
+			}
 			getTableHeadersMap().put(field.getName(), translate);
 		}
 	}
