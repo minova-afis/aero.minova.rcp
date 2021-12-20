@@ -437,7 +437,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("1.234,00", result.text, "Text");
-		assertEquals(1, result.caretPosition, "CaretPosition");
+		assertEquals(2, result.caretPosition, "CaretPosition");
 		assertEquals(new Value(1234.0), result.value, "Value");
 	}
 
@@ -483,7 +483,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("11.234,00", result.text, "Text");
-		assertEquals(2, result.caretPosition, "CaretPosition");
+		assertEquals(3, result.caretPosition, "CaretPosition");
 		assertEquals(new Value(11234.0), result.value, "Value");
 	}
 
@@ -506,7 +506,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("111.234,00", result.text, "Text");
-		assertEquals(3, result.caretPosition, "CaretPosition");
+		assertEquals(4, result.caretPosition, "CaretPosition");
 		assertEquals(new Value(111234.0), result.value, "Value");
 	}
 
@@ -529,7 +529,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("1.111.234,00", result.text, "Text");
-		assertEquals(5, result.caretPosition, "CaretPosition");
+		assertEquals(6, result.caretPosition, "CaretPosition");
 		assertEquals(new Value(1111234.0), result.value, "Value");
 	}
 
@@ -552,7 +552,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("1.111.111.234,00", result.text, "Text");
-		assertEquals(9, result.caretPosition, "CaretPosition");
+		assertEquals(10, result.caretPosition, "CaretPosition");
 		assertEquals(new Value(1111111234.0), result.value, "Value");
 	}
 
@@ -621,7 +621,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("1.111.111.234,00", result.text, "Text");
-		assertEquals(9, result.caretPosition, "CaretPosition");
+		assertEquals(10, result.caretPosition, "CaretPosition");
 		assertEquals(new Value(1111111234.0), result.value, "Value");
 	}
 
@@ -952,7 +952,7 @@ class NumberValueAccessorTests {
 		Result result = numberValueAccessor.processInput(//
 				"1000,65", // insertion
 				0, // start
-				8, // end
+				7, // end
 				0, // keyCode
 				2, // decimals
 				Locale.GERMANY, // locale
