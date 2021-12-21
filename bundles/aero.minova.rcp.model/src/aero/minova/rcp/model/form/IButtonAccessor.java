@@ -8,13 +8,17 @@ public interface IButtonAccessor {
 
 	void setEnabled(boolean enabled);
 
+	boolean isEnabled();
+
+	boolean isCanBeEnabled();
+
 	void addSelectionListener(SelectionListener listener);
+
+	void removeSelectionListener(SelectionListener listener);
+
+	List<SelectionListener> getSelectionListener();
 
 	void setCanBeEnabled(boolean canBeEnabled);
 
 	void updateEnabled();
-
-	boolean isEnabled();
-	
-	List<SelectionListener> getSelectionListener();
 }

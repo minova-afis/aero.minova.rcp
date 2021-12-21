@@ -139,9 +139,7 @@ import aero.minova.rcp.rcp.widgets.SectionGrid;
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
 	private static final int MARGIN_SECTION = 8;
-	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten =
-																											// 5
-																											// Zwischenräume
+	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
@@ -208,8 +206,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
 
-		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht
-		// steuert
+		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
@@ -221,10 +218,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			mDetail.getHelper().setControls(mDetail);
 		}
 
-		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit
-		// ungespeicherten Änderungen zu schließen
-		// Außerdem wird "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false
-		// gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
+		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen. Außerdem wird
+		// "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
 		IWindowCloseHandler handler = mWindow -> {
 			@SuppressWarnings("unchecked")
 			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
@@ -261,8 +256,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		boolean stateToLoad = prefs.get(prefName, null) != null; // Gibt es überhaupt etwaszu laden?
 		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
 		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
-		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in
-		// LifeCycle gesetzt
+		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
 		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
 				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
 
@@ -377,14 +371,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		parent.setTabList(parent.getChildren());
 		// Holen des Parts
 		Composite part = parent.getParent();
-		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die
-		// Toolbar mit selektiert wird.
+		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
 		part.setTabList(TabUtil.getTabListForPart(part, selectAllControls));
-		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die
-		// Anwendung mit Tab navigiert werden kann.
+		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
 		part.getParent().setTabList(new Control[0]);
 
-//		Object widget = handledToolItem.getWidget();
 		// Helper-Klasse initialisieren
 		initializeHelper(form.getHelperClass());
 	}
@@ -421,8 +412,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
 		} else {
 			getDetail().setHelper(iHelper);
-			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar
-																				// ist
+			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
 
@@ -621,12 +611,17 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
 			MButton mButton = new MButton(btn.getId());
 			mButton.setText(btn.getText());
+			mButton.setIcon(btn.getIcon());
+
+			ButtonAccessor ba;
 			if (isHead) {
-				mButton.setButtonAccessor(createToolItemInPartToolbar(btn));
+				ba = createToolItemInPartToolbar(btn);
 			} else {
-				mButton.setButtonAccessor(createToolItemInSection(bar, btn));
+				ba = createToolItemInSection(bar, btn);
 			}
 
+			mButton.setButtonAccessor(ba);
+			ba.setmButton(mButton);
 			mDetail.putButton(mButton);
 		}
 

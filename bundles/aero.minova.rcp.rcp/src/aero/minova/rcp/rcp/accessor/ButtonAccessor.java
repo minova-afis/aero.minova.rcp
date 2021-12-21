@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolItem;
 
 import aero.minova.rcp.model.form.IButtonAccessor;
+import aero.minova.rcp.model.form.MButton;
 
 public class ButtonAccessor implements IButtonAccessor {
 
@@ -17,6 +18,9 @@ public class ButtonAccessor implements IButtonAccessor {
 	private MenuItem menuItem;
 	private MHandledToolItem handledToolItem;
 	private MHandledMenuItem handledMenuItem;
+
+	private MButton mButton;
+
 	List<SelectionListener> selectionListeners = new ArrayList<>();
 
 	// Wenn canBeEnabled false ist, darf der Button nicht enabled werden (z.B.: Löschen in Grids wenn keine Zellen ausgewählt)
@@ -39,6 +43,10 @@ public class ButtonAccessor implements IButtonAccessor {
 	public ButtonAccessor(ToolItem toolItem, MenuItem menuItem) {
 		this.toolItem = toolItem;
 		this.menuItem = menuItem;
+	}
+
+	public void setmButton(MButton mButton) {
+		this.mButton = mButton;
 	}
 
 	@Override
@@ -95,6 +103,30 @@ public class ButtonAccessor implements IButtonAccessor {
 	@Override
 	public List<SelectionListener> getSelectionListener() {
 		return selectionListeners;
+	}
+
+	@Override
+	public boolean isCanBeEnabled() {
+		return canBeEnabled;
+	}
+
+	@Override
+	public void removeSelectionListener(SelectionListener listener) {
+		if (toolItem != null) {
+			toolItem.removeSelectionListener(listener);
+		}
+
+		if (menuItem != null) {
+			menuItem.removeSelectionListener(listener);
+		}
+
+		if (toolItem == null && menuItem == null) {
+			selectionListeners.remove(listener);
+		}
+	}
+
+	public MButton getmButton() {
+		return mButton;
 	}
 
 }

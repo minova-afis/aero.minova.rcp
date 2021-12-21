@@ -25,12 +25,20 @@ public class MButton {
 		return id;
 	}
 
-	public void setButtonAccessor(IButtonAccessor buttonAccessor) {
-		this.buttonAccessor = buttonAccessor;
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 
 	public IButtonAccessor getButtonAccessor() {
 		return buttonAccessor;
+	}
+
+	public void setButtonAccessor(IButtonAccessor buttonAccessor) {
+		this.buttonAccessor = buttonAccessor;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -43,6 +51,18 @@ public class MButton {
 
 	public void addSelectionListener(SelectionListener listener) {
 		buttonAccessor.addSelectionListener(listener);
+	}
+
+	public void removeSelectionListener(SelectionListener listener) {
+		buttonAccessor.removeSelectionListener(listener);
+	}
+
+	public boolean isCanBeEnabled() {
+		return buttonAccessor.isCanBeEnabled();
+	}
+
+	public void setCanBeEnabled(boolean canBeEnabled) {
+		buttonAccessor.setCanBeEnabled(canBeEnabled);
 	}
 
 }
