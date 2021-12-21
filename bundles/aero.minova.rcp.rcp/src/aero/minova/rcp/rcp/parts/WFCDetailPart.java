@@ -58,6 +58,8 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -66,7 +68,11 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -628,25 +634,101 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private ButtonAccessor createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
-		Object event;
-		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 
+		// Kein Gruppenname: Element nur in Toolbar, kein Menü
+		if (btn.getGroup() == null) {
+			ToolItem item = new ToolItem(bar, SWT.PUSH);
+			fillItemWithValues(item, btn);
+			return new ButtonAccessor(item);
+		}
+
+		// Menü für Gruppennamen finden
+		Menu groupMenu = null;
+		if (btn.getGroup() != null) {
+			for (ToolItem c : bar.getItems()) {
+				if (btn.getGroup().equalsIgnoreCase((String) c.getData(Constants.GROUP_NAME))) {
+					groupMenu = (Menu) c.getData(Constants.GROUP_MENU);
+					break;
+				}
+			}
+		}
+
+		ToolItem toolItem = null;
+
+		// Erstes Vorkommen des Gruppennamens: Element in Toolbar, Menü muss noch erstellt werden
+		if (groupMenu == null) {
+			final ToolItem item = new ToolItem(bar, SWT.DROP_DOWN);
+			fillItemWithValues(item, btn);
+
+			Menu menu = new Menu(new Shell(Display.getCurrent()), SWT.POP_UP);
+			item.setData(Constants.GROUP_MENU, menu);
+
+			item.addListener(SWT.Selection, event -> {
+				if (event.detail == SWT.ARROW) {
+					Rectangle rect = item.getBounds();
+					Point pt = new Point(rect.x, rect.y + rect.height);
+					pt = bar.toDisplay(pt);
+					menu.setLocation(pt.x, pt.y);
+					menu.setVisible(true);
+				}
+			});
+
+			toolItem = item;
+			groupMenu = menu;
+		}
+
+		// Wenn Gruppenname gegeben ist soll der Button immer auch in das Dropdown-Menü
+		MenuItem menuEntry = new MenuItem(groupMenu, SWT.PUSH);
+		fillItemWithValues(menuEntry, btn);
+
+		return new ButtonAccessor(toolItem, menuEntry);
+	}
+
+	/**
+	 * Füllt das Item mit den Werten aus dem Knopf (Text, Tooptip, Icon) und fügt den Onclick Listener hinzu, wenn in der Maske definiert
+	 * 
+	 * @param item
+	 * @param btn
+	 */
+	private void fillItemWithValues(Item item, aero.minova.rcp.form.model.xsd.Button btn) {
 		item.setData(btn);
-		item.setEnabled(btn.isEnabled());
+		item.setData(Constants.GROUP_NAME, btn.getGroup());
+
+		if (item instanceof MenuItem) {
+			((MenuItem) item).setEnabled(btn.isEnabled());
+		} else if (item instanceof ToolItem) {
+			((ToolItem) item).setEnabled(btn.isEnabled());
+		}
+
 		if (btn.getText() != null) {
-			item.setToolTipText(translationService.translate(btn.getText(), null));
+			if (item instanceof MenuItem) {
+				((MenuItem) item).setText(translationService.translate(btn.getText(), null));
+				((MenuItem) item).setToolTipText(translationService.translate(btn.getText(), null));
+			} else if (item instanceof ToolItem) {
+				((ToolItem) item).setToolTipText(translationService.translate(btn.getText(), null));
+			}
 		}
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
 			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
 			item.setImage(resManager.createImage(buttonImageDescriptor));
 		}
 
-		event = findEventForID(btn.getId());
+		Object event = findEventForID(btn.getId());
 		if (event instanceof Onclick) {
 			Onclick onclick = (Onclick) event;
-			item.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
+			if (item instanceof MenuItem) {
+				((MenuItem) item).addSelectionListener(getSelectionAdapterForItem(onclick));
+			} else if (item instanceof ToolItem) {
+				((ToolItem) item).addSelectionListener(getSelectionAdapterForItem(onclick));
+			}
+		}
+	}
+
+	private SelectionAdapter getSelectionAdapterForItem(Onclick onclick) {
+		return new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (e.detail != SWT.ARROW) {
 					// TODO: Andere procedures/bindings/instances auswerten
 					List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
 
@@ -663,9 +745,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 						}
 					}
 				}
-			});
-		}
-		return new ButtonAccessor(item);
+			}
+		};
 	}
 
 	private ButtonAccessor createToolItemInPartToolbar(aero.minova.rcp.form.model.xsd.Button btn) {
@@ -673,7 +754,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Kein Gruppenname: Element nur in Toolbar, kein Menü
 		if (btn.getGroup() == null) {
 			MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
-			fillItemWithValues(handledToolItem, btn);
+			fillMHandledItemWithValues(handledToolItem, btn);
 			mPart.getToolbar().getChildren().add(handledToolItem);
 			return new ButtonAccessor(handledToolItem);
 		}
@@ -682,7 +763,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		MMenu groupMenu = null;
 		if (btn.getGroup() != null) {
 			for (MToolBarElement element : mPart.getToolbar().getChildren()) {
-				if (btn.getGroup().equalsIgnoreCase(element.getPersistedState().get("GroupName"))) {
+				if (btn.getGroup().equalsIgnoreCase(element.getPersistedState().get(Constants.GROUP_NAME))) {
 					groupMenu = ((MHandledToolItem) element).getMenu();
 					break;
 				}
@@ -694,17 +775,17 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Erstes Vorkommen des Gruppennamens: Element in Toolbar, Menü muss noch erstellt werden
 		if (groupMenu == null) {
 			handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
-			fillItemWithValues(handledToolItem, btn);
+			fillMHandledItemWithValues(handledToolItem, btn);
 			mPart.getToolbar().getChildren().add(handledToolItem);
 
 			groupMenu = eModelService.createModelElement(MMenu.class);
-			handledToolItem.getPersistedState().put("GroupName", btn.getGroup());
+			handledToolItem.getPersistedState().put(Constants.GROUP_NAME, btn.getGroup());
 			handledToolItem.setMenu(groupMenu);
 		}
 
 		// Wenn Gruppenname gegeben ist soll der Button immer auch in das Dropdown-Menü
 		MHandledMenuItem menuEntry = eModelService.createModelElement(MHandledMenuItem.class);
-		fillItemWithValues(menuEntry, btn);
+		fillMHandledItemWithValues(menuEntry, btn);
 		groupMenu.getChildren().add(menuEntry);
 
 		return new ButtonAccessor(handledToolItem, menuEntry);
@@ -716,7 +797,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 * @param handledItem
 	 * @param btn
 	 */
-	private void fillItemWithValues(MHandledItem handledItem, aero.minova.rcp.form.model.xsd.Button btn) {
+	private void fillMHandledItemWithValues(MHandledItem handledItem, aero.minova.rcp.form.model.xsd.Button btn) {
 		handledItem.getPersistedState().put(IWorkbench.PERSIST_STATE, String.valueOf(false));
 		handledItem.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
 		handledItem.setLabel(btn.getText());
@@ -771,7 +852,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				mParameterForm.setValue(procedureID);
 				parameter.add(mParameterForm);
 			} else {
-				// Auch in Methode createToolItemInSection() anpassen!!
+				// Auch in Methode getSelectionAdapterForItem() anpassen!!
 				System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 			}
 		}

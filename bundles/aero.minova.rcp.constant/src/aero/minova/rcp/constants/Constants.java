@@ -44,6 +44,8 @@ public class Constants {
 	public static final String PARAMETER = "parameter";
 	public static final String WIZARD = "wizard";
 	public static final String PROCEDURE = "procedure";
+	public static final String GROUP_NAME = "GroupName";
+	public static final String GROUP_MENU = "GroupMenu";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";

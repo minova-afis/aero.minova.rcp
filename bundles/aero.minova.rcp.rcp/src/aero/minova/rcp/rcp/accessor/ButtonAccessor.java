@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolItem;
 
 import aero.minova.rcp.model.form.IButtonAccessor;
@@ -13,6 +14,7 @@ import aero.minova.rcp.model.form.IButtonAccessor;
 public class ButtonAccessor implements IButtonAccessor {
 
 	private ToolItem toolItem;
+	private MenuItem menuItem;
 	private MHandledToolItem handledToolItem;
 	private MHandledMenuItem handledMenuItem;
 	List<SelectionListener> selectionListeners = new ArrayList<>();
@@ -34,10 +36,19 @@ public class ButtonAccessor implements IButtonAccessor {
 		this.handledMenuItem = handledMenuItem;
 	}
 
+	public ButtonAccessor(ToolItem toolItem, MenuItem menuItem) {
+		this.toolItem = toolItem;
+		this.menuItem = menuItem;
+	}
+
 	@Override
 	public void setEnabled(boolean enabled) {
 		if (toolItem != null) {
 			toolItem.setEnabled(enabled && canBeEnabled);
+		}
+
+		if (menuItem != null) {
+			menuItem.setEnabled(enabled && canBeEnabled);
 		}
 
 		if (handledToolItem != null) {
@@ -70,7 +81,13 @@ public class ButtonAccessor implements IButtonAccessor {
 	public void addSelectionListener(SelectionListener listener) {
 		if (toolItem != null) {
 			toolItem.addSelectionListener(listener);
-		} else {
+		}
+
+		if (menuItem != null) {
+			menuItem.addSelectionListener(listener);
+		}
+
+		if (toolItem == null && menuItem == null) {
 			selectionListeners.add(listener);
 		}
 	}
