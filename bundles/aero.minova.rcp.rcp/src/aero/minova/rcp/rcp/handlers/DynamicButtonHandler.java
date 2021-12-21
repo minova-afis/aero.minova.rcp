@@ -11,7 +11,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Shell;
 
@@ -54,28 +54,22 @@ public class DynamicButtonHandler {
 			((WFCDetailPart) mPart.getObject()).getRequestUtil().callProcedure(p);
 		} else {
 			// Helper Logik....
-			
+
 			MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
 
 			MButton button = detail.getButton(parameter);
 			for (SelectionListener listener : button.getButtonAccessor().getSelectionListener()) {
 				listener.widgetSelected(null);
 			}
-			
 		}
 	}
-	
+
 	@CanExecute
-	public boolean canExecute(MHandledToolItem toolItem, MPart mPart) {
-	
-		String parameter = toolItem.getPersistedState().get(Constants.CONTROL_ID);
-
+	public boolean canExecute(MHandledItem item, MPart mPart) {
+		String parameter = item.getPersistedState().get(Constants.CONTROL_ID);
 		MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
-
 		MButton button = detail.getButton(parameter);
 		return button.getButtonAccessor().isEnabled();
-		
 	}
-	
 
 }

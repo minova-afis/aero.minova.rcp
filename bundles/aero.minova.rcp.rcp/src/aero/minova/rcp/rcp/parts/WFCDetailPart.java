@@ -39,6 +39,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -161,7 +162,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private boolean dirtyFlag;
 
 	@Inject
-	private MPart mpart;
+	private MPart mPart;
 
 	@Inject
 	private TranslationService translationService;
@@ -610,28 +611,23 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		} else {
 			buttons = ((Page) headOPOGWrapper.headOrPageOrGrid).getButton();
 		}
-/// Button (Bt, Bt, Bt, ) Button Button
-		MPart mPart = (MPart) eModelService.find("aero.minova.rcp.rcp.part.details", mPerspective);
 
 		for (aero.minova.rcp.form.model.xsd.Button btn : buttons) {
 			MButton mButton = new MButton(btn.getId());
 			mButton.setText(btn.getText());
 			if (isHead) {
-				MHandledToolItem handledToolItem = createToolItemInPartToolbar(mPart, btn);
-				mButton.setButtonAccessor(new ButtonAccessor(handledToolItem));
+				mButton.setButtonAccessor(createToolItemInPartToolbar(btn));
 			} else {
-				final ToolItem item = createToolItemInSection(bar, btn);
-				mButton.setButtonAccessor(new ButtonAccessor(item));
+				mButton.setButtonAccessor(createToolItemInSection(bar, btn));
 			}
 
 			mDetail.putButton(mButton);
-
 		}
 
 		section.setTextClient(bar);
 	}
 
-	private ToolItem createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
+	private ButtonAccessor createToolItemInSection(final ToolBar bar, aero.minova.rcp.form.model.xsd.Button btn) {
 		Object event;
 		final ToolItem item = new ToolItem(bar, SWT.PUSH);
 
@@ -657,21 +653,95 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					for (Object o : binderOrProcedureOrInstances) {
 						if (o instanceof Wizard) {
 							Map<String, String> parameter = Map.of(Constants.CLAZZ, Constants.WIZARD, Constants.PARAMETER, ((Wizard) o).getWizardname());
-							ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand", parameter);
+							ParameterizedCommand command = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON, parameter);
 							handlerService.executeHandler(command);
 						} else if (o instanceof Procedure) {
 							casRequestsUtil.callProcedure((Procedure) o);
 						} else {
+							// Auch in Methode createParameters() anpassen!!
 							System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 						}
 					}
 				}
 			});
 		}
-		return item;
+		return new ButtonAccessor(item);
 	}
 
-	private List<MParameter> createParameters(List<Object> binderOrProcedureOrInstances, MPart mPart) {
+	private ButtonAccessor createToolItemInPartToolbar(aero.minova.rcp.form.model.xsd.Button btn) {
+
+		// Kein Gruppenname: Element nur in Toolbar, kein Menü
+		if (btn.getGroup() == null) {
+			MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
+			fillItemWithValues(handledToolItem, btn);
+			mPart.getToolbar().getChildren().add(handledToolItem);
+			return new ButtonAccessor(handledToolItem);
+		}
+
+		// Menü für Gruppennamen finden
+		MMenu groupMenu = null;
+		if (btn.getGroup() != null) {
+			for (MToolBarElement element : mPart.getToolbar().getChildren()) {
+				if (btn.getGroup().equalsIgnoreCase(element.getPersistedState().get("GroupName"))) {
+					groupMenu = ((MHandledToolItem) element).getMenu();
+					break;
+				}
+			}
+		}
+
+		MHandledToolItem handledToolItem = null;
+
+		// Erstes Vorkommen des Gruppennamens: Element in Toolbar, Menü muss noch erstellt werden
+		if (groupMenu == null) {
+			handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
+			fillItemWithValues(handledToolItem, btn);
+			mPart.getToolbar().getChildren().add(handledToolItem);
+
+			groupMenu = eModelService.createModelElement(MMenu.class);
+			handledToolItem.getPersistedState().put("GroupName", btn.getGroup());
+			handledToolItem.setMenu(groupMenu);
+		}
+
+		// Wenn Gruppenname gegeben ist soll der Button immer auch in das Dropdown-Menü
+		MHandledMenuItem menuEntry = eModelService.createModelElement(MHandledMenuItem.class);
+		fillItemWithValues(menuEntry, btn);
+		groupMenu.getChildren().add(menuEntry);
+
+		return new ButtonAccessor(handledToolItem, menuEntry);
+	}
+
+	/**
+	 * Füllt das handledItem mit den Werten aus dem Knopf (Text, Tooptip, Icon), fügt den Command (und damit den Handler) sowie die benötigten Parameter hinzu
+	 * 
+	 * @param handledItem
+	 * @param btn
+	 */
+	private void fillItemWithValues(MHandledItem handledItem, aero.minova.rcp.form.model.xsd.Button btn) {
+		handledItem.getPersistedState().put(IWorkbench.PERSIST_STATE, String.valueOf(false));
+		handledItem.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
+		handledItem.setLabel(btn.getText());
+		handledItem.setTooltip(btn.getText());
+		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
+			handledItem.setIconURI(ImageUtil.retrieveIcon(btn.getIcon(), false));
+		}
+
+		MCommand command = mApplication.getCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON);
+		handledItem.setCommand(command);
+
+		Object event = findEventForID(btn.getId());
+		if (event instanceof Onclick) {
+			Onclick onclick = (Onclick) event;
+			List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
+			handledItem.getParameters().addAll(createParameters(binderOrProcedureOrInstances));
+		} else {
+			MParameter mParameterForm = eModelService.createModelElement(MParameter.class);
+			mParameterForm.setName(Constants.PARAMETER);
+			mParameterForm.setValue(btn.getId());
+			handledItem.getParameters().add(mParameterForm);
+		}
+	}
+
+	private List<MParameter> createParameters(List<Object> binderOrProcedureOrInstances) {
 		List<MParameter> parameter = new ArrayList<>();
 		MParameter mParameterForm = null;
 		for (Object o : binderOrProcedureOrInstances) {
@@ -680,7 +750,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				mParameterForm.setName(Constants.CLAZZ);
 				mParameterForm.setValue(Constants.WIZARD);
 				parameter.add(mParameterForm);
-				// handledToolItem.getParameters().add(mParameterForm);
 
 				mParameterForm = eModelService.createModelElement(MParameter.class);
 				mParameterForm.setName(Constants.PARAMETER);
@@ -702,71 +771,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				mParameterForm.setValue(procedureID);
 				parameter.add(mParameterForm);
 			} else {
+				// Auch in Methode createToolItemInSection() anpassen!!
 				System.err.println("Event vom Typ " + o.getClass() + " für Buttons noch nicht implementiert!");
 			}
 		}
 		return parameter;
-	}
-
-	private MHandledToolItem createToolItemInPartToolbar(MPart mPart, aero.minova.rcp.form.model.xsd.Button btn) {
-		MHandledToolItem handledToolItem = eModelService.createModelElement(MHandledToolItem.class);
-		handledToolItem.getPersistedState().put(IWorkbench.PERSIST_STATE, String.valueOf(false));
-		handledToolItem.setLabel(btn.getText());
-		handledToolItem.setTooltip(btn.getText());
-		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
-			handledToolItem.setIconURI(ImageUtil.retrieveIcon(btn.getIcon(), false));
-		}
-
-		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.dynamicbuttoncommand");
-		handledToolItem.setCommand(command);
-
-		MParameter mParameterForm = null;
-
-		Object event = findEventForID(btn.getId());
-		if (btn.getGroup() != null) {
-			MMenu groupMenu = null;
-			String groupName = btn.getGroup();
-			// Suche Gruppe
-			for (MToolBarElement element : mPart.getToolbar().getChildren()) {
-				if (groupName.equalsIgnoreCase(element.getPersistedState().get("GroupName"))) {
-					groupMenu = ((MHandledToolItem) element).getMenu();
-				} else {
-					// Gruppe erstellen
-					groupMenu = eModelService.createModelElement(MMenu.class);
-					element.getPersistedState().put("GroupName", btn.getGroup());
-					handledToolItem.setMenu(groupMenu);
-				}
-				// Eintrag erstellen
-				MHandledMenuItem menuEntry = eModelService.createModelElement(MHandledMenuItem.class);
-				// Parameter holen
-				if (event instanceof Onclick) {
-					Onclick onclick = (Onclick) event;
-					List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
-					// Fallunterscheidung wenn wir Wizzards oder Prozeduren haben
-					menuEntry.getParameters().addAll(createParameters(binderOrProcedureOrInstances, mPart));
-				} else {
-					mParameterForm = eModelService.createModelElement(MParameter.class);
-					mParameterForm.setName(Constants.PARAMETER);
-					mParameterForm.setValue(btn.getId());
-					menuEntry.getParameters().add(mParameterForm);
-				}
-				menuEntry.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
-				groupMenu.getChildren().add(menuEntry);
-			}
-		}
-		if (event instanceof Onclick) {
-			Onclick onclick = (Onclick) event;
-			List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
-			handledToolItem.getParameters().addAll(createParameters(binderOrProcedureOrInstances, mPart));
-		} else {
-			handledToolItem.getPersistedState().put(Constants.CONTROL_ID, btn.getId());
-			mParameterForm = eModelService.createModelElement(MParameter.class);
-			mParameterForm.setName(Constants.PARAMETER);
-			mParameterForm.setValue(btn.getId());
-			handledToolItem.getParameters().add(mParameterForm);
-		}
-		mPart.getToolbar().getChildren().add(handledToolItem);
-		return handledToolItem;
 	}
 
 	private Object findEventForID(String id) {
@@ -991,7 +1000,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void setDirtyFlag(boolean dirtyFlag) {
 		this.dirtyFlag = dirtyFlag;
 
-		mpart.setDirty(dirtyFlag);
+		mPart.setDirty(dirtyFlag);
 		@SuppressWarnings("unchecked")
 		List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
 
