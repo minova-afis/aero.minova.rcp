@@ -333,9 +333,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				if (start != end) {
 					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
 					if (decimals != 0 && !insertion.contains("" + dfs.getDecimalSeparator())) {
-						newCaretPosition = start + formatInsertion.length() - decimals - 1;
+						newCaretPosition = caretPosition + formatInsertion.length() - 1 - decimals;
 					} else {
-						newCaretPosition = start + formatInsertion.length();
+						newCaretPosition = caretPosition + formatInsertion.length() + countGroupingSeperator;
 					}
 
 				} else if (text.length() == textBefore.length() + insertion.length()) {
