@@ -45,18 +45,22 @@ public class DateFormattingWidget extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
+		String tooltipString = "d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\nMMM: "
+				+ translationService.translate("@Preferences.DateUtilPattern.MonthShortcut", null) + "\ny/u: "
+				+ translationService.translate("@Preferences.DateUtilPattern.Year", null) + "\n"
+				+ translationService.translate("@Preferences.DateUtilPattern.Longest", null) + " Pattern: dd.MMM.yyyy";
+
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(getLabel());
-		label.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
+		label.setToolTipText(tooltipString);
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = getIndent();
 		label.setLayoutData(labelGridData);
 
 		Composite cmp = new Composite(parent, SWT.NONE);
-		cmp.setLayout(new GridLayout(2, false));
+		cmp.setLayout(new GridLayout(3, false));
 		final GridData cmpGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		cmp.setLayoutData(cmpGridData);
 		addControl(cmp);
@@ -65,16 +69,15 @@ public class DateFormattingWidget extends CustomPWWidget {
 		addControl(text);
 		text.setMessage(DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale));
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-		text.setToolTipText("d: " + translationService.translate("@Preferences.DateUtilPattern.Day", null) + "\nM: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Month", null) + "\ny/u: "
-				+ translationService.translate("@Preferences.DateUtilPattern.Year", null));
+		text.setToolTipText(tooltipString);
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		textGridData.widthHint = 185;
 		text.setLayoutData(textGridData);
 
 		Label example = new Label(cmp, SWT.NONE);
 		addControl(example);
-		final GridData exampleGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		final GridData exampleGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		exampleGridData.widthHint = 100;
 		example.setLayoutData(exampleGridData);
 		example.setText(getDateStringFromPattern(text.getText()));
 
@@ -82,6 +85,10 @@ public class DateFormattingWidget extends CustomPWWidget {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), text.getText());
 			example.setText(getDateStringFromPattern(text.getText()));
 		});
+
+		Label icon = new Label(cmp, SWT.NONE);
+		createTooltipInfoIcon(icon);
+		icon.setToolTipText(tooltipString);
 
 		return text;
 	}
@@ -91,16 +98,19 @@ public class DateFormattingWidget extends CustomPWWidget {
 			try {
 				LocalDateTime date = LocalDateTime.of(2015, 12, 24, 23, 45);
 				String formatted = DateUtil.getDateString(date.toInstant(ZoneOffset.UTC), locale, pattern);
-				return formatted;
+				String example = "25.März.2024";
+				if (formatted.length() <= example.length()) {
+					return formatted;
+				}
 			} catch (Exception e) {
-				return "Invalid format!";
+				return translationService.translate("@Util.InvalidMessage", null);
 			}
 		}
-		return "Invalid format!";
+		return translationService.translate("@Preferences.DateUtilPattern.PatternToLongMessage", null);
 	}
 
 	private boolean validatePattern(String input) {
-		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\\s]{0,1})([dM]{0,3})([\\.,/\\s]{0,1})([dMyu]{0,4})");
+		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\s]{0,1})([dMyu]{0,3})([\\.,/\s]{0,1})([dMyu]{0,4})");
 		if (pattern.matcher(input).matches()) {
 			return true;
 		}

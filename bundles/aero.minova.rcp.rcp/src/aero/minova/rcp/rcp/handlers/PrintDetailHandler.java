@@ -184,7 +184,8 @@ public class PrintDetailHandler {
 			table.addRow(row);
 
 			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
-					"reports/" + reportNames.get(maskName), "reports/" + maskName.replace(".xml", "") + "_Detail.pdf", mPerspective, disablePreview);
+					"reports/" + reportNames.get(maskName), "outputReports/" + maskName.replace(".xml", "") + "_" + integerValue + "_Detail.pdf", mPerspective,
+					disablePreview);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));

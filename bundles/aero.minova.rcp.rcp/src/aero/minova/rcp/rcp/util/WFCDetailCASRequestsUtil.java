@@ -190,9 +190,8 @@ public class WFCDetailCASRequestsUtil {
 			}
 			currentKeyTable = table;
 
-			updateGridLookupValues();
-
 			sendEventToHelper(ActionCode.BEFOREREAD);
+			updateGridLookupValues();
 
 			// Hauptfelder, OPs und Grids in einer Transaktion lesen
 			List<TransactionEntry> procedureList = new ArrayList<>();
@@ -699,8 +698,8 @@ public class WFCDetailCASRequestsUtil {
 	public void buildDeleteTable(@UIEventTopic(Constants.BROKER_DELETEENTRY) MPerspective perspective) {
 		if (perspective == this.perspective && getKeys() != null) {
 
-			sendEventToHelper(ActionCode.BEFOREDEL);
 			updateGridLookupValues();
+			sendEventToHelper(ActionCode.BEFOREDEL);
 
 			// Hauptmaske, OPs und Grids werden in einer Transaktion gelöscht
 			List<TransactionEntry> procedureList = new ArrayList<>();
@@ -852,9 +851,9 @@ public class WFCDetailCASRequestsUtil {
 		if (!discardChanges()) {
 			return;
 		}
+		updateGridLookupValues();
 		sendEventToHelper(ActionCode.BEFORENEW);
 		clearFields(map);
-		updateGridLookupValues();
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
@@ -1033,18 +1032,21 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
-		for (Field field : dataFormService.getFieldsFromForm(f)) {
+		return checkFieldsEmpty(dataFormService.getFieldsFromForm(f), fieldPrefix, checkedFields);
+	}
+
+	private boolean checkFieldsEmpty(List<Field> fieldsToCheck, String fieldPrefix, List<MField> checkedFields) {
+		for (Field field : fieldsToCheck) {
 			MField mfield = mDetail.getField(fieldPrefix + field.getName());
 
 			if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
-				if (!checkedFields.contains(mfield) && mfield.getValue().getBooleanValue()) {
+				if (!checkedFields.contains(mfield) && Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
 					return true;
 				}
 			} else if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -1052,11 +1054,8 @@ public class WFCDetailCASRequestsUtil {
 		// Sind die OP Felder leer?
 		if (selectedOptionPages.isEmpty()) {
 			for (Form opform : mDetail.getOptionPages()) {
-				for (Field field : dataFormService.getFieldsFromForm(opform)) {
-					String fieldName = opform.getDetail().getProcedureSuffix() + "." + field.getName();
-					if (mDetail.getField(fieldName).getValue() != null) {
-						return true;
-					}
+				if (checkFieldsEmpty(dataFormService.getFieldsFromForm(opform), opform.getDetail().getProcedureSuffix() + ".", new ArrayList<>())) {
+					return true;
 				}
 			}
 		}
@@ -1204,17 +1203,17 @@ public class WFCDetailCASRequestsUtil {
 		List<Field> subfields = new ArrayList<>();
 
 		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
+			List<Object> fieldsOrGrids = new ArrayList<>();
+
 			if (o instanceof Head) {
-				for (Object fieldOrGrid : ((Head) o).getFieldOrGrid()) {
-					if (fieldOrGrid instanceof Field) {
-						subfields.add((Field) fieldOrGrid);
-					}
-				}
+				fieldsOrGrids = ((Head) o).getFieldOrGrid();
 			} else if (o instanceof Page) {
-				for (Object fieldOrGrid : ((Page) o).getFieldOrGrid()) {
-					if (fieldOrGrid instanceof Field) {
-						subfields.add((Field) fieldOrGrid);
-					}
+				fieldsOrGrids = ((Page) o).getFieldOrGrid();
+			}
+
+			for (Object fieldOrGrid : fieldsOrGrids) {
+				if (fieldOrGrid instanceof Field) {
+					subfields.add((Field) fieldOrGrid);
 				}
 			}
 		}
@@ -1230,5 +1229,4 @@ public class WFCDetailCASRequestsUtil {
 			sg.updateGridLookupValues();
 		}
 	}
-
 }

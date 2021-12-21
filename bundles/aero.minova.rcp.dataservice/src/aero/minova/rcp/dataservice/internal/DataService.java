@@ -326,8 +326,8 @@ public class DataService implements IDataService {
 	}
 
 	private SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
-		if (fromJson.getReturnCode() == null) {
-			String errorMessage = null;
+		if ((fromJson.getReturnCode() == null || fromJson.getReturnCode() < 0) && fromJson.getResultSet() == null) {
+			String errorMessage = "";
 			Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
 			Matcher m = fullError.matcher(originalBody);
 			if (m.find()) {
@@ -336,6 +336,9 @@ public class DataService implements IDataService {
 			Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
 			errorMessage = cutError.matcher(errorMessage).replaceAll("");
 			errorMessage = errorMessage.replaceAll("\"", "");
+			if (errorMessage.isBlank()) {
+				errorMessage = "msg.NoErrorMessageAvailable";
+			}
 			Table error = new Table();
 			error.setName(ERROR);
 			error.addColumn(new Column("Message", DataType.STRING));
@@ -345,7 +348,7 @@ public class DataService implements IDataService {
 			// FehlerCode
 			fromJson.setReturnCode(-1);
 		}
-		if (fromJson.getReturnCode() == -1 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
+		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
 			ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, procedureName);
 			postError(e);
 			return null;
@@ -619,7 +622,7 @@ public class DataService implements IDataService {
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromTable(String tableName, String lookupDescriptionColumnName, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
-		ArrayList<LookupValue> list = new ArrayList<>();
+		List<LookupValue> list = new ArrayList<>();
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
@@ -647,31 +650,31 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<Table> tableFuture = getTableAsync(t, false);
-		try {
-			Table ta = tableFuture.get();
-			if (ta != null) {
-				for (Row r : ta.getRows()) {
-					LookupValue lv = new LookupValue(//
-							r.getValue(0).getIntegerValue(), //
-							r.getValue(1).getStringValue(), //
-							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+		return tableFuture.thenApplyAsync(ta -> {
+			try {
+				if (ta != null) {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
 
-					map.put(lv.keyLong, lv);
-					list.add(lv);
+						map.put(lv.keyLong, lv);
+						list.add(lv);
+					}
 				}
+			} catch (Exception e) {
+				System.out.println("Error, using cache: " + tableName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+				list.addAll(map.values());
 			}
-		} catch (Exception e) {
-			System.out.println("Error, using cache: " + tableName);
-			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-			list.addAll(map.values());
-		}
-
-		return CompletableFuture.supplyAsync(() -> list);
+			return list;
+		});
 	}
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromProcedure(String procedureName, MField field, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
-		ArrayList<LookupValue> list = new ArrayList<>();
+		List<LookupValue> list = new ArrayList<>();
 		String hashName = resolve ? procedureName : CacheUtil.getNameList(field);
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
@@ -714,28 +717,28 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
-		try {
-			SqlProcedureResult res = tableFuture.get();
-			if (res != null) {
-				Table ta = res.getResultSet();
-				if (ta != null) {
-					for (Row r : ta.getRows()) {
-						LookupValue lv = new LookupValue(//
-								r.getValue(0).getIntegerValue(), //
-								r.getValue(1).getStringValue(), //
-								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-						map.put(lv.keyLong, lv);
-						list.add(lv);
+		return tableFuture.thenApplyAsync(res -> {
+			try {
+				if (res != null) {
+					Table ta = res.getResultSet();
+					if (ta != null) {
+						for (Row r : ta.getRows()) {
+							LookupValue lv = new LookupValue(//
+									r.getValue(0).getIntegerValue(), //
+									r.getValue(1).getStringValue(), //
+									r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+							map.put(lv.keyLong, lv);
+							list.add(lv);
+						}
 					}
 				}
+			} catch (Exception e) {
+				System.out.println("Error, using Cache: " + hashName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+				list.addAll(map.values());
 			}
-		} catch (Exception e) {
-			System.out.println("Error, using Cache: " + hashName);
-			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-			list.addAll(map.values());
-		}
-
-		return CompletableFuture.supplyAsync(() -> list);
+			return list;
+		});
 	}
 
 	@Override
@@ -806,9 +809,16 @@ public class DataService implements IDataService {
 
 			sendRequest.thenApply(response -> {
 				log("CAS Answer Send Logs: " + response.statusCode() + " " + response.body());
-				if (response.statusCode() != 200) {
-					throw new RuntimeException("Server returned " + response.statusCode());
+				if (response.statusCode() != 200) { // Fehlermeldung anzeigen
+					Table error = new Table();
+					error.setName(ERROR);
+					error.addColumn(new Column("Message", DataType.STRING));
+					error.addRow(RowBuilder.newRow().withValue(response.body()).create());
+					ErrorObject eo = new ErrorObject(error, username, "sendingLogs");
+					postError(eo);
+					return null;
 				}
+
 				postNotification("msg.UploadSuccess");
 				return response;
 			});

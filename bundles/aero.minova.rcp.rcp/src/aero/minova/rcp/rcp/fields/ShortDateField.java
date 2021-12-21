@@ -2,9 +2,9 @@ package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 

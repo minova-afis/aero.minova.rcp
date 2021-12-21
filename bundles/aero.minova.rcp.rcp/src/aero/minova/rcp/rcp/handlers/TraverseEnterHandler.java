@@ -150,6 +150,7 @@ public class TraverseEnterHandler {
 
 		if (focussedControl instanceof NatTable) {
 			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
+			((NatTable) focussedControl).commitAndCloseActiveCellEditor();
 		} else {
 			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSectionAccessor()).getSection();
 		}
@@ -226,7 +227,7 @@ public class TraverseEnterHandler {
 				}
 
 				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
-				if (fc != null) {
+				if (fc == null) {
 					if (focussedControl instanceof LookupComposite) {
 						lookup = (LookupComposite) focussedControl;
 						lookup.closePopup();
@@ -354,47 +355,53 @@ public class TraverseEnterHandler {
 		NatTable natTable = (NatTable) focussedControl;
 		Table dataTable = (Table) natTable.getData(Constants.GRID_DATA_DATATABLE);
 		SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
-		int irs = 0;
-		int ics = 1;
-		((NatTable) focussedControl).commitAndCloseActiveCellEditor();
+		int irs = -1;
+		int ics = 0;
 
 		// Prüfen, ob die NatTable selektiert ist und ob von der selektierten Zelle aus das nächste Pflichtfeld ermittelt werden soll
 		if (natTable.isFocusControl() && countFromSelectedCell) {
 			// Selektierte Zelle suchen und die Row und Column Position setzen
-			irs = selectionLayer.getLastSelectedCellPosition().getRowPosition() + 1;
-			ics = selectionLayer.getLastSelectedCellPosition().getColumnPosition() + 1;
+			irs = selectionLayer.getSelectionAnchor().getRowPosition();
+			ics = selectionLayer.getSelectionAnchor().getColumnPosition();
 
 			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
-			for (int ic = ics + 1; ic < natTable.getColumnCount(); ic++) {
-				if (selectEmptyRequiredCell(natTable, dataTable, irs, ic))
+			for (int ic = ics + 1; ic < selectionLayer.getColumnCount(); ic++) {
+				if (selectEmptyRequiredCell(natTable, dataTable, selectionLayer, irs, ics, countFromSelectedCell))
 					return true;
 			}
 		}
 
 		// Leeres Pflichtfeld ermitteln
 		// irs kann 0 oder der Rowindex der selektierten Zelle sein
-		for (int ir = irs + 1; ir < natTable.getRowCount(); ir++) {
-			for (int ic = 1; ic < natTable.getColumnCount(); ic++) {
-				if (selectEmptyRequiredCell(natTable, dataTable, ir, ic))
+		for (int ir = irs + 1; ir < selectionLayer.getRowCount(); ir++) {
+			for (int ic = -1; ic < selectionLayer.getColumnCount(); ic++) {
+				if (selectEmptyRequiredCell(natTable, dataTable, selectionLayer, ir, ic, false))
 					return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean selectEmptyRequiredCell(NatTable natTable, Table dataTable, int irs, int ic) {
+	private boolean selectEmptyRequiredCell(NatTable natTable, Table dataTable, SelectionLayer selectionLayer, int irs, int ic, boolean cellSelected) {
+		List<Column> visibleColumns = new ArrayList<>();
 		for (Column column : dataTable.getColumns()) {
-			if (column.getName().equals(dataTable.getColumnName(ic + 1)) && column.isRequired()) {
-				if (dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())) == null
-						|| dataTable.getRows().get(irs - 1).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
-					SelectionLayer selectionLayer = (SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER);
+			if (column.isVisible()) {
+				visibleColumns.add(column);
+			}
+		}
+
+		for (int i = ic + 1; i < selectionLayer.getColumnCount(); i++) {
+			int index = selectionLayer.getColumnIndexByPosition(i);
+			Column column = dataTable.getColumns().get(index);
+			if (column.isRequired()) {
+				if (dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())) == null
+						|| dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
 					natTable.setFocus();
-					int ici = ic - 1;
-					int iri = irs - 1;
-					return natTable.doCommand(new SelectCellCommand(selectionLayer, ici, iri, false, false));
+					return natTable.doCommand(new SelectCellCommand(selectionLayer, i, irs, false, false));
 				}
 			}
 		}
+
 		return false;
 	}
 

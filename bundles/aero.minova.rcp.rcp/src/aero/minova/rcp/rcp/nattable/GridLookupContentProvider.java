@@ -15,10 +15,14 @@ public class GridLookupContentProvider {
 
 	public GridLookupContentProvider(IDataService dataService, String tablename) {
 		values = new ArrayList<>();
+		values = new ArrayList<>();
 		this.dataService = dataService;
 		this.tablename = tablename;
 		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tablename, true);
-		listLookup.thenAccept(l -> values.addAll(l));
+		listLookup.thenAccept(l -> {
+			values.addAll(l);
+		});
+
 	}
 
 	public List<LookupValue> getValues() {
@@ -27,9 +31,10 @@ public class GridLookupContentProvider {
 
 	public void update() {
 		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tablename, true);
-		listLookup.thenAccept(l -> {
+		listLookup.thenAcceptAsync(l -> {
 			values.clear();
 			values.addAll(l);
 		});
 	}
+
 }
