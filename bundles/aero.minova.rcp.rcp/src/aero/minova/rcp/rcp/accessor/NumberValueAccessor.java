@@ -306,10 +306,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			else if (SWT.DEL == keyCode) {
 				if (start + 1 != end) {
 					newCaretPosition = start + 1 + countGroupingSeperator;
-				} else if (decimalCaretPostion <= caretPosition || textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()
+				} else if ((decimalCaretPostion <= caretPosition && decimals != 0) || textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()
 						|| textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
 					newCaretPosition = caretPosition + 1;
-				} else if (text.equals(formatted0) && decimals != 0) {
+				} else if (text.equals(formatted0)) {
 					newCaretPosition = 1;
 				} else {
 					newCaretPosition = caretPosition + countGroupingSeperator;
