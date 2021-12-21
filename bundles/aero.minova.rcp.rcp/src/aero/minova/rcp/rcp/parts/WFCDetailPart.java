@@ -712,18 +712,24 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (event instanceof Onclick) {
 			Onclick onclick = (Onclick) event;
 			if (item instanceof MenuItem) {
-				((MenuItem) item).addSelectionListener(getSelectionAdapterForItem(onclick));
+				((MenuItem) item).addSelectionListener(getSelectionAdapterForItem(onclick, item));
 			} else if (item instanceof ToolItem) {
-				((ToolItem) item).addSelectionListener(getSelectionAdapterForItem(onclick));
+				((ToolItem) item).addSelectionListener(getSelectionAdapterForItem(onclick, item));
 			}
 		}
 	}
 
-	private SelectionAdapter getSelectionAdapterForItem(Onclick onclick) {
+	private SelectionAdapter getSelectionAdapterForItem(Onclick onclick, Item item) {
 		return new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (e.detail != SWT.ARROW) {
+				boolean isEnabled = false;
+				if (item instanceof MenuItem) {
+					isEnabled = ((MenuItem) item).isEnabled();
+				} else if (item instanceof ToolItem) {
+					isEnabled = ((ToolItem) item).isEnabled();
+				}
+				if (e.detail != SWT.ARROW && isEnabled) {
 					// TODO: Andere procedures/bindings/instances auswerten
 					List<Object> binderOrProcedureOrInstances = onclick.getBinderOrProcedureOrInstance();
 
