@@ -29,7 +29,6 @@ public class MButton {
 		this.buttonAccessor = buttonAccessor;
 	}
 
-	
 	public IButtonAccessor getButtonAccessor() {
 		return buttonAccessor;
 	}
@@ -37,12 +36,13 @@ public class MButton {
 	public void setEnabled(boolean enabled) {
 		buttonAccessor.setEnabled(enabled);
 	}
-	
-	
+
+	public boolean isEnabled() {
+		return buttonAccessor.isEnabled();
+	}
 
 	public void addSelectionListener(SelectionListener listener) {
 		buttonAccessor.addSelectionListener(listener);
 	}
-
 
 }
