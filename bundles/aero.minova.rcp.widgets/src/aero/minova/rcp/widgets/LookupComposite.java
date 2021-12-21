@@ -47,7 +47,6 @@ public class LookupComposite extends Composite {
 	private final Table table;
 	private LookupContentProvider contentProvider;
 	private boolean useSingleClick = false;
-	private LookupValue firstValue;
 	/**
 	 * Das Label, das den Wert beschreibt. Die Description aus der Datenbank.
 	 */
@@ -199,18 +198,22 @@ public class LookupComposite extends Composite {
 		popupValues = contentProvider.getContent(value);
 		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
-			firstValue = null;
 			if (contentProvider.getValuesSize() == 0) {
 				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.NoLookupEntries", null),
 						translationService.translate("@Notification", null));
 			}
 			return;
 		}
-		firstValue = popupValues.get(0);
 
 		table.removeAll();
 		for (LookupValue popupValue : popupValues) {
-			final TableItem tableItem = new TableItem(table, SWT.NONE);
+			TableItem tableItem;
+			if (popupValue.getKeyText().equalsIgnoreCase(text.getText())) {
+				// Bei genauer Übereinstimmung des Matchcodes Element an erste Stelle setzten, siehe #1086
+				tableItem = new TableItem(table, SWT.NONE, 0);
+			} else {
+				tableItem = new TableItem(table, SWT.NONE);
+			}
 			tableItem.setText(0, popupValue.keyText);
 			tableItem.setText(1, popupValue.description.replace("\r\n", "; "));
 			tableItem.setFont(text.getFont());
@@ -470,9 +473,22 @@ public class LookupComposite extends Composite {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			text.setText(lv.keyText);
 			field.setValue(lv, true);
-		} else if (popup.isVisible() && firstValue != null) {
-			text.setText(firstValue.keyText);
-			field.setValue(firstValue, true);
+		} else if (popup.isVisible()) {
+
+			// Zuerst versuchen, einen genauen Match auf den KeyText zu finden, siehe #1086
+			for (LookupValue lv : popupValues) {
+				if (lv.keyText.equalsIgnoreCase(text.getText())) {
+					text.setText(lv.keyText);
+					field.setValue(lv, true);
+					return;
+				}
+			}
+
+			// Ansonsten ersten Wert eintragen
+			if (!popupValues.isEmpty()) {
+				text.setText(popupValues.get(0).keyText);
+				field.setValue(popupValues.get(0), true);
+			}
 		}
 	}
 
