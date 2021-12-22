@@ -433,6 +433,37 @@ printInvoice.addSelectionListener(new SimpleSelectionAdapter() {
 });
 ----
 
+**ACHTUNG bei Buttons mit Dropdown in Abschnitten**
+
+In Version 12 können mehrere Knöpfe zu einer Gruppe zusammengefasst werden (`group`-Tag in der xml). 
+Diese werden dann als Dropdown dargestellt. 
+Befinden sich diese Knöpfe NICHT in den Kopfdaten muss im Helper eine if-Bedingung eingefügt werden, um zu verhindern, dass die Methoden ausgeführt werden, wenn auf den Pfeil geklickt wird oder der Button disabled ist.
+Sind die Knöpfe in den Kopfdaten muss nichts weiter beachtet werden.
+
+[source,xml]
+----
+<!-- Beispiel für gruppierte Knöpfe -->
+<page icon="Calendar.ico" id="Administration" text="@tJournaltemplate.Group.Administration">
+	<button id="insertTemplates" group="insert" icon="CompleteRecords.Command" text="@tJournaltemplate.action.insertTemplates"/>          			
+	<button id="insertSingleTemplate" group="insert" icon="CompleteRecord.Command" text="@tJournaltemplate.action.insertSingleTemplate"/>
+	...
+</page>
+----
+
+[source,java]
+----
+MButton insertTemplates = mDetail.getButton("insertTemplates");
+insertTemplates.addSelectionListener(new SimpleSelectionAdapter() {
+	@Override
+	public void handle(SelectionEvent e) {
+		// Die if-Bedingung verhindert, dass die Methoden ausgeführt werden, wenn auf den Pfeil geklickt wird oder der Button disabled ist
+		if (e.detail != SWT.ARROW && insertTemplates.isEnabled()) {
+			// Entsprechende Methode(n) ausführen
+		}
+	}
+});
+----
+
 === Ein-/Ausblenden von Sections
 
 In Version 11 konnten einzelne Sections über die Maske ein- oder ausgeplendet werden.

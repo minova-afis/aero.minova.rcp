@@ -2,15 +2,14 @@ package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.DataType;
@@ -137,14 +136,14 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	public void updatePossibleValues() {
 		LookupComposite up = ((LookupComposite) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true);
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> {
-			try {
-				up.getContentProvider().setValuesOnly(l);
-				if (l.size() == 1) {
-					field.setValue(l.get(0), false);
-				}
-			} catch (SWTException e) {}
-		}));
+
+		try {
+			List<LookupValue> l = listLookup.get();
+			up.getContentProvider().setValuesOnly(l);
+			if (l.size() == 1) {
+				field.setValue(l.get(0), false);
+			}
+		} catch (InterruptedException | ExecutionException e) {}
 	}
 
 	/**

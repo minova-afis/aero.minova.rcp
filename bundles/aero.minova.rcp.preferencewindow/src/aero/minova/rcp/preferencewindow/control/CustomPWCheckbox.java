@@ -3,9 +3,12 @@ package aero.minova.rcp.preferencewindow.control;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 
 public class CustomPWCheckbox extends CustomPWWidget {
 
@@ -18,7 +21,7 @@ public class CustomPWCheckbox extends CustomPWWidget {
 	 *            associated key
 	 */
 	public CustomPWCheckbox(final String label, @Optional String tooltip, final String propertyKey) {
-		super(label, tooltip, propertyKey, 1, true);
+		super(label, tooltip, propertyKey, 2, false);
 	}
 
 	/**
@@ -26,19 +29,38 @@ public class CustomPWCheckbox extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
+		
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(2, false));
+		GridData gd = new GridData();
+		gd.horizontalIndent = 25;
+		gd.horizontalSpan = 2;
+		cmp.setLayoutData(gd);
+		addControl(cmp);
+
 		if (getLabel() == null) {
 			throw new UnsupportedOperationException("Please specify a label for a checkbox");
 		}
-		final Button button = new Button(parent, SWT.CHECK);
+		final Button button = new Button(cmp, SWT.CHECK);
 		button.setToolTipText(getTooltip());
-		addControl(button);
 		button.setText(getLabel());
+
+		GridData buttonGD = new GridData();
+		buttonGD.horizontalAlignment = GridData.FILL;
+		button.setLayoutData(buttonGD);
+
 		final boolean originalSelection = (Boolean) PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
 		button.setSelection(originalSelection);
 
 		button.addListener(SWT.Selection, e -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), button.getSelection());
 		});
+
+		Label icon = new Label(cmp, SWT.NONE);
+		if (getTooltip() != null) {
+			createTooltipInfoIcon(icon);
+		}
+
 		return button;
 	}
 

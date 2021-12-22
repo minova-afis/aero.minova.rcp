@@ -192,7 +192,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
@@ -220,7 +220,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, dateTimeDisplayConverter, DisplayMode.NORMAL, configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
@@ -250,7 +250,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
@@ -279,7 +279,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
@@ -347,7 +347,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
@@ -369,7 +369,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
 		if (!isReadOnly) {
-			MinovaTextCellEditor attributeValue = new MinovaTextCellEditor(true, true);
+			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
 			attributeValue.setSelectionMode(EditorSelectionEnum.START);
 			configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, attributeValue, DisplayMode.NORMAL,
 					ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);

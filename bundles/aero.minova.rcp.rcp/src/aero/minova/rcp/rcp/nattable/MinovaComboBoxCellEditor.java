@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -19,11 +20,21 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
+
+import aero.minova.rcp.model.LookupValue;
 
 public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 
 	private GridLookupContentProvider contentProvider;
+	private Cursor cursor;
+	private List<LookupValue> mCanonicalValues;
+	private String selectedValue;
 
 	/**
 	 * Create a new single selection {@link MinovaComboBoxCellEditor} based on the given list of items, showing the default number of items in the dropdown of
@@ -31,15 +42,109 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 	 */
 	public MinovaComboBoxCellEditor(GridLookupContentProvider contentProvider) {
 		super(contentProvider.getValues(), NatCombo.DEFAULT_NUM_OF_VISIBLE_ITEMS);
+		this.mCanonicalValues = contentProvider.getValues();
 		this.contentProvider = contentProvider;
 	}
 
-	private EHandlerService getHandlerService(Control control) {
-		return (EHandlerService) control.getParent().getData("EHandlerService");
+	@Override
+	protected Control activateCell(Composite parent, final Object originalCanonicalValue) {
+		this.setFocusOnText(true);
+		Control combo = super.activateCell(parent, originalCanonicalValue);
+		if (this.editMode == EditModeEnum.INLINE) {
+			Text textC = ((Text) getEditorControl().getChildren()[0]);
+			if (originalCanonicalValue instanceof Character) {
+				textC.setText(originalCanonicalValue.toString());
+			} else {
+				textC.selectAll();
+			}
+		}
+		return combo;
 	}
 
-	private ECommandService getCommandService(Control control) {
-		return (ECommandService) control.getParent().getData("ECommandService");
+	@Override
+	public boolean commit(MoveDirectionEnum direction) {
+		return commit(direction, true);
+	}
+
+	@Override
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit) {
+		return commit(direction, closeAfterCommit, false);
+	}
+
+	@Override
+	public boolean commit(MoveDirectionEnum direction, boolean closeAfterCommit, boolean skipValidation) {
+		boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
+		parent.forceFocus();
+		return commited;
+	}
+
+	@Override
+	public NatCombo createEditorControl(Composite parent) {
+		int style = SWT.NONE;
+		if (!this.freeEdit) {
+			style |= SWT.READ_ONLY;
+		}
+		if (this.multiselect) {
+			style |= SWT.MULTI;
+		}
+		if (this.useCheckbox) {
+			style |= SWT.CHECK;
+		}
+		final MinovaNatCombo combo = (this.iconImage == null) ? new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.showDropdownFilter)
+				: new MinovaNatCombo(parent, this.cellStyle, this.maxVisibleItems, style, this.iconImage, this.showDropdownFilter);
+
+		combo.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
+		this.cursor = combo.getCursor();
+
+		if (this.multiselect) {
+			combo.setMultiselectValueSeparator(this.multiselectValueSeparator);
+			combo.setMultiselectTextBracket(this.multiselectTextPrefix, this.multiselectTextSuffix);
+		}
+
+		addNatComboListener(combo);
+		return combo;
+	}
+
+	@Override
+	public Object getCanonicalValue() {
+
+		// Auswahl mit der Maus
+		if (selectedValue != null) {
+			return getValueWithKeytext(selectedValue);
+		}
+
+		String valueInEditor = ((MinovaNatCombo) getEditorControl()).getTextValue();
+
+		// Wenn nichts im Feld steht soll auch nicht reingeschrieben werden, damit das komplette Löschen einer Zelle möglich ist
+		if (valueInEditor == null || valueInEditor.isBlank()) {
+			return null;
+		}
+
+		// Nach genauer Übereinstimmung (bis auf Groß-/Kleinschreibung) Suchen
+		LookupValue exact = getValueWithKeytext(valueInEditor);
+		if (exact != null) {
+			return exact;
+		}
+
+		// Ersten Wert setzten, der mit der Eingabe beginnt
+		for (LookupValue lv : mCanonicalValues) {
+			if (lv.keyText.toLowerCase().startsWith(valueInEditor.toLowerCase())) {
+				this.selectedValue = null;
+				return lv;
+			}
+		}
+
+		return null;
+	}
+
+	private LookupValue getValueWithKeytext(String kexText) {
+		for (LookupValue lv : mCanonicalValues) {
+			if (lv.keyText.equalsIgnoreCase(kexText)) {
+				this.selectedValue = null;
+				return lv;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -56,17 +161,14 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			@Override
 			public void keyPressed(KeyEvent event) {
 				if ((event.keyCode == SWT.CR) || (event.keyCode == SWT.KEYPAD_CR)) {
-					combo.getParent().forceFocus();
-					commit(MoveDirectionEnum.NONE, false);
+					EHandlerService handlerService = (EHandlerService) combo.getParent().getData("EHandlerService");
+					ECommandService commandService = (ECommandService) combo.getParent().getData("ECommandService");
+					commit(MoveDirectionEnum.NONE, true);
 					Map<String, String> parameter = new HashMap<>();
-					ParameterizedCommand command = getCommandService(combo).createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
-					EHandlerService handlerService = getHandlerService(combo);
+					ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 					handlerService.executeHandler(command);
-					close();
-				} else if (event.keyCode == SWT.TAB) {
-					commit(MoveDirectionEnum.RIGHT, true);
 				} else if (event.keyCode == SWT.ESC) {
-					if (MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE) {
+					if (editMode == EditModeEnum.INLINE) {
 						close();
 					} else {
 						combo.hideDropdownControl();
@@ -77,13 +179,18 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 		});
 
 		combo.addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseUp(MouseEvent e) {
-				commit(MoveDirectionEnum.NONE, (!MinovaComboBoxCellEditor.this.multiselect && MinovaComboBoxCellEditor.this.editMode == EditModeEnum.INLINE));
-				if (!MinovaComboBoxCellEditor.this.multiselect && MinovaComboBoxCellEditor.this.editMode == EditModeEnum.DIALOG) {
+				if (e.widget instanceof Table) {
+					selectedValue = ((Table) e.widget).getItem(((Table) e.widget).getSelectionIndex()).getText();
+				}
+				commit(MoveDirectionEnum.RIGHT, (!multiselect && editMode == EditModeEnum.INLINE));
+				if (!multiselect && editMode == EditModeEnum.DIALOG) {
 					// hide the dropdown after a value was selected in the combo
 					// in a dialog
 					combo.hideDropdownControl();
+					combo.getParent().forceFocus();
 				}
 			}
 		});
@@ -97,7 +204,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			}
 		});
 
-		if (this.editMode == EditModeEnum.INLINE) {
+		if (editMode == EditModeEnum.INLINE) {
 			combo.addShellListener(new ShellAdapter() {
 				@Override
 				public void shellClosed(ShellEvent e) {
@@ -106,7 +213,7 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 			});
 		}
 
-		if (this.editMode == EditModeEnum.DIALOG) {
+		if (editMode == EditModeEnum.DIALOG) {
 			combo.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusLost(FocusEvent e) {
@@ -114,5 +221,8 @@ public class MinovaComboBoxCellEditor extends ComboBoxCellEditor {
 				}
 			});
 		}
+
+		combo.addDisposeListener(e -> cursor.dispose());
 	}
+
 }
