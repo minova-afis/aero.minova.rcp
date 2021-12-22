@@ -88,6 +88,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
 import aero.minova.rcp.css.ICssStyler;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
@@ -116,7 +117,6 @@ import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
-import aero.minova.rcp.rcp.layouts.DetailData;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import ca.odell.glazedlists.EventList;
@@ -652,7 +652,7 @@ public class SectionGrid {
 	}
 
 	public void fillHorizontal() {
-		DetailData rd = (DetailData) section.getLayoutData();
+		MinovaSectionData rd = (MinovaSectionData) section.getLayoutData();
 		rd.horizontalFill = !rd.horizontalFill;
 		section.requestLayout();
 

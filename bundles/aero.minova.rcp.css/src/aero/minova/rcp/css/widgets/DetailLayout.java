@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.layouts;
+package aero.minova.rcp.css.widgets;
 
 import static java.lang.Math.max;
 
@@ -62,15 +62,15 @@ public class DetailLayout extends Layout {
 		Control[] children = composite.getChildren();
 		Control[] columnChildren = new Control[children.length];
 		Control[] horizontalFillChildren = new Control[children.length];
-		DetailData[] columnData = new DetailData[children.length];
-		DetailData[] horizontalFillData = new DetailData[children.length];
+		MinovaSectionData[] columnData = new MinovaSectionData[children.length];
+		MinovaSectionData[] horizontalFillData = new MinovaSectionData[children.length];
 		int columnChildrenCount = 0;
 		int horizontalFillChildrenCount = 0;
 		int maxColumnWidth = 0;
 
 		for (int i = 0; i < children.length; i++) {
 			Control control = children[i];
-			DetailData data = (DetailData) control.getLayoutData();
+			MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
 			if (data != null && data.visible && !data.horizontalFill) {
 				Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 				initData(data, size);
@@ -98,7 +98,7 @@ public class DetailLayout extends Layout {
 		return size;
 	}
 
-	private void initData(DetailData data, Point size) {
+	private void initData(MinovaSectionData data, Point size) {
 		data.column = 0;
 		data.width = size.x;
 		data.height = size.y;
@@ -106,7 +106,7 @@ public class DetailLayout extends Layout {
 		data.left = 0;
 	}
 
-	private Point layoutColumn(DetailData[] detailData, int size, int width) {
+	private Point layoutColumn(MinovaSectionData[] detailData, int size, int width) {
 		int totalHeight = 0;
 		int maxWidth = 0;
 		for (int i = 0; i < size; i++) {
@@ -122,7 +122,7 @@ public class DetailLayout extends Layout {
 		int lastBottonPosition = 0;
 		int column = 0;
 		for (int i = 0; i < size; i++) {
-			DetailData lv = detailData[i];
+			MinovaSectionData lv = detailData[i];
 			if (lv.height / 2 + lastBottonPosition <= averageHeight || column == columns - 1) {
 				lv.column = column;
 				lv.top = lastBottonPosition;
@@ -145,7 +145,7 @@ public class DetailLayout extends Layout {
 		int elementCount = 0;
 		column = 0;
 		for (int i = 0; i < size; i++) {
-			DetailData lv = detailData[i];
+			MinovaSectionData lv = detailData[i];
 			if (lv.column != column) {
 				column++;
 				left += columnWidth + spacing;
@@ -172,11 +172,11 @@ public class DetailLayout extends Layout {
 		return new Point(maxWidth, maxHeight);
 	}
 
-	private Point layoutHorizontalFill(DetailData[] horizontalFillData, int horizontalFillChildrenCount, Point size, int parentWidth) {
+	private Point layoutHorizontalFill(MinovaSectionData[] horizontalFillData, int horizontalFillChildrenCount, Point size, int parentWidth) {
 		int width = max(size.x, parentWidth) - marginLeft - marginRight;
 		int top = size.y - marginBottom;
 		for (int i = 0; i < horizontalFillChildrenCount; i++) {
-			DetailData dd = horizontalFillData[i];
+			MinovaSectionData dd = horizontalFillData[i];
 			dd.left = marginLeft;
 			dd.width = width;
 			dd.top = top + spacing;
@@ -188,7 +188,7 @@ public class DetailLayout extends Layout {
 	private void move(Control[] controls) {
 		for (int i = 0; i < controls.length; i++) {
 			Control control = controls[i];
-			DetailData detailData = (DetailData) control.getLayoutData();
+			MinovaSectionData detailData = (MinovaSectionData) control.getLayoutData();
 			control.setBounds(detailData.left, detailData.top, detailData.width, detailData.height);
 		}
 	}

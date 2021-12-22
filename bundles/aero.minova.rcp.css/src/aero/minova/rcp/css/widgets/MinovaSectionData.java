@@ -1,10 +1,10 @@
-package aero.minova.rcp.rcp.layouts;
+package aero.minova.rcp.css.widgets;
 
 import org.eclipse.swt.SWT;
 
-public final class DetailData {
+public final class MinovaSectionData {
 	protected int left = 0;
-	protected int width = SWT.DEFAULT;
+	public int width = SWT.DEFAULT;
 	protected int top = 0;
 	protected int height = SWT.DEFAULT;
 	protected int column = 0;
