@@ -40,8 +40,10 @@ public class DetailLayout extends Layout {
 		Composite parent = composite.getParent();
 		Point extent = layout(composite, false, (parent instanceof ScrolledComposite) ? parent.getClientArea().width : composite.getClientArea().width,
 				flushCache);
-		if (wHint != SWT.DEFAULT) extent.x = wHint;
-		if (hHint != SWT.DEFAULT) extent.y = hHint;
+		if (wHint != SWT.DEFAULT)
+			extent.x = wHint;
+		if (hHint != SWT.DEFAULT)
+			extent.y = hHint;
 		return extent;
 	}
 
@@ -59,17 +61,17 @@ public class DetailLayout extends Layout {
 	private Point layout(Composite composite, boolean move, int width, boolean flushCache) {
 		Control[] children = composite.getChildren();
 		Control[] columnChildren = new Control[children.length];
-		Control[] expandedChildren = new Control[children.length];
+		Control[] horizontalFillChildren = new Control[children.length];
 		DetailData[] columnData = new DetailData[children.length];
-		DetailData[] expandedData = new DetailData[children.length];
+		DetailData[] horizontalFillData = new DetailData[children.length];
 		int columnChildrenCount = 0;
-		int expandedChildrenCount = 0;
+		int horizontalFillChildrenCount = 0;
 		int maxColumnWidth = 0;
 
 		for (int i = 0; i < children.length; i++) {
 			Control control = children[i];
 			DetailData data = (DetailData) control.getLayoutData();
-			if (data != null && data.visible && !data.expanded) {
+			if (data != null && data.visible && !data.horizontalFill) {
 				Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 				initData(data, size);
 				columnChildren[columnChildrenCount] = children[i];
@@ -79,15 +81,15 @@ public class DetailLayout extends Layout {
 			} else {
 				Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 				initData(data, size);
-				expandedChildren[expandedChildrenCount] = children[i];
-				expandedData[expandedChildrenCount] = data;
-				expandedChildrenCount++;
+				horizontalFillChildren[horizontalFillChildrenCount] = children[i];
+				horizontalFillData[horizontalFillChildrenCount] = data;
+				horizontalFillChildrenCount++;
 			}
 		}
 
 		Point size;
 		size = layoutColumn(columnData, columnChildrenCount, width);
-		size = layoutExpanded(expandedData, expandedChildrenCount, size, width);
+		size = layoutHorizontalFill(horizontalFillData, horizontalFillChildrenCount, size, width);
 
 		if (move) {
 			move(children);
@@ -170,11 +172,11 @@ public class DetailLayout extends Layout {
 		return new Point(maxWidth, maxHeight);
 	}
 
-	private Point layoutExpanded(DetailData[] expandedData, int expandedChildrenCount, Point size, int parentWidth) {
+	private Point layoutHorizontalFill(DetailData[] horizontalFillData, int horizontalFillChildrenCount, Point size, int parentWidth) {
 		int width = max(size.x, parentWidth) - marginLeft - marginRight;
 		int top = size.y - marginBottom;
-		for (int i = 0; i < expandedChildrenCount; i++) {
-			DetailData dd = expandedData[i];
+		for (int i = 0; i < horizontalFillChildrenCount; i++) {
+			DetailData dd = horizontalFillData[i];
 			dd.left = marginLeft;
 			dd.width = width;
 			dd.top = top + spacing;
@@ -199,11 +201,16 @@ public class DetailLayout extends Layout {
 	@Override
 	public String toString() {
 		String string = "DetailLayout {";
-		if (marginLeft != 0) string += "marginLeft=" + marginLeft + " ";
-		if (marginTop != 0) string += "marginTop=" + marginTop + " ";
-		if (marginRight != 0) string += "marginRight=" + marginRight + " ";
-		if (marginBottom != 0) string += "marginBottom=" + marginBottom + " ";
-		if (spacing != 0) string += "spacing=" + spacing + " ";
+		if (marginLeft != 0)
+			string += "marginLeft=" + marginLeft + " ";
+		if (marginTop != 0)
+			string += "marginTop=" + marginTop + " ";
+		if (marginRight != 0)
+			string += "marginRight=" + marginRight + " ";
+		if (marginBottom != 0)
+			string += "marginBottom=" + marginBottom + " ";
+		if (spacing != 0)
+			string += "spacing=" + spacing + " ";
 		string = string.trim();
 		string += "}";
 		return string;

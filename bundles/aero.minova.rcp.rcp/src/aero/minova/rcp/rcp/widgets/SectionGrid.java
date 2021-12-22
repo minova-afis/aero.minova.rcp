@@ -641,7 +641,7 @@ public class SectionGrid {
 		natTable.requestLayout();
 
 		DetailData rd = (DetailData) section.getLayoutData();
-		rd.expanded = !rd.expanded;
+		rd.horizontalFill = !rd.horizontalFill;
 		// Section soll nicht kleiner als Default sein
 //		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
 		section.requestLayout();

@@ -15,8 +15,8 @@ public final class DetailData {
 	 * <li>0: defined first element. This element can't be changed</li>
 	 * <li>1 ... : ordered following elements</li>
 	 * </ul>
-	 * All elements which are not visible ({@link #visible} will be ignored and not layouted. All expanded ({@link #expanded} elements are sorted at the end of
-	 * all not expanded controls.
+	 * All elements which are not visible ({@link #visible} will be ignored and not layouted. All horizontalFill ({@link #horizontalFill} elements are sorted at
+	 * the end of all not horizontalFilled controls.
 	 */
 	public int order = -1;
 	/**
@@ -26,10 +26,10 @@ public final class DetailData {
 	/**
 	 * true, if this control should use the width of the parent control
 	 */
-	public boolean expanded = false;
+	public boolean horizontalFill = false;
 
 	@Override
 	public String toString() {
-		return "(c=" + column + ", l=" + left + ", w=" + width + ", t=" + top + ", h=" + height + ", exclude=" + visible + ", expand=" + expanded + ")";
+		return "(c=" + column + ", l=" + left + ", w=" + width + ", t=" + top + ", h=" + height + ", exclude=" + visible + ", expand=" + horizontalFill + ")";
 	}
 }
