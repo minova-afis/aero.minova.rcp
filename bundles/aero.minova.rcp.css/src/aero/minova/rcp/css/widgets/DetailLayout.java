@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
+import aero.minova.rcp.css.ICssStyler;
+
 public class DetailLayout extends Layout {
 	/**
 	 * spacing specifies the number of points between the edge of one cell and the edge of its neighbouring cell. The default value is 5.
@@ -70,9 +72,10 @@ public class DetailLayout extends Layout {
 
 		for (int i = 0; i < children.length; i++) {
 			Control control = children[i];
+			ICssStyler styler = ((MinovaSection) control).getCssStyler();
 			MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
 			if (data != null && data.visible && !data.horizontalFill) {
-				Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
+				Point size = control.computeSize(styler.getSectionWidth(), SWT.DEFAULT, flushCache);
 				initData(data, size);
 				columnChildren[columnChildrenCount] = children[i];
 				columnData[columnChildrenCount] = data;
@@ -107,6 +110,7 @@ public class DetailLayout extends Layout {
 	}
 
 	private Point layoutColumn(MinovaSectionData[] detailData, int size, int width) {
+		// Spaltenbreite anhand der breitesten Spalte ermitteln
 		int totalHeight = 0;
 		int maxWidth = 0;
 		for (int i = 0; i < size; i++) {
@@ -114,26 +118,25 @@ public class DetailLayout extends Layout {
 			maxWidth = max(detailData[i].width, maxWidth);
 		}
 
-		// Spaltenbreite anhand der breitesten Spalte ermitteln
+		// Spaltenanzahl ermitteln
 		int columns = max(1, (width - marginLeft - marginRight - spacing) / maxWidth);
 		columns = max(1, (width - marginLeft - marginRight - spacing * (columns - 1)) / maxWidth);
 
 		int averageHeight = totalHeight / columns + 1;
-		int lastBottonPosition = 0;
+		int lastBottomPosition = 0;
 		int column = 0;
 		for (int i = 0; i < size; i++) {
 			MinovaSectionData lv = detailData[i];
-			if (lv.height / 2 + lastBottonPosition <= averageHeight || column == columns - 1) {
+			if (lv.height / 2 + lastBottomPosition <= averageHeight || column == columns - 1) {
 				lv.column = column;
-				lv.top = lastBottonPosition;
-				lastBottonPosition += lv.height;
+				lv.top = lastBottomPosition;
+				lastBottomPosition += lv.height;
 			} else {
 				column++;
 				lv.column = column;
 				lv.top = 0;
-				lastBottonPosition = lv.height;
+				lastBottomPosition = lv.height;
 			}
-			totalHeight += detailData[i].height;
 		}
 		maxWidth = 0;
 		int left = marginLeft;
@@ -182,7 +185,7 @@ public class DetailLayout extends Layout {
 			dd.top = top + spacing;
 			top += dd.height + spacing;
 		}
-		return new Point(top + marginBottom, width + marginLeft + marginRight);
+		return new Point(width + marginLeft + marginRight, top + marginBottom);
 	}
 
 	private void move(Control[] controls) {
