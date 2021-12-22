@@ -77,9 +77,8 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -88,8 +87,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
 import aero.minova.rcp.css.ICssStyler;
-import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.css.widgets.MinovaSection;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -484,12 +483,11 @@ public class SectionGrid {
 
 		FormData fd = new FormData();
 
-		defaultWidth = section.getCssStyler().getSectionWidth() - BUFFER;
-		String prefsWidthKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-		String widthString = prefsDetailSections.get(prefsWidthKey, null);
-		fd.width = widthString != null ? Integer.parseInt(widthString) : defaultWidth;
-		section.setData(Constants.SECTION_WIDTH, fd.width + BUFFER);
+		// Nattable immer über die gesamte Breite des Parent-Composites zeichnen
+		fd.left = new FormAttachment(0);
+		fd.right = new FormAttachment(100);
 
+		// Höhe wiederherstellen
 		defaultHeight = natTable.getRowHeightByPosition(0) * 5;
 		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
 		String heightString = prefsDetailSections.get(prefsHeightKey, null);
@@ -636,14 +634,9 @@ public class SectionGrid {
 		fd.height = optimalHeight;
 		natTable.requestLayout();
 
-		Point p = section.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		RowData rd = (RowData) section.getLayoutData();
-		rd.height = p.y;
-		section.requestLayout();
-
 		// Height Speicher, damit beim Neuladen wieder hergestellt wird
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
-		prefsDetailSections.put(key, rd.height + "");
+		prefsDetailSections.put(key, fd.height + "");
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
