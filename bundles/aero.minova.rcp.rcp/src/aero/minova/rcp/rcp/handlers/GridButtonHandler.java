@@ -27,12 +27,11 @@ public class GridButtonHandler {
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CONTROL_GRID_BUTTON_ID) String buttonId,
 			@Optional @Named(Constants.CONTROL_GRID_ID) String gridID, MPart part) {
 
-		SectionGrid sectionGrid = null;
 		WFCDetailPart wfcdetailpart = (WFCDetailPart) part.getObject();
 		if (wfcdetailpart != null) {
 			MGrid mGrid = wfcdetailpart.getDetail().getGrid(gridID);
-			GridAccessor valueAccessor = (GridAccessor) mGrid.getGridAccessor();
-			sectionGrid = valueAccessor.getSectionGrid();
+			GridAccessor gridAccessor = (GridAccessor) mGrid.getGridAccessor();
+			SectionGrid sectionGrid = gridAccessor.getSectionGrid();
 			if (sectionGrid == null) {
 				return;
 			}
@@ -43,10 +42,11 @@ public class GridButtonHandler {
 				sectionGrid.deleteCurrentRows();
 			} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH)) {
 				NatTableUtil.resizeColumns(sectionGrid.getNatTable());
-				sectionGrid.adjustWidth();
 			} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT)) {
 				NatTableUtil.resizeRows(sectionGrid.getNatTable());
 				sectionGrid.adjustHeight();
+			} else if (buttonId.equals(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL)) {
+				sectionGrid.fillHorizontal();
 			}
 		}
 	}

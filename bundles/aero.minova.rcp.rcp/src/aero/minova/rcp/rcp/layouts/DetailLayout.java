@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Layout;
 
 public class DetailLayout extends Layout {
 	/**
-	 * spacing specifies the number of points between the edge of one cell and the edge of its neighbouring cell. The default value is 3.
+	 * spacing specifies the number of points between the edge of one cell and the edge of its neighbouring cell. The default value is 5.
 	 */
 	public int spacing = 5;
 	/**

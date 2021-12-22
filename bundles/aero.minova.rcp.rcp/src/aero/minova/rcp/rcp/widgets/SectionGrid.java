@@ -17,8 +17,6 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -266,6 +264,13 @@ public class SectionGrid {
 		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
 		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
+
+		Button btnHorizontalFill = new Button();
+		btnHorizontalFill.setId(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
+		btnHorizontalFill.setIcon("ResizeLayout.Command");
+		btnHorizontalFill.setText(translationService.translate("@Action.HorizontalFill", null));
+		btnHorizontalFill.setEnabled(true);
+		createToolItem(bar, btnHorizontalFill, grid.getId() + "." + btnHorizontalFill.getId());
 
 		section.setTextClient(bar);
 	}
@@ -617,47 +622,14 @@ public class SectionGrid {
 		}
 	}
 
-	public void adjustWidth() {
-
-		int detailWidthPercentage = Integer.parseInt(emservice
-				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.details", MPartStack.class).get(0).getContainerData());
-		int detailWidthUI = (int) (mwindow.getWidth() * (detailWidthPercentage / 10000.0)) - 50;
-
-		FormData fd = (FormData) natTable.getLayoutData();
-
-		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
-		int optimalWidth = natTable.getPreferredWidth();
-		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
-			optimalWidth -= natTable.getColumnWidthByPosition(i);
-		}
-
-		// Maximal aktuelle Detailbreite ausfüllen
-		optimalWidth = Math.min(detailWidthUI, optimalWidth);
-
-		// Toggel zwischen Default-Breite und kompletter Nattable
-		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
-
-		fd.width = newWidth;
-		natTable.requestLayout();
-
+	public void fillHorizontal() {
 		DetailData rd = (DetailData) section.getLayoutData();
 		rd.horizontalFill = !rd.horizontalFill;
-		// Section soll nicht kleiner als Default sein
-//		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
 		section.requestLayout();
 
-		// Width in den Context setzten, damit wir überall darauf zugreifen können
-		MPart detail = emservice.findElements(perspective, "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
-//		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
-
-		// Width Speicher, damit beim Neuladen wieder hergestellt wird
-		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-//		prefsDetailSections.put(key, rd.width + "");
-		try {
-			prefsDetailSections.flush();
-		} catch (BackingStoreException e) {
-			e.printStackTrace();
-		}
+		// Zustand speichern, damit wiederhergestellt werden kann
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".horizontalFill";
+		prefsDetailSections.put(key, rd.horizontalFill + "");
 	}
 
 	public Row addNewRow() {

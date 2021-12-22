@@ -511,19 +511,19 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 */
 
 	private void layoutSection(Composite parent, HeadOrPageOrGridWrapper headOrPageOrGrid) {
-		DetailData headLayoutData = new DetailData();
+		DetailData sectionData = new DetailData();
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		} else {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
 		}
-		section.setLayoutData(headLayoutData);
+		section.setLayoutData(sectionData);
 
 		// Alten Zustand wiederherstellen
-		String prefsWidthKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".width";
-		String widthString = prefsDetailSections.get(prefsWidthKey, SECTION_WIDTH + "");
-//		headLayoutData.width = Integer.parseInt(widthString);
+		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
+		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
+		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
 		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
 		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
 		section.setExpanded(Boolean.parseBoolean(expandedString));
