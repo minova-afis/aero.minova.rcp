@@ -335,7 +335,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					if (decimals != 0 && !insertion.contains("" + dfs.getDecimalSeparator())) {
 						newCaretPosition = caretPosition + formatInsertion.length() - 1 - decimals;
 					} else {
-						newCaretPosition = caretPosition + formatInsertion.length() + countGroupingSeperator;
+						newCaretPosition = start + formatInsertion.length() + countGroupingSeperator;
 					}
 
 				} else if (text.length() == textBefore.length() + insertion.length()) {
