@@ -78,7 +78,7 @@ public class DetailLayout extends Layout {
 				columnData[columnChildrenCount] = data;
 				columnChildrenCount++;
 				maxColumnWidth = Math.max(maxColumnWidth, size.x);
-			} else {
+			} else if (data != null && data.visible) {
 				Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 				initData(data, size);
 				horizontalFillChildren[horizontalFillChildrenCount] = children[i];

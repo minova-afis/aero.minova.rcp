@@ -30,6 +30,6 @@ public final class MinovaSectionData {
 
 	@Override
 	public String toString() {
-		return "(c=" + column + ", l=" + left + ", w=" + width + ", t=" + top + ", h=" + height + ", exclude=" + visible + ", expand=" + horizontalFill + ")";
+		return "(c=" + column + ", l=" + left + ", w=" + width + ", t=" + top + ", h=" + height + ", visible=" + visible + ", horizontalFill=" + horizontalFill + ")";
 	}
 }
