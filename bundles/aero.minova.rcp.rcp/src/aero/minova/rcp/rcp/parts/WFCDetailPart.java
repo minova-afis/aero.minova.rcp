@@ -1,10 +1,6 @@
 
 package aero.minova.rcp.rcp.parts;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.ArrayList;
@@ -50,13 +46,10 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -68,6 +61,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -118,14 +112,11 @@ import aero.minova.rcp.rcp.layouts.DetailLayout;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
-import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
-	private static final int MARGIN_SECTION = 8;
-	public static final int SECTION_WIDTH = 4 * COLUMN_WIDTH + 3 * MARGIN_LEFT + 2 * MARGIN_SECTION + 50; // 4 Spalten = 5 Zwischenräume
 	@Inject
 	protected UISynchronize sync;
 
@@ -171,6 +162,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private IEclipseContext appContext;
 
+	private int detailWidth;
+
 	@Inject
 	MWindow mwindow;
 
@@ -196,7 +189,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
 		casRequestsUtil.initializeCasRequestUtil(getDetail(), mPerspective, this);
 		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
-		mPerspective.getContext().set(Constants.DETAIL_WIDTH, SECTION_WIDTH);
+		mPerspective.getContext().set(Constants.DETAIL_WIDTH, detailWidth);
 		TranslateUtil.translate(composite, translationService, locale);
 
 		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
@@ -546,9 +539,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
 
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
+
+		detailWidth = section.getCssStyler().getSectionWidth();
 	}
 
-	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, Section section, MSection mSection) {
+	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, MinovaSection section, MSection mSection) {
 		// Client Area
 		Composite clientComposite = getFormToolkit().createComposite(section);
 		clientComposite.setLayout(new FormLayout());
@@ -690,7 +685,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	 * @param mSection
 	 *            die Section deren Fields erstellt werden.
 	 */
-	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, Section section) {
+	private void createFields(Composite composite, HeadOrPageOrGridWrapper headOrPage, MSection mSection, MinovaSection section) {
 		IEclipseContext context = mPerspective.getContext();
 		List<MField> visibleMFields = new ArrayList<>();
 		for (Object fieldOrGrid : headOrPage.getFieldOrGrid()) {
@@ -762,7 +757,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		return null;
 	}
 
-	private void createGrid(Composite composite, MSection mSection, Section section, IEclipseContext context, Object fieldOrGrid) {
+	private void createGrid(Composite composite, MSection mSection, MinovaSection section, IEclipseContext context, Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
 		mGrid.addGridChangeListener(this);
@@ -814,12 +809,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private void addBottonMargin(Composite composite, int row, int column) {
 		// Abstand nach unten
-		Label spacing = new Label(composite, SWT.NONE);
-		FormData spacingFormData = new FormData();
-		spacingFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
-		spacingFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		spacingFormData.height = 0;
-		spacing.setLayoutData(spacingFormData);
+//		Label spacing = new Label(composite, SWT.NONE);
+//		FormData spacingFormData = new FormData();
+//		spacingFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
+//		spacingFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
+//		spacingFormData.height = 0;
+//		spacing.setLayoutData(spacingFormData);
 	}
 
 	private void createField(Composite composite, MField field, int row, int column) {

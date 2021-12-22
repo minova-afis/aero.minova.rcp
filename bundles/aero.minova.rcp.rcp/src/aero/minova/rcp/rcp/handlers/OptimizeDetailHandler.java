@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
@@ -17,7 +18,7 @@ import aero.minova.rcp.rcp.parts.WFCStatisticDetailPart;
 public class OptimizeDetailHandler {
 
 	@Execute
-	public void execute(EModelService emservice, MWindow mwindow) {
+	public void execute(EModelService emservice, MWindow mwindow, MPerspective mPerspective) {
 		MPart detail = emservice.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
 
 		// Höhe mindestens 900 Pixel
@@ -37,7 +38,7 @@ public class OptimizeDetailHandler {
 			}
 		}
 
-		Integer defaultSectionWidth = WFCDetailPart.SECTION_WIDTH;
+		Integer defaultSectionWidth = (Integer) mPerspective.getContext().get(Constants.DETAIL_WIDTH);
 
 		// Detail-Composite finden (Kann auch Statistik-Part sein)
 		Composite detailComposite;

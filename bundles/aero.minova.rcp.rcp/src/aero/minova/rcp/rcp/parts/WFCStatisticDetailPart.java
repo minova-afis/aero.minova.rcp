@@ -46,6 +46,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Map.Entry;
@@ -80,7 +81,6 @@ import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
-import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.widgets.MinovaNotifier;
 
 @SuppressWarnings("restriction")

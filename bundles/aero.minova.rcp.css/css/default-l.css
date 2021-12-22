@@ -21,7 +21,7 @@ Text, Label.DescriptionLabel, LookupText, TextAssist, ImageHyperlink {
 }
 
 NatTable {
-	font-size: 14;
+	font-size: 14px;
 	padding: 4;
 	/*row-height: 34;*/
 }
@@ -30,7 +30,18 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	.selectionAnchor:select, .SummaryRow, .ROW_HEADER, .TREE_EXPANDED,
 	.TREE_EXPANDED:select, .TREE_COLLAPSED, .TREE_COLLAPSED:select,
 	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {
-	font-size: 14;
+	font-size: 14px;
 	padding: 4;
 	/*row-height: 34;*/
+}
+
+
+MinovaSection {
+	date-width: 120px;
+	date-time-width: 160px;
+	number-width: 120px;
+	row-height: 33px;
+	section-spacing: 7px;
+	text-width: 160px;
+	time-width: 80px;
 }

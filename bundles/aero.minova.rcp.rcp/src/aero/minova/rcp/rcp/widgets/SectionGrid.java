@@ -83,11 +83,12 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
+import aero.minova.rcp.css.ICssStyler;
+import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -118,7 +119,6 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.layouts.DetailData;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
-import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -156,7 +156,7 @@ public class SectionGrid {
 	private Table dataTable;
 	private Grid grid;
 	private Composite composite;
-	private Section section;
+	private MinovaSection section;
 	private MDetail mDetail;
 
 	private SortedList<Row> sortedList;
@@ -184,8 +184,8 @@ public class SectionGrid {
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
-	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
-	private int default_height;
+	private int defaultWidth = ICssStyler.CSS_TEXT_WIDTH - BUFFER;
+	private int defaultHeight;
 
 	private ColumnReorderLayer columnReorderLayer;
 
@@ -203,7 +203,7 @@ public class SectionGrid {
 
 	private ColumnHeaderLayer columnHeaderLayer;
 
-	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
+	public SectionGrid(Composite composite, MinovaSection section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
@@ -484,14 +484,16 @@ public class SectionGrid {
 
 		FormData fd = new FormData();
 
+		defaultWidth = section.getCssStyler().getSectionWidth() - BUFFER;
 		String prefsWidthKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
 		String widthString = prefsDetailSections.get(prefsWidthKey, null);
-		fd.width = widthString != null ? Integer.parseInt(widthString) : DEFAULT_WIDTH;
+		fd.width = widthString != null ? Integer.parseInt(widthString) : defaultWidth;
+		section.setData(Constants.SECTION_WIDTH, fd.width + BUFFER);
 
-		default_height = natTable.getRowHeightByPosition(0) * 5;
+		defaultHeight = natTable.getRowHeightByPosition(0) * 5;
 		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
 		String heightString = prefsDetailSections.get(prefsHeightKey, null);
-		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
+		fd.height = heightString != null ? Integer.parseInt(heightString) : defaultHeight;
 		prevHeight = fd.height;
 
 		getNatTable().setLayoutData(fd);
@@ -627,7 +629,7 @@ public class SectionGrid {
 		optimalHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, optimalHeight);
 
 		if (optimalHeight == prevHeight) {
-			optimalHeight = default_height;
+			optimalHeight = defaultHeight;
 		}
 
 		prevHeight = optimalHeight;
