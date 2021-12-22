@@ -57,6 +57,13 @@ public class MinovaSection extends Section {
 		this.imageLink.requestLayout();
 	}
 
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		((MinovaSectionData) this.getLayoutData()).visible = visible;
+		this.getParent().requestLayout();
+	}
+
 	public boolean getExpandable() {
 		return expandable;
 	}
