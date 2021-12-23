@@ -266,21 +266,21 @@ public class SectionGrid {
 		Button btnOptimizeHigh = new Button();
 		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
-		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
+		btnOptimizeHigh.setText(translationService.translate("@Action.Grid.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
 		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
-		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
+		btnOptimizeWidth.setText(translationService.translate("@Action.Grid.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
 		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
 
 		Button btnHorizontalFill = new Button();
 		btnHorizontalFill.setId(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
 		btnHorizontalFill.setIcon("ResizeLayout.Command");
-		btnHorizontalFill.setText(translationService.translate("@Action.HorizontalFill", null));
+		btnHorizontalFill.setText(translationService.translate("@Action.Grid.HorizontalFill", null));
 		btnHorizontalFill.setEnabled(true);
 		createToolItem(bar, btnHorizontalFill, grid.getId() + "." + btnHorizontalFill.getId());
 
