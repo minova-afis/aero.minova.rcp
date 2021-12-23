@@ -735,7 +735,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			row += mField.getNumberRowsSpanned() - 1;
 			column += width;
 		}
-		addBottonMargin(clientComposite, row + 1, column);
 	}
 
 	public MField createMField(Field field, MSection mSection, String suffix) {
@@ -807,16 +806,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 				addKeysFromXBSToGrid(grid, settingsForMask);
 			}
 		}
-	}
-
-	private void addBottonMargin(Composite composite, int row, int column) {
-		// Abstand nach unten
-//		Label spacing = new Label(composite, SWT.NONE);
-//		FormData spacingFormData = new FormData();
-//		spacingFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT + MARGIN_TOP);
-//		spacingFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-//		spacingFormData.height = 0;
-//		spacing.setLayoutData(spacingFormData);
 	}
 
 	private void createField(Composite composite, MField field, int row, int column) {
