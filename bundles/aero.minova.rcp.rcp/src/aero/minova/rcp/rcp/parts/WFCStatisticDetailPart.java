@@ -142,7 +142,9 @@ public class WFCStatisticDetailPart {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		mDetail = new MDetail();
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
-		parent.setLayout(new DetailLayout());
+		DetailLayout detailLayout = new DetailLayout();
+		parent.setLayout(detailLayout);
+		mPerspective.getContext().set(Constants.DETAIL_LAYOUT, detailLayout);
 		layoutSection();
 	}
 

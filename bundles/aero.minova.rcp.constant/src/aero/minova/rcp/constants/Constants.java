@@ -42,6 +42,7 @@ public class Constants {
 
 	public static final String CONTROL_GRID_ID = "grid_id";
 	public static final String DETAIL_COMPOSITE = "DetailComposite";
+	public static final String DETAIL_LAYOUT = "DetailLayout";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";

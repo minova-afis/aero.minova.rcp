@@ -41,7 +41,7 @@ public class DetailLayout extends Layout {
 	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
 		Composite parent = composite.getParent();
 		Point extent = layout(composite, false, (parent instanceof ScrolledComposite) ? parent.getClientArea().width : composite.getClientArea().width,
-				flushCache);
+				flushCache, true);
 		if (wHint != SWT.DEFAULT)
 			extent.x = wHint;
 		if (hHint != SWT.DEFAULT)
@@ -57,10 +57,10 @@ public class DetailLayout extends Layout {
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		Rectangle clientArea = composite.getClientArea();
-		layout(composite, true, clientArea.width, flushCache);
+		layout(composite, true, clientArea.width, flushCache, true);
 	}
 
-	private Point layout(Composite composite, boolean move, int width, boolean flushCache) {
+	public Point layout(Composite composite, boolean move, int width, boolean flushCache, boolean calculateHorizontal) {
 		Control[] children = composite.getChildren();
 		Control[] columnChildren = new Control[children.length];
 		Control[] horizontalFillChildren = new Control[children.length];
@@ -92,7 +92,9 @@ public class DetailLayout extends Layout {
 
 		Point size;
 		size = layoutColumn(columnData, columnChildrenCount, width);
-		size = layoutHorizontalFill(horizontalFillData, horizontalFillChildrenCount, size, width);
+		if (calculateHorizontal) {
+			size = layoutHorizontalFill(horizontalFillData, horizontalFillChildrenCount, size, width);
+		}
 
 		if (move) {
 			move(children);

@@ -61,9 +61,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.css.widgets.DetailLayout;
 import aero.minova.rcp.css.widgets.MinovaSection;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.model.xsd.Field;
@@ -328,8 +328,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
 		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
-		wrap.setLayout(new DetailLayout());
+		DetailLayout detailLayout = new DetailLayout();
+		wrap.setLayout(detailLayout);
 		parent.setData(Constants.DETAIL_COMPOSITE, wrap);
+		mPerspective.getContext().set(Constants.DETAIL_LAYOUT, detailLayout);
 
 		// Abschnitte der Hauptmaske und OPs erstellen
 		for (Object headOrPage : form.getDetail().getHeadAndPageAndGrid()) {
