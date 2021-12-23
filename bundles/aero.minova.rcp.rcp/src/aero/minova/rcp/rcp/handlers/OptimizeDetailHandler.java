@@ -60,7 +60,7 @@ public class OptimizeDetailHandler {
 		}
 
 		int size = 100000;
-		float detailSize = (float) (prefDetailWidth + 25.0) / mwindow.getWidth();
+		float detailSize = (float) (prefDetailWidth + 35.0) / mwindow.getWidth();
 		float leftSize = 1.0f - detailSize;
 
 		MPartSashContainer element = emservice
