@@ -36,7 +36,6 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
-import aero.minova.rcp.rcp.labels.FieldLabel;
 import aero.minova.rcp.widgets.LookupComposite;
 import aero.minova.rcp.widgets.LookupContentProvider;
 

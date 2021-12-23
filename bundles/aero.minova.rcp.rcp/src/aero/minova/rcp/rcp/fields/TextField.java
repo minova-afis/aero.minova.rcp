@@ -25,7 +25,6 @@ import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
-import aero.minova.rcp.rcp.labels.FieldLabel;
 
 public class TextField {
 

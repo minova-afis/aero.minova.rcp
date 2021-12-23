@@ -40,7 +40,6 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.ShortTimeValueAccessor;
-import aero.minova.rcp.rcp.labels.FieldLabel;
 import aero.minova.rcp.util.TimeUtil;
 
 public class ShortTimeField {

@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.labels;
+package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
