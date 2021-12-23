@@ -21,8 +21,6 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -79,17 +77,18 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
+import aero.minova.rcp.css.ICssStyler;
+import aero.minova.rcp.css.widgets.MinovaSection;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -119,7 +118,6 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
-import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -157,7 +155,7 @@ public class SectionGrid {
 	private Table dataTable;
 	private Grid grid;
 	private Composite composite;
-	private Section section;
+	private MinovaSection section;
 	private MDetail mDetail;
 
 	private SortedList<Row> sortedList;
@@ -185,8 +183,8 @@ public class SectionGrid {
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
-	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
-	private int default_height;
+	private int defaultWidth = ICssStyler.CSS_TEXT_WIDTH - BUFFER;
+	private int defaultHeight;
 
 	private ColumnReorderLayer columnReorderLayer;
 
@@ -204,7 +202,7 @@ public class SectionGrid {
 
 	private ColumnHeaderLayer columnHeaderLayer;
 
-	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
+	public SectionGrid(Composite composite, MinovaSection section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
@@ -268,16 +266,23 @@ public class SectionGrid {
 		Button btnOptimizeHigh = new Button();
 		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
-		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
+		btnOptimizeHigh.setText(translationService.translate("@Action.Grid.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
 		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
-		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
+		btnOptimizeWidth.setText(translationService.translate("@Action.Grid.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
 		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
+
+		Button btnHorizontalFill = new Button();
+		btnHorizontalFill.setId(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
+		btnHorizontalFill.setIcon("ResizeLayout.Command");
+		btnHorizontalFill.setText(translationService.translate("@Action.Grid.HorizontalFill", null));
+		btnHorizontalFill.setEnabled(true);
+		createToolItem(bar, btnHorizontalFill, grid.getId() + "." + btnHorizontalFill.getId());
 
 		section.setTextClient(bar);
 	}
@@ -478,14 +483,15 @@ public class SectionGrid {
 
 		FormData fd = new FormData();
 
-		String prefsWidthKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-		String widthString = prefsDetailSections.get(prefsWidthKey, null);
-		fd.width = widthString != null ? Integer.parseInt(widthString) : DEFAULT_WIDTH;
+		// Nattable immer über die gesamte Breite des Parent-Composites zeichnen
+		fd.left = new FormAttachment(0);
+		fd.right = new FormAttachment(100);
 
-		default_height = natTable.getRowHeightByPosition(0) * 5;
+		// Höhe wiederherstellen
+		defaultHeight = natTable.getRowHeightByPosition(0) * 5;
 		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
 		String heightString = prefsDetailSections.get(prefsHeightKey, null);
-		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
+		fd.height = heightString != null ? Integer.parseInt(heightString) : defaultHeight;
 		prevHeight = fd.height;
 
 		getNatTable().setLayoutData(fd);
@@ -621,21 +627,16 @@ public class SectionGrid {
 		optimalHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, optimalHeight);
 
 		if (optimalHeight == prevHeight) {
-			optimalHeight = default_height;
+			optimalHeight = defaultHeight;
 		}
 
 		prevHeight = optimalHeight;
 		fd.height = optimalHeight;
 		natTable.requestLayout();
 
-		Point p = section.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		RowData rd = (RowData) section.getLayoutData();
-		rd.height = p.y;
-		section.requestLayout();
-
 		// Height Speicher, damit beim Neuladen wieder hergestellt wird
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
-		prefsDetailSections.put(key, rd.height + "");
+		prefsDetailSections.put(key, fd.height + "");
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
@@ -643,46 +644,14 @@ public class SectionGrid {
 		}
 	}
 
-	public void adjustWidth() {
-
-		int detailWidthPercentage = Integer.parseInt(emservice
-				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.details", MPartStack.class).get(0).getContainerData());
-		int detailWidthUI = (int) (mwindow.getWidth() * (detailWidthPercentage / 10000.0)) - 50;
-
-		FormData fd = (FormData) natTable.getLayoutData();
-
-		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
-		int optimalWidth = natTable.getPreferredWidth();
-		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
-			optimalWidth -= natTable.getColumnWidthByPosition(i);
-		}
-
-		// Maximal aktuelle Detailbreite ausfüllen
-		optimalWidth = Math.min(detailWidthUI, optimalWidth);
-
-		// Toggel zwischen Default-Breite und kompletter Nattable
-		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
-
-		fd.width = newWidth;
-		natTable.requestLayout();
-
-		RowData rd = (RowData) section.getLayoutData();
-		// Section soll nicht kleiner als Default sein
-		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
+	public void fillHorizontal() {
+		MinovaSectionData rd = (MinovaSectionData) section.getLayoutData();
+		rd.horizontalFill = !rd.horizontalFill;
 		section.requestLayout();
 
-		// Width in den Context setzten, damit wir überall darauf zugreifen können
-		MPart detail = emservice.findElements(perspective, "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
-		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
-
-		// Width Speicher, damit beim Neuladen wieder hergestellt wird
-		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-		prefsDetailSections.put(key, rd.width + "");
-		try {
-			prefsDetailSections.flush();
-		} catch (BackingStoreException e) {
-			e.printStackTrace();
-		}
+		// Zustand speichern, damit wiederhergestellt werden kann
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".horizontalFill";
+		prefsDetailSections.put(key, rd.horizontalFill + "");
 	}
 
 	public Row addNewRow() {

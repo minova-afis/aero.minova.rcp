@@ -50,7 +50,8 @@ Require-Bundle: aero.minova.rcp.form.model,
  aero.minova.rcp.preferences;bundle-version="1.2.0",
  aero.minova.libs.fop,
  org.eclipse.osgi.services;bundle-version="3.10.0",
- jakarta.xml.bind;bundle-version="2.3.3"
+ jakarta.xml.bind;bundle-version="2.3.3",
+ aero.minova.rcp.css;bundle-version="12.0.27"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: aero.minova.rcp.rcp
 Import-Package: aero.minova.rcp.constants,

@@ -1,30 +1,22 @@
+/* Colors for macos */
 Canvas, CTabItem, DetailComposite, ExpandableComposite, LayoutComposite,
 	MinovaSection, NatTable, ScrolledComposite, Section, ToolBar  {
-	background-color: COLOR-WIDGET-BACKGROUND;
 	color: #404040;
 }
 Section, MinovaSection {
-	background-color: COLOR-WIDGET-BACKGROUND;
-	background-color-titlebar: COLOR-WIDGET-BACKGROUND;
 	border-color-titlebar: black;
 }
-Section  {
-	color: #404040;
-	background-color: inherit;
-}
-Composite {
-	background-color: COLOR-WIDGET-BACKGROUND;
+Composite, .MPart, MinovaSection {
+	background-color: #ececec; /* Standard eclipse 2021-09 macos */
 }
 
 CTabItem:selected {
 	background-color: white;
 }
 
-
 Label, Text, Button, Button.Description, Label.Description, Section.Description  {
 	color: #404040;
 }
-
 
 /*Verschiedene Feldfarben*/
 Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {

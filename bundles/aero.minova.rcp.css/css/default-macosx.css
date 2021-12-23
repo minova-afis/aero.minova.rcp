@@ -1,37 +1,49 @@
-@import url("platform:/plugin/aero.minova.rcp.css/css/colors.css");
+@import url("platform:/plugin/aero.minova.rcp.css/css/macos/colors.css");
+@import	url("platform:/plugin/aero.minova.rcp.css/css/macos/nattable.css");
 
-@import url("platform:/plugin/aero.minova.rcp.css/css/margin.css");
-
-@import url("platform:/plugin/aero.minova.rcp.css/css/common.css");
-
-@import
-	url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
+.MPartStack {
+	swt-maximize-visible: false;
+	swt-minimize-visible: false;
+}
 
 CTabFolder {
 	swt-tab-height: 32px;
 }
 
-Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie {
-	/*font-size: 10px;*/
-	
-}
-
-Text, Label.DescriptionLabel, LookupText, TextAssist, ImageHyperlink {
-	/*font-size: 10px;*/
-	
-}
-
 NatTable {
-	font-size: 11px;
+	font-size: 12pt; 
 	padding: 3;
-	/*row-height: 24;*/
 }
 
 NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	.selectionAnchor:select, .SummaryRow, .ROW_HEADER, .TREE_EXPANDED,
 	.TREE_EXPANDED:select, .TREE_COLLAPSED, .TREE_COLLAPSED:select,
 	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {
-	font-size: 11px;
+	font-size: 12pt; 
 	padding: 3;
-	/*row-height: 24;*/
+}
+
+MinovaSection {
+	date-width: 90px;
+	date-time-width: 130px;
+	number-width: 90px;
+	row-height: 24px;
+	section-spacing: 5px;
+	text-width: 130px;
+	time-width: 65px;
+}
+
+Text, Label, Button {
+	font-family:VERDANA;
+	font-size: 12pt;
+}
+
+Text#Console {
+	font-family: "courier new";
+}
+
+CTabItem, Section, MinovaSection {
+	font-family:VERDANA;
+	font-size: 13pt;
+	font-weight: bold;
 }

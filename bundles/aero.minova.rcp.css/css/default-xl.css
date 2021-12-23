@@ -21,7 +21,7 @@ Text, Label.DescriptionLabel, LookupText, TextAssist, ImageHyperlink {
 }
 
 NatTable {
-	font-size: 20;
+	font-size: 20px;
 	padding: 5;
 	/*row-height: 49;*/
 }
@@ -33,4 +33,16 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	font-size: 20;
 	padding: 5;
 	/*row-height: 49;*/
+}
+
+
+
+MinovaSection {
+	date-width: 170px;
+	date-time-width: 190px;
+	number-width: 160px;
+	row-height: 45px;
+	section-spacing: 10px;
+	text-width: 190px;
+	time-width: 120px;
 }

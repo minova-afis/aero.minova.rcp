@@ -36,8 +36,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -46,6 +44,9 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.widgets.DetailLayout;
+import aero.minova.rcp.css.widgets.MinovaSection;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Map.Entry;
@@ -80,7 +81,6 @@ import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
-import aero.minova.rcp.rcp.widgets.MinovaSection;
 import aero.minova.rcp.widgets.MinovaNotifier;
 
 @SuppressWarnings("restriction")
@@ -142,7 +142,9 @@ public class WFCStatisticDetailPart {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		mDetail = new MDetail();
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
-		parent.setLayout(new RowLayout(SWT.VERTICAL));
+		DetailLayout detailLayout = new DetailLayout();
+		parent.setLayout(detailLayout);
+		mPerspective.getContext().set(Constants.DETAIL_LAYOUT, detailLayout);
 		layoutSection();
 	}
 
@@ -155,9 +157,8 @@ public class WFCStatisticDetailPart {
 	private void layoutSection() {
 		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		section.setData(TRANSLATE_PROPERTY, "@" + STATISTIC);
-		RowData rowData = new RowData();
-		rowData.width = SECTION_WIDTH;
-		section.setLayoutData(rowData);
+		MinovaSectionData sectionData = new MinovaSectionData();
+		section.setLayoutData(sectionData);
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(STATISTIC, false);
 		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
@@ -174,6 +175,8 @@ public class WFCStatisticDetailPart {
 		cTabFolder.getParent().setTabList(new Control[0]);
 
 		TranslateUtil.translate(parent, translationService, locale);
+
+		mPerspective.getContext().set(Constants.DETAIL_WIDTH, section.getCssStyler().getSectionWidth());
 	}
 
 	/**
