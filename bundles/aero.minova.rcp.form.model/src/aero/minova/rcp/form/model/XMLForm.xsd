@@ -725,6 +725,12 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="group" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>definiert den Gruppennamen, zu dem dieser Button zugehörig ist
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="set">
 		<xs:annotation>
@@ -1295,7 +1301,6 @@
 		<xs:sequence maxOccurs="1" minOccurs="1">
 			<xs:choice maxOccurs="1" minOccurs="0">
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="button-group" type="button-group"/>
 			</xs:choice>
 			<xs:choice maxOccurs="1" minOccurs="1">
 				<xs:choice maxOccurs="unbounded" minOccurs="0">
@@ -1303,11 +1308,6 @@
 					<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid" />
 				</xs:choice>
 			</xs:choice>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="button-group">
-		<xs:sequence maxOccurs="1" minOccurs="1">
-			<xs:element maxOccurs="unbounded" minOccurs="1" name="button" type="button"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:element name="grid">
