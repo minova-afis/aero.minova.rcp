@@ -37,8 +37,11 @@ public class Constants {
 	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
+	public static final String CONTROL_GRID_BUTTON_HORIZONTALFILL = "grid_button_horizontalFill";
+
 	public static final String CONTROL_GRID_ID = "grid_id";
 	public static final String DETAIL_COMPOSITE = "DetailComposite";
+	public static final String DETAIL_LAYOUT = "DetailLayout";
 
 	public static final String CLAZZ = "clazz";
 	public static final String PARAMETER = "parameter";
@@ -159,6 +162,7 @@ public class Constants {
 
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
+	public static final String SECTION_WIDTH = "SectionWidth";
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
 	public static final String OPTION_PAGE = "OptionPage";
