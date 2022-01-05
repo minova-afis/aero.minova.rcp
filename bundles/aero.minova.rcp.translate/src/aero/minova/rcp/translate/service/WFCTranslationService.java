@@ -44,7 +44,7 @@ public class WFCTranslationService extends TranslationService {
 	Locale locale;
 
 	private String customerId = "MIN";
-	private String applicationId = "WFC";
+	private String applicationId = "SIS";
 	private Properties resources = new Properties();
 
 	private Properties usedProperties = new Properties();

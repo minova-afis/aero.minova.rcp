@@ -26,7 +26,7 @@ public class Manager {
 	public void postContextCreate(IEclipseContext context) {
 		context.set(TranslationService.LOCALE, CustomLocale.getLocale());
 		configureTranslationService(context);
-		context.set("aero.minova.rcp.applicationid", "WFC");
+		context.set("aero.minova.rcp.applicationid", "SIS");
 		context.set("aero.minova.rcp.customerid", "MIN");
 		initPrefs();
 	}
