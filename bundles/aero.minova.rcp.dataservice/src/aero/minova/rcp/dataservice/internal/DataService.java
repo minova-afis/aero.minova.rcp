@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -338,16 +336,12 @@ public class DataService implements IDataService {
 	}
 
 	public ErrorObject checkForError(SqlProcedureResult fromJson, String procedureName) {
-
-		// SQL Fehler: Es gibt Resultset, als wert ADO | ....
-		// CAS Fehler: Es gibt Resultset, KEIN ADO im Wert
-
-		// Returncode >= null, nichts zu tun
+		// Returncode >= null -> kein Fehler -> nichts zu tun
 		if (fromJson != null && fromJson.getReturnCode() >= 0) {
 			return null;
 		}
 
-		// returncode negativ, kein resultSet
+		// fromJson null ist oder kein Resultset: Default Fehlermeldung
 		if (fromJson == null || fromJson.getResultSet() == null) {
 			Table error = new Table();
 			error.setName(ERROR);
@@ -362,31 +356,6 @@ public class DataService implements IDataService {
 			return new ErrorObject(fromJson.getResultSet(), username, procedureName);
 		}
 		return null;
-	}
-
-	public SqlProcedureResult checkForSQLError(SqlProcedureResult fromJson) {
-		String value = fromJson.getResultSet().getRows().get(0).getValue(0).getStringValue();
-		// SQL - Fehler
-		if (value.matches(".*ADO.*|")) {
-			String errorMessage = "";
-			Pattern fullError = Pattern.compile(".*?\\|.*?\\|(.*?)\\|.*?");
-			Matcher m = fullError.matcher(value);
-			if (m.find()) {
-				errorMessage = m.group(1);
-			}
-			if (errorMessage.isBlank()) {
-				errorMessage = "msg.NoErrorMessageAvailable";
-			}
-			Table error = new Table();
-			error.setName(ERROR);
-			error.addColumn(new Column("Message", DataType.STRING));
-
-
-			fromJson = new SqlProcedureResult();
-			fromJson.setResultSet(error);
-			fromJson.setReturnCode(-1);
-		}
-		return fromJson;
 	}
 
 	@Override
