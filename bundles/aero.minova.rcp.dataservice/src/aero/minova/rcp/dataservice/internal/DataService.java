@@ -358,8 +358,6 @@ public class DataService implements IDataService {
 			fromJson.setReturnCode(-1);
 		}
 
-		fromJson = checkForSQLError(fromJson);
-
 		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
 			return new ErrorObject(fromJson.getResultSet(), username, procedureName);
 		}
@@ -382,7 +380,8 @@ public class DataService implements IDataService {
 			Table error = new Table();
 			error.setName(ERROR);
 			error.addColumn(new Column("Message", DataType.STRING));
-			error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
+
+
 			fromJson = new SqlProcedureResult();
 			fromJson.setResultSet(error);
 			fromJson.setReturnCode(-1);

@@ -1,7 +1,11 @@
 package aero.minova.rcp.rcp.util;
 
 import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +78,7 @@ import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.widgets.MinovaNotifier;
 
 public class WFCDetailCASRequestsUtil {
@@ -649,6 +654,51 @@ public class WFCDetailCASRequestsUtil {
 				List<String> params = new ArrayList<>();
 				for (int i = 1; i < errorTable.getColumnCount(); i++) {
 					Value v = errorTable.getRows().get(0).getValue(i);
+					String columnName = errorTable.getColumnName(i);
+					switch (columnName) {
+					case "p":
+						params.add(translationService.translate("@" + v.getStringValue(), null));
+						break;
+					case "i":
+						try {
+							params.add("" + NumberFormat.getInstance(wfcDetailPart.getLocale()).parse(v.getStringValue()).intValue());
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						break;
+					case "f.iso":
+						params.add("" + Float.parseFloat(v.getStringValue()));
+
+						break;
+					case "f":
+						try {
+							params.add("" + NumberFormat.getInstance(wfcDetailPart.getLocale()).parse(v.getStringValue()).floatValue());
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						break;
+					case "d.iso":
+						try {
+							Date parsedDate = new SimpleDateFormat("yyyyMMdd").parse(v.getStringValue());
+							params.add(DateUtil.getDateString(parsedDate.toInstant(), wfcDetailPart.getLocale(), null));
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						break;
+					case "d":
+						try {
+							Date parsedDate = new SimpleDateFormat("ddMMyyyy").parse(v.getStringValue());
+							params.add(DateUtil.getDateString(parsedDate.toInstant(), wfcDetailPart.getLocale(), null));
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						break;
+
+					default:
+						// "s" gehört als Standard dazu!
+						params.add(v.getStringValue());
+						break;
+					}
 					params.add(v.getStringValue());
 				}
 				value = MessageFormat.format(value, params.toArray(new String[0]));
