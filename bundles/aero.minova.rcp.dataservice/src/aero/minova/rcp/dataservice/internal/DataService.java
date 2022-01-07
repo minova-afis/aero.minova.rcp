@@ -290,8 +290,11 @@ public class DataService implements IDataService {
 			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
 
 			for (TransactionResultEntry entry : transactionResults) {
-				SqlProcedureResult fromJson = entry.getSQLProcedureResult();
-				checkProcedureResult(fromJson, t.body(), entry.getId());
+				SqlProcedureResult entryResult = entry.getSQLProcedureResult();
+				entryResult = checkProcedureResult(entryResult, gson.toJson(entryResult), entry.getId());
+				if (entryResult == null) {
+					break;
+				}
 			}
 			return transactionResults;
 		});
@@ -325,17 +328,54 @@ public class DataService implements IDataService {
 		});
 	}
 
-	private SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
-		if ((fromJson.getReturnCode() == null || fromJson.getReturnCode() < 0) && fromJson.getResultSet() == null) {
+	public SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
+		ErrorObject e = checkForError(fromJson, procedureName);
+		if (e != null) {
+			postError(e);
+			return null;
+		}
+		return fromJson;
+	}
+
+	public ErrorObject checkForError(SqlProcedureResult fromJson, String procedureName) {
+
+		// SQL Fehler: Es gibt Resultset, als wert ADO | ....
+		// CAS Fehler: Es gibt Resultset, KEIN ADO im Wert
+
+		// Returncode >= null, nichts zu tun
+		if (fromJson != null && fromJson.getReturnCode() >= 0) {
+			return null;
+		}
+
+		// returncode negativ, kein resultSet
+		if (fromJson == null || fromJson.getResultSet() == null) {
+			Table error = new Table();
+			error.setName(ERROR);
+			error.addColumn(new Column("Message", DataType.STRING));
+			error.addRow(RowBuilder.newRow().withValue("msg.NoErrorMessageAvailable").create());
+			fromJson = new SqlProcedureResult();
+			fromJson.setResultSet(error);
+			fromJson.setReturnCode(-1);
+		}
+
+		fromJson = checkForSQLError(fromJson);
+
+		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
+			return new ErrorObject(fromJson.getResultSet(), username, procedureName);
+		}
+		return null;
+	}
+
+	public SqlProcedureResult checkForSQLError(SqlProcedureResult fromJson) {
+		String value = fromJson.getResultSet().getRows().get(0).getValue(0).getStringValue();
+		// SQL - Fehler
+		if (value.matches(".*ADO.*|")) {
 			String errorMessage = "";
-			Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
-			Matcher m = fullError.matcher(originalBody);
+			Pattern fullError = Pattern.compile(".*?\\|.*?\\|(.*?)\\|.*?");
+			Matcher m = fullError.matcher(value);
 			if (m.find()) {
-				errorMessage = m.group(0);
+				errorMessage = m.group(1);
 			}
-			Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
-			errorMessage = cutError.matcher(errorMessage).replaceAll("");
-			errorMessage = errorMessage.replaceAll("\"", "");
 			if (errorMessage.isBlank()) {
 				errorMessage = "msg.NoErrorMessageAvailable";
 			}
@@ -345,13 +385,7 @@ public class DataService implements IDataService {
 			error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
 			fromJson = new SqlProcedureResult();
 			fromJson.setResultSet(error);
-			// FehlerCode
 			fromJson.setReturnCode(-1);
-		}
-		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
-			ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, procedureName);
-			postError(e);
-			return null;
 		}
 		return fromJson;
 	}
