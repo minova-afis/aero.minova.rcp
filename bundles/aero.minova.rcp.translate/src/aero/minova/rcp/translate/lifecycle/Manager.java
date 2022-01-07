@@ -26,8 +26,12 @@ public class Manager {
 	public void postContextCreate(IEclipseContext context) {
 		context.set(TranslationService.LOCALE, CustomLocale.getLocale());
 		configureTranslationService(context);
-		context.set("aero.minova.rcp.applicationid", "SIS");
-		context.set("aero.minova.rcp.customerid", "MIN");
+		if (!context.containsKey("aero.minova.rcp.applicationid")) {
+			context.set("aero.minova.rcp.applicationid", "SIS");
+		}
+		if (!context.containsKey("aero.minova.rcp.customerid")) {
+			context.set("aero.minova.rcp.customerid", "MIN");
+		}
 		initPrefs();
 	}
 
@@ -46,7 +50,7 @@ public class Manager {
 
 	/**
 	 * Öffnet den "Structural changes"-Dialog wenn sich die Model-Version geändert hat
-	 * 
+	 *
 	 * @param translationService
 	 * @param context
 	 */
@@ -109,8 +113,9 @@ public class Manager {
 		boolean gridTabNavigation = preferences.getBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, true);
 		preferences.putBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, gridTabNavigation);
 		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
-		if ("".equals(fd))
+		if ("".equals(fd)) {
 			fd = null;
+		}
 		FontData fdC = (fd == null ? null : new FontData(fd));
 		if (fd != null) {
 			preferences.put(ApplicationPreferences.INDEX_FONT, (fdC.toString()));
