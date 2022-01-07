@@ -28,6 +28,9 @@ import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
+import aero.minova.rcp.form.setup.util.XBSUtil;
+import aero.minova.rcp.form.setup.xbs.Map;
+import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 
 public class MenuProcessor {
@@ -64,6 +67,18 @@ public class MenuProcessor {
 			String xbsContent = xbsFuture.get();
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
 			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
+
+			Node settingsNode = XBSUtil.getNodeWithName(preferences, "settings");
+			Map map = settingsNode.getMap();
+			if (map != null && map.getEntry() != null) {
+				for (aero.minova.rcp.form.setup.xbs.Map.Entry e : map.getEntry()) {
+					if (e.getKey().equalsIgnoreCase("CustomerID")) {
+						mApplication.getContext().set("aero.minova.rcp.customerid", e.getValue());
+					} else if (e.getKey().equalsIgnoreCase("ApplicationID")) {
+						mApplication.getContext().set("aero.minova.rcp.applicationid", e.getValue());
+					}
+				}
+			}
 		} catch (InterruptedException | ExecutionException | JAXBException e) {
 			e.printStackTrace();
 		}
