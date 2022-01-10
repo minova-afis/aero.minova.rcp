@@ -369,11 +369,10 @@ public class DataService implements IDataService {
 		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getValue().toString() + ".xml");
 		try {
 			Files.createDirectories(path.getParent());
-			FileUtil.createFile(path.toString());
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
 		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
@@ -394,7 +393,7 @@ public class DataService implements IDataService {
 			}
 
 			try {
-				FileWriter fw = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
+				FileWriter fw = new FileWriter(finalPath.toFile(), StandardCharsets.UTF_8);
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 				fw.write("<" + rootElement + ">");
 				for (Row r : fromJson.getResultSet().getRows()) {
@@ -407,7 +406,7 @@ public class DataService implements IDataService {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return path;
+			return finalPath;
 		});
 	}
 
@@ -420,12 +419,13 @@ public class DataService implements IDataService {
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
 		Path path = getStoragePath().resolve(fileName);
+
 		try {
 			Files.createDirectories(path.getParent());
-			FileUtil.createFile(path.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
 		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
@@ -453,15 +453,15 @@ public class DataService implements IDataService {
 
 			// Ansonsten byteArray in File schreiben
 			try {
-				OutputStream out = new FileOutputStream(path.toString());
+				OutputStream out = new FileOutputStream(finalPath.toString());
 				out.write(t.body());
 				out.close();
-				log("CAS Answer PDF:\n" + path);
+				log("CAS Answer PDF:\n" + finalPath);
 			} catch (IOException e) {
 				handleCASError(e, "PDF", true);
 			}
 
-			return path;
+			return finalPath;
 		});
 	}
 
@@ -832,6 +832,12 @@ public class DataService implements IDataService {
 
 	@Override
 	public String getSiteParameter(String key, String defaultVal) {
+		if (siteParameters.containsKey(key)) {
+			return siteParameters.get(key);
+		}
+
+		// Nochmal versuchen, die SiteParameter abzurufen, wenn Wert nicht gefunden wurde
+		initSiteParameters();
 		if (siteParameters.containsKey(key)) {
 			return siteParameters.get(key);
 		}
