@@ -841,6 +841,16 @@ public class DataService implements IDataService {
 		if (siteParameters.containsKey(key)) {
 			return siteParameters.get(key);
 		}
+
+		// Notification, dass Default-Wert genutzt wird
+		Table t = TableBuilder.newTable("Notification").withColumn("Message", DataType.STRING)//
+				.withColumn("s", DataType.STRING)//
+				.withColumn("s", DataType.STRING).create();
+		Row r = RowBuilder.newRow().withValue("msg.UsingDefaultTSiteParameterValue").withValue(key).withValue(defaultVal).create();
+		t.addRow(r);
+		ErrorObject eo = new ErrorObject(t, username);
+		postNotification(eo);
+
 		return defaultVal;
 	}
 
@@ -862,7 +872,12 @@ public class DataService implements IDataService {
 				+ value.getProcedureOrView());
 	}
 
-	public void postNotification(String message) {
+	/**
+	 * Zeigt eine Nachricht als Notification an. Die Nachricht kann ein String oder ein ErrorObject sein
+	 * 
+	 * @param message
+	 */
+	public void postNotification(Object message) {
 		Dictionary<String, Object> data = new Hashtable<>(2);
 		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWNOTIFICATION);
 		data.put(IEventBroker.DATA, message);
