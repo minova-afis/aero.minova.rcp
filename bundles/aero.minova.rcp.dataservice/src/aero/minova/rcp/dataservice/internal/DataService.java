@@ -833,6 +833,12 @@ public class DataService implements IDataService {
 		if (siteParameters.containsKey(key)) {
 			return siteParameters.get(key);
 		}
+
+		// Nochmal versuchen, die SiteParameter abzurufen, wenn Wert nicht gefunden wurde
+		initSiteParameters();
+		if (siteParameters.containsKey(key)) {
+			return siteParameters.get(key);
+		}
 		return defaultVal;
 	}
 
