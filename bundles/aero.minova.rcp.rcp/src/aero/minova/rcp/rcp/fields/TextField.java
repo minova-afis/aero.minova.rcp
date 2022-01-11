@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.fields;
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -22,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
@@ -38,7 +38,7 @@ public class TextField {
 		int style = SWT.BORDER;
 		if (field.getNumberRowsSpanned() > 1) {
 			// Maskenentwickler hat mehrzeilige Eingabe definiert
-			style |= SWT.MULTI | SWT.WRAP;
+			style |= SWT.WRAP;
 		}
 
 		Text text = TextFactory.newText(style).text("").create(composite);
@@ -74,7 +74,7 @@ public class TextField {
 
 		text.setData(Constants.CONTROL_FIELD, field);
 		CssData cssData = new CssData(CssType.TEXT_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
-				field.isFillToRight());
+				field.isFillToRight() || field.isFillHorizontal());
 		text.setData(CssData.CSSDATA_KEY, cssData);
 
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
@@ -87,15 +87,19 @@ public class TextField {
 
 		FormData fd = new FormData();
 		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		fd.left = new FormAttachment((column == 0) ? 25 : 75);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2 && field.isFillToRight()) {
+
+		if (field.isFillHorizontal() && field.getLabel() == null) {
+			fd.left = new FormAttachment((column == 0) ? 0 : 50);
+		} else {
+			fd.left = new FormAttachment((column == 0) ? 25 : 75);
+		}
+
+		if ((field.getNumberColumnsSpanned() > 2 && field.isFillToRight()) || field.isFillHorizontal() || column >= 2) {
 			fd.right = new FormAttachment(100, -MARGIN_BORDER);
 		} else {
-			fd.width = TEXT_WIDTH - MARGIN_BORDER * 2;
+			fd.right = new FormAttachment(50, -ICssStyler.CSS_SECTION_SPACING);
 		}
-		if (field.getNumberRowsSpanned() > 1) {
-			fd.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP * 2;
-		}
+
 		text.setLayoutData(fd);
 
 		return text;

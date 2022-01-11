@@ -89,6 +89,7 @@ public class ModelToViewModel {
 		if (field.getText() != null) {
 			MField f = new MTextField();
 			f.setFillToRight("toright".equals(field.getFill()));
+			f.setFillHorizontal("horizontal".equals(field.getFill()));
 			f.setMaxTextLength(field.getText().getLength());
 			return f;
 		}
