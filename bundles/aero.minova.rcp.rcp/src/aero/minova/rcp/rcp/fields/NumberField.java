@@ -83,8 +83,8 @@ public class NumberField {
 		text.setLayoutData(textFormData);
 		NumberFieldUtil.setMessage(text);
 
-		text.setData(CssData.CSSDATA_KEY,
-				new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), field.isFillToRight()));
+		text.setData(CssData.CSSDATA_KEY, new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+				field.isFillToRight() || field.isFillHorizontal()));
 
 		unit.setData(TRANSLATE_PROPERTY, unitText);
 		unit.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "DescriptionLabel");
