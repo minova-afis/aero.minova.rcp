@@ -557,6 +557,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
 
 		detailWidth = section.getCssStyler().getSectionWidth();
+		section.requestLayout();
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, MinovaSection section, MSection mSection) {
