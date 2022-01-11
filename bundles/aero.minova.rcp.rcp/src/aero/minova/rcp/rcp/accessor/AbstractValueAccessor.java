@@ -90,7 +90,7 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 	@Override
 	public Value setValue(Value value, boolean user) {
 		// Wenn der Focus auf dem Control liegt, setzen wir keinen Wert
-		if (isFocussed()) {
+		if (isFocussed() && user) {
 			return getDisplayValue();
 		}
 
