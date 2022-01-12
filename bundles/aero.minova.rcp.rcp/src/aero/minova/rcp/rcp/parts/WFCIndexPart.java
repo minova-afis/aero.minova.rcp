@@ -107,6 +107,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
+import aero.minova.rcp.rcp.util.LimitIndexDialog;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -338,9 +339,26 @@ public class WFCIndexPart extends WFCFormPart {
 			// clear the group by summary cache so the new summary calculation gets triggered
 			bodyLayerStack.getBodyDataLayer().clearCache();
 			Table table = map.get(mPerspective);
-			updateData(table.getRows());
+			List<Row> rows = table.getRows();
+			int limit = -1;
 
-			if (table.getRows().isEmpty()) {
+			// TODO: nur öffnen, wenn mehr als 1000 Sätze
+			LimitIndexDialog lid = new LimitIndexDialog(Display.getCurrent().getActiveShell(), translationService, rows.size());
+			lid.open();
+			limit = lid.getLimit();
+
+			// Abbrechen, (x), Escape -> nichts laden/ändern
+			if (limit == -2) {
+				return;
+			}
+
+			if (limit >= 0) {
+				rows = rows.subList(0, Math.min(limit, rows.size()));
+			}
+
+			updateData(rows);
+
+			if (rows.isEmpty()) {
 				MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
 						translationService.translate("@msg.NoRecordsLoaded", null));
 			}
