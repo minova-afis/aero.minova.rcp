@@ -538,6 +538,10 @@ public class SectionGrid {
 				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
 		}
+
+		if (gridConfiguration != null) {
+			gridConfiguration.translateLookups();
+		}
 	}
 
 	public void execButtonHandler(String btnId, String commandName) {

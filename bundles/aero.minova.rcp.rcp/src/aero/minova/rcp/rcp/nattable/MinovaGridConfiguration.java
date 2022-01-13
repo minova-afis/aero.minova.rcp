@@ -148,6 +148,10 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		contentProviderList.stream().forEach(GridLookupContentProvider::update);
 	}
 
+	public void translateLookups() {
+		contentProviderList.stream().forEach(GridLookupContentProvider::translateAllLookups);
+	}
+
 	private void configureLookupCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired,
 			String lookupTable) {
 		Style cellStyle = new Style();
