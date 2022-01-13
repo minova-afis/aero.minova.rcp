@@ -174,8 +174,8 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_CAS, translationService.translate("@Preferences.Timeout.TimeoutCas", null), null, 0.1,
 				DisplayType.INTEGER, 15));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION,
-				translationService.translate("@Preferences.Timeout.TimeoutOpenNotification", null), null, 0.2, DisplayType.INTEGER, 1));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION,
+//				translationService.translate("@Preferences.Timeout.TimeoutOpenNotification", null), null, 0.2, DisplayType.INTEGER, 1));
 
 //		Die Section Teiltabelle wird ausgeblendet. Die Preferences werden zu einem späteren Zeitpunkt teilweise wieder implementiert.
 //		psd = new PreferenceSectionDescriptor("Grid", translationService.translate("@Preferences.Grid", null), 0.6);
