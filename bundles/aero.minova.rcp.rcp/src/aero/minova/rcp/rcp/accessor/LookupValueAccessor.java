@@ -79,6 +79,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 		if (value instanceof LookupValue) {
 			LookupValue lv = (LookupValue) value;
+			((LookupComposite) control).getContentProvider().translateLookup(lv);
 			((LookupComposite) control).getDescription().setText(lv.description);
 			((LookupComposite) control).setText(lv.keyText);
 			((LookupComposite) control).setMessage("...");
