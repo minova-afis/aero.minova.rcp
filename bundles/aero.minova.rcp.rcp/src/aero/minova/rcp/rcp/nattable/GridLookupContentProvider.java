@@ -4,25 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.e4.core.services.translation.TranslationService;
+
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.LookupValue;
 
 public class GridLookupContentProvider {
 
+	TranslationService translationService;
 	List<LookupValue> values;
 	IDataService dataService;
-	String tablename;
+	String tableName;
 
-	public GridLookupContentProvider(IDataService dataService, String tablename) {
-		values = new ArrayList<>();
+	public GridLookupContentProvider(IDataService dataService, String tablename, TranslationService translationService) {
 		values = new ArrayList<>();
 		this.dataService = dataService;
-		this.tablename = tablename;
-		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tablename, true);
-		listLookup.thenAccept(l -> {
-			values.addAll(l);
-		});
-
+		this.tableName = tablename;
+		this.translationService = translationService;
+		update();
 	}
 
 	public List<LookupValue> getValues() {
@@ -30,11 +29,26 @@ public class GridLookupContentProvider {
 	}
 
 	public void update() {
-		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tablename, true);
+		CompletableFuture<List<LookupValue>> listLookup = dataService.resolveGridLookup(tableName, true);
 		listLookup.thenAcceptAsync(l -> {
 			values.clear();
+			if (tableName != null) {
+				for (LookupValue lv : l) {
+					translateLookup(lv);
+				}
+			}
 			values.addAll(l);
 		});
+	}
+
+	public void translateLookup(LookupValue lv) {
+		String translateKey = tableName + ".KeyText." + lv.keyLong;
+		String translated = translationService.translate("@" + tableName + ".KeyText." + lv.keyLong, null);
+		lv.keyText = translateKey.equals(translated) ? lv.keyText : translated;
+
+		translateKey = tableName + ".Description." + lv.keyLong;
+		translated = translationService.translate("@" + tableName + ".Description." + lv.keyLong, null);
+		lv.description = translateKey.equals(translated) ? lv.keyText : translated;
 	}
 
 }

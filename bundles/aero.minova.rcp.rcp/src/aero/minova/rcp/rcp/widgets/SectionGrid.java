@@ -424,7 +424,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService, translationService);
 		getNatTable().addConfiguration(gridConfiguration);
 		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
