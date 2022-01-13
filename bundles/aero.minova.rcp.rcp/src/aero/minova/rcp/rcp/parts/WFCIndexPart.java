@@ -3,9 +3,11 @@ package aero.minova.rcp.rcp.parts;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -102,8 +104,11 @@ import org.osgi.service.prefs.BackingStoreException;
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
@@ -166,6 +171,9 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private SelectionThread selectionThread;
 
+	private HashMap<String, List<LookupValue>> lookupsToTranslate = new HashMap<>();
+	private HashMap<String, Column> lookupColumnsToTranslate = new HashMap<>();
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -176,6 +184,16 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable = createNatTable(parent, form, getData(), selectionService, mPerspective.getContext());
 		loadPrefs(Constants.LAST_STATE, autoLoadIndex);
+
+		for (Column c : data.getColumns()) {
+			if (c.getTranslateTable() != null) {
+				lookupColumnsToTranslate.put(c.getName(), c);
+				CompletableFuture<List<LookupValue>> resolveGridLookup = dataService.resolveGridLookup(c.getTranslateTable(), false);
+				resolveGridLookup.thenApply(list -> {
+					return lookupsToTranslate.put(c.getName(), list);
+				});
+			}
+		}
 	}
 
 	@PersistState
@@ -338,6 +356,8 @@ public class WFCIndexPart extends WFCFormPart {
 			// clear the group by summary cache so the new summary calculation gets triggered
 			bodyLayerStack.getBodyDataLayer().clearCache();
 			Table table = map.get(mPerspective);
+
+			translateTable(table);
 			updateData(table.getRows());
 
 			if (table.getRows().isEmpty()) {
@@ -345,6 +365,43 @@ public class WFCIndexPart extends WFCFormPart {
 						translationService.translate("@msg.NoRecordsLoaded", null));
 			}
 		}
+	}
+
+	private void translateTable(Table table) {
+		for (Column c : table.getColumns()) {
+			if (lookupsToTranslate.containsKey(c.getName())) {
+				for (Row r : table.getRows()) {
+					String translateValue = lookupColumnsToTranslate.get(c.getName()).getTranslateValue();
+					String translateTable = lookupColumnsToTranslate.get(c.getName()).getTranslateTable();
+					String toTranslate = r.getValue(table.getColumnIndex(c.getName())).getStringValue();
+
+					List<LookupValue> lookups = lookupsToTranslate.get(c.getName());
+
+					String res = toTranslate;
+
+					if (translateValue.equalsIgnoreCase("KeyText")) {
+						for (LookupValue lv : lookups) {
+							if (lv.keyText.equalsIgnoreCase(toTranslate)) {
+								String translateKey = translateTable + ".KeyText." + lv.keyLong;
+								String translated = translationService.translate("@" + translateTable + ".KeyText." + lv.keyLong, null);
+								res = translateKey.equals(translated) ? lv.keyText : translated;
+							}
+						}
+					} else if (translateValue.equalsIgnoreCase("Description")) {
+						for (LookupValue lv : lookups) {
+							if (lv.description.equalsIgnoreCase(toTranslate)) {
+								String translateKey = translateTable + ".Description." + lv.keyLong;
+								String translated = translationService.translate("@" + translateTable + ".Description." + lv.keyLong, null);
+								res = translateKey.equals(translated) ? lv.keyText : translated;
+							}
+						}
+					}
+
+					r.setValue(new Value(res), table.getColumnIndex(c.getName()));
+				}
+			}
+		}
+
 	}
 
 	@Inject

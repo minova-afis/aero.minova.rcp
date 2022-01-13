@@ -320,6 +320,8 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="translateTable" use="optional" type="xs:string" />
+		<xs:attribute name="translateValue" use="optional" type="xs:string" />
 	</xs:complexType>
 	<xs:complexType name="field">
 		<xs:sequence>

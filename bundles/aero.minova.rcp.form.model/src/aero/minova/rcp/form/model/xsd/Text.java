@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/restriction&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
+ *       &lt;attribute name="translateTable" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="translateValue" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -37,6 +39,10 @@ public class Text {
 
     @XmlAttribute(name = "length")
     protected Integer length;
+    @XmlAttribute(name = "translateTable")
+    protected String translateTable;
+    @XmlAttribute(name = "translateValue")
+    protected String translateValue;
 
     /**
      * Ruft den Wert der length-Eigenschaft ab.
@@ -64,6 +70,54 @@ public class Text {
      */
     public void setLength(Integer value) {
         this.length = value;
+    }
+
+    /**
+     * Ruft den Wert der translateTable-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTranslateTable() {
+        return translateTable;
+    }
+
+    /**
+     * Legt den Wert der translateTable-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTranslateTable(String value) {
+        this.translateTable = value;
+    }
+
+    /**
+     * Ruft den Wert der translateValue-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTranslateValue() {
+        return translateValue;
+    }
+
+    /**
+     * Legt den Wert der translateValue-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTranslateValue(String value) {
+        this.translateValue = value;
     }
 
 }

@@ -24,6 +24,8 @@ public class Column {
 	boolean visible;
 	String lookupTable;
 	KeyType keyType;
+	private String translateTable;
+	private String translateValue;
 
 	@Override
 	public String toString() {
@@ -120,6 +122,22 @@ public class Column {
 
 	public void setKeyType(KeyType keyType) {
 		this.keyType = keyType;
+	}
+
+	public String getTranslateTable() {
+		return translateTable;
+	}
+
+	public void setTranslateTable(String translateTable) {
+		this.translateTable = translateTable;
+	}
+
+	public String getTranslateValue() {
+		return translateValue;
+	}
+
+	public void setTranslateValue(String translateValue) {
+		this.translateValue = translateValue;
 	}
 
 	@Override
