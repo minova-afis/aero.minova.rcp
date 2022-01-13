@@ -190,7 +190,11 @@ public class WFCIndexPart extends WFCFormPart {
 				lookupColumnsToTranslate.put(c.getName(), c);
 				CompletableFuture<List<LookupValue>> resolveGridLookup = dataService.resolveGridLookup(c.getTranslateTable(), false);
 				resolveGridLookup.thenApply(list -> {
-					return lookupsToTranslate.put(c.getName(), list);
+					List<LookupValue> newList = new ArrayList<>();
+					for (LookupValue lv : list) {
+						newList.add(new LookupValue(lv.keyLong, lv.keyText, lv.description));
+					}
+					return lookupsToTranslate.put(c.getName(), newList);
 				});
 			}
 		}
@@ -206,7 +210,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 * xxx.index.sortby (index,sortDirection(ASC|DESC);index2....); -> Sortierung <br>
 	 * xxx.index.groupby (expand[0,1];index;index2...); -> Gruppierung <br>
 	 * Ähnlich im SearchPart
-	 * 
+	 *
 	 * @param saveRowConfig
 	 * @param name
 	 */
