@@ -20,13 +20,14 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
+import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.util.Tools;
 
@@ -66,7 +67,8 @@ public class PrintUtil {
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
-				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
+				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+						translationService.translate("@msg.ErrorShowingFile", null), e);
 			}
 		}));
 	}

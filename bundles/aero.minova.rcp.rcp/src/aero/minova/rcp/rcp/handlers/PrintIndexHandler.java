@@ -37,9 +37,9 @@ import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
@@ -244,7 +244,8 @@ public class PrintIndexHandler {
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
-				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
+				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+						translationService.translate("@msg.ErrorShowingFile", null), e);
 			}
 
 		}
