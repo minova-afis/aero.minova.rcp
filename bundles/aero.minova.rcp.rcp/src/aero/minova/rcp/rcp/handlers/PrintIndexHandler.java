@@ -230,7 +230,7 @@ public class PrintIndexHandler {
 					PrintUtil.checkPreview(activePerspective, modelService, partService);
 				}
 
-				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
+				urlPDF = PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
 				if (!createXmlXsl) {
 					Files.delete(pathXSL);

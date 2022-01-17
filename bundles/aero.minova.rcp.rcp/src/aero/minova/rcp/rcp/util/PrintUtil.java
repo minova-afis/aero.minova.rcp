@@ -58,7 +58,7 @@ public class PrintUtil {
 
 				String xslPathNew = getXSLPathWithLocale(dataService, xslPath);
 
-				PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPathNew).toFile());
+				pdfFile = PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPathNew).toFile());
 
 				if (disablePreview) {
 					PrintUtil.showFile(pdfFile.toString(), null);
@@ -161,12 +161,13 @@ public class PrintUtil {
 	 * @param pdf
 	 * @param xml
 	 * @param xsl
+	 * @return
 	 * @throws TransformerException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void generatePDF(URL pdf, String xmlString, File stylesheet) throws IOException, SAXException, TransformerException {
-		PDFGenerator.createPdfFile(xmlString, stylesheet, pdf);
+	public static URL generatePDF(URL pdf, String xmlString, File stylesheet) throws IOException, SAXException, TransformerException {
+		return PDFGenerator.createPdfFile(xmlString, stylesheet, pdf);
 	}
 
 	/**
