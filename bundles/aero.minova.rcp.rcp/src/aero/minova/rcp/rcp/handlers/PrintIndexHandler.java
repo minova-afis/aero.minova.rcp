@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -41,6 +40,7 @@ import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.internal.FileUtil;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
@@ -215,13 +215,14 @@ public class PrintIndexHandler {
 			try {
 				Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title + "_Index.pdf");
 				Files.createDirectories(pathPDF.getParent());
-				createFile(pathPDF.toString());
+
+				pathPDF = Path.of(FileUtil.createFile(pathPDF.toString()));
 				URL urlPDF = pathPDF.toFile().toURI().toURL();
 
 				Path pathXML = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xml");
 				Path pathXSL = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xsl");
-				createFile(pathXML.toString());
-				createFile(pathXSL.toString());
+				pathXML = Path.of(FileUtil.createFile(pathXML.toString()));
+				pathXSL = Path.of(FileUtil.createFile(pathXSL.toString()));
 				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
@@ -258,26 +259,6 @@ public class PrintIndexHandler {
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * Erstellt eine Datei falls sie existiert, wird sie geleert.
-	 *
-	 * @param path
-	 */
-	public void createFile(String path) {
-		try {
-			File file = new File(path);
-			if (!file.exists()) {
-				file.createNewFile();
-			} else {
-				FileOutputStream writer = new FileOutputStream(path);
-				writer.write(("").getBytes());
-				writer.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
