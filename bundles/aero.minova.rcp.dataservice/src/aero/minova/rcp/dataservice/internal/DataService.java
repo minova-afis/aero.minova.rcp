@@ -401,8 +401,8 @@ public class DataService implements IDataService {
 				}
 				fw.write("</" + rootElement + ">");
 				fw.close();
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (IOException e) {
+				handleCASError(e, "XML", true, "msg.ErrorShowingFile");
 			}
 			return finalPath;
 		});
@@ -456,7 +456,7 @@ public class DataService implements IDataService {
 				out.close();
 				log("CAS Answer PDF:\n" + finalPath);
 			} catch (IOException e) {
-				handleCASError(e, "PDF", true);
+				handleCASError(e, "PDF", true, "msg.ErrorShowingFile");
 			}
 
 			return finalPath;
@@ -843,9 +843,13 @@ public class DataService implements IDataService {
 	}
 
 	private void handleCASError(Throwable ex, String method, boolean showErrorMessage) {
+		handleCASError(ex, method, showErrorMessage, "msg.WFCNoResponseServer");
+	}
+
+	private void handleCASError(Throwable ex, String method, boolean showErrorMessage, String message) {
 		log("CAS Error " + method + ":\n" + ex.getMessage());
 		if (showErrorMessage) {
-			showNoResposeServerError("msg.WFCNoResponseServer", ex);
+			showNoResposeServerError(message, ex);
 		}
 	}
 
