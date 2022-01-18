@@ -666,10 +666,12 @@ public class WFCDetailCASRequestsUtil {
 	private String formatMessage(ErrorObject et) {
 		Table errorTable = et.getErrorTable();
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
-		String messageproperty = "@" + vMessageProperty.getStringValue();
+		String messageproperty = "@" + vMessageProperty.getStringValue().strip();
 		String value = translationService.translate(messageproperty, null);
-		// Ticket number {0} is not numeric
-		if (errorTable.getColumnCount() > 1) {
+
+		if (value.equals(messageproperty) && errorTable.getColumnIndex("DEFAULT") != -1) { // Keine Übersetzung gefunden -> Default nutzen
+			value = errorTable.getRows().get(0).getValue(errorTable.getColumnIndex("DEFAULT")).getStringValue();
+		} else if (errorTable.getColumnCount() > 1) {// Ticket number {0} is not numeric
 
 			value = value.replaceAll("%(\\d*)", "{$1}"); // %n fürs Formattieren mit {n} ersetzen
 
