@@ -43,7 +43,6 @@ public class MenuProcessor {
 	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
 	private int menuId = 0;
 
-
 	@Inject
 	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication, IEclipseContext context) {
 
@@ -70,8 +69,8 @@ public class MenuProcessor {
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
 			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
 			Node settingsNode = XBSUtil.getNodeWithName(preferences, "settings");
-			Map map = settingsNode.getMap();
-			if (map != null && map.getEntry() != null) {
+			if (settingsNode != null && settingsNode.getMap() != null && settingsNode.getMap().getEntry() != null) {
+				Map map = settingsNode.getMap();
 				for (aero.minova.rcp.form.setup.xbs.Map.Entry e : map.getEntry()) {
 					if (e.getKey().equalsIgnoreCase("CustomerID")) {
 						context.set("aero.minova.rcp.customerid", e.getValue());

@@ -38,14 +38,9 @@ public class FileUtil {
 				}
 
 				// Ansonsten leeren String in das File schreiben
-				try {
-					FileOutputStream writer = new FileOutputStream(path);
-					writer.write(("").getBytes());
-					writer.close();
-				} catch (FileNotFoundException e2) {
-					// Wenn auch das nicht funktioniert, File mit Endung "_n+1" erstellen
-					return createFile(path, number + 1);
-				}
+				FileOutputStream writer = new FileOutputStream(path);
+				writer.write(("").getBytes());
+				writer.close();
 			}
 		} catch (IOException e) {
 			return createFile(path, number + 1);

@@ -153,7 +153,13 @@ public class MinovaSectionStyler implements ICssStyler {
 
 		// Höhe
 		if (cd.numberRowsSpanned > 1) {
-			fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing * 2;
+			// Mehrzeilige Textfelder verhalten sich unter Mac und Windows unterschiedlich
+			if (System.getProperty("os.name").startsWith("Mac OS")) {
+				fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing;
+				fd.top.offset = (int) (cd.row * rowHeight + sectionSpacing * 0.5);
+			} else {
+				fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing * 2;
+			}
 		}
 	}
 

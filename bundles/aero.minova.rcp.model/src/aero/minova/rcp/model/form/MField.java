@@ -27,12 +27,13 @@ public abstract class MField {
 	private String unitText;
 	private final int decimals;
 	private Integer sqlIndex;
-	private Integer numberColumnsSpanned = 2;
-	private Integer numberRowsSpanned = 1;
+	private int numberColumnsSpanned = 2;
+	private int numberRowsSpanned = 1;
 	private Double maximumValue;
 	private Double minimumValue;
 	private int maxTextLength;
 	private boolean fillToRight = false;
+	private boolean fillHorizontal = false;
 	private String lookupTable;
 	private String lookupProcedurePrefix;
 	private String lookupDescription;
@@ -176,19 +177,19 @@ public abstract class MField {
 		this.sqlIndex = sqlIndex;
 	}
 
-	public Integer getNumberColumnsSpanned() {
+	public int getNumberColumnsSpanned() {
 		return numberColumnsSpanned;
 	}
 
-	public void setNumberColumnsSpanned(Integer numberColumnsSpanned) {
+	public void setNumberColumnsSpanned(int numberColumnsSpanned) {
 		this.numberColumnsSpanned = numberColumnsSpanned;
 	}
 
-	public Integer getNumberRowsSpanned() {
+	public int getNumberRowsSpanned() {
 		return numberRowsSpanned;
 	}
 
-	public void setNumberRowsSpanned(Integer numberRowsSpanned) {
+	public void setNumberRowsSpanned(int numberRowsSpanned) {
 		this.numberRowsSpanned = numberRowsSpanned;
 	}
 
@@ -226,6 +227,14 @@ public abstract class MField {
 
 	public void setFillToRight(boolean fillToRight) {
 		this.fillToRight = fillToRight;
+	}
+
+	public boolean isFillHorizontal() {
+		return fillHorizontal;
+	}
+
+	public void setFillHorizontal(boolean fillHorizontal) {
+		this.fillHorizontal = fillHorizontal;
 	}
 
 	public String getLookupProcedurePrefix() {

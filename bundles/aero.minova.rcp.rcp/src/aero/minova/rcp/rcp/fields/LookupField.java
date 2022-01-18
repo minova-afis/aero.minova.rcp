@@ -69,7 +69,7 @@ public class LookupField {
 		lookupFormData.width = FieldUtil.TEXT_WIDTH;
 
 		// Lookup-Felder sollen immer genau eine Zeile hoch sein
-		CssData cssData = new CssData(CssType.TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), 1, field.isFillToRight());
+		CssData cssData = new CssData(CssType.TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), 1, field.isFillToRight() || field.isFillHorizontal());
 		lookupControl.setData(CssData.CSSDATA_KEY, cssData);
 
 		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
@@ -78,12 +78,12 @@ public class LookupField {
 
 		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
 		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
+		if (field.getNumberColumnsSpanned() == 4) {
 			descriptionLabelFormData.width = FieldUtil.MARGIN_LEFT * 2 + FieldUtil.COLUMN_WIDTH * 2;
 		} else {
 			descriptionLabelFormData.width = 0;
 		}
-		if (field.getNumberRowsSpanned() != null && field.getNumberRowsSpanned() > 1) { // ZB für Contact Lookups
+		if (field.getNumberRowsSpanned() > 1) { // ZB für Contact Lookups
 			descriptionLabelFormData.height = field.getNumberRowsSpanned() * FieldUtil.COLUMN_HEIGHT;
 			descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.TOP);
 		}
