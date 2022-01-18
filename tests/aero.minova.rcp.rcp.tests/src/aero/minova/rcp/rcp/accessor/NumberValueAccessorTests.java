@@ -13,6 +13,256 @@ import aero.minova.rcp.rcp.accessor.NumberValueAccessor.Result;
 
 class NumberValueAccessorTests {
 
+	// ================================================================================
+	// Testfälle aus Issue #1084
+	// ================================================================================
+
+	@Test
+	void testCompleteSelectionWindows() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"1", // insertion
+				0, // start
+				9, // end
+				49, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				0, // caretPosition
+				"12.345,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("1,00", result.text);
+		assertEquals(1, result.caretPosition);
+	}
+
+	@Test
+	void testEntfZeroFive() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				0, // start
+				1, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				0, // caretPosition
+				"0,50", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,50", result.text);
+		assertEquals(1, result.caretPosition);
+	}
+
+	@Test
+	void testEntfZeroZero() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				0, // start
+				1, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				0, // caretPosition
+				"0,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,00", result.text);
+		assertEquals(1, result.caretPosition);
+	}
+
+	@Test
+	void testEntfKomma() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				0, // start
+				1, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"0,50", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,50", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+
+	@Test
+	void testEntfAfterKomma() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				2, // start
+				3, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"0,50", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,00", result.text);
+		assertEquals(3, result.caretPosition);
+	}
+
+	@Test
+	void testEntfPunkt() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				0, // start
+				1, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"1.230,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("1.230,00", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+
+	@Test
+	void testIntCompleteSelection() {
+		MNumberField field = new MNumberField(0);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"1", // insertion
+				0, // start
+				5, // end
+				49, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				0, // caretPosition
+				"1.234", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("1", result.text);
+		assertEquals(1, result.caretPosition);
+	}
+
+	@Test
+	void testReplaceNumber() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"2", // insertion
+				3, // start
+				5, // end
+				50, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"1.111,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("112,00", result.text);
+		assertEquals(3, result.caretPosition);
+	}
+
+	@Test
+	void testEnterKommaZero() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				",", // insertion
+				1, // start
+				1, // end
+				44, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"0,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,00", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+
+	@Test
+	void testEnterKommaFive() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				",", // insertion
+				1, // start
+				1, // end
+				44, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"0,50", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,50", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+
+	@Test
+	void testNumberAfterKomma() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"2", // insertion
+				2, // start
+				2, // end
+				50, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"0,10", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,21", result.text);
+		assertEquals(3, result.caretPosition);
+	}
+
+	// ================================================================================
+	// "Normale" Testfälle
+	// ================================================================================
+
 	@Test
 	void testDecimalSeparatorGerman() {
 		MNumberField field = new MNumberField(2);
@@ -28,7 +278,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("9.000,00", result.text, "Text");
@@ -49,7 +299,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("9,00", result.text, "Text");
@@ -70,7 +320,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				2, // caretPosition
 				"99,95", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("9.999,95", result.text, "Text");
@@ -92,7 +342,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"0,000", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1,000", result.text, "Text");
@@ -115,7 +365,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"1,000", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("12,000", result.text, "Text");
@@ -138,7 +388,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				2, // caretPosition
 				"99,95", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -160,7 +410,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				2, // caretPosition
 				"1,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -182,7 +432,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"999,95", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -205,7 +455,7 @@ class NumberValueAccessorTests {
 				Locale.US, // locale
 				3, // caretPosition
 				"900.00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -227,7 +477,7 @@ class NumberValueAccessorTests {
 				Locale.US, // locale
 				3, // caretPosition
 				"900.00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals(new Value(9000.00), result.value);
@@ -248,7 +498,7 @@ class NumberValueAccessorTests {
 				Locale.US, // locale
 				3, // caretPosition
 				"900.000", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals(5, result.caretPosition);
@@ -269,7 +519,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"900,000", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -291,7 +541,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"100,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -314,7 +564,7 @@ class NumberValueAccessorTests {
 				Locale.US, // locale
 				3, // caretPosition
 				"100.00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 
@@ -337,7 +587,7 @@ class NumberValueAccessorTests {
 				Locale.GERMAN, // locale
 				3, // caretPosition
 				"100,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals(2, result.caretPosition);
@@ -364,7 +614,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"0,1000", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("0,1200", result.text, "Text");
@@ -387,7 +637,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				2, // caretPosition
 				"89.234,1", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("897.234,1", result.text, "Text");
@@ -410,7 +660,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"10,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("170,00", result.text, "Text");
@@ -433,7 +683,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.234,00", result.text, "Text");
@@ -456,7 +706,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				4, // caretPosition
 				"1,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("1,45", result.text, "Text");
@@ -479,7 +729,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("11.234,00", result.text, "Text");
@@ -502,7 +752,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("111.234,00", result.text, "Text");
@@ -525,7 +775,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.111.234,00", result.text, "Text");
@@ -548,7 +798,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.111.111.234,00", result.text, "Text");
@@ -571,7 +821,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("2.341.111,00", result.text, "Text");
@@ -594,7 +844,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("5,00", result.text, "Text");
@@ -617,7 +867,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"234,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.111.111.234,00", result.text, "Text");
@@ -640,7 +890,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"1,50", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals(2, result.caretPosition, "CaretPosition");
@@ -661,7 +911,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"1,52", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals(4, result.caretPosition, "CaretPosition");
@@ -682,7 +932,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"0,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("10,00", result.text, "Text");
@@ -705,7 +955,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"0,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1,00", result.text, "Text");
@@ -728,7 +978,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"0,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("100,00", result.text);
@@ -751,7 +1001,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"0,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("100,00", result.text);
@@ -774,7 +1024,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"12.345,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("12.345,00", result.text);
@@ -797,7 +1047,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				2, // caretPosition
 				"12.345,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("12.345,00", result.text);
@@ -820,7 +1070,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				6, // caretPosition
 				"12.345,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("12.345,00", result.text);
@@ -843,7 +1093,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				5, // caretPosition
 				"1,234", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1,234", result.text);
@@ -866,7 +1116,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				4, // caretPosition
 				"1,234", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1,238", result.text);
@@ -889,7 +1139,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("1.000,00", result.text);
@@ -912,7 +1162,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("100,00", result.text);
@@ -935,7 +1185,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("1.000.000,00", result.text);
@@ -958,7 +1208,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("1.000,65", result.text);
@@ -981,7 +1231,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				2, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("1.100,00", result.text);
@@ -1004,7 +1254,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				true//
 		);
 		assertEquals("15.100,00", result.text);
@@ -1027,7 +1277,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.565,00", result.text);
@@ -1050,7 +1300,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.565,00", result.text);
@@ -1073,7 +1323,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("15.123.465,00", result.text);
@@ -1096,7 +1346,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				7, // caretPosition
 				"1.565,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.565,06", result.text);
@@ -1119,7 +1369,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				4, // caretPosition
 				"123.456,78", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("12.356,78", result.text);
@@ -1142,7 +1392,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				4, // caretPosition
 				"12.356,78", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.236,78", result.text);
@@ -1165,7 +1415,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				3, // caretPosition
 				"12.356,78", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("12,78", result.text);
@@ -1188,7 +1438,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				8, // caretPosition
 				"1.234.567,89", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("123.456,89", result.text);
@@ -1211,7 +1461,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				6, // caretPosition
 				"12.356,78", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("123.561,78", result.text);
@@ -1234,7 +1484,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				5, // caretPosition
 				"1.234.567,89", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("1.234.567,89", result.text);
@@ -1257,7 +1507,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				0, // caretPosition
 				"1,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("0,00", result.text);
@@ -1280,7 +1530,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"1,00", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("0,00", result.text);
@@ -1303,7 +1553,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"0", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("10", result.text);
@@ -1326,7 +1576,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"0", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("54.321", result.text);
@@ -1349,7 +1599,7 @@ class NumberValueAccessorTests {
 				Locale.GERMANY, // locale
 				1, // caretPosition
 				"0", // textBefore
-				decimalFormatSymbols,//
+				decimalFormatSymbols, //
 				false//
 		);
 		assertEquals("87.654.321", result.text);
