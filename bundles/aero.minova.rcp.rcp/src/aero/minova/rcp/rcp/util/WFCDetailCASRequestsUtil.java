@@ -692,7 +692,6 @@ public class WFCDetailCASRequestsUtil {
 					break;
 				case "f.iso":
 					params.add("" + Float.parseFloat(v.getStringValue()));
-
 					break;
 				case "f":
 					try {
@@ -717,7 +716,8 @@ public class WFCDetailCASRequestsUtil {
 						e.printStackTrace();
 					}
 					break;
-
+				case "DEFAULT": // Spalte mit DEFAULT-String -> kein Param
+					break;
 				default:
 					// "s" oder ungültiger Spaltenname -> String
 					params.add(v.getStringValue());
