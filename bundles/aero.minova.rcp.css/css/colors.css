@@ -1,71 +1,49 @@
-CTabItem, LayoutComposite, ExpandableComposite,
-	ScrolledComposite, Canvas, DetailComposite, ToolBar, NatTable, Section  {
+Canvas, CTabItem, DetailComposite, ExpandableComposite, LayoutComposite,
+	MinovaSection, NatTable, ScrolledComposite, Section, ToolBar  {
 	background-color: COLOR-WIDGET-BACKGROUND;
-	color: #222222;
+	color: #404040;
 }
-Label, Section  {
-	color: #222222;
+Section, MinovaSection {
+	background-color: COLOR-WIDGET-BACKGROUND;
+	background-color-titlebar: COLOR-WIDGET-BACKGROUND;
+	border-color-titlebar: black;
+}
+Section  {
+	color: #404040;
 	background-color: inherit;
 }
-
-
-/* Für Winows wäre es gut, die Farbe der Buttons auf weiß setzten zu können #768*/
-Button {
-	color: #222222;
-	background-color: inherit;
-}
-
-Label.DescriptionLabel {
-	color: black;
-}
-
-
 Composite {
 	background-color: COLOR-WIDGET-BACKGROUND;
 }
 
-
-Section {
-	background-color: COLOR-WIDGET-BACKGROUND;
-	background-color-titlebar: COLOR-WIDGET-BACKGROUND;
-	/*background-color-gradient-titlebar: #e9e9e9;*/
-	border-color-titlebar: black;
-}
 CTabItem:selected {
 	background-color: white;
 }
 
-Text.Standard, LookupComposite.Standard, TextAssist.Standard {
-	background-color: white;
-	color: black;
+
+Label, Text, Button, Button.Description, Label.Description, Section.Description  {
+	color: #404040;
 }
 
-Text.ValueRequired, LookupComposite.ValueRequired, TextAssist.ValueRequired {
-	background-color: #FCD267;
-	color: black;
-}
 
-Text.InvalidValue, LookupComposite.InvalidValue, TextAssist.InvalidValue {
-	background-color: red;
-	color: black;
-}
-
+/*Verschiedene Feldfarben*/
 Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {
 	background-color: inherit;
 }
-
-Text#Console {
-	color: white;
-	background-color: black;
+Text.Standard, LookupComposite.Standard, TextAssist.Standard {
+	background-color: white;
+}
+Text.ValueRequired, LookupComposite.ValueRequired, TextAssist.ValueRequired {
+	background-color: #FCD267;
+}
+Text.InvalidValue, LookupComposite.InvalidValue, TextAssist.InvalidValue {
+	background-color: red;
 }
 
-/*
-
-Label.UnitText {
-	color: black;
-}
-*/
 Label#SplashLabel {
 	color: white;
-	background-color: inherit;
+}
+Text#Console {
+	background-color: black;
+	color: white;
 }

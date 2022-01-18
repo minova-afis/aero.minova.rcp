@@ -1,0 +1,171 @@
+/* Nattable für MacOS */
+NatTable {
+	color: #404040;
+	cell-background-color: white;
+	table-border-color: auto;
+	render-grid-lines: true;
+	grid-line-color: black;
+	grid-line-width: 1px;
+	font-weight: normal;
+	font-style: normal;
+	font-family: VERDANA;
+	tree-structure-painter: background tree;
+	row-height: auto;
+}
+
+/** #22441: kann jetzt doch wieder verwendet werden */
+NatTable:select {
+	painter-resolution: false;
+	/*tree-structure-painter: background padding tree;*/
+}
+
+NatTable > .COLUMN_HEADER {
+	cell-background-color: RGB(240, 240, 240);
+	render-grid-lines: true;
+	font-weight: normal;
+	font-style: normal;
+	font-family: VERDANA;
+	color: #404040;
+	text-align: left;
+}
+
+NatTable > .COLUMN_HEADER:select {
+	cell-background-color: RGB(240, 240, 240);
+	render-grid-lines: true;
+	font-weight: normal;
+	font-style: normal;
+	font-family: VERDANA;
+	color: #404040;
+	text-align: left;
+}
+
+NatTable > .BODY:select {
+    painter-resolution: false;
+	cell-background-color: yellow;
+	color: #404040;
+	font-weight: normal;
+	font-style: normal;
+	font-family: VERDANA;
+}
+
+NatTable > .selectionAnchor:select {
+    painter-resolution: false;
+	cell-background-color: yellow;
+	color: #404040;
+	font-style: normal;
+	font-family: VERDANA;
+}
+
+
+NatTable > .TREE_EXPANDED {
+	painter-resolution: false;
+	font-weight: bold;
+}
+NatTable > .TREE_EXPANDED:select {
+	painter-resolution: false;
+	font-weight: bold;
+}
+NatTable > .TREE_COLLAPSED {
+	painter-resolution: false;
+	font-weight: bold;
+}
+NatTable > .TREE_COLLAPSED:select {
+	painter-resolution: false;
+	font-weight: bold;
+}
+NatTable > .GROUP_BY_OBJECT {
+	painter-resolution: false;
+	font-weight: bold;
+}
+NatTable > .GROUP_BY_OBJECT:select {
+	painter-resolution: false;
+	font-weight: bold;
+}
+
+
+NatTable > .SummaryRow {
+	painter-resolution: false;
+	font-weight: bold;
+	cell-background-color: RGB(240, 240, 240);
+	text-align: left;
+}
+
+NatTable > .PercentModel {
+	converter: percentage;
+}
+
+NatTable > .BooleanModel {
+	text-align: center;
+	painter: background checkbox2;
+	converter: boolean;
+}
+NatTable > .BooleanModel:select {
+	text-align: center;
+	painter: background checkbox2;
+	converter: boolean;
+}
+
+
+NatTable > .DoubleModel {
+	text-align: right;
+	converter: double 1 5;
+}
+
+NatTable > .Decimal1Model {
+	text-align: right;
+	converter: double 1 1;
+}
+NatTable > .Decimal2Model {
+	text-align: right;
+	converter: double 2 2;
+}
+NatTable > .Decimal3Model {
+	text-align: right;
+	converter: double 3 3;
+}
+NatTable > .Decimal4Model {
+	text-align: right;
+	converter: double 4 4;
+}
+NatTable > .Decimal5Model {
+	text-align: right;
+	converter: double 5 5;
+}
+NatTable > .Decimal6Model {
+	text-align: right;
+	converter: double 6 6;
+}
+
+NatTable > .IntegerModel {
+	text-align: right;
+	converter: int;
+}
+NatTable > .BigIntModel {
+	text-align: right;
+	converter: int;
+}
+NatTable > .TristateModel {
+	text-align: center;
+	painter: background checkbox3;
+}
+NatTable > .TristateModel:select {
+	text-align: center;
+	painter: background checkbox3;
+}
+
+NatTable > .NoeditModel {
+	color: grey;
+}
+NatTable > .NoeditModel:select {
+	color: grey;
+}
+
+NatTable > .NUMBER_WITH_BACKGROUND {
+	text-align: right;
+	converter: int;
+	painter-resolution: false;
+}
+
+NatTable > .TEXT_WITH_BACKGROUND {
+	painter-resolution: false;
+}

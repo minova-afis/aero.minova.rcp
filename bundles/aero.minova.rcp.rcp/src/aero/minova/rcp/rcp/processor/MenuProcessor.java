@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -28,6 +29,9 @@ import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
+import aero.minova.rcp.form.setup.util.XBSUtil;
+import aero.minova.rcp.form.setup.xbs.Map;
+import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 
 public class MenuProcessor {
@@ -40,7 +44,7 @@ public class MenuProcessor {
 	private int menuId = 0;
 
 	@Inject
-	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication) {
+	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication, IEclipseContext context) {
 
 		this.modelService = modelService;
 		this.mApplication = mApplication;
@@ -64,6 +68,18 @@ public class MenuProcessor {
 			String xbsContent = xbsFuture.get();
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
 			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
+			Node settingsNode = XBSUtil.getNodeWithName(preferences, "settings");
+			if (settingsNode != null && settingsNode.getMap() != null && settingsNode.getMap().getEntry() != null) {
+				Map map = settingsNode.getMap();
+				for (aero.minova.rcp.form.setup.xbs.Map.Entry e : map.getEntry()) {
+					if (e.getKey().equalsIgnoreCase("CustomerID")) {
+						context.set("aero.minova.rcp.customerid", e.getValue());
+					} else if (e.getKey().equalsIgnoreCase("ApplicationID")) {
+						context.set("aero.minova.rcp.applicationid", e.getValue());
+					}
+				}
+			}
+
 		} catch (InterruptedException | ExecutionException | JAXBException e) {
 			e.printStackTrace();
 		}

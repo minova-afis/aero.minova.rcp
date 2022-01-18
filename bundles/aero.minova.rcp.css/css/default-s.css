@@ -33,3 +33,13 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	padding: 2;
 	/*row-height: 19;*/
 }
+
+MinovaSection {
+	date-width: 70px;
+	date-time-width: 100px;
+	number-width: 60px;
+	row-height: 20px;
+	section-spacing: 3px;
+	text-width: 100px;
+	time-width: 50px;
+}

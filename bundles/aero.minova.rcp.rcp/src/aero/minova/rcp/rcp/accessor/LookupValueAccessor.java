@@ -141,7 +141,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			List<LookupValue> l = listLookup.get();
 			up.getContentProvider().setValuesOnly(l);
 			if (l.size() == 1) {
-				field.setValue(l.get(0), false);
+				field.setValue(l.get(0), true);
 			}
 		} catch (InterruptedException | ExecutionException e) {}
 	}

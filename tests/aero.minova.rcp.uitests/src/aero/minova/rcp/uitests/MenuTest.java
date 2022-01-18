@@ -70,7 +70,7 @@ public class MenuTest {
 		SWTBotShell shell = bot.shell("Preferences");
 		assertNotNull(shell);
 		SWTBot childBot = new SWTBot(shell.widget);
-		SWTBotText currentWorkspaceText = childBot.text(2);
+		SWTBotText currentWorkspaceText = childBot.text(1);
 		assertNotNull(currentWorkspaceText);
 		assertNotNull(currentWorkspaceText.getText());
 		String pathWorkspace = currentWorkspaceText.getText();

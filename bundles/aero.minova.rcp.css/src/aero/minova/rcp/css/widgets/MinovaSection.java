@@ -1,8 +1,6 @@
-package aero.minova.rcp.rcp.widgets;
+package aero.minova.rcp.css.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -11,7 +9,11 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.css.ICssStyler;
+import aero.minova.rcp.css.MinovaSectionStyler;
+
 public class MinovaSection extends Section {
+	private ICssStyler cssStyler;
 
 	private final ImageHyperlink imageLink;
 
@@ -19,6 +21,8 @@ public class MinovaSection extends Section {
 
 	public MinovaSection(Composite parent, int style) {
 		super(parent, style);
+
+		cssStyler = new MinovaSectionStyler(this);
 
 		expandable = (style & ExpandableComposite.TWISTIE) != 0;
 
@@ -32,33 +36,13 @@ public class MinovaSection extends Section {
 		this.imageLink.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
 			public void linkActivated(final HyperlinkEvent e) {
-				setExpandState();
-			}
-
-		});
-
-		this.textLabel.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// Wollen nichts tun
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == SWT.SPACE) {
-					setExpandState();
+				if (!isExpanded()) {
+					setExpanded(true);
+				} else if (MinovaSection.this.getExpandable()) {
+					setExpanded(false);
 				}
 			}
 		});
-	}
-
-	public void setExpandState() {
-		if (!isExpanded()) {
-			setExpanded(true);
-		} else if (MinovaSection.this.getExpandable()) {
-			setExpanded(false);
-		}
 	}
 
 	public void setImage(final Image image) {
@@ -73,6 +57,13 @@ public class MinovaSection extends Section {
 		this.imageLink.requestLayout();
 	}
 
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		((MinovaSectionData) this.getLayoutData()).visible = visible;
+		this.getParent().requestLayout();
+	}
+
 	public boolean getExpandable() {
 		return expandable;
 	}
@@ -81,4 +72,11 @@ public class MinovaSection extends Section {
 		this.expandable = expandable;
 	}
 
+	/**
+	 * @return Style-Engine, der man die Properties geben kann
+	 * @author Wilfried Saak
+	 */
+	public ICssStyler getCssStyler() {
+		return cssStyler;
+	}
 }

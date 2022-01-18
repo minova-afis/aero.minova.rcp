@@ -32,14 +32,23 @@ public class Constants {
 	public static final String CONTROL_VALUE = "value";
 	public static final String CONTROL_ID = "id";
 	public static final String CONTROL_MDETAIL = "mDetail";
-	public static final String CONTROL_WIZARD = "wizard";
 	public static final String CONTROL_GRID_BUTTON_ID = "grid_button_id";
 	public static final String CONTROL_GRID_BUTTON_INSERT = "grid_button_insert";
 	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
+	public static final String CONTROL_GRID_BUTTON_HORIZONTALFILL = "grid_button_horizontalFill";
+
 	public static final String CONTROL_GRID_ID = "grid_id";
 	public static final String DETAIL_COMPOSITE = "DetailComposite";
+	public static final String DETAIL_LAYOUT = "DetailLayout";
+
+	public static final String CLAZZ = "clazz";
+	public static final String PARAMETER = "parameter";
+	public static final String WIZARD = "wizard";
+	public static final String PROCEDURE = "procedure";
+	public static final String GROUP_NAME = "GroupName";
+	public static final String GROUP_MENU = "GroupMenu";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
@@ -153,6 +162,7 @@ public class Constants {
 
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
+	public static final String SECTION_WIDTH = "SectionWidth";
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
 	public static final String OPTION_PAGE = "OptionPage";
@@ -165,6 +175,7 @@ public class Constants {
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_PRINTDETAIL = "aero.minova.rcp.rcp.command.printdetail";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL = "aero.minova.rcp.rcp.command.savedetail";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART = "aero.minova.rcp.rcp.command.selectsearchpart";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON = "aero.minova.rcp.rcp.command.dynamicbuttoncommand";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";

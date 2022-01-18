@@ -1,9 +1,8 @@
-/* TODO: sortieren */
+/* Nattable für Windows/Linux */
 NatTable {
 	color: black;
 	cell-background-color: white;
 	table-border-color: auto;
-	/*column-width: auto;*/
 	render-grid-lines: true;
 	grid-line-color: black;
 	grid-line-width: 1px;
@@ -91,11 +90,6 @@ NatTable > .SummaryRow {
 	text-align: left;
 }
 
-
-
-
-
-
 NatTable > .PercentModel {
 	converter: percentage;
 }
@@ -111,17 +105,6 @@ NatTable > .BooleanModel:select {
 	converter: boolean;
 }
 
-/* TODO: locale (erst mal wieder in StyleConfiguration)
-NatTable > .DateModel {
-	converter: date "dd.MM.yyyy";
-}
-NatTable > .TimeModel {
-	converter: date "HH:mm";
-}
-NatTable > .DateTimeModel {
-	converter: date;
-}
- */
 
 NatTable > .DoubleModel {
 	text-align: right;
@@ -161,11 +144,6 @@ NatTable > .BigIntModel {
 	text-align: right;
 	converter: int;
 }
-
-/* TODO: LookupModel */
-
-/* TODO: LookupHeaderModel */
-
 NatTable > .TristateModel {
 	text-align: center;
 	painter: background checkbox3;
@@ -174,8 +152,6 @@ NatTable > .TristateModel:select {
 	text-align: center;
 	painter: background checkbox3;
 }
-
-/* TODO: IconModel */
 
 NatTable > .NoeditModel {
 	color: grey;

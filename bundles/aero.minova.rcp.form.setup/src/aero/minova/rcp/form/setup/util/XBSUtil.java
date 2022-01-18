@@ -11,7 +11,7 @@ public class XBSUtil {
 
 	/**
 	 * Liefert die ERSTE Node mit dem angegebenen Namen aus den Preferences
-	 * 
+	 *
 	 * @param preferences
 	 *            aus der .xbs ausgelesenen Preferences
 	 * @param name
@@ -31,13 +31,13 @@ public class XBSUtil {
 
 	/**
 	 * Liefert die ERSTE Node mit angegebenen Namen aus der übergebenen Parentnode (wenn die Parentnode den Namen hat wird sie zurückgegeben )
-	 * 
+	 *
 	 * @param node
 	 * @param name
 	 * @return
 	 */
 	public static Node getNodeWithName(Node node, String name) {
-		if (node.getName().equals(name)) {
+		if (node.getName().equalsIgnoreCase(name)) {
 			return node;
 		}
 
@@ -71,7 +71,7 @@ public class XBSUtil {
 	/**
 	 * Liefert die Map mit den Einstellungen für die gesamte Anwendung zurück. <br>
 	 * ACHTUNG: Geht aktuell davon aus, das diese immer im zweiten Knoten liegt! Muss evtl angepasst werden
-	 * 
+	 *
 	 * @param preferences
 	 * @return
 	 */
