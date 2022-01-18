@@ -87,7 +87,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		if (!insertion.matches("[a-zA-Z]+")) {
+		if (insertion.matches("[0-9]+") || insertion.isBlank()) {
 			Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
 
 			verificationActive = true;
@@ -333,9 +333,11 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				if (start != end) {
 					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
 					if (decimals != 0 && !insertion.contains("" + dfs.getDecimalSeparator())) {
-						newCaretPosition = caretPosition + formatInsertion.length() - 1 - decimals;
+						newCaretPosition = start + formatInsertion.length() - 1 - decimals;
+					} else if (start + end == textBefore.length()) {
+						newCaretPosition = start + formatInsertion.length();
 					} else {
-						newCaretPosition = caretPosition + formatInsertion.length() + countGroupingSeperator;
+						newCaretPosition = start + formatInsertion.length() + countGroupingSeperator;
 					}
 
 				} else if (text.length() == textBefore.length() + insertion.length()) {
