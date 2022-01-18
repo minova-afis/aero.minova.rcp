@@ -100,15 +100,15 @@ public class PrintDetailHandler {
 	@CanExecute
 	public boolean canExecute(MPart mpart, MPerspective mPerspective) {
 
-		String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
-		String procedureName = procedureNames.get(maskName);
-		String reportName = reportNames.get(maskName);
-		String rootElement = rootElements.get(maskName);
-
 		// Überprüfen, ob reports Ordner geladen wurde
 		if (!reportsFolderExists) {
 			return false;
 		}
+
+		String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
+		String procedureName = procedureNames.get(maskName);
+		String reportName = reportNames.get(maskName);
+		String rootElement = rootElements.get(maskName);
 
 		// Wenn diese Maske noch nicht geöffnet wurde application.xbs überprüfen
 		if (!checkedMasks.contains(maskName)) {
@@ -167,29 +167,23 @@ public class PrintDetailHandler {
 
 	@Execute
 	public void execute(MPart mpart, MWindow window, EModelService modelService, EPartService partService, MPerspective mPerspective) {
-		try {
-			if (!(mpart.getObject() instanceof WFCDetailPart)) {
-				return;
-			}
-
-			// Keylong-Wert finden
-			String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
-			WFCDetailPart wfcDetail = (WFCDetailPart) mpart.getObject();
-			MField field = wfcDetail.getDetail().getField("KeyLong");
-			int integerValue = field.getValue().getIntegerValue();
-
-			// Tabelle ans CAS aufbauen
-			Table table = TableBuilder.newTable(procedureNames.get(maskName)).withColumn("KeyLong", DataType.STRING).create();
-			Row row = RowBuilder.newRow().withValue("" + integerValue).create();
-			table.addRow(row);
-
-			PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
-					"reports/" + reportNames.get(maskName), "outputReports/" + maskName.replace(".xml", "") + "_" + integerValue + "_Detail.pdf", mPerspective,
-					disablePreview);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
+		if (!(mpart.getObject() instanceof WFCDetailPart)) {
+			return;
 		}
-	}
 
+		// Keylong-Wert finden
+		String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
+		WFCDetailPart wfcDetail = (WFCDetailPart) mpart.getObject();
+		MField field = wfcDetail.getDetail().getField("KeyLong");
+		int integerValue = field.getValue().getIntegerValue();
+
+		// Tabelle ans CAS aufbauen
+		Table table = TableBuilder.newTable(procedureNames.get(maskName)).withColumn("KeyLong", DataType.STRING).create();
+		Row row = RowBuilder.newRow().withValue("" + integerValue).create();
+		table.addRow(row);
+
+		PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
+				"reports/" + reportNames.get(maskName), "outputReports/" + maskName.replace(".xml", "") + "_" + integerValue + "_Detail.pdf", mPerspective,
+				disablePreview);
+	}
 }

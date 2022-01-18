@@ -20,13 +20,14 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
+import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.util.Tools;
 
@@ -57,7 +58,7 @@ public class PrintUtil {
 
 				String xslPathNew = getXSLPathWithLocale(dataService, xslPath);
 
-				PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPathNew).toFile());
+				pdfFile = PrintUtil.generatePDF(pdfFile, xmlString, dataService.getStoragePath().resolve(xslPathNew).toFile());
 
 				if (disablePreview) {
 					PrintUtil.showFile(pdfFile.toString(), null);
@@ -66,7 +67,8 @@ public class PrintUtil {
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
-				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
+				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+						translationService.translate("@msg.ErrorShowingFile", null), e);
 			}
 		}));
 	}
@@ -159,12 +161,13 @@ public class PrintUtil {
 	 * @param pdf
 	 * @param xml
 	 * @param xsl
+	 * @return
 	 * @throws TransformerException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void generatePDF(URL pdf, String xmlString, File stylesheet) throws IOException, SAXException, TransformerException {
-		PDFGenerator.createPdfFile(xmlString, stylesheet, pdf);
+	public static URL generatePDF(URL pdf, String xmlString, File stylesheet) throws IOException, SAXException, TransformerException {
+		return PDFGenerator.createPdfFile(xmlString, stylesheet, pdf);
 	}
 
 	/**

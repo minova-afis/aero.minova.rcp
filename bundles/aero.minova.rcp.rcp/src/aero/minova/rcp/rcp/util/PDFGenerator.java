@@ -19,7 +19,10 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.eclipse.core.runtime.Path;
 import org.xml.sax.SAXException;
+
+import aero.minova.rcp.dataservice.internal.FileUtil;
 
 /**
  * Generate a PDF file using XML data and XSLT stylesheets
@@ -28,8 +31,11 @@ public class PDFGenerator {
 
 	private PDFGenerator() {}
 
-	public static void createPdfFile(String xmlDataString, File stylesheet, URL pdf) throws IOException, SAXException, TransformerException {
+	public static URL createPdfFile(String xmlDataString, File stylesheet, URL pdf) throws IOException, SAXException, TransformerException {
 		System.out.println("Create pdf file ...");
+
+		// File erstellen -> bei Fehler mit "_1", "_2", ...
+		pdf = new Path(FileUtil.createFile(pdf.getFile())).toFile().toURI().toURL();
 
 		FileOutputStream pdfOutputStream = new FileOutputStream(pdf.getFile());
 
@@ -56,6 +62,7 @@ public class PDFGenerator {
 
 		pdfOutputStream.flush();
 		pdfOutputStream.close();
-	}
 
+		return pdf;
+	}
 }
