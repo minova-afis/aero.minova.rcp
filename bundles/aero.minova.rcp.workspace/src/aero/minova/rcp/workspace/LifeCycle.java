@@ -63,7 +63,9 @@ public class LifeCycle {
 		ImageDescriptor imageDefault = ImageUtil.getImageDefault("wfc.application/16x16.png");
 		ImageDescriptor imageDefault2 = ImageUtil.getImageDefault("wfc.application/32x32.png");
 		ImageDescriptor imageDefault3 = ImageUtil.getImageDefault("wfc.application/64x64.png");
-		WorkspaceDialog.setDefaultImages(new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage() });
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDefault("wfc.application/256x256.png");
+		WorkspaceDialog.setDefaultImages(
+				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
