@@ -20,11 +20,14 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
@@ -57,9 +60,15 @@ public class LifeCycle {
 		// Versuchen über Commandline-Argumente einzuloggen, für UI-Tests genutzt
 		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
 
+		ImageDescriptor imageDefault = ImageUtil.getImageDefault("wfc.application/16x16.png");
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDefault("wfc.application/32x32.png");
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDefault("wfc.application/64x64.png");
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDefault("wfc.application/256x256.png");
+		WorkspaceDialog.setDefaultImages(
+				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
+
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
-
 			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, logger, sync);
 
 			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
@@ -83,7 +92,7 @@ public class LifeCycle {
 
 	/**
 	 * Versuchen über Default-Daten einzuloggen. Bei Fehlschlag wird Login-Dialog geöffnet
-	 * 
+	 *
 	 * @param workspaceLocation
 	 * @param workspaceDialog
 	 * @return
@@ -207,7 +216,8 @@ public class LifeCycle {
 				Files.createFile(resolve);
 				Files.writeString(resolve, modelVersionPlugin);
 
-				// Wenn das ModelVersion.txt file nicht existiert ist es ein neuer Workspace -> readString == null -> Meldung nicht anzeigen und workspace nicht
+				// Wenn das ModelVersion.txt file nicht existiert ist es ein neuer Workspace ->
+				// readString == null -> Meldung nicht anzeigen und workspace nicht
 				// löschen
 				if (readString != null) {
 					Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
@@ -223,7 +233,7 @@ public class LifeCycle {
 	/**
 	 * Wir löschen auch die Einstellungen, die für das persistieren der angehefteten Toolbars zuständig sind, da es sonst bei -clearPersistedState und einer
 	 * Änderung der ModelVersion Probleme gibt (Siehe Issue #703)
-	 * 
+	 *
 	 * @param workspaceLocation
 	 */
 	private void deleteCustomPrefs(URI workspaceLocation) {
