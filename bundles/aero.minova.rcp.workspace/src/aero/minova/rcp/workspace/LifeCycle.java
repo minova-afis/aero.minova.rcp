@@ -21,11 +21,7 @@ import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -65,7 +61,9 @@ public class LifeCycle {
 		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
 
 		ImageDescriptor imageDefault = ImageUtil.getImageDefault("wfc.application/16x16.png");
-		WorkspaceDialog.setDefaultImages(new Image[] { imageDefault.createImage()});
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDefault("wfc.application/32x32.png");
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDefault("wfc.png");
+		WorkspaceDialog.setDefaultImages(new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage() });
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
@@ -101,8 +99,7 @@ public class LifeCycle {
 		try {
 			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
 			if (!Platform.getInstanceLocation().isSet()) {
-				Platform.getInstanceLocation()
-						.set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+				Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
 
 				try {
 					workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
@@ -125,8 +122,7 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Überprüfen, ob die Default-Login-Daten gültig sind. Ansonsten Öffnen des
-	 * Default-Workspaces
+	 * Überprüfen, ob die Default-Login-Daten gültig sind. Ansonsten Öffnen des Default-Workspaces
 	 * 
 	 * @param workspaceLocation
 	 * @param workspaceDialog
@@ -134,8 +130,7 @@ public class LifeCycle {
 	 * @return
 	 * @throws StorageException
 	 */
-	private URI checkDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog, ISecurePreferences sPrefs)
-			throws StorageException {
+	private URI checkDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog, ISecurePreferences sPrefs) throws StorageException {
 		String username = sPrefs.get(WorkspaceAccessPreferences.USER, null);
 		String pw = sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null);
 		String url = sPrefs.get(WorkspaceAccessPreferences.URL, null);
@@ -157,8 +152,7 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Versucht User, PW und URL aus commandline auszulesen. Wenn erfolgreich,
-	 * werden diese genutzt und es öffnet sich kein Login-Dialog
+	 * Versucht User, PW und URL aus commandline auszulesen. Wenn erfolgreich, werden diese genutzt und es öffnet sich kein Login-Dialog
 	 * 
 	 * @param workbenchContext
 	 * @return
@@ -199,10 +193,8 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Vergleicht die ModelVersion mit der Datei die in der Application mitgeliefert
-	 * wird. Ist diese Datei in der Workspacelocation nicht vorhanden, müssen wir in
-	 * jedem Fall clearPersistedState aufrufen. Ist die Datei vorhanden aber hat
-	 * eine zu alte Version gilt das Gleiche. Andernfalls machen nichts!
+	 * Vergleicht die ModelVersion mit der Datei die in der Application mitgeliefert wird. Ist diese Datei in der Workspacelocation nicht vorhanden, müssen wir
+	 * in jedem Fall clearPersistedState aufrufen. Ist die Datei vorhanden aber hat eine zu alte Version gilt das Gleiche. Andernfalls machen nichts!
 	 */
 	private void checkModelVersion(URI workspaceLocation, IEclipseContext workbenchContext) {
 		// lese WorkSpaceFile aus der WorkSpaceLocation
@@ -226,8 +218,7 @@ public class LifeCycle {
 				// readString == null -> Meldung nicht anzeigen und workspace nicht
 				// löschen
 				if (readString != null) {
-					Files.deleteIfExists(Path.of(workspaceLocation)
-							.resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
+					Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
 					deleteCustomPrefs(workspaceLocation);
 					workbenchContext.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, true);
 				}
@@ -238,28 +229,26 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Wir löschen auch die Einstellungen, die für das persistieren der angehefteten
-	 * Toolbars zuständig sind, da es sonst bei -clearPersistedState und einer
+	 * Wir löschen auch die Einstellungen, die für das persistieren der angehefteten Toolbars zuständig sind, da es sonst bei -clearPersistedState und einer
 	 * Änderung der ModelVersion Probleme gibt (Siehe Issue #703)
 	 *
 	 * @param workspaceLocation
 	 */
 	private void deleteCustomPrefs(URI workspaceLocation) {
 		try {
-			Files.deleteIfExists(Path.of(workspaceLocation).resolve(
-					".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.keptperspectives.prefs"));
-			Files.deleteIfExists(Path.of(workspaceLocation).resolve(
-					".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.toolbarorder.prefs"));
-			Files.deleteIfExists(Path.of(workspaceLocation).resolve(
-					".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.detailsections.prefs"));
+			Files.deleteIfExists(Path.of(workspaceLocation)
+					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.keptperspectives.prefs"));
+			Files.deleteIfExists(
+					Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.toolbarorder.prefs"));
+			Files.deleteIfExists(Path.of(workspaceLocation)
+					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.detailsections.prefs"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Lädt aus dem aero.minova.rcp.workspaceplugin den Inhalt aus der
-	 * ModelVersion.txt. Diese stellt die aktuelle Modelversion bereit.
+	 * Lädt aus dem aero.minova.rcp.workspaceplugin den Inhalt aus der ModelVersion.txt. Diese stellt die aktuelle Modelversion bereit.
 	 *
 	 * @return
 	 */
