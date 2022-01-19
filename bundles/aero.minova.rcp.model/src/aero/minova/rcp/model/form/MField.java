@@ -50,6 +50,7 @@ public abstract class MField {
 	// Wenn canBeValid = false, dann ist das Feld aufgrund einer Berechnung auf falsch gesetzt
 	private boolean canBeValid = true;
 	private boolean primary = false;
+	private boolean keyTypeUser = false;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -443,5 +444,13 @@ public abstract class MField {
 
 	public void setPrimary(boolean primary) {
 		this.primary = primary;
+	}
+
+	public boolean isKeyTypeUser() {
+		return keyTypeUser;
+	}
+
+	public void setKeyTypeUser(boolean keyTypeUser) {
+		this.keyTypeUser = keyTypeUser;
 	}
 }

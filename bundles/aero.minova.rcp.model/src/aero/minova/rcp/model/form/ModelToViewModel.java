@@ -28,6 +28,7 @@ public class ModelToViewModel {
 		}
 
 		f.setPrimary(KeyType.PRIMARY.toString().equalsIgnoreCase(field.getKeyType()));
+		f.setKeyTypeUser(KeyType.USER.toString().equalsIgnoreCase(field.getKeyType()));
 
 		return f;
 	}
