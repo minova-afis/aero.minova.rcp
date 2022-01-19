@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -47,13 +48,15 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private List<String> readOnlyColumns;
 	private IConfigRegistry configRegistry;
 	private List<GridLookupContentProvider> contentProviderList;
+	private TranslationService translationService;
 
-	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService) {
+	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService, TranslationService translationService) {
 		this.columns = columns;
 		this.grid = grid;
 		this.dataService = dataService;
 		this.readOnlyColumns = new ArrayList<>();
 		contentProviderList = new ArrayList<>();
+		this.translationService = translationService;
 		initGridFields();
 	}
 
@@ -145,13 +148,17 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		contentProviderList.stream().forEach(GridLookupContentProvider::update);
 	}
 
+	public void translateLookups() {
+		contentProviderList.stream().forEach(GridLookupContentProvider::translateAllLookups);
+	}
+
 	private void configureLookupCell(IConfigRegistry configRegistry, int columnIndex, String configLabel, boolean isReadOnly, boolean isRequired,
 			String lookupTable) {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.LEFT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
 
-		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable);
+		GridLookupContentProvider contentProvider = new GridLookupContentProvider(dataService, lookupTable, translationService);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new LookupDisplayConverter(contentProvider), DisplayMode.NORMAL,
 				configLabel + columnIndex);
 

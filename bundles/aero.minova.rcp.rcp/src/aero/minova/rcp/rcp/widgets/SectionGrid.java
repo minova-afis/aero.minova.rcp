@@ -424,7 +424,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService, translationService);
 		getNatTable().addConfiguration(gridConfiguration);
 		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
@@ -537,6 +537,10 @@ public class SectionGrid {
 			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
 				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
 			}
+		}
+
+		if (gridConfiguration != null) {
+			gridConfiguration.translateLookups();
 		}
 	}
 

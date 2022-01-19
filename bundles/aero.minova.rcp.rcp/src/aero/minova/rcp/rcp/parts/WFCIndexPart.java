@@ -188,7 +188,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 * xxx.index.sortby (index,sortDirection(ASC|DESC);index2....); -> Sortierung <br>
 	 * xxx.index.groupby (expand[0,1];index;index2...); -> Gruppierung <br>
 	 * Ähnlich im SearchPart
-	 * 
+	 *
 	 * @param saveRowConfig
 	 * @param name
 	 */
