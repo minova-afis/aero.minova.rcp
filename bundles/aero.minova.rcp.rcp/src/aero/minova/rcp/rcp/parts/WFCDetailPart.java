@@ -121,6 +121,7 @@ import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
+import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
@@ -543,6 +544,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					ToolBar bar = (ToolBar) textClient;
 					ToolItem tItem = new ToolItem(bar, SWT.PUSH);
 					tItem.setImage(image);
+					tItem.setData(FieldUtil.TRANSLATE_PROPERTY, section.getData(FieldUtil.TRANSLATE_PROPERTY));
+					tItem.setToolTipText(translationService.translate((String) section.getData(FieldUtil.TRANSLATE_PROPERTY), null));
+
 					tItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(t -> {
 						section.setVisible(true);
 						tItem.dispose();
@@ -723,6 +727,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			} else if (item instanceof ToolItem) {
 				((ToolItem) item).setToolTipText(translationService.translate(btn.getText(), null));
 			}
+			item.setData(FieldUtil.TRANSLATE_PROPERTY, btn.getText());
 		}
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
 			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
