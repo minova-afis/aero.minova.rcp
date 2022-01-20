@@ -79,4 +79,8 @@ public class MinovaSection extends Section {
 	public ICssStyler getCssStyler() {
 		return cssStyler;
 	}
+
+	public ImageHyperlink getImageLink() {
+		return imageLink;
+	}
 }

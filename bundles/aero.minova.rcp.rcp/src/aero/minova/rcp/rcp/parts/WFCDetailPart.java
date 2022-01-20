@@ -51,8 +51,11 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -186,6 +189,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	MApplication mApplication;
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
 	private ScrolledComposite scrolled;
+
+	private MinovaSection headSection;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -526,8 +531,28 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = section;
 		} else {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section.getImageLink().addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+					section.setVisible(false);
+					Image image = section.getImageLink().getImage();
+					Control textClient = headSection.getTextClient();
+					ToolBar bar = (ToolBar) textClient;
+					ToolItem tItem = new ToolItem(bar, SWT.PUSH);
+					tItem.setImage(image);
+					tItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(t -> {
+						section.setVisible(true);
+						tItem.dispose();
+						bar.requestLayout();
+						headSection.requestLayout();
+					}));
+					bar.requestLayout();
+					headSection.requestLayout();
+				}
+			});
 		}
 		section.setLayoutData(sectionData);
 
