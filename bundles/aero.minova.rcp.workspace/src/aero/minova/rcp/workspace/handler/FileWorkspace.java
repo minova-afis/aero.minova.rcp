@@ -21,6 +21,7 @@ import java.util.prefs.Preferences;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
 
+import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
 
 @SuppressWarnings("restriction")
@@ -37,8 +38,7 @@ public class FileWorkspace extends WorkspaceHandler {
 	}
 
 	@Override
-	public boolean checkConnection(String username, String password, String applicationArea, Boolean setAsDefault)
-			throws WorkspaceException {
+	public boolean checkConnection(String username, String password, String applicationArea, Boolean setAsDefault) throws WorkspaceException {
 		// Verbindungswerte zurücksetzen
 		workspaceData.setUsername(username);
 		workspaceData.setPassword(password);
@@ -47,19 +47,16 @@ public class FileWorkspace extends WorkspaceHandler {
 			// Existenz des Hauptverzeichnisses prüfen
 			File configDir = new File(workspaceData.getConnection().toURI());
 			if (!configDir.exists()) {
-				throw new WorkspaceException(
-						MessageFormat.format("Path {0} does not exist!", configDir.getAbsolutePath()));
+				throw new WorkspaceException(MessageFormat.format("Path {0} does not exist!", configDir.getAbsolutePath()));
 			}
 			if (!configDir.isDirectory()) {
-				throw new WorkspaceException(
-						MessageFormat.format("File {0} is not a directory!", configDir.getAbsolutePath()));
+				throw new WorkspaceException(MessageFormat.format("File {0} is not a directory!", configDir.getAbsolutePath()));
 			}
 
 			// Unterverzeichnis für die Anwendung überprüfen
 			File appDir = new File(configDir.getAbsolutePath() + "/Program Files/application");
 			if (!appDir.exists()) {
-				throw new WorkspaceException(
-						MessageFormat.format("Application Folder {0} does not exist!", appDir.getAbsolutePath()));
+				throw new WorkspaceException(MessageFormat.format("Application Folder {0} does not exist!", appDir.getAbsolutePath()));
 			}
 
 			// Anwendungsdefinition prüfen
@@ -76,8 +73,7 @@ public class FileWorkspace extends WorkspaceHandler {
 				} catch (IOException | BackingStoreException e) {
 					e.printStackTrace();
 				}
-				throw new WorkspaceException(MessageFormat.format("application.xbs does not exist in folder {0}!",
-						appDir.getAbsolutePath()));
+				throw new WorkspaceException(MessageFormat.format("application.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 			}
 
 			// Anwendungsdefinition einlesen
@@ -106,8 +102,7 @@ public class FileWorkspace extends WorkspaceHandler {
 				} catch (IOException | BackingStoreException e) {
 					e.printStackTrace();
 				}
-				throw new WorkspaceException(
-						MessageFormat.format("connection.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
+				throw new WorkspaceException(MessageFormat.format("connection.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 			}
 
 			// Datenbankdefinition einlesen
@@ -146,8 +141,7 @@ public class FileWorkspace extends WorkspaceHandler {
 					connection = DriverManager.getConnection(connectionString, username, password);
 				}
 			} catch (SQLException e) {
-				throw new WorkspaceException(MessageFormat.format("No connection to server {0} for user {1} possible ",
-						connectionString, username));
+				throw new WorkspaceException(MessageFormat.format("No connection to server {0} for user {1} possible ", connectionString, username));
 			}
 
 			// Benutzername in der DB auslesen
@@ -162,8 +156,7 @@ public class FileWorkspace extends WorkspaceHandler {
 				statement.close();
 				connection.close();
 			} catch (SQLException e) {
-				throw new WorkspaceException(
-						MessageFormat.format("Error retrieving username please try statement ' {0}'", sqlQuery));
+				throw new WorkspaceException(MessageFormat.format("Error retrieving username please try statement ' {0}'", sqlQuery));
 			}
 
 			// Wir sind erfolgreich an der Datenabnk angemeldet
@@ -188,7 +181,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			String defaultPath = System.getProperty("user.home");
 
 			// build the desired path for the workspace
-			String path = defaultPath + "/.minwfc/" + workspaceData.getWorkspaceHashHex() + "/";
+			String path = defaultPath + "/" + LifeCycle.DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
 			URL instanceLocationUrl;
 			try {
 				instanceLocationUrl = new URL("file", null, path);
