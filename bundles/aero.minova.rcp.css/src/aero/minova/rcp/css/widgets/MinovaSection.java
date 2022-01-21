@@ -1,10 +1,11 @@
 package aero.minova.rcp.css.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
@@ -33,14 +34,28 @@ public class MinovaSection extends Section {
 		this.imageLink.setFont(parent.getFont());
 		super.textLabel = this.imageLink;
 
-		this.imageLink.addHyperlinkListener(new HyperlinkAdapter() {
+		// Bei Klick auf Titel Section ein-/ausklappen
+		this.imageLink.addMouseListener(new MouseAdapter() {
+			private boolean doubleClick;
+
 			@Override
-			public void linkActivated(final HyperlinkEvent e) {
-				if (!isExpanded()) {
-					setExpanded(true);
-				} else if (MinovaSection.this.getExpandable()) {
-					setExpanded(false);
-				}
+			public void mouseDoubleClick(MouseEvent e) {
+				doubleClick = true;
+			}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				doubleClick = false;
+				// Erst sichergehen, dass es sich nicht um einen Doppelklick handelt
+				Display.getDefault().timerExec(Display.getDefault().getDoubleClickTime(), () -> {
+					if (!doubleClick) {
+						if (!isExpanded()) {
+							setExpanded(true);
+						} else if (MinovaSection.this.getExpandable()) {
+							setExpanded(false);
+						}
+					}
+				});
 			}
 		});
 	}
