@@ -129,7 +129,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			DecimalFormatSymbols dfs, boolean rangeSelected) {
 		Result result = new Result();
 		String text;
-		boolean doit = false;
+		boolean doit = true;
 		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 		numberFormat.setMaximumFractionDigits(decimals);
 		numberFormat.setMinimumFractionDigits(decimals);
