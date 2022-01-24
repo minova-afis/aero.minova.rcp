@@ -20,6 +20,8 @@ public class MinovaSection extends Section {
 
 	private boolean expandable;
 
+	private boolean minimized;
+
 	public MinovaSection(Composite parent, int style) {
 		super(parent, style);
 
@@ -97,5 +99,13 @@ public class MinovaSection extends Section {
 
 	public ImageHyperlink getImageLink() {
 		return imageLink;
+	}
+
+	public boolean isMinimized() {
+		return minimized;
+	}
+
+	public void setMinimized(boolean minimized) {
+		this.minimized = minimized;
 	}
 }

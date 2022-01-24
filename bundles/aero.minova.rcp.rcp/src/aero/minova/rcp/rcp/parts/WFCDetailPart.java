@@ -538,36 +538,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			section.getImageLink().addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
-					section.setVisible(false);
-					Image image = section.getImageLink().getImage();
-					Control textClient = headSection.getTextClient();
-					ToolBar bar = (ToolBar) textClient;
-					ToolItem tItem = new ToolItem(bar, SWT.PUSH);
-					tItem.setImage(image);
-					tItem.setData(FieldUtil.TRANSLATE_PROPERTY, section.getData(FieldUtil.TRANSLATE_PROPERTY));
-					tItem.setToolTipText(translationService.translate((String) section.getData(FieldUtil.TRANSLATE_PROPERTY), null));
-
-					tItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(t -> {
-						section.setVisible(true);
-						tItem.dispose();
-						bar.requestLayout();
-						headSection.requestLayout();
-					}));
-					bar.requestLayout();
-					headSection.requestLayout();
+					minimizeSection(section);
 				}
 			});
 		}
 		section.setLayoutData(sectionData);
-
-		// Alten Zustand wiederherstellen
-		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
-		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
-		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
-		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
-		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
-		section.setExpanded(Boolean.parseBoolean(expandedString));
-
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
@@ -585,8 +560,48 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
 
+		// Alten Zustand wiederherstellen
+		// HorizontalFill
+		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
+		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
+		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
+
+		// Ein-/Ausgeklappt
+		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
+		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
+		section.setExpanded(Boolean.parseBoolean(expandedString));
+
+		// Minimiert
+		String prefsMinimizedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".minimized";
+		String minimizedString = prefsDetailSections.get(prefsMinimizedString, "false");
+		if (Boolean.parseBoolean(minimizedString)) {
+			minimizeSection(section);
+		}
+
 		detailWidth = section.getCssStyler().getSectionWidth();
 		section.requestLayout();
+	}
+
+	private void minimizeSection(MinovaSection section) {
+		section.setVisible(false);
+		section.setMinimized(true);
+		Image image = section.getImageLink().getImage();
+		Control textClient = headSection.getTextClient();
+		ToolBar bar = (ToolBar) textClient;
+		ToolItem tItem = new ToolItem(bar, SWT.PUSH);
+		tItem.setImage(image);
+		tItem.setData(FieldUtil.TRANSLATE_PROPERTY, section.getData(FieldUtil.TRANSLATE_PROPERTY));
+		tItem.setToolTipText(translationService.translate((String) section.getData(FieldUtil.TRANSLATE_PROPERTY), null));
+
+		tItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+			section.setVisible(true);
+			section.setMinimized(false);
+			tItem.dispose();
+			bar.requestLayout();
+			headSection.requestLayout();
+		}));
+		headSection.requestLayout();
+		bar.requestLayout();
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, MinovaSection section, MSection mSection) {
@@ -1182,9 +1197,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Sections, ein-/ausgeklappt
 		for (MSection s : mDetail.getMSectionList()) {
-			Section section = ((SectionAccessor) s.getSectionAccessor()).getSection();
+			MinovaSection section = ((SectionAccessor) s.getSectionAccessor()).getSection();
 			String prefsExpandedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".expanded";
 			prefsDetailSections.put(prefsExpandedString, section.isExpanded() + "");
+
+			String prefsMinimizedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".minimized";
+			prefsDetailSections.put(prefsMinimizedString, section.isMinimized() + "");
 		}
 
 		try {
