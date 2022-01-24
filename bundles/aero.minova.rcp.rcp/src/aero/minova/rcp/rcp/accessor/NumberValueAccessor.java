@@ -136,30 +136,22 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
 
-		// Prüft ob die Eingabe statt findet oder nicht
+		// Löschen von Dezimal- und Grupierungstrennzeichen abfangen
 		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && start + 1 == end) {
 			if (keyCode == SWT.DEL) {
 				if (textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
 					doit = false;
-				} else {
-					doit = true;
 				}
 			} else if (keyCode == SWT.BS) {
-				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichengelöscht werden soll
+				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichen gelöscht werden soll
 					doit = false;
-				} else {
-					doit = true;
 				}
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
 			if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
 				doit = false;
-			} else {
-				doit = true;
 			}
-		} else {
-			doit = true;
 		}
 
 		if (doit) {
@@ -184,18 +176,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			textBefore = sb.toString();
 
 			// insertion von überflüssigen Zeichen befreien
-			position = 0;
-			sb = new StringBuilder();
-			for (char c : insertion.toCharArray()) {
-				if (c >= '0' && c <= '9')
-					sb.append(c);
-				else if (c == dfs.getDecimalSeparator())
-					sb.append(c);
-				else
-					position--; // wir entfernen das Zeichen; wird am Ende der Schleife wieder hochgezählt
-				position++;
-			}
-			insertion = sb.toString();
+			insertion = insertion.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
 
 			if (start != end) {
 				// wir müssen etwas herausschneiden
@@ -218,13 +199,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		} else {
 
-			for (char c : textBefore.toCharArray()) {
-				if (c >= '0' && c <= '9')
-					sb.append(c);
-				else if (c == dfs.getDecimalSeparator())
-					sb.append(c);
-			}
-			textBefore = sb.toString();
+			textBefore = textBefore.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
 
 			text = textBefore;
 		}
@@ -318,14 +293,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		} else {
 			// Falls der vorherige Text leer oder 0 ist oder der neue Text 0 ist.
 			if ((textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) && caretPosition < decimalCaretPostion) {
-				if (insertion.equals("" + dfs.getDecimalSeparator())) {
-					newCaretPosition = decimalCaretPostion;
-				} else {
-					newCaretPosition = insertion.length() + countGroupingSeperator;
-				}
+				newCaretPosition = insertion.length() + countGroupingSeperator;
 			}
-			// Prüft ob man sich hinter dem dezimal Trennzeichen befindet und die Eingabe eine Zahl ist
-			else if (decimalCaretPostion <= caretPosition && Character.isDigit(insertion.charAt(0))) {
+			// Prüft ob man sich hinter dem dezimal Trennzeichen befindet
+			else if (decimalCaretPostion <= caretPosition) {
 				newCaretPosition = caretPosition + insertion.length();
 				if (newCaretPosition >= text.length())
 					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
