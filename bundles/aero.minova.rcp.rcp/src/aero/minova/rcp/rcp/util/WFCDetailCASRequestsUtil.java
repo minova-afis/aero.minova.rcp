@@ -1017,6 +1017,7 @@ public class WFCDetailCASRequestsUtil {
 
 	public void setKeys(Map<String, Value> map) {
 		this.keys = map;
+		updateKeytypeUserReadonly();
 	}
 
 	private void focusFirstEmptyField() {
@@ -1297,6 +1298,23 @@ public class WFCDetailCASRequestsUtil {
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.updateGridLookupValues();
+		}
+	}
+
+	/**
+	 * Setzt Felder mit key-type="user" (v.a. Matchcodes) auf read-only, wenn der Datensatz bereits einmal gespeichert wurde. Ansonsten können sie wie in der
+	 * Maske angegeben bearbeitet werden.
+	 */
+	private void updateKeytypeUserReadonly() {
+		for (MField f : mDetail.getFields()) {
+			if (!f.isKeyTypeUser()) {
+				continue;
+			}
+			if (getKeys() == null) {
+				f.resetReadOnlyAndRequired();
+			} else {
+				f.setReadOnly(true);
+			}
 		}
 	}
 }

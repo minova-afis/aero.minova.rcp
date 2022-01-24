@@ -1,6 +1,8 @@
 package aero.minova.rcp.workspace;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -8,7 +10,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -20,11 +24,14 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
@@ -32,6 +39,8 @@ import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 @SuppressWarnings("restriction")
 public class LifeCycle {
+
+	public static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 
 	@Inject
 	Logger logger;
@@ -41,6 +50,8 @@ public class LifeCycle {
 
 	@Inject
 	IDataService dataService;
+
+	String defaultConnectionString;
 
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException {
@@ -54,13 +65,31 @@ public class LifeCycle {
 			}
 		}
 
+		// settings.properties einlesen wenn vorhanden und im Context ablegen
+		final Path settingsPath = Paths.get(System.getProperty("user.home")).resolve(LifeCycle.DEFAULT_CONFIG_FOLDER).resolve(Constants.SETTINGS_FILE_NAME);
+		Properties settings = new Properties();
+		if (settingsPath.toFile().exists()) {
+			try (BufferedInputStream targetStream = new BufferedInputStream(new FileInputStream(settingsPath.toFile()))) {
+				settings.load(targetStream);
+			} catch (IOException e) {}
+		}
+		workbenchContext.set(Constants.SETTINGS_PROPERTIES, settings);
+		defaultConnectionString = settings.getProperty(Constants.SETTINGS_DEFAULT_CONNECTION_STRING);
+
 		// Versuchen über Commandline-Argumente einzuloggen, für UI-Tests genutzt
 		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
 
+		ImageDescriptor imageDefault = ImageUtil.getImageDefault("wfc.application/16x16.png");
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDefault("wfc.application/32x32.png");
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDefault("wfc.application/64x64.png");
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDefault("wfc.application/256x256.png");
+		WorkspaceDialog.setDefaultImages(
+				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
+
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
-
-			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, logger, sync);
+			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, logger);
+			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
 
 			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
 				// Wenn Default-Workspace gesetzt ist diesen nutzen
@@ -83,7 +112,7 @@ public class LifeCycle {
 
 	/**
 	 * Versuchen über Default-Daten einzuloggen. Bei Fehlschlag wird Login-Dialog geöffnet
-	 * 
+	 *
 	 * @param workspaceLocation
 	 * @param workspaceDialog
 	 * @return
@@ -136,7 +165,8 @@ public class LifeCycle {
 			dataService.setLogger(logger);
 			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
-			workspaceDialog = new WorkspaceDialog(null, logger, sync, sPrefs.name());
+			workspaceDialog = new WorkspaceDialog(null, logger, sPrefs.name());
+			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
 			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 		}
 
@@ -207,7 +237,8 @@ public class LifeCycle {
 				Files.createFile(resolve);
 				Files.writeString(resolve, modelVersionPlugin);
 
-				// Wenn das ModelVersion.txt file nicht existiert ist es ein neuer Workspace -> readString == null -> Meldung nicht anzeigen und workspace nicht
+				// Wenn das ModelVersion.txt file nicht existiert ist es ein neuer Workspace ->
+				// readString == null -> Meldung nicht anzeigen und workspace nicht
 				// löschen
 				if (readString != null) {
 					Files.deleteIfExists(Path.of(workspaceLocation).resolve(".metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi"));
@@ -223,7 +254,7 @@ public class LifeCycle {
 	/**
 	 * Wir löschen auch die Einstellungen, die für das persistieren der angehefteten Toolbars zuständig sind, da es sonst bei -clearPersistedState und einer
 	 * Änderung der ModelVersion Probleme gibt (Siehe Issue #703)
-	 * 
+	 *
 	 * @param workspaceLocation
 	 */
 	private void deleteCustomPrefs(URI workspaceLocation) {
@@ -261,8 +292,7 @@ public class LifeCycle {
 		int returnCode;
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("ReturnCode: " + returnCode);
-			System.exit(returnCode); // sollte nie aufgerufen werden, aber der Benutzer hat keinen Workspace
-										// ausgesucht
+			System.exit(returnCode);
 		}
 		try {
 			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();

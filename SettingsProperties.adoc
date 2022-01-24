@@ -1,0 +1,15 @@
+= settings.properties
+
+Mit der Datei ``settings.properties`` können Kunden einige Standarteinstellungen konfigurieren, noch bevor von der Anwendung eine Verbindung zum Server aufgenommen wurde.
+Die Datei muss von den Kunden selbst verteilt werden.
+
+Sie MUSS den Namen ``settings.properties`` tragen und in ``<BenutzerOrdner>/.minwfc/`` liegen.
+
+Die Properties werden in der Klasse ``LifeCycle`` eingelesen und sofort in den workbench-Context abgelegt (Key ist ``Constants.SETTINGS_PROPERTIES``).
+
+Im Folgenden werden die möglichen Einträge beschrieben.
+
+=== defaultConnectionString
+
+Der Wert dieser Propertie wird in das Feld ``Connection String`` der Login Maske eingetragen, solange noch kein Profil angelegt wurde. 
+Damit können Kunden den Standard-Server leicht vorkonfigurieren.

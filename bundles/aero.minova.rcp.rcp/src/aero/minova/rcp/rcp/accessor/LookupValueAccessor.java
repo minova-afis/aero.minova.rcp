@@ -1,13 +1,17 @@
 package aero.minova.rcp.rcp.accessor;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
 
@@ -79,6 +83,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		}
 		if (value instanceof LookupValue) {
 			LookupValue lv = (LookupValue) value;
+			((LookupComposite) control).getContentProvider().translateLookup(lv);
 			((LookupComposite) control).getDescription().setText(lv.description);
 			((LookupComposite) control).setText(lv.keyText);
 			((LookupComposite) control).setMessage("...");
@@ -130,6 +135,14 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 					field.setValue(null, false);
 				}
 			}
+		}
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		if (control != null && getDisplayValue() != null) {
+			updateControlFromValue(control, getDisplayValue());
 		}
 	}
 

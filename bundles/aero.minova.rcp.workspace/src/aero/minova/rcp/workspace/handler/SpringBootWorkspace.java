@@ -37,12 +37,12 @@ import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
+import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
 
 @SuppressWarnings("restriction")
 public class SpringBootWorkspace extends WorkspaceHandler {
 
-	private static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
 
 	private static final int TIMEOUT_DURATION = 15;
@@ -115,7 +115,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				if (!getApplicationArea().isEmpty()) {
 					instanceLocationUrl = new URL(getApplicationArea());
 				} else {
-					String path = defaultPath + "/" + DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
+					String path = defaultPath + "/" + LifeCycle.DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
 					instanceLocationUrl = new URL("file", null, path);
 				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
@@ -181,7 +181,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	public static SSLContext disabledSslVerificationContext() {
 		try {
 			final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(DEFAULT_CONFIG_FOLDER).resolve(KEYSTORE_FILE_NAME);
+			final Path trustStorePath = Paths.get(System.getProperty("user.home")).resolve(LifeCycle.DEFAULT_CONFIG_FOLDER).resolve(KEYSTORE_FILE_NAME);
 			if (isRegularFile(trustStorePath)) {
 				trustStore.load(new FileInputStream(trustStorePath.toString()), "geheim".toCharArray());
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
