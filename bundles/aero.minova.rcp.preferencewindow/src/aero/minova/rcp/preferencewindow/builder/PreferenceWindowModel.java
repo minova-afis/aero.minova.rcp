@@ -42,7 +42,7 @@ public class PreferenceWindowModel {
 		TranslationService translationService = context.get(TranslationService.class);
 		IExtensionRegistry extensionRegistry = context.get(IExtensionRegistry.class);
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
-		xbsPreferences = XBSUtil.getMainMap(preferences);
+		xbsPreferences = XBSUtil.getMapOfNode(preferences, "Settings");
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
