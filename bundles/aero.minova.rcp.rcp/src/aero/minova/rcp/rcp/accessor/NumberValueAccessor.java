@@ -290,6 +290,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					newCaretPosition = caretPosition + countGroupingSeperator;
 				}
 			}
+		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
+			newCaretPosition = decimalCaretPostion;
 		} else {
 			// Falls der vorherige Text leer oder 0 ist oder der neue Text 0 ist.
 			if ((textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) && caretPosition < decimalCaretPostion) {
