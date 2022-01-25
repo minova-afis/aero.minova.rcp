@@ -269,25 +269,26 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		if (keyCode == SWT.BS || keyCode == SWT.DEL) {
 			// Wenn mit Backspace gelöscht wird
 			if (keyCode == SWT.BS) {
-				if (start + 1 != end) {
-					newCaretPosition = start;
-				} else if (text.equals(formatted0)) {
+				if (text.equals(formatted0)) {
 					newCaretPosition = 1;
+				} else if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
+					newCaretPosition = caretPosition - 1;
 				} else {
-					newCaretPosition = caretPosition - 1 + countGroupingSeperator;
+					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
 				}
 			}
 			// Wenn mit ENTF gelöscht wird
 			else if (SWT.DEL == keyCode) {
-				if (start + 1 != end) {
-					newCaretPosition = start + 1 + countGroupingSeperator;
-				} else if ((decimalCaretPostion < caretPosition && decimals != 0) || textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()
-						|| textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
+				if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
 					newCaretPosition = caretPosition + 1;
 				} else if (text.equals(formatted0)) {
 					newCaretPosition = 1;
+				} else if (textBefore.length() - decimals <= caretPosition) {
+					newCaretPosition = caretPosition + 1;
+				} else if (countGroupingSeperator == 0) {
+					newCaretPosition = caretPosition;
 				} else {
-					newCaretPosition = caretPosition + countGroupingSeperator;
+					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
 				}
 			}
 		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
@@ -304,15 +305,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 			} else {
 				if (start != end) {
-					String formatInsertion = numberFormat.format(Double.parseDouble(insertion.replace(dfs.getDecimalSeparator(), '.')));
-					if (decimals != 0 && !insertion.contains("" + dfs.getDecimalSeparator())) {
-						newCaretPosition = start + formatInsertion.length() - 1 - decimals;
-					} else if (start + end == textBefore.length()) {
-						newCaretPosition = start + formatInsertion.length();
-					} else {
-						newCaretPosition = start + formatInsertion.length() + countGroupingSeperator;
-					}
-
+					newCaretPosition = start + insertion.length() + getGroupingSeperatorCount(text, dfs);
 				} else if (text.length() == textBefore.length() + insertion.length()) {
 					newCaretPosition = caretPosition + insertion.length();
 				} else {
