@@ -69,8 +69,8 @@ class NumberValueAccessorTests {
 
 		Result result = numberValueAccessor.processInput(//
 				"", // insertion
-				0, // start
-				1, // end
+				2, // start
+				3, // end
 				127, // keyCode
 				2, // decimals
 				Locale.GERMANY, // locale
