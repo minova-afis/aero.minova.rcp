@@ -135,6 +135,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		numberFormat.setMinimumFractionDigits(decimals);
 		numberFormat.setGroupingUsed(true);
 		StringBuilder sb = new StringBuilder();
+		int originalStart = start;
+		int originalEnd = end;
 
 		// Löschen von Dezimal- und Grupierungstrennzeichen abfangen
 		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && start + 1 == end) {
@@ -208,7 +210,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')));
 				result.text = numberFormat.format(result.value.getDoubleValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat, dfs);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, originalStart, originalEnd, decimals, caretPosition,
+						numberFormat, dfs);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0.0);
 				result.text = numberFormat.format(result.value.getDoubleValue());
@@ -218,7 +221,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Integer.parseInt(text));
 				result.text = numberFormat.format(result.value.getIntegerValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, decimals, caretPosition, numberFormat, dfs);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, originalStart, originalEnd, decimals, caretPosition,
+						numberFormat, dfs);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0);
 				result.text = numberFormat.format(result.value.getIntegerValue());
@@ -272,7 +276,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
 					newCaretPosition = caretPosition - 1;
 				} else {
-					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
+					newCaretPosition = caretPosition - 1 + countGroupingSeperator;
 				}
 			}
 			// Wenn mit ENTF gelöscht wird
@@ -282,7 +286,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				} else if (textBefore.length() - decimals <= caretPosition) {
 					newCaretPosition = caretPosition + 1;
 				} else {
-					newCaretPosition = caretPosition + countGroupingSeperator;
+					newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(start, end), dfs);
 				}
 			}
 		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
@@ -299,7 +303,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 			} else {
 				if (start != end) {
-					newCaretPosition = start + insertion.length() + getGroupingSeperatorCount(text, dfs);
+					newCaretPosition = start + insertion.length();
 				} else if (text.length() == textBefore.length() + insertion.length()) {
 					newCaretPosition = caretPosition + insertion.length();
 				} else {
