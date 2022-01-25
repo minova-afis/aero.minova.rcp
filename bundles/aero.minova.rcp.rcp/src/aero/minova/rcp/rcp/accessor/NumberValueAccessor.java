@@ -210,8 +210,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')));
 				result.text = numberFormat.format(result.value.getDoubleValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, originalStart, originalEnd, decimals, caretPosition,
-						numberFormat, dfs);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
+						caretPosition, numberFormat, dfs);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0.0);
 				result.text = numberFormat.format(result.value.getDoubleValue());
@@ -221,8 +221,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			try {
 				result.value = new Value(Integer.parseInt(text));
 				result.text = numberFormat.format(result.value.getIntegerValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, originalStart, originalEnd, decimals, caretPosition,
-						numberFormat, dfs);
+				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
+						caretPosition, numberFormat, dfs);
 			} catch (NumberFormatException e) {
 				result.value = new Value(0);
 				result.text = numberFormat.format(result.value.getIntegerValue());
@@ -258,8 +258,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int decimals, int caretPosition,
-			NumberFormat numberFormat, DecimalFormatSymbols dfs) {
+	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int ostart, int oend, int decimals,
+			int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
 
 		if (textBefore != null && !textBefore.isEmpty())
 			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
@@ -276,17 +276,20 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
 					newCaretPosition = caretPosition - 1;
 				} else {
-					newCaretPosition = caretPosition - 1 + countGroupingSeperator;
+					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
+					;
 				}
 			}
 			// Wenn mit ENTF gelöscht wird
 			else if (SWT.DEL == keyCode) {
 				if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
 					newCaretPosition = caretPosition + 1;
-				} else if (textBefore.length() - decimals <= caretPosition) {
+				} else if (textBefore.length() - decimals <= caretPosition || text.length() == textBefore.length()) {
 					newCaretPosition = caretPosition + 1;
+				} else if (countGroupingSeperator == 0) {
+					newCaretPosition = caretPosition;
 				} else {
-					newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(start, end), dfs);
+					newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
 				}
 			}
 		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
@@ -303,7 +306,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
 			} else {
 				if (start != end) {
-					newCaretPosition = start + insertion.length();
+					newCaretPosition = start + insertion.length() + getGroupingSeperatorCount(text, dfs);
 				} else if (text.length() == textBefore.length() + insertion.length()) {
 					newCaretPosition = caretPosition + insertion.length();
 				} else {
