@@ -60,7 +60,29 @@ class NumberValueAccessorTests {
 		assertEquals("0,50", result.text);
 		assertEquals(1, result.caretPosition);
 	}
-	
+
+	@Test
+	void testEntfZeroFiveDeleteFive() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				0, // start
+				1, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"0,50", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,00", result.text);
+		assertEquals(3, result.caretPosition);
+	}
+
 	@Test
 	void testBSZeroFive() {
 		MNumberField field = new MNumberField(2);
@@ -1263,7 +1285,7 @@ class NumberValueAccessorTests {
 		assertEquals(4, result.caretPosition);
 		assertEquals(new Value(12356.78), result.value);
 	}
-	
+
 	@Test
 	void testInsertKeyCode8() {
 		MNumberField field = new MNumberField(2);
