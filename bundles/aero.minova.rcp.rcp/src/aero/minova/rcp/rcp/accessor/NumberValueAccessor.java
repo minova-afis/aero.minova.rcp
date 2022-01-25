@@ -87,7 +87,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		if (!insertion.contains("[a-zA-Z]")) {
+		if (insertion.matches("([0-9]*)|([\\" + dfs.getGroupingSeparator() + dfs.getDecimalSeparator() + "]*)")) {
 			Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
 
 			verificationActive = true;
