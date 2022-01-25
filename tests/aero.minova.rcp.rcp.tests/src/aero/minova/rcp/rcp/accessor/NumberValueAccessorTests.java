@@ -102,7 +102,7 @@ class NumberValueAccessorTests {
 				true//
 		);
 		assertEquals("0,50", result.text);
-		assertEquals(2, result.caretPosition);
+		assertEquals(0, result.caretPosition);
 	}
 
 	@Test
@@ -1397,7 +1397,7 @@ class NumberValueAccessorTests {
 				false//
 		);
 		assertEquals("0,00", result.text);
-		assertEquals(0, result.caretPosition);
+		assertEquals(1, result.caretPosition);
 		assertEquals(new Value(0.00), result.value);
 	}
 
