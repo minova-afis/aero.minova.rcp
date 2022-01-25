@@ -281,10 +281,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					newCaretPosition = caretPosition + 1;
 				} else if (textBefore.length() - decimals <= caretPosition) {
 					newCaretPosition = caretPosition + 1;
-				} else if (countGroupingSeperator == 0) {
-					newCaretPosition = caretPosition;
 				} else {
-					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
+					newCaretPosition = caretPosition + countGroupingSeperator;
 				}
 			}
 		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
