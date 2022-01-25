@@ -52,7 +52,7 @@ class NumberValueAccessorTests {
 				127, // keyCode
 				2, // decimals
 				Locale.GERMANY, // locale
-				1, // caretPosition
+				0, // caretPosition
 				"0,50", // textBefore
 				decimalFormatSymbols, //
 				true//
@@ -80,7 +80,7 @@ class NumberValueAccessorTests {
 				true//
 		);
 		assertEquals("0,50", result.text);
-		assertEquals(1, result.caretPosition);
+		assertEquals(2, result.caretPosition);
 	}
 
 	@Test
