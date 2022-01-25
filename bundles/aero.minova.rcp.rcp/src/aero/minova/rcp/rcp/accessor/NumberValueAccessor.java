@@ -269,9 +269,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		if (keyCode == SWT.BS || keyCode == SWT.DEL) {
 			// Wenn mit Backspace gelöscht wird
 			if (keyCode == SWT.BS) {
-				if (text.equals(formatted0)) {
-					newCaretPosition = 1;
-				} else if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
+				if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
 					newCaretPosition = caretPosition - 1;
 				} else {
 					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
@@ -281,8 +279,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			else if (SWT.DEL == keyCode) {
 				if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
 					newCaretPosition = caretPosition + 1;
-				} else if (text.equals(formatted0)) {
-					newCaretPosition = 1;
 				} else if (textBefore.length() - decimals <= caretPosition) {
 					newCaretPosition = caretPosition + 1;
 				} else if (countGroupingSeperator == 0) {
