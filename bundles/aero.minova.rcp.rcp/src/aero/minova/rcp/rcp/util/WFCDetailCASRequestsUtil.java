@@ -666,8 +666,8 @@ public class WFCDetailCASRequestsUtil {
 	private String formatMessage(ErrorObject et) {
 		Table errorTable = et.getErrorTable();
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
-		String messageproperty = "@" + vMessageProperty.getStringValue().strip();
-		String value = translationService.translate(messageproperty, null);
+		String messageproperty = vMessageProperty.getStringValue().strip();
+		String value = translationService.translate("@" + messageproperty, null);
 
 		if (value.equals(messageproperty) && errorTable.getColumnIndex("DEFAULT") != -1) { // Keine Übersetzung gefunden -> Default nutzen
 			value = errorTable.getRows().get(0).getValue(errorTable.getColumnIndex("DEFAULT")).getStringValue();
