@@ -120,18 +120,14 @@ public class DateUtil {
 		try {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
-					try {
-						// Es beginnt mit eine Tagesangabe
-						startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
-					} catch (Exception e) {
-						startOfToday = null;
-					}
+					// Es beginnt mit eine Tagesangabe
+					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
 				}
 			}
-		} catch (DateTimeException e) {
+		} catch (DateTimeException | NullPointerException e ) {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
