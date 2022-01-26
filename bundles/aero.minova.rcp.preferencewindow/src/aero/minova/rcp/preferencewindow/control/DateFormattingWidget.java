@@ -94,7 +94,7 @@ public class DateFormattingWidget extends CustomPWWidget {
 	}
 
 	private String getDateStringFromPattern(String pattern) {
-		if (validatePattern(pattern) || pattern.isBlank()) {
+		if (!pattern.contains("MMMM")) {
 			try {
 				LocalDateTime date = LocalDateTime.of(2015, 12, 24, 23, 45);
 				String formatted = DateUtil.getDateString(date.toInstant(ZoneOffset.UTC), locale, pattern);
@@ -107,11 +107,6 @@ public class DateFormattingWidget extends CustomPWWidget {
 			}
 		}
 		return translationService.translate("@Preferences.DateUtilPattern.PatternToLongMessage", null);
-	}
-
-	private boolean validatePattern(String input) {
-		Pattern pattern = Pattern.compile("([dMyu]{0,4})([\\.,/\\s]{0,1})([dMyu]{0,3})([\\.,/\\s]{0,1})([dMyu]{0,4})");
-		return pattern.matcher(input).matches();
 	}
 
 	/**
