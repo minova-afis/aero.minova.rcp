@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.root</artifactId>
-		<version>12.0.27-SNAPSHOT</version>
+		<version>12.0.28-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 

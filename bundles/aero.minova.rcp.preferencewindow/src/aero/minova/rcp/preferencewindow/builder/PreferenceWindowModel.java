@@ -42,7 +42,7 @@ public class PreferenceWindowModel {
 		TranslationService translationService = context.get(TranslationService.class);
 		IExtensionRegistry extensionRegistry = context.get(IExtensionRegistry.class);
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
-		xbsPreferences = XBSUtil.getMainMap(preferences);
+		xbsPreferences = XBSUtil.getMapOfNode(preferences, "Settings");
 
 		List<PreferenceTabDescriptor> cprf = new ArrayList<>();
 
@@ -50,7 +50,8 @@ public class PreferenceWindowModel {
 		cprf.add(buildDarstellungsTab(translationService));
 		cprf.add(buildErweiterungTab(translationService));
 		cprf.add(buildDruckenTab(translationService));
-		cprf.add(buildConsoleTab(translationService));
+		// Konsole haben wir nicht
+		// cprf.add(buildConsoleTab(translationService));
 
 		IExtensionPoint point = extensionRegistry.getExtensionPoint("minova.preferencepage");
 		for (IExtension extension : point.getExtensions()) {
@@ -73,8 +74,11 @@ public class PreferenceWindowModel {
 				translationService.translate("@Preferences.Application", null), 0.1);
 		PreferenceSectionDescriptor psd = new PreferenceSectionDescriptor("GeneralExecution", translationService.translate("@Preferences.General", null), 0.1);
 		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.LICENCE_WARNING_BEFORE_WEEKS,
-				translationService.translate("@Preferences.LicenceWarningBeforeWeeks", null), null, 0.1, DisplayType.INTEGER, 0));
+
+		// Lizenzwarnung ausblenden, weil sie aktuell nicht verwendet wird
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.LICENCE_WARNING_BEFORE_WEEKS,
+//				translationService.translate("@Preferences.LicenceWarningBeforeWeeks", null), null, 0.1, DisplayType.INTEGER, 0));
+
 		psd.add(new PreferenceDescriptor("DefaultWorkspace", translationService.translate("@Preferences.DefaultWorkspace", null),
 				translationService.translate("@Preferences.DefaultWorkspace.Tooltip", null), 0.2, DisplayType.CUSTOMCHECK, false));
 		psd.add(new PreferenceDescriptor("CurrentWorkspace", translationService.translate("@Preferences.CurrentWorkspace", null), null, 0.3,
@@ -139,12 +143,12 @@ public class PreferenceWindowModel {
 		// TODO Übersetzung anpassen, damit sowohl beim Löschen als auch beim Speichern der Index neugeladen wird.
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.AUTO_RELOAD_INDEX, translationService.translate("@Preferences.AutoReloadIndex", null), null,
 				0.2, DisplayType.CHECK, false));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES,
-				translationService.translate("@Preferences.SheetStylesMessageBoxes", null), null, 0.3, DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DETAIL_BUTTON_TEXT,
-				translationService.translate("@Preferences.ShowDetailButtonText", null), null, 0.4, DisplayType.CHECK, true));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.USE_FORM_BUFFER, translationService.translate("@Preferences.UseFormBuffer", null), null, 0.5,
-				DisplayType.CHECK, true));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHEET_STYLES_MESSAGE_BOXES,
+//				translationService.translate("@Preferences.SheetStylesMessageBoxes", null), null, 0.3, DisplayType.CHECK, true));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DETAIL_BUTTON_TEXT,
+//				translationService.translate("@Preferences.ShowDetailButtonText", null), null, 0.4, DisplayType.CHECK, true));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.USE_FORM_BUFFER, translationService.translate("@Preferences.UseFormBuffer", null), null, 0.5,
+//				DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX,
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndex", null),
 				translationService.translate("@Preferences.ShowDiscardChangesDialogIndex.Tooltip", null), 0.6, DisplayType.CHECK, false));
@@ -153,12 +157,13 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_DELETE_WARNING, translationService.translate("@Preferences.ShowDeleteWarning", null), null,
 				0.8, DisplayType.CHECK, xbsShowDelete));
 
-		psd = new PreferenceSectionDescriptor("Buffer", translationService.translate("@Preferences.Buffer", null), 0.2);
-		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.DISPLAY_BUFFER_MS, translationService.translate("@Preferences.Buffer.DisplayBufferMs", null),
-				null, 0.1, DisplayType.INTEGER, 20));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.MAX_BUFFER_MS, translationService.translate("@Preferences.Buffer.MaxBufferMs", null), null, 0.2,
-				DisplayType.INTEGER, 90));
+		// AnzeigePuffer werden nicht mehr verwendet
+//		psd = new PreferenceSectionDescriptor("Buffer", translationService.translate("@Preferences.Buffer", null), 0.2);
+//		ptd.add(psd);
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.DISPLAY_BUFFER_MS, translationService.translate("@Preferences.Buffer.DisplayBufferMs", null),
+//				null, 0.1, DisplayType.INTEGER, 20));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.MAX_BUFFER_MS, translationService.translate("@Preferences.Buffer.MaxBufferMs", null), null, 0.2,
+//				DisplayType.INTEGER, 90));
 
 		psd = new PreferenceSectionDescriptor("Table", translationService.translate("@Preferences.Table", null), 0.3);
 		ptd.add(psd);
@@ -169,8 +174,8 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_CAS, translationService.translate("@Preferences.Timeout.TimeoutCas", null), null, 0.1,
 				DisplayType.INTEGER, 15));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION,
-				translationService.translate("@Preferences.Timeout.TimeoutOpenNotification", null), null, 0.2, DisplayType.INTEGER, 1));
+//		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION,
+//				translationService.translate("@Preferences.Timeout.TimeoutOpenNotification", null), null, 0.2, DisplayType.INTEGER, 1));
 
 //		Die Section Teiltabelle wird ausgeblendet. Die Preferences werden zu einem späteren Zeitpunkt teilweise wieder implementiert.
 //		psd = new PreferenceSectionDescriptor("Grid", translationService.translate("@Preferences.Grid", null), 0.6);
@@ -196,8 +201,9 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.CREATE_XML_XS, translationService.translate("@Preferences.Print.CreateXMLXSL", null), null, 0.1,
 				DisplayType.CHECK, false));
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_FONT, translationService.translate("@Preferences.Print.IndexFont", null), null, 0.2,
-				DisplayType.FONT, null));
+		// Schriftartwechsel verhindern! Warum brauchen wir es überhaupt.
+		// psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_FONT, translationService.translate("@Preferences.Print.IndexFont", null), null, 0.2,
+		// DisplayType.FONT, null));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.OPTIMIZED_WIDTHS, translationService.translate("@Preferences.Print.OptimizeWidths", null), null,
 				0.3, DisplayType.CHECK, true));
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.HIDE_EMPTY_COLS, translationService.translate("@Preferences.Print.HideEmptyCols", null), null,

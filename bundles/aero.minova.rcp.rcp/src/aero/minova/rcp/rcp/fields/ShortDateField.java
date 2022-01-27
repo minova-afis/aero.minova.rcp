@@ -63,7 +63,7 @@ public class ShortDateField {
 						locale);
 				ArrayList<String> result = new ArrayList<>();
 				Instant date = DateUtil.getDate(entry, locale, dateUtil);
-				if (date == null && !entry.isEmpty()) {
+				if (date == null) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
 					result.add(DateUtil.getDateString(date, locale, dateUtil));

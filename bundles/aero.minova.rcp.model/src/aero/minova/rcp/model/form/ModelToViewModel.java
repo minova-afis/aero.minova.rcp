@@ -28,6 +28,10 @@ public class ModelToViewModel {
 		}
 
 		f.setPrimary(KeyType.PRIMARY.toString().equalsIgnoreCase(field.getKeyType()));
+		f.setKeyTypeUser(KeyType.USER.toString().equalsIgnoreCase(field.getKeyType()));
+		if (f.isKeyTypeUser()) { // Felder mit keyType="user" sind immer Pflichtfelder
+			f.setOriginalRequired(true);
+		}
 
 		return f;
 	}

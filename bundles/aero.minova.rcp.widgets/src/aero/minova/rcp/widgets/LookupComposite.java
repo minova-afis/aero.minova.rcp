@@ -71,9 +71,6 @@ public class LookupComposite extends Composite {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
 
-		this.contentProvider = new LookupContentProvider();
-		this.contentProvider.setLookup(this);
-
 		text = new Text(this, style);
 		popup = new Shell(getDisplay(), SWT.ON_TOP);
 		popup.setLayout(new FillLayout());
@@ -312,6 +309,11 @@ public class LookupComposite extends Composite {
 	public LookupContentProvider getContentProvider() {
 		checkWidget();
 		return contentProvider;
+	}
+
+	public void setContentProvider(LookupContentProvider contentProvider) {
+		checkWidget();
+		this.contentProvider = contentProvider;
 	}
 
 	/**

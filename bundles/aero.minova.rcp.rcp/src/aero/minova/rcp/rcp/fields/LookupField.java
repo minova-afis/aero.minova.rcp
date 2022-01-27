@@ -53,6 +53,11 @@ public class LookupField {
 		lookupControl.setLabel(label);
 		ContextInjectionFactory.inject(lookupControl, context); // In Context injected, damit TranslationService genutzt werden kann
 
+		LookupContentProvider contentProvider = new LookupContentProvider(field.getLookupTable());
+		contentProvider.setLookup(lookupControl);
+		lookupControl.setContentProvider(contentProvider);
+		ContextInjectionFactory.inject(contentProvider, context); // In Context injected, damit TranslationService genutzt werden kann
+
 		Label descriptionLabel = LabelFactory.newLabel(SWT.LEFT).create(composite);
 
 		FormData lookupFormData = new FormData();
@@ -120,6 +125,7 @@ public class LookupField {
 	 */
 	@Inject
 	@Optional
+	@Deprecated
 	public static void requestLookUpEntriesAll(MField field, MDetail detail, LookupComposite lookup) {
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
@@ -140,6 +146,7 @@ public class LookupField {
 	 * @param ta
 	 * @param c
 	 */
+	@Deprecated
 	public static void changeOptionsForLookupField(Table ta, LookupComposite lookupControl, boolean twisty) {
 		MLookupField field = (MLookupField) lookupControl.getData(Constants.CONTROL_FIELD);
 		field.setOptions(ta);
@@ -151,6 +158,7 @@ public class LookupField {
 	 *
 	 * @param lookUpControl
 	 */
+	@Deprecated
 	public static void changeSelectionBoxList(LookupComposite lookUpControl, MLookupField field, boolean twisty) {
 		if (field.getOptions() != null) {
 			Table t = field.getOptions();

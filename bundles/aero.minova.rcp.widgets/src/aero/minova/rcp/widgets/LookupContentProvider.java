@@ -7,7 +7,10 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.services.translation.TranslationService;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
@@ -20,7 +23,15 @@ public class LookupContentProvider {
 
 	private Predicate<LookupValue> filter;
 
+	@Inject
+	private TranslationService translationService;
+
 	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupcontentprovider"));
+	private String tableName;
+
+	public LookupContentProvider(String tableName) {
+		this.tableName = tableName;
+	}
 
 	/**
 	 * Provides the content
@@ -46,9 +57,26 @@ public class LookupContentProvider {
 			result = result.stream().filter(lv -> getFilter().test(lv)).collect(Collectors.toList());
 		}
 
+		// Wenn möglich Übersetzten
+		if (tableName != null) {
+			for (LookupValue lv : result) {
+				translateLookup(lv);
+			}
+		}
+
 		// Groß- und Kleinschreibung ignorieren
 		result.sort(new SortIgnoreCase());
 		return result;
+	}
+
+	public void translateLookup(LookupValue lv) {
+		String translateKey = tableName + ".KeyText." + lv.keyLong;
+		String translated = translationService.translate("@" + tableName + ".KeyText." + lv.keyLong, null);
+		lv.keyText = translateKey.equals(translated) ? lv.keyText : translated;
+
+		translateKey = tableName + ".Description." + lv.keyLong;
+		translated = translationService.translate("@" + tableName + ".Description." + lv.keyLong, null);
+		lv.description = translateKey.equals(translated) ? lv.keyText : translated;
 	}
 
 	private String buildRegex(String entry) {
@@ -71,7 +99,7 @@ public class LookupContentProvider {
 	 * @param lookup
 	 *            the textAssist to set
 	 */
-	protected void setLookup(final LookupComposite lookup) {
+	public void setLookup(final LookupComposite lookup) {
 		this.lookup = lookup;
 	}
 

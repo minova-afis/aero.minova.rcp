@@ -1,7 +1,7 @@
 package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.DATE_TIME_WIDTH;
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 
@@ -34,6 +34,7 @@ import org.osgi.service.prefs.Preferences;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
@@ -96,8 +97,8 @@ public class DateTimeField {
 
 		FormData fd = new FormData();
 		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		fd.left = new FormAttachment((column == 0) ? 25 : 75);
-		fd.width = DATE_TIME_WIDTH;
+		fd.left = new FormAttachment(column == 0 ? 25 : 75);
+		fd.right = new FormAttachment(column == 0 ? 50 : 100, column == 0 ? -ICssStyler.CSS_SECTION_SPACING : -MARGIN_BORDER);
 		text.setLayoutData(fd);
 		text.setData(CssData.CSSDATA_KEY,
 				new CssData(CssType.DATE_TIME_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), false));

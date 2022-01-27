@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova.rcp</groupId>
 	<artifactId>aero.minova.rcp.root</artifactId>
-	<version>12.0.27-SNAPSHOT</version>
+	<version>12.0.28-SNAPSHOT</version>
 	<name>[mvn] Root</name>
 	<packaging>pom</packaging>
 

@@ -15,7 +15,11 @@ public class LookupDisplayConverter extends DisplayConverter {
 	@Override
 	public Object canonicalToDisplayValue(Object canonicalValue) {
 		if (canonicalValue instanceof LookupValue) {
-			return ((LookupValue) canonicalValue).getKeyText();
+			for (LookupValue lv : contentProvider.getValues()) {
+				if (lv.getKeyLong().equals(((LookupValue) canonicalValue).keyLong)) {
+					return lv.getKeyText();
+				}
+			}
 		} else if (canonicalValue instanceof Integer) {
 			for (LookupValue lv : contentProvider.getValues()) {
 				if (lv.getKeyLong().equals(canonicalValue)) {
