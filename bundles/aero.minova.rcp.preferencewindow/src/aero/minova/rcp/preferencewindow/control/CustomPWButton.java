@@ -18,7 +18,7 @@ public class CustomPWButton extends CustomPWWidget {
 	 *            selection listener
 	 */
 	public CustomPWButton(final String label, final SelectionListener listener) {
-		super(label, null, 1, true);
+		super(label, null, null, 1, true);
 		this.listener = listener;
 	}
 
