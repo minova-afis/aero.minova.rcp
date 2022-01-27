@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -21,6 +22,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.util.ErrorObject;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
 
 public class LoadIndexHandler {
@@ -33,6 +35,10 @@ public class LoadIndexHandler {
 
 	@Inject
 	private IDataService dataService;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_LIMIT)
+	int indexLimit;
 
 	volatile boolean loading = false;
 
@@ -51,6 +57,7 @@ public class LoadIndexHandler {
 		((WFCSearchPart) findElements.get(0).getObject()).saveNattable();
 		((WFCSearchPart) findElements.get(0).getObject()).updateUserInput();
 		Table searchTable = (Table) findElements.get(0).getContext().get("NatTableDataSearchArea");
+		searchTable.setMetaDataLimit(indexLimit); // erstmal nur eingestellte Anzahl Datensätze laden
 		CompletableFuture<Table> tableFuture = dataService.getTableAsync(searchTable);
 
 		tableFuture.thenAccept(t -> {

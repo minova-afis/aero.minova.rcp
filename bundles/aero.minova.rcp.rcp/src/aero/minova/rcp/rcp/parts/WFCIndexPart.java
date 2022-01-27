@@ -139,6 +139,10 @@ public class WFCIndexPart extends WFCFormPart {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
 	int tableSelectionBuffer;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_LIMIT)
+	int indexLimit;
+
 	private Table data;
 
 	private NatTable natTable;
@@ -338,14 +342,19 @@ public class WFCIndexPart extends WFCFormPart {
 		if (map.get(mPerspective) != null) {
 			// clear the group by summary cache so the new summary calculation gets triggered
 			bodyLayerStack.getBodyDataLayer().clearCache();
+
 			Table table = map.get(mPerspective);
 			List<Row> rows = table.getRows();
 			int limit = -1;
 
-			// TODO: nur öffnen, wenn mehr als 1000 Sätze
-			LimitIndexDialog lid = new LimitIndexDialog(Display.getCurrent().getActiveShell(), translationService, rows.size());
-			lid.open();
-			limit = lid.getLimit();
+			int totalResults = table.getMetaData().getTotalResults();
+			if (totalResults >= indexLimit) {
+				LimitIndexDialog lid = new LimitIndexDialog(Display.getCurrent().getActiveShell(), translationService, totalResults, indexLimit);
+				lid.open();
+				limit = lid.getLimit();
+			}
+			
+			//TODO: Neue Anfrage, wenn mehr Datensätze gewünscht sind
 
 			// Abbrechen, (x), Escape -> nichts laden/ändern
 			if (limit == -2) {

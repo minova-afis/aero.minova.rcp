@@ -269,6 +269,6 @@ public class Table {
 	}
 
 	public void setMetaDataLimit(int limit) {
-		metaData.setLimited(limit);
+		fillMetaData(limit, null, null);
 	}
 }

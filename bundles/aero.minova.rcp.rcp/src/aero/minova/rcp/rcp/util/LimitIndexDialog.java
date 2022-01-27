@@ -21,7 +21,13 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class LimitIndexDialog extends IconAndMessageDialog {
 
+	/**
+	 * -1: alles Laden<br>
+	 * -2: nichts Laden <br>
+	 * >= 0: gebene Anzahl laden
+	 */
 	private int limit = -2;
+	private int defaultLimit;
 
 	private TranslationService translationService;
 
@@ -31,9 +37,10 @@ public class LimitIndexDialog extends IconAndMessageDialog {
 	public static final int BUTTON_NO_LIMIT_ID = 5;
 	public static final int BUTTON_CANCEL_ID = 6;
 
-	public LimitIndexDialog(Shell parentShell, TranslationService translationService, int currentNumber) {
+	public LimitIndexDialog(Shell parentShell, TranslationService translationService, int currentNumber, int defaultLimit) {
 		super(parentShell);
 		this.translationService = translationService;
+		this.defaultLimit = defaultLimit;
 		this.message = MessageFormat.format(translationService.translate("@limitIndex.message", null), currentNumber);
 	}
 
@@ -52,7 +59,7 @@ public class LimitIndexDialog extends IconAndMessageDialog {
 		LabelFactory.newLabel(SWT.BORDER).text(translationService.translate("@limitIndex.inputLabel", null)).create(wrap);
 
 		limitEditor = new Spinner(wrap, SWT.BORDER);
-		limitEditor.setValues(1000, 0, Integer.MAX_VALUE, 0, 1, 10);
+		limitEditor.setValues(defaultLimit, 0, Integer.MAX_VALUE, 0, 1, 10);
 
 		return dialogParent;
 	}
