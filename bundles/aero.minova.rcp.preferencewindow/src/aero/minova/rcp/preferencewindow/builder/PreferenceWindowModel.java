@@ -165,10 +165,13 @@ public class PreferenceWindowModel {
 //		psd.add(new PreferenceDescriptor(ApplicationPreferences.MAX_BUFFER_MS, translationService.translate("@Preferences.Buffer.MaxBufferMs", null), null, 0.2,
 //				DisplayType.INTEGER, 90));
 
-		psd = new PreferenceSectionDescriptor("Table", translationService.translate("@Preferences.Table", null), 0.3);
+		psd = new PreferenceSectionDescriptor("Table", translationService.translate("@Form.Index", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TABLE_SELECTION_BUFFER_MS,
-				translationService.translate("@Preferences.Table.TableSelectionBufferMs", null), null, 0.1, DisplayType.INTEGER, 150));
+				translationService.translate("@Preferences.Table.TableSelectionBufferMs", null),
+				translationService.translate("@Preferences.Table.TableSelectionBufferMs.Tooltip", null), 0.1, DisplayType.INTEGER, 150));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.INDEX_LIMIT, translationService.translate("@Preferences.Table.IndexLimit", null),
+				translationService.translate("@Preferences.Table.IndexLimit.Tooltip", null), 0.2, DisplayType.INTEGER, 1000));
 
 		psd = new PreferenceSectionDescriptor("Timeout", translationService.translate("@Preferences.Timeout", null), 0.4);
 		ptd.add(psd);

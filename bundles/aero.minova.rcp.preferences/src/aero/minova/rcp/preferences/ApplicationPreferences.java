@@ -267,5 +267,7 @@ public class ApplicationPreferences {
 
 	public static final String GRID_TAB_NAVIGATION = "GridTabNavigation";
 
+	public static final String INDEX_LIMIT = "IndexLimit";
+
 	private ApplicationPreferences() {}
 }
