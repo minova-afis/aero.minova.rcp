@@ -50,8 +50,7 @@ public class CustomPWIntegerText extends CustomPWText {
 		// Wenn nötig Einheit hinzufügen
 		if (completeLabel.contains("[")) {
 			final Label unit = new Label(cmp, SWT.NONE);
-			unit.setText(completeLabel.substring(completeLabel.lastIndexOf("[") + 1));
-			unit.setText(unit.getText().replace("]", ""));
+			unit.setText(completeLabel.substring(completeLabel.lastIndexOf("[") + 1).replace("]", ""));
 			final GridData unitGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			unit.setLayoutData(unitGridData);
 			addControl(unit);
