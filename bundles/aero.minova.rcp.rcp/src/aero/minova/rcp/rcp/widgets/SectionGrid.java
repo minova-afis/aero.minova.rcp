@@ -243,7 +243,7 @@ public class SectionGrid {
 			Button btnInsert = new Button();
 			btnInsert.setId(Constants.CONTROL_GRID_BUTTON_INSERT);
 			btnInsert.setIcon("NewRecord.Command");
-			btnInsert.setText(translationService.translate("@Action.New", null));
+			btnInsert.setText("@Action.New");
 			btnInsert.setEnabled(true);
 			createToolItem(bar, btnInsert, grid.getId() + "." + btnInsert.getId());
 		}
@@ -252,7 +252,7 @@ public class SectionGrid {
 			Button btnDel = new Button();
 			btnDel.setId(Constants.CONTROL_GRID_BUTTON_DELETE);
 			btnDel.setIcon("DeleteRecord.Command");
-			btnDel.setText(translationService.translate("@Action.DeleteLine", null));
+			btnDel.setText("@Action.DeleteLine");
 			btnDel.setEnabled(true);
 			createToolItem(bar, btnDel, grid.getId() + "." + btnDel.getId());
 		}
@@ -266,21 +266,21 @@ public class SectionGrid {
 		Button btnOptimizeHigh = new Button();
 		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
-		btnOptimizeHigh.setText(translationService.translate("@Action.Grid.OptimizeHeight", null));
+		btnOptimizeHigh.setText("@Action.Grid.OptimizeHeight");
 		btnOptimizeHigh.setEnabled(true);
 		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
-		btnOptimizeWidth.setText(translationService.translate("@Action.Grid.OptimizeWidth", null));
+		btnOptimizeWidth.setText("@Action.Grid.OptimizeWidth");
 		btnOptimizeWidth.setEnabled(true);
 		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
 
 		Button btnHorizontalFill = new Button();
 		btnHorizontalFill.setId(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
 		btnHorizontalFill.setIcon("ResizeLayout.Command");
-		btnHorizontalFill.setText(translationService.translate("@Action.Grid.HorizontalFill", null));
+		btnHorizontalFill.setText("@Action.Grid.HorizontalFill");
 		btnHorizontalFill.setEnabled(true);
 		createToolItem(bar, btnHorizontalFill, grid.getId() + "." + btnHorizontalFill.getId());
 
@@ -298,6 +298,7 @@ public class SectionGrid {
 		item.setEnabled(btn.isEnabled());
 		if (btn.getText() != null) {
 			item.setToolTipText(translationService.translate(btn.getText(), null));
+			item.setData(FieldUtil.TRANSLATE_PROPERTY, btn.getText());
 		}
 
 		MButton mButton = new MButton(buttonID);
