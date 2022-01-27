@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class CustomPWIntegerText extends CustomPWText {
 
+	String completeLabel;
+
 	/**
 	 * Constructor
 	 *
@@ -21,71 +23,43 @@ public class CustomPWIntegerText extends CustomPWText {
 	 *            associated key
 	 */
 	public CustomPWIntegerText(final String label, @Optional String tooltip, final String propertyKey) {
-		super(label, tooltip, propertyKey);
+		super(label.contains("[") ? label.substring(0, label.lastIndexOf("[") - 1) : label, tooltip, propertyKey);
+		completeLabel = label;
 	}
 
 	@Override
 	public Control build(final Composite parent) {
-		String translatedLabel = getLabel();
 
-		if (translatedLabel.contains("[")) {
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(translatedLabel.substring(0, translatedLabel.lastIndexOf("[") - 1));
-			label.setToolTipText(getTooltip());
-			final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
-			labelGridData.horizontalIndent = 25;
-			label.setLayoutData(labelGridData);
-			addControl(label);
+		buildLabel(parent, GridData.CENTER);
 
-			Composite cmp = new Composite(parent, SWT.NONE);
-			cmp.setLayout(new GridLayout(3, false));
-			addControl(cmp);
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(3, false));
+		addControl(cmp);
 
-			text = new Text(cmp, SWT.BORDER | SWT.RIGHT | getStyle());
-			final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-			textGridData.widthHint = 150;
-			text.setLayoutData(textGridData);
-			text.setToolTipText(getTooltip());
-			addControl(text);
+		text = new Text(cmp, SWT.BORDER | SWT.RIGHT | getStyle());
+		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		textGridData.widthHint = 150;
+		text.setLayoutData(textGridData);
+		text.setToolTipText(getTooltip());
+		addControl(text);
 
-			addVerifyListeners();
-			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-			text.addListener(SWT.Modify, event -> {
-				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
-			});
+		addVerifyListeners();
+		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+		text.addListener(SWT.Modify, event -> PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue()));
 
+		// Wenn nötig Einheit hinzufügen
+		if (completeLabel.contains("[")) {
 			final Label unit = new Label(cmp, SWT.NONE);
-			unit.setText(translatedLabel.substring(translatedLabel.lastIndexOf("[") + 1));
+			unit.setText(completeLabel.substring(completeLabel.lastIndexOf("[") + 1));
 			unit.setText(unit.getText().replace("]", ""));
 			final GridData unitGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 			unit.setLayoutData(unitGridData);
 			addControl(unit);
+		}
 
-			Label icon = new Label(cmp, SWT.NONE);
-			if (getTooltip() != null) {
-				createTooltipInfoIcon(icon);
-			}
-
-		} else {
-			buildLabel(parent, GridData.CENTER);
-
-			Composite cmp = new Composite(parent, SWT.NONE);
-			cmp.setLayout(new GridLayout(2, false));
-			addControl(cmp);
-
-			text = new Text(cmp, SWT.BORDER | SWT.RIGHT | getStyle());
-			text.setToolTipText(getTooltip());
-			addControl(text);
-			addVerifyListeners();
-			text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
-			text.addListener(SWT.Modify, event -> {
-				PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
-			});
-
-			Label icon = new Label(cmp, SWT.NONE);
-			if (getTooltip() != null) {
-				createTooltipInfoIcon(icon);
-			}
+		Label icon = new Label(cmp, SWT.NONE);
+		if (getTooltip() != null) {
+			createTooltipInfoIcon(icon);
 		}
 
 		return text;
