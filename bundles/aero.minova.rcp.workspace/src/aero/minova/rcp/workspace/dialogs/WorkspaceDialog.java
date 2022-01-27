@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
@@ -54,15 +53,15 @@ public class WorkspaceDialog extends Dialog {
 
 	private Logger logger;
 	private boolean loadedProfile = false;
+	private String defaultConnectionString;
 
-	public WorkspaceDialog(Shell parentShell, Logger logger, UISynchronize sync) {
+	public WorkspaceDialog(Shell parentShell, Logger logger) {
 		super(parentShell);
 		this.logger = logger;
 	}
 
-	public WorkspaceDialog(Shell parentShell, Logger logger, UISynchronize sync, String profileName) {
-		super(parentShell);
-		this.logger = logger;
+	public WorkspaceDialog(Shell parentShell, Logger logger, String profileName) {
+		this(parentShell, logger);
 		this.profileName = profileName;
 	}
 
@@ -94,18 +93,16 @@ public class WorkspaceDialog extends Dialog {
 			public void focusLost(FocusEvent e) {
 				int i = profile.getSelectionIndex();
 				try {
-					username.setText("");
 					if (profile.getText().isEmpty() || !loadedProfile || i == -1) {
 						password.setText("");
 					} else {
+						username.setText("");
 						password.setText("xxxxxxxxxxxxxxxxxxxx");
+						connectionString.setText("");
+						applicationArea.setText("");
 					}
-					connectionString.setText("");
-					applicationArea.setText("");
 					loadProfileData();
-				} catch (NullPointerException ex) {
-
-				}
+				} catch (NullPointerException ex) {}
 			}
 		});
 
@@ -179,6 +176,11 @@ public class WorkspaceDialog extends Dialog {
 		// Wenn profileName gegeben wurde dieses laden
 		setProfile(profileName);
 		loadProfileData();
+
+		// Wenn noch keine Profile gegeben sind, Connection-String aus settings.properties nutzen
+		if (profile.getItemCount() == 0 && defaultConnectionString != null) {
+			connectionString.setText(defaultConnectionString);
+		}
 
 		return container;
 	}
@@ -285,4 +287,7 @@ public class WorkspaceDialog extends Dialog {
 		}
 	}
 
+	public void setDefaultConnectionString(String defaultConnectionString) {
+		this.defaultConnectionString = defaultConnectionString;
+	}
 }

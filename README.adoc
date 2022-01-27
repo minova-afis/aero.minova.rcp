@@ -283,6 +283,7 @@ Die Configuration habe ich auch standalone erstellt / released.
 
 * link:releng/aero.minova.rcp.product/README.adoc[Aktueller Releaseprozess]
 * link:PluginErstellen.adoc[Erstellen von neuen Plugins (für Helper, Ersatz von JavaScript in Masken)]
+* link:SettingsProperties.adoc[settings.properties Datei]
 * link:Updatesite.adoc[Erstellen und Nutzen von der Updatesite]
 * link:bundles/aero.minova.rcp.preferences/README.adoc[Einstellungen]
 * link:bundles/aero.minova.rcp.rcp/README.adoc[UI Eigenschaften]

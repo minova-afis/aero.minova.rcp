@@ -4,6 +4,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -22,8 +23,8 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public CustomPWChooser(final String label, final String propertyKey, @Optional TranslationService translationService) {
-		super(label, propertyKey, 3, false);
+	public CustomPWChooser(final String label, final String tooltip, final String propertyKey, @Optional TranslationService translationService) {
+		super(label, tooltip, propertyKey, 2, false);
 		this.translationService = translationService;
 		setGrabExcessSpace(false);
 	}
@@ -34,29 +35,36 @@ public abstract class CustomPWChooser extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-
-		if (getLabel() == null) {
-			throw new UnsupportedOperationException("You need to set a label for a directory or a dialog chooser");
-		} else {
-			label.setText(getLabel());
-		}
+		label.setText(getLabel());
+		label.setToolTipText(getTooltip());
 		addControl(label);
 		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
 		labelGridData.horizontalIndent = 25;
 		label.setLayoutData(labelGridData);
 
-		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY);
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(3, false));
+		GridData gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		cmp.setLayoutData(gd);
+		addControl(cmp);
+
+		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
+		text.setToolTipText(getTooltip());
 		addControl(text);
 		final GridData textGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(textGridData);
 
-		final Button button = new Button(parent, SWT.PUSH);
+		final Button button = new Button(cmp, SWT.PUSH);
 		addControl(button);
-		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		button.setText(translationService.translate("@Preferences.Choose", null) + "...");
-		button.setLayoutData(buttonGridData);
 
 		setButtonAction(text, button);
+
+		Label icon = new Label(cmp, SWT.NONE);
+		if (getTooltip() != null) {
+			createTooltipInfoIcon(icon);
+		}
 
 		return button;
 

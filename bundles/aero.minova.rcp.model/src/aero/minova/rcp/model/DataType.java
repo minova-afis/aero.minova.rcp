@@ -8,5 +8,6 @@ public enum DataType {
 	INSTANT, //
 	ZONED, //
 	BOOLEAN, //
-	FILTER
+	FILTER, //
+	REFERENCE
 }

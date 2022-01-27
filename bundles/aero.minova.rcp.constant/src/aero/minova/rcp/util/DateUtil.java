@@ -127,7 +127,7 @@ public class DateUtil {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
 				}
 			}
-		} catch (DateTimeException e) {
+		} catch (DateTimeException | NullPointerException e ) {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}

@@ -4,21 +4,23 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -54,6 +56,8 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
+import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.selection.event.ISelectionEvent;
@@ -62,7 +66,6 @@ import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.eclipse.nebula.widgets.nattable.ui.action.IKeyAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -71,21 +74,21 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
+import aero.minova.rcp.css.ICssStyler;
+import aero.minova.rcp.css.widgets.MinovaSection;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -95,6 +98,7 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.KeyType;
+import aero.minova.rcp.model.ReferenceValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
@@ -105,6 +109,7 @@ import aero.minova.rcp.model.form.IGridValidator;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.ButtonAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
@@ -113,7 +118,6 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
-import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -143,11 +147,15 @@ public class SectionGrid {
 	@Inject
 	private IEventBroker broker;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
+	boolean gridTabNavigation;
+
 	private NatTable natTable;
 	private Table dataTable;
 	private Grid grid;
 	private Composite composite;
-	private Section section;
+	private MinovaSection section;
 	private MDetail mDetail;
 
 	private SortedList<Row> sortedList;
@@ -175,8 +183,8 @@ public class SectionGrid {
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
-	private static final int DEFAULT_WIDTH = WFCDetailPart.SECTION_WIDTH - BUFFER;
-	private int default_height;
+	private int defaultWidth = ICssStyler.CSS_TEXT_WIDTH - BUFFER;
+	private int defaultHeight;
 
 	private ColumnReorderLayer columnReorderLayer;
 
@@ -190,7 +198,11 @@ public class SectionGrid {
 
 	private GlazedListsEventLayer eventLayer;
 
-	public SectionGrid(Composite composite, Section section, Grid grid, MDetail mDetail) {
+	private MinovaColumnPropertyAccessor columnPropertyAccessor;
+
+	private ColumnHeaderLayer columnHeaderLayer;
+
+	public SectionGrid(Composite composite, MinovaSection section, Grid grid, MDetail mDetail) {
 		this.section = section;
 		this.grid = grid;
 		this.composite = composite;
@@ -254,16 +266,23 @@ public class SectionGrid {
 		Button btnOptimizeHigh = new Button();
 		btnOptimizeHigh.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT);
 		btnOptimizeHigh.setIcon("ExpandSectionVertical.Command");
-		btnOptimizeHigh.setText(translationService.translate("@Action.OptimizeHeight", null));
+		btnOptimizeHigh.setText(translationService.translate("@Action.Grid.OptimizeHeight", null));
 		btnOptimizeHigh.setEnabled(true);
 		createToolItem(bar, btnOptimizeHigh, grid.getId() + "." + btnOptimizeHigh.getId());
 
 		Button btnOptimizeWidth = new Button();
 		btnOptimizeWidth.setId(Constants.CONTROL_GRID_BUTTON_OPTIMIZEWIDTH);
 		btnOptimizeWidth.setIcon("ExpandSectionHorizontal.Command");
-		btnOptimizeWidth.setText(translationService.translate("@Action.OptimizeWidth", null));
+		btnOptimizeWidth.setText(translationService.translate("@Action.Grid.OptimizeWidth", null));
 		btnOptimizeWidth.setEnabled(true);
 		createToolItem(bar, btnOptimizeWidth, grid.getId() + "." + btnOptimizeWidth.getId());
+
+		Button btnHorizontalFill = new Button();
+		btnHorizontalFill.setId(Constants.CONTROL_GRID_BUTTON_HORIZONTALFILL);
+		btnHorizontalFill.setIcon("ResizeLayout.Command");
+		btnHorizontalFill.setText(translationService.translate("@Action.Grid.HorizontalFill", null));
+		btnHorizontalFill.setEnabled(true);
+		createToolItem(bar, btnHorizontalFill, grid.getId() + "." + btnHorizontalFill.getId());
 
 		section.setTextClient(bar);
 	}
@@ -284,7 +303,7 @@ public class SectionGrid {
 		MButton mButton = new MButton(buttonID);
 		mButton.setIcon(btn.getIcon());
 		mButton.setText(btn.getText());
-		ButtonAccessor bA = new ButtonAccessor(mButton, item);
+		ButtonAccessor bA = new ButtonAccessor(item);
 		mButton.setButtonAccessor(bA);
 		mDetail.putButton(mButton);
 
@@ -323,7 +342,7 @@ public class SectionGrid {
 		// create the body stack
 		EventList<Row> eventList = GlazedLists.eventList(dataTable.getRows());
 		sortedList = new SortedList<>(eventList, null);
-		MinovaColumnPropertyAccessor columnPropertyAccessor = new MinovaColumnPropertyAccessor(dataTable, grid);
+		columnPropertyAccessor = new MinovaColumnPropertyAccessor(dataTable, grid);
 		columnPropertyAccessor.initPropertyNames(translationService);
 
 		IDataProvider bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
@@ -369,12 +388,13 @@ public class SectionGrid {
 
 		viewportLayer = new ViewportLayer(selectionLayer);
 		viewportLayer.setRegionName(GridRegion.BODY);
+		viewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(selectionLayer, ITraversalStrategy.TABLE_TRAVERSAL_STRATEGY));
 
 		// build the column header layer
 		IDataProvider columnHeaderDataProvider = new DefaultColumnHeaderDataProvider(columnPropertyAccessor.getPropertyNames(),
 				columnPropertyAccessor.getTableHeadersMap());
 		DataLayer columnHeaderDataLayer = new DefaultColumnHeaderDataLayer(columnHeaderDataProvider);
-		ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
+		columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer);
 		sortHeaderLayer = new SortHeaderLayer<>(columnHeaderLayer,
 				new GlazedListsSortModel<>(sortedList, columnPropertyAccessor, configRegistry, columnHeaderDataLayer), false);
 		// Eigenen Sort-Comparator auf alle Spalten registrieren (Verhindert Fehler bei Datumsspalten)
@@ -404,7 +424,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService);
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService, translationService);
 		getNatTable().addConfiguration(gridConfiguration);
 		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
@@ -422,15 +442,16 @@ public class SectionGrid {
 		getNatTable().addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty()) {
+				if (((NatTable) e.getSource()).getChildren().length <= 0) {
 					((DetailAccessor) mDetail.getDetailAccessor()).setSelectedControl(null);
+					selectionLayer.clear();
 				}
-				selectionLayer.clear();
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null) {
+				if (selectionLayer.getSelectedCells().isEmpty() && getNatTable().getActiveCellEditor() == null
+						&& ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl() != getNatTable()) {
 					getNatTable()
 							.doCommand(new SelectCellCommand(selectionLayer, selectionLayer.getColumnPositionByIndex(viewportLayer.getColumnIndexByPosition(0)),
 									selectionLayer.getRowPositionByIndex(viewportLayer.getRowIndexByPosition(0)), false, false));
@@ -443,12 +464,18 @@ public class SectionGrid {
 
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_NEXT:
-				selectionLayer.clear();
-				e.doit = true;
+				if ((selectionLayer.getSelectionAnchor().columnPosition == selectionLayer.getColumnCount() - 1
+						&& selectionLayer.getSelectionAnchor().rowPosition == selectionLayer.getRowCount() - 1) || !gridTabNavigation || sortedList.isEmpty()) {
+					selectionLayer.clear();
+					e.doit = true;
+				}
 				break;
 			case SWT.TRAVERSE_TAB_PREVIOUS:
-				selectionLayer.clear();
-				e.doit = true;
+				if ((selectionLayer.getSelectionAnchor().columnPosition == 0 && selectionLayer.getSelectionAnchor().rowPosition == 0) || !gridTabNavigation
+						|| sortedList.isEmpty()) {
+					selectionLayer.clear();
+					e.doit = true;
+				}
 				break;
 			default:
 				break;
@@ -457,14 +484,15 @@ public class SectionGrid {
 
 		FormData fd = new FormData();
 
-		String prefsWidthKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-		String widthString = prefsDetailSections.get(prefsWidthKey, null);
-		fd.width = widthString != null ? Integer.parseInt(widthString) : DEFAULT_WIDTH;
+		// Nattable immer über die gesamte Breite des Parent-Composites zeichnen
+		fd.left = new FormAttachment(0);
+		fd.right = new FormAttachment(100);
 
-		default_height = natTable.getRowHeightByPosition(0) * 5;
+		// Höhe wiederherstellen
+		defaultHeight = natTable.getRowHeightByPosition(0) * 5;
 		String prefsHeightKey = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
 		String heightString = prefsDetailSections.get(prefsHeightKey, null);
-		fd.height = heightString != null ? Integer.parseInt(heightString) : default_height;
+		fd.height = heightString != null ? Integer.parseInt(heightString) : defaultHeight;
 		prevHeight = fd.height;
 
 		getNatTable().setLayoutData(fd);
@@ -486,15 +514,10 @@ public class SectionGrid {
 			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
 			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), new IKeyAction() {
-
-			@Override
-			public void run(NatTable natTable, KeyEvent event) {
-				Map<String, String> parameter = new HashMap<>();
-				ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
-				handlerService.executeHandler(command);
-
-			}
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), (natTable, event) -> {
+			Map<String, String> parameter = new HashMap<>();
+			ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
+			handlerService.executeHandler(command);
 		});
 
 		getNatTable().setData(Constants.GRID_DATA_SECTION, section);
@@ -503,6 +526,22 @@ public class SectionGrid {
 		getNatTable().setData("EHandlerService", handlerService);
 		getNatTable().setData("ECommandService", commandService);
 		return getNatTable();
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
+
+		if (gridConfiguration != null) {
+			gridConfiguration.translateLookups();
+		}
 	}
 
 	public void execButtonHandler(String btnId, String commandName) {
@@ -540,21 +579,7 @@ public class SectionGrid {
 	}
 
 	private void addRowsFromTable(Table rowsToAdd) {
-		for (Row rowInNewTable : rowsToAdd.getRows()) {
-			Row rowInOriginal = this.dataTable.addRow();
-
-			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
-			for (Column originalColumn : this.dataTable.getColumns()) {
-
-				for (Column newColumn : rowsToAdd.getColumns()) {
-					if (originalColumn.getName().equals(newColumn.getName())) {
-						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
-						int index = this.dataTable.getColumns().indexOf(originalColumn);
-						rowInOriginal.setValue(v, index);
-					}
-				}
-			}
-		}
+		this.dataTable.addRowsFromTable(rowsToAdd);
 		updateNatTable();
 	}
 
@@ -607,21 +632,16 @@ public class SectionGrid {
 		optimalHeight = Math.max(natTable.getRowHeightByPosition(0) * 3, optimalHeight);
 
 		if (optimalHeight == prevHeight) {
-			optimalHeight = default_height;
+			optimalHeight = defaultHeight;
 		}
 
 		prevHeight = optimalHeight;
 		fd.height = optimalHeight;
 		natTable.requestLayout();
 
-		Point p = section.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-		RowData rd = (RowData) section.getLayoutData();
-		rd.height = p.y;
-		section.requestLayout();
-
 		// Height Speicher, damit beim Neuladen wieder hergestellt wird
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".height";
-		prefsDetailSections.put(key, rd.height + "");
+		prefsDetailSections.put(key, fd.height + "");
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
@@ -629,46 +649,14 @@ public class SectionGrid {
 		}
 	}
 
-	public void adjustWidth() {
-
-		int detailWidthPercentage = Integer.parseInt(emservice
-				.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.partstack.details", MPartStack.class).get(0).getContainerData());
-		int detailWidthUI = (int) (mwindow.getWidth() * (detailWidthPercentage / 10000.0)) - 50;
-
-		FormData fd = (FormData) natTable.getLayoutData();
-
-		// TODO: Mit ausgeblendeten Spalten ist die neue Tabelle noch zu Breit
-		int optimalWidth = natTable.getPreferredWidth();
-		for (int i : columnHideShowLayer.getHiddenColumnIndexes()) {
-			optimalWidth -= natTable.getColumnWidthByPosition(i);
-		}
-
-		// Maximal aktuelle Detailbreite ausfüllen
-		optimalWidth = Math.min(detailWidthUI, optimalWidth);
-
-		// Toggel zwischen Default-Breite und kompletter Nattable
-		int newWidth = fd.width == DEFAULT_WIDTH ? optimalWidth : DEFAULT_WIDTH;
-
-		fd.width = newWidth;
-		natTable.requestLayout();
-
-		RowData rd = (RowData) section.getLayoutData();
-		// Section soll nicht kleiner als Default sein
-		rd.width = Math.max(newWidth, DEFAULT_WIDTH) + BUFFER;
+	public void fillHorizontal() {
+		MinovaSectionData rd = (MinovaSectionData) section.getLayoutData();
+		rd.horizontalFill = !rd.horizontalFill;
 		section.requestLayout();
 
-		// Width in den Context setzten, damit wir überall darauf zugreifen können
-		MPart detail = emservice.findElements(perspective, "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
-		detail.getContext().set(Constants.DETAIL_WIDTH, rd.width);
-
-		// Width Speicher, damit beim Neuladen wieder hergestellt wird
-		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".width";
-		prefsDetailSections.put(key, rd.width + "");
-		try {
-			prefsDetailSections.flush();
-		} catch (BackingStoreException e) {
-			e.printStackTrace();
-		}
+		// Zustand speichern, damit wiederhergestellt werden kann
+		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".horizontalFill";
+		prefsDetailSections.put(key, rd.horizontalFill + "");
 	}
 
 	public Row addNewRow() {
@@ -688,14 +676,14 @@ public class SectionGrid {
 	}
 
 	public void setPrimaryKeys(Map<String, Value> primaryKeys) {
+
 		for (Row r : dataTable.getRows()) {
 
 			if (!getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen
 
 				for (Field f : grid.getField()) {
 					if (getFieldnameToValue().containsKey(f.getName())) {
-						Value v = mDetail.getField(getFieldnameToValue().get(f.getName())).getValue();
-						r.setValue(v, grid.getField().indexOf(f));
+						setReferenceOrMainValue(r, primaryKeys, getFieldnameToValue().get(f.getName()), grid.getField().indexOf(f));
 					}
 				}
 
@@ -705,15 +693,25 @@ public class SectionGrid {
 					if (KeyType.PRIMARY.toString().equalsIgnoreCase(f.getKeyType())) {
 						int index = grid.getField().indexOf(f);
 
-						if (primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
-							r.setValue(primaryKeys.get(f.getName()), index);
+						if (primaryKeys != null && primaryKeys.containsKey(f.getName())) { // Übereinstimmende Namen nutzen
+							setReferenceOrMainValue(r, primaryKeys, f.getName(), index);
 						} else if (firstPrimary) { // Default: erstes Primary-Feld bekommt Wert von KeyLong
-							r.setValue(primaryKeys.get("KeyLong"), index);
+							setReferenceOrMainValue(r, primaryKeys, Constants.TABLE_KEYLONG, index);
 						}
 						firstPrimary = false;
 					}
 				}
 			}
+		}
+	}
+
+	private void setReferenceOrMainValue(Row r, Map<String, Value> primaryKeys, String mainFieldName, int indexInRow) {
+		if (primaryKeys == null) { // Bei Insert ReferenceValue
+			ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, mainFieldName);
+			r.setValue(v, indexInRow);
+		} else { // Bei Update Wert aus der Hauptmaske
+			Value v = mDetail.getField(mainFieldName).getValue();
+			r.setValue(v, indexInRow);
 		}
 	}
 
@@ -911,6 +909,10 @@ public class SectionGrid {
 		// Anzeigen der Fehlermeldung
 		this.natTable.addConfiguration(new CrossValidationConfiguration(validator, broker));
 		this.natTable.configure();
+	}
+
+	public void updateGridLookupValues() {
+		gridConfiguration.updateContentProvider();
 	}
 
 }

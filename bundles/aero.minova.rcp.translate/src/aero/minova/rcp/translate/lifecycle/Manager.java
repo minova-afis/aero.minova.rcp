@@ -8,9 +8,12 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.translate.service.WFCTranslationService;
@@ -23,8 +26,12 @@ public class Manager {
 	public void postContextCreate(IEclipseContext context) {
 		context.set(TranslationService.LOCALE, CustomLocale.getLocale());
 		configureTranslationService(context);
-		context.set("aero.minova.rcp.applicationid", "WFC");
-		context.set("aero.minova.rcp.customerid", "MIN");
+		if (!context.containsKey("aero.minova.rcp.applicationid")) {
+			context.set("aero.minova.rcp.applicationid", "SIS");
+		}
+		if (!context.containsKey("aero.minova.rcp.customerid")) {
+			context.set("aero.minova.rcp.customerid", "MIN");
+		}
 		initPrefs();
 	}
 
@@ -37,6 +44,22 @@ public class Manager {
 			WFCTranslationService translationService = ContextInjectionFactory.make(WFCTranslationService.class, context);
 			translationService.setTranslationService((TranslationService) currentTranslationService);
 			context.set(TranslationService.class, translationService);
+			openResetWorkspaceUIDialog(translationService, context);
+		}
+	}
+
+	/**
+	 * Öffnet den "Structural changes"-Dialog wenn sich die Model-Version geändert hat
+	 *
+	 * @param translationService
+	 * @param context
+	 */
+	private void openResetWorkspaceUIDialog(WFCTranslationService translationService, IEclipseContext context) {
+		boolean showMessage = context.get(Constants.SHOW_WORKSPACE_RESET_MESSAGE) != null && (boolean) context.get(Constants.SHOW_WORKSPACE_RESET_MESSAGE);
+		if (showMessage) {
+			MessageDialog.openWarning(Display.getCurrent().getActiveShell(), translationService.translate("@msg.WorkspaceResetTitle", null),
+					translationService.translate("@msg.WorkspaceResetMessage", null));
+			context.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, false);
 		}
 	}
 
@@ -87,9 +110,12 @@ public class Manager {
 		preferences.putBoolean(ApplicationPreferences.DISABLE_PREVIEW, deactivateinternpreview);
 		int maxCharacter = preferences.getInt(ApplicationPreferences.MAX_CHARS, 24000);
 		preferences.putInt(ApplicationPreferences.MAX_CHARS, maxCharacter);
+		boolean gridTabNavigation = preferences.getBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, true);
+		preferences.putBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, gridTabNavigation);
 		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
-		if ("".equals(fd))
+		if ("".equals(fd)) {
 			fd = null;
+		}
 		FontData fdC = (fd == null ? null : new FontData(fd));
 		if (fd != null) {
 			preferences.put(ApplicationPreferences.INDEX_FONT, (fdC.toString()));

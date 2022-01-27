@@ -15,4 +15,7 @@ public enum ActionCode {
 
 	BEFOREREAD, //
 	AFTERREAD,
+
+	AFTERCOPY, //
+	AFTERBLOCK
 }

@@ -32,15 +32,12 @@ public class SectionAccessor implements ISectionAccessor {
 	}
 
 	/**
-	 * Ändert die Sichtbarkeit zum gegeben Wert. Außerdem wird die Section ein-/ausgeklappt damit sie weniger Platz wegnimmt <br>
-	 * TODO: Komplett entfernen, nicht nur ausblenden
+	 * Ändert die Sichtbarkeit zum gegeben Wert.
 	 * 
 	 * @param visible
 	 */
 	@Override
 	public void setVisible(boolean visible) {
 		section.setVisible(visible);
-		section.setExpanded(visible);
 	}
-
 }

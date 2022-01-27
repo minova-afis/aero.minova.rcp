@@ -1,0 +1,41 @@
+/* Colors for macos */
+Canvas, CTabItem, DetailComposite, ExpandableComposite, LayoutComposite,
+	MinovaSection, NatTable, ScrolledComposite, Section, ToolBar  {
+	color: #404040;
+}
+Section, MinovaSection {
+	border-color-titlebar: black;
+}
+Composite, .MPart, MinovaSection {
+	background-color: #ececec; /* Standard eclipse 2021-09 macos */
+}
+
+CTabItem:selected {
+	background-color: white;
+}
+
+Label, Text, Button, Button.Description, Label.Description, Section.Description  {
+	color: #404040;
+}
+
+/*Verschiedene Feldfarben*/
+Text.ReadOnly, LookupComposite.ReadOnly, TextAssist.ReadOnly {
+	background-color: inherit;
+}
+Text.Standard, LookupComposite.Standard, TextAssist.Standard {
+	background-color: white;
+}
+Text.ValueRequired, LookupComposite.ValueRequired, TextAssist.ValueRequired {
+	background-color: #FCD267;
+}
+Text.InvalidValue, LookupComposite.InvalidValue, TextAssist.InvalidValue {
+	background-color: red;
+}
+
+Label#SplashLabel {
+	color: white;
+}
+Text#Console {
+	background-color: black;
+	color: white;
+}

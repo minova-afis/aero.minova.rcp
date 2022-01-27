@@ -1,12 +1,9 @@
 package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 import static aero.minova.rcp.rcp.fields.FieldUtil.SHORT_DATE_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,7 +19,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssistContentProvider;
 import org.eclipse.swt.SWT;
@@ -36,6 +32,8 @@ import org.eclipse.swt.widgets.Label;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.CssData;
+import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
@@ -54,10 +52,7 @@ public class ShortDateField {
 			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
-
-		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
-		label.setData(TRANSLATE_PROPERTY, labelText);
+		Label label = FieldLabel.create(composite, field);
 
 		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
 
@@ -68,7 +63,7 @@ public class ShortDateField {
 						locale);
 				ArrayList<String> result = new ArrayList<>();
 				Instant date = DateUtil.getDate(entry, locale, dateUtil);
-				if (date == null && !entry.isEmpty()) {
+				if (date == null) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
 					result.add(DateUtil.getDateString(date, locale, dateUtil));
@@ -104,19 +99,15 @@ public class ShortDateField {
 		ContextInjectionFactory.inject(valueAccessor, context);
 		field.setValueAccessor(valueAccessor);
 
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
+		FormData fd = new FormData();
+		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
+		fd.left = new FormAttachment((column == 0) ? 25 : 75);
+		fd.width = SHORT_DATE_WIDTH;
+		text.setLayoutData(fd);
+		text.setData(CssData.CSSDATA_KEY,
+				new CssData(CssType.DATE_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), false));
 
-		labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		textFormData.width = SHORT_DATE_WIDTH;
-
-		label.setLayoutData(labelFormData);
-		text.setLayoutData(textFormData);
+		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
 
 		return text;
 	}

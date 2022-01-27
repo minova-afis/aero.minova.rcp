@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.awt.Font;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -37,17 +36,17 @@ import org.eclipse.nebula.widgets.nattable.resize.MaxCellBoundsHelper;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.internal.FileUtil;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
-import aero.minova.rcp.rcp.parts.Preview;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.rcp.print.ColumnInfo;
 import aero.minova.rcp.rcp.print.ReportConfiguration;
@@ -106,9 +105,9 @@ public class PrintIndexHandler {
 	@PostConstruct
 	public void downloadPFDZip() {
 		try {
-			dataService.getHashedZip("PDF.zip");
+			dataService.getHashedZip("pdf.zip");
 		} catch (Exception e) {}
-		File pdfFolder = dataService.getStoragePath().resolve("PDF/").toFile();
+		File pdfFolder = dataService.getStoragePath().resolve("pdf/").toFile();
 		pdfFolderExists = pdfFolder.exists();
 	}
 
@@ -134,9 +133,9 @@ public class PrintIndexHandler {
 		StringBuffer xml = new StringBuffer();
 
 		MPerspective activePerspective = modelService.getActivePerspective(window);
-		title = translationService.translate(activePerspective.getLabel(), activePerspective.getLabel());
+		title = translationService.translate(activePerspective.getLabel(), null);
 
-		Path path_reports = dataService.getStoragePath().resolve("PDF/");
+		Path path_reports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
 		if (o instanceof WFCIndexPart) {
 
@@ -150,7 +149,7 @@ public class PrintIndexHandler {
 			// Gruppierung
 			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
-			List<Integer> groupByIndicesReordered = new ArrayList<Integer>();
+			List<Integer> groupByIndicesReordered = new ArrayList<>();
 
 			// Optimalen Spaltenbreiten ermitteln
 			int[] widths = new int[columnReorderLayer.getColumnCount()];
@@ -214,22 +213,25 @@ public class PrintIndexHandler {
 			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 			try {
-				Path pathPDF = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.pdf");
+				Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title + "_Index.pdf");
 				Files.createDirectories(pathPDF.getParent());
-				createFile(pathPDF.toString());
+
+				pathPDF = Path.of(FileUtil.createFile(pathPDF.toString()));
 				URL urlPDF = pathPDF.toFile().toURI().toURL();
 
-				Path pathXML = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xml");
-				Path pathXSL = dataService.getStoragePath().resolve("PDF/" + xmlRootTag + "_Index.xsl");
-				createFile(pathXML.toString());
-				createFile(pathXSL.toString());
+				Path pathXML = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xml");
+				Path pathXSL = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xsl");
+				pathXML = Path.of(FileUtil.createFile(pathXML.toString()));
+				pathXSL = Path.of(FileUtil.createFile(pathXSL.toString()));
 				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");
 				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
 
 				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				PrintUtil.checkPreview(window, modelService, partService);
+				if (!disablePreview) {
+					PrintUtil.checkPreview(activePerspective, modelService, partService);
+				}
 
-				PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
+				urlPDF = PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
 
 				if (!createXmlXsl) {
 					Files.delete(pathXSL);
@@ -239,11 +241,12 @@ public class PrintIndexHandler {
 				if (disablePreview) {
 					PrintUtil.showFile(urlPDF.toString(), null);
 				} else {
-					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(window, modelService, partService));
+					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(activePerspective, modelService, partService));
 				}
 			} catch (IOException | SAXException | TransformerException e) {
 				e.printStackTrace();
-				broker.post(Constants.BROKER_SHOWERRORMESSAGE, translationService.translate("@msg.ErrorShowingFile", null));
+				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+						translationService.translate("@msg.ErrorShowingFile", null), e);
 			}
 
 		}
@@ -259,28 +262,8 @@ public class PrintIndexHandler {
 	}
 
 	/**
-	 * Erstellt eine Datei falls sie existiert, wird sie geleert.
-	 *
-	 * @param path
-	 */
-	public void createFile(String path) {
-		try {
-			File file = new File(path);
-			if (!file.exists()) {
-				file.createNewFile();
-			} else {
-				FileOutputStream writer = new FileOutputStream(path);
-				writer.write(("").getBytes());
-				writer.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Schreibt die XML Datei aus den Daten der NatTable
-	 * 
+	 *
 	 * @param indexPart
 	 * @param groupByIndices
 	 * @param treeList
@@ -383,7 +366,7 @@ public class PrintIndexHandler {
 			xml.append("<Row>\n");
 			for (final Integer d : columnReorderList) {
 				Column c = colConfig.get(colIndex).column;
-				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				if (r.getValue(d) != null) {
 					if (r.getValue(d).getType() == DataType.DOUBLE) {
 						// Definierte Nachkommastellen für diese Spalte werden gedruckt
@@ -403,7 +386,7 @@ public class PrintIndexHandler {
 						xml.append("]]>");
 					}
 				}
-				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 				colIndex++;
 			}
 			xml.append("</Row>\n");
@@ -429,9 +412,9 @@ public class PrintIndexHandler {
 				}
 
 				Column c = colConfig.get(i).column;
-				sumRow += "<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
+				sumRow += "<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
 				sumRow += summary;
-				sumRow += "</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
+				sumRow += "</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
 			}
 		}
 
@@ -451,9 +434,9 @@ public class PrintIndexHandler {
 			}
 			if (summary != null) {
 				Column c = colConfig.get(i).column;
-				xml.append("<" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
 				xml.append(summary);
-				xml.append("</" + translationService.translate(c.getLabel(), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
 			}
 		}
 

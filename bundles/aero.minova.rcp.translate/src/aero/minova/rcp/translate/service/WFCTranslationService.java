@@ -44,7 +44,7 @@ public class WFCTranslationService extends TranslationService {
 	Locale locale;
 
 	private String customerId = "MIN";
-	private String applicationId = "WFC";
+	private String applicationId = "SIS";
 	private Properties resources = new Properties();
 
 	private Properties usedProperties = new Properties();
@@ -80,12 +80,16 @@ public class WFCTranslationService extends TranslationService {
 				updateRequired = false;
 			}
 		}
-		if (key.startsWith("%")) {
-			if (parent != null) {
-				return parent.translate(key, contributorURI);
-			} else {
-				return key;
+		try {
+			if (key.startsWith("%")) {
+				if (parent != null) {
+					return parent.translate(key, contributorURI);
+				} else {
+					return key;
+				}
 			}
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 		}
 
 		String translation = translate(key);
@@ -100,7 +104,7 @@ public class WFCTranslationService extends TranslationService {
 
 	/**
 	 * einen MINOVA String übersetzen
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -108,14 +112,17 @@ public class WFCTranslationService extends TranslationService {
 		if (key.startsWith("@") && !key.startsWith("@@")) {
 			key = key.substring(1);
 			String value = resources.getProperty(key + "." + applicationId + "." + customerId);
-			if (value != null)
+			if (value != null) {
 				return translate(value);
+			}
 			value = resources.getProperty(key + "." + customerId);
-			if (value != null)
+			if (value != null) {
 				return translate(value);
+			}
 			value = resources.getProperty(key + "." + applicationId);
-			if (value != null)
+			if (value != null) {
 				return translate(value);
+			}
 			value = resources.getProperty(key);
 			return value == null ? key : translate(value);
 		}
@@ -146,7 +153,7 @@ public class WFCTranslationService extends TranslationService {
 
 	/**
 	 * Wird verwendet, um den existierenden platform translation service zu cachen und für bestimmte String zu verwenden
-	 * 
+	 *
 	 * @param bundleTranslationProvider
 	 */
 
@@ -168,7 +175,7 @@ public class WFCTranslationService extends TranslationService {
 	 * baseName + "_" + language + "_" + country + "_" + variant <br>
 	 * baseName + "_" + language + "_" + country <br>
 	 * baseName + "_" + language
-	 * 
+	 *
 	 * @throws URISyntaxException
 	 */
 	private void loadResources() {

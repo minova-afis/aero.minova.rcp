@@ -577,9 +577,9 @@
 		</xs:sequence>
 		<!-- Entweder oder -->
 		<xs:attribute name="procedure-suffix" type="xs:NCName" />
-		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="sp">
+		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="xpcor">
 			<xs:annotation>
-				<xs:documentation>Prozedurprefix (z.B. 'op', 'sp' usw.)
+				<xs:documentation>Prozedurprefix (z.B. 'xpcor', 'op', 'sp' usw.)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -722,6 +722,12 @@
 			<xs:annotation>
 				<xs:documentation>definiert den Bezug des Buttons auf eine Element
 					mit der angegebenen id
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="group" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>definiert den Gruppennamen, zu dem dieser Button zugehörig ist
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -1318,9 +1324,9 @@
 				</xs:choice>
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events" />
 			</xs:sequence>
-			<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="op">
+			<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="xpcor">
 				<xs:annotation>
-					<xs:documentation>Prozedurprefix (z.B. 'op', 'sp' usw.)
+					<xs:documentation>Prozedurprefix (z.B. 'xpcor', 'xpcas' usw.)
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>

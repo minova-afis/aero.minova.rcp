@@ -1,5 +1,6 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.nebula.widgets.opal.commons.StringUtil;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
@@ -12,8 +13,8 @@ public class CustomPWFloatText extends CustomPWText {
 	 * @param label associated label
 	 * @param propertyKey associated key
 	 */
-	public CustomPWFloatText(final String label, final String propertyKey) {
-		super(label, propertyKey);
+	public CustomPWFloatText(final String label,@Optional  String tooltip, final String propertyKey) {
+		super(label, tooltip, propertyKey);
 	}
 
 	/**

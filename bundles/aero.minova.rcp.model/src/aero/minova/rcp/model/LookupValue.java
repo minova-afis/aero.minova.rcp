@@ -5,8 +5,8 @@ import java.text.MessageFormat;
 public class LookupValue extends Value {
 	private static final long serialVersionUID = 202102061225L;
 	public final Integer keyLong;
-	public final String keyText;
-	public final String description;
+	public String keyText;
+	public String description;
 
 	public LookupValue(Integer keyLong, String keyText, String description) {
 		super(keyLong);

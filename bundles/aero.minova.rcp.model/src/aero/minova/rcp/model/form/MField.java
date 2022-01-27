@@ -27,12 +27,13 @@ public abstract class MField {
 	private String unitText;
 	private final int decimals;
 	private Integer sqlIndex;
-	private Integer numberColumnsSpanned = 2;
-	private Integer numberRowsSpanned = 1;
+	private int numberColumnsSpanned = 2;
+	private int numberRowsSpanned = 1;
 	private Double maximumValue;
 	private Double minimumValue;
 	private int maxTextLength;
 	private boolean fillToRight = false;
+	private boolean fillHorizontal = false;
 	private String lookupTable;
 	private String lookupProcedurePrefix;
 	private String lookupDescription;
@@ -49,6 +50,7 @@ public abstract class MField {
 	// Wenn canBeValid = false, dann ist das Feld aufgrund einer Berechnung auf falsch gesetzt
 	private boolean canBeValid = true;
 	private boolean primary = false;
+	private boolean keyTypeUser = false;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -176,19 +178,19 @@ public abstract class MField {
 		this.sqlIndex = sqlIndex;
 	}
 
-	public Integer getNumberColumnsSpanned() {
+	public int getNumberColumnsSpanned() {
 		return numberColumnsSpanned;
 	}
 
-	public void setNumberColumnsSpanned(Integer numberColumnsSpanned) {
+	public void setNumberColumnsSpanned(int numberColumnsSpanned) {
 		this.numberColumnsSpanned = numberColumnsSpanned;
 	}
 
-	public Integer getNumberRowsSpanned() {
+	public int getNumberRowsSpanned() {
 		return numberRowsSpanned;
 	}
 
-	public void setNumberRowsSpanned(Integer numberRowsSpanned) {
+	public void setNumberRowsSpanned(int numberRowsSpanned) {
 		this.numberRowsSpanned = numberRowsSpanned;
 	}
 
@@ -228,6 +230,14 @@ public abstract class MField {
 		this.fillToRight = fillToRight;
 	}
 
+	public boolean isFillHorizontal() {
+		return fillHorizontal;
+	}
+
+	public void setFillHorizontal(boolean fillHorizontal) {
+		this.fillHorizontal = fillHorizontal;
+	}
+
 	public String getLookupProcedurePrefix() {
 		return lookupProcedurePrefix;
 	}
@@ -245,7 +255,7 @@ public abstract class MField {
 	}
 
 	public String getLookupDescription() {
-		return lookupDescription;
+		return lookupDescription == null ? Constants.TABLE_DESCRIPTION : lookupDescription;
 	}
 
 	public void setLookupDescription(String lookupDescription) {
@@ -361,7 +371,7 @@ public abstract class MField {
 		return mSection;
 	}
 
-	public void setmPage(MSection mSection) {
+	public void setMSection(MSection mSection) {
 		this.mSection = mSection;
 	}
 
@@ -434,5 +444,13 @@ public abstract class MField {
 
 	public void setPrimary(boolean primary) {
 		this.primary = primary;
+	}
+
+	public boolean isKeyTypeUser() {
+		return keyTypeUser;
+	}
+
+	public void setKeyTypeUser(boolean keyTypeUser) {
+		this.keyTypeUser = keyTypeUser;
 	}
 }

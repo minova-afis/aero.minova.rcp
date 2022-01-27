@@ -10,14 +10,10 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
@@ -53,21 +49,6 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 			return;
 		} else {
 			changedPerspectives.remove(perspective);
-
-			// Wenn die Perspektive angeheftet war, muss das * entfernt werden
-			List<MTrimBar> findElements = modelService.findElements(window, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
-			MTrimBar tBar = findElements.get(0);
-			Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
-			if (c != null) {
-				ToolBar tb = (ToolBar) c.getChildren()[0];
-				String perspectiveLabel = translationService.translate(perspective.getLabel(), null);
-				for (ToolItem item : tb.getItems()) {
-					if (item.getText().contains(perspectiveLabel)) {
-						item.setText(perspectiveLabel);
-					}
-				}
-				tb.requestLayout();
-			}
 		}
 
 		// Entfernt die Perspektive

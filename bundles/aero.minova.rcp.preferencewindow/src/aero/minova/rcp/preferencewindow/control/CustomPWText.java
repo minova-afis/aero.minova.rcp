@@ -3,8 +3,10 @@ package aero.minova.rcp.preferencewindow.control;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public abstract class CustomPWText extends CustomPWWidget {
@@ -13,11 +15,13 @@ public abstract class CustomPWText extends CustomPWWidget {
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
-	 * @param propertyKey associated property key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated property key
 	 */
-	public CustomPWText(final String label, final String propertyKey) {
-		super(label, propertyKey, label == null ? 1 : 2, false);
+	public CustomPWText(final String label, final String tooltip, final String propertyKey) {
+		super(label, tooltip, propertyKey, 2, false);
 		setGrabExcessSpace(true);
 	}
 
@@ -27,13 +31,25 @@ public abstract class CustomPWText extends CustomPWWidget {
 	@Override
 	public Control build(final Composite parent) {
 		buildLabel(parent, GridData.CENTER);
-		text = new Text(parent, SWT.BORDER | getStyle());
+
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(2, false));
+		addControl(cmp);
+
+		text = new Text(cmp, SWT.BORDER | getStyle());
 		addControl(text);
 		addVerifyListeners();
 		text.setText(PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey()).toString());
+		text.setToolTipText(getTooltip());
 		text.addListener(SWT.Modify, event -> {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), convertValue());
 		});
+
+		Label icon = new Label(cmp, SWT.NONE);
+		if (getTooltip() != null) {
+			createTooltipInfoIcon(icon);
+		}
+
 		return text;
 	}
 

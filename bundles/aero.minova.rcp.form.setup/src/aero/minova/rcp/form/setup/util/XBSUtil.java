@@ -9,9 +9,11 @@ import aero.minova.rcp.form.setup.xbs.Preferences;
 
 public class XBSUtil {
 
+	private XBSUtil() {}
+
 	/**
 	 * Liefert die ERSTE Node mit dem angegebenen Namen aus den Preferences
-	 * 
+	 *
 	 * @param preferences
 	 *            aus der .xbs ausgelesenen Preferences
 	 * @param name
@@ -31,13 +33,13 @@ public class XBSUtil {
 
 	/**
 	 * Liefert die ERSTE Node mit angegebenen Namen aus der übergebenen Parentnode (wenn die Parentnode den Namen hat wird sie zurückgegeben )
-	 * 
+	 *
 	 * @param node
 	 * @param name
 	 * @return
 	 */
 	public static Node getNodeWithName(Node node, String name) {
-		if (node.getName().equals(name)) {
+		if (node.getName().equalsIgnoreCase(name)) {
 			return node;
 		}
 
@@ -69,17 +71,21 @@ public class XBSUtil {
 	}
 
 	/**
-	 * Liefert die Map mit den Einstellungen für die gesamte Anwendung zurück. <br>
-	 * ACHTUNG: Geht aktuell davon aus, das diese immer im zweiten Knoten liegt! Muss evtl angepasst werden
-	 * 
+	 * Liefert die Map einer Node der .xbs zurück.
+	 *
 	 * @param preferences
 	 * @return
 	 */
-	public static Map<String, String> getMainMap(Preferences preferences) {
+	public static Map<String, String> getMapOfNode(Preferences preferences, String name) {
 
-		aero.minova.rcp.form.setup.xbs.Map prefMap = preferences.getRoot().getNode().get(0).getNode().get(0).getMap();
 		Map<String, String> map = new HashMap<>();
 
+		Node settingsNode = getNodeWithName(preferences, name);
+		if (settingsNode == null) {
+			return map;
+		}
+
+		aero.minova.rcp.form.setup.xbs.Map prefMap = settingsNode.getMap();
 		for (Entry e : prefMap.getEntry()) {
 			map.put(e.getKey(), e.getValue());
 		}

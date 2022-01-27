@@ -207,4 +207,40 @@ public class Table {
 	public Value getValue(int col, int row) {
 		return rows.get(row).getValue(col);
 	}
+
+	public void addColumns(List<Column> columns) {
+		for (Column c : columns) {
+			addColumn(c);
+		}
+	}
+
+	public void addRows(List<Row> rows) {
+		for (Row r : rows) {
+			addRow(r);
+		}
+	}
+
+	/**
+	 * Versucht die Zeilen der übergebenen Tabelle hinzuzufügen. Dabei werden sie Spaltennamen verglichen. Spalten in der übergebenen Tabelle die in der
+	 * aktuellen nicht existieren werden ignoriert. Fehlen Spalten der aktuellen Tabelle in der Übergebenen wird null eingetragen.
+	 * 
+	 * @param rowsToAdd
+	 */
+	public void addRowsFromTable(Table rowsToAdd) {
+		for (Row rowInNewTable : rowsToAdd.getRows()) {
+			Row rowInOriginal = addRow();
+
+			// Passende Werte in der übergebenen Tabelle finden (über Column Namen)
+			for (Column originalColumn : getColumns()) {
+
+				for (Column newColumn : rowsToAdd.getColumns()) {
+					if (originalColumn.getName().equals(newColumn.getName())) {
+						Value v = rowInNewTable.getValue(rowsToAdd.getColumns().indexOf(newColumn));
+						int index = getColumns().indexOf(originalColumn);
+						rowInOriginal.setValue(v, index);
+					}
+				}
+			}
+		}
+	}
 }

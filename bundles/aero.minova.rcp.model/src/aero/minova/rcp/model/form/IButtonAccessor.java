@@ -1,21 +1,24 @@
 package aero.minova.rcp.model.form;
 
+import java.util.List;
+
 import org.eclipse.swt.events.SelectionListener;
 
 public interface IButtonAccessor {
 
-	public void setEnabled(boolean enabled);
+	void setEnabled(boolean enabled);
 
-	public boolean getEnabled();
-
-	public void addSelectionListener(SelectionListener listener);
-
-	public void removeSelectionListener(SelectionListener listener);
+	boolean isEnabled();
 
 	boolean isCanBeEnabled();
+
+	void addSelectionListener(SelectionListener listener);
+
+	void removeSelectionListener(SelectionListener listener);
+
+	List<SelectionListener> getSelectionListener();
 
 	void setCanBeEnabled(boolean canBeEnabled);
 
 	void updateEnabled();
-
 }

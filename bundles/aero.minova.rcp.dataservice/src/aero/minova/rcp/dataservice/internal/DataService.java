@@ -1,9 +1,12 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -30,8 +33,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -52,18 +53,22 @@ import org.osgi.service.event.EventConstants;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
 import aero.minova.rcp.dataservice.ZipService;
 import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.ColumnSerializer;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.TransactionEntry;
+import aero.minova.rcp.model.TransactionResultEntry;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.ValueDeserializer;
 import aero.minova.rcp.model.ValueSerializer;
@@ -168,6 +173,7 @@ public class DataService implements IDataService {
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.registerTypeAdapter(Column.class, new ColumnSerializer()) //
 				.setPrettyPrinting() //
 				.create();
 	}
@@ -259,6 +265,40 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public CompletableFuture<List<TransactionResultEntry>> callTransactionAsync(List<TransactionEntry> procedureList) {
+		String body = gson.toJson(procedureList);
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/x-procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+
+		log("CAS Call Transaction List:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), procedureList);
+
+		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, "Call Transaction List", true);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			log("CAS Answer Call Transaction List:\n" + t.body());
+			Type listType = new TypeToken<ArrayList<TransactionResultEntry>>() {}.getType();
+
+			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
+
+			for (TransactionResultEntry entry : transactionResults) {
+				SqlProcedureResult entryResult = entry.getSQLProcedureResult();
+				entryResult = checkProcedureResult(entryResult, gson.toJson(entryResult), entry.getId());
+				if (entryResult == null) {
+					break;
+				}
+			}
+			return transactionResults;
+		});
+	}
+
+	@Override
 	public CompletableFuture<SqlProcedureResult> callProcedureAsync(Table table) {
 		return callProcedureAsync(table, true);
 	}
@@ -282,32 +322,40 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Call Procedure:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			if (fromJson.getReturnCode() == null) {
-				String errorMessage = null;
-				Pattern fullError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| .*?\\\"");
-				Matcher m = fullError.matcher(t.body());
-				if (m.find()) {
-					errorMessage = m.group(0);
-				}
-				Pattern cutError = Pattern.compile("com.microsoft.sqlserver.jdbc.SQLServerException: .*? \\| .*? \\| .*? \\| ");
-				errorMessage = cutError.matcher(errorMessage).replaceAll("");
-				errorMessage = errorMessage.replaceAll("\"", "");
-				Table error = new Table();
-				error.setName(ERROR);
-				error.addColumn(new Column("Message", DataType.STRING));
-				error.addRow(RowBuilder.newRow().withValue(errorMessage).create());
-				fromJson = new SqlProcedureResult();
-				fromJson.setResultSet(error);
-				// FehlerCode
-				fromJson.setReturnCode(-1);
-			}
-			if (fromJson.getReturnCode() == -1 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
-				ErrorObject e = new ErrorObject(fromJson.getResultSet(), username, table.getName());
-				postError(e);
-				return null;
-			}
-			return fromJson;
+			return checkProcedureResult(fromJson, t.body(), table.getName());
 		});
+	}
+
+	public SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
+		ErrorObject e = checkForError(fromJson, procedureName);
+		if (e != null) {
+			postError(e);
+			return null;
+		}
+		return fromJson;
+	}
+
+	public ErrorObject checkForError(SqlProcedureResult fromJson, String procedureName) {
+		// Returncode >= null -> kein Fehler -> nichts zu tun
+		if (fromJson != null && fromJson.getReturnCode() >= 0) {
+			return null;
+		}
+
+		// fromJson null ist oder kein Resultset: Default Fehlermeldung
+		if (fromJson == null || fromJson.getResultSet() == null) {
+			Table error = new Table();
+			error.setName(ERROR);
+			error.addColumn(new Column("Message", DataType.STRING));
+			error.addRow(RowBuilder.newRow().withValue("msg.NoErrorMessageAvailable").create());
+			fromJson = new SqlProcedureResult();
+			fromJson.setResultSet(error);
+			fromJson.setReturnCode(-1);
+		}
+
+		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
+			return new ErrorObject(fromJson.getResultSet(), username, procedureName);
+		}
+		return null;
 	}
 
 	@Override
@@ -318,16 +366,15 @@ public class DataService implements IDataService {
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
-		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getStringValue() + ".xml");
+		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getValue().toString() + ".xml");
 		try {
 			Files.createDirectories(path.getParent());
-			FileUtil.createFile(path.toString());
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
-		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
@@ -339,20 +386,27 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer XML Detail:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
+
+			fromJson = checkProcedureResult(fromJson, t.body(), table.getName());
+			if (fromJson == null) {
+				return null;
+			}
+
 			try {
-				FileWriter fw = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
+				FileWriter fw = new FileWriter(finalPath.toFile(), StandardCharsets.UTF_8);
 				fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 				fw.write("<" + rootElement + ">");
 				for (Row r : fromJson.getResultSet().getRows()) {
-					String s = r.getValue(0).getStringValue();
-					fw.write(s + "\n");
+					if (r.getValue(0) != null) {
+						fw.write(r.getValue(0).getStringValue() + "\n");
+					}
 				}
 				fw.write("</" + rootElement + ">");
 				fw.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				handleCASError(e, "XML", true, "msg.ErrorShowingFile");
 			}
-			return path;
+			return finalPath;
 		});
 	}
 
@@ -365,16 +419,17 @@ public class DataService implements IDataService {
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
 
 		Path path = getStoragePath().resolve(fileName);
+
 		try {
 			Files.createDirectories(path.getParent());
-			FileUtil.createFile(path.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
-		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""));
+		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
-		CompletableFuture<HttpResponse<Path>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofFile(path));
+		CompletableFuture<HttpResponse<byte[]>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofByteArray());
 
 		sendRequest.exceptionally(ex -> {
 			handleCASError(ex, "PDF", true);
@@ -382,8 +437,31 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
-			log("CAS Answer PDF:\n" + t.body());
-			return path;
+
+			// Überprüfen, ob ein Fehler geworfen wurde (dann wird SqlProcedureResult zurückgegeben)
+			try {
+				String asString = new String(t.body(), StandardCharsets.UTF_8);
+				SqlProcedureResult fromJson = gson.fromJson(asString, SqlProcedureResult.class);
+				log("CAS Answer PDF:\n" + asString);
+				fromJson = checkProcedureResult(fromJson, asString, table.getName());
+				if (fromJson == null) {
+					return null;
+				}
+			} catch (Exception e) {
+				// Wenn hier ein Exception geworfen wird wurde kein SqlProcedureResult/kein Fehler geliefert, die Daten können gespeichert werden
+			}
+
+			// Ansonsten byteArray in File schreiben
+			try {
+				OutputStream out = new FileOutputStream(finalPath.toString());
+				out.write(t.body());
+				out.close();
+				log("CAS Answer PDF:\n" + finalPath);
+			} catch (IOException e) {
+				handleCASError(e, "PDF", true, "msg.ErrorShowingFile");
+			}
+
+			return finalPath;
 		});
 	}
 
@@ -546,7 +624,7 @@ public class DataService implements IDataService {
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromTable(String tableName, String lookupDescriptionColumnName, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
-		ArrayList<LookupValue> list = new ArrayList<>();
+		List<LookupValue> list = new ArrayList<>();
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
@@ -574,29 +652,31 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<Table> tableFuture = getTableAsync(t, false);
-		try {
-			Table ta = tableFuture.get();
-			for (Row r : ta.getRows()) {
-				LookupValue lv = new LookupValue(//
-						r.getValue(0).getIntegerValue(), //
-						r.getValue(1).getStringValue(), //
-						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+		return tableFuture.thenApplyAsync(ta -> {
+			try {
+				if (ta != null) {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
 
-				map.put(lv.keyLong, lv);
-				list.add(lv);
+						map.put(lv.keyLong, lv);
+						list.add(lv);
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("Error, using cache: " + tableName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+				list.addAll(map.values());
 			}
-		} catch (Exception e) {
-			System.out.println("Error, using cache: " + tableName);
-			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-			list.addAll(map.values());
-		}
-
-		return CompletableFuture.supplyAsync(() -> list);
+			return list;
+		});
 	}
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromProcedure(String procedureName, MField field, Integer keyLong, String keyText,
 			boolean resolve, boolean useCache) {
-		ArrayList<LookupValue> list = new ArrayList<>();
+		List<LookupValue> list = new ArrayList<>();
 		String hashName = resolve ? procedureName : CacheUtil.getNameList(field);
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
@@ -627,33 +707,40 @@ public class DataService implements IDataService {
 			row.addValue(null);
 			t.addColumn(new Column(TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(true));
-			for (String paramName : field.getLookupParameters()) {
-				MField paramField = field.getDetail().getField(paramName);
-				t.addColumn(new Column(paramName, paramField.getDataType()));
-				row.addValue(paramField.getValue());
+			if (field.getLookupParameters() != null) {
+				for (String paramName : field.getLookupParameters()) {
+					MField paramField = field.getDetail().getField(paramName);
+					t.addColumn(new Column(paramName, paramField.getDataType()));
+					row.addValue(paramField.getValue());
+				}
 			}
 		}
 
 		t.addRow(row);
 
 		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
-		try {
-			Table ta = tableFuture.get().getResultSet();
-			for (Row r : ta.getRows()) {
-				LookupValue lv = new LookupValue(//
-						r.getValue(0).getIntegerValue(), //
-						r.getValue(1).getStringValue(), //
-						r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-				map.put(lv.keyLong, lv);
-				list.add(lv);
+		return tableFuture.thenApplyAsync(res -> {
+			try {
+				if (res != null) {
+					Table ta = res.getResultSet();
+					if (ta != null) {
+						for (Row r : ta.getRows()) {
+							LookupValue lv = new LookupValue(//
+									r.getValue(0).getIntegerValue(), //
+									r.getValue(1).getStringValue(), //
+									r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+							map.put(lv.keyLong, lv);
+							list.add(lv);
+						}
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("Error, using Cache: " + hashName);
+				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
+				list.addAll(map.values());
 			}
-		} catch (Exception e) {
-			System.out.println("Error, using Cache: " + hashName);
-			showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-			list.addAll(map.values());
-		}
-
-		return CompletableFuture.supplyAsync(() -> list);
+			return list;
+		});
 	}
 
 	@Override
@@ -724,9 +811,16 @@ public class DataService implements IDataService {
 
 			sendRequest.thenApply(response -> {
 				log("CAS Answer Send Logs: " + response.statusCode() + " " + response.body());
-				if (response.statusCode() != 200) {
-					throw new RuntimeException("Server returned " + response.statusCode());
+				if (response.statusCode() != 200) { // Fehlermeldung anzeigen
+					Table error = new Table();
+					error.setName(ERROR);
+					error.addColumn(new Column("Message", DataType.STRING));
+					error.addRow(RowBuilder.newRow().withValue(response.body()).create());
+					ErrorObject eo = new ErrorObject(error, username, "sendingLogs");
+					postError(eo);
+					return null;
 				}
+
 				postNotification("msg.UploadSuccess");
 				return response;
 			});
@@ -741,13 +835,33 @@ public class DataService implements IDataService {
 		if (siteParameters.containsKey(key)) {
 			return siteParameters.get(key);
 		}
+
+		// Nochmal versuchen, die SiteParameter abzurufen, wenn Wert nicht gefunden wurde
+		initSiteParameters();
+		if (siteParameters.containsKey(key)) {
+			return siteParameters.get(key);
+		}
+
+		// Notification, dass Default-Wert genutzt wird
+		Table t = TableBuilder.newTable("Notification").withColumn("Message", DataType.STRING)//
+				.withColumn("s", DataType.STRING)//
+				.withColumn("s", DataType.STRING).create();
+		Row r = RowBuilder.newRow().withValue("msg.UsingDefaultTSiteParameterValue").withValue(key).withValue(defaultVal).create();
+		t.addRow(r);
+		ErrorObject eo = new ErrorObject(t, username);
+		postNotification(eo);
+
 		return defaultVal;
 	}
 
 	private void handleCASError(Throwable ex, String method, boolean showErrorMessage) {
+		handleCASError(ex, method, showErrorMessage, "msg.WFCNoResponseServer");
+	}
+
+	private void handleCASError(Throwable ex, String method, boolean showErrorMessage, String message) {
 		log("CAS Error " + method + ":\n" + ex.getMessage());
 		if (showErrorMessage) {
-			showNoResposeServerError("msg.WFCNoResponseServer", ex);
+			showNoResposeServerError(message, ex);
 		}
 	}
 
@@ -762,7 +876,12 @@ public class DataService implements IDataService {
 				+ value.getProcedureOrView());
 	}
 
-	public void postNotification(String message) {
+	/**
+	 * Zeigt eine Nachricht als Notification an. Die Nachricht kann ein String oder ein ErrorObject sein
+	 * 
+	 * @param message
+	 */
+	public void postNotification(Object message) {
 		Dictionary<String, Object> data = new Hashtable<>(2);
 		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWNOTIFICATION);
 		data.put(IEventBroker.DATA, message);
@@ -804,6 +923,26 @@ public class DataService implements IDataService {
 			body = body + "\n" + sqlString;
 		}
 		log(body);
+	}
+
+	private void log(String body, List<TransactionEntry> procedureList) {
+		String sqlString = "";
+		try {
+			for (TransactionEntry e : procedureList) {
+				sqlString += SQLStringUtil.prepareProcedureString(e.getTable()) + "\n";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		sqlString = sqlString.strip();
+
+		if (LOG_SQL_STRING) {
+			body = body + "\n" + sqlString;
+		}
+		log(body);
+
 	}
 
 	private void log(String body) {

@@ -188,7 +188,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 * xxx.index.sortby (index,sortDirection(ASC|DESC);index2....); -> Sortierung <br>
 	 * xxx.index.groupby (expand[0,1];index;index2...); -> Gruppierung <br>
 	 * Ähnlich im SearchPart
-	 * 
+	 *
 	 * @param saveRowConfig
 	 * @param name
 	 */
@@ -700,8 +700,9 @@ public class WFCIndexPart extends WFCFormPart {
 				return;
 			}
 
-			List<Row> c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
-			List<Row> collection = c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			// Ausgewählten Zeilen müssen gefiltert werden, um Gruppen-Zeilen zu entfernen
+			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List<Row> collection = (List<Row>) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
 
 			Table t = dataFormService.getTableFromFormIndex(form);
 			for (Row r : collection) {

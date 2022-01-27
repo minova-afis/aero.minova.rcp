@@ -3,12 +3,14 @@ package aero.minova.rcp.rcp.fields;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
@@ -16,7 +18,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.BundleContext;
@@ -24,6 +25,8 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.CssData;
+import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
@@ -41,8 +44,7 @@ public class LookupField {
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
-		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = LabelFactory.newLabel(SWT.RIGHT).create(composite);
+		Label label = FieldLabel.create(composite, field);
 
 		IEclipseContext context = perspective.getContext();
 
@@ -50,6 +52,11 @@ public class LookupField {
 		lookupControl.setMessage("...");
 		lookupControl.setLabel(label);
 		ContextInjectionFactory.inject(lookupControl, context); // In Context injected, damit TranslationService genutzt werden kann
+
+		LookupContentProvider contentProvider = new LookupContentProvider(field.getLookupTable());
+		contentProvider.setLookup(lookupControl);
+		lookupControl.setContentProvider(contentProvider);
+		ContextInjectionFactory.inject(contentProvider, context); // In Context injected, damit TranslationService genutzt werden kann
 
 		Label descriptionLabel = LabelFactory.newLabel(SWT.LEFT).create(composite);
 
@@ -63,8 +70,12 @@ public class LookupField {
 		lookupControl.setData(Constants.CONTROL_FIELD, field);
 
 		lookupFormData.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
-		lookupFormData.left = new FormAttachment(composite, FieldUtil.MARGIN_LEFT * (column + 1) + (column + 1) * FieldUtil.COLUMN_WIDTH);
-		lookupFormData.width = FieldUtil.COLUMN_WIDTH;
+		lookupFormData.left = new FormAttachment((column == 0) ? 25 : 75);
+		lookupFormData.width = FieldUtil.TEXT_WIDTH;
+
+		// Lookup-Felder sollen immer genau eine Zeile hoch sein
+		CssData cssData = new CssData(CssType.TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), 1, field.isFillToRight() || field.isFillHorizontal());
+		lookupControl.setData(CssData.CSSDATA_KEY, cssData);
 
 		labelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
 		labelFormData.right = new FormAttachment(lookupControl, FieldUtil.MARGIN_LEFT * -1, SWT.LEFT);
@@ -72,20 +83,24 @@ public class LookupField {
 
 		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
 		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() == 4) {
+		if (field.getNumberColumnsSpanned() == 4) {
 			descriptionLabelFormData.width = FieldUtil.MARGIN_LEFT * 2 + FieldUtil.COLUMN_WIDTH * 2;
 		} else {
 			descriptionLabelFormData.width = 0;
 		}
+		if (field.getNumberRowsSpanned() > 1) { // ZB für Contact Lookups
+			descriptionLabelFormData.height = field.getNumberRowsSpanned() * FieldUtil.COLUMN_HEIGHT;
+			descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.TOP);
+		}
 
-		label.setData(FieldUtil.TRANSLATE_PROPERTY, labelText);
 		label.setData(AERO_MINOVA_RCP_LOOKUP, lookupControl);
-		label.setLayoutData(labelFormData);
+		FieldLabel.layout(label, lookupControl, row, column, field.getNumberRowsSpanned());
 
 		lookupControl.setLayoutData(lookupFormData);
 		lookupControl.setDescription(descriptionLabel);
 
 		descriptionLabel.setLayoutData(descriptionLabelFormData);
+		descriptionLabel.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "DescriptionLabel");
 
 		lookupControl.addTraverseListener(e -> {
 			Text text = ((Text) e.getSource());
@@ -110,6 +125,7 @@ public class LookupField {
 	 */
 	@Inject
 	@Optional
+	@Deprecated
 	public static void requestLookUpEntriesAll(MField field, MDetail detail, LookupComposite lookup) {
 
 		BundleContext bundleContext = FrameworkUtil.getBundle(LookupField.class).getBundleContext();
@@ -117,7 +133,11 @@ public class LookupField {
 		IDataService dataService = (IDataService) bundleContext.getService(serviceReference);
 
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, false);
-		listLookup.thenAccept(l -> Display.getDefault().asyncExec(() -> lookup.getContentProvider().setValues(l)));
+
+		try {
+			List<LookupValue> l = listLookup.get();
+			lookup.getContentProvider().setValues(l);
+		} catch (InterruptedException | ExecutionException e) {}
 	}
 
 	/**
@@ -126,6 +146,7 @@ public class LookupField {
 	 * @param ta
 	 * @param c
 	 */
+	@Deprecated
 	public static void changeOptionsForLookupField(Table ta, LookupComposite lookupControl, boolean twisty) {
 		MLookupField field = (MLookupField) lookupControl.getData(Constants.CONTROL_FIELD);
 		field.setOptions(ta);
@@ -137,6 +158,7 @@ public class LookupField {
 	 *
 	 * @param lookUpControl
 	 */
+	@Deprecated
 	public static void changeSelectionBoxList(LookupComposite lookUpControl, MLookupField field, boolean twisty) {
 		if (field.getOptions() != null) {
 			Table t = field.getOptions();

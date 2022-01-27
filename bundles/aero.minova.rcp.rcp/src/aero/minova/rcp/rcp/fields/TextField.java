@@ -1,23 +1,16 @@
 package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_LEFT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -26,6 +19,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.CssData;
+import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.TextValueAccessor;
@@ -37,15 +33,12 @@ public class TextField {
 	}
 
 	public static Control create(Composite composite, MField field, int row, int column, MPerspective perspective) {
-
-		String labelText = field.getLabel() == null ? "" : field.getLabel();
-		Label label = LabelFactory.newLabel(SWT.RIGHT).text(labelText).create(composite);
-		label.setData(TRANSLATE_PROPERTY, labelText);
+		Label label = FieldLabel.create(composite, field);
 
 		int style = SWT.BORDER;
 		if (field.getNumberRowsSpanned() > 1) {
 			// Maskenentwickler hat mehrzeilige Eingabe definiert
-			style |= SWT.MULTI | SWT.WRAP;
+			style |= SWT.WRAP;
 		}
 
 		Text text = TextFactory.newText(style).text("").create(composite);
@@ -66,24 +59,23 @@ public class TextField {
 				}
 			}
 		});
-		
-		text.addTraverseListener(new TraverseListener() {
 
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
-					e.doit = true;
-				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
-					e.doit = false;
-					text.setText(text.getText() + "\t");
-					text.setSelection(text.getText().length());
-				} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
-					e.doit = true;
-				}
+		text.addTraverseListener(e -> {
+			if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 0) {
+				e.doit = true;
+			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 262144) {
+				e.doit = false;
+				text.setText(text.getText() + "\t");
+				text.setSelection(text.getText().length());
+			} else if (e.detail == SWT.TRAVERSE_TAB_NEXT && e.stateMask == 65536) {
+				e.doit = true;
 			}
-			
 		});
+
 		text.setData(Constants.CONTROL_FIELD, field);
+		CssData cssData = new CssData(CssType.TEXT_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+				field.isFillToRight() || field.isFillHorizontal());
+		text.setData(CssData.CSSDATA_KEY, cssData);
 
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
@@ -91,29 +83,24 @@ public class TextField {
 		ContextInjectionFactory.inject(valueAccessor, context);
 		field.setValueAccessor(valueAccessor);
 
-		FormData labelFormData = new FormData();
-		FormData textFormData = new FormData();
+		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
 
-		labelFormData.right = new FormAttachment(text, MARGIN_LEFT * -1, SWT.LEFT);
-		labelFormData.width = COLUMN_WIDTH;
+		FormData fd = new FormData();
+		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment(composite, MARGIN_LEFT * (column + 1) + (column + 1) * COLUMN_WIDTH);
-		if (field.getNumberColumnsSpanned() != null && field.getNumberColumnsSpanned().intValue() > 2 && field.isFillToRight()) {
-			textFormData.width = COLUMN_WIDTH * 3 + MARGIN_LEFT * 2 + MARGIN_BORDER;
+		if (field.isFillHorizontal() && field.getLabel() == null) {
+			fd.left = new FormAttachment((column == 0) ? 0 : 50);
 		} else {
-			textFormData.width = TEXT_WIDTH;
-		}
-		if (field.getNumberRowsSpanned() > 1) {
-			textFormData.height = COLUMN_HEIGHT * field.getNumberRowsSpanned() - MARGIN_TOP;
-			labelFormData.top = new FormAttachment(text, 0, SWT.TOP);
-		} else {
-			labelFormData.top = new FormAttachment(text, 0, SWT.CENTER);
+			fd.left = new FormAttachment((column == 0) ? 25 : 75);
 		}
 
-		label.setLayoutData(labelFormData);
+		if ((field.getNumberColumnsSpanned() > 2 && field.isFillToRight()) || field.isFillHorizontal() || column >= 2) {
+			fd.right = new FormAttachment(100, -MARGIN_BORDER);
+		} else {
+			fd.right = new FormAttachment(50, -ICssStyler.CSS_SECTION_SPACING);
+		}
 
-		text.setLayoutData(textFormData);
+		text.setLayoutData(fd);
 
 		return text;
 	}

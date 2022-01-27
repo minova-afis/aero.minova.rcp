@@ -3,6 +3,7 @@ package aero.minova.rcp.widgets;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -46,7 +47,6 @@ public class LookupComposite extends Composite {
 	private final Table table;
 	private LookupContentProvider contentProvider;
 	private boolean useSingleClick = false;
-	private LookupValue firstValue;
 	/**
 	 * Das Label, das den Wert beschreibt. Die Description aus der Datenbank.
 	 */
@@ -68,11 +68,8 @@ public class LookupComposite extends Composite {
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
 	 */
 	public LookupComposite(Composite parent, int style) {
-		super(parent, style);
+		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
-
-		this.contentProvider = new LookupContentProvider();
-		this.contentProvider.setLookup(this);
 
 		text = new Text(this, style);
 		popup = new Shell(getDisplay(), SWT.ON_TOP);
@@ -198,20 +195,24 @@ public class LookupComposite extends Composite {
 		popupValues = contentProvider.getContent(value);
 		if (popupValues == null || popupValues.isEmpty()) {
 			popup.setVisible(false);
-			firstValue = null;
 			if (contentProvider.getValuesSize() == 0) {
 				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.NoLookupEntries", null),
 						translationService.translate("@Notification", null));
 			}
 			return;
 		}
-		firstValue = popupValues.get(0);
 
 		table.removeAll();
 		for (LookupValue popupValue : popupValues) {
-			final TableItem tableItem = new TableItem(table, SWT.NONE);
+			TableItem tableItem;
+			if (popupValue.getKeyText().equalsIgnoreCase(text.getText())) {
+				// Bei genauer Übereinstimmung des Matchcodes Element an erste Stelle setzten, siehe #1086
+				tableItem = new TableItem(table, SWT.NONE, 0);
+			} else {
+				tableItem = new TableItem(table, SWT.NONE);
+			}
 			tableItem.setText(0, popupValue.keyText);
-			tableItem.setText(1, popupValue.description);
+			tableItem.setText(1, popupValue.description.replace("\r\n", "; "));
 			tableItem.setFont(text.getFont());
 		}
 		table.getColumn(0).pack();
@@ -262,9 +263,9 @@ public class LookupComposite extends Composite {
 			// Der Wert des Feldes soll auf null gesetzt werden, wenn der Text gelöscht oder geändert wird
 			MField field = (MField) text.getParent().getData(Constants.CONTROL_FIELD);
 			if (string.isBlank()) {
-				field.setValue(null, false);
+				field.setValue(null, true);
 			} else if (field.getValue() instanceof LookupValue) {
-				field.setValue(null, false);
+				field.setValue(null, true);
 				// Den Eingetragenen Text wieder ins Textfeld setzten
 				text.setText(string);
 				text.setSelection(text.getText().length());
@@ -308,6 +309,11 @@ public class LookupComposite extends Composite {
 	public LookupContentProvider getContentProvider() {
 		checkWidget();
 		return contentProvider;
+	}
+
+	public void setContentProvider(LookupContentProvider contentProvider) {
+		checkWidget();
+		this.contentProvider = contentProvider;
 	}
 
 	/**
@@ -469,9 +475,22 @@ public class LookupComposite extends Composite {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			text.setText(lv.keyText);
 			field.setValue(lv, true);
-		} else if (popup.isVisible() && firstValue != null) {
-			text.setText(firstValue.keyText);
-			field.setValue(firstValue, true);
+		} else if (popup.isVisible()) {
+
+			// Zuerst versuchen, einen genauen Match auf den KeyText zu finden, siehe #1086
+			for (LookupValue lv : popupValues) {
+				if (lv.keyText.equalsIgnoreCase(text.getText())) {
+					text.setText(lv.keyText);
+					field.setValue(lv, true);
+					return;
+				}
+			}
+
+			// Ansonsten ersten Wert eintragen
+			if (!popupValues.isEmpty()) {
+				text.setText(popupValues.get(0).keyText);
+				field.setValue(popupValues.get(0), true);
+			}
 		}
 	}
 
@@ -521,10 +540,12 @@ public class LookupComposite extends Composite {
 
 				CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup(field, false);
 				setLastState();
-				listLookup.thenAccept(l -> {
-					Display.getDefault().asyncExec(() -> contentProvider.setValues(l));
+
+				try {
+					List<LookupValue> l = listLookup.get();
+					contentProvider.setValues(l);
 					gettingData = false;
-				});
+				} catch (InterruptedException | ExecutionException e) {}
 			} else {
 				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.ActiveRequest", null),
 						translationService.translate("@Notification", null));

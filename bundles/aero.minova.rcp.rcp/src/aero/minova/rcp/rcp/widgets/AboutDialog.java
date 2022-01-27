@@ -11,6 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -33,7 +34,7 @@ public class AboutDialog extends TitleAreaDialog {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parentShell);
 		lizenzFont = resManager.createFont(FontDescriptor.createFrom(new FontData("Arial", 12, SWT.NORMAL)));
 		infoFont = resManager.createFont(FontDescriptor.createFrom(new FontData("Arial", 14, SWT.NORMAL)));
-		
+		setTitleAreaColor(new RGB(236, 236, 236));
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class AboutDialog extends TitleAreaDialog {
 		layout.numColumns = 2;
 		layout.verticalSpacing = 1;
 		info.setLayout(layout);
-		Image wfc = resManager.createImage(ImageUtil.getImageDefault("wfc.png"));
+		Image wfc = resManager.createImage(ImageUtil.getImageDefault("wfc.application/128x128.png"));
 		createText(info, wfc, "WebFatClient CoreApplicationService", infoFont, IMessageProvider.INFORMATION);
 		return info;
 	}

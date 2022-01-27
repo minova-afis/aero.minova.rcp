@@ -14,6 +14,7 @@ import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.rcp.util.PrintUtil;
 
 public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row> {
 
@@ -34,6 +35,12 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		this.table = table;
 		this.grid = grid;
 		propertyNames = new String[grid.getField().size()];
+		tableHeadersMap = new HashMap<>();
+	}
+
+	public MinovaColumnPropertyAccessor(Table table) {
+		this.table = table;
+		propertyNames = new String[table.getColumnCount()];
 		tableHeadersMap = new HashMap<>();
 	}
 
@@ -62,6 +69,8 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 			initPropertyNamesForm(translationService);
 		} else if (grid != null) {
 			initPropertyNamesGrid(translationService);
+		} else if (table != null) {
+			initPropertyNamesTable(translationService);
 		}
 	}
 
@@ -70,7 +79,7 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		for (Column column : form.getIndexView().getColumn()) {
 			String translate = column.getName();
 			if (column.getLabel() != null) {
-				translate = translationService.translate(column.getLabel(), null);
+				translate = translationService.translate(PrintUtil.prepareTranslation(column), null);
 			}
 			getTableHeadersMap().put(column.getName(), translate);
 			propertyNames[i++] = column.getName();
@@ -89,26 +98,50 @@ public class MinovaColumnPropertyAccessor implements IColumnPropertyAccessor<Row
 		}
 	}
 
+	private void initPropertyNamesTable(TranslationService translationService) {
+		int i = 0;
+		for (aero.minova.rcp.model.Column c : table.getColumns()) {
+			String translate = c.getName();
+			if (c.getLabel() != null) {
+				translate = translationService.translate(c.getLabel(), null);
+			}
+			getTableHeadersMap().put(c.getName(), translate);
+			propertyNames[i++] = c.getName();
+		}
+	}
+
 	public void translate(TranslationService translationService) {
 		getTableHeadersMap().clear();
 		if (form != null) {
 			translateForm(translationService);
 		} else if (grid != null) {
 			translateGrid(translationService);
+		} else {
+			translateTable(translationService);
 		}
 	}
 
 	private void translateForm(TranslationService translationService) {
 		for (Column column : form.getIndexView().getColumn()) {
-			String translate = translationService.translate(column.getLabel(), null);
+			String translate = translationService.translate(PrintUtil.prepareTranslation(column), null);
 			getTableHeadersMap().put(column.getName(), translate);
 		}
 	}
 
 	private void translateGrid(TranslationService translationService) {
 		for (Field field : grid.getField()) {
-			String translate = translationService.translate(field.getText().toString(), null);
+			String translate = field.getName();
+			if (field.getLabel() != null) {
+				translate = translationService.translate(field.getLabel(), null);
+			}
 			getTableHeadersMap().put(field.getName(), translate);
+		}
+	}
+
+	private void translateTable(TranslationService translationService) {
+		for (aero.minova.rcp.model.Column column : table.getColumns()) {
+			String translate = translationService.translate(PrintUtil.prepareTranslation(column), null);
+			getTableHeadersMap().put(column.getName(), translate);
 		}
 	}
 

@@ -3,7 +3,8 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_4t2ksL4REeuQC6-nmD0NNA" featurename="commands" parentElementId="xpath:/">
     <elements xsi:type="commands:Command" xmi:id="_9LplsL4REeuQC6-nmD0NNA" elementId="aero.minova.rcp.rcp.command.dynamicbuttoncommand" commandName="DynamicButtonCommand">
       <persistedState key="persistState" value="false"/>
-      <parameters xmi:id="_KDWpML4YEeuQC6-nmD0NNA" elementId="wizard" name="wizard"/>
+      <parameters xmi:id="_KDWpML4YEeuQC6-nmD0NNA" elementId="clazz" name="clazz"/>
+      <parameters xmi:id="_hAPCwFNUEeypkfCw6usOsw" elementId="parameter" name="parameter"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_b1dVUNsWEeuRe68NbHdf4w" elementId="aero.minova.rcp.rcp.command.gridbuttoncommand" commandName="GridButtonCommand">
       <parameters xmi:id="_gMbVkNsWEeuRe68NbHdf4w" elementId="grid_button_id" name="grid_button_id"/>

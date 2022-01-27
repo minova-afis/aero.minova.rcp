@@ -4,6 +4,7 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -14,6 +15,7 @@ public class MinovaWizardDialog extends WizardDialog {
 
 	public MinovaWizardDialog(Shell parentShell, IWizard newWizard) {
 		super(parentShell, newWizard);
+		setTitleAreaColor(new RGB(236, 236, 236));
 	}
 
 	@Override

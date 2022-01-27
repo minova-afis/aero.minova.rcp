@@ -8,6 +8,7 @@ public class Constants {
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
 
 	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
+	public static final String REVERT_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.revert";
 
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
@@ -19,6 +20,8 @@ public class Constants {
 	public static final String TABLE_COUNT = "Count";
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 
+	public static final String TRANSACTION_PARENT = "transactionParent";
+
 	public static final String CONTROL_FIELD = "field";
 	public static final String CONTROL_OPTIONS = "options";
 	public static final String CONTROL_CONSUMER = "consumer";
@@ -29,13 +32,23 @@ public class Constants {
 	public static final String CONTROL_VALUE = "value";
 	public static final String CONTROL_ID = "id";
 	public static final String CONTROL_MDETAIL = "mDetail";
-	public static final String CONTROL_WIZARD = "wizard";
 	public static final String CONTROL_GRID_BUTTON_ID = "grid_button_id";
 	public static final String CONTROL_GRID_BUTTON_INSERT = "grid_button_insert";
 	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
+	public static final String CONTROL_GRID_BUTTON_HORIZONTALFILL = "grid_button_horizontalFill";
+
 	public static final String CONTROL_GRID_ID = "grid_id";
+	public static final String DETAIL_COMPOSITE = "DetailComposite";
+	public static final String DETAIL_LAYOUT = "DetailLayout";
+
+	public static final String CLAZZ = "clazz";
+	public static final String PARAMETER = "parameter";
+	public static final String WIZARD = "wizard";
+	public static final String PROCEDURE = "procedure";
+	public static final String GROUP_NAME = "GroupName";
+	public static final String GROUP_MENU = "GroupMenu";
 
 	// Trenner für Serializer/Deserialiser
 	public static final String SOH = "\u0001";
@@ -48,14 +61,7 @@ public class Constants {
 	public static final String INSERT_REQUEST = "Insert";
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
-
-	// Felder aus der Form, welche ohne Halperclass direkt angesprochen werden müssen
-	public static final String FORM_BOOKINGDATE = "BookingDate";
-	public static final String FORM_STARTDATE = "StartDate";
-	public static final String FORM_ENDDATE = "EndDate";
-	public static final String FORM_RENDEREDQUANTITY = "RenderedQuantity";
-	public static final String FORM_CHARGEDQUANTITY = "ChargedQuantity";
-	public static final String EMPLOYEEKEY = "EmployeeKey";
+	public static final String BLOCK_REQUEST = "Block";
 
 	// Liste an Broker-Konstanten
 	public static final String BROKER_SAVEENTRY = "aero/minova/rcp/SaveEntry";
@@ -89,6 +95,8 @@ public class Constants {
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESS = "aero/minova/rcp/ProcedureWithTableSuccess";
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
 	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
+	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
+	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
@@ -105,6 +113,8 @@ public class Constants {
 	public static final String LAST_STATE = "LAST_STATE";
 	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
 	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
+
+	public static final String SHOW_WORKSPACE_RESET_MESSAGE = "ShowWorkspaceResetMessage";
 
 	// NatTable Label
 	public static final String COMPARATOR_LABEL = "CUSTOM_COMPARATOR_LABEL"; // Für eigene Sortierung
@@ -144,109 +154,27 @@ public class Constants {
 
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
+	public static final String SECTION_WIDTH = "SectionWidth";
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
-	public static final Object OPTION_PAGE_GRID = "OptionPageGrid";
+	public static final String OPTION_PAGE = "OptionPage";
+	public static final String OPTION_PAGE_GRID = "OptionPageGrid";
+	public static final String GRID = "Grid";
 
 	// Commands
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX = "aero.minova.rcp.rcp.command.loadindex";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_PRINTDETAIL = "aero.minova.rcp.rcp.command.printdetail";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL = "aero.minova.rcp.rcp.command.savedetail";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART = "aero.minova.rcp.rcp.command.selectsearchpart";
+	public static final String AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON = "aero.minova.rcp.rcp.command.dynamicbuttoncommand";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";
 
-	/**
-	 * Hier werden Standard-Einstellungen definiert, die wirklich oft genutzt werden
-	 *
-	 * @author dombrovski
-	 */
-	public enum Standard {
-		/** alte Standardverbindung */
-		CONNECTION("connection"),
+	// settings.properties Einstellungen
+	public static final String SETTINGS_FILE_NAME = "settings.properties";
+	public static final String SETTINGS_PROPERTIES = "SettingsProperties";
+	public static final String SETTINGS_DEFAULT_CONNECTION_STRING = "defaultConnectionString";
 
-		CONNECTION_DRIVER("driver", "net.sourceforge.jtds.jdbc.Driver"),
-
-		/** Standardverbindung für Dienste und Java 2 */
-		CONNECTION2("connection2"),
-
-		/** Verbindung zur Truckdb */
-		TRUCKCONNECTION("truckconnection"),
-
-		/** Kunden-ID, z.B. 'ZOTZ' */
-		CUSTOMER_ID("CustomerID"),
-
-		/** Kodierung der XML-Reports */
-		ENCODING_XML_REPORT("xmlReportEncoding", "UTF-8"),
-
-		/**
-		 * optionale Einstellung für Report-Sprache, Default: Sprache des Users<br>
-		 * z.B. "fr_CH" oder "de"
-		 */
-		REPORT_LOCALE("ReportLocale"),
-
-		/**
-		 * optionale Einstellung für System-Sprache, Default: Sprache des Betriebssystems<br>
-		 * z.B. "fr_CH" oder "de"
-		 */
-		// SYSTEM_LOCALE("SystemLocale"), WIS: wird derzeit über UI-Preferences gemacht
-
-		/** MDI-Dateiname */
-		FILE_MDI("MDIFilename"),
-
-		/** Lizenz gültig von */
-		LICENCE_VALID_FROM("licensedata/validFrom"),
-
-		/** Lizenz gültig bis */
-		LICENCE_VALID_UNTIL("licensedata/validUntil"),
-
-		/** Logo (muss im Report-Pfad liegen) */
-		LOGO("Logo", "logo.gif"),
-
-		/** Bild-Pfad */
-		PATH_IMAGE("ImagePath"),
-
-		/** Report-Pfad */
-		PATH_REPORT("ReportPath"),
-
-		/** Dokumente-Pfad */
-		PATH_DOCUMENT("DocumentPath"),
-
-		/** Lizenz-Signatur */
-		SIGNATURE("signature"),
-
-		/** Stornieren- oder Löschen-Dialog anzeigen? */
-		SHOW_CANCEL_DIALOG("ShowCancelDialog", "1"),
-
-		/** Korrektur-Dialog anzeigen? */
-		SHOW_CORRECTION_DIALOG("ShowCorrectionDialog", "1"),
-
-		SITE_ADDRESS_1("SiteAddress1", "MINOVA Information Systems GmbH"),
-
-		SITE_ADDRESS_2("SiteAddress2", "Tröltschstraße 4"),
-
-		SITE_ADDRESS_3("SiteAddress3", "D-97072 Würzburg"),
-
-		SITE_PHONE("SitePhone", "+49 (931) 322 35-0"),
-
-		SITE_FAX("SiteFax", "+49 (931) 322 35-55");
-
-		public final String defaultValue;
-
-		public final String path;
-
-		/**
-		 * Liefert alle geladenen Standardwerte für die gegebene Applikation
-		 */
-
-		Standard(String path) {
-			this(path, null);
-		}
-
-		Standard(String path, String defaultValue) {
-			this.path = path;
-			this.defaultValue = defaultValue;
-		}
-	}
 }
