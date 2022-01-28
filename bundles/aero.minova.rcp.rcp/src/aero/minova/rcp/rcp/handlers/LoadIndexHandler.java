@@ -81,8 +81,8 @@ public class LoadIndexHandler {
 				broker.post(Constants.BROKER_SHOWERROR, e);
 			} else {
 				Display.getDefault().asyncExec(() -> {
-					int limit = -1;
 					int current = t.getRows().size();
+					int limit = current;
 
 					int totalResults = t.getMetaData().getTotalResults();
 					if (totalResults > indexLimit && showLimitDialog) {
