@@ -88,6 +88,11 @@ public class Table {
 		rows.remove(row);
 	}
 
+	public void setRows(List<Row> newRows) {
+		rows.clear();
+		rows.addAll(newRows);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -271,4 +276,5 @@ public class Table {
 	public void setMetaDataLimit(int limit) {
 		fillMetaData(limit, null, null);
 	}
+
 }

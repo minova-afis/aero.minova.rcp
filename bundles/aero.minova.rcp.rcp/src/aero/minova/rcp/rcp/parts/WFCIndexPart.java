@@ -107,7 +107,6 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
-import aero.minova.rcp.rcp.util.LimitIndexDialog;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
@@ -345,26 +344,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 			Table table = map.get(mPerspective);
 			List<Row> rows = table.getRows();
-			int limit = -1;
-
-			int totalResults = table.getMetaData().getTotalResults();
-			if (totalResults >= indexLimit) {
-				LimitIndexDialog lid = new LimitIndexDialog(Display.getCurrent().getActiveShell(), translationService, totalResults, indexLimit);
-				lid.open();
-				limit = lid.getLimit();
-			}
-			
-			//TODO: Neue Anfrage, wenn mehr Datensätze gewünscht sind
-
-			// Abbrechen, (x), Escape -> nichts laden/ändern
-			if (limit == -2) {
-				return;
-			}
-
-			if (limit >= 0) {
-				rows = rows.subList(0, Math.min(limit, rows.size()));
-			}
-
 			updateData(rows);
 
 			if (rows.isEmpty()) {
