@@ -3,7 +3,9 @@ package aero.minova.rcp.css;
 import org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandler;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.properties.AbstractCSSPropertySWTHandler;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.css.CSSValue;
 
 import aero.minova.rcp.css.widgets.MinovaSection;
@@ -44,13 +46,22 @@ public class MinovaSectionPropertyHandler extends AbstractCSSPropertySWTHandler 
 
 	@Override
 	protected void applyCSSProperty(Control control, String property, CSSValue value, String pseudo, CSSEngine engine) throws Exception {
-		if (!(control instanceof MinovaSection)) return;
-		if (value.getCssValueType() != CSSValue.CSS_PRIMITIVE_VALUE) return;
+		if (!(control instanceof MinovaSection))
+			return;
+		if (value.getCssValueType() != CSSValue.CSS_PRIMITIVE_VALUE)
+			return;
 
 		MinovaSection minovaSection = (MinovaSection) control;
 		String val = value.getCssText();
 		// bisher sind alles int-Werte
 		int pixel = (int) Float.parseFloat(val.substring(0, val.length() - 2));
+
+		// Skalierung unter Windows beachten -> Felder entsprechend vergrößern
+		double scaling = 1.0;
+		if ("win32".equals(SWT.getPlatform())) {
+			scaling = Display.getCurrent().getDPI().x / 96.0;
+		}
+		pixel = (int) (pixel * scaling);
 
 		switch (property) {
 		case DATE_WIDTH:
