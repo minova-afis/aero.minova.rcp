@@ -138,10 +138,6 @@ public class WFCIndexPart extends WFCFormPart {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
 	int tableSelectionBuffer;
 
-	@Inject
-	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_LIMIT)
-	int indexLimit;
-
 	private Table data;
 
 	private NatTable natTable;
@@ -341,12 +337,10 @@ public class WFCIndexPart extends WFCFormPart {
 		if (map.get(mPerspective) != null) {
 			// clear the group by summary cache so the new summary calculation gets triggered
 			bodyLayerStack.getBodyDataLayer().clearCache();
-
 			Table table = map.get(mPerspective);
-			List<Row> rows = table.getRows();
-			updateData(rows);
+			updateData(table.getRows());
 
-			if (rows.isEmpty()) {
+			if (table.getRows().isEmpty()) {
 				MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
 						translationService.translate("@msg.NoRecordsLoaded", null));
 			}

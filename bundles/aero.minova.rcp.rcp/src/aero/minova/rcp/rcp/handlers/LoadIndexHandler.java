@@ -80,13 +80,12 @@ public class LoadIndexHandler {
 				ErrorObject e = new ErrorObject(t, dataService.getUserName());
 				broker.post(Constants.BROKER_SHOWERROR, e);
 			} else {
-
 				Display.getDefault().asyncExec(() -> {
 					int limit = -1;
 					int current = t.getRows().size();
 
 					int totalResults = t.getMetaData().getTotalResults();
-					if (totalResults >= indexLimit && showLimitDialog) {
+					if (totalResults > indexLimit && showLimitDialog) {
 						LimitIndexDialog lid = new LimitIndexDialog(Display.getDefault().getActiveShell(), translationService, totalResults, indexLimit);
 						lid.open();
 						limit = lid.getLimit();
