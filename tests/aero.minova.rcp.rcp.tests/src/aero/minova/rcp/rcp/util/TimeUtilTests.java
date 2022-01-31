@@ -140,4 +140,11 @@ public class TimeUtilTests {
 	public void testShortcut2MinuteChars() {
 		TimeUtil.setShortcuts("h", "mm");
 	}
+
+	@Test
+	public void entryPM() {
+		Instant now = Instant.now();
+		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(16).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "08:00 PM", "HH:mm", Locale.US));
+	}
 }
