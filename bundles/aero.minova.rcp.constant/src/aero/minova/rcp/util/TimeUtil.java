@@ -57,7 +57,11 @@ public class TimeUtil {
 	}
 
 	public static Instant getTime(String input) {
-		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, "", Locale.getDefault());
+		return getTime(input, "");
+	}
+
+	public static Instant getTime(String input, String timeUtilPref) {
+		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, Locale.getDefault());
 	}
 
 	public static Instant getTime(Instant now, String input) {
