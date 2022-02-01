@@ -8,6 +8,7 @@
 	url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
 
 CTabFolder {
+	/*ACHTUNG: Bei Änderungen auch MinovaCTabFolderPropertyHandler anpassen*/
 	swt-tab-height: 32px;
 }
 

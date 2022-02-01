@@ -17,6 +17,8 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -185,7 +187,58 @@ public class ImageUtil {
 		default:
 			throw new RuntimeException("Angeforderte Größe ist nicht verfügbar!");
 		}
+
+		// Skalierung unter Windows beachten
+		if ("win32".equals(SWT.getPlatform())) {
+			calculatedSize = scale(calculatedSize);
+		}
+
 		return calculatedSize + "x" + calculatedSize + ".png";
+	}
+
+	/**
+	 * Unter Windows müssen die Bildgrößen angepasst werden, je nachdem welche Skalierung genutzt wird
+	 * 
+	 * @param calculatedSize
+	 * @return
+	 */
+	private static int scale(int calculatedSize) {
+		try {
+			int dpi = Display.getCurrent().getDPI().x;
+
+			if (dpi == 144 || dpi == 168) {
+				switch (calculatedSize) {
+				case 16:
+					calculatedSize = 24;
+					break;
+				case 24:
+					calculatedSize = 32;
+					break;
+				case 32:
+					calculatedSize = 48;
+					break;
+				case 48:
+					calculatedSize = 64;
+					break;
+				}
+			} else if (dpi == 192) {
+				switch (calculatedSize) {
+				case 16:
+					calculatedSize = 32;
+					break;
+				case 24:
+					calculatedSize = 48;
+					break;
+				case 32:
+				case 48:
+					calculatedSize = 64;
+					break;
+				}
+			}
+		} catch (NullPointerException e) {
+			// Tritt in UI Tests auf
+		}
+		return calculatedSize;
 	}
 
 }
