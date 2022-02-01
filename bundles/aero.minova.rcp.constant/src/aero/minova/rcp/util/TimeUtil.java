@@ -1,6 +1,7 @@
 package aero.minova.rcp.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -63,16 +64,33 @@ public class TimeUtil {
 	public static Instant getTime(String input, String timeUtilPref) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, Locale.getDefault());
 	}
+	
+	public static Instant getTime(String input, String timeUtilPref, Locale locale) {
+		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, locale);
+	}
 
 	public static Instant getTime(Instant now, String input) {
 		return getTime(now, input, "", Locale.getDefault());
 	}
-
+	
 	public static Instant getTime(Instant now, String input, String timeUtilPref) {
 		return getTime(now, input, timeUtilPref, Locale.getDefault());
 	}
 
 	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
+		try {
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+			LocalTime lt = LocalTime.parse(input.toLowerCase(), dtf);
+			LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
+			now = ldt.toInstant(ZoneOffset.UTC);
+		} catch (Exception e) {
+			now = getAlternativeTime(now, input, timeUtilPref, locale);
+		}
+
+		return now;
+	}
+
+	public static Instant getAlternativeTime(Instant now, String input, String timeUtilPref, Locale locale) {
 		if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
