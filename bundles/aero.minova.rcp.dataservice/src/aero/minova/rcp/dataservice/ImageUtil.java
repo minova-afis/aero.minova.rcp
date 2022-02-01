@@ -203,37 +203,40 @@ public class ImageUtil {
 	 * @return
 	 */
 	private static int scale(int calculatedSize) {
-		int dpi = Display.getCurrent().getDPI().x;
+		try {
+			int dpi = Display.getCurrent().getDPI().x;
 
-		if (dpi == 144 || dpi == 168) {
-			switch (calculatedSize) {
-			case 16:
-				calculatedSize = 24;
-				break;
-			case 24:
-				calculatedSize = 32;
-				break;
-			case 32:
-				calculatedSize = 48;
-				break;
-			case 48:
-				calculatedSize = 64;
-				break;
+			if (dpi == 144 || dpi == 168) {
+				switch (calculatedSize) {
+				case 16:
+					calculatedSize = 24;
+					break;
+				case 24:
+					calculatedSize = 32;
+					break;
+				case 32:
+					calculatedSize = 48;
+					break;
+				case 48:
+					calculatedSize = 64;
+					break;
+				}
+			} else if (dpi == 192) {
+				switch (calculatedSize) {
+				case 16:
+					calculatedSize = 32;
+					break;
+				case 24:
+					calculatedSize = 48;
+					break;
+				case 32:
+				case 48:
+					calculatedSize = 64;
+					break;
+				}
 			}
-		} else if (dpi == 192) {
-
-			switch (calculatedSize) {
-			case 16:
-				calculatedSize = 32;
-				break;
-			case 24:
-				calculatedSize = 48;
-				break;
-			case 32:
-			case 48:
-				calculatedSize = 64;
-				break;
-			}
+		} catch (NullPointerException e) {
+			// Tritt in UI Tests auf
 		}
 		return calculatedSize;
 	}
