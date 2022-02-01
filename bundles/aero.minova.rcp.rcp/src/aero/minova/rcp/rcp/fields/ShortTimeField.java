@@ -59,7 +59,7 @@ public class ShortTimeField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant time = TimeUtil.getTime(entry, timeUtil);
+				Instant time = TimeUtil.getTime(entry, timeUtil, locale);
 				if (time == null && !entry.isEmpty()) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
