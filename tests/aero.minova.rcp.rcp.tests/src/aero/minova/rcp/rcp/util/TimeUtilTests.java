@@ -144,7 +144,7 @@ public class TimeUtilTests {
 	@Test
 	public void entryPM() {
 		Instant now = Instant.now();
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(16).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(now, "08:00 PM", "HH:mm", Locale.US));
+		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(20).toInstant(ZoneOffset.UTC);
+		assertEquals(expected, TimeUtil.getTime(now, "08:00 PM", "hh:mm a", Locale.US));
 	}
 }
