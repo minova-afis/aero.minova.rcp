@@ -64,7 +64,7 @@ public class TimeUtil {
 	public static Instant getTime(String input, String timeUtilPref) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, Locale.getDefault());
 	}
-	
+
 	public static Instant getTime(String input, String timeUtilPref, Locale locale) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, locale);
 	}
@@ -72,7 +72,7 @@ public class TimeUtil {
 	public static Instant getTime(Instant now, String input) {
 		return getTime(now, input, "", Locale.getDefault());
 	}
-	
+
 	public static Instant getTime(Instant now, String input, String timeUtilPref) {
 		return getTime(now, input, timeUtilPref, Locale.getDefault());
 	}
@@ -91,6 +91,13 @@ public class TimeUtil {
 	}
 
 	public static Instant getAlternativeTime(Instant now, String input, String timeUtilPref, Locale locale) {
+		if (input.contains("am")) {
+			input = input.substring(0, input.indexOf("a")) + input.substring(input.indexOf("a") + 2);
+		} else if (input.contains("pm")) {
+			input = input.substring(0, input.indexOf("p")) + input.substring(input.indexOf("p") + 2);
+		}
+		System.out.println(input);
+
 		if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
@@ -114,11 +121,10 @@ public class TimeUtil {
 				// TODO: handle exception
 			}
 		} else {
-			DateTimeFormatter dtf;
 			FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
 			for (FormatStyle formatStyle : styles) {
 				try {
-					dtf = DateTimeFormatter.ofLocalizedTime(formatStyle).withLocale(locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(formatStyle).withLocale(locale);
 					LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
 					String formatted = lt.format(dtf);
 					now = Instant.parse(formatted);
