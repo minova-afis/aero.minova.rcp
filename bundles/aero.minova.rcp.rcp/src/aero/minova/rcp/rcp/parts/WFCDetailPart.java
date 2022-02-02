@@ -51,8 +51,11 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -118,6 +121,7 @@ import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
+import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
@@ -186,6 +190,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	MApplication mApplication;
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
 	private ScrolledComposite scrolled;
+
+	private MinovaSection headSection;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -526,19 +532,17 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead) {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			headSection = section;
 		} else {
 			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section.getImageLink().addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+					minimizeSection(section);
+				}
+			});
 		}
 		section.setLayoutData(sectionData);
-
-		// Alten Zustand wiederherstellen
-		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
-		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
-		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
-		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
-		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
-		section.setExpanded(Boolean.parseBoolean(expandedString));
-
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.icon, false);
@@ -556,8 +560,48 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
 
+		// Alten Zustand wiederherstellen
+		// HorizontalFill
+		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
+		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
+		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
+
+		// Ein-/Ausgeklappt
+		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
+		String expandedString = prefsDetailSections.get(prefsExpandedString, "true");
+		section.setExpanded(Boolean.parseBoolean(expandedString));
+
+		// Minimiert
+		String prefsMinimizedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".minimized";
+		String minimizedString = prefsDetailSections.get(prefsMinimizedString, "false");
+		if (Boolean.parseBoolean(minimizedString)) {
+			minimizeSection(section);
+		}
+
 		detailWidth = section.getCssStyler().getSectionWidth();
 		section.requestLayout();
+	}
+
+	private void minimizeSection(MinovaSection section) {
+		section.setVisible(false);
+		section.setMinimized(true);
+		Image image = section.getImageLink().getImage();
+		Control textClient = headSection.getTextClient();
+		ToolBar bar = (ToolBar) textClient;
+		ToolItem tItem = new ToolItem(bar, SWT.PUSH);
+		tItem.setImage(image);
+		tItem.setData(FieldUtil.TRANSLATE_PROPERTY, section.getData(FieldUtil.TRANSLATE_PROPERTY));
+		tItem.setToolTipText(translationService.translate((String) section.getData(FieldUtil.TRANSLATE_PROPERTY), null));
+
+		tItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+			section.setVisible(true);
+			section.setMinimized(false);
+			tItem.dispose();
+			bar.requestLayout();
+			headSection.requestLayout();
+		}));
+		headSection.requestLayout();
+		bar.requestLayout();
 	}
 
 	private void layoutSectionClient(HeadOrPageOrGridWrapper headOrPageOrGrid, MinovaSection section, MSection mSection) {
@@ -698,6 +742,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			} else if (item instanceof ToolItem) {
 				((ToolItem) item).setToolTipText(translationService.translate(btn.getText(), null));
 			}
+			item.setData(FieldUtil.TRANSLATE_PROPERTY, btn.getText());
 		}
 		if (btn.getIcon() != null && btn.getIcon().trim().length() > 0) {
 			final ImageDescriptor buttonImageDescriptor = ImageUtil.getImageDescriptor(btn.getIcon().replace(".ico", ""), false);
@@ -1152,9 +1197,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Sections, ein-/ausgeklappt
 		for (MSection s : mDetail.getMSectionList()) {
-			Section section = ((SectionAccessor) s.getSectionAccessor()).getSection();
+			MinovaSection section = ((SectionAccessor) s.getSectionAccessor()).getSection();
 			String prefsExpandedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".expanded";
 			prefsDetailSections.put(prefsExpandedString, section.isExpanded() + "");
+
+			String prefsMinimizedString = form.getTitle() + "." + section.getData(TRANSLATE_PROPERTY) + ".minimized";
+			prefsDetailSections.put(prefsMinimizedString, section.isMinimized() + "");
 		}
 
 		try {

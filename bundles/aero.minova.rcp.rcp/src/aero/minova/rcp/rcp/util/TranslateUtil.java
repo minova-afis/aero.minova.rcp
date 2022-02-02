@@ -10,8 +10,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.rcp.fields.LookupField;
 
 public class TranslateUtil {
@@ -30,6 +35,8 @@ public class TranslateUtil {
 					ExpandableComposite expandableComposite = (ExpandableComposite) control;
 					expandableComposite.setText(value);
 					translate((Composite) expandableComposite.getClient(), translationService, locale);
+
+					translateToolbar(expandableComposite, translationService);
 				} else if (control instanceof Label) {
 					Label l = ((Label) control);
 					Object data = l.getData(LookupField.AERO_MINOVA_RCP_LOOKUP);
@@ -55,6 +62,28 @@ public class TranslateUtil {
 		for (Control control : composite.getChildren()) {
 			if (control.getData(TRANSLATE_LOCALE) != null) {
 				control.setData(TRANSLATE_LOCALE, locale);
+			}
+		}
+	}
+
+	private static void translateToolbar(ExpandableComposite expandableComposite, TranslationService translationService) {
+		if (expandableComposite.getTextClient() instanceof ToolBar) {
+			ToolBar bar = (ToolBar) expandableComposite.getTextClient();
+
+			for (ToolItem i : bar.getItems()) {
+				String property = (String) i.getData(TRANSLATE_PROPERTY);
+				String value = translationService.translate(property, null);
+				i.setToolTipText(value);
+
+				if (i.getData(Constants.GROUP_MENU) != null) {
+					Menu m = (Menu) i.getData(Constants.GROUP_MENU);
+					for (MenuItem mi : m.getItems()) {
+						property = (String) mi.getData(TRANSLATE_PROPERTY);
+						value = translationService.translate(property, null);
+						mi.setText(value);
+						mi.setToolTipText(value);
+					}
+				}
 			}
 		}
 	}
