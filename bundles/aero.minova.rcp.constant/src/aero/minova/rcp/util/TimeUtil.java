@@ -79,6 +79,9 @@ public class TimeUtil {
 
 	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
 		try {
+			// Wir versuchen den Input String direkt zu parsen mit dem übergebenen Pattern. Das parsen funktioniert nur, wenn der Input String exakt dem Pattern
+			// entspricht. Z.B. für die Uhrzeit 08:00 pm muss der Input String "08:00 PM" lauten mit dem Locale.US (oder anderer englischer Locale). Die
+			// korrekte Schreibweise des Merdiem ist hier sehr wichtig.
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
 			LocalTime lt = LocalTime.parse(input, dtf);
 			LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
@@ -91,6 +94,8 @@ public class TimeUtil {
 	}
 
 	public static Instant getAlternativeTime(Instant now, String input, String timeUtilPref, Locale locale) {
+		// das m in am/pm kolidiert mit unseren Shortcuts und muss rausgeschnitten werden. Dieser Fehler tritt nur bei am/pm auf.Bei Meridiems in anderen
+		// Sprache tritt er nicht auf.
 		if (input.contains("am")) {
 			input = input.substring(0, input.indexOf("a")) + input.substring(input.indexOf("a") + 2);
 		} else if (input.contains("pm")) {
