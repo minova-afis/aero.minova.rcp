@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -79,13 +81,23 @@ public class TimeUtil {
 
 	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
 		try {
-			// Wir versuchen den Input String direkt zu parsen mit dem übergebenen Pattern. Das parsen funktioniert nur, wenn der Input String exakt dem Pattern
-			// entspricht. Z.B. für die Uhrzeit 08:00 pm muss der Input String "08:00 PM" lauten mit dem Locale.US (oder anderer englischer Locale). Die
-			// korrekte Schreibweise des Merdiem ist hier sehr wichtig.
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
-			LocalTime lt = LocalTime.parse(input, dtf);
-			LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
-			now = ldt.toInstant(ZoneOffset.UTC);
+			if (!timeUtilPref.isBlank()) {
+				// Wir versuchen den Input String direkt zu parsen mit dem übergebenen Pattern. Das parsen funktioniert nur, wenn der Input String exakt dem
+				// Pattern
+				// entspricht. Z.B. für die Uhrzeit 08:00 pm muss der Input String "08:00 PM" lauten mit dem Locale.US (oder anderer englischer Locale). Die
+				// korrekte Schreibweise des Merdiem ist hier sehr wichtig.
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+				LocalTime lt = LocalTime.parse(input, dtf);
+				LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
+				now = ldt.toInstant(ZoneOffset.UTC);
+			} else {
+				// Wir probieren das Instant zu formatieren mit dem Pattern, das für das Locale als default gilt.
+				DateTimeFormatter dtf = DateTimeFormatter
+						.ofPattern(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale), locale);
+				LocalTime lt = LocalTime.parse(input, dtf);
+				LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
+				now = ldt.toInstant(ZoneOffset.UTC);
+			}
 		} catch (Exception e) {
 			// Klappt das Parsen nicht, wird der alternative Code ausgeführt, der den Input String splitted und so zu einem Instant kommt.
 			now = getAlternativeTime(now, input, timeUtilPref, locale);
@@ -126,6 +138,7 @@ public class TimeUtil {
 				// TODO: handle exception
 			}
 		} else {
+			// Testen verschiedener Format Styles, um eine passende Formatierung zu finden.
 			FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
 			for (FormatStyle formatStyle : styles) {
 				try {
@@ -134,7 +147,7 @@ public class TimeUtil {
 					String formatted = lt.format(dtf);
 					now = Instant.parse(formatted);
 					break;
-				} catch (Exception e) {
+				} catch (Exception ex) {
 					// dann war is nicht in diesem Format
 				}
 			}
