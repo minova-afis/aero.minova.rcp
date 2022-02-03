@@ -80,7 +80,7 @@ public class TimeUtil {
 	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
 		try {
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
-			LocalTime lt = LocalTime.parse(input.toLowerCase(), dtf);
+			LocalTime lt = LocalTime.parse(input, dtf);
 			LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
 			now = ldt.toInstant(ZoneOffset.UTC);
 		} catch (Exception e) {
@@ -96,7 +96,6 @@ public class TimeUtil {
 		} else if (input.contains("pm")) {
 			input = input.substring(0, input.indexOf("p")) + input.substring(input.indexOf("p") + 2);
 		}
-		System.out.println(input);
 
 		if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
