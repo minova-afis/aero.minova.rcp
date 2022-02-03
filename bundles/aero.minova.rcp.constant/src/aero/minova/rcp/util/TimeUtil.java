@@ -87,6 +87,7 @@ public class TimeUtil {
 			LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
 			now = ldt.toInstant(ZoneOffset.UTC);
 		} catch (Exception e) {
+			// Klappt das Parsen nicht, wird der alternative Code ausgeführt, der den Input String splitted und so zu einem Instant kommt.
 			now = getAlternativeTime(now, input, timeUtilPref, locale);
 		}
 
