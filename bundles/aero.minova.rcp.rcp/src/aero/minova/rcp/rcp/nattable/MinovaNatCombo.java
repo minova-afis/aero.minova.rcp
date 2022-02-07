@@ -314,12 +314,8 @@ public class MinovaNatCombo extends NatCombo {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (null != element && element instanceof String) {
-					if (!text.getText().isBlank() && (text.getText().contains("%") || text.getText().contains("_"))) {
-						WildcardMatcher matcher = new WildcardMatcher(text.getText().toLowerCase());
-						return matcher.matches(((String) element).toLowerCase());
-					} else {
-						return ((String) element).toLowerCase().startsWith(text.getText().toLowerCase());
-					}
+					WildcardMatcher matcher = new WildcardMatcher(text.getText().toLowerCase() + "%");
+					return matcher.matches(((String) element).toLowerCase());
 				}
 				return false;
 			}
