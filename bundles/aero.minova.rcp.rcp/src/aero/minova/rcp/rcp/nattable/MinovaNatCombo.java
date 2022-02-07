@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.rcp.util.WildcardMatcher;
+import aero.minova.rcp.util.WildcardMatcher;
 
 public class MinovaNatCombo extends NatCombo {
 
