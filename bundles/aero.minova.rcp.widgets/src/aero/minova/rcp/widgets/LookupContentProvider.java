@@ -16,6 +16,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.util.WildcardMatcher;
 
 public class LookupContentProvider {
 	private LookupComposite lookup;
@@ -47,9 +48,9 @@ public class LookupContentProvider {
 			System.out.println("Entry:[" + entry + "]");
 		}
 
-		String regex = buildRegex(entry);
-		List<LookupValue> result = values.stream().filter(
-				lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.replace("\r\n", "; ").toUpperCase().matches(regex.toUpperCase()))
+		WildcardMatcher matcher = new WildcardMatcher(entry.toUpperCase() + "%");
+		List<LookupValue> result = values.stream()
+				.filter(lv -> matcher.matches(lv.keyText.toUpperCase()) || matcher.matches(lv.description.replace("\r\n", "; ").toUpperCase()))
 				.collect(Collectors.toList());
 
 		// Wenn gegeben, weiteren Filter anwenden
