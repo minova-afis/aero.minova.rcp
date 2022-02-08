@@ -1,11 +1,14 @@
 package aero.minova.rcp.util;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -57,7 +60,15 @@ public class TimeUtil {
 	}
 
 	public static Instant getTime(String input) {
-		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, "", Locale.getDefault());
+		return getTime(input, "");
+	}
+
+	public static Instant getTime(String input, String timeUtilPref) {
+		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, Locale.getDefault());
+	}
+
+	public static Instant getTime(String input, String timeUtilPref, Locale locale) {
+		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, locale);
 	}
 
 	public static Instant getTime(Instant now, String input) {
@@ -69,6 +80,41 @@ public class TimeUtil {
 	}
 
 	public static Instant getTime(Instant now, String input, String timeUtilPref, Locale locale) {
+		try {
+			if (!timeUtilPref.isBlank()) {
+				// Wir versuchen den Input String direkt zu parsen mit dem übergebenen Pattern. Das parsen funktioniert nur, wenn der Input String exakt dem
+				// Pattern
+				// entspricht. Z.B. für die Uhrzeit 08:00 pm muss der Input String "08:00 PM" lauten mit dem Locale.US (oder anderer englischer Locale). Die
+				// korrekte Schreibweise des Merdiem ist hier sehr wichtig.
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
+				LocalTime lt = LocalTime.parse(input, dtf);
+				LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
+				now = ldt.toInstant(ZoneOffset.UTC);
+			} else {
+				// Wir probieren das Instant zu formatieren mit dem Pattern, das für das Locale als default gilt.
+				DateTimeFormatter dtf = DateTimeFormatter
+						.ofPattern(DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, FormatStyle.SHORT, Chronology.ofLocale(locale), locale), locale);
+				LocalTime lt = LocalTime.parse(input, dtf);
+				LocalDateTime ldt = LocalDateTime.of(LocalDate.of(1900, 1, 1), lt);
+				now = ldt.toInstant(ZoneOffset.UTC);
+			}
+		} catch (Exception e) {
+			// Klappt das Parsen nicht, wird der alternative Code ausgeführt, der den Input String splitted und so zu einem Instant kommt.
+			now = getAlternativeTime(now, input, timeUtilPref, locale);
+		}
+
+		return now;
+	}
+
+	public static Instant getAlternativeTime(Instant now, String input, String timeUtilPref, Locale locale) {
+		// das m in am/pm kolidiert mit unseren Shortcuts und muss rausgeschnitten werden. Dieser Fehler tritt nur bei am/pm auf.Bei Meridiems in anderen
+		// Sprache tritt er nicht auf.
+		if (input.contains("am")) {
+			input = input.substring(0, input.indexOf("a")) + input.substring(input.indexOf("a") + 2);
+		} else if (input.contains("pm")) {
+			input = input.substring(0, input.indexOf("p")) + input.substring(input.indexOf("p") + 2);
+		}
+
 		if (input.equals("0")) {
 			LocalDateTime lt = LocalDateTime.ofInstant(now, ZoneId.of("UTC")).truncatedTo(ChronoUnit.MINUTES);
 			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
@@ -92,16 +138,16 @@ public class TimeUtil {
 				// TODO: handle exception
 			}
 		} else {
-			DateTimeFormatter dtf;
+			// Testen verschiedener Format Styles, um eine passende Formatierung zu finden.
 			FormatStyle[] styles = new FormatStyle[] { FormatStyle.SHORT, FormatStyle.MEDIUM, FormatStyle.LONG, FormatStyle.FULL };
 			for (FormatStyle formatStyle : styles) {
 				try {
-					dtf = DateTimeFormatter.ofLocalizedTime(formatStyle).withLocale(locale);
+					DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedTime(formatStyle).withLocale(locale);
 					LocalTime lt = LocalTime.ofInstant(now, ZoneId.of("UTC"));
 					String formatted = lt.format(dtf);
 					now = Instant.parse(formatted);
 					break;
-				} catch (Exception e) {
+				} catch (Exception ex) {
 					// dann war is nicht in diesem Format
 				}
 			}

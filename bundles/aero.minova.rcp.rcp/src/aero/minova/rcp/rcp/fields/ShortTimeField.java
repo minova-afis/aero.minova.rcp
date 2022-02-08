@@ -59,13 +59,10 @@ public class ShortTimeField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant time = TimeUtil.getTime(entry);
+				Instant time = TimeUtil.getTime(entry, timeUtil, locale);
 				if (time == null && !entry.isEmpty()) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
-					Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-					String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "",
-							locale);
 					result.add(TimeUtil.getTimeString(time, locale, timeUtil));
 					field.setValue(new Value(time), true);
 				}
