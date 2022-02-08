@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -78,22 +77,6 @@ public class LookupContentProvider {
 		translateKey = tableName + ".Description." + lv.keyLong;
 		translated = translationService.translate("@" + tableName + ".Description." + lv.keyLong, null);
 		lv.description = translateKey.equals(translated) ? lv.keyText : translated;
-	}
-
-	private String buildRegex(String entry) {
-		String regex = "";
-
-		for (String s : entry.split("%", -1)) {
-			for (String s2 : s.split("_", -1)) {
-				regex += Pattern.quote(s2) + ".";
-			}
-			if (regex.length() > 0) {
-				regex = regex.substring(0, regex.length() - 1);
-			}
-			regex += ".*";
-		}
-
-		return regex;
 	}
 
 	/**
