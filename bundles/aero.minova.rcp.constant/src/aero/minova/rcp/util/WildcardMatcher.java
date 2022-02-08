@@ -23,7 +23,7 @@ public class WildcardMatcher {
 			regex.append('(').append(toRegex(part)).append(')');
 			next = true;
 		}
-		pattern = Pattern.compile(regex.toString() + ".*s");
+		pattern = Pattern.compile(regex.toString() + ".*");
 	}
 
 	private static CharSequence toRegex(final String expression) {
