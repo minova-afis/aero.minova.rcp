@@ -282,9 +282,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 			// Wenn mit ENTF gelöscht wird
 			else if (SWT.DEL == keyCode) {
-				if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()) {
-					newCaretPosition = caretPosition + 1;
-				} else if (textBefore.length() - decimals <= caretPosition || text.length() == textBefore.length()) {
+				if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
+						|| (text.length() == textBefore.length() && caretPosition < decimalCaretPostion)) {
 					newCaretPosition = caretPosition + 1;
 				} else if (countGroupingSeperator == 0) {
 					newCaretPosition = caretPosition;

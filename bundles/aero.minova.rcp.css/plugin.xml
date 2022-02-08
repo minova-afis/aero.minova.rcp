@@ -52,6 +52,15 @@
       </provider>
    </extension>
    <extension
+         point="org.eclipse.e4.ui.css.core.elementProvider">
+      <provider
+            class="aero.minova.rcp.css.MinovaCTabFolderElementProvider">
+         <widget
+               class="org.eclipse.swt.custom.CTabFolder">
+         </widget>
+      </provider>
+   </extension>
+   <extension
          point="org.eclipse.e4.ui.css.core.propertyHandler">
       <handler
             adapter="aero.minova.rcp.css.MinovaSectionAdapter"
@@ -77,6 +86,14 @@
          </property-name>
          <property-name
                name="time-width">
+         </property-name>
+      </handler>
+      <handler
+            adapter="aero.minova.rcp.css.MinovaCTabFolderAdapter"
+            composite="false"
+            handler="aero.minova.rcp.css.MinovaCTabFolderPropertyHandler">
+         <property-name
+               name="swt-tab-height">
          </property-name>
       </handler>
    </extension>

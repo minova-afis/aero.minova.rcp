@@ -14,6 +14,32 @@ import aero.minova.rcp.rcp.accessor.NumberValueAccessor.Result;
 class NumberValueAccessorTests {
 
 	// ================================================================================
+	// Testfälle aus Issue #1132
+	// ================================================================================
+	
+	@Test
+	void testDELAfterKomma() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				2, // start
+				3, // end
+				127, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"0,34", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0,40", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+
+	// ================================================================================
 	// Testfälle aus Issue #1084
 	// ================================================================================
 
@@ -80,7 +106,7 @@ class NumberValueAccessorTests {
 				true//
 		);
 		assertEquals("0,00", result.text);
-		assertEquals(3, result.caretPosition);
+		assertEquals(2, result.caretPosition);
 	}
 
 	@Test
@@ -892,7 +918,7 @@ class NumberValueAccessorTests {
 				decimalFormatSymbols, //
 				false//
 		);
-		assertEquals(4, result.caretPosition, "CaretPosition");
+		assertEquals(3, result.caretPosition, "CaretPosition");
 	}
 
 	@Test

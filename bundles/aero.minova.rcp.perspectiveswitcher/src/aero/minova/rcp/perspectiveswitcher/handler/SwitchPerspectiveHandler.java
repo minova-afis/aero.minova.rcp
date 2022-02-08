@@ -120,7 +120,8 @@ public class SwitchPerspectiveHandler {
 
 			MPart detailPart = partService.findPart(Constants.DETAIL_PART);
 			detailPart.setIconURI(ImageUtil.retrieveIcon(mPerspective.getIconURI(), false));
-			detailPart.setLabel(translationService.translate(mPerspective.getLabel(), null));
+			detailPart.setLabel(mPerspective.getLabel());
+			detailPart.updateLocalization();
 		} else {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		}
