@@ -47,7 +47,7 @@ public class LookupContentProvider {
 			System.out.println("Entry:[" + entry + "]");
 		}
 
-		WildcardMatcher matcher = new WildcardMatcher(entry.toUpperCase() + "%");
+		WildcardMatcher matcher = new WildcardMatcher(entry.toUpperCase());
 		List<LookupValue> result = values.stream()
 				.filter(lv -> matcher.matches(lv.keyText.toUpperCase()) || matcher.matches(lv.description.replace("\r\n", "; ").toUpperCase()))
 				.collect(Collectors.toList());

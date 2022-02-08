@@ -3,7 +3,7 @@ package aero.minova.rcp.util;
 import java.util.regex.Pattern;
 
 public class WildcardMatcher {
-	
+
 	private final Pattern pattern;
 
 	/**
@@ -23,7 +23,7 @@ public class WildcardMatcher {
 			regex.append('(').append(toRegex(part)).append(')');
 			next = true;
 		}
-		pattern = Pattern.compile(regex.toString());
+		pattern = Pattern.compile(regex.toString() + ".*s");
 	}
 
 	private static CharSequence toRegex(final String expression) {
