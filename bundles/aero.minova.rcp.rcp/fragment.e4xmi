@@ -99,6 +99,7 @@
       <persistedState key="persistState" value="false"/>
       <parameters xmi:id="_laMxt7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.commandparameter.exportto" name="exportTo" optional="false"/>
     </elements>
+    <elements xsi:type="commands:Command" xmi:id="_GyJbgIjZEeym3oYqWtuRxA" elementId="aero.minova.rcp.rcp.command.managecolumns" commandName="Manage Columns"/>
     <elements xsi:type="commands:Command" xmi:id="_laMxuLbdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.command.printindex" commandName="Print Index">
       <persistedState key="persistState" value="false"/>
     </elements>
@@ -169,6 +170,7 @@
               <handlers xmi:id="_CeFnnbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.expandorcollapseindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExpandOrCollapseIndexHandler" command="_laMxtLbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnn7byEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.exportindex" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ExportIndexHandler" command="_laMxtrbdEeuZF8ZS2_h9rA"/>
               <handlers xmi:id="_CeFnoLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.print" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.PrintIndexHandler" command="_laMxuLbdEeuZF8ZS2_h9rA"/>
+              <handlers xmi:id="_R_CKsIjZEeym3oYqWtuRxA" elementId="aero.minova.rcp.rcp.handler.manageColumns" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.ManageColumnsHandler" command="_GyJbgIjZEeym3oYqWtuRxA"/>
               <toolbar xmi:id="_CeFnobbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.index.toolbar"/>
             </children>
             <children xsi:type="basic:Part" xmi:id="_CeFnsLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.formpreview" visible="false" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.parts.Preview" label="@Form.Preview" iconURI="platform:/plugin/aero.minova.rcp.images/images/PrintPreview/32x32.png" closeable="true"/>
@@ -291,6 +293,7 @@
         </menu>
         <parameters xmi:id="_CeFnrbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttodefault" name="aero.minova.rcp.rcp.commandparameter.exportto" value="CLIPBOARD"/>
       </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="__miwcIjYEeym3oYqWtuRxA" elementId="aero.minova.rcp.rcp.handledtoolitem.managecolumns" label="@Action.ManageColumns" tooltip="@Action.ManageColumns" command="_GyJbgIjZEeym3oYqWtuRxA"/>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnrrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.Print" iconURI="platform:/plugin/aero.minova.rcp.images/images/Print.Command/32x32.png" tooltip="@Action.Print" command="_laMxuLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
