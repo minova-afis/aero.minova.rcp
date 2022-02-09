@@ -76,7 +76,7 @@ public class LookupContentProvider {
 
 		translateKey = tableName + ".Description." + lv.keyLong;
 		translated = translationService.translate("@" + tableName + ".Description." + lv.keyLong, null);
-		lv.description = translateKey.equals(translated) ? lv.keyText : translated;
+		lv.description = translateKey.equals(translated) ? lv.description : translated;
 	}
 
 	/**
