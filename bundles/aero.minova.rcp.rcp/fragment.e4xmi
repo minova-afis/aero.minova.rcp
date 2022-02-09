@@ -293,7 +293,7 @@
         </menu>
         <parameters xmi:id="_CeFnrbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.parameter.exporttodefault" name="aero.minova.rcp.rcp.commandparameter.exportto" value="CLIPBOARD"/>
       </children>
-      <children xsi:type="menu:HandledToolItem" xmi:id="__miwcIjYEeym3oYqWtuRxA" elementId="aero.minova.rcp.rcp.handledtoolitem.managecolumns" label="@Action.ManageColumns" tooltip="@Action.ManageColumns" command="_GyJbgIjZEeym3oYqWtuRxA"/>
+      <children xsi:type="menu:HandledToolItem" xmi:id="__miwcIjYEeym3oYqWtuRxA" elementId="aero.minova.rcp.rcp.handledtoolitem.managecolumns" label="@Action.ManageColumns" iconURI="platform:/plugin/aero.minova.rcp.images/images/ManageColumns.Command/32x32.png" tooltip="@Action.ManageColumns" command="_GyJbgIjZEeym3oYqWtuRxA"/>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnrrbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.Print" iconURI="platform:/plugin/aero.minova.rcp.images/images/Print.Command/32x32.png" tooltip="@Action.Print" command="_laMxuLbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
