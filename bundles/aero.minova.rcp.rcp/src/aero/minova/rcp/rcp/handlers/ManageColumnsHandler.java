@@ -29,7 +29,12 @@ public class ManageColumnsHandler {
 		WFCIndexPart indexPart = (WFCIndexPart) mpart.getObject();
 
 		ManageColumnsDialog dialog = new ManageColumnsDialog(shell, translationsService, indexPart.getData().getColumns());
-		dialog.open();
+		int dialogResult = dialog.open();
+
+		// Nicht auf "Übernehmen" geklickt -> Abbrechen
+		if (dialogResult != 0) {
+			return;
+		}
 
 		// Auch Such-Spalten updaten
 		Table searchTable = (Table) mPerspective.getContext().get(Constants.SEARCH_TABLE);

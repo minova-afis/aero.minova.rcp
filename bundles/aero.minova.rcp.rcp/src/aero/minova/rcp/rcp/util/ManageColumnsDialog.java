@@ -6,128 +6,120 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.widgets.ButtonFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import aero.minova.rcp.model.Column;
 
 public class ManageColumnsDialog extends TitleAreaDialog {
 
-	private TranslationService translationService;
-
 	// ungleich 0 oder 1 um zu verhindern, dass Dialog sich schliesst
 	private static final int BUTTON_OK_ID = 4;
-	private static final int BUTTON_CANCEL_ID = 5;
 
+	private TranslationService translationService;
 	private List<Column> columns;
 	private Map<Column, Button> checkboxes;
-	private Map<Column, Boolean> originalState;
 
 	public ManageColumnsDialog(Shell parentShell, TranslationService translationService, List<Column> columns) {
 		super(parentShell);
 		this.translationService = translationService;
 		this.columns = columns;
 		checkboxes = new HashMap<>();
-		originalState = new HashMap<>();
-		for (Column c : columns) {
-			originalState.put(c, c.isVisible());
-		}
+		setTitleAreaColor(new RGB(236, 236, 236));
 	}
 
 	@Override
 	protected Control createDialogArea(Composite dialogParent) {
-		setTitle(translationService.translate("@ManageColumns.Title", null));
-		setMessage(translationService.translate("@ManageColumns.Message", null));
+		setTitle(translationService.translate("@ManageColumns.Message", null));
 
-		Composite parent = (Composite) super.createDialogArea(dialogParent);
+		Composite parent = new Composite(dialogParent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		parent.setLayout(layout);
+		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gd.heightHint = computePreferredHeight(parent, 15);
+		parent.setLayoutData(gd);
+		parent.setFont(dialogParent.getFont());
+		// Build the separator line
+		Label titleBarSeparator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
+		titleBarSeparator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		parent.setSize(200, 200);
 
-		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		// Buttons für alles de-/aktivieren
+		Composite buttonComp = new Composite(parent, SWT.NONE);
+		buttonComp.setLayout(new GridLayout(2, false));
+		Button selectAll = ButtonFactory.newButton(SWT.PUSH).text(translationService.translate("@SelectAll", null)).create(buttonComp);
+		selectAll.addListener(SWT.Selection, event -> selectAll(true));
+		Button deselectAll = ButtonFactory.newButton(SWT.PUSH).text(translationService.translate("@DeselectAll", null)).create(buttonComp);
+		deselectAll.addListener(SWT.Selection, event -> selectAll(false));
+
+		ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL);
 		sc.setLayout(new GridLayout());
-		sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		sc.setExpandVertical(true);
-		sc.setExpandHorizontal(true);
-		sc.setAlwaysShowScrollBars(true);
 
 		Composite wrap = new Composite(sc, SWT.NONE);
 		wrap.setLayout(new GridLayout());
-		wrap.setSize(200, 100);
 		sc.setContent(wrap);
 
-		Button selectAll = ButtonFactory.newButton(SWT.PUSH).text(translationService.translate("@SelectAll", null)).create(wrap);
-		selectAll.addListener(SWT.Selection, event -> selectAll(true));
-		Button deselectAll = ButtonFactory.newButton(SWT.PUSH).text(translationService.translate("@DeselectAll", null)).create(wrap);
-		deselectAll.addListener(SWT.Selection, event -> selectAll(false));
-		Button revert = ButtonFactory.newButton(SWT.PUSH).text(translationService.translate("@Revert", null)).create(wrap);
-		revert.addListener(SWT.Selection, event -> revertVisible());
-
+		// Checkbox für jede Spalte
 		for (Column c : columns) {
 			if (c.getLabel() != null) {
 				Button b = ButtonFactory.newButton(SWT.CHECK).text(translationService.translate(c.getLabel(), null)).create(wrap);
 				b.setSelection(c.isVisible());
-				b.addListener(SWT.Selection, event -> c.setVisible(b.getSelection()));
 				checkboxes.put(c, b);
 			}
 		}
 
-		// System.out.println(wrap.getSize());
-
-//		sc.setExpandHorizontal(true);
-//		sc.setExpandVertical(true);
-//		sc.setSize(200, 100);
-//		sc.addListener(SWT.Resize, event -> {
-//			wrap.setSize(200, 200);
-//
-//			int width = 200;
-//			sc.setMinSize(wrap.computeSize(width, SWT.DEFAULT));
-//			System.out.println(wrap.getSize() + " " + width + " " + sc.getMinHeight());
-//		});
+		// Scrolled Composite konfigurieren
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.heightHint = computePreferredHeight(sc, checkboxes.entrySet().size());
+		sc.setLayoutData(gridData);
+		sc.setContent(wrap);
+		sc.setExpandHorizontal(true);
+		sc.setExpandVertical(true);
+		sc.addListener(SWT.Resize, event -> {
+			int width = sc.getClientArea().width;
+			sc.setMinSize(parent.computeSize(width, SWT.DEFAULT));
+		});
 
 		return parent;
 	}
 
-	private void revertVisible() {
+	private void updateVisible() {
 		for (Entry<Column, Button> e : checkboxes.entrySet()) {
-			boolean select = originalState.get(e.getKey());
-			e.getValue().setSelection(select);
-			e.getKey().setVisible(select);
+			e.getKey().setVisible(e.getValue().getSelection());
 		}
 	}
 
 	private void selectAll(boolean select) {
 		for (Entry<Column, Button> e : checkboxes.entrySet()) {
 			e.getValue().setSelection(select);
-			e.getKey().setVisible(select);
 		}
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// Button zum Canceln
-		Button cancel = createButton(parent, BUTTON_CANCEL_ID, translationService.translate("@Abort", null), false);
-		cancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				revertVisible();
-				close();
-			}
-		});
+		createButton(parent, IDialogConstants.CANCEL_ID, translationService.translate("@Abort", null), false);
 
 		// Button zum Bestätigen
 		Button ok = createButton(parent, BUTTON_OK_ID, translationService.translate("@Apply", null), true);
 		ok.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				// TODO
+				updateVisible();
 				close();
 			}
 		});
@@ -138,4 +130,19 @@ public class ManageColumnsDialog extends TitleAreaDialog {
 		super.configureShell(shell);
 		shell.setText(translationService.translate("@ManageColumns.Title", null));
 	}
+
+	private int computePreferredHeight(Composite c, int numberOfLines) {
+		int defaultHorizontalSpacing = 6;
+		Button b = ButtonFactory.newButton(SWT.CHECK).text("TMP").create(c);
+		Point preferredSize = b.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		b.dispose();
+
+		return numberOfLines * (preferredSize.y + defaultHorizontalSpacing);
+	}
+
+	@Override
+	protected boolean isResizable() {
+		return true;
+	}
+
 }
