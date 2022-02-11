@@ -44,6 +44,15 @@ public class Table {
 		return -1;
 	}
 
+	public Column getColumn(String columnName) {
+		for (int i = 0; i < columns.size(); i++) {
+			if (columns.get(i).getName().equals(columnName)) {
+				return columns.get(i);
+			}
+		}
+		return null;
+	}
+
 	public List<Column> getColumns() {
 		return columns;
 	}
