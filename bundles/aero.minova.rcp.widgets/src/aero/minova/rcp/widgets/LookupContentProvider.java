@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -16,6 +15,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.util.WildcardMatcher;
 
 public class LookupContentProvider {
 	private LookupComposite lookup;
@@ -47,9 +47,9 @@ public class LookupContentProvider {
 			System.out.println("Entry:[" + entry + "]");
 		}
 
-		String regex = buildRegex(entry);
-		List<LookupValue> result = values.stream().filter(
-				lv -> lv.keyText.toUpperCase().matches(regex.toUpperCase()) || lv.description.replace("\r\n", "; ").toUpperCase().matches(regex.toUpperCase()))
+		WildcardMatcher matcher = new WildcardMatcher(entry.toUpperCase());
+		List<LookupValue> result = values.stream()
+				.filter(lv -> matcher.matches(lv.keyText.toUpperCase()) || matcher.matches(lv.description.replace("\r\n", "; ").toUpperCase()))
 				.collect(Collectors.toList());
 
 		// Wenn gegeben, weiteren Filter anwenden
@@ -76,23 +76,7 @@ public class LookupContentProvider {
 
 		translateKey = tableName + ".Description." + lv.keyLong;
 		translated = translationService.translate("@" + tableName + ".Description." + lv.keyLong, null);
-		lv.description = translateKey.equals(translated) ? lv.keyText : translated;
-	}
-
-	private String buildRegex(String entry) {
-		String regex = "";
-
-		for (String s : entry.split("%", -1)) {
-			for (String s2 : s.split("_", -1)) {
-				regex += Pattern.quote(s2) + ".";
-			}
-			if (regex.length() > 0) {
-				regex = regex.substring(0, regex.length() - 1);
-			}
-			regex += ".*";
-		}
-
-		return regex;
+		lv.description = translateKey.equals(translated) ? lv.description : translated;
 	}
 
 	/**
