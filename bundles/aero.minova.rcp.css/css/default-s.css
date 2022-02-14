@@ -12,7 +12,8 @@ CTabFolder {
 	swt-tab-height: 24px;
 }
 
-Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie, CCombo {
+Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie, CCombo,
+	FlatButton {
 	font-size: 8px;
 }
 
