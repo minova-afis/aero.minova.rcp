@@ -549,6 +549,20 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
 			section.setImage(resManager.createImage(imageDescriptor));
 		}
+		
+		section.addControlListener(new ControlListener() {
+			
+			@Override
+			public void controlResized(ControlEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void controlMoved(ControlEvent e) {
+				parent.setTabList(TabUtil.getTabListForPart(parent, selectAllControls));
+			}
+		});
 
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
