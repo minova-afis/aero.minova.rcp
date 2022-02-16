@@ -195,6 +195,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private MinovaSection headSection;
 
+	private int sectionCount = -1;
+
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
@@ -575,6 +577,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
 
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
+
+		// Order setzen und sectionCount erhöhen
+		sectionCount++;
+		sectionData.order = sectionCount;
 
 		// Alten Zustand wiederherstellen
 		// HorizontalFill

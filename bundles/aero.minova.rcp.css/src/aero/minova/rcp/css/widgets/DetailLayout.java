@@ -69,6 +69,7 @@ public class DetailLayout extends Layout {
 		int columnChildrenCount = 0;
 		int horizontalFillChildrenCount = 0;
 		int maxColumnWidth = 0;
+		int order = -1;
 
 		for (int i = 0; i < children.length; i++) {
 			Control control = children[i];
@@ -87,6 +88,22 @@ public class DetailLayout extends Layout {
 				horizontalFillChildren[horizontalFillChildrenCount] = children[i];
 				horizontalFillData[horizontalFillChildrenCount] = data;
 				horizontalFillChildrenCount++;
+			}
+		}
+
+		for (Control control : columnChildren) {
+			if (control != null) {
+				MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
+				order++;
+				data.order = order;
+			}
+		}
+
+		for (Control control : horizontalFillChildren) {
+			if (control != null) {
+				MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
+				order++;
+				data.order = order;
 			}
 		}
 
