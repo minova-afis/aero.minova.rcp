@@ -15,6 +15,7 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.widgets.LookupComposite;
@@ -58,6 +59,29 @@ public class TabUtil {
 		return tabList.toArray(new Control[0]);
 	}
 
+	public static Control[] getSortedSectionTabList(Composite parent) {
+		List<Control> tabList = new ArrayList<>(parent.getChildren().length);
+
+		for (Control section : parent.getChildren()) {
+			tabList.add(section);
+		}
+
+		Collections.sort(tabList, (f1, f2) -> {
+			int order1 = ((MinovaSectionData) f1.getLayoutData()).order;
+			int order2 = ((MinovaSectionData) f2.getLayoutData()).order;
+
+			if (order1 == order2) {
+				return 0;
+			} else if (order1 < order2) {
+				return -1;
+			} else {
+				return 1;
+			}
+		});
+
+		return tabList.toArray(new Control[0]);
+	}
+
 	/**
 	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
 	 *
@@ -94,8 +118,7 @@ public class TabUtil {
 		for (Control child : composite.getChildren()) {
 			if (child instanceof ToolBar && selectAllControls && !mSection.isHead()) {
 				tabList.add(1, child);
-			} else 
-			if (child instanceof Twistie || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
+			} else if (child instanceof Twistie || (child instanceof ImageHyperlink && !selectAllControls) || child instanceof Label) {
 				// Die sollen nicht in die Tabliste
 			} else {
 				tabList.add(child);
