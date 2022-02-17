@@ -59,6 +59,12 @@ public class TabUtil {
 		return tabList.toArray(new Control[0]);
 	}
 
+	/**
+	 * Liefert ein nach der Order sortierten Array von Sections zurück.
+	 * 
+	 * @param parent DetailPart
+	 * @return nach der Order sortierte TabList
+	 */
 	public static Control[] getSortedSectionTabList(Composite parent) {
 		List<Control> tabList = new ArrayList<>(parent.getChildren().length);
 

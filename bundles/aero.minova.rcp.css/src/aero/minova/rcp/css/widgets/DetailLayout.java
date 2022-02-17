@@ -91,14 +91,16 @@ public class DetailLayout extends Layout {
 			}
 		}
 
+		// Order neu setzen für alle Sections mit horizontalFill = false
 		for (Control control : columnChildren) {
 			if (control != null) {
 				MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
 				order++;
 				data.order = order;
-			}
+			} 
 		}
 
+		// Danach Order neu setzen für alle Sections mit horizontalFill = true
 		for (Control control : horizontalFillChildren) {
 			if (control != null) {
 				MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
