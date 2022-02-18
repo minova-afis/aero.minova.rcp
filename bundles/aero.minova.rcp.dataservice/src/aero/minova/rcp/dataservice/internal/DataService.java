@@ -253,13 +253,18 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
+			log("CAS Answer Table:\n" + t.body());
+
 			Table fromJson = gson.fromJson(t.body(), Table.class);
-			if (fromJson.getName().equals(ERROR)) {
-				ErrorObject e = new ErrorObject(fromJson, username, searchTable.getName());
-				postError(e);
+			if (fromJson == null || fromJson.getName() == null) {
+				postError(checkForError(null, searchTable.getName()));
 				return null;
 			}
-			log("CAS Answer Table:\n" + t.body());
+			if (fromJson.getName().equals(ERROR)) {
+				postError(new ErrorObject(fromJson, username, searchTable.getName()));
+				return null;
+			}
+
 			return fromJson;
 		});
 	}
