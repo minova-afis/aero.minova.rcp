@@ -24,6 +24,7 @@ public class Column {
 	boolean visible;
 	String lookupTable;
 	KeyType keyType;
+	boolean key;
 
 	@Override
 	public String toString() {
@@ -120,6 +121,14 @@ public class Column {
 
 	public void setKeyType(KeyType keyType) {
 		this.keyType = keyType;
+	}
+
+	public boolean isKey() {
+		return key;
+	}
+
+	public void setKey(boolean key) {
+		this.key = key;
 	}
 
 	@Override

@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
- *       &lt;attribute name="key" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="key" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="aggregate"&gt;
  *         &lt;simpleType&gt;
@@ -496,8 +496,12 @@ public class Column {
      *     {@link java.lang.Boolean }
      *     
      */
-    public java.lang.Boolean isKey() {
-        return key;
+    public boolean isKey() {
+        if (key == null) {
+            return false;
+        } else {
+            return key;
+        }
     }
 
     /**

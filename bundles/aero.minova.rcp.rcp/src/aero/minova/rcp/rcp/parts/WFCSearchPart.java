@@ -2,6 +2,7 @@ package aero.minova.rcp.rcp.parts;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -81,20 +82,27 @@ public class WFCSearchPart extends WFCFormPart {
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
+
 	@Inject
 	private IMinovaJsonService mjs;
+
 	@Inject
 	TranslationService translationService;
-	private Table data;
-	private NatTable natTable;
+
 	@Inject
 	MPart mPart;
+
+	private Table data;
+	private NatTable natTable;
+
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 	private ColumnHeaderLayer columnHeaderLayer;
 	private ColumnReorderLayer columnReorderLayer;
+	private ColumnHideShowLayer columnHideShowLayer;
 	private DataLayer bodyDataLayer;
+	private MinovaSearchConfiguration msc;
 
 	@PostConstruct
 	public void createComposite(Composite parent, IEclipseContext context) {
@@ -114,7 +122,7 @@ public class WFCSearchPart extends WFCFormPart {
 		getData().getRows().get(getData().getRows().size() - 1).setValue(new Value(false), 0);
 
 		parent.setLayout(new GridLayout());
-		mPart.getContext().set("NatTableDataSearchArea", getData());
+		mPerspective.getContext().set(Constants.SEARCH_TABLE, getData());
 
 		natTable = createNatTable(parent, form, getData());
 
@@ -174,7 +182,7 @@ public class WFCSearchPart extends WFCFormPart {
 		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
-		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
+		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 		ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
@@ -208,7 +216,7 @@ public class WFCSearchPart extends WFCFormPart {
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 		natTable.addConfiguration(new SingleClickSortConfiguration());
 
-		MinovaSearchConfiguration msc = new MinovaSearchConfiguration(table.getColumns(), searchForm);
+		msc = new MinovaSearchConfiguration(table.getColumns(), searchForm);
 		natTable.addConfiguration(msc);
 		columnHideShowLayer.hideColumnPositions(msc.getHiddenColumns());
 
@@ -238,6 +246,7 @@ public class WFCSearchPart extends WFCFormPart {
 	/**
 	 * xxx.table -> Inhalt der Tabelle <br>
 	 * xxx.search.size (index,breite(int)) -> Speichert auch Reihenfolge der Spalten <br>
+	 * xxx.index.hidden ([index;index2...]); -> Unsichtbare Spalten <br>
 	 * Ähnlich im IndexPart
 	 * 
 	 * @param saveRowConfig
@@ -251,11 +260,15 @@ public class WFCSearchPart extends WFCFormPart {
 		String tableName = getData().getName();
 		prefs.put(tableName + "." + name + ".table", mjs.table2Json(getData(), true));
 		if (saveRowConfig) {
+			// Reihenfolge und Größe
 			String search = "";
 			for (int i : columnReorderLayer.getColumnIndexOrder()) {
 				search += i + "," + bodyDataLayer.getColumnWidthByPosition(i) + ";";
 			}
 			prefs.put(tableName + "." + name + ".search.size", search);
+
+			// Sichtbarkeit
+			prefs.put(tableName + "." + name + ".search.hidden", columnHideShowLayer.getHiddenColumnIndexes().toString());
 		}
 
 		try {
@@ -310,6 +323,18 @@ public class WFCSearchPart extends WFCFormPart {
 		columnReorderLayer.getColumnIndexOrder().addAll(0, order);
 		columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
 
+		// Sichtbarkeit
+		string = prefs.get(tableName + "." + name + ".search.hidden", null);
+		if (string != null && !string.equals("")) {
+			String replace = string.replaceAll("^\\[|]$", "");
+			replace = replace.replaceAll(", ", ",");
+			List<String> stringIndices = new ArrayList<>(Arrays.asList(replace.split(",")));
+			for (int i = 0; i < data.getColumnCount(); i++) {
+				boolean hidden = stringIndices.contains(i + "");
+				data.getColumns().get(i).setVisible(!hidden);
+			}
+			updateColumns(""); // UI updaten
+		}
 	}
 
 	@Inject
@@ -357,6 +382,13 @@ public class WFCSearchPart extends WFCFormPart {
 		natTable.commitAndCloseActiveCellEditor();
 		deleteSearchRows(rows2delete);
 		refreshNatTable();
+	}
+
+	@Inject
+	@Optional
+	public void updateColumns(@UIEventTopic(Constants.BROKER_UPDATECOLUMNS) String s) {
+		columnHideShowLayer.showAllColumns();
+		columnHideShowLayer.hideColumnPositions(msc.getHiddenColumns());
 	}
 
 	public void deleteSearchRows(List<Row> rows) {

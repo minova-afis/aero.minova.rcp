@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.handlers;
 
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -151,7 +153,7 @@ public class PerspectiveControl {
 	@Inject
 	@Optional
 	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
-		translate(translationService);
+		translate();
 	}
 
 	@Inject
@@ -163,9 +165,21 @@ public class PerspectiveControl {
 	}
 
 	private void translate() {
+		if (toolBar == null) {
+			return;
+		}
+
 		for (ToolItem item : toolBar.getItems()) {
-			String value = translationService.translate(item.getText(), null);
-			item.setText(value);
+			String property = (String) item.getData(TRANSLATE_PROPERTY);
+			if (property == null) {
+				continue;
+			}
+			String value = translationService.translate(property, null);
+
+			if (item.getImage() == null) {
+				item.setText(value);
+			}
+			item.setToolTipText(value);
 		}
 		toolBar.pack(true);
 	}
@@ -186,15 +200,13 @@ public class PerspectiveControl {
 
 			shortcut = new ToolItem(toolBar, SWT.RADIO);
 			shortcut.setData(perspectiveId);
-			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
+			shortcut.setData(TRANSLATE_PROPERTY, formLable);
 
+			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
 			if (descriptor != null && !descriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
 				shortcut.setImage(descriptor.createImage());
-			} else {
-				shortcut.setText(localizedLabel != null ? localizedLabel : "");
 			}
 
-			shortcut.setToolTipText(localizedTooltip != null ? localizedTooltip : localizedLabel);
 			shortcut.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent event) {
@@ -209,6 +221,7 @@ public class PerspectiveControl {
 				}
 			});
 		}
+		translate();
 	}
 
 	/*

@@ -41,6 +41,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.util.WildcardMatcher;
+
 public class MinovaNatCombo extends NatCombo {
 
 	public MinovaNatCombo(Composite parent, IStyle cellStyle, int maxVisibleItems, int style, Image iconImage) {
@@ -312,7 +314,8 @@ public class MinovaNatCombo extends NatCombo {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (null != element && element instanceof String) {
-					return ((String) element).toLowerCase().startsWith(text.getText().toLowerCase());
+					WildcardMatcher matcher = new WildcardMatcher(text.getText().toLowerCase());
+					return matcher.matches(((String) element).toLowerCase());
 				}
 				return false;
 			}
