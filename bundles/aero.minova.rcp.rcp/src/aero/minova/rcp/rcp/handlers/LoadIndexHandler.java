@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -52,6 +51,9 @@ public class LoadIndexHandler {
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.INDEX_LIMIT)
 	int indexLimit;
 
+	int loadedRows;
+	int requestedRows;
+
 	volatile boolean loading = false;
 
 	@CanExecute
@@ -76,12 +78,14 @@ public class LoadIndexHandler {
 		searchPart.updateUserInput();
 		Table searchTable = (Table) mPerspective.getContext().get(Constants.SEARCH_TABLE);
 
-		loadTable(perspective, searchTable, indexLimit, true);
+		loadedRows = 0;
+		requestedRows = indexLimit;
+		loadTable(perspective, searchTable, 1);
 	}
 
-	private void loadTable(MPerspective perspective, Table searchTable, int indexLimit, boolean showLimitDialog) {
-		searchTable.setMetaDataLimit(indexLimit); // erstmal nur eingestellte Anzahl Datensätze laden
+	private void loadTable(MPerspective perspective, Table searchTable, int page) {
 		Table requestTable = filterInvisibleColumns(searchTable);
+		requestTable.fillMetaData(indexLimit, null, page); // erstmal nur eingestellte Anzahl Datensätze laden
 		CompletableFuture<Table> tableFuture = dataService.getTableAsync(requestTable);
 
 		tableFuture.thenAccept(t -> {
@@ -91,40 +95,7 @@ public class LoadIndexHandler {
 				ErrorObject e = new ErrorObject(t, dataService.getUserName());
 				broker.post(Constants.BROKER_SHOWERROR, e);
 			} else {
-				Display.getDefault().asyncExec(() -> {
-					int current = t.getRows().size();
-					int limit = current;
-
-					MPart indexMPart = model.findElements(perspective, Constants.INDEX_PART, MPart.class).get(0);
-					WFCIndexPart indexPart = (WFCIndexPart) indexMPart.getObject();
-					Table resultTable = addColumns(indexPart.getData(), t);
-
-					int totalResults = resultTable.getMetaData().getTotalResults();
-					if (totalResults > indexLimit && showLimitDialog) {
-						LimitIndexDialog lid = new LimitIndexDialog(Display.getDefault().getActiveShell(), translationService, totalResults, indexLimit);
-						lid.open();
-						limit = lid.getLimit();
-					}
-
-					// Mehr Datensätze gewüscht -> neue Anfrage
-					if ((limit > current || limit == -1) && showLimitDialog) {
-						loadTable(perspective, searchTable, limit == -1 ? 0 : limit, false);
-						return;
-					}
-
-					// Abbrechen, (x), Escape -> nichts laden/ändern
-					if (limit == -2) {
-						return;
-					}
-
-					if (limit >= 0) {
-						List<Row> newRows = new ArrayList<>();
-						newRows.addAll(t.getRows().subList(0, Math.min(limit, current)));
-						resultTable.setRows(newRows);
-					}
-
-					broker.post(Constants.BROKER_LOADINDEXTABLE, Map.of(perspective, resultTable));
-				});
+				processResult(perspective, searchTable, page, t);
 			}
 		});
 
@@ -132,6 +103,47 @@ public class LoadIndexHandler {
 			loading = false;
 			broker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 			return null;
+		});
+	}
+
+	private void processResult(MPerspective perspective, Table searchTable, int page, Table t) {
+		Display.getDefault().asyncExec(() -> {
+			int current = t.getRows().size();
+			loadedRows += current;
+
+			MPart indexMPart = model.findElements(perspective, Constants.INDEX_PART, MPart.class).get(0);
+			WFCIndexPart indexPart = (WFCIndexPart) indexMPart.getObject();
+			Table resultTable = addColumns(indexPart.getData(), t);
+
+			int totalResults = resultTable.getMetaData().getTotalResults();
+			if (totalResults > indexLimit && page == 1) {
+				LimitIndexDialog lid = new LimitIndexDialog(Display.getDefault().getActiveShell(), translationService, totalResults, indexLimit);
+				lid.open();
+				requestedRows = lid.getLimit();
+
+				// Abbrechen, (x), Escape -> nichts laden/ändern
+				if (requestedRows == -2) {
+					return;
+				}
+
+				// Komplett laden
+				if (requestedRows == -1) {
+					requestedRows = totalResults;
+				}
+
+				if (requestedRows >= 0) {
+					List<Row> newRows = new ArrayList<>();
+					newRows.addAll(resultTable.getRows().subList(0, Math.min(requestedRows, current)));
+					resultTable.setRows(newRows);
+				}
+			}
+
+			// Mehr Datensätze gewüscht -> weitere Anfragen über paging
+			if (resultTable.getMetaData().getResultsLeft() > 0 && loadedRows < requestedRows) {
+				loadTable(perspective, searchTable, t.getMetaData().getPage() + 1);
+			}
+
+			broker.post(Constants.BROKER_LOADINDEXTABLE, resultTable);
 		});
 	}
 

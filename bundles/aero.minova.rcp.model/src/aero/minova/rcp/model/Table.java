@@ -281,9 +281,4 @@ public class Table {
 	public void setMetaData(TableMetaData metaData) {
 		this.metaData = metaData;
 	}
-
-	public void setMetaDataLimit(int limit) {
-		fillMetaData(limit, null, null);
-	}
-
 }
