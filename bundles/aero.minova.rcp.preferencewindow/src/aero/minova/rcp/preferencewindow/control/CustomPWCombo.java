@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import aero.minova.rcp.preferencewindow.builder.ComboHeightAdjust;
+
 public class CustomPWCombo extends CustomPWWidget {
 	private final List<Object> data;
 	private final boolean editable;
@@ -58,6 +60,9 @@ public class CustomPWCombo extends CustomPWWidget {
 		addControl(cmp);
 
 		final CCombo combo = new CCombo(cmp, SWT.BORDER | (editable ? SWT.NONE : SWT.READ_ONLY));
+		final GridData comboGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		comboGridData.heightHint = ComboHeightAdjust.getComboHeight();
+		combo.setLayoutData(comboGridData);
 		combo.setToolTipText(getTooltip());
 		addControl(combo);
 

@@ -12,8 +12,8 @@ CTabFolder {
 	swt-tab-height: 40px;
 }
 
-Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie, CCombo
-	{
+Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie, CCombo,
+	FlatButton {
 	font-size: 14px;
 }
 
@@ -35,7 +35,6 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	padding: 4;
 	/*row-height: 34;*/
 }
-
 
 MinovaSection {
 	date-width: 120px;
