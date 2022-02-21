@@ -58,7 +58,7 @@ public abstract class CustomPWWidget extends PWWidget {
 	public void createTooltipInfoIcon(Label label) {
 		label.setToolTipText(getTooltip());
 		LocalResourceManager resManager = new LocalResourceManager(JFaceResources.getResources());
-		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor("Information", false);
+		ImageDescriptor imageDescriptor = ImageUtil.getImageDefault("tooltip-info.png");
 		label.setImage(resManager.createImage(imageDescriptor));
 
 		GridData iconGD = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
