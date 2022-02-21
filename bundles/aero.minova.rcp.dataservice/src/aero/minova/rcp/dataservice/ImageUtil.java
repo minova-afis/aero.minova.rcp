@@ -45,6 +45,7 @@ public class ImageUtil {
 	/**
 	 * Liefert einen ImageDescriptor für das Bild. <br>
 	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht. <br>
+	 * Die Größe des Bildes entspricht den Einstellungen <br>
 	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
 	 * <br>
 	 *
@@ -57,35 +58,59 @@ public class ImageUtil {
 		}
 
 		String location = retrieveIcon(filename, isToolBar);
+		return gegtImageDescriptorFromFilename(location);
+	}
 
-		try {
-			URL url = URI.create(location).toURL();
-			return ImageDescriptor.createFromURL(url);
-		} catch (MalformedURLException | IllegalArgumentException e) {
-			System.err.println("Invalid URI " + location + " for icon " + filename);
+	/**
+	 * Liefert einen ImageDescriptor für das Bild in der entsprechenden Größe. <br>
+	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht. <br>
+	 * Der ImageDescriptor sollte mit einem @LocalResourceManager verwendet werden, damit das Image automatisch disposed wird, wenn es nicht mehr benötigt wird.
+	 * <br>
+	 *
+	 * @param filename
+	 * @return
+	 */
+	public static ImageDescriptor getImageDescriptor(String filename, int size) {
+		if (filename == null || filename.equals("")) {
+			return ImageDescriptor.createFromURL(null);
 		}
-		return ImageDescriptor.createFromURL(null);
+
+		String location = findIcon(filename, size + "x" + size + ".png");
+		return gegtImageDescriptorFromFilename(location);
+	}
+
+	private static ImageDescriptor gegtImageDescriptorFromFilename(String location) {
+		URL url = null;
+		try {
+			url = URI.create(location).toURL();
+		} catch (MalformedURLException | IllegalArgumentException e) {}
+		return ImageDescriptor.createFromURL(url);
 	}
 
 	/**
 	 * Liefert einen String mit der Location des Bildes. <br>
-	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht.
+	 * Zuerst wird im "images" Ordner im aero.minova.rcp.images Plugin gesucht. Wird es dort nicht gefunden wird im vom Server geladenen Ordner gesucht.<br>
+	 * Die Größe des Bildes entspricht den Einstellungen
 	 *
 	 * @param filename
 	 * @return
 	 */
 	public static String retrieveIcon(String icon, boolean isToolBar) {
-
 		if (icon == null) {
 			return null;
 		}
 
-		String iconWithoutExtension = icon.toLowerCase().replace(".png", "").replace(".ico", "");
 		String size = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE).get(ApplicationPreferences.FONT_ICON_SIZE, "M").toLowerCase();
+		String iconSize = calculateImagesSize(size, isToolBar);
+
+		return findIcon(icon, iconSize);
+	}
+
+	private static String findIcon(String icon, String iconSize) {
+		String iconWithoutExtension = icon.toLowerCase().replace(".png", "").replace(".ico", "");
 
 		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
-		String iconSize = calculateImagesSize(size, isToolBar);
 		URL localURL = FileLocator.find(bundle, new Path("images/" + icon + "/" + iconSize));
 		if (localURL != null) {
 			try {
@@ -107,6 +132,7 @@ public class ImageUtil {
 				for (File file : listFiles) {
 					if (file.getName().toLowerCase().equals(iconWithoutExtension)) {
 						resolve = file.toPath().resolve(iconSize);
+						break;
 					}
 				}
 			}
