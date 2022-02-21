@@ -46,7 +46,7 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="key" type="xs:boolean" use="optional">
+		<xs:attribute name="key" type="xs:boolean" use="optional" default="false">
 			<xs:annotation>
 				<xs:documentation>
 					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Gibt an, dass die Spalte einen Schlüssel enthält, der

@@ -166,6 +166,8 @@ public class WFCIndexPart extends WFCFormPart {
 
 	private SelectionThread selectionThread;
 
+	private MinovaIndexConfiguration mic;
+
 	@PostConstruct
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
@@ -187,6 +189,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 * xxx.index.size (index,breite(int)); -> Speichert auch Reihenfolge der Spalte <br>
 	 * xxx.index.sortby (index,sortDirection(ASC|DESC);index2....); -> Sortierung <br>
 	 * xxx.index.groupby (expand[0,1];index;index2...); -> Gruppierung <br>
+	 * xxx.index.hidden ([index;index2...]); -> Unsichtbare Spalten <br>
 	 * Ähnlich im SearchPart
 	 *
 	 * @param saveRowConfig
@@ -226,6 +229,9 @@ public class WFCIndexPart extends WFCFormPart {
 			group += i + ";";
 		}
 		prefs.put(tableName + "." + name + ".index.groupby", group);
+
+		// Sichtbarkeit
+		prefs.put(tableName + "." + name + ".index.hidden", bodyLayerStack.columnHideShowLayer.getHiddenColumnIndexes().toString());
 
 		try {
 			prefs.flush();
@@ -297,6 +303,19 @@ public class WFCIndexPart extends WFCFormPart {
 			} else {
 				expandGroups("");
 			}
+		}
+
+		// Sichtbarkeit
+		string = prefs.get(tableName + "." + name + ".index.hidden", null);
+		if (string != null && !string.equals("")) {
+			String replace = string.replaceAll("^\\[|]$", "");
+			replace = replace.replaceAll(", ", ",");
+			List<String> stringIndices = new ArrayList<>(Arrays.asList(replace.split(",")));
+			for (int i = 0; i < data.getColumnCount(); i++) {
+				boolean hidden = stringIndices.contains(i + "");
+				data.getColumns().get(i).setVisible(!hidden);
+			}
+			updateColumns(""); // UI updaten
 		}
 
 		if (loadIndex) {
@@ -371,6 +390,13 @@ public class WFCIndexPart extends WFCFormPart {
 	private void expandGroups(@UIEventTopic(Constants.BROKER_EXPANDINDEX) String s) {
 		natTable.doCommand(new TreeExpandAllCommand());
 		expandGroups = true;
+	}
+
+	@Inject
+	@Optional
+	public void updateColumns(@UIEventTopic(Constants.BROKER_UPDATECOLUMNS) String s) {
+		bodyLayerStack.columnHideShowLayer.showAllColumns();
+		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mic.getHiddenColumns());
 	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
@@ -464,7 +490,7 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		});
 
-		MinovaIndexConfiguration mic = new MinovaIndexConfiguration(table.getColumns(), form);
+		mic = new MinovaIndexConfiguration(table.getColumns(), form);
 		natTable.addConfiguration(mic);
 		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mic.getHiddenColumns());
 

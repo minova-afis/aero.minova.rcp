@@ -7,6 +7,8 @@ public class Constants {
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
 
+	public static final String SEARCH_TABLE = "NatTableDataSearchArea";
+
 	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
 	public static final String REVERT_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.revert";
 
@@ -97,6 +99,7 @@ public class Constants {
 	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
 	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
 	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
+	public static final String BROKER_UPDATECOLUMNS = "aero/minova/rcp/UpdateColumns";
 
 	// Operatoren
 	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };

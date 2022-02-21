@@ -87,6 +87,8 @@ public class DataFormService implements IDataFormService {
 			boolean visibleBasedOnSize = c.getSize() == null || c.getSize().intValue() > 0;
 			tableColumn.setVisible(c.isVisible() && visibleBasedOnSize);
 
+			tableColumn.setKey(c.isKey());
+
 			dataTable.addColumn(tableColumn);
 		}
 		return dataTable;

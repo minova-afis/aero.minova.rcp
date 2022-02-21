@@ -51,6 +51,9 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -192,6 +195,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private ScrolledComposite scrolled;
 
 	private MinovaSection headSection;
+
+	private int sectionCount = -1;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
@@ -550,6 +555,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			section.setImage(resManager.createImage(imageDescriptor));
 		}
 
+		section.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlMoved(ControlEvent e) {
+				parent.setTabList(TabUtil.getSortedSectionTabList(parent));
+			}
+		});
+
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
@@ -559,6 +571,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		layoutSectionClient(headOrPageOrGrid, section, mSection);
 
 		section.addListener(SWT.Resize, event -> adjustScrollbar(scrolled, parent));
+
+		// Order setzen und sectionCount erhöhen
+		sectionCount++;
+		sectionData.order = sectionCount;
 
 		// Alten Zustand wiederherstellen
 		// HorizontalFill
