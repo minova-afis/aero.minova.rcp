@@ -62,7 +62,8 @@ public class TabUtil {
 	/**
 	 * Liefert ein nach der Order sortierten Array von Sections zurück.
 	 * 
-	 * @param parent DetailPart
+	 * @param parent
+	 *            DetailPart
 	 * @return nach der Order sortierte TabList
 	 */
 	public static Control[] getSortedSectionTabList(Composite parent) {
@@ -75,8 +76,14 @@ public class TabUtil {
 		Collections.sort(tabList, (f1, f2) -> {
 			int order1 = ((MinovaSectionData) f1.getLayoutData()).order;
 			int order2 = ((MinovaSectionData) f2.getLayoutData()).order;
+			boolean hFill1 = ((MinovaSectionData) f1.getLayoutData()).horizontalFill;
+			boolean hFill2 = ((MinovaSectionData) f2.getLayoutData()).horizontalFill;
 
-			if (order1 == order2) {
+			if (hFill1 && !hFill2) {
+				return 1;
+			} else if (!hFill1 && hFill2) {
+				return -1;
+			} else if (order1 == order2) {
 				return 0;
 			} else if (order1 < order2) {
 				return -1;
