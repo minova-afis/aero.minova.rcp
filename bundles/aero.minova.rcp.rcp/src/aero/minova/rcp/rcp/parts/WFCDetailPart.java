@@ -51,6 +51,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -554,14 +555,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			section.setImage(resManager.createImage(imageDescriptor));
 		}
 
-		section.addControlListener(new ControlListener() {
-
-			@Override
-			public void controlResized(ControlEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
+		section.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlMoved(ControlEvent e) {
 				parent.setTabList(TabUtil.getSortedSectionTabList(parent));
