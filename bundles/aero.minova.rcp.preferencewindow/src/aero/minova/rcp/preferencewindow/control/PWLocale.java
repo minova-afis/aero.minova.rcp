@@ -21,6 +21,7 @@ import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.builder.ComboHeightAdjust;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
@@ -47,7 +48,8 @@ public class PWLocale extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public PWLocale(final String label, @Optional String tooltip, final String propertyKey, IEclipseContext context, TranslationService translationService, IDataService dataService) {
+	public PWLocale(final String label, @Optional String tooltip, final String propertyKey, IEclipseContext context, TranslationService translationService,
+			IDataService dataService) {
 		super(label, tooltip, propertyKey, label == null ? 1 : 2, false);
 		this.context = context;
 		this.translationService = translationService;
@@ -92,7 +94,7 @@ public class PWLocale extends CustomPWWidget {
 		labelLGridData.horizontalIndent = getIndent();
 		languageLabel.setLayoutData(labelLGridData);
 		addControl(languageLabel);
-		
+
 		Composite cmpL = new Composite(parent, SWT.NONE);
 		cmpL.setLayout(new GridLayout(2, false));
 		final GridData cmpGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -100,6 +102,9 @@ public class PWLocale extends CustomPWWidget {
 		addControl(cmpL);
 
 		comboLanguage = new CCombo(cmpL, SWT.BORDER | SWT.READ_ONLY);
+		GridData languageData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		languageData.heightHint = ComboHeightAdjust.getComboHeight();
+		comboLanguage.setLayoutData(languageData);
 		addControl(comboLanguage);
 
 		// Setzt die Text auf den in den Preferences gespeicherten Wert
@@ -124,7 +129,7 @@ public class PWLocale extends CustomPWWidget {
 			comboCountries.select(0);
 
 		});
-		
+
 		Label icon = new Label(cmpL, SWT.NONE);
 
 		// Label für Landauswahl erstellen
@@ -134,7 +139,7 @@ public class PWLocale extends CustomPWWidget {
 		labelCGridData.horizontalIndent = getIndent();
 		countryLabel.setLayoutData(labelCGridData);
 		addControl(countryLabel);
-		
+
 		Composite cmpC = new Composite(parent, SWT.NONE);
 		cmpC.setLayout(new GridLayout(2, false));
 		final GridData cmpCGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -144,6 +149,7 @@ public class PWLocale extends CustomPWWidget {
 		// Combo Box für Landauswahl erstellen
 		comboCountries = new CCombo(cmpC, SWT.BORDER | SWT.READ_ONLY);
 		GridData countryData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		countryData.heightHint = ComboHeightAdjust.getComboHeight();
 		comboCountries.setLayoutData(countryData);
 		addControl(comboCountries);
 
@@ -162,7 +168,7 @@ public class PWLocale extends CustomPWWidget {
 				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY,
 						comboCountries.getItem(comboCountries.indexOf(comboCountries.getText())));
 		});
-		
+
 		Label iconC = new Label(cmpC, SWT.NONE);
 
 		return comboLanguage;

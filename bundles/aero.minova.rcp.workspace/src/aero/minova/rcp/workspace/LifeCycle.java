@@ -79,10 +79,10 @@ public class LifeCycle {
 		// Versuchen über Commandline-Argumente einzuloggen, für UI-Tests genutzt
 		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
 
-		ImageDescriptor imageDefault = ImageUtil.getImageDefault("wfc.application/16x16.png");
-		ImageDescriptor imageDefault2 = ImageUtil.getImageDefault("wfc.application/32x32.png");
-		ImageDescriptor imageDefault3 = ImageUtil.getImageDefault("wfc.application/64x64.png");
-		ImageDescriptor imageDefault4 = ImageUtil.getImageDefault("wfc.application/256x256.png");
+		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor("WFC.Application", 16);
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor("WFC.Application", 32);
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor("WFC.Application", 64);
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor("WFC.Application", 256);
 		WorkspaceDialog.setDefaultImages(
 				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
 
