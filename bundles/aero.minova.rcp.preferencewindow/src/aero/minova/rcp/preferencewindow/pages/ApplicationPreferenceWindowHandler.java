@@ -10,7 +10,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -24,6 +26,7 @@ import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.jface.util.Util;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PWTab;
@@ -42,6 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
@@ -88,12 +92,17 @@ public class ApplicationPreferenceWindowHandler {
 	@Inject
 	IDataService dataService;
 
-	@SuppressWarnings("restriction")
 	@Inject
 	EHandlerService handlerService;
+	
+	@Inject
+	ECommandService commandService;
 
 	@Inject
 	EModelService modelService;
+	
+	@Inject
+	EPartService partService;
 
 	IWorkbench workbench;
 
@@ -177,8 +186,13 @@ public class ApplicationPreferenceWindowHandler {
 
 		boolean newSelectAllControls = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.SELECT_ALL_CONTROLS, DisplayType.CHECK,
 				true, s);
+		if(curentSelectAllControls != newSelectAllControls) {
+			ParameterizedCommand command = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_SETNEWTAB);
+			handlerService.executeHandler(command);
+		}
+		
 		String newTheme = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_ICON_SIZE, DisplayType.COMBO, "M", s);
-		if (!currentTheme.equals(newTheme) || !curentSelectAllControls == newSelectAllControls) {
+		if (!currentTheme.equals(newTheme)) {
 			Shell activeShell = Display.getCurrent().getActiveShell();
 
 			PlainMessageDialog confirmRestart = getBuilder(activeShell, translationService.translate("@Action.Restart", null))
