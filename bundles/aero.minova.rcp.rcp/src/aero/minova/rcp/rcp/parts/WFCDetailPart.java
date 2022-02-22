@@ -216,7 +216,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mPerspective.getContext().set(WFCDetailCASRequestsUtil.class, casRequestsUtil);
 		mPerspective.getContext().set(Constants.DETAIL_WIDTH, detailWidth);
 		TranslateUtil.translate(composite, translationService, locale);
-
+		
 		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().setControls(mDetail);
@@ -565,6 +565,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		// Wir erstellen die Section des Details.
 		MSection mSection = new MSection(headOrPageOrGrid.isHead, "open", mDetail, headOrPageOrGrid.id, section.getText());
 		mSection.setSectionAccessor(new SectionAccessor(mSection, section));
+		section.setData(Constants.MSECTION, mSection);
 		// Button erstellen, falls vorhanden
 		createButton(headOrPageOrGrid, section);
 
