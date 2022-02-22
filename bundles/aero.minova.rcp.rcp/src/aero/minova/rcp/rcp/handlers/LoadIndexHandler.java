@@ -130,17 +130,18 @@ public class LoadIndexHandler {
 				if (requestedRows == -1) {
 					requestedRows = totalResults;
 				}
-
-				if (requestedRows >= 0) {
-					List<Row> newRows = new ArrayList<>();
-					newRows.addAll(resultTable.getRows().subList(0, Math.min(requestedRows, current)));
-					resultTable.setRows(newRows);
-				}
 			}
 
 			// Mehr Datensätze gewüscht -> weitere Anfragen über paging
 			if (resultTable.getMetaData().getResultsLeft() > 0 && loadedRows < requestedRows) {
 				loadTable(perspective, searchTable, t.getMetaData().getPage() + 1);
+			}
+
+			// Evtl müssen die letzten Zeilen entfernt werden (limit = 100; angefragte Zeilen = 250 -> 3 Pages anfragen, die letzten 50 Zeilen entfernen)
+			if (loadedRows > requestedRows) {
+				List<Row> newRows = new ArrayList<>();
+				newRows.addAll(resultTable.getRows().subList(0, requestedRows % indexLimit));
+				resultTable.setRows(newRows);
 			}
 
 			broker.post(Constants.BROKER_LOADINDEXTABLE, resultTable);
