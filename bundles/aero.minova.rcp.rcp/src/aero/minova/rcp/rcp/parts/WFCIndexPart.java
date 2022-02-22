@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -24,6 +23,7 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -129,6 +129,9 @@ public class WFCIndexPart extends WFCFormPart {
 
 	@Inject
 	private EHandlerService handlerService;
+
+	@Inject
+	private EModelService modelService;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_LOAD_INDEX)
@@ -352,17 +355,21 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@Inject
 	@Optional
-	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Map<MPerspective, Table> map) {
-		if (map.get(mPerspective) != null) {
-			// clear the group by summary cache so the new summary calculation gets triggered
-			bodyLayerStack.getBodyDataLayer().clearCache();
-			Table table = map.get(mPerspective);
-			updateData(table.getRows());
+	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Table resultTable) {
+		MPerspective activePerspective = modelService.getActivePerspective(context.get(MWindow.class));
+		if (!activePerspective.equals(mPerspective)) {
+			return;
+		}
 
-			if (table.getRows().isEmpty()) {
-				MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
-						translationService.translate("@msg.NoRecordsLoaded", null));
-			}
+		// clear the group by summary cache so the new summary calculation gets triggered
+		bodyLayerStack.getBodyDataLayer().clearCache();
+
+		// Daten in Nattable schreiben. Wenn Page != 1 werden die Zeilen nur angehängt
+		updateData(resultTable.getRows(), resultTable.getMetaData().getPage() != 1);
+
+		if (resultTable.getRows().isEmpty()) {
+			MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
+					translationService.translate("@msg.NoRecordsLoaded", null));
 		}
 	}
 
@@ -861,8 +868,17 @@ public class WFCIndexPart extends WFCFormPart {
 		}
 	}
 
-	public void updateData(List<Row> list) {
-		bodyLayerStack.getSortedList().clear();
+	/**
+	 * Lädt die Liste von Zeilen in die Nattable.
+	 * 
+	 * @param list
+	 * @param add
+	 *            true: Liste wird unten angehängt; false: Alte Einträge werden verworfen
+	 */
+	public void updateData(List<Row> list, boolean add) {
+		if (!add) {
+			bodyLayerStack.getSortedList().clear();
+		}
 		bodyLayerStack.getSortedList().addAll(list);
 		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
 	}

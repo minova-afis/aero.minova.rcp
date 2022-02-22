@@ -122,6 +122,9 @@ public class Manager {
 		} else {
 			preferences.put(ApplicationPreferences.INDEX_FONT, "");
 		}
+		int indexLimit = preferences.getInt(ApplicationPreferences.INDEX_LIMIT, 1000);
+		preferences.putInt(ApplicationPreferences.INDEX_LIMIT, indexLimit);
+
 	}
 
 }
