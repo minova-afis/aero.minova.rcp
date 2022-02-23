@@ -28,8 +28,10 @@ public class SetNewTabHandler {
 
 	@Execute
 	public void execute(EModelService modelService, MWindow window) {
+		// Wir holen und das PerspectiveStack, das alle Perspektiven enthält
 		MPerspectiveStack perspectiveStack = (MPerspectiveStack) modelService.find("aero.minova.rcp.rcp.perspectivestack", window);
 
+		// Für jede Perspektive wird die TabListe aktualisiert
 		for (MPerspective perspective : perspectiveStack.getChildren()) {
 			PartImpl detailPart = (PartImpl) modelService.find("aero.minova.rcp.rcp.part.details", perspective);
 			Composite detail = (Composite) ((ScrolledComposite) ((WFCDetailPart) detailPart.getObject()).getComposite().getChildren()[0]).getChildren()[0];
