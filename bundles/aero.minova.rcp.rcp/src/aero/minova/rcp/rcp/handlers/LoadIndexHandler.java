@@ -133,7 +133,8 @@ public class LoadIndexHandler {
 			}
 
 			// Mehr Datensätze gewüscht -> weitere Anfragen über paging
-			if (resultTable.getMetaData().getResultsLeft() > 0 && loadedRows < requestedRows) {
+			Integer resultsLeft = resultTable.getMetaData().getResultsLeft();
+			if (resultsLeft != null && resultsLeft > 0 && loadedRows < requestedRows) {
 				loadTable(perspective, searchTable, t.getMetaData().getPage() + 1);
 			}
 
