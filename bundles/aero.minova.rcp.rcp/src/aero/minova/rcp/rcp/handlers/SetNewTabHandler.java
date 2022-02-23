@@ -4,6 +4,8 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -26,12 +28,16 @@ public class SetNewTabHandler {
 
 	@Execute
 	public void execute(EModelService modelService, MWindow window) {
-		PartImpl detailPart = (PartImpl) modelService.find("aero.minova.rcp.rcp.part.details", window);
-		Composite detail = (Composite) ((ScrolledComposite) ((WFCDetailPart) detailPart.getObject()).getComposite().getChildren()[0]).getChildren()[0];
-		Control[] sections = detail.getChildren();
-		for (Control minovaSection : sections) {
-			((MinovaSection) minovaSection).setTabList(
-					TabUtil.getTabListForSection((MinovaSection) minovaSection, (MSection) minovaSection.getData(Constants.MSECTION), selectAllControls));
+		MPerspectiveStack perspectiveStack = (MPerspectiveStack) modelService.find("aero.minova.rcp.rcp.perspectivestack", window);
+
+		for (MPerspective perspective : perspectiveStack.getChildren()) {
+			PartImpl detailPart = (PartImpl) modelService.find("aero.minova.rcp.rcp.part.details", perspective);
+			Composite detail = (Composite) ((ScrolledComposite) ((WFCDetailPart) detailPart.getObject()).getComposite().getChildren()[0]).getChildren()[0];
+			Control[] sections = detail.getChildren();
+			for (Control minovaSection : sections) {
+				((MinovaSection) minovaSection).setTabList(
+						TabUtil.getTabListForSection((MinovaSection) minovaSection, (MSection) minovaSection.getData(Constants.MSECTION), selectAllControls));
+			}
 		}
 	}
 
