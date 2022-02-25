@@ -30,6 +30,8 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
@@ -82,6 +84,8 @@ public class PerspectiveControl {
 	ToolBar toolBar;
 	ToolItem shortcut;
 
+	private LocalResourceManager resManager;
+
 	Preferences prefsKeptPerspectives = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
 	Preferences prefsToolbarOrder = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_TOOLBARORDER);
 	List<String> openToolbarItems;
@@ -95,6 +99,8 @@ public class PerspectiveControl {
 		composite = new Composite(parent, SWT.BAR);
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		composite.setLayout(rowLayout);
+
+		resManager = new LocalResourceManager(JFaceResources.getResources(), composite);
 
 		toolBar = new ToolBar(composite, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		toolBar.addMenuDetectListener(event -> {
@@ -204,7 +210,7 @@ public class PerspectiveControl {
 
 			ImageDescriptor descriptor = ImageUtil.getImageDescriptor(iconURI, true);
 			if (descriptor != null && !descriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
-				shortcut.setImage(descriptor.createImage());
+				shortcut.setImage(resManager.createImage(descriptor));
 			}
 
 			shortcut.addSelectionListener(new SelectionAdapter() {
