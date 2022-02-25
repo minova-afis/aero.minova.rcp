@@ -267,5 +267,10 @@ public class ApplicationPreferences {
 
 	public static final String GRID_TAB_NAVIGATION = "GridTabNavigation";
 
+	/**
+	 * Wenn im Index mehr als diese Anzahl Datensätze geladen werden wird Dialog zum Limit setzten angezeigt
+	 */
+	public static final String INDEX_LIMIT = "IndexLimit";
+
 	private ApplicationPreferences() {}
 }

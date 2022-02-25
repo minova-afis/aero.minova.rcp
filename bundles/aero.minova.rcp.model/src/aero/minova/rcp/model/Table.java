@@ -8,11 +8,7 @@ import java.util.List;
 public class Table {
 
 	String name;
-	// vDriverIndex
-	// opReadDriverRights
-	// spReadDriver
-	// opReadContact
-	//
+	private TableMetaData metaData;
 	List<Column> columns = new ArrayList<>();
 	List<Row> rows = new ArrayList<>();
 
@@ -99,6 +95,11 @@ public class Table {
 
 	public void deleteRow(Row row) {
 		rows.remove(row);
+	}
+
+	public void setRows(List<Row> newRows) {
+		rows.clear();
+		rows.addAll(newRows);
 	}
 
 	@Override
@@ -251,5 +252,33 @@ public class Table {
 				}
 			}
 		}
+	}
+
+	public void fillMetaData(Integer limit, Integer totalResults, Integer page) {
+		TableMetaData metaData = getMetaData();
+		if (metaData == null) {
+			metaData = new TableMetaData();
+		}
+		if (limit <= 0) {
+			limit = totalResults;
+		}
+		if (totalResults != null && limit != null && totalResults > 0 && limit > 0) {
+			int totalPages = (int) Math.ceil(totalResults / (double) limit);
+			metaData.setResultsLeft(Math.max(totalResults - (page * limit), 0));
+			metaData.setTotalPages(totalPages);
+		}
+		metaData.setLimited(limit);
+		metaData.setPage(page);
+		metaData.setTotalResults(totalResults);
+
+		this.setMetaData(metaData);
+	}
+
+	public TableMetaData getMetaData() {
+		return metaData;
+	}
+
+	public void setMetaData(TableMetaData metaData) {
+		this.metaData = metaData;
 	}
 }
