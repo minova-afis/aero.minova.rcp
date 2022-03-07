@@ -26,12 +26,12 @@ class NumberValueAccessorTests {
 		Result result = numberValueAccessor.processInput(//
 				"", // insertion
 				0, // start
-				2, // end
+				1, // end
 				8, // keyCode
 				0, // decimals
 				Locale.GERMANY, // locale
-				2, // caretPosition
-				"12", // textBefore
+				1, // caretPosition
+				"1", // textBefore
 				decimalFormatSymbols, //
 				true//
 		);
