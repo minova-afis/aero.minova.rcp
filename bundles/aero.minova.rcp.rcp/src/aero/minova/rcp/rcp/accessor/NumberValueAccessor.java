@@ -145,7 +145,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
 					doit = false;
 				}
-			} else if (keyCode == SWT.BS) {
+			} else if (keyCode == SWT.BS && decimals > 0) {
 				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichen gelöscht werden soll
 					doit = false;
 				}
