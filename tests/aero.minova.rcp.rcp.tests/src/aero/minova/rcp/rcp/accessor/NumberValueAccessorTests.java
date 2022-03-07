@@ -12,7 +12,33 @@ import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor.Result;
 
 class NumberValueAccessorTests {
+	
+	// ================================================================================
+	// Testfälle aus Issue #1166
+	// ================================================================================
 
+	@Test
+	void testCompleteBSIntegerField() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"", // insertion
+				0, // start
+				1, // end
+				8, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				1, // caretPosition
+				"1", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("0", result.text);
+		assertEquals(1, result.caretPosition);
+	}
+	
 	// ================================================================================
 	// Testfälle aus Issue #1132
 	// ================================================================================

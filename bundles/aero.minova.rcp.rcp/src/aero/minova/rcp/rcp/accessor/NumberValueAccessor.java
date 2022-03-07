@@ -88,7 +88,16 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 		if (insertion.matches("([0-9]*)|([\\" + dfs.getGroupingSeparator() + dfs.getDecimalSeparator() + "]*)")) {
-			Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
+			Result r = new Result();
+			
+			try {
+				r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
+			} catch (Exception exception) {
+				NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+				r.value = new Value(0.0);
+				r.text = numberFormat.format(r.value.getDoubleValue());
+				r.caretPosition = 1;
+			}
 
 			verificationActive = true;
 			field.setValue(r.value, true);
@@ -145,7 +154,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
 					doit = false;
 				}
-			} else if (keyCode == SWT.BS) {
+			} else if (keyCode == SWT.BS && decimals > 0) {
 				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichen gelöscht werden soll
 					doit = false;
 				}
