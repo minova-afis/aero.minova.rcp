@@ -34,16 +34,16 @@ public class SetNewTabHandler {
 		// Für jede Perspektive wird die TabListe aktualisiert
 		for (MPerspective perspective : perspectiveStack.getChildren()) {
 			PartImpl detailPart = (PartImpl) modelService.find("aero.minova.rcp.rcp.part.details", perspective);
-			Composite detail = (Composite) ((ScrolledComposite) ((WFCDetailPart) detailPart.getObject()).getComposite().getChildren()[0]).getChildren()[0];
-			detail.getParent().getParent().getParent().setTabList(TabUtil.getTabListForPart(detail.getParent().getParent().getParent(), selectAllControls));
+			Composite detail = (Composite) ((WFCDetailPart) detailPart.getObject()).getComposite().getData(Constants.SECTION_PARENT);
+			((Composite) detail.getData(Constants.PART_COMPOSITE))
+					.setTabList(TabUtil.getTabListForPart(((Composite) detail.getData(Constants.PART_COMPOSITE)), selectAllControls));
 			Control[] sections = detail.getChildren();
 			for (Control minovaSection : sections) {
 				((MinovaSection) minovaSection).setTabList(
 						TabUtil.getTabListForSection((MinovaSection) minovaSection, (MSection) minovaSection.getData(Constants.MSECTION), selectAllControls));
 			}
 		}
-		
-		
+
 	}
 
 }

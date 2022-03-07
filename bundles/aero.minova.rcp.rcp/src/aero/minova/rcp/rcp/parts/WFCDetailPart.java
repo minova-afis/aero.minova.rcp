@@ -364,6 +364,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			layoutSection(wrap, wrapper);
 		}
 		loadOptionPages(wrap);
+		
+		parent.setData(Constants.SECTION_PARENT, wrap);
 
 		scrolled.setContent(wrap);
 		scrolled.setExpandHorizontal(true);
@@ -375,6 +377,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		parent.setTabList(parent.getChildren());
 		// Holen des Parts
 		Composite part = parent.getParent();
+		wrap.setData(Constants.PART_COMPOSITE, part);
 		// Setzen der TabListe des Parts. Dabei bestimmt SelectAllControls, ob die Toolbar mit selektiert wird.
 		part.setTabList(TabUtil.getTabListForPart(part, selectAllControls));
 		// Wir setzen eine leere TabListe für die Perspektive, damit nicht durch die Anwendung mit Tab navigiert werden kann.
