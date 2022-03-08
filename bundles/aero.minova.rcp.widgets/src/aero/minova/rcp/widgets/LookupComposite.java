@@ -184,8 +184,8 @@ public class LookupComposite extends Composite {
 				}
 			} else {
 				if (event.keyCode == SWT.ARROW_DOWN || ((event.stateMask & SWT.CTRL) != 0) && (event.keyCode == SWT.SPACE)) {
-					showAllElements(text.getText());
-				}
+				showAllElements(text.getText());
+			}
 			}
 		};
 	}
@@ -240,7 +240,10 @@ public class LookupComposite extends Composite {
 		}
 
 		popup.setLocation(x, y);
-		popup.setVisible(true);
+		if (!popup.isVisible()) {
+			popup.setVisible(true);
+			popup.moveAbove(getShell());
+		}
 
 		if (System.getProperty("os.name").startsWith("Linux")) {
 			table.setFocus();
