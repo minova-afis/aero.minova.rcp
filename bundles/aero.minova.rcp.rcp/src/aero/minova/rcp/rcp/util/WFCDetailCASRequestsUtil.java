@@ -458,7 +458,7 @@ public class WFCDetailCASRequestsUtil {
 		while (valuePosition < formTable.getColumnCount()) {
 			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + formTable.getColumnName(valuePosition);
 			MField field = mDetail.getField(fieldname);
-			rb.withValue(field.getValue() != null ? field.getValue().getValue() : null);
+			rb.withValue(field.getValue());
 			valuePosition++;
 		}
 
