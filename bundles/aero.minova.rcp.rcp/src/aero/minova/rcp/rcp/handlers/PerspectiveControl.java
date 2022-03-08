@@ -304,13 +304,6 @@ public class PerspectiveControl {
 
 		openToolbarItems.remove(item.getData());
 		saveToolbarOrder();
-
-		Image icon = item.getImage();
-		if (icon != null) {
-			item.setImage(null);
-			icon.dispose();
-		}
-
 		item.dispose();
 	}
 
