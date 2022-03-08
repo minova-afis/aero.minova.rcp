@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.TypeParam;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 
 public class ModelToViewModel {
@@ -68,7 +69,7 @@ public class ModelToViewModel {
 		}
 
 		if (field.getMoney() != null) {
-			MField f = new MNumberField(field.getMoney().getDecimals());
+			MField f = new MNumberField(field.getMoney().getDecimals(), DataType.BIGDECIMAL);
 			if (field.getMoney().getMaxValue() != null) {
 				f.setMaximumValue(field.getMoney().getMaxValue().doubleValue());
 			}

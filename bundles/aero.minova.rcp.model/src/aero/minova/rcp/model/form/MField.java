@@ -65,6 +65,11 @@ public abstract class MField {
 			this.dataType = DataType.INTEGER;
 		}
 	}
+	
+	protected MField(int decimals, DataType dataType) {
+		this.decimals = decimals;
+		this.dataType = dataType;
+	}
 
 	/**
 	 * Mit dieser Methode kann man einen Listener für Wertänderungen anhängen.
