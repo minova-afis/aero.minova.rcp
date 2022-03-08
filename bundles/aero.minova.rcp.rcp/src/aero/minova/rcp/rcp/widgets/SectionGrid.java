@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -577,6 +578,9 @@ public class SectionGrid {
 				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().indexOf(r), false, GridChangeType.INSERT));
 			}
 		}
+
+		// Wenn eine Zeile mit gleichen Keys wieder hinzugefügt wird soll sie nicht gelöscht werden
+		rowsToDelete = rowsToDelete.stream().filter(row -> !dataTable.containsRowByKeys(row)).collect(Collectors.toList());
 	}
 
 	private void addRowsFromTable(Table rowsToAdd) {
