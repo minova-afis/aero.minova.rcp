@@ -121,6 +121,9 @@ public class Column {
 
 	public void setKeyType(KeyType keyType) {
 		this.keyType = keyType;
+		if (KeyType.PRIMARY.equals(keyType)) {
+			key = true;
+		}
 	}
 
 	public boolean isKey() {

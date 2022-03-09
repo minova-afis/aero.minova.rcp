@@ -48,6 +48,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 			if (value.getType().equals(DataType.DOUBLE)) {
 				((Text) control).setText(numberFormat.format(value.getDoubleValue()));
+			} else if (value.getType().equals(DataType.BIGDECIMAL)) {
+				((Text) control).setText(numberFormat.format(value.getBigDecimalValue()));
 			} else {
 				((Text) control).setText(numberFormat.format(value.getIntegerValue()));
 			}
@@ -88,7 +90,20 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 		if (insertion.matches("([0-9]*)|([\\" + dfs.getGroupingSeparator() + dfs.getDecimalSeparator() + "]*)")) {
-			Result r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
+			Result r = new Result();
+
+			try {
+				r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
+			} catch (Exception exception) {
+				NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+				r.value = new Value(0.0, field.getDataType());
+				if (field.getDataType().equals(DataType.BIGDECIMAL)) {
+					r.text = numberFormat.format(r.value.getBigDecimalValue());
+				} else {
+					r.text = numberFormat.format(r.value.getDoubleValue());
+				}
+				r.caretPosition = 1;
+			}
 
 			verificationActive = true;
 			field.setValue(r.value, true);
@@ -145,7 +160,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
 					doit = false;
 				}
-			} else if (keyCode == SWT.BS) {
+			} else if (keyCode == SWT.BS && decimals > 0) {
 				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichen gelöscht werden soll
 					doit = false;
 				}
@@ -208,13 +223,21 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		if (decimals > 0) {
 			try {
-				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')));
-				result.text = numberFormat.format(result.value.getDoubleValue());
+				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')), field.getDataType());
+				if (field.getDataType().equals(DataType.BIGDECIMAL)) {
+					result.text = numberFormat.format(result.value.getBigDecimalValue());
+				} else {
+					result.text = numberFormat.format(result.value.getDoubleValue());
+				}
 				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
 						caretPosition, numberFormat, dfs);
 			} catch (NumberFormatException e) {
-				result.value = new Value(0.0);
-				result.text = numberFormat.format(result.value.getDoubleValue());
+				result.value = new Value(0.0, field.getDataType());
+				if (field.getDataType().equals(DataType.BIGDECIMAL)) {
+					result.text = numberFormat.format(result.value.getBigDecimalValue());
+				} else {
+					result.text = numberFormat.format(result.value.getDoubleValue());
+				}
 				result.caretPosition = 1;
 			}
 		} else {

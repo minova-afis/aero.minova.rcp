@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Table {
 
@@ -254,24 +255,47 @@ public class Table {
 		}
 	}
 
+	/**
+	 * Liefert true, wenn die Tabelle eine Zeile mit gleichen Keys enthält. Es wird davon ausgegangen, dass die Zeilen die Werte in gleicher Reihenfolge
+	 * enthalten.
+	 * 
+	 * @param r
+	 * @return
+	 */
+	public boolean containsRowByKeys(Row r) {
+		for (Row tableRow : rows) {
+			boolean keysMatch = true;
+			for (int i = 0; i < r.size(); i++) {
+				if (columns.get(i).key && !Objects.equals(tableRow.getValue(i), r.getValue(i))) {
+					keysMatch = false;
+					break;
+				}
+			}
+			if (keysMatch) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void fillMetaData(Integer limit, Integer totalResults, Integer page) {
-		TableMetaData metaData = getMetaData();
-		if (metaData == null) {
-			metaData = new TableMetaData();
+		TableMetaData newMetaData = getMetaData();
+		if (newMetaData == null) {
+			newMetaData = new TableMetaData();
 		}
 		if (limit <= 0) {
 			limit = totalResults;
 		}
 		if (totalResults != null && limit != null && totalResults > 0 && limit > 0) {
 			int totalPages = (int) Math.ceil(totalResults / (double) limit);
-			metaData.setResultsLeft(Math.max(totalResults - (page * limit), 0));
-			metaData.setTotalPages(totalPages);
+			newMetaData.setResultsLeft(Math.max(totalResults - (page * limit), 0));
+			newMetaData.setTotalPages(totalPages);
 		}
-		metaData.setLimited(limit);
-		metaData.setPage(page);
-		metaData.setTotalResults(totalResults);
+		newMetaData.setLimited(limit);
+		newMetaData.setPage(page);
+		newMetaData.setTotalResults(totalResults);
 
-		this.setMetaData(metaData);
+		this.setMetaData(newMetaData);
 	}
 
 	public TableMetaData getMetaData() {

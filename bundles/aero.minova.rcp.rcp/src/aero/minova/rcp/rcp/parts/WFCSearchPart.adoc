@@ -2,15 +2,15 @@
 
 Der SearchPart dient der Filterung und der Suche von Datensätzen. Dieser Bereich zeigt die gleichen Felder an wie der Indexbereich. Verschiedenen Kriterien können miteinander kombiniert werden. Dafür ist das erste Feld vorgesehen. Nach dem Laden der Suchkriterien wird das Ergebnis im Indexbereich dargestellt.
 
-image::../../../../../../images/searchpart-01.png[650,650]  
+image::../../../../../../../../images/searchpart-01.png[650,650]  
 
 == Konzept
 
 Ein Interpreter wird für jede Zelle des Suchbereichs registriert. Er ersetzt visuell den eingetragenen Wert. Bei der Darstellung werden die Felder, welche nicht gerade editiert werden, mit den Werten dargestellt. Das Feld welches gerade editiert wird, trägt noch den Inhalt der Eingabe.
 
-image::../../../../../../images/searchpart-02.png[650,650]  
+image::../../../../../../../../images/searchpart-02.png[650,650]  
 
-In diesem Beispiel wird sichtbar, dass kein Datum als eingabe erfolgte sondern entsprechende Kürzel order Formeln.
+In diesem Beispiel wird sichtbar, dass kein Datum als Eingabe erfolgte sondern entsprechende Kürzel oder Formeln.
 
 === Suchanfrage
 

@@ -1,9 +1,15 @@
 package aero.minova.rcp.model.form;
 
+import aero.minova.rcp.model.DataType;
+
 public class MNumberField extends MField {
 
 	public MNumberField(int decimals) {
 		super(decimals);
+	}
+
+	public MNumberField(int decimals, DataType dataType) {
+		super(decimals, dataType);
 	}
 
 	@Override
