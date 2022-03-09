@@ -53,6 +53,7 @@ import org.osgi.service.event.EventConstants;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import aero.minova.rcp.constants.Constants;
@@ -65,6 +66,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.ServerAnswer;
 import aero.minova.rcp.model.SqlProcedureResult;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.TransactionEntry;
@@ -255,17 +257,11 @@ public class DataService implements IDataService {
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Table:\n" + t.body());
 
-			Table fromJson = gson.fromJson(t.body(), Table.class);
-			if (fromJson == null || fromJson.getName() == null) {
-				postError(checkForError(null, searchTable.getName()));
-				return null;
-			}
-			if (fromJson.getName().equals(ERROR)) {
-				postError(new ErrorObject(fromJson, username, searchTable.getName()));
+			if (checkForError(t.body(), searchTable.getName())) {
 				return null;
 			}
 
-			return fromJson;
+			return gson.fromJson(t.body(), Table.class);
 		});
 	}
 
@@ -288,14 +284,19 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Call Transaction List:\n" + t.body());
+
+			if (checkForError(t.body(), procedureList.get(0).getTable().getName())) {
+				return null;
+			}
+
+			//Auch einzelne Ergebnisse auf Fehler überprüfen
 			Type listType = new TypeToken<ArrayList<TransactionResultEntry>>() {}.getType();
-
 			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
-
 			for (TransactionResultEntry entry : transactionResults) {
 				SqlProcedureResult entryResult = entry.getSQLProcedureResult();
-				entryResult = checkProcedureResult(entryResult, gson.toJson(entryResult), entry.getId());
-				if (entryResult == null) {
+				ErrorObject e = checkForErrorInSQLResult(entryResult, procedureList.get(transactionResults.indexOf(entry)).getTable().getName());
+				if (e != null) {
+					postError(e);
 					break;
 				}
 			}
@@ -326,22 +327,79 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(t -> {
 			log("CAS Answer Call Procedure:\n" + t.body());
-			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
-			return checkProcedureResult(fromJson, t.body(), table.getName());
+
+			if (checkForError(t.body(), table.getName())) {
+				return null;
+			}
+
+			return gson.fromJson(t.body(), SqlProcedureResult.class);
 		});
 	}
 
-	public SqlProcedureResult checkProcedureResult(SqlProcedureResult fromJson, String originalBody, String procedureName) {
-		ErrorObject e = checkForError(fromJson, procedureName);
+	/**
+	 * Liefert true, wenn ein Fehler enthalten ist. Folgende möglichen Fehlermeldungen werden geprüft: <br>
+	 * - SqlProcedureResult mit negativen Returncode <br>
+	 * - Table mit Namen Error <br>
+	 * - Serverantwort mit HTTP-Code >= 300 <br>
+	 * 
+	 * @param body
+	 * @param sourceName
+	 * @return
+	 */
+	private boolean checkForError(String body, String sourceName) {
+
+		ErrorObject e = null;
+
+		try {
+			SqlProcedureResult sqlResult = gson.fromJson(body, SqlProcedureResult.class);
+			if (sqlResult != null && sqlResult.getReturnCode() != null) {
+				e = checkForErrorInSQLResult(sqlResult, sourceName);
+			}
+		} catch (JsonSyntaxException ex) {
+			// War kein SqlProcedureResult
+		}
+
+		try {
+			Table fromJson = gson.fromJson(body, Table.class);
+			if (fromJson != null && fromJson.getName() != null && fromJson.getName().equals(ERROR)) {
+				e = new ErrorObject(fromJson, username, sourceName);
+			}
+		} catch (JsonSyntaxException ex) {
+			// War keine Table
+		}
+
+		try {
+			ServerAnswer serverAnswer = gson.fromJson(body, ServerAnswer.class);
+			if (serverAnswer != null && serverAnswer.getStatus() != 0) {
+				e = checkForErrorInServerAnswer(serverAnswer, sourceName);
+			}
+		} catch (JsonSyntaxException ex) {
+			// War keine ServerAnswer
+		}
+
 		if (e != null) {
 			postError(e);
-			return null;
+			return true;
 		}
-		return fromJson;
+		return false;
 	}
 
-	public ErrorObject checkForError(SqlProcedureResult fromJson, String procedureName) {
-		// Returncode >= null -> kein Fehler -> nichts zu tun
+	private ErrorObject checkForErrorInServerAnswer(ServerAnswer serverAnswer, String sourceName) {
+		if (serverAnswer.getStatus() < 300) {
+			return null;
+		}
+
+		//HTTP Status >= 300 -> Fehler
+		Table error = new Table();
+		error.setName(ERROR);
+		error.addColumn(new Column("Message", DataType.STRING));
+		error.addRow(RowBuilder.newRow().withValue(serverAnswer.getMessage()).create());
+
+		return new ErrorObject(error, username, sourceName);
+	}
+
+	public ErrorObject checkForErrorInSQLResult(SqlProcedureResult fromJson, String procedureName) {
+		// Returncode >= 0 -> kein Fehler -> nichts zu tun
 		if (fromJson != null && fromJson.getReturnCode() >= 0) {
 			return null;
 		}
@@ -392,8 +450,7 @@ public class DataService implements IDataService {
 			log("CAS Answer XML Detail:\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 
-			fromJson = checkProcedureResult(fromJson, t.body(), table.getName());
-			if (fromJson == null) {
+			if (checkForError(t.body(), table.getName())) {
 				return null;
 			}
 
@@ -442,14 +499,11 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
-
 			// Überprüfen, ob ein Fehler geworfen wurde (dann wird SqlProcedureResult zurückgegeben)
 			try {
 				String asString = new String(t.body(), StandardCharsets.UTF_8);
-				SqlProcedureResult fromJson = gson.fromJson(asString, SqlProcedureResult.class);
-				log("CAS Answer PDF:\n" + asString);
-				fromJson = checkProcedureResult(fromJson, asString, table.getName());
-				if (fromJson == null) {
+				if (checkForError(asString, table.getName())) {
+					log("CAS Answer PDF:\n" + asString);
 					return null;
 				}
 			} catch (Exception e) {

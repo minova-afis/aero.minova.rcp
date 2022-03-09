@@ -665,6 +665,11 @@ public class WFCDetailCASRequestsUtil {
 
 	private String formatMessage(ErrorObject et) {
 		Table errorTable = et.getErrorTable();
+
+		if (errorTable == null) {
+			return "";
+		}
+
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
 		String messageproperty = vMessageProperty.getStringValue().strip();
 		String value = translationService.translate("@" + messageproperty, null);
