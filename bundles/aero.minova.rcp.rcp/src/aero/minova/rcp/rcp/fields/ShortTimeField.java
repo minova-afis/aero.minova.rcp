@@ -40,6 +40,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.ShortTimeValueAccessor;
+import aero.minova.rcp.rcp.util.TextAssistUtil;
 import aero.minova.rcp.util.TimeUtil;
 
 public class ShortTimeField {
@@ -55,22 +56,10 @@ public class ShortTimeField {
 
 		Label label = FieldLabel.create(composite, field);
 
-		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
-			@Override
-			public List<String> getContent(String entry) {
-				ArrayList<String> result = new ArrayList<>();
-				Instant time = TimeUtil.getTime(entry, timeUtil, locale);
-				if (time == null && !entry.isEmpty()) {
-					result.add(translationService.translate("@msg.ErrorConverting", null));
-				} else {
-					result.add(TimeUtil.getTimeString(time, locale, timeUtil));
-					field.setValue(new Value(time), true);
-				}
-				return result;
-			}
-
-		};
+		TextAssistContentProvider contentProvider = TextAssistUtil.getTimeTextAssistProvider(field, translationService, locale, timeUtil);
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
+		text.setData(Constants.TEXTASSIST_TYPE, Constants.TEXTASSIST_TYPE_DATE);
+		text.setData(Constants.CONTROL_FIELD, field);
 		LocalDateTime date = LocalDateTime.of(LocalDate.of(2000, 01, 01), LocalTime.of(11, 59));
 		text.setMessage(TimeUtil.getTimeString(date.toInstant(ZoneOffset.UTC), locale, timeUtil));
 		text.setNumberOfLines(1);

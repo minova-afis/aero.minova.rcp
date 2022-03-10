@@ -41,6 +41,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.DateTimeValueAccessor;
+import aero.minova.rcp.rcp.util.TextAssistUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 
 public class DateTimeField {
@@ -52,24 +53,10 @@ public class DateTimeField {
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 		Label label = FieldLabel.create(composite, field);
 
-		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
-
-			@Override
-			public List<String> getContent(String entry) {
-				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateTimeUtil.getDateTime(Instant.now(), entry, locale);
-				if (date == null && !entry.isEmpty()) {
-					result.add(translationService.translate("@msg.ErrorConverting", null));
-				} else {
-					result.add(DateTimeUtil.getDateTimeString(date, locale, dateUtil, timeUtil));
-					field.setValue(new Value(date), true);
-				}
-				return result;
-			}
-
-		};
-
+		TextAssistContentProvider contentProvider = TextAssistUtil.getTextAssistProvider(field, translationService, locale, dateUtil, timeUtil);
 		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
+		text.setData(Constants.TEXTASSIST_TYPE, Constants.TEXTASSIST_TYPE_DATE);
+		text.setData(Constants.CONTROL_FIELD, field);
 		LocalDateTime of = LocalDateTime.of(LocalDate.of(2020, 12, 12), LocalTime.of(22, 55));
 		text.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil));
 		text.setNumberOfLines(1);
