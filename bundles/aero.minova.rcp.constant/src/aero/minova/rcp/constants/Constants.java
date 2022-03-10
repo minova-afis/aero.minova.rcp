@@ -43,6 +43,11 @@ public class Constants {
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT = "grid_button_optimizeHeight";
 	public static final String CONTROL_GRID_BUTTON_OPTIMIZEWIDTH = "grid_button_optimizeWidth";
 	public static final String CONTROL_GRID_BUTTON_HORIZONTALFILL = "grid_button_horizontalFill";
+	
+	public static final String TEXTASSIST_TYPE="TextAssistType";
+	public static final String TEXTASSIST_TYPE_DATE="Date";
+	public static final String TEXTASSIST_TYPE_TIME="Time";
+	public static final String TEXTASSIST_TYPE_DATE_TIME="Date-Time";
 
 	public static final String CONTROL_GRID_ID = "grid_id";
 	public static final String DETAIL_COMPOSITE = "DetailComposite";
