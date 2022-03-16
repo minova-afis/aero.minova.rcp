@@ -16,13 +16,11 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.dataservice.ImageUtil;
 
 public class SwitchPerspectiveHandler {
 
@@ -116,12 +114,7 @@ public class SwitchPerspectiveHandler {
 	 */
 	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
 		if (element instanceof MPerspective) {
-			MPerspective mPerspective = partService.switchPerspective(perspectiveID).get();
-
-			MPart detailPart = partService.findPart(Constants.DETAIL_PART);
-			detailPart.setIconURI(ImageUtil.retrieveIcon(mPerspective.getIconURI(), false));
-			detailPart.setLabel(mPerspective.getLabel());
-			detailPart.updateLocalization();
+			partService.switchPerspective(perspectiveID);
 		} else {
 			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
 		}

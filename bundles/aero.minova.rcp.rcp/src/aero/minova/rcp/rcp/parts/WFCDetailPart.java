@@ -53,7 +53,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -209,6 +208,11 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		layoutForm(parent);
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
+
+		// Label und Icon aus Maske setzten
+		mPart.setIconURI(ImageUtil.retrieveIcon(form.getIcon(), false));
+		mPart.setLabel(form.getTitle());
+		mPart.updateLocalization();
 
 		// Erstellen der Util-Klasse, welche sämtliche funktionen der Detailansicht steuert
 		casRequestsUtil = ContextInjectionFactory.make(WFCDetailCASRequestsUtil.class, mPerspective.getContext());
