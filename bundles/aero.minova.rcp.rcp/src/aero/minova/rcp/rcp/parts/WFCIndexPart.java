@@ -403,7 +403,11 @@ public class WFCIndexPart extends WFCFormPart {
 	@Optional
 	public void updateColumns(@UIEventTopic(Constants.BROKER_UPDATECOLUMNS) String s) {
 		bodyLayerStack.columnHideShowLayer.showAllColumns();
-		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mic.getHiddenColumns());
+		List<Integer> positions = new ArrayList<>();
+		for (Integer i : mic.getHiddenColumns()) {
+			positions.add(bodyLayerStack.columnHideShowLayer.getColumnPositionByIndex(i));
+		}
+		bodyLayerStack.columnHideShowLayer.hideColumnPositions(positions);
 	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
