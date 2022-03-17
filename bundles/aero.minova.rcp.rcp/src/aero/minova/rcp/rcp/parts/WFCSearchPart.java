@@ -388,7 +388,11 @@ public class WFCSearchPart extends WFCFormPart {
 	@Optional
 	public void updateColumns(@UIEventTopic(Constants.BROKER_UPDATECOLUMNS) String s) {
 		columnHideShowLayer.showAllColumns();
-		columnHideShowLayer.hideColumnPositions(msc.getHiddenColumns());
+		List<Integer> positions = new ArrayList<>();
+		for (Integer i : msc.getHiddenColumns()) {
+			positions.add(columnHideShowLayer.getColumnPositionByIndex(i));
+		}
+		columnHideShowLayer.hideColumnPositions(positions);
 	}
 
 	public void deleteSearchRows(List<Row> rows) {
