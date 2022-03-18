@@ -29,6 +29,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolTip;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
@@ -47,7 +49,7 @@ public class ShortDateField {
 	private ShortDateField() {
 		throw new IllegalStateException("Utility class");
 	}
-
+	
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective,
 			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -73,25 +75,60 @@ public class ShortDateField {
 			}
 
 		};
-		TextAssist text = new TextAssist(composite, SWT.BORDER, contentProvider);
+		Control text;
 		LocalDateTime time = LocalDateTime.of(LocalDate.of(2000, 01, 01), LocalTime.of(11, 59));
-		text.setMessage(DateUtil.getDateString(time.toInstant(ZoneOffset.UTC), locale, dateUtil));
-		text.setNumberOfLines(1);
-		text.setData(TRANSLATE_LOCALE, locale);
-		text.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				text.selectAll();
-			}
-
-			@Override
-			public void focusLost(FocusEvent e) {
-				if (text.getText().isBlank()) {
-					field.setValue(null, true);
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			Text text2 = new Text(composite, SWT.BORDER);
+			text = text2;
+			ToolTip tooltip = new ToolTip(text2.getShell(), SWT.ICON_INFORMATION);
+			text2.setMessage(DateUtil.getDateString(time.toInstant(ZoneOffset.UTC), locale, dateUtil));
+			text2.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					text2.selectAll();
+					tooltip.setAutoHide(false);
 				}
-			}
-		});
+				@Override
+				public void focusLost(FocusEvent e) {
+					tooltip.setAutoHide(true);
+				}
+			});
+			text2.addModifyListener(e -> {
+				try {
+					if (!tooltip.getAutoHide()) {
+						List<String> values = contentProvider.getContent(((Text) e.widget).getText());
+						if (!values.isEmpty()) {
+							tooltip.setText(values.get(0));
+							tooltip.setVisible(true);
+						}
+					} else {
+						tooltip.setText("");
+					}
+				} catch (NullPointerException ex) {}
+			});
+		} else {
+			TextAssist text2 = new TextAssist(composite, SWT.BORDER, contentProvider);
+			text = text2;
+
+			text2.setMessage(DateUtil.getDateString(time.toInstant(ZoneOffset.UTC), locale, dateUtil));
+			text2.setNumberOfLines(1);
+			text2.setData(TRANSLATE_LOCALE, locale);
+			text2.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					text2.selectAll();
+				}
+
+				@Override
+				public void focusLost(FocusEvent e) {
+					if (text2.getText().isBlank()) {
+						field.setValue(null, true);
+					}
+				}
+			});
+		}
 		text.setData(Constants.CONTROL_FIELD, field);
+		text.setData(TRANSLATE_LOCALE, locale);
 
 		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
 		IEclipseContext context = perspective.getContext();
@@ -106,7 +143,7 @@ public class ShortDateField {
 		text.setLayoutData(fd);
 		text.setData(CssData.CSSDATA_KEY,
 				new CssData(CssType.DATE_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), false));
-
+		
 		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
 
 		return text;
