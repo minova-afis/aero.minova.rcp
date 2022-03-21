@@ -4,7 +4,7 @@
 @import url("platform:/plugin/aero.minova.rcp.css/css/common/nattable.css");
 
 CTabFolder {
-	swt-tab-height: 32px;
+	swt-tab-height: 34px;
 }
 
 Widget, CTabItem, ToolBar, ToolTip, Label, Button, LookupTwistie {
@@ -35,7 +35,7 @@ MinovaSection {
 	date-width: 90px;
 	date-time-width: 130px;
 	number-width: 90px;
-	row-height: 24px;
+	row-height: 34px;
 	section-spacing: 5px;
 	text-width: 130px;
 	time-width: 65px;
