@@ -12,6 +12,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.model.Value;
@@ -22,9 +23,9 @@ import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 public class ShortTimeValueAccessor extends AbstractValueAccessor {
 
-	public ShortTimeValueAccessor(MField field, TextAssist textAssist) {
-		super(field, textAssist);
-	}
+	public ShortTimeValueAccessor(MField field, Control control) {
+ 		super(field, control);
+ 	}
 
 	@Override
 	protected void updateControlFromValue(Control control, Value value) {
@@ -33,16 +34,24 @@ public class ShortTimeValueAccessor extends AbstractValueAccessor {
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 
 		if (value == null) {
-			((TextAssist) control).setText("");
+			setText(control, "");
 		} else {
 			Instant time = value.getInstantValue();
 			LocalTime localTime = LocalTime.ofInstant(time, ZoneId.of("UTC"));
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(timeUtil, locale);
 			if(timeUtil.equals("")) {
-				((TextAssist) control).setText(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
+				setText(control, localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)));
 			} else {
-				((TextAssist) control).setText(localTime.format(dtf));
+				setText(control, localTime.format(dtf));
 			}
+		}
+	}
+	
+	private void setText(Control control, String text) {
+		if (control instanceof TextAssist) {
+			((TextAssist) control).setText(text);
+		} else if (control instanceof Text) {
+			((Text) control).setText(text);
 		}
 	}
 }

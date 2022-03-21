@@ -12,6 +12,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.model.Value;
@@ -22,8 +23,8 @@ import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 
 public class ShortDateValueAccessor extends AbstractValueAccessor {
 
-	public ShortDateValueAccessor(MField field, TextAssist textAssist) {
-		super(field, textAssist);
+	public ShortDateValueAccessor(MField field, Control control) {
+		super(field, control);
 	}
 
 	@Override
@@ -33,19 +34,25 @@ public class ShortDateValueAccessor extends AbstractValueAccessor {
 		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 
 		if (value == null) {
-			((TextAssist) control).setText("");
+			setText(control, "");
 		} else {
 			Instant date = value.getInstantValue();
 			LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
 			if (dateUtil.equals("")) {
 				// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
-				((TextAssist) control).setText(localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
+				setText(control, localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 			} else {
 				// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
-				((TextAssist) control).setText(localDate.format(dtf));
+				setText(control, localDate.format(dtf));
 			}
 		}
 	}
-
+		private void setText(Control control, String text) {
+			if (control instanceof TextAssist) {
+				((TextAssist) control).setText(text);
+			} else if (control instanceof Text) {
+				((Text) control).setText(text);
+			}
+		}
 }

@@ -63,6 +63,8 @@ public class LookupComposite extends Composite {
 
 	@Inject
 	private TranslationService translationService;
+	
+	private long popupTime;
 
 	/**
 	 * Constructs a new instance of this class given its parent and a style value describing its behavior and appearance.
@@ -115,6 +117,9 @@ public class LookupComposite extends Composite {
 
 			@Override
 			public void focusGained(FocusEvent e) {
+				if (System.getProperty("os.name").startsWith("Linux") && popupTime == -1) {
+					return;
+				}
 				text.selectAll();
 			}
 		});
@@ -243,11 +248,9 @@ public class LookupComposite extends Composite {
 		if (!popup.isVisible()) {
 			popup.setVisible(true);
 			popup.moveAbove(getShell());
+			popupTime = System.currentTimeMillis() + 250;
 		}
-
-		if (System.getProperty("os.name").startsWith("Linux")) {
-			table.setFocus();
-		}
+		
 	}
 
 	/**
@@ -290,10 +293,16 @@ public class LookupComposite extends Composite {
 			if (LookupComposite.this.isDisposed() || LookupComposite.this.getDisplay().isDisposed()) {
 				return;
 			}
+			if (System.getProperty("os.name").startsWith("Linux") && popupTime > System.currentTimeMillis()) {
+				text.setFocus();
+				popupTime = -1;
+				return;
+			}
 			final Control control = LookupComposite.this.getDisplay().getFocusControl();
 			if (control == null || (control != text && control != table && control != popup)) {
 				popup.setVisible(false);
 			}
+			text.clearSelection();
 		});
 	}
 
@@ -468,6 +477,9 @@ public class LookupComposite extends Composite {
 	 */
 	public void setText(final String text) {
 		checkWidget();
+		if (System.getProperty("os.name").startsWith("Linux") && popupTime > System.currentTimeMillis()) {
+			return;
+		}
 		this.text.setData(SETTEXT_KEY, Boolean.TRUE);
 		this.text.setText(text);
 	}
