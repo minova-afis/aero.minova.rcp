@@ -1020,6 +1020,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 			row += mField.getNumberRowsSpanned() - 1;
 			column += width;
+			if (mField.isFillHorizontal()) {
+				column = 4;
+			}
 		}
 	}
 
