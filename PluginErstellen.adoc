@@ -636,8 +636,7 @@ broker.send(Constants.BROKER_SHOWERRORMESSAGE, "msg.errormessage"); // Fehlermel
 
 Es ist möglich, für eine Masken ein zusätzliches Tab in den Einstellungen hinzuzufügen (z.B. um den/die Mitarbeiter:in in der Stundenerfassung vorzubelegen). 
 Dafür muss eine neue Klasse definiert werden, die die Klasse ``PreferenceTabDescriptor``erweitert.
-Das verwendete Icon muss aktuell im ``icons`` Ordner des ``aero.minova.rcp.preferencewindow``-Plugins liegen.
-In dem Beispiel ist auch gezeigt, wie man an den TranslationService kommt.
+Das verwendete Icon muss (wie die andern Bilder der Maske) im ``src/main/app/images/`` Ordner abgelegt werden.
 Die Einstellungen werden dann wie auch die Haupteinstellungen aufgebaut, siehe auch Klasse ``PreferenceWindowModel``.
 Auf die eingestellten Werte kann dann wie für alle anderen Einstellungen auch zugegriffen werden.
 
