@@ -42,8 +42,17 @@ public class DeleteDetailHandler {
 	}
 
 	@Execute
-	public void execute(@Optional MPerspective perspective) {
+	public void execute(MPart part, @Optional MPerspective perspective) {
 		if (perspective == null) {
+			return;
+		}
+
+		// Bei ungespeicherten Änderungen darf nicht gelöscht werden
+		if (part.getObject() instanceof WFCDetailPart && ((WFCDetailPart) part.getObject()).getDirtyFlag()) {
+			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
+					translationService.translate("@msg.DeleteUnsavedChangesTitle", null), null,
+					translationService.translate("@msg.DeleteUnsavedChangesMessage", null), MessageDialog.CONFIRM, new String[] { "OK" }, 0);
+			dialog.open();
 			return;
 		}
 
