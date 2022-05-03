@@ -162,7 +162,7 @@ public class TraverseEnterHandler {
 		}
 
 		for (Control children : fcSection.getChildren()) {
-			if (children instanceof Composite && !(children instanceof ToolBar) && !(children instanceof ImageHyperlink)) {
+			if (children instanceof Composite && !(children instanceof ToolBar) && !(children instanceof ImageHyperlink) && !(children instanceof Twistie)) {
 				comp = (Composite) children;
 				break;
 			}
@@ -293,6 +293,7 @@ public class TraverseEnterHandler {
 					}
 					fc = control;
 					fc.setFocus();
+					System.out.println(fc);
 					return fc;
 				}
 			} else {
@@ -327,7 +328,8 @@ public class TraverseEnterHandler {
 		Composite compo = null;
 		for (Section section : sectionList) {
 			for (Control children : section.getChildren()) {
-				if (children instanceof Composite && !(children instanceof Label || children instanceof ToolBar || children instanceof ImageHyperlink)) {
+				if (children instanceof Composite
+						&& !(children instanceof Label || children instanceof ToolBar || children instanceof ImageHyperlink || children instanceof Twistie)) {
 					compo = (Composite) children;
 				}
 			}
