@@ -1028,7 +1028,7 @@ public class WFCDetailCASRequestsUtil {
 	private void focusFirstEmptyField() {
 		for (MSection section : mDetail.getMSectionList()) {
 			for (MField field : section.getTabList()) {
-				if (field.getValue() == null) {
+				if (field.getValue() == null && !field.isReadOnly()) {
 					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
 					return;
 				}
