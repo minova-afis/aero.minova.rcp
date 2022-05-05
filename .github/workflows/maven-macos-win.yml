@@ -15,7 +15,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        java: [ '11' ]
+        java: [ '11.0.14' ]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
