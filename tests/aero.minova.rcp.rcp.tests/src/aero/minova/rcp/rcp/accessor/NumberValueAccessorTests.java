@@ -12,9 +12,9 @@ import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor.Result;
 
 class NumberValueAccessorTests {
-	
+
 	// ================================================================================
-	// Testfälle aus Issue #1166
+	// Testfall aus Issue #1166, verbessert auf komplettes Leeren des Feldes
 	// ================================================================================
 
 	@Test
@@ -35,14 +35,14 @@ class NumberValueAccessorTests {
 				decimalFormatSymbols, //
 				true//
 		);
-		assertEquals("0", result.text);
-		assertEquals(1, result.caretPosition);
+		assertEquals("", result.text);
+		assertEquals(0, result.caretPosition);
 	}
-	
+
 	// ================================================================================
 	// Testfälle aus Issue #1132
 	// ================================================================================
-	
+
 	@Test
 	void testDELAfterKomma() {
 		MNumberField field = new MNumberField(2);

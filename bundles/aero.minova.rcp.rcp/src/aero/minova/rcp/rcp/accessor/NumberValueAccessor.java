@@ -247,9 +247,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
 						caretPosition, numberFormat, dfs);
 			} catch (NumberFormatException e) {
-				result.value = new Value(0);
-				result.text = numberFormat.format(result.value.getIntegerValue());
-				result.caretPosition = 1;
+				result.value = null;
+				result.text = "";
+				result.caretPosition = 0;
 			}
 		}
 
