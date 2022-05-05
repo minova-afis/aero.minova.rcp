@@ -238,7 +238,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		};
 
 		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString() + "/ping")) //
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(getConnectionString()).resolve("ping")) //
 					.header("Content-Type", "application/json") //
 					.method("GET", BodyPublishers.ofString(""))//
 					.timeout(Duration.ofSeconds(TIMEOUT_DURATION)).build();

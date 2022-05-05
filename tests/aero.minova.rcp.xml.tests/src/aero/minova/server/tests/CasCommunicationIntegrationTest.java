@@ -119,7 +119,7 @@ class CasCommunicationIntegrationTest {
 				+ "        {\n" + "            \"values\" : [\n" + "                \"n-1\"\n" + "                , null\n" + "                , \"b-0\"\n"
 				+ "            ]\n" + "        }\n" + "    ]\n" + "}";
 
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server).resolve("data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;
@@ -161,7 +161,7 @@ class CasCommunicationIntegrationTest {
 				+ "                , \"d-0.5\"\n" + "                , \"s-Test via CAS\"\n" + "                , \"b-0\"\n" + "            ]\n" + "        }\n"
 				+ "    ]\n" + "}";
 
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server).resolve("data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;
@@ -177,7 +177,7 @@ class CasCommunicationIntegrationTest {
 	@Test
 	void ensureLoginWorks() {
 
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/login")).build();
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server).resolve("login")).build();
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
