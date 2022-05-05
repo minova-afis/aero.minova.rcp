@@ -140,7 +140,7 @@ public class DataService implements IDataService {
 	public void setCredentials(String username, String password, String server, URI workspacePath) {
 		this.username = username;
 		this.password = password;
-		this.server = URI.create(server);
+		this.server = URI.create(server.endsWith("/") ? server : server.concat("/"));
 		this.workspacePath = workspacePath;
 		init();
 		initSiteParameters();
