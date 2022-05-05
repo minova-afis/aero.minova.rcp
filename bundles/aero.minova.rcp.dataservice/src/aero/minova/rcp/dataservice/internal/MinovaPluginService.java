@@ -50,6 +50,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 			downloadPlugins = false;
 		}
 
+		// Passende Plugins finden
 		int lastIndexOf = helperClass.lastIndexOf('.');
 		String pluginName = helperClass.substring(0, lastIndexOf);
 		Path storagePath = dataService.getStoragePath();
@@ -68,22 +69,34 @@ public class MinovaPluginService implements IMinovaPluginService {
 			return;
 		}
 
+		// Aktuellstes Plugin finden
+		Path newestPlugin = plugins.get(0);
+		PluginInformation newestPluginInfo = new PluginInformation(plugins.get(0).toFile());
+		for (Path p : plugins) {
+			PluginInformation pI = new PluginInformation(p.toFile());
+			if (pI.isNewerAs(newestPluginInfo)) {
+				newestPlugin = p;
+				newestPluginInfo = pI;
+			}
+		}
+
 		BundleContext bundleContext = FrameworkUtil.getBundle(MinovaPluginService.class).getBundleContext();
 		try {
 			Bundle[] bundles = bundleContext.getBundles();
 
+			// Wenn vorhanden alte Version deinstallieren
 			for (Bundle bundle : bundles) {
 				Version bundleVersion = bundle.getVersion();
 				if (bundle.getSymbolicName().equals(pluginName)) {
-					PluginInformation pI = new PluginInformation(plugins.get(0).toFile());
-					if (!pI.isDifferent(bundleVersion)) {
+					if (!newestPluginInfo.isDifferent(bundleVersion)) {
 						return;
 					}
 					bundle.uninstall();
 				}
 			}
 
-			Bundle installBundle = bundleContext.installBundle(plugins.get(0).toUri().toString());
+			// Plugin installieren
+			Bundle installBundle = bundleContext.installBundle(newestPlugin.toUri().toString());
 			installBundle.start(Bundle.START_ACTIVATION_POLICY);
 		} catch (BundleException e) {
 			e.printStackTrace();
