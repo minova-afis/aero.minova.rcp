@@ -293,7 +293,6 @@ public class TraverseEnterHandler {
 					}
 					fc = control;
 					fc.setFocus();
-					System.out.println(fc);
 					return fc;
 				}
 			} else {
