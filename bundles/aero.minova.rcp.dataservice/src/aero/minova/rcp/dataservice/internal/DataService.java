@@ -289,12 +289,16 @@ public class DataService implements IDataService {
 				return null;
 			}
 
-			//Auch einzelne Ergebnisse auf Fehler überprüfen
+			// Auch einzelne Ergebnisse auf Fehler überprüfen
 			Type listType = new TypeToken<ArrayList<TransactionResultEntry>>() {}.getType();
 			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
 			for (TransactionResultEntry entry : transactionResults) {
 				SqlProcedureResult entryResult = entry.getSQLProcedureResult();
-				ErrorObject e = checkForErrorInSQLResult(entryResult, procedureList.get(transactionResults.indexOf(entry)).getTable().getName());
+				String procedureName = entry.getId();
+				if (procedureList.size() > transactionResults.indexOf(entry)) {
+					procedureName = procedureList.get(transactionResults.indexOf(entry)).getTable().getName();
+				}
+				ErrorObject e = checkForErrorInSQLResult(entryResult, procedureName);
 				if (e != null) {
 					postError(e);
 					break;
@@ -389,7 +393,7 @@ public class DataService implements IDataService {
 			return null;
 		}
 
-		//HTTP Status >= 300 -> Fehler
+		// HTTP Status >= 300 -> Fehler
 		Table error = new Table();
 		error.setName(ERROR);
 		error.addColumn(new Column("Message", DataType.STRING));
