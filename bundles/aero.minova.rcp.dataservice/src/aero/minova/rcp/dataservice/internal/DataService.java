@@ -294,7 +294,11 @@ public class DataService implements IDataService {
 			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
 			for (TransactionResultEntry entry : transactionResults) {
 				SqlProcedureResult entryResult = entry.getSQLProcedureResult();
-				ErrorObject e = checkForErrorInSQLResult(entryResult, procedureList.get(transactionResults.indexOf(entry)).getTable().getName());
+				String procedureName = entry.getId();
+				if (procedureList.size() > transactionResults.indexOf(entry)) {
+					procedureName = procedureList.get(transactionResults.indexOf(entry)).getTable().getName();
+				}
+				ErrorObject e = checkForErrorInSQLResult(entryResult, procedureName);
 				if (e != null) {
 					postError(e);
 					break;
