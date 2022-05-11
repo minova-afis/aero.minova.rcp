@@ -12,10 +12,16 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.dataservice.IMinovaPluginService;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
@@ -29,8 +35,7 @@ public class DynamicButtonHandler {
 	protected TranslationService translationService;
 
 	@Inject
-	@Optional
-	IMinovaWizard wizard;
+	protected IMinovaPluginService pluginService;
 
 	@Execute
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CLAZZ) String className,
@@ -38,6 +43,9 @@ public class DynamicButtonHandler {
 
 		if (Constants.WIZARD.equals(className)) {
 			try {
+
+				IMinovaWizard wizard = findWizard(parameter);
+
 				MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
 
 				ContextInjectionFactory.inject(wizard, context);
@@ -70,6 +78,30 @@ public class DynamicButtonHandler {
 		MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
 		MButton button = detail.getButton(parameter);
 		return button.getButtonAccessor().isEnabled();
+	}
+
+	private IMinovaWizard findWizard(String wizardName) {
+		IMinovaWizard iWizard = null;
+
+		pluginService.activatePlugin(wizardName);
+		BundleContext bundleContext = FrameworkUtil.getBundle(WFCDetailPart.class).getBundleContext();
+		try {
+			ServiceReference<?>[] allServiceReferences = bundleContext.getAllServiceReferences(IMinovaWizard.class.getName(), null);
+			for (ServiceReference<?> serviceReference : allServiceReferences) {
+				String property = (String) serviceReference.getProperty("component.name");
+				if (property.equals(wizardName)) {
+					iWizard = (IMinovaWizard) bundleContext.getService(serviceReference);
+				}
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		if (iWizard == null) {
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.WizardNotFound", null));
+		}
+
+		return iWizard;
 	}
 
 }
