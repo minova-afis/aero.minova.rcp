@@ -14,6 +14,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
 
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
@@ -46,6 +48,10 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	String timezone;
 
 	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED)
+	boolean selectFirstRequired;
+
+	@Inject
 	private TranslationService translationService;
 
 	@Inject
@@ -59,6 +65,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	private static final MinovaWizardPageChangedListener mwpcl = new MinovaWizardPageChangedListener();
 	protected MDetail mDetail;
 
+	protected MinovaWizardPageEnterHelper enterHelper;
+
 	public MinovaWizardPage(String pageName, String pageTitle, String pageDescription) {
 		super(pageName);
 		setTitle(pageTitle);
@@ -68,6 +76,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 
 		mSection = new MSection(false, "", mDetail, "", "");
+		enterHelper = new MinovaWizardPageEnterHelper(selectFirstRequired);
 	}
 
 	@Override
@@ -120,17 +129,18 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	protected MField createMField(Composite composite, DataType dataType, DateTimeType dateTimeType, String label, int row, int column, boolean required) {
 
 		MField mField = null;
+		Control c = null;
 		switch (dataType) {
 		case BIGDECIMAL:
 		case DOUBLE:
 			mField = new MNumberField(2);
 			initField(label, required, mField);
-			NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
+			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
 			break;
 		case BOOLEAN:
 			mField = new MBooleanField();
 			initField(label, required, mField);
-			BooleanField.create(composite, mField, row, column, locale, mPerspective);
+			c = BooleanField.create(composite, mField, row, column, locale, mPerspective);
 			break;
 		case FILTER:
 			// Sollte nicht vorkommen
@@ -142,7 +152,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case INTEGER:
 			mField = new MNumberField(0);
 			initField(label, required, mField);
-			NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
+			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
 			break;
 		case REFERENCE:
 			// Sollte nicht vorkommen
@@ -150,8 +160,11 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case STRING:
 			mField = new MTextField();
 			initField(label, required, mField);
-			TextField.create(composite, mField, row, column, mPerspective);
+			c = TextField.create(composite, mField, row, column, mPerspective);
 			break;
+		}
+		if (c != null) {
+			c.addListener(SWT.KeyDown, createKeyListener(mField));
 		}
 
 		return mField;
@@ -164,26 +177,29 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		mField.addValueChangeListener(this);
 		mDetail.putField(mField);
 		mField.setMSection(mSection);
+		enterHelper.addField(mField);
 	}
 
 	private MField createInstantField(Composite composite, DateTimeType dateTimeType, int row, int column, MField mField, String label, boolean required) {
+		Control c = null;
 		switch (dateTimeType) {
 		case DATE:
 			mField = new MShortDateField();
 			initField(label, required, mField);
-			ShortDateField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+			c = ShortDateField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
 			break;
 		case DATETIME:
 			mField = new MDateTimeField();
 			initField(label, required, mField);
-			DateTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+			c = DateTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
 			break;
 		case TIME:
 			mField = new MShortTimeField();
 			initField(label, required, mField);
-			ShortTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+			c = ShortTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
 			break;
 		}
+		c.addListener(SWT.KeyDown, createKeyListener(mField));
 		return mField;
 	}
 
@@ -205,5 +221,14 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	@Override
 	public void valueChange(ValueChangeEvent evt) {
 		setPageComplete(mDetail.allFieldsAndGridsValid());
+	}
+
+	private Listener createKeyListener(MField mField) {
+		return event -> {
+			if (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR) {
+				enterHelper.selectNewFieldOrSave(mField);
+				event.doit = false;
+			}
+		};
 	}
 }
