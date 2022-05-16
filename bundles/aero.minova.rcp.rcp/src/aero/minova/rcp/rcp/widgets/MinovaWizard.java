@@ -4,8 +4,6 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.jface.dialogs.DialogSettings;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 
@@ -20,7 +18,6 @@ import aero.minova.rcp.model.helper.IMinovaWizard;
  */
 public class MinovaWizard extends Wizard implements IMinovaWizard {
 	private IMinovaWizardFinishAction finishAction;
-	private Object opener;
 
 	@Inject
 	private IEclipseContext context;
@@ -29,26 +26,18 @@ public class MinovaWizard extends Wizard implements IMinovaWizard {
 
 	public MinovaWizard(String wizardName) {
 		this.setWindowTitle(wizardName);
-		this.init();
 	}
 
 	@Override
+	/**
+	 * Am Ende von Implementierungen super.addPages() aufrufen, damit Pages im Kontext sind!
+	 */
 	public void addPages() {
-		// wird von WizardDialog automatisch aufgerufen
-		// Beispiele:
-		// addPage(new PrintPage1());
-		// addPage(new PrintPage2());
 
-		// #23481: Deshalb müssen die abgeleiteten Klassen super.addPages() aufrufen
+		// Alle Pages in den Kontext injecten -> Am Ende von Implementierungen immer super.addPages() aufrufen
 		for (IWizardPage page : getPages()) {
 			ContextInjectionFactory.inject(page, context);
 		}
-	}
-
-	@Override
-	public void dispose() {
-		// pages werden von der Superklasse bereits bereinigt
-		super.dispose();
 	}
 
 	/**
@@ -56,24 +45,6 @@ public class MinovaWizard extends Wizard implements IMinovaWizard {
 	 */
 	public IMinovaWizardFinishAction getFinishAction() {
 		return finishAction;
-	}
-
-	/**
-	 * liefert das Objekt, das den Wizard geöffnet hat<br>
-	 * das kann das öffnende Fenster, oder auch ein Part oder DataSourceBundle sein
-	 *
-	 * @return
-	 */
-	public Object getOpener() {
-		return this.opener;
-	}
-
-	/**
-	 * kann verwendet werden, um Settings vorzubelegen und andere Werte zu initialisieren
-	 */
-	public void init() {
-		IDialogSettings dialogSettings = new DialogSettings(this.getClass().getSimpleName());
-		this.setDialogSettings(dialogSettings);
 	}
 
 	@Override
@@ -100,16 +71,6 @@ public class MinovaWizard extends Wizard implements IMinovaWizard {
 	 */
 	public void setFinishAction(IMinovaWizardFinishAction finishAction) {
 		this.finishAction = finishAction;
-	}
-
-	/**
-	 * setzt das Objekt, das den Wizard geöffnet hat<br>
-	 * das kann das öffnende Fenster, oder auch ein Part oder DataSourceBundle sein
-	 *
-	 * @param opener
-	 */
-	public void setOpener(Object opener) {
-		this.opener = opener;
 	}
 
 	@Override
