@@ -27,7 +27,7 @@ public class MinovaWizardPageEnterHelper {
 		((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
 	}
 
-	public void selectNewFieldOrSave(MField currentField) {
+	public void selectNextField(MField currentField) {
 		int startIndex = 0;
 		if (!selectFirstRequired) {
 			startIndex = fields.indexOf(currentField) + 1;
