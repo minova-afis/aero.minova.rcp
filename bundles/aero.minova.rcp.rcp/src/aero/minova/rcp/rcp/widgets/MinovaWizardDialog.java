@@ -30,10 +30,14 @@ public class MinovaWizardDialog extends WizardDialog {
 			cancelButton.setText(translationService.translate("@Abort", null));
 
 			Button backButton = getButton(IDialogConstants.BACK_ID);
-			backButton.setText("< " + translationService.translate("@Back", null));
+			if (backButton != null) {
+				backButton.setText("< " + translationService.translate("@Back", null));
+			}
 
 			Button nextButton = getButton(IDialogConstants.NEXT_ID);
-			nextButton.setText(translationService.translate("@Next", null) + " >");
+			if (nextButton != null) {
+				nextButton.setText(translationService.translate("@Next", null) + " >");
+			}
 		}
 	}
 
