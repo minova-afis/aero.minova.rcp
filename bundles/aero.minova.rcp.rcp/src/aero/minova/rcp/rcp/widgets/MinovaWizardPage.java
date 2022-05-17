@@ -13,10 +13,18 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import aero.minova.rcp.css.widgets.DetailLayout;
+import aero.minova.rcp.css.widgets.MinovaSection;
+import aero.minova.rcp.css.widgets.MinovaSectionData;
+import aero.minova.rcp.form.model.xsd.Lookup;
+import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.event.ValueChangeEvent;
@@ -36,28 +44,30 @@ import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
+import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public class MinovaWizardPage extends WizardPage implements ValueChangeListener {
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
-	String timezone;
+	protected String timezone;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED)
-	boolean selectFirstRequired;
+	protected boolean selectFirstRequired;
 
 	@Inject
-	private TranslationService translationService;
+	protected TranslationService translationService;
 
 	@Inject
-	private MPerspective mPerspective;
+	protected MPerspective mPerspective;
 
-	Locale locale = CustomLocale.getLocale();
+	protected Locale locale = CustomLocale.getLocale();
 
 	// Leider für die Required Prüfung Notwendig
 	MSection mSection;
@@ -114,8 +124,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	}
 
 	/**
-	 * Erstellt ein MField inkl dem UI. <br>
-	 * Achtung: Für Lookups methode createMLookupField verwenden!
+	 * Erstellt ein MField <br>
+	 * Achtung: Für Lookups Methode createMLookupField verwenden!
 	 * 
 	 * @param composite
 	 * @param dataType
@@ -126,46 +136,47 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	 * @param required
 	 * @return
 	 */
-	protected MField createMField(Composite composite, DataType dataType, DateTimeType dateTimeType, String label, int row, int column, boolean required) {
+	protected MField createMField(DataType dataType, DateTimeType dateTimeType, String label, boolean required) {
 
 		MField mField = null;
-		Control c = null;
 		switch (dataType) {
 		case BIGDECIMAL:
 		case DOUBLE:
 			mField = new MNumberField(2);
-			initField(label, required, mField);
-			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
 			break;
 		case BOOLEAN:
 			mField = new MBooleanField();
-			initField(label, required, mField);
-			c = BooleanField.create(composite, mField, row, column, locale, mPerspective);
 			break;
 		case FILTER:
 			// Sollte nicht vorkommen
 			break;
 		case INSTANT:
 		case ZONED:
-			mField = createInstantField(composite, dateTimeType, row, column, mField, label, required);
+			switch (dateTimeType) {
+			case DATE:
+				mField = new MShortDateField();
+				break;
+			case DATETIME:
+				mField = new MDateTimeField();
+				break;
+			case TIME:
+				mField = new MShortTimeField();
+				break;
+			}
 			break;
 		case INTEGER:
 			mField = new MNumberField(0);
-			initField(label, required, mField);
-			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
 			break;
 		case REFERENCE:
 			// Sollte nicht vorkommen
 			break;
 		case STRING:
 			mField = new MTextField();
-			initField(label, required, mField);
-			c = TextField.create(composite, mField, row, column, mPerspective);
+			((MTextField) mField).setMaxTextLength(200);
 			break;
 		}
-		if (c != null) {
-			c.addListener(SWT.KeyDown, createKeyListener(mField));
-		}
+
+		initField(label, required, mField);
 
 		return mField;
 	}
@@ -180,32 +191,78 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		enterHelper.addField(mField);
 	}
 
-	private MField createInstantField(Composite composite, DateTimeType dateTimeType, int row, int column, MField mField, String label, boolean required) {
+	/**
+	 * Erstellt das UI-Feld
+	 * 
+	 * @param mField
+	 * @param dateTimeType
+	 * @param composite
+	 * @param row
+	 * @param column
+	 * @return
+	 */
+	protected Control createUIField(MField mField, DateTimeType dateTimeType, Composite composite, int row, int column) {
 		Control c = null;
-		switch (dateTimeType) {
-		case DATE:
-			mField = new MShortDateField();
-			initField(label, required, mField);
-			c = ShortDateField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+		switch (mField.getDataType()) {
+		case BIGDECIMAL:
+		case DOUBLE:
+			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
 			break;
-		case DATETIME:
-			mField = new MDateTimeField();
-			initField(label, required, mField);
-			c = DateTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+		case BOOLEAN:
+			c = BooleanField.create(composite, mField, row, column, locale, mPerspective);
 			break;
-		case TIME:
-			mField = new MShortTimeField();
-			initField(label, required, mField);
-			c = ShortTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+		case FILTER:
+			// Sollte nicht vorkommen
+			break;
+		case INSTANT:
+		case ZONED:
+			switch (dateTimeType) {
+			case DATE:
+				c = ShortDateField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+				break;
+			case DATETIME:
+				c = DateTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+				break;
+			case TIME:
+				c = ShortTimeField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
+				break;
+			}
+			break;
+		case INTEGER:
+			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
+			break;
+		case REFERENCE:
+			// Sollte nicht vorkommen
+			break;
+		case STRING:
+			c = TextField.create(composite, mField, row, column, mPerspective);
 			break;
 		}
-		c.addListener(SWT.KeyDown, createKeyListener(mField));
+
+		if (c != null) {
+			c.addListener(SWT.KeyDown, createKeyListener(mField));
+		}
+
+		return c;
+	}
+
+	protected MLookupField createMLookupField(Lookup lookup, String label, boolean required) {
+		MLookupField mField = new MLookupField();
+		mField.setLookupTable(lookup.getTable());
+		mField.setLookupProcedurePrefix(lookup.getProcedurePrefix());
+		mField.setLookupDescription(lookup.getDescriptionName());
+		for (TypeParam typeParam : lookup.getParam()) {
+			mField.addLookupParameter(typeParam.getFieldName());
+		}
+
+		initField(label, required, mField);
 		return mField;
 	}
 
-	protected MLookupField createMLookupField() {
-		// TODO
-		return new MLookupField();
+	protected Control createUILookupField(MField mField, Composite composite, int row, int column) {
+		Control c = LookupField.create(composite, mField, row, column, locale, mPerspective);
+		c.addListener(SWT.KeyDown, createKeyListener(mField));
+		return c;
 	}
 
 	private static class MinovaWizardPageChangedListener implements IPageChangedListener {
@@ -219,16 +276,65 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	}
 
 	@Override
+	/**
+	 * Knöpfe updaten
+	 */
 	public void valueChange(ValueChangeEvent evt) {
-		setPageComplete(mDetail.allFieldsAndGridsValid());
+		setPageComplete(mDetail.allFieldsAndGridsValid() && !popupIsOpen());
 	}
 
 	private Listener createKeyListener(MField mField) {
 		return event -> {
 			if (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR) {
-				enterHelper.selectNewFieldOrSave(mField);
+				enterHelper.selectNextField(mField);
 				event.doit = false;
 			}
+			setPageComplete(mDetail.allFieldsAndGridsValid() && !popupIsOpen());
 		};
+	}
+
+	public boolean popupIsOpen() {
+		Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
+		if (focussedControl instanceof LookupComposite) {
+			return ((LookupComposite) focussedControl).popupIsOpen();
+		}
+		return false;
+	}
+
+	/**
+	 * Erstellt ein Composite mit dem MinovaLayout. Für Wizardpages mit "normalen" Feldern.
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	protected Composite getComposite(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new DetailLayout());
+		setControl(container); // Von wizard benötigt
+
+		MinovaSection section = new MinovaSection(container, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		MinovaSectionData sectionData = new MinovaSectionData();
+		section.setLayoutData(sectionData);
+
+		Composite composite = new Composite(section, SWT.None);
+		composite.setLayout(new FormLayout());
+		section.setClient(composite);
+
+		return composite;
+	}
+
+	/**
+	 * Erstellt ein Composite für Wizardpages mit Tabelle
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	protected Composite getCompositeNattable(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		container.setLayout(layout);
+		layout.numColumns = 1;
+		setControl(container);// Von wizard benötigt
+		return container;
 	}
 }
