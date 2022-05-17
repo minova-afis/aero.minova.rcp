@@ -28,6 +28,16 @@ public class MinovaWizardDialog extends WizardDialog {
 
 			Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
 			cancelButton.setText(translationService.translate("@Abort", null));
+
+			Button backButton = getButton(IDialogConstants.BACK_ID);
+			if (backButton != null) {
+				backButton.setText("< " + translationService.translate("@Back", null));
+			}
+
+			Button nextButton = getButton(IDialogConstants.NEXT_ID);
+			if (nextButton != null) {
+				nextButton.setText(translationService.translate("@Next", null) + " >");
+			}
 		}
 	}
 

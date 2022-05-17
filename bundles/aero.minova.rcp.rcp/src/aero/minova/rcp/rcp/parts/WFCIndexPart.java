@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.parts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -29,16 +28,13 @@ import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
@@ -79,10 +75,6 @@ import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfigurat
 import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
-import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
-import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
-import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
@@ -99,7 +91,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.service.prefs.BackingStoreException;
 
-import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Row;
@@ -107,8 +98,10 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
+import aero.minova.rcp.rcp.util.CustomComparator;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
+import aero.minova.rcp.rcp.util.NattableSummaryUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -535,7 +528,7 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 		});
 
-		configureSummary(form);
+		NattableSummaryUtil.configureSummary(form, natTable, bodyLayerStack.getSortedList(), columnPropertyAccessor);
 
 		natTable.configure();
 		// Hier können wir das Theme setzen
@@ -545,57 +538,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 		return natTable;
 
-	}
-
-	private void configureSummary(Form form) {
-		final IDataProvider summaryDataProvider = new ListDataProvider<>(bodyLayerStack.getSortedList(), columnPropertyAccessor);
-
-		// add summary configuration
-		natTable.addConfiguration(new AbstractRegistryConfiguration() {
-
-			@Override
-			public void configureRegistry(IConfigRegistry configRegistry) {
-				int i = 0;
-				for (aero.minova.rcp.form.model.xsd.Column column : form.getIndexView().getColumn()) {
-					ISummaryProvider summaryProvider = null;
-
-					if (column.getAggregate() != null) {
-						AggregateOption agg = AggregateOption.valueOf(column.getAggregate());
-						switch (agg) {
-						case AVERAGE:
-							summaryProvider = new AverageSummaryProvider(summaryDataProvider);
-							break;
-						case COUNT:
-							summaryProvider = new CountSummaryProvider(summaryDataProvider);
-							break;
-						case MAX:
-							summaryProvider = new MaxSummaryProvider(summaryDataProvider);
-							break;
-						case MIN:
-							summaryProvider = new MinSummaryProvider(summaryDataProvider);
-							break;
-						case SUM:
-							summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
-							break;
-						default:
-							break;
-						}
-					}
-
-					// Summe ("total" in .xml)
-					if (column.isTotal() != null && column.isTotal()) {
-						summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
-					}
-
-					if (summaryProvider != null) {
-						configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER, summaryProvider, DisplayMode.NORMAL,
-								SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
-					}
-
-					i++;
-				}
-			}
-		});
 	}
 
 	public NatTable getNattable() {
@@ -750,127 +692,6 @@ public class WFCIndexPart extends WFCFormPart {
 			}
 			if (!collection.isEmpty()) {
 				context.set(Constants.BROKER_ACTIVEROWS, t);
-			}
-		}
-	}
-
-	static class CountSummaryProvider implements ISummaryProvider {
-
-		private IDataProvider dataProvider;
-
-		public CountSummaryProvider(IDataProvider dataProvider) {
-			this.dataProvider = dataProvider;
-		}
-
-		@Override
-		public Object summarize(int columnIndex) {
-			return this.dataProvider.getRowCount();
-		}
-	}
-
-	static class AverageSummaryProvider implements ISummaryProvider {
-
-		private IDataProvider dataProvider;
-
-		public AverageSummaryProvider(IDataProvider dataProvider) {
-			this.dataProvider = dataProvider;
-		}
-
-		@Override
-		public Object summarize(int columnIndex) {
-			int rowCount = this.dataProvider.getRowCount();
-			int valueRows = 0;
-			double total = 0;
-
-			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
-				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number) {
-					valueRows++;
-					total += ((Number) dataValue).doubleValue();
-				}
-			}
-			if (valueRows == 0) {
-				return 0;
-			}
-			return total / valueRows;
-		}
-	}
-
-	static class MinSummaryProvider implements ISummaryProvider {
-
-		private IDataProvider dataProvider;
-
-		public MinSummaryProvider(IDataProvider dataProvider) {
-			this.dataProvider = dataProvider;
-		}
-
-		@Override
-		public Object summarize(int columnIndex) {
-			int rowCount = this.dataProvider.getRowCount();
-			double min = Double.MAX_VALUE;
-
-			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
-				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number) {
-					if (((Number) dataValue).doubleValue() < min) {
-						min = ((Number) dataValue).doubleValue();
-					}
-				}
-			}
-			if (min == Double.MAX_VALUE) {
-				return 0;
-			}
-			return min;
-		}
-	}
-
-	static class MaxSummaryProvider implements ISummaryProvider {
-
-		private IDataProvider dataProvider;
-
-		public MaxSummaryProvider(IDataProvider dataProvider) {
-			this.dataProvider = dataProvider;
-		}
-
-		@Override
-		public Object summarize(int columnIndex) {
-			int rowCount = this.dataProvider.getRowCount();
-			double max = Double.MIN_VALUE;
-
-			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
-				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number) {
-					if (((Number) dataValue).doubleValue() > max) {
-						max = ((Number) dataValue).doubleValue();
-					}
-				}
-			}
-			if (max == Double.MIN_VALUE) {
-				return 0;
-			}
-			return max;
-		}
-	}
-
-	private class CustomComparator implements Comparator<Object> {
-		@Override
-		public int compare(Object o1, Object o2) {
-			if (o1 == null) {
-				if (o2 == null) {
-					return 0;
-				} else {
-					return -1;
-				}
-			} else if (o2 == null) {
-				return 1;
-			} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
-																														// gleiche Klasse haben
-				return ((Comparable) o1).compareTo(o2);
-			} else {
-				return o1.toString().compareTo(o2.toString());
 			}
 		}
 	}

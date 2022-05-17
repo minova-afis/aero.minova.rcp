@@ -103,6 +103,10 @@ public class Table {
 		rows.addAll(newRows);
 	}
 
+	public void clearRows() {
+		rows.clear();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
