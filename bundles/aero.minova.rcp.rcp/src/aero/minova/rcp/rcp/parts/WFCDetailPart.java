@@ -205,6 +205,12 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		appContext = mApp.getContext();
 		mApplication = mApp;
 		getForm();
+
+		if (form.getDetail() == null) {
+			mPart.setVisible(false);
+			return;
+		}
+
 		layoutForm(parent);
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());

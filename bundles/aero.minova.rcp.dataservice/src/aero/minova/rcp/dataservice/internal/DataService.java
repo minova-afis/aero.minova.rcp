@@ -119,7 +119,7 @@ public class DataService implements IDataService {
 
 	private String username = null;// "admin";
 	private String password = null;// "rqgzxTf71EAx8chvchMi";
-	private String server = null;// "http://publictest.minova.com:17280/cas";
+	private URI server = null;// "http://publictest.minova.com:17280/cas";
 
 	private URI workspacePath;
 
@@ -140,7 +140,7 @@ public class DataService implements IDataService {
 	public void setCredentials(String username, String password, String server, URI workspacePath) {
 		this.username = username;
 		this.password = password;
-		this.server = server;
+		this.server = URI.create(server.endsWith("/") ? server : server.concat("/"));
 		this.workspacePath = workspacePath;
 		init();
 		initSiteParameters();
@@ -240,7 +240,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<Table> getTableAsync(Table searchTable, boolean showErrorMessage) {
 		String body = gson.toJson(searchTable);
 
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/index")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/index")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.method("GET", BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
@@ -268,7 +268,7 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<List<TransactionResultEntry>> callTransactionAsync(List<TransactionEntry> procedureList) {
 		String body = gson.toJson(procedureList);
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/x-procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/x-procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
@@ -289,7 +289,7 @@ public class DataService implements IDataService {
 				return null;
 			}
 
-			//Auch einzelne Ergebnisse auf Fehler überprüfen
+			// Auch einzelne Ergebnisse auf Fehler überprüfen
 			Type listType = new TypeToken<ArrayList<TransactionResultEntry>>() {}.getType();
 			List<TransactionResultEntry> transactionResults = gson.fromJson(t.body(), listType);
 			for (TransactionResultEntry entry : transactionResults) {
@@ -311,7 +311,7 @@ public class DataService implements IDataService {
 
 	public CompletableFuture<SqlProcedureResult> callProcedureAsync(Table table, boolean showErrorMessage) {
 		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
@@ -389,7 +389,7 @@ public class DataService implements IDataService {
 			return null;
 		}
 
-		//HTTP Status >= 300 -> Fehler
+		// HTTP Status >= 300 -> Fehler
 		Table error = new Table();
 		error.setName(ERROR);
 		error.addColumn(new Column("Message", DataType.STRING));
@@ -424,7 +424,7 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<Path> getXMLAsync(Table table, String rootElement) {
 		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
@@ -475,7 +475,7 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
 		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
@@ -568,7 +568,7 @@ public class DataService implements IDataService {
 	 */
 	@Override
 	public void downloadFile(String fileName) throws IOException, InterruptedException {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/read?path=" + fileName))//
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/read?path=" + fileName))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 		log("CAS Request File Sync:\n" + request + "\n" + fileName);
@@ -613,7 +613,7 @@ public class DataService implements IDataService {
 	 * @return
 	 */
 	public CompletableFuture<String> getServerHashForFile(String filename) {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/files/hash?path=" + filename))//
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/hash?path=" + filename))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
@@ -854,7 +854,7 @@ public class DataService implements IDataService {
 			ZipService.zipFile(getStoragePath().resolve(".metadata").toString(), getStoragePath().resolve("logs.zip").toString());
 
 			// Kein Timeout, da Upload länger dauer kann
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/upload/logs"))//
+			HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("upload/logs"))//
 					.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM)//
 					.POST(BodyPublishers.ofByteArray(Files.readAllBytes(getStoragePath().resolve("logs.zip"))))//
 					.build();

@@ -42,7 +42,7 @@ public class CopyHandler {
 	@Evaluate
 	public boolean visible(MPart part) {
 		detail = (WFCDetailPart) part.getObject();
-		return detail.getForm().getDetail().isButtonCopyVisible();
+		return detail.getForm().getDetail() != null && detail.getForm().getDetail().isButtonCopyVisible();
 	}
 
 	@CanExecute

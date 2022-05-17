@@ -74,7 +74,7 @@ public class NumberField {
 		Double maximum = field.getMaximumValue();
 		maximum = maximum == null ? Double.MAX_VALUE : maximum;
 		Double minimum = field.getMinimumValue();
-		minimum = minimum == null ? Double.MIN_VALUE : maximum;
+		minimum = minimum == null ? Double.MIN_VALUE : minimum;
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.setData(FIELD_DECIMALS, decimals);
 		text.setData(FIELD_MAX_VALUE, maximum);
