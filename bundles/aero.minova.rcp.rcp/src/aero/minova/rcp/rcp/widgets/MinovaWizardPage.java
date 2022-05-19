@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -23,6 +24,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import aero.minova.rcp.css.widgets.DetailLayout;
 import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
+import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Lookup;
 import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.DataType;
@@ -66,6 +68,12 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 	@Inject
 	protected MPerspective mPerspective;
+
+	@Inject
+	protected IEclipseContext context;
+
+	@Inject
+	protected IDataService dataService;
 
 	protected Locale locale = CustomLocale.getLocale();
 
