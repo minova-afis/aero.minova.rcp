@@ -1,3 +1,0 @@
-= Workspace Manager
-
-xref:./doc/adoc/index.adoc#[Index]
