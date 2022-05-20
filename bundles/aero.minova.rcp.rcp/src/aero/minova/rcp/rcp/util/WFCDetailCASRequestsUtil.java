@@ -1224,6 +1224,7 @@ public class WFCDetailCASRequestsUtil {
 		List<MField> visibleMFields = new ArrayList<>();
 
 		List<MField> toTraverse = new ArrayList<>();
+		List<MParamStringField> paramStringFields = new ArrayList<>();
 		toTraverse.addAll(mSection.getTabList());
 		for (MField f : toTraverse) {
 			visibleMFields.add(f);
@@ -1233,13 +1234,12 @@ public class WFCDetailCASRequestsUtil {
 				String suffix = name.contains("\\.") ? name.substring(name.lastIndexOf("\\."), name.length()) : "";
 
 				MParamStringField mParamString = (MParamStringField) f;
+				paramStringFields.add(mParamString);
 				for (Field subField : mParamString.getSubFields()) {
 					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
 					visibleMFields.add(subMField);
 					mParamString.addSubMField(subMField);
-
 				}
-
 			}
 		}
 
@@ -1261,6 +1261,9 @@ public class WFCDetailCASRequestsUtil {
 		clientComposite.setTabList(TabUtil.getTabListForSectionComposite(mSection, clientComposite));
 		// Setzen der TabListe der Sections im Part.
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
+
+		// Zwischengespeicherten Wert wieder eintragen
+		paramStringFields.stream().forEach(f -> f.setValue(new Value(f.getChacheValue().getStringValue() + " "), false));
 
 		section.requestLayout();
 		section.style();
