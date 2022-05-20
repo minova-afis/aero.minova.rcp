@@ -22,12 +22,20 @@ public class FileUtil {
 	}
 
 	private static String createFile(String path, int number) {
+
+		if (number > 20) {
+			return null;
+		}
+
 		path = number == 0 ? path : path.replace(".pdf", "").replaceAll("_\\d", "") + "_" + number + ".pdf";
 
 		try {
 			File file = new File(path);
 			// Wenn es das File noch nicht gibt wird es erstellt
 			if (!file.exists()) {
+				if (file.getParentFile() != null) {
+					file.getParentFile().mkdirs();
+				}
 				file.createNewFile();
 			} else {
 
