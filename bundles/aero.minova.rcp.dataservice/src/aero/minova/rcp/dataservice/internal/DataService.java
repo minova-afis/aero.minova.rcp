@@ -441,7 +441,7 @@ public class DataService implements IDataService {
 		}
 		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
-		log("CAS Request XML Detail:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
+		log("CAS Request XML Detail:\nPath: " + finalPath + "\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
 		CompletableFuture<HttpResponse<String>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofString());
 
@@ -451,7 +451,7 @@ public class DataService implements IDataService {
 		});
 
 		return sendRequest.thenApply(t -> {
-			log("CAS Answer XML Detail:\n" + t.body());
+			log("CAS Answer XML Detail:\nPath: " + finalPath + "\n" + t.body());
 			SqlProcedureResult fromJson = gson.fromJson(t.body(), SqlProcedureResult.class);
 
 			if (checkForError(t.body(), table.getName())) {
