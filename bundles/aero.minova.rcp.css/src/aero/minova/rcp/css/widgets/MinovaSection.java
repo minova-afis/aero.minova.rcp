@@ -97,6 +97,10 @@ public class MinovaSection extends Section {
 		return cssStyler;
 	}
 
+	public void style() {
+		cssStyler.style();
+	}
+
 	public ImageHyperlink getImageLink() {
 		return imageLink;
 	}

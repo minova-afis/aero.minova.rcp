@@ -606,6 +606,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		detailWidth = section.getCssStyler().getSectionWidth();
 		section.requestLayout();
+		section.style();
 	}
 
 	private void minimizeSection(MinovaSection section) {
