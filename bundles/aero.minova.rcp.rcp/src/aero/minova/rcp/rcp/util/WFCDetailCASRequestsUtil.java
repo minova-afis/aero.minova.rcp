@@ -39,9 +39,9 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.forms.widgets.Section;
 
 import aero.minova.rcp.constants.Constants;
+import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.EventParam;
@@ -1218,7 +1218,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 		mSection.getTabList().removeAll(toRemove);
-		Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
+		MinovaSection section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
 		mDetail.getFields().removeAll(toRemove);
 
 		List<MField> visibleMFields = new ArrayList<>();
@@ -1263,6 +1263,7 @@ public class WFCDetailCASRequestsUtil {
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
 
 		section.requestLayout();
+		section.style();
 		TranslateUtil.translate(clientComposite, translationService, wfcDetailPart.getLocale());
 
 	}
