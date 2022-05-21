@@ -82,7 +82,7 @@ public class LookupField {
 		labelFormData.width = FieldUtil.COLUMN_WIDTH;
 
 		descriptionLabelFormData.top = new FormAttachment(lookupControl, 0, SWT.CENTER);
-		descriptionLabelFormData.left = new FormAttachment(lookupControl, 0, SWT.RIGHT);
+		descriptionLabelFormData.left = new FormAttachment(lookupControl, FieldUtil.UNIT_GAP, SWT.RIGHT); // etwas Abstand zw. LookupWidget und Text
 		if (field.getNumberColumnsSpanned() == 4) {
 			descriptionLabelFormData.width = FieldUtil.MARGIN_LEFT * 2 + FieldUtil.COLUMN_WIDTH * 2;
 		} else {
