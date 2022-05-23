@@ -1263,7 +1263,7 @@ public class WFCDetailCASRequestsUtil {
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
 
 		// Zwischengespeicherten Wert wieder eintragen
-		paramStringFields.stream().forEach(f -> f.setValue(new Value(f.getChacheValue().getStringValue() + " "), false));
+		paramStringFields.stream().forEach(f -> f.setValue(new Value(f.getCacheValue().getStringValue() + " "), false));
 
 		section.requestLayout();
 		section.style();
