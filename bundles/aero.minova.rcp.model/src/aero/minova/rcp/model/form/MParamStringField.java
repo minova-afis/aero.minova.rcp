@@ -23,6 +23,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 	private List<MField> subMFields;
 	private List<Field> subFields;
 	private Locale locale;
+	private Value cacheValue;
 
 	public List<MField> getSubMFields() {
 		return subMFields;
@@ -57,6 +58,8 @@ public class MParamStringField extends MField implements ValueChangeListener {
 	public void setValue(Value value, boolean user) {
 		super.setValue(value, user);
 
+		cacheValue = value;
+
 		// Alle Unterfelder leeren
 		if (value == null || value.getStringValue() == null) {
 			for (MField subMField : subMFields) {
@@ -69,9 +72,12 @@ public class MParamStringField extends MField implements ValueChangeListener {
 		List<Value> values = ParamStringUtil.convertStringParameterToValues(value.getStringValue(), locale);
 
 		// Unterfelder füllen
-		for (int i = 0; i < subMFields.size(); i++) {
-			System.out.println("Setting " + subMFields.get(i).getLabel() + " " + values.get(i));
-			subMFields.get(i).setValue(values.get(i), false);
+		try {
+			for (int i = 0; i < subMFields.size(); i++) {
+				subMFields.get(i).setValue(values.get(i), false);
+			}
+		} catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+			// Wenn gerade ein neuer Datensatz geladen wurde passen die Werte und Felder evtl nicht zusammen
 		}
 	}
 
@@ -94,7 +100,15 @@ public class MParamStringField extends MField implements ValueChangeListener {
 		if (evt.isUser()) {
 			this.setValue(getValue(), false);
 		}
+	}
 
+	/**
+	 * Liefert den zuletzt durch setValue() gesetzten Wert zurück (ohne die Unterfelder zu beachten)
+	 * 
+	 * @return
+	 */
+	public Value getCacheValue() {
+		return cacheValue;
 	}
 
 }
