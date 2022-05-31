@@ -5,7 +5,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -48,7 +48,7 @@ public class LabelTextField {
 		fd.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		fd.left = new FormAttachment((column == 0) ? 0 : 50);
 
-		if ((field.getNumberColumnsSpanned() > 2 && field.isFillToRight()) || field.isFillHorizontal() || column >= 2) {
+		if (field.getNumberColumnsSpanned() > 2 || field.isFillHorizontal() || column >= 2) {
 			fd.right = new FormAttachment(100, -MARGIN_BORDER);
 		} else {
 			fd.right = new FormAttachment(50, -ICssStyler.CSS_SECTION_SPACING);
