@@ -21,16 +21,6 @@ public class FieldUtil {
 		COLUMN_HEIGHT = size.y + 20;
 		COLUMN_WIDTH = size.x + 80;
 
-		text.setText("00:00 am");
-		shell.layout();
-		size = text.getSize();
-		SHORT_TIME_WIDTH = size.x + 5;
-
-		text.setText("12.12.2020 22:55 am");
-		shell.layout();
-		size = text.getSize();
-		DATE_TIME_WIDTH = size.x + 5;
-
 		text.setText("25.März.2024");
 		shell.layout();
 		size = text.getSize();
@@ -55,8 +45,6 @@ public class FieldUtil {
 	public static final int TEXT_WIDTH = COLUMN_WIDTH;
 	public static final int NUMBER_WIDTH = COLUMN_WIDTH - 75; // war 104
 	public static final int SHORT_DATE_WIDTH; // war 88
-	public static final int DATE_TIME_WIDTH; //
-	public static final int SHORT_TIME_WIDTH; // war 52
 	public static final int MARGIN_LEFT = 5;
 	public static final int MARGIN_TOP = 5;
 	public static final int MARGIN_BORDER = 2;
