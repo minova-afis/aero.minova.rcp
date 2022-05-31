@@ -25,8 +25,17 @@ public class LabelTextField {
 		throw new IllegalStateException("Utility class");
 	}
 
+	public static Control createBold(Composite composite, MField field, int row, int column, MPerspective perspective) {
+
+		return createLabel(composite, field, row, column, true);
+	}
+
 	public static Control create(Composite composite, MField field, int row, int column, MPerspective perspective) {
 
+		return createLabel(composite, field, row, column, true);
+	}
+
+	public static Label createLabel(Composite composite, MField field, int row, int column, boolean bold) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 
 		int style = SWT.BORDER;
@@ -37,8 +46,14 @@ public class LabelTextField {
 
 		style |= SWT.LEFT;
 		Label label = LabelFactory.newLabel(style).text(labelText).create(composite);
-		CssData cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
-				field.isFillToRight() || field.isFillHorizontal());
+		CssData cssData;
+		if (bold) {
+			cssData = new CssData(CssType.LABEL_TEXT_BOLD_FIELD, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+					field.isFillToRight() || field.isFillHorizontal());
+		} else {
+			cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+					field.isFillToRight() || field.isFillHorizontal());
+		}
 		label.setData(CssData.CSSDATA_KEY, cssData);
 
 		label.setData(TRANSLATE_PROPERTY, labelText);
@@ -55,7 +70,6 @@ public class LabelTextField {
 		}
 
 		label.setLayoutData(fd);
-
 		return label;
 	}
 }

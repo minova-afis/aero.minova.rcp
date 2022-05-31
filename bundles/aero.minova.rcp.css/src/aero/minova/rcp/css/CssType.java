@@ -39,5 +39,9 @@ public enum CssType {
 	/**
 	 * Label Text Felder
 	 */
-	LABEL_TEXT_FIELD;
+	LABEL_TEXT_FIELD,
+	/**
+	 * Label Text Felder FETT
+	 */
+	LABEL_TEXT_BOLD_FIELD;
 }

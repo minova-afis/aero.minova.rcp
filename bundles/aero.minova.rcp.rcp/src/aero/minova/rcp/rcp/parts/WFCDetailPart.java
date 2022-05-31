@@ -1122,7 +1122,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(composite, field, row, column, mPerspective);
 		} else if (field instanceof MLabelText) {
-			LabelTextField.create(composite, field, row, column, mPerspective);
+			LabelTextField.createBold(composite, field, row, column, mPerspective);
 		}
 	}
 

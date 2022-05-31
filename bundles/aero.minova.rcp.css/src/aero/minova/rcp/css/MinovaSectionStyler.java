@@ -120,6 +120,9 @@ public class MinovaSectionStyler implements ICssStyler {
 			case LABEL_TEXT_FIELD:
 				styleLabelTextField(fd, cd);
 				break;
+			case LABEL_TEXT_BOLD_FIELD:
+				styleLabelTextBoldField(fd, cd);
+				break;
 			case LABEL:
 			default:
 				styleLabel(fd, cd);
@@ -129,6 +132,11 @@ public class MinovaSectionStyler implements ICssStyler {
 	}
 
 	private void styleLabelTextField(FormData fd, CssData cd) {
+		fd.right.offset = sectionSpacing * -1;
+		fd.top.offset = cd.row * rowHeight;
+	}
+
+	private void styleLabelTextBoldField(FormData fd, CssData cd) {
 		fd.right.offset = sectionSpacing * -1;
 		fd.top.offset = cd.row * rowHeight;
 	}
