@@ -133,10 +133,8 @@ public class MinovaSectionStyler implements ICssStyler {
 		fd.top.offset = cd.row * rowHeight;
 	}
 
-
 	private void styleLabel(FormData fd, CssData cd) {
 		fd.right.offset = sectionSpacing * -1;
-		// fd.top.offset = cd.row * rowHeight;
 	}
 
 	private void styleDateField(FormData fd, CssData cd) {
