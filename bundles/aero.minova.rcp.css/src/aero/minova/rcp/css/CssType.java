@@ -35,5 +35,9 @@ public enum CssType {
 	/**
 	 * Zeitfelder
 	 */
-	TIME_FIELD;
+	TIME_FIELD,
+	/**
+	 * Label Text Felder
+	 */
+	LABEL_TEXT_FIELD;
 }

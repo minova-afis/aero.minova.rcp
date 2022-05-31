@@ -1,8 +1,6 @@
 package aero.minova.rcp.rcp.fields;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
 
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
@@ -36,12 +34,12 @@ public class LabelTextField {
 
 		style |= SWT.LEFT;
 		Label label = LabelFactory.newLabel(style).text(labelText).create(composite);
-		CssData cssData = new CssData(CssType.LABEL, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+		CssData cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
 				field.isFillToRight() || field.isFillHorizontal());
 		label.setData(CssData.CSSDATA_KEY, cssData);
 
 		FormData fd = new FormData();
-		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
+		fd.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		fd.left = new FormAttachment((column == 0) ? 0 : 50);
 
 		if ((field.getNumberColumnsSpanned() > 2 && field.isFillToRight()) || field.isFillHorizontal() || column >= 2) {
