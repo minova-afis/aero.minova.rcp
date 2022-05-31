@@ -1,8 +1,11 @@
 package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
+import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -37,6 +40,9 @@ public class LabelTextField {
 		CssData cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
 				field.isFillToRight() || field.isFillHorizontal());
 		label.setData(CssData.CSSDATA_KEY, cssData);
+
+		label.setData(TRANSLATE_PROPERTY, labelText);
+		label.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "Description");
 
 		FormData fd = new FormData();
 		fd.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
