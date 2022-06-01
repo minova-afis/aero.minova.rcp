@@ -51,6 +51,7 @@ public abstract class MField {
 	private boolean canBeValid = true;
 	private boolean primary = false;
 	private boolean keyTypeUser = false;
+	private boolean labelText;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -65,7 +66,7 @@ public abstract class MField {
 			this.dataType = DataType.INTEGER;
 		}
 	}
-	
+
 	protected MField(int decimals, DataType dataType) {
 		this.decimals = decimals;
 		this.dataType = dataType;
@@ -457,5 +458,13 @@ public abstract class MField {
 
 	public void setKeyTypeUser(boolean keyTypeUser) {
 		this.keyTypeUser = keyTypeUser;
+	}
+
+	public boolean isLabelText() {
+		return labelText;
+	}
+
+	public void setLabelText(boolean b) {
+		labelText = b;
 	}
 }

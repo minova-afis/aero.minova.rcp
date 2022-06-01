@@ -341,6 +341,7 @@
 				<xs:element name="void" />
 				<xs:element name="boolean" type="boolean" />
 				<xs:element name="color" type="color" />
+				<xs:element name="label-text"/>
 			</xs:choice>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="msg">
 				<xs:complexType>

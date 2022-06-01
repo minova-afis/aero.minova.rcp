@@ -27,6 +27,9 @@ public class ModelToViewModel {
 		if (field.getTabIndex() != null) {
 			f.setTabIndex(field.getTabIndex().intValue());
 		}
+		if (field.getLabelText() != null) {
+			f.setLabelText(true);
+		}
 
 		f.setPrimary(KeyType.PRIMARY.toString().equalsIgnoreCase(field.getKeyType()));
 		f.setKeyTypeUser(KeyType.USER.toString().equalsIgnoreCase(field.getKeyType()));
@@ -96,6 +99,13 @@ public class ModelToViewModel {
 			f.setFillToRight("toright".equals(field.getFill()));
 			f.setFillHorizontal("horizontal".equals(field.getFill()));
 			f.setMaxTextLength(field.getText().getLength());
+			return f;
+		}
+
+		if (field.getLabelText() != null) {
+			MField f = new MLabelText();
+			f.setFillToRight("toright".equals(field.getFill()));
+			f.setFillHorizontal("horizontal".equals(field.getFill()));
 			return f;
 		}
 
