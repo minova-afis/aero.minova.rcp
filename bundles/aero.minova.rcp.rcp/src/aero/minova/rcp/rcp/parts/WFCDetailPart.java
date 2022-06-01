@@ -612,9 +612,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	}
 
 	private void minimizeSection(MinovaSection section) {
+		Image image = section.getImageLink().getImage();
+		if (image == null) {
+			return;
+		}
+
 		section.setVisible(false);
 		section.setMinimized(true);
-		Image image = section.getImageLink().getImage();
 		Control textClient = headSection.getTextClient();
 		ToolBar bar = (ToolBar) textClient;
 		ToolItem tItem = new ToolItem(bar, SWT.PUSH);
