@@ -145,6 +145,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "weekDay",
     "editor",
     "money",
+    "radioBoolean",
     "paramString",
     "_void",
     "_boolean",
@@ -182,6 +183,8 @@ public class Field {
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
     protected String label;
+    @XmlAttribute(name = "radio-boolean")
+    protected int radioBoolean;
     @XmlAttribute(name = "tab-index")
     protected BigInteger tabIndex;
     @XmlAttribute(name = "name", required = true)
@@ -678,8 +681,32 @@ public class Field {
     public void setLabel(String value) {
         this.label = value;
     }
+    
+    /**
+     * Ruft den Wert der radiobox-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public int getRadioBoolean() {
+		return radioBoolean;
+	}
 
     /**
+     * Legt den Wert der radiobox-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link int }
+     *     
+     */
+	public void setRadioBoolean(int value) {
+		this.radioBoolean = value;
+	}
+
+	/**
      * Ruft den Wert der tabIndex-Eigenschaft ab.
      * 
      * @return

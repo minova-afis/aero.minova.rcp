@@ -98,7 +98,7 @@ public class ModelToViewModel {
 			f.setMaxTextLength(field.getText().getLength());
 			return f;
 		}
-
+		
 		if (field.getParamString() != null) {
 			MParamStringField f = new MParamStringField(locale);
 			f.setSubFields(field.getParamString().getField());

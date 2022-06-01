@@ -110,6 +110,7 @@ import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MRadioBooleanField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
@@ -126,6 +127,7 @@ import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.RadioBooleanField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
@@ -1119,6 +1121,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			LookupField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(composite, field, row, column, mPerspective);
+		} else if (field instanceof MRadioBooleanField) {
+			RadioBooleanField.create(composite, field, row, column, locale, mPerspective);
 		}
 	}
 
