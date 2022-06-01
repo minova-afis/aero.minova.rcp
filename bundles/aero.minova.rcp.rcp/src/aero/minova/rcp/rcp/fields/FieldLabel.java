@@ -37,4 +37,5 @@ public abstract class FieldLabel {
 		CssData cssData = new CssData(CssType.LABEL, column, row, 1, numberRowsSpanned, false);
 		label.setData(CssData.CSSDATA_KEY, cssData);
 	}
+
 }

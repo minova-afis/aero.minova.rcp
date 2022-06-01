@@ -26,27 +26,27 @@
                        <label row="measured-before-row"></label> 
                     </column>
                     <column>
-                        <field name="measured-level-before" text="@MeasurementDate">
+                        <field name="measured-level-before" text="@MeasurementDate" sql-index="-1">
                             <number decimals="0"/>
                         </field> 
                     </column>
                     <column>
-                        <field name="measured-date-before" text="@MeasurementDate">
+                        <field name="measured-date-before" text="@MeasurementDate" sql-index="-1">
                             <date-time></date-time>
                         </field> 
                     </column>
                     <column>
-                        <field name="measure-ambient-volume-before" text="@MeasurementDate">
+                        <field name="measure-ambient-volume-before" text="@MeasurementDate" sql-index="-1">
                             <number decimals="0"/>
                         </field> 
                     </column>
                     <column>
-                        <field name="measure-standard-volume-before" text="@MeasurementDate">
+                        <field name="measure-standard-volume-before" text="@MeasurementDate" sql-index="-1">
                             <number decimals="0"/>
                         </field> 
                     </column>
                     <column>
-                        <field name="measure-weight-before" text="@MeasurementDate">
+                        <field name="measure-weight-before" text="@MeasurementDate" sql-index="-1">
                             <number decimals="0"/>
                         </field> 
                     </column>

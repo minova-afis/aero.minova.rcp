@@ -12,7 +12,7 @@ import aero.minova.rcp.css.widgets.MinovaSectionData;
 
 /**
  * Diese Klasse kann MinovaSections stylen.
- * 
+ *
  * @author Wilfried Saak
  */
 public class MinovaSectionStyler implements ICssStyler {
@@ -39,7 +39,7 @@ public class MinovaSectionStyler implements ICssStyler {
 
 	/**
 	 * Liefert eine Liste mit allen Controls der Section, die auch über {@link CssData} verfügen.
-	 * 
+	 *
 	 * @return Liste mit den Controls, die über {@link CssData} verfügen.
 	 */
 	private List<Control> getStylableControls() {
@@ -68,7 +68,7 @@ public class MinovaSectionStyler implements ICssStyler {
 	 * Liefert den Abstand von 2 Elementen in einer MinovaSection mit max. 4 Spalten. Dieser Abstand wird zwischen den Spalten, am Anfang und am Ende
 	 * eingehalten. Daraus ergibt sich eine Gesamtebreite der {@link MinovaSectionStyler#section} von<br/>
 	 * 5 * {@link #sectionSpacing} + 4 * {@link #textWidth}
-	 * 
+	 *
 	 * @return Horizontaler Abstand zwischen 2 Elementen in px
 	 */
 	@Override
@@ -117,12 +117,28 @@ public class MinovaSectionStyler implements ICssStyler {
 			case DATE_TIME_FIELD:
 				styleDateTimeField(fd, cd);
 				break;
+			case LABEL_TEXT_FIELD:
+				styleLabelTextField(fd, cd);
+				break;
+			case LABEL_TEXT_BOLD_FIELD:
+				styleLabelTextBoldField(fd, cd);
+				break;
 			case LABEL:
 			default:
 				styleLabel(fd, cd);
 				break;
 			}
 		}
+	}
+
+	private void styleLabelTextField(FormData fd, CssData cd) {
+		fd.right.offset = sectionSpacing * -1;
+		fd.top.offset = cd.row * rowHeight;
+	}
+
+	private void styleLabelTextBoldField(FormData fd, CssData cd) {
+		fd.right.offset = sectionSpacing * -1;
+		fd.top.offset = cd.row * rowHeight;
 	}
 
 	private void styleLabel(FormData fd, CssData cd) {
@@ -140,8 +156,9 @@ public class MinovaSectionStyler implements ICssStyler {
 	}
 
 	private void styleTextField(FormData fd, CssData cd) {
-		if (cd == null)
+		if (cd == null) {
 			return;
+		}
 
 		// Top
 		fd.top.offset = cd.row * rowHeight;
@@ -164,8 +181,9 @@ public class MinovaSectionStyler implements ICssStyler {
 	}
 
 	private void styleTimeField(FormData fd, CssData cd) {
-		if (cd == null)
+		if (cd == null) {
 			return;
+		}
 
 		// Top
 		fd.top.offset = cd.row * rowHeight;

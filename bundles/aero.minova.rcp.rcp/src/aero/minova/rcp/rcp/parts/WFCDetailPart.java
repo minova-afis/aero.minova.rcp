@@ -107,6 +107,7 @@ import aero.minova.rcp.model.form.MDateTimeField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
+import aero.minova.rcp.model.form.MLabelText;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MParamStringField;
@@ -125,6 +126,7 @@ import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.FieldUtil;
+import aero.minova.rcp.rcp.fields.LabelTextField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
 import aero.minova.rcp.rcp.fields.RadioBooleanField;
@@ -750,7 +752,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	/**
 	 * Füllt das Item mit den Werten aus dem Knopf (Text, Tooptip, Icon) und fügt den Onclick Listener hinzu, wenn in der Maske definiert
-	 * 
+	 *
 	 * @param item
 	 * @param btn
 	 */
@@ -864,7 +866,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	/**
 	 * Füllt das handledItem mit den Werten aus dem Knopf (Text, Tooptip, Icon), fügt den Command (und damit den Handler) sowie die benötigten Parameter hinzu
-	 * 
+	 *
 	 * @param handledItem
 	 * @param btn
 	 */
@@ -1123,6 +1125,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			TextField.create(composite, field, row, column, mPerspective);
 		} else if (field instanceof MRadioBooleanField) {
 			RadioBooleanField.create(composite, field, row, column, locale, mPerspective);
+		} else if (field instanceof MLabelText) {
+			LabelTextField.createBold(composite, field, row, column, mPerspective);
 		}
 	}
 
@@ -1169,7 +1173,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	/**
 	 * True wenn es Änderungen gab, False ansonsten
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean getDirtyFlag() {
