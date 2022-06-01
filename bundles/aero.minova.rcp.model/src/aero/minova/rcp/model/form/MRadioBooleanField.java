@@ -5,7 +5,7 @@ import aero.minova.rcp.model.DataType;
 public class MRadioBooleanField extends MField{
 
 	protected MRadioBooleanField() {
-		super(DataType.INTEGER);
+		super(DataType.STRING);
 	}
 
 }

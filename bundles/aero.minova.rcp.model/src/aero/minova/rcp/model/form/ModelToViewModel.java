@@ -101,11 +101,16 @@ public class ModelToViewModel {
 			f.setMaxTextLength(field.getText().getLength());
 			return f;
 		}
-		
+
 		if (field.getLabelText() != null) {
 			MField f = new MLabelText();
 			f.setFillToRight("toright".equals(field.getFill()));
 			f.setFillHorizontal("horizontal".equals(field.getFill()));
+			return f;
+		}
+
+		if (field.getRadiobox() != null) {
+			MField f = new MRadioBooleanField();
 			return f;
 		}
 

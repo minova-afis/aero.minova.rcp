@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;element name="boolean" type="{}boolean"/&gt;
  *           &lt;element name="color" type="{}color"/&gt;
  *           &lt;element name="label-text" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
+ *           &lt;element name="radiobox" type="{}radiobox-element"/&gt;
  *         &lt;/choice&gt;
  *         &lt;element name="msg" maxOccurs="unbounded" minOccurs="0"&gt;
  *           &lt;complexType&gt;
@@ -146,12 +147,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "weekDay",
     "editor",
     "money",
-    "radioBoolean",
     "paramString",
     "_void",
     "_boolean",
     "color",
     "labelText",
+    "radiobox",
     "msg"
 })
 public class Field {
@@ -184,11 +185,10 @@ public class Field {
     protected Color color;
     @XmlElement(name = "label-text")
     protected Object labelText;
+    protected RadioboxElement radiobox;
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
     protected String label;
-    @XmlAttribute(name = "radio-boolean")
-    protected int radioBoolean;
     @XmlAttribute(name = "tab-index")
     protected BigInteger tabIndex;
     @XmlAttribute(name = "name", required = true)
@@ -658,6 +658,30 @@ public class Field {
     }
 
     /**
+     * Ruft den Wert der radiobox-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link RadioboxElement }
+     *     
+     */
+    public RadioboxElement getRadiobox() {
+        return radiobox;
+    }
+
+    /**
+     * Legt den Wert der radiobox-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link RadioboxElement }
+     *     
+     */
+    public void setRadiobox(RadioboxElement value) {
+        this.radiobox = value;
+    }
+
+    /**
      * Gets the value of the msg property.
      * 
      * <p>
@@ -709,32 +733,8 @@ public class Field {
     public void setLabel(String value) {
         this.label = value;
     }
-    
-    /**
-     * Ruft den Wert der radiobox-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public int getRadioBoolean() {
-		return radioBoolean;
-	}
 
     /**
-     * Legt den Wert der radiobox-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link int }
-     *     
-     */
-	public void setRadioBoolean(int value) {
-		this.radioBoolean = value;
-	}
-
-	/**
      * Ruft den Wert der tabIndex-Eigenschaft ab.
      * 
      * @return

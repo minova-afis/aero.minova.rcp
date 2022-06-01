@@ -261,6 +261,22 @@
 		<xs:attribute name="min-value" type="xs:float" use="optional" />
 		<xs:attribute name="max-value" type="xs:float" use="optional" />
 	</xs:complexType>
+	<xs:complexType name="radiobox">
+		<xs:attribute name="text" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:appinfo>
+					<jxb:property name="label" />
+				</xs:appinfo>
+				<xs:documentation>
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Dieser Name sollte immer mit '@' beginnen.
+						Dann wird der Name in den Messages
+						nachgeschlagen.
+					</p>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="name" type="xs:ID" use="required" />
+	</xs:complexType>
 	<xs:complexType name="bignumber">
 		<xs:attribute default="0" name="decimals" use="optional">
 			<xs:simpleType>
@@ -342,6 +358,7 @@
 				<xs:element name="boolean" type="boolean" />
 				<xs:element name="color" type="color" />
 				<xs:element name="label-text"/>
+				<xs:element name="radiobox" type="radiobox-element"/>
 			</xs:choice>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="msg">
 				<xs:complexType>
@@ -660,6 +677,11 @@
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="onclick" type="onclick" />
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="onbinder" type="onbinder" />
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="value-change" type="value-change" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="radiobox-element">
+	<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="2" name="radio" type="radiobox"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="page">
