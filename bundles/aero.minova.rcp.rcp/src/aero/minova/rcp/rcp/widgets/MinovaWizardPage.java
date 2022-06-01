@@ -249,6 +249,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 		if (c != null) {
 			c.addListener(SWT.KeyDown, createKeyListener(mField));
+			c.addListener(SWT.FocusOut, createKeyListener(mField));
 		}
 
 		return c;
@@ -270,6 +271,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	protected Control createUILookupField(MField mField, Composite composite, int row, int column) {
 		Control c = LookupField.create(composite, mField, row, column, locale, mPerspective);
 		c.addListener(SWT.KeyDown, createKeyListener(mField));
+		c.addListener(SWT.FocusOut, createKeyListener(mField));
 		return c;
 	}
 
