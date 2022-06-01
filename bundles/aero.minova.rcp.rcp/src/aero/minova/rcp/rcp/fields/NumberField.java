@@ -66,7 +66,7 @@ public class NumberField {
 		textFormData.width = NUMBER_WIDTH;
 
 		unitFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		unitFormData.left = new FormAttachment(text, 0, SWT.RIGHT);
+		unitFormData.left = new FormAttachment(text, FieldUtil.UNIT_GAP, SWT.RIGHT);  // etwas Abstand zw. NumberField und Unit
 		unitFormData.right = new FormAttachment((column == 0) ? 50 : 100);
 
 		Integer decimals = field.getDecimals();

@@ -115,7 +115,7 @@ public class PreferenceWindowModel {
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.FONT_ICON_SIZE, translationService.translate("@Preferences.FontSize", null), null, 0.1,
 				DisplayType.COMBO, "M", "S", "M", "L", "XL"));
-		psd = new PreferenceSectionDescriptor("Fromatting", translationService.translate("@Preferences.Formatting", null), 0.3);
+		psd = new PreferenceSectionDescriptor("Formatting", translationService.translate("@Preferences.Formatting", null), 0.3);
 		ptd.add(psd);
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.DATE_UTIL, translationService.translate("@Preferences.DateUtilPattern", null), null, 0.1,
 				DisplayType.DATE_UTIL, ""));

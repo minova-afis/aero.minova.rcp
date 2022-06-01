@@ -30,7 +30,7 @@ public class FieldUtil {
 	public static final String TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
 	public static final String TRANSLATE_LOCALE = "aero.minova.rcp.translate.locale";
 	/**
-	 * Anzahl der Nachkommastellen be Zahlen. Ist der Wert > 0 handelt es automatisch im einen Double.
+	 * Anzahl der Nachkommastellen bei Zahlen. Ist der Wert > 0, handelt es automatisch im einen Double.
 	 */
 	public static final String FIELD_DECIMALS = "aero.minova.rcp.field.decimals";
 	public static final String FIELD_MAX_VALUE = "aero.minova.rcp.field.maximum";
@@ -48,6 +48,14 @@ public class FieldUtil {
 	public static final int MARGIN_LEFT = 5;
 	public static final int MARGIN_TOP = 5;
 	public static final int MARGIN_BORDER = 2;
+
+	/**
+	 * Lücke zwischen<ol>
+	 *     <li>NumberField und Unit {@link NumberField} </li>
+	 *     <li>LookupWidget und AusgabeText {@link LookupField}</li>
+	 * </ol>
+	 */
+	public static final int UNIT_GAP = 5;
 
 	private FieldUtil() {}
 
