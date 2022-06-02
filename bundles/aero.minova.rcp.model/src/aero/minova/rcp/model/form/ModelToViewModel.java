@@ -26,6 +26,11 @@ public class ModelToViewModel {
 		if (field.getNumberRowsSpanned() != null) {
 			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
 		}
+		if (f instanceof MRadioField) {
+			// Höhe immer +1 weil
+			f.setNumberRowsSpanned((int) Math.ceil((double) ((MRadioField) f).getRadiobuttons().size() / 4) + 1);
+			f.setNumberColumnsSpanned(4);
+		}
 		if (field.getTabIndex() != null) {
 			f.setTabIndex(field.getTabIndex().intValue());
 		}
