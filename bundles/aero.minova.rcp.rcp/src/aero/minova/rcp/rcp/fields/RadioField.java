@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Label;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MBooleanField;
@@ -72,12 +73,12 @@ public class RadioField {
 		fdG.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		comp.setLayoutData(fdG);
 
-		CssData cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row + 1, 4, 1, true);
+		CssData cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row + 1, 4, (int) Math.ceil((double) radioField.getRadiobuttons().size() / 4), true);
 		comp.setData(CssData.CSSDATA_KEY, cssData);
 
 		for (MBooleanField b : radioField.getRadiobuttons()) {
 			String optionLabel = b.getLabel();
-
+			double indexInList = radioField.getRadiobuttons().indexOf(b);
 			Button button = ButtonFactory.newButton(SWT.RADIO).text(optionLabel).create(comp);
 
 			// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
@@ -87,8 +88,8 @@ public class RadioField {
 			b.setValueAccessor(valueAccessor);
 
 			FormData fd = new FormData();
-			fd.top = new FormAttachment(comp, 0);
-			fd.left = new FormAttachment(radioField.getRadiobuttons().indexOf(b) * 25);
+			fd.top = new FormAttachment(comp, (int) Math.floor(indexInList / 4) * ICssStyler.CSS_ROW_HEIGHT);
+			fd.left = new FormAttachment((int) ((indexInList * 25) % 100));
 			button.setLayoutData(fd);
 
 			button.setData(TRANSLATE_PROPERTY, optionLabel);
