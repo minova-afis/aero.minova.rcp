@@ -142,11 +142,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Radiobox }
+     * Create an instance of {@link Radio }
      * 
      */
-    public Radiobox createRadiobox() {
-        return new Radiobox();
+    public Radio createRadio() {
+        return new Radio();
     }
 
     /**
@@ -254,11 +254,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RadioboxElement }
+     * Create an instance of {@link Radiobox }
      * 
      */
-    public RadioboxElement createRadioboxElement() {
-        return new RadioboxElement();
+    public Radiobox createRadiobox() {
+        return new Radiobox();
     }
 
     /**

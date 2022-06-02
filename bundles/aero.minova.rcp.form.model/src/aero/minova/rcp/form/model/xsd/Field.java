@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;element name="boolean" type="{}boolean"/&gt;
  *           &lt;element name="color" type="{}color"/&gt;
  *           &lt;element name="label-text" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
- *           &lt;element name="radiobox" type="{}radiobox-element"/&gt;
+ *           &lt;element name="radiobox" type="{}radiobox"/&gt;
  *         &lt;/choice&gt;
  *         &lt;element name="msg" maxOccurs="unbounded" minOccurs="0"&gt;
  *           &lt;complexType&gt;
@@ -185,7 +185,7 @@ public class Field {
     protected Color color;
     @XmlElement(name = "label-text")
     protected Object labelText;
-    protected RadioboxElement radiobox;
+    protected Radiobox radiobox;
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
     protected String label;
@@ -662,10 +662,10 @@ public class Field {
      * 
      * @return
      *     possible object is
-     *     {@link RadioboxElement }
+     *     {@link Radiobox }
      *     
      */
-    public RadioboxElement getRadiobox() {
+    public Radiobox getRadiobox() {
         return radiobox;
     }
 
@@ -674,10 +674,10 @@ public class Field {
      * 
      * @param value
      *     allowed object is
-     *     {@link RadioboxElement }
+     *     {@link Radiobox }
      *     
      */
-    public void setRadiobox(RadioboxElement value) {
+    public void setRadiobox(Radiobox value) {
         this.radiobox = value;
     }
 

@@ -261,7 +261,7 @@
 		<xs:attribute name="min-value" type="xs:float" use="optional" />
 		<xs:attribute name="max-value" type="xs:float" use="optional" />
 	</xs:complexType>
-	<xs:complexType name="radiobox">
+	<xs:complexType name="radio">
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:appinfo>
@@ -358,7 +358,7 @@
 				<xs:element name="boolean" type="boolean" />
 				<xs:element name="color" type="color" />
 				<xs:element name="label-text"/>
-				<xs:element name="radiobox" type="radiobox-element"/>
+				<xs:element name="radiobox" type="radiobox"/>
 			</xs:choice>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="msg">
 				<xs:complexType>
@@ -679,9 +679,9 @@
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="value-change" type="value-change" />
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="radiobox-element">
-	<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="2" name="radio" type="radiobox"/>
+	<xs:complexType name="radiobox">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="2" name="radio" type="radio"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="page">
