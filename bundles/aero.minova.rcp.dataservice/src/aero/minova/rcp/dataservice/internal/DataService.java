@@ -242,7 +242,7 @@ public class DataService implements IDataService {
 
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/index")) //
 				.header(CONTENT_TYPE, "application/json") //
-				.method("GET", BodyPublishers.ofString(body))//
+				.method("POST", BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
 
 		log("CAS Request Table:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), searchTable, false);
