@@ -108,7 +108,7 @@ public class MParamStringField extends MField implements ValueChangeListener {
 	 * @return
 	 */
 	public Value getCacheValue() {
-		return cacheValue;
+		return cacheValue != null ? cacheValue : new Value("");
 	}
 
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import aero.minova.rcp.form.model.xsd.Field;
-import aero.minova.rcp.form.model.xsd.Radiobox;
+import aero.minova.rcp.form.model.xsd.Radio;
 import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
@@ -112,18 +112,16 @@ public class ModelToViewModel {
 		}
 
 		if (field.getRadiobox() != null) {
-			MRadioBooleanField mRadioBooleanField = new MRadioBooleanField();
-			if (field.getRadiobox().getRadio().isEmpty()) {
-				ArrayList<MBooleanField> radiobuttons = new ArrayList<>();
-				for (Radiobox r : field.getRadiobox().getRadio()) {
-					MBooleanField b = new MBooleanField();
-					b.setLabel(r.getLabel());
-					b.setName(r.getName());
-					radiobuttons.add(b);
-				}
-				mRadioBooleanField.setRadiobuttons(radiobuttons);
+			MRadioField mRadioField = new MRadioField();
+			ArrayList<MBooleanField> radiobuttons = new ArrayList<>();
+			for (Radio r : field.getRadiobox().getRadio()) {
+				MBooleanField b = new MBooleanField();
+				b.setLabel(r.getLabel());
+				b.setName(r.getName());
+				radiobuttons.add(b);
 			}
-			return mRadioBooleanField;
+			mRadioField.setRadiobuttons(radiobuttons);
+			return mRadioField;
 		}
 
 		if (field.getParamString() != null) {
