@@ -56,8 +56,8 @@ public class RadioField {
 		fdL.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		label.setLayoutData(fdL);
 
-		CssData cssData2 = new CssData(CssType.LABEL_TEXT_FIELD, column, row, 4, 1, true);
-		label.setData(CssData.CSSDATA_KEY, cssData2);
+		CssData cssDataLabel = new CssData(CssType.LABEL_TEXT_FIELD, column, row, 4, 1, true);
+		label.setData(CssData.CSSDATA_KEY, cssDataLabel);
 
 		RadioValueAccessor rva = new RadioValueAccessor(radioField, label);
 		ContextInjectionFactory.inject(rva, perspective.getContext());
@@ -73,8 +73,9 @@ public class RadioField {
 		fdG.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		comp.setLayoutData(fdG);
 
-		CssData cssData = new CssData(CssType.LABEL_TEXT_FIELD, column, row + 1, 4, (int) Math.ceil((double) radioField.getRadiobuttons().size() / 4), true);
-		comp.setData(CssData.CSSDATA_KEY, cssData);
+		CssData cssDataComposite = new CssData(CssType.LABEL_TEXT_FIELD, column, row + 1, 4, (int) Math.ceil((double) radioField.getRadiobuttons().size() / 4),
+				true);
+		comp.setData(CssData.CSSDATA_KEY, cssDataComposite);
 
 		for (MBooleanField b : radioField.getRadiobuttons()) {
 			String optionLabel = b.getLabel();
