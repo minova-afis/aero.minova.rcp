@@ -1125,7 +1125,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			ShortTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MLookupField) {
 			LookupField.create(composite, field, row, column, locale, mPerspective);
-		} else if (field instanceof MTextField || field instanceof MParamStringField) {
+		} else if (field instanceof MTextField) {
 			TextField.create(composite, field, row, column, mPerspective);
 		} else if (field instanceof MRadioField) {
 			RadioField.create(composite, field, row, column, locale, mPerspective);

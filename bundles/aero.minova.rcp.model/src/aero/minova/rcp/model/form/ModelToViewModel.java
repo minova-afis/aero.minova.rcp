@@ -31,6 +31,10 @@ public class ModelToViewModel {
 			f.setNumberRowsSpanned((int) Math.ceil((double) ((MRadioField) f).getRadiobuttons().size() / 4) + 1);
 			f.setNumberColumnsSpanned(4);
 		}
+		if (f instanceof MParamStringField) {
+			// Param-String Felder werden nicht angezeigt
+			f.setNumberRowsSpanned(0);
+		}
 		if (field.getTabIndex() != null) {
 			f.setTabIndex(field.getTabIndex().intValue());
 		}
