@@ -27,7 +27,7 @@ public class ModelToViewModel {
 			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
 		}
 		if (f instanceof MRadioField) {
-			// Höhe immer +1 weil
+			// Höhe 1 (für Label) + Anzahl Knöpfe/4
 			f.setNumberRowsSpanned((int) Math.ceil((double) ((MRadioField) f).getRadiobuttons().size() / 4) + 1);
 			f.setNumberColumnsSpanned(4);
 		}
