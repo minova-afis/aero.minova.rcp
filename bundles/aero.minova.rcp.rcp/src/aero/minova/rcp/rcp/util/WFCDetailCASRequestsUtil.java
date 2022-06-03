@@ -666,8 +666,8 @@ public class WFCDetailCASRequestsUtil {
 	private String formatMessage(ErrorObject et) {
 		Table errorTable = et.getErrorTable();
 
-		if (errorTable == null) {
-			return "";
+		if (errorTable == null || errorTable.getRows().get(0).getValue(0) == null) {
+			return "Internal Server Error";
 		}
 
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
