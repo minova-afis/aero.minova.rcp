@@ -142,6 +142,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Radio }
+     * 
+     */
+    public Radio createRadio() {
+        return new Radio();
+    }
+
+    /**
      * Create an instance of {@link Bignumber }
      * 
      */
@@ -243,6 +251,14 @@ public class ObjectFactory {
      */
     public Label createLabel() {
         return new Label();
+    }
+
+    /**
+     * Create an instance of {@link Radiobox }
+     * 
+     */
+    public Radiobox createRadiobox() {
+        return new Radiobox();
     }
 
     /**

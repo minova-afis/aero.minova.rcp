@@ -1,8 +1,10 @@
 package aero.minova.rcp.model.form;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import aero.minova.rcp.form.model.xsd.Field;
+import aero.minova.rcp.form.model.xsd.Radio;
 import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
@@ -23,6 +25,11 @@ public class ModelToViewModel {
 		}
 		if (field.getNumberRowsSpanned() != null) {
 			f.setNumberRowsSpanned(Integer.parseInt(field.getNumberRowsSpanned()));
+		}
+		if (f instanceof MRadioField) {
+			// Höhe immer +1 weil
+			f.setNumberRowsSpanned((int) Math.ceil((double) ((MRadioField) f).getRadiobuttons().size() / 4) + 1);
+			f.setNumberColumnsSpanned(4);
 		}
 		if (field.getTabIndex() != null) {
 			f.setTabIndex(field.getTabIndex().intValue());
@@ -107,6 +114,19 @@ public class ModelToViewModel {
 			f.setFillToRight("toright".equals(field.getFill()));
 			f.setFillHorizontal("horizontal".equals(field.getFill()));
 			return f;
+		}
+
+		if (field.getRadiobox() != null) {
+			MRadioField mRadioField = new MRadioField();
+			ArrayList<MBooleanField> radiobuttons = new ArrayList<>();
+			for (Radio r : field.getRadiobox().getRadio()) {
+				MBooleanField b = new MBooleanField();
+				b.setLabel(r.getLabel());
+				b.setName(r.getName());
+				radiobuttons.add(b);
+			}
+			mRadioField.setRadiobuttons(radiobuttons);
+			return mRadioField;
 		}
 
 		if (field.getParamString() != null) {

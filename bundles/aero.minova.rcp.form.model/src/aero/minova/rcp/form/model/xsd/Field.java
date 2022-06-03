@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;element name="boolean" type="{}boolean"/&gt;
  *           &lt;element name="color" type="{}color"/&gt;
  *           &lt;element name="label-text" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
+ *           &lt;element name="radiobox" type="{}radiobox"/&gt;
  *         &lt;/choice&gt;
  *         &lt;element name="msg" maxOccurs="unbounded" minOccurs="0"&gt;
  *           &lt;complexType&gt;
@@ -151,6 +152,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "_boolean",
     "color",
     "labelText",
+    "radiobox",
     "msg"
 })
 public class Field {
@@ -183,6 +185,7 @@ public class Field {
     protected Color color;
     @XmlElement(name = "label-text")
     protected Object labelText;
+    protected Radiobox radiobox;
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
     protected String label;
@@ -652,6 +655,30 @@ public class Field {
      */
     public void setLabelText(Object value) {
         this.labelText = value;
+    }
+
+    /**
+     * Ruft den Wert der radiobox-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Radiobox }
+     *     
+     */
+    public Radiobox getRadiobox() {
+        return radiobox;
+    }
+
+    /**
+     * Legt den Wert der radiobox-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Radiobox }
+     *     
+     */
+    public void setRadiobox(Radiobox value) {
+        this.radiobox = value;
     }
 
     /**
