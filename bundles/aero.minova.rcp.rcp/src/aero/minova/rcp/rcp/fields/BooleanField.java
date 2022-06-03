@@ -1,8 +1,8 @@
 package aero.minova.rcp.rcp.fields;
 
 import static aero.minova.rcp.rcp.fields.FieldUtil.COLUMN_HEIGHT;
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
 import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_TOP;
-import static aero.minova.rcp.rcp.fields.FieldUtil.TEXT_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Control;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
@@ -47,7 +48,11 @@ public class BooleanField {
 		FormData fd = new FormData();
 		fd.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
 		fd.left = new FormAttachment((column == 0) ? 25 : 75);
-		fd.width = TEXT_WIDTH;
+		if (field.getNumberColumnsSpanned() > 2 || field.isFillHorizontal() || column >= 2) {
+			fd.right = new FormAttachment(100, -MARGIN_BORDER);
+		} else {
+			fd.right = new FormAttachment(50, -ICssStyler.CSS_SECTION_SPACING);
+		}
 		button.setLayoutData(fd);
 
 		button.setData(CssData.CSSDATA_KEY, new CssData(CssType.TEXT_FIELD, column + 1, row, 1, 1, false));
