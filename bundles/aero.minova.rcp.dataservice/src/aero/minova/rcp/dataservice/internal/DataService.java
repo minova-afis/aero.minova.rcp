@@ -342,6 +342,7 @@ public class DataService implements IDataService {
 
 	/**
 	 * Liefert true, wenn ein Fehler enthalten ist. Folgende möglichen Fehlermeldungen werden geprüft: <br>
+	 * - leerer/null body <br>
 	 * - SqlProcedureResult mit negativen Returncode <br>
 	 * - Table mit Namen Error <br>
 	 * - Serverantwort mit HTTP-Code >= 300 <br>
@@ -353,6 +354,10 @@ public class DataService implements IDataService {
 	private boolean checkForError(String body, String sourceName) {
 
 		ErrorObject e = null;
+
+		if (body == null || body.isBlank()) {
+			e = new ErrorObject(getDefaultError().getResultSet(), username, sourceName);
+		}
 
 		try {
 			SqlProcedureResult sqlResult = gson.fromJson(body, SqlProcedureResult.class);
@@ -410,19 +415,25 @@ public class DataService implements IDataService {
 
 		// fromJson null ist oder kein Resultset: Default Fehlermeldung
 		if (fromJson == null || fromJson.getResultSet() == null) {
-			Table error = new Table();
-			error.setName(ERROR);
-			error.addColumn(new Column("Message", DataType.STRING));
-			error.addRow(RowBuilder.newRow().withValue("msg.NoErrorMessageAvailable").create());
-			fromJson = new SqlProcedureResult();
-			fromJson.setResultSet(error);
-			fromJson.setReturnCode(-1);
+			fromJson = getDefaultError();
 		}
 
 		if (fromJson.getReturnCode() < 0 && fromJson.getResultSet() != null && ERROR.equals(fromJson.getResultSet().getName())) {
 			return new ErrorObject(fromJson.getResultSet(), username, procedureName);
 		}
 		return null;
+	}
+
+	private SqlProcedureResult getDefaultError() {
+		SqlProcedureResult fromJson;
+		Table error = new Table();
+		error.setName(ERROR);
+		error.addColumn(new Column("Message", DataType.STRING));
+		error.addRow(RowBuilder.newRow().withValue("msg.NoErrorMessageAvailable").create());
+		fromJson = new SqlProcedureResult();
+		fromJson.setResultSet(error);
+		fromJson.setReturnCode(-1);
+		return fromJson;
 	}
 
 	@Override
@@ -632,11 +643,12 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(response -> {
 			log("CAS Answer Server Hash for File:\n" + response.body());
-			if (response.statusCode() != 200) {
-				throw new RuntimeException("Server returned " + response.statusCode());
+			if (checkForError(response.body(), filename)) {
+				return null;
 			}
-			return response;
-		}).thenApply(HttpResponse::body);
+
+			return response.body();
+		});
 	}
 
 	@Override
