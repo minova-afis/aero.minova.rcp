@@ -643,11 +643,12 @@ public class DataService implements IDataService {
 
 		return sendRequest.thenApply(response -> {
 			log("CAS Answer Server Hash for File:\n" + response.body());
-			if (response.statusCode() != 200) {
-				throw new RuntimeException("Server returned " + response.statusCode());
+			if (checkForError(response.body(), filename)) {
+				return null;
 			}
-			return response;
-		}).thenApply(HttpResponse::body);
+
+			return response.body();
+		});
 	}
 
 	@Override
