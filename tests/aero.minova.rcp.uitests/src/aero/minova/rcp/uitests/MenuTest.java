@@ -39,6 +39,7 @@ import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
 
+@SuppressWarnings("restriction")
 @ExtendWith(SWTBotJunit5Extension.class)
 public class MenuTest {
 
@@ -69,7 +70,7 @@ public class MenuTest {
 		// Workspace-Ordner auslesen
 		SWTBotShell shell = bot.shell("Preferences");
 		assertNotNull(shell);
-		SWTBot childBot = new SWTBot(shell.widget);
+		SWTBot childBot = shell.bot();
 		SWTBotText currentWorkspaceText = childBot.text(1);
 		assertNotNull(currentWorkspaceText);
 		assertNotNull(currentWorkspaceText.getText());
