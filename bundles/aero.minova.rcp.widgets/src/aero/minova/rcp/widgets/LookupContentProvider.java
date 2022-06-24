@@ -64,8 +64,8 @@ public class LookupContentProvider {
 			}
 		}
 
-		// Groß- und Kleinschreibung ignorieren
-		result.sort(new SortIgnoreCase());
+		// Groß- und Kleinschreibung ignorieren, bei entry == Matchcode dieses Element an erste Stelle, siehe #1086
+		result.sort(new SortIgnoreCase(entry));
 		return result;
 	}
 
@@ -122,10 +122,24 @@ public class LookupContentProvider {
 	}
 
 	public class SortIgnoreCase implements Comparator<Object> {
+		private String entry;
+
+		public SortIgnoreCase(String entry) {
+			this.entry = entry;
+		}
+
 		@Override
 		public int compare(Object o1, Object o2) {
 			String s1 = ((LookupValue) o1).keyText;
 			String s2 = ((LookupValue) o2).keyText;
+
+			// Bei genauer Übereinstimmung des Matchcodes Element an erste Stelle setzten, siehe #1086
+			if (s1.equalsIgnoreCase(entry)) {
+				return -1;
+			} else if (s2.equalsIgnoreCase(entry)) {
+				return 1;
+			}
+
 			return s1.toLowerCase().compareTo(s2.toLowerCase());
 		}
 	}
