@@ -63,7 +63,7 @@ public class LookupComposite extends Composite {
 
 	@Inject
 	private TranslationService translationService;
-	
+
 	private long popupTime;
 
 	/**
@@ -189,8 +189,8 @@ public class LookupComposite extends Composite {
 				}
 			} else {
 				if (event.keyCode == SWT.ARROW_DOWN || ((event.stateMask & SWT.CTRL) != 0) && (event.keyCode == SWT.SPACE)) {
-				showAllElements(text.getText());
-			}
+					showAllElements(text.getText());
+				}
 			}
 		};
 	}
@@ -250,7 +250,7 @@ public class LookupComposite extends Composite {
 			popup.moveAbove(getShell());
 			popupTime = System.currentTimeMillis() + 250;
 		}
-		
+
 	}
 
 	/**
@@ -488,14 +488,12 @@ public class LookupComposite extends Composite {
 		MField field = (MField) getData(Constants.CONTROL_FIELD);
 		if (popup.isVisible() && table.getSelectionIndex() != -1) {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
-			text.setText(lv.keyText);
 			field.setValue(lv, true);
 		} else if (popup.isVisible()) {
 
 			// Zuerst versuchen, einen genauen Match auf den KeyText zu finden, siehe #1086
 			for (LookupValue lv : popupValues) {
 				if (lv.keyText.equalsIgnoreCase(text.getText())) {
-					text.setText(lv.keyText);
 					field.setValue(lv, true);
 					return;
 				}
@@ -503,7 +501,6 @@ public class LookupComposite extends Composite {
 
 			// Ansonsten ersten Wert eintragen
 			if (!popupValues.isEmpty()) {
-				text.setText(popupValues.get(0).keyText);
 				field.setValue(popupValues.get(0), true);
 			}
 		}
