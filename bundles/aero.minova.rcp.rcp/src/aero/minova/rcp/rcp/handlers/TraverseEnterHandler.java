@@ -152,7 +152,7 @@ public class TraverseEnterHandler {
 			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
 			((NatTable) focussedControl).commitAndCloseActiveCellEditor();
 		} else {
-			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getmSection().getSectionAccessor()).getSection();
+			fcSection = ((SectionAccessor) ((MField) control.getData(Constants.CONTROL_FIELD)).getMSection().getSectionAccessor()).getSection();
 		}
 
 		if (focussedControl instanceof LookupComposite) {
@@ -285,7 +285,7 @@ public class TraverseEnterHandler {
 			if (!(control instanceof NatTable)) {
 				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
 				if (field.getValue() == null && field.isRequired() && !field.isReadOnly()) {
-					Section section = ((SectionAccessor) field.getmSection().getSectionAccessor()).getSection();
+					Section section = ((SectionAccessor) field.getMSection().getSectionAccessor()).getSection();
 					// Prüfen, ob die Section in der das nächste Pflichtfeld sich befindet geschlossen ist
 					if (!section.isExpanded()) {
 						// Section öffnen

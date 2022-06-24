@@ -20,6 +20,7 @@ public class ModelToViewModel {
 		f.setSqlIndex(field.getSqlIndex().intValue());
 		f.setOriginalRequired(field.isRequired());
 		f.setOriginalReadOnly(field.isReadOnly());
+		f.setOriginalVisible(field.isVisible());
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 		}

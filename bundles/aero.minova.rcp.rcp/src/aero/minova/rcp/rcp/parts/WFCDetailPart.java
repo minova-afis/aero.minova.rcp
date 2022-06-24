@@ -216,7 +216,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		layoutForm(parent);
+		
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
+		ContextInjectionFactory.inject(mDetail.getDetailAccessor(), mPerspective.getContext()); // In Context, damit Injection verfügbar ist
+
 		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
 
 		// Label und Icon aus Maske setzten
@@ -1002,7 +1005,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 				String suffix = headOrPage.isOP ? headOrPage.formSuffix + "." : "";
 				MField mField = createMField(field, mSection, suffix);
-				if (field.isVisible()) {
+				if (mField.isVisible()) {
 					visibleMFields.add(mField);
 				}
 
@@ -1010,7 +1013,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					for (Field f : ((MParamStringField) mField).getSubFields()) {
 						MField subfield = createMField(f, mSection, suffix);
 						((MParamStringField) mField).addSubMField(subfield);
-						if (f.isVisible()) {
+						if (subfield.isVisible()) {
 							visibleMFields.add(subfield);
 						}
 					}
@@ -1049,9 +1052,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			f.setName(fieldName);
 
 			getDetail().putField(f);
+			f.setMSection(mSection);
 
 			if (field.isVisible()) {
-				f.setMSection(mSection);
 				mSection.addTabField(f);
 			}
 

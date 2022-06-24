@@ -39,11 +39,13 @@ public abstract class MField {
 	private String lookupDescription;
 	private List<String> lookupParameters;
 	private final DataType dataType;
-	private MDetail detail;
+	private MDetail mDetail;
 	private boolean originalRequired;
 	private boolean required;
 	private boolean originalReadOnly;
 	private boolean readOnly;
+	private boolean originalVisible;
+	private boolean visible;
 	private int tabIndex;
 	private MSection mSection;
 	private String cssClass = Constants.CSS_STANDARD;
@@ -306,11 +308,11 @@ public abstract class MField {
 	}
 
 	public MDetail getDetail() {
-		return detail;
+		return mDetail;
 	}
 
 	public void setDetail(MDetail detail) {
-		this.detail = detail;
+		this.mDetail = detail;
 	}
 
 	public void setOriginalRequired(boolean originalRequired) {
@@ -365,6 +367,53 @@ public abstract class MField {
 		setRequired(originalRequired);
 	}
 
+	/**
+	 * Ändert die Sichtbarkeit des Feldes. <br>
+	 * Die gesamte Section muss dafür neu gezeichnet werden, also möglichst sparsam einsetzten.
+	 * 
+	 * @param visible
+	 */
+	public void setVisible(boolean visible) {
+
+		// Wenn es keine Änderung gab nichts tun, um Resourcen zu sparen
+		if (this.visible == visible) {
+			return;
+		}
+
+		this.visible = visible;
+
+		// Section neu Zeichnen
+		if (mDetail != null && mDetail.getDetailAccessor() != null) {
+			mDetail.getDetailAccessor().redrawSection(mSection);
+		}
+
+		// Value Accessor entfernen, da das UI-Feld nicht mehr existiert
+		if (!visible) {
+			valueAccessor = null;
+		}
+
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setOriginalVisible(boolean originalVisible) {
+		this.originalVisible = originalVisible;
+		setVisible(originalVisible);
+	}
+
+	public boolean getOriginalVisible() {
+		return originalVisible;
+	}
+
+	/**
+	 * Setzt die Sichtbarkeit auf den in der Maske definierten Zustand
+	 */
+	public void resetVisibility() {
+		setVisible(originalVisible);
+	}
+
 	public int getTabIndex() {
 		return tabIndex;
 	}
@@ -373,7 +422,7 @@ public abstract class MField {
 		this.tabIndex = tabIndex;
 	}
 
-	public MSection getmSection() {
+	public MSection getMSection() {
 		return mSection;
 	}
 
