@@ -39,7 +39,7 @@ public abstract class MField {
 	private String lookupDescription;
 	private List<String> lookupParameters;
 	private final DataType dataType;
-	private MDetail detail;
+	private MDetail mDetail;
 	private boolean originalRequired;
 	private boolean required;
 	private boolean originalReadOnly;
@@ -308,11 +308,11 @@ public abstract class MField {
 	}
 
 	public MDetail getDetail() {
-		return detail;
+		return mDetail;
 	}
 
 	public void setDetail(MDetail detail) {
-		this.detail = detail;
+		this.mDetail = detail;
 	}
 
 	public void setOriginalRequired(boolean originalRequired) {
@@ -369,8 +369,8 @@ public abstract class MField {
 
 	public void setVisible(boolean visible) {
 		this.visible = visible;
-		if (detail != null && detail.getDetailAccessor() != null) {
-			detail.getDetailAccessor().redrawSection(mSection);
+		if (mDetail != null && mDetail.getDetailAccessor() != null) {
+			mDetail.getDetailAccessor().redrawSection(mSection);
 		}
 
 		if (!visible) {
