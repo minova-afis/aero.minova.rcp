@@ -44,6 +44,8 @@ public abstract class MField {
 	private boolean required;
 	private boolean originalReadOnly;
 	private boolean readOnly;
+	private boolean originalVisible;
+	private boolean visible;
 	private int tabIndex;
 	private MSection mSection;
 	private String cssClass = Constants.CSS_STANDARD;
@@ -365,6 +367,35 @@ public abstract class MField {
 		setRequired(originalRequired);
 	}
 
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+		if (detail != null && detail.getDetailAccessor() != null) {
+			detail.getDetailAccessor().redrawSection(mSection);
+		}
+
+		if (!visible) {
+			valueAccessor = null;
+		}
+
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public void setOriginalVisible(boolean originalVisible) {
+		this.originalVisible = originalVisible;
+		setVisible(originalVisible);
+	}
+
+	public boolean getOriginalVisible() {
+		return originalVisible;
+	}
+
+	public void resetVisibility() {
+		setVisible(originalVisible);
+	}
+
 	public int getTabIndex() {
 		return tabIndex;
 	}
@@ -373,7 +404,7 @@ public abstract class MField {
 		this.tabIndex = tabIndex;
 	}
 
-	public MSection getmSection() {
+	public MSection getMSection() {
 		return mSection;
 	}
 

@@ -1212,7 +1212,7 @@ public class WFCDetailCASRequestsUtil {
 		// SubFelder von Param-String Feldern entfernen
 		List<MField> toRemove = new ArrayList<>();
 		for (MField mField : mDetail.getFields()) {
-			if (mField instanceof MParamStringField && mField.getmSection().equals(mSection)) {
+			if (mField instanceof MParamStringField && mField.getMSection().equals(mSection)) {
 				toRemove.addAll(((MParamStringField) mField).getSubMFields());
 				((MParamStringField) mField).clearSubMFields();
 			}
@@ -1227,7 +1227,9 @@ public class WFCDetailCASRequestsUtil {
 		List<MParamStringField> paramStringFields = new ArrayList<>();
 		toTraverse.addAll(mSection.getTabList());
 		for (MField f : toTraverse) {
-			visibleMFields.add(f);
+			if (f.isVisible()) {
+				visibleMFields.add(f);
+			}
 
 			if (f instanceof MParamStringField) {
 				String name = f.getName();
@@ -1237,7 +1239,9 @@ public class WFCDetailCASRequestsUtil {
 				paramStringFields.add(mParamString);
 				for (Field subField : mParamString.getSubFields()) {
 					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
-					visibleMFields.add(subMField);
+					if (subMField.isVisible()) {
+						visibleMFields.add(subMField);
+					}
 					mParamString.addSubMField(subMField);
 				}
 			}
@@ -1300,7 +1304,7 @@ public class WFCDetailCASRequestsUtil {
 
 		mParamString.getSubFields().clear();
 		mParamString.getSubFields().addAll(subfields);
-		redrawSection(mParamString.getmSection());
+		redrawSection(mParamString.getMSection());
 	}
 
 	private void updateGridLookupValues() {
