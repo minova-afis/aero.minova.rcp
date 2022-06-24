@@ -367,12 +367,27 @@ public abstract class MField {
 		setRequired(originalRequired);
 	}
 
+	/**
+	 * Ändert die Sichtbarkeit des Feldes. <br>
+	 * Die gesamte Section muss dafür neu gezeichnet werden, also möglichst sparsam einsetzten.
+	 * 
+	 * @param visible
+	 */
 	public void setVisible(boolean visible) {
+
+		// Wenn es keine Änderung gab nichts tun, um Resourcen zu sparen
+		if (this.visible == visible) {
+			return;
+		}
+
 		this.visible = visible;
+
+		// Section neu Zeichnen
 		if (mDetail != null && mDetail.getDetailAccessor() != null) {
 			mDetail.getDetailAccessor().redrawSection(mSection);
 		}
 
+		// Value Accessor entfernen, da das UI-Feld nicht mehr existiert
 		if (!visible) {
 			valueAccessor = null;
 		}
@@ -392,6 +407,9 @@ public abstract class MField {
 		return originalVisible;
 	}
 
+	/**
+	 * Setzt die Sichtbarkeit auf den in der Maske definierten Zustand
+	 */
 	public void resetVisibility() {
 		setVisible(originalVisible);
 	}
