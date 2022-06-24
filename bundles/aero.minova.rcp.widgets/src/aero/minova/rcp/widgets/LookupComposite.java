@@ -130,7 +130,6 @@ public class LookupComposite extends Composite {
 			if (!useSingleClick) {
 				return;
 			}
-//			text.setText(table.getSelection()[0].getText());
 			MField field = (MField) getData(Constants.CONTROL_FIELD);
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			field.setValue(lv, true);
@@ -141,7 +140,6 @@ public class LookupComposite extends Composite {
 			if (useSingleClick) {
 				return;
 			}
-//			text.setText(table.getSelection()[0].getText());
 			MField field = (MField) getData(Constants.CONTROL_FIELD);
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			field.setValue(lv, true);
@@ -210,12 +208,7 @@ public class LookupComposite extends Composite {
 		table.removeAll();
 		for (LookupValue popupValue : popupValues) {
 			TableItem tableItem;
-			if (popupValue.getKeyText().equalsIgnoreCase(text.getText())) {
-				// Bei genauer Übereinstimmung des Matchcodes Element an erste Stelle setzten, siehe #1086
-				tableItem = new TableItem(table, SWT.NONE, 0);
-			} else {
-				tableItem = new TableItem(table, SWT.NONE);
-			}
+			tableItem = new TableItem(table, SWT.NONE);
 			tableItem.setText(0, popupValue.keyText);
 			tableItem.setText(1, popupValue.description.replace("\r\n", "; "));
 			tableItem.setFont(text.getFont());
@@ -489,20 +482,8 @@ public class LookupComposite extends Composite {
 		if (popup.isVisible() && table.getSelectionIndex() != -1) {
 			LookupValue lv = popupValues.get(table.getSelectionIndex());
 			field.setValue(lv, true);
-		} else if (popup.isVisible()) {
-
-			// Zuerst versuchen, einen genauen Match auf den KeyText zu finden, siehe #1086
-			for (LookupValue lv : popupValues) {
-				if (lv.keyText.equalsIgnoreCase(text.getText())) {
-					field.setValue(lv, true);
-					return;
-				}
-			}
-
-			// Ansonsten ersten Wert eintragen
-			if (!popupValues.isEmpty()) {
-				field.setValue(popupValues.get(0), true);
-			}
+		} else if (popup.isVisible() && !popupValues.isEmpty()) {
+			field.setValue(popupValues.get(0), true);
 		}
 	}
 
