@@ -295,6 +295,7 @@ public class WFCStatisticDetailPart {
 		// Übersetzen und zeichen
 		TranslateUtil.translate(parent, translationService, locale);
 		section.requestLayout();
+		section.style();
 	}
 
 	public void createUIFields(List<MField> mFields, Composite clientComposite) {
