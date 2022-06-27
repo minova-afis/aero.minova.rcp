@@ -57,7 +57,7 @@ public class BlockHandler implements ValueChangeListener {
 	@Evaluate
 	public boolean visible(MPart part) {
 		this.detail = (WFCDetailPart) part.getObject();
-		return detail.getForm().getDetail() != null && detail.getForm().getDetail().isButtonBlockVisible();
+		return detail != null && detail.getForm().getDetail() != null && detail.getForm().getDetail().isButtonBlockVisible();
 	}
 
 	@CanExecute
