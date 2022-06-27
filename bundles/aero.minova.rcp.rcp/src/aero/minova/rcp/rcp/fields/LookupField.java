@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.fields;
 
+import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +29,7 @@ import org.osgi.framework.ServiceReference;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.Row;
@@ -71,7 +74,11 @@ public class LookupField {
 
 		lookupFormData.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		lookupFormData.left = new FormAttachment((column == 0) ? 25 : 75);
-		lookupFormData.width = FieldUtil.TEXT_WIDTH;
+		if (column >= 2) {
+			lookupFormData.right = new FormAttachment(100, -MARGIN_BORDER);
+		} else {
+			lookupFormData.right = new FormAttachment(50, -ICssStyler.CSS_SECTION_SPACING);
+		}
 
 		// Lookup-Felder sollen immer genau eine Zeile hoch sein
 		CssData cssData = new CssData(CssType.TEXT_FIELD, column, row, field.getNumberColumnsSpanned(), 1, field.isFillToRight() || field.isFillHorizontal());
