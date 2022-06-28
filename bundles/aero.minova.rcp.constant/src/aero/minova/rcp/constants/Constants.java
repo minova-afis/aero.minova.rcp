@@ -91,7 +91,6 @@ public class Constants {
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
 	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
-	public static final String BROKER_SHOWCONNECTIONERRORMESSAGE = "aero/minova/rcp/ShowConnectionErrorMessage";
 	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
 	public static final String BROKER_PROCEDUREWITHTABLEERROR = "aero/minova/rcp/ProcedureWithTableError";
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESS = "aero/minova/rcp/ProcedureWithTableSuccess";

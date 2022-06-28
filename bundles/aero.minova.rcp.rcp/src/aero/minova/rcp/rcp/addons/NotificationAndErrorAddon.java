@@ -50,20 +50,6 @@ public class NotificationAndErrorAddon {
 	private static final String ERROR = "Error";
 	private static final String DEFAULT = "DEFAULT";
 
-	@Inject
-	@Optional
-	public void showConnectionErrorMessage(@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) ErrorObject et) {
-		String translate = translationService.translate("@" + et.getMessage(), null);
-		if (et.getT() == null) {
-			MessageDialog.openError(shell, getTranslation(ERROR), translate);
-		} else {
-			ShowErrorDialogHandler.execute(shell, getTranslation(ERROR), translate, et.getT());
-		}
-
-		// Fokus auf den Search Part legen, damit Fehlermeldungen nicht mehrmals angezeigt werden
-		selectSearchPart();
-	}
-
 	/**
 	 * Liefert das übersetzte Objekt zurück
 	 *
@@ -90,8 +76,11 @@ public class NotificationAndErrorAddon {
 	@Optional
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERROR) ErrorObject et) {
 		String value = formatMessage(et);
-		value += "\n\nUser : " + et.getUser();
-		value += "\nProcedure/View: " + et.getProcedureOrView();
+
+		value += "\n\nUser: " + et.getUser();
+		if (et.getProcedureOrView() != null) {
+			value += "\nProcedure/View: " + et.getProcedureOrView();
+		}
 
 		// Fokus auf den Search Part legen, damit Fehlermeldungen von Lookups nicht mehrmals angezeigt werden
 		selectSearchPart();
@@ -117,7 +106,7 @@ public class NotificationAndErrorAddon {
 		Table errorTable = et.getErrorTable();
 
 		if (errorTable == null || errorTable.getRows().get(0).getValue(0) == null) {
-			return "Internal Server Error";
+			return getTranslation(et.getMessage());
 		}
 
 		Value vMessageProperty = errorTable.getRows().get(0).getValue(0);
