@@ -27,7 +27,6 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -42,8 +41,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -142,9 +139,6 @@ import aero.minova.rcp.rcp.widgets.SectionGrid;
 public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
 
 	@Inject
-	protected UISynchronize sync;
-
-	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
 
@@ -174,9 +168,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private Locale locale;
 
 	@Inject
-	EPartService partService;
-
-	@Inject
 	private ECommandService commandService;
 
 	@Inject
@@ -193,7 +184,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Inject
 	EModelService eModelService;
+
 	MApplication mApplication;
+
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
 	private ScrolledComposite scrolled;
 
@@ -220,7 +213,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		}
 
 		layoutForm(parent);
-		
+
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 		ContextInjectionFactory.inject(mDetail.getDetailAccessor(), mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 
@@ -242,32 +235,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().setControls(mDetail);
 		}
-
-		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen. Außerdem wird
-		// "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
-		IWindowCloseHandler handler = mWindow -> {
-			@SuppressWarnings("unchecked")
-			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
-			if (pList != null && !pList.isEmpty()) {
-				StringBuilder listString = new StringBuilder();
-				for (MPerspective mPerspective : pList) {
-					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
-				}
-				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
-						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
-						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
-
-				boolean res = dialog.open() == 0;
-				if (res) {
-					prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
-				}
-				return res;
-			}
-			prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
-
-			return true;
-		};
-		window.getContext().set(IWindowCloseHandler.class, handler);
 
 		openRestoringUIDialog();
 	}
