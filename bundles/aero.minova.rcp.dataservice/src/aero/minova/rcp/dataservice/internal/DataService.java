@@ -19,7 +19,6 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -105,7 +104,7 @@ public class DataService implements IDataService {
 	private static int timeoutDuration = 15;
 	private static int timeoutDurationOpenNotification = 1;
 	private int minTimeBetweenError = 3;
-	long timeOfLastConnectionErrorMessage = -1;
+	Map<String, Long> timeOfLastErrorMessage = new HashMap<>();
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
@@ -488,58 +487,6 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
-		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
-				.header(CONTENT_TYPE, "application/json") //
-				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
-
-		Path path = getStoragePath().resolve(fileName);
-
-		try {
-			Files.createDirectories(path.getParent());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
-
-		log("CAS Request PDF:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
-
-		CompletableFuture<HttpResponse<byte[]>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofByteArray());
-
-		sendRequest.exceptionally(ex -> {
-			handleCASError(ex, "PDF", true);
-			return null;
-		});
-
-		return sendRequest.thenApply(t -> {
-			// Überprüfen, ob ein Fehler geworfen wurde (dann wird SqlProcedureResult zurückgegeben)
-			try {
-				String asString = new String(t.body(), StandardCharsets.UTF_8);
-				if (checkForError(asString, table.getName())) {
-					log("CAS Answer PDF:\n" + asString);
-					return null;
-				}
-			} catch (Exception e) {
-				// Wenn hier ein Exception geworfen wird wurde kein SqlProcedureResult/kein Fehler geliefert, die Daten können gespeichert werden
-			}
-
-			// Ansonsten byteArray in File schreiben
-			try {
-				OutputStream out = new FileOutputStream(finalPath.toString());
-				out.write(t.body());
-				out.close();
-				log("CAS Answer PDF:\n" + finalPath);
-			} catch (IOException e) {
-				handleCASError(e, "PDF", true, "msg.ErrorShowingFile");
-			}
-
-			return finalPath;
-		});
-	}
-
-	@Override
 	public CompletableFuture<String> getHashedFile(String filename) {
 		logCache("Requested file: " + filename);
 		try {
@@ -547,7 +494,7 @@ public class DataService implements IDataService {
 				logCache(filename + " need to download / update the file ");
 				// File löschen, damit es komplett aktualisiert wird
 				getStoragePath().resolve(filename).toFile().delete();
-				downloadFile(filename);
+				downloadFile(filename).join();
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -561,7 +508,7 @@ public class DataService implements IDataService {
 		try {
 			if (checkIfUpdateIsRequired(zipname)) {
 				logCache(zipname + " need to download / update the file ");
-				downloadFile(zipname);
+				downloadFile(zipname).join();
 				if (this.getStoragePath().resolve(zipname).toFile().exists()) {
 					ZipService.unzipFile(this.getStoragePath().resolve(zipname).toFile(), this.getStoragePath().toString());
 				}
@@ -573,6 +520,28 @@ public class DataService implements IDataService {
 		return true;
 	}
 
+	@Override
+	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
+		String method = "PDF";
+		String body = gson.toJson(table);
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
+				.header(CONTENT_TYPE, "application/json") //
+				.POST(BodyPublishers.ofString(body))//
+				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
+
+		Path path = getStoragePath().resolve(fileName);
+		try {
+			Files.createDirectories(path.getParent());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
+
+		log("CAS Request " + method + ":\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
+
+		return downloadWithRequest(fileName, method, request, finalPath);
+	}
+
 	/**
 	 * synchrones laden einer Datei vom Server.
 	 *
@@ -582,17 +551,58 @@ public class DataService implements IDataService {
 	 * @throws IOException
 	 */
 	@Override
-	public void downloadFile(String fileName) throws IOException, InterruptedException {
+	public CompletableFuture<Path> downloadFile(String fileName) throws IOException, InterruptedException {
+		String method = "File Async";
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/read?path=" + fileName))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
 				.timeout(Duration.ofSeconds(timeoutDuration)).build();
-		log("CAS Request File Sync:\n" + request + "\n" + fileName);
 		Path localFile = getStoragePath().resolve(fileName);
 
+		log("CAS Request " + method + ":\n" + request + "\n" + fileName);
+
+		return downloadWithRequest(fileName, method, request, localFile);
+	}
+
+	private CompletableFuture<Path> downloadWithRequest(String fileName, String method, HttpRequest request, Path localFile) {
+		CompletableFuture<HttpResponse<byte[]>> sendRequest = httpClient.sendAsync(request, BodyHandlers.ofByteArray());
+
+		sendRequest.exceptionally(ex -> {
+			handleCASError(ex, method, true);
+			return null;
+		});
+
+		return sendRequest.thenApply(t -> {
+			if (checkForErrorInByteStream(t, fileName, method)) {
+				return null;
+			}
+
+			// Bei keinem Fehler Datei erstellen
+			writeByteStreamToFile(t, localFile, method);
+			return localFile;
+		});
+	}
+
+	private boolean checkForErrorInByteStream(HttpResponse<byte[]> t, String fileName, String method) {
+		// Überprüfen, ob ein Fehler geworfen wurde (dann wird SqlProcedureResult zurückgegeben)
 		try {
-			httpClient.send(request, BodyHandlers.ofFile(localFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE));
+			String asString = new String(t.body(), StandardCharsets.UTF_8);
+			if (checkForError(asString, fileName)) {
+				log("CAS Answer " + method + ":\n" + asString);
+				return true;
+			}
 		} catch (Exception e) {
-			handleCASError(e, "File Sync", false);
+			// Wenn hier ein Exception geworfen wird wurde kein SqlProcedureResult/kein Fehler geliefert, die Daten können gespeichert werden
+		}
+		return false;
+	}
+
+	private void writeByteStreamToFile(HttpResponse<byte[]> t, Path localFile, String method) {
+		// Ansonsten byteArray in File schreiben
+		try (OutputStream out = new FileOutputStream(localFile.toString())) {
+			log("CAS Answer " + method + ":\n" + localFile);
+			out.write(t.body());
+		} catch (IOException e) {
+			handleCASError(e, "File Sync", true, "msg.ErrorShowingFile");
 		}
 	}
 
@@ -703,11 +713,11 @@ public class DataService implements IDataService {
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
-			System.out.println("UseCache: " + tableName);
+			logCache("UseCache: " + tableName);
 			list.addAll(map.values());
 			return CompletableFuture.supplyAsync(() -> list);
 		} else if (useCache && map.containsKey(keyLong)) {
-			System.out.println("UseCache: " + tableName + " (" + keyLong + ")");
+			logCache("UseCache: " + tableName + " (" + keyLong + ")");
 			list.add(map.get(keyLong));
 			return CompletableFuture.supplyAsync(() -> list);
 		}
@@ -727,6 +737,12 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<Table> tableFuture = getTableAsync(t, false);
+
+		tableFuture.exceptionally(e -> {
+			handleLookupError(tableName, list, map, e);
+			return null;
+		});
+
 		return tableFuture.thenApplyAsync(ta -> {
 			try {
 				if (ta != null) {
@@ -741,12 +757,16 @@ public class DataService implements IDataService {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("Error, using cache: " + tableName);
-				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-				list.addAll(map.values());
+				handleLookupError(tableName, list, map, e);
 			}
 			return list;
 		});
+	}
+
+	private void handleLookupError(String tableOrProcedureName, List<LookupValue> list, HashMap<Integer, LookupValue> map, Throwable e) {
+		logCache("Error, using cache: " + tableOrProcedureName);
+		postError(new ErrorObject("msg.WFCNoResponseServerUsingCache", username, e));
+		list.addAll(map.values());
 	}
 
 	private CompletableFuture<List<LookupValue>> getLookupValuesFromProcedure(String procedureName, MField field, Integer keyLong, String keyText,
@@ -756,11 +776,11 @@ public class DataService implements IDataService {
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
-			System.out.println("UseCache: " + hashName);
+			logCache("UseCache: " + hashName);
 			list.addAll(map.values());
 			return CompletableFuture.supplyAsync(() -> list);
 		} else if (useCache && map.containsKey(keyLong)) {
-			System.out.println("UseCache: " + hashName + " (" + keyLong + ")");
+			logCache("UseCache: " + hashName + " (" + keyLong + ")");
 			list.add(map.get(keyLong));
 			return CompletableFuture.supplyAsync(() -> list);
 		}
@@ -794,6 +814,12 @@ public class DataService implements IDataService {
 		t.addRow(row);
 
 		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
+
+		tableFuture.exceptionally(e -> {
+			handleLookupError(procedureName, list, map, e);
+			return null;
+		});
+
 		return tableFuture.thenApplyAsync(res -> {
 			try {
 				if (res != null) {
@@ -810,9 +836,7 @@ public class DataService implements IDataService {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("Error, using Cache: " + hashName);
-				showNoResposeServerError("msg.WFCNoResponseServerUsingCache", e);
-				list.addAll(map.values());
+				handleLookupError(procedureName, list, map, e);
 			}
 			return list;
 		});
@@ -936,19 +960,8 @@ public class DataService implements IDataService {
 	private void handleCASError(Throwable ex, String method, boolean showErrorMessage, String message) {
 		log("CAS Error " + method + ":\n" + ex.getMessage());
 		if (showErrorMessage) {
-			showNoResposeServerError(message, ex);
+			postError(new ErrorObject(message, username, ex));
 		}
-	}
-
-	public void postError(ErrorObject value) {
-		Dictionary<String, Object> data = new Hashtable<>(2);
-		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
-		data.put(IEventBroker.DATA, value);
-		Event event = new Event(Constants.BROKER_SHOWERROR, data);
-		eventAdmin.postEvent(event);
-
-		log("CAS error:\n" + value.getErrorTable().getRows().get(0).getValue(0).getStringValue() + "\nUser: " + value.getUser() + "\nProcedure/View: "
-				+ value.getProcedureOrView());
 	}
 
 	/**
@@ -964,21 +977,25 @@ public class DataService implements IDataService {
 		eventAdmin.postEvent(event);
 	}
 
-	public void showNoResposeServerError(String message, Throwable th) {
-		// Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
-		if ((System.currentTimeMillis() - timeOfLastConnectionErrorMessage) > minTimeBetweenError * 1000) {
+	public void postError(ErrorObject value) {
+		// Selbe Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
+		if ((System.currentTimeMillis() - timeOfLastErrorMessage.getOrDefault(value.getMessage(), (long) -1)) > minTimeBetweenError * 1000) {
 			Dictionary<String, Object> data = new Hashtable<>(2);
-			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
-			data.put(IEventBroker.DATA, new ErrorObject(message, username, th));
-			Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
+			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
+			data.put(IEventBroker.DATA, value);
+			Event event = new Event(Constants.BROKER_SHOWERROR, data);
 			eventAdmin.postEvent(event);
-			timeOfLastConnectionErrorMessage = System.currentTimeMillis();
+
+			timeOfLastErrorMessage.put(value.getMessage(), System.currentTimeMillis());
+
+			log("CAS Error:\n" + value.getErrorTable().getRows().get(0).getValue(0).getStringValue() + "\nUser: " + value.getUser() + "\nProcedure/View: "
+					+ value.getProcedureOrView());
 		}
 	}
 
 	private void logCache(String message) {
 		if (LOG_CACHE) {
-			System.out.println(message);
+			logger.info(message);
 		}
 	}
 
@@ -1001,28 +1018,29 @@ public class DataService implements IDataService {
 	}
 
 	private void log(String body, List<TransactionEntry> procedureList) {
-		String sqlString = "";
-		try {
-			for (TransactionEntry e : procedureList) {
-				sqlString += SQLStringUtil.prepareProcedureString(e.getTable()) + "\n";
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		sqlString = sqlString.strip();
-
 		if (LOG_SQL_STRING) {
+			StringBuilder sqlStringBuilder = new StringBuilder();
+			try {
+				for (TransactionEntry e : procedureList) {
+					sqlStringBuilder.append(SQLStringUtil.prepareProcedureString(e.getTable()) + "\n");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			String sqlString = sqlStringBuilder.toString().strip();
 			body = body + "\n" + sqlString;
 		}
 		log(body);
-
 	}
 
 	private void log(String body) {
 		if (logger != null) {
 			logger.info(body);
 		}
+	}
+
+	@Override
+	public Logger getLogger() {
+		return logger;
 	}
 }

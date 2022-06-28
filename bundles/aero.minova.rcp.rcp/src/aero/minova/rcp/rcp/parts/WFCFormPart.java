@@ -26,7 +26,6 @@ public abstract class WFCFormPart {
 
 	public Form getForm() {
 		IEclipseContext ctx = mPerspective.getContext();
-//		form = ctx.get(Form.class);
 		if (form == null) {
 			// TODO herausfinden wo das gesetzt wird und dokumentieren
 			String formName = mPerspective.getPersistedState().get(E4WorkbenchParameterConstants.FORM_NAME);
@@ -39,4 +38,16 @@ public abstract class WFCFormPart {
 		return form;
 	}
 
+	/**
+	 * Wenn reload false ist wird nicht versucht, die Form erneut vom CAS zu laden wenn sie nicht vorhanden ist
+	 * 
+	 * @param reload
+	 * @return
+	 */
+	public Form getForm(boolean reload) {
+		if (!reload) {
+			return form;
+		}
+		return getForm();
+	}
 }

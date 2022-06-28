@@ -210,6 +210,10 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mApplication = mApp;
 		getForm();
 
+		if (form == null) {
+			return;
+		}
+
 		if (form.getDetail() == null) {
 			mPart.setVisible(false);
 			return;

@@ -1,6 +1,5 @@
 package aero.minova.rcp.translate.service;
 
-import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Objects;
@@ -16,7 +15,6 @@ import org.osgi.service.event.EventConstants;
 
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.IDummyService;
-import aero.minova.rcp.dataservice.ZipService;
 
 @Component(immediate = true)
 public class WFCTranslationDownloadService {
@@ -56,22 +54,9 @@ public class WFCTranslationDownloadService {
 	@Activate
 	public void handleDataService() {
 		Objects.requireNonNull(dataService);
-
-
 		CompletableFuture.runAsync(() -> {
-			try {
-				boolean checkIfUpdateIsRequired = dataService.checkIfUpdateIsRequired("i18n.zip");
-				if (checkIfUpdateIsRequired) {
-					dataService.downloadFile("i18n.zip");
-					ZipService.unzipFile(dataService.getStoragePath().resolve("i18n.zip").toFile(),
-							dataService.getStoragePath().toString());
-					postEvent();
-				}
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
-			}
+			dataService.getHashedZip("i18n.zip");
+			postEvent();
 		});
-
 	}
-
 }
