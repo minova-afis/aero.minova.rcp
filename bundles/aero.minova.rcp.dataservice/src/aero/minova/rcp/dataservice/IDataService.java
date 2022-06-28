@@ -116,14 +116,15 @@ public interface IDataService {
 	boolean checkIfUpdateIsRequired(String fileName) throws IOException, InterruptedException;
 
 	/**
-	 * synchrones laden einer Datei vom Server.
+	 * asynchrones laden einer Datei vom Server.
 	 *
 	 * @param serverFileName
 	 *            relativer Pfad und Dateiname auf dem Server
+	 * @return
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	void downloadFile(String serverFileName) throws IOException, InterruptedException;
+	CompletableFuture<Path> downloadFile(String serverFileName) throws IOException, InterruptedException;
 
 	CompletableFuture<String> getCachedFileContent(String filename);
 
@@ -135,6 +136,8 @@ public interface IDataService {
 	String getUserName();
 
 	void setLogger(Logger logger);
+
+	Logger getLogger();
 
 	void setTimeout(int timeout);
 
