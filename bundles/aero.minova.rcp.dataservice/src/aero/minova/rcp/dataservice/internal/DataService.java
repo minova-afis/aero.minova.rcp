@@ -745,14 +745,16 @@ public class DataService implements IDataService {
 
 		return tableFuture.thenApplyAsync(ta -> {
 			try {
-				for (Row r : ta.getRows()) {
-					LookupValue lv = new LookupValue(//
-							r.getValue(0).getIntegerValue(), //
-							r.getValue(1).getStringValue(), //
-							r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+				if (ta != null) {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
 
-					map.put(lv.keyLong, lv);
-					list.add(lv);
+						map.put(lv.keyLong, lv);
+						list.add(lv);
+					}
 				}
 			} catch (Exception e) {
 				handleLookupError(tableName, list, map, e);
