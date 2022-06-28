@@ -27,8 +27,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -37,14 +35,12 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.Event;
@@ -53,7 +49,6 @@ import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.ImageUtil;
-import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
 @SuppressWarnings("restriction")
@@ -372,23 +367,6 @@ public class PerspectiveControl {
 			}
 		});
 		menuItem.setSelection(!keptPerspective.isBlank());
-	}
-
-	@Inject
-	@Optional
-	public void showConnectionErrorMessage(EPartService partService, EModelService model, Shell shell,
-			@UIEventTopic(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE) ErrorObject et) {
-		String translate = translationService.translate("@" + et.getMessage(), null);
-		if (et.getT() == null) {
-			MessageDialog.openError(shell, "Error", translate);
-		} else {
-			ShowErrorDialogHandler.execute(shell, "Error", translate, et.getT());
-		}
-
-		// Wenn möglich Search-Part aktivieren, um wiederkehrende Fehler zu vermeiden
-		String commandID = Constants.AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART;
-		ParameterizedCommand cmd = commandService.createCommand(commandID, null);
-		handlerService.executeHandler(cmd);
 	}
 
 	@Inject
