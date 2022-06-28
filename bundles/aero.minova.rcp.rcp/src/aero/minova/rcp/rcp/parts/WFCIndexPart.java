@@ -168,6 +168,10 @@ public class WFCIndexPart extends WFCFormPart {
 	public void createComposite(Composite parent, EModelService modelService) {
 		new FormToolkit(parent.getDisplay());
 		getForm();
+		if (form == null) {
+			return;
+		}
+
 		data = dataFormService.getTableFromFormIndex(form);
 
 		parent.setLayout(new GridLayout());
@@ -193,7 +197,7 @@ public class WFCIndexPart extends WFCFormPart {
 	 */
 	@PersistTableSelection
 	public void savePrefs(@Named("SaveRowConfig") boolean saveRowConfig, @Named("ConfigName") String name) {
-		if (!saveRowConfig) {
+		if (!saveRowConfig || form == null) {
 			return;
 		}
 

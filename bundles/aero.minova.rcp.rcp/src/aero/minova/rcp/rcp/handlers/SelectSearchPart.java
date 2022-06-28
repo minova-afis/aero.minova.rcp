@@ -30,10 +30,17 @@ public class SelectSearchPart {
 		MPart part = findElements.get(0);
 		partService.activate(part);
 		WFCSearchPart searchPart = (WFCSearchPart) part.getObject();
+		if (searchPart == null) {
+			return;
+		}
 		NatTable natTable = searchPart.getNatTable();
+		if (natTable == null) {
+			return;
+		}
 		SelectionLayer selectionLayer = searchPart.getSelectionLayer();
 		natTable.setFocus();
 		natTable.doCommand(new SelectCellCommand(selectionLayer, 2, 0, false, false));
 		natTable.commitAndCloseActiveCellEditor();
+
 	}
 }
