@@ -14,6 +14,7 @@
 			<xs:element name="long-time" />
 			<xs:element name="date-time" />
 			<xs:element name="week-day" />
+			<xs:element name="period" />
 			<xs:element name="money" type="money" />
 		</xs:choice>
 		<xs:attribute name="name" type="xs:NCName" use="required">
@@ -358,6 +359,7 @@
 				<xs:element name="boolean" type="boolean" />
 				<xs:element name="color" type="color" />
 				<xs:element name="label-text"/>
+				<xs:element name="period"/>
 				<xs:element name="radiobox" type="radiobox"/>
 			</xs:choice>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="msg">

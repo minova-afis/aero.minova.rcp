@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;element name="boolean" type="{}boolean"/&gt;
  *           &lt;element name="color" type="{}color"/&gt;
  *           &lt;element name="label-text" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
+ *           &lt;element name="period" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *           &lt;element name="radiobox" type="{}radiobox"/&gt;
  *         &lt;/choice&gt;
  *         &lt;element name="msg" maxOccurs="unbounded" minOccurs="0"&gt;
@@ -152,6 +153,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "_boolean",
     "color",
     "labelText",
+    "period",
     "radiobox",
     "msg"
 })
@@ -185,6 +187,7 @@ public class Field {
     protected Color color;
     @XmlElement(name = "label-text")
     protected Object labelText;
+    protected Object period;
     protected Radiobox radiobox;
     protected List<Field.Msg> msg;
     @XmlAttribute(name = "text")
@@ -655,6 +658,30 @@ public class Field {
      */
     public void setLabelText(Object value) {
         this.labelText = value;
+    }
+
+    /**
+     * Ruft den Wert der period-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Object }
+     *     
+     */
+    public Object getPeriod() {
+        return period;
+    }
+
+    /**
+     * Legt den Wert der period-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Object }
+     *     
+     */
+    public void setPeriod(Object value) {
+        this.period = value;
     }
 
     /**
