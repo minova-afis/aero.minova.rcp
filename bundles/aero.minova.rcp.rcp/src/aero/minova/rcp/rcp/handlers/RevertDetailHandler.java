@@ -11,17 +11,22 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 
 public class RevertDetailHandler {
 
 	@Inject
 	IEventBroker broker;
 
+	@Inject
+	@Optional
+	DirtyFlagUtil dirtyFlagUtil;
+
 	@CanExecute
 	public boolean canExecute(MPart part) {
 		if (part.getObject() instanceof WFCDetailPart) {
 			WFCDetailPart detail = (WFCDetailPart) part.getObject();
-			return detail.getRequestUtil().getSelectedTable() != null && detail.getDirtyFlag();
+			return detail.getRequestUtil().getSelectedTable() != null && dirtyFlagUtil.isDirty();
 		}
 		return false;
 	}

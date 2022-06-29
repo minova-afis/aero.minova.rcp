@@ -54,7 +54,6 @@ import aero.minova.rcp.model.TransactionResultEntry;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
-import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
@@ -108,6 +107,9 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX)
 	boolean showDiscardDialogIndex;
+
+	@Inject
+	DirtyFlagUtil dirtyFlagUtil;
 
 	private MDetail mDetail;
 
@@ -197,7 +199,7 @@ public class WFCDetailCASRequestsUtil {
 							selectedTable = res.getOutputParameters();
 						} else if (id.startsWith(Constants.OPTION_PAGE + "_")) { // OP
 							String opID = id.substring(id.indexOf("_") + 1);
-							selectedOptionPages.put(opID, res.getOutputParameters());
+							getSelectedOptionPages().put(opID, res.getOutputParameters());
 						} else if (id.startsWith(Constants.GRID + "_")) { // Grid
 							MGrid g = mDetail.getGrid(id.substring(id.indexOf("_") + 1));
 							if (g != null && res.getResultSet() != null) {
@@ -262,7 +264,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	public void setGridContent(MGrid g, Table data) {
-		selectedGrids.put(g.getId(), data.copy());
+		getSelectedGrids().put(g.getId(), data.copy());
 		updateSelectedGrid(g.getId());
 	}
 
@@ -326,7 +328,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Option Pages
-		for (Entry<String, Table> e : selectedOptionPages.entrySet()) {
+		for (Entry<String, Table> e : getSelectedOptionPages().entrySet()) {
 			setFieldsFromTable(e.getKey(), e.getValue());
 		}
 
@@ -353,7 +355,7 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	public void updateSelectedGrids() {
-		for (String gridID : selectedGrids.keySet()) {
+		for (String gridID : getSelectedGrids().keySet()) {
 			updateSelectedGrid(gridID);
 		}
 	}
@@ -362,9 +364,9 @@ public class WFCDetailCASRequestsUtil {
 		MGrid mGrid = mDetail.getGrid(gridID);
 		GridAccessor gVA = (GridAccessor) mGrid.getGridAccessor();
 		SectionGrid sectionGrid = gVA.getSectionGrid();
-		Table t = sectionGrid.setDataTable(selectedGrids.get(gridID).copy());
+		Table t = sectionGrid.setDataTable(getSelectedGrids().get(gridID).copy());
 		sectionGrid.clearDataChanges();
-		selectedGrids.put(gridID, t);
+		getSelectedGrids().put(gridID, t);
 		broker.send(Constants.BROKER_CHECKDIRTY, "");
 	}
 
@@ -763,7 +765,7 @@ public class WFCDetailCASRequestsUtil {
 	 * @return
 	 */
 	private boolean discardChanges() {
-		if (wfcDetailPart.getDirtyFlag()) {
+		if (dirtyFlagUtil.isDirty()) {
 			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
 					translationService.translate("@msg.New.DirtyMessage", null), MessageDialog.CONFIRM,
 					new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
@@ -786,7 +788,7 @@ public class WFCDetailCASRequestsUtil {
 
 		// Felder leeren
 		selectedTable = null;
-		selectedOptionPages.clear();
+		getSelectedOptionPages().clear();
 		for (MField f : mDetail.getFields()) {
 			setKeys(null);
 			f.setValue(null, false);
@@ -796,7 +798,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Grids leeren
-		selectedGrids.clear();
+		getSelectedGrids().clear();
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.clearGrid();
@@ -866,137 +868,20 @@ public class WFCDetailCASRequestsUtil {
 		return selectedTable;
 	}
 
-	/**
-	 * Prüfung ob eine Wertänderung in Feldern oder Grids stattgefunden hat.
-	 *
-	 * @return
-	 */
-	public boolean checkDirty() {
-		return checkFields() || checkOPs() || checkGrids();
-	}
-
-	private boolean checkFields() {
-		// Prüfung der mFields ob es einen Value ≠ null gibt
-		if (getSelectedTable() == null || getSelectedTable().getRows().isEmpty()) {
-			for (MField mfield : mDetail.getFields()) {
-				if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
-					if (mfield.getValue().getBooleanValue()) {
-						return true;
-					}
-				} else if (mfield.getValue() != null) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		return checkFieldsWithTable(selectedTable, form);
-	}
-
-	/**
-	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
-	 */
-	private boolean checkFieldsWithTable(Table t, Form f) {
-		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
-		List<MField> checkedFields = new ArrayList<>();
-		for (int i = 0; i < t.getColumnCount(); i++) {
-			MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
-			checkedFields.add(c);
-			Value sV = t.getRows().get(0).getValue(i);
-			if (c == null) {
-				continue;
-			}
-			if (c instanceof MLookupField) {
-				// LU mit index 0 gibt es nie
-				if (c.getValue() == null && sV != null && sV.getIntegerValue() == 0) {
-					continue;
-				}
-
-				if (sV == null && c.getValue() != null || //
-						sV != null && c.getValue() == null || //
-						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
-					return true;
-				}
-			} else if (c instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> spezielle Prüfung
-				if (sV == null && !c.getValue().getBooleanValue()) { // TableValue null -> Booleanfeld Wert soll false sein
-					continue;
-				}
-
-				if (!c.getValue().equals(sV)) {
-					return true;
-				}
-			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
-				return true;
-			}
-		}
-
-		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
-		return checkFieldsEmpty(dataFormService.getFieldsFromForm(f), fieldPrefix, checkedFields);
-	}
-
-	private boolean checkFieldsEmpty(List<Field> fieldsToCheck, String fieldPrefix, List<MField> checkedFields) {
-		for (Field field : fieldsToCheck) {
-			MField mfield = mDetail.getField(fieldPrefix + field.getName());
-
-			if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
-				if (!checkedFields.contains(mfield) && Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
-					return true;
-				}
-			} else if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean checkOPs() {
-		// Sind die OP Felder leer?
-		if (selectedOptionPages.isEmpty()) {
-			for (Form opform : mDetail.getOptionPages()) {
-				if (checkFieldsEmpty(dataFormService.getFieldsFromForm(opform), opform.getDetail().getProcedureSuffix() + ".", new ArrayList<>())) {
-					return true;
-				}
-			}
-		}
-
-		// Felder der OPs mit Werten vom CAS vergleichen
-		for (Entry<String, Table> entry : selectedOptionPages.entrySet()) {
-			Form opform = mDetail.getOptionPage(entry.getKey());
-			Table table = entry.getValue();
-			if (checkFieldsWithTable(table, opform)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean checkGrids() {
-		// Prüfen, ob die MGrids Zeilen haben
-		if (selectedGrids.isEmpty()) {
-			for (MGrid grid : mDetail.getGrids()) {
-				if (!grid.getDataTable().getRows().isEmpty()) {
-					return true;
-				}
-			}
-		}
-
-		// Aktuellen Grids mit Werten der CAS-Zurückgabe vergleichen
-		for (Entry<String, Table> entry : selectedGrids.entrySet()) {
-			MGrid mGrid = mDetail.getGrid(entry.getKey());
-			if (!entry.getValue().equals(mGrid.getDataTable())) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public void setSelectedTable(Table table) {
 		this.selectedTable = table;
 	}
 
+	public Map<String, Table> getSelectedOptionPages() {
+		return selectedOptionPages;
+	}
+
+	public Map<String, Table> getSelectedGrids() {
+		return selectedGrids;
+	}
+
 	public void clearSelectedGrids() {
-		this.selectedGrids.clear();
+		this.getSelectedGrids().clear();
 	}
 
 	@Inject
@@ -1152,5 +1037,14 @@ public class WFCDetailCASRequestsUtil {
 				f.setReadOnly(true);
 			}
 		}
+	}
+
+	/**
+	 * @deprecated Stattdessen {@link DirtyFlagUtil#checkDirty()} nutzen. Einige Helper benutzen diese Methode, deshalb bleibt sie
+	 * @return
+	 */
+	@Deprecated(since = "12.0.36", forRemoval = false)
+	public boolean checkDirty() {
+		return dirtyFlagUtil.checkDirty();
 	}
 }
