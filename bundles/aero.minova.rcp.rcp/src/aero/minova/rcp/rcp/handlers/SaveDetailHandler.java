@@ -22,6 +22,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 
 public class SaveDetailHandler implements ValueChangeListener, GridChangeListener {
 
@@ -32,6 +33,10 @@ public class SaveDetailHandler implements ValueChangeListener, GridChangeListene
 
 	@Inject
 	MPart part;
+
+	@Inject
+	@Optional
+	DirtyFlagUtil dirtyFlagUtil;
 
 	// Während gespeichert wird soll der Handler daktiviert sein
 	private boolean saving;
@@ -61,7 +66,7 @@ public class SaveDetailHandler implements ValueChangeListener, GridChangeListene
 			}
 			firstCall = false;
 
-			return mDetail.allFieldsAndGridsValid() && detail.getDirtyFlag();
+			return mDetail.allFieldsAndGridsValid() && dirtyFlagUtil.isDirty();
 		}
 		return false;
 	}

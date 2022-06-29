@@ -19,6 +19,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 
 public class DeleteDetailHandler {
 
@@ -31,6 +32,10 @@ public class DeleteDetailHandler {
 
 	@Inject
 	TranslationService translationService;
+
+	@Inject
+	@Optional
+	DirtyFlagUtil dirtyFlagUtil;
 
 	@CanExecute
 	public boolean canExecute(MPart part, @Named(IServiceConstants.ACTIVE_SELECTION) @Optional Object selection) {
@@ -48,7 +53,7 @@ public class DeleteDetailHandler {
 		}
 
 		// Bei ungespeicherten Änderungen darf nicht gelöscht werden
-		if (part.getObject() instanceof WFCDetailPart && ((WFCDetailPart) part.getObject()).getDirtyFlag()) {
+		if (part.getObject() instanceof WFCDetailPart && dirtyFlagUtil.isDirty()) {
 			MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(),
 					translationService.translate("@msg.DeleteUnsavedChangesTitle", null), null,
 					translationService.translate("@msg.DeleteUnsavedChangesMessage", null), MessageDialog.CONFIRM, new String[] { "OK" }, 0);
