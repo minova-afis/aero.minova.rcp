@@ -880,7 +880,11 @@ public class WFCDetailCASRequestsUtil {
 		if (getSelectedTable() == null || getSelectedTable().getRows().isEmpty()) {
 			for (MField mfield : mDetail.getFields()) {
 				if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
-					if (mfield.getValue().getBooleanValue()) {
+					if (Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
+						return true;
+					}
+				} else if (mfield instanceof MParamStringField) {
+					if (!((MParamStringField) mfield).isNullValue()) {
 						return true;
 					}
 				} else if (mfield.getValue() != null) {
