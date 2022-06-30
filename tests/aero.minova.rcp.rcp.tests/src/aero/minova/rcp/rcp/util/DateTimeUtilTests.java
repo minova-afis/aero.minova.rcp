@@ -254,27 +254,6 @@ class DateTimeUtilTests {
 	}
 
 	@Test
-	void ensureOuputOfGivenDateAt10_28WithZoneIdEurope_Monaco() {
-		Instant initialDay = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("Europe/Monaco")).toInstant();
-		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(8).plusMinutes(28).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(initialDay, "13052020 1028", "Europe/Monaco"));
-	}
-
-	@Test
-	void ensureOuputOfGivenDateAt10_28WithZoneIdEurope_London() {
-		Instant initialDay = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("Europe/London")).toInstant();
-		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(9).plusMinutes(28).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(initialDay, "13052020 1028", "Europe/London"));
-	}
-
-	@Test
-	void ensureOuputOfGivenDateAt10_28WithZoneIdAmerica_Juneau() {
-		Instant initialDay = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).atZone(ZoneId.of("America/Juneau")).toInstant();
-		Instant expected = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(28).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, DateTimeUtil.getDateTime(initialDay, "13052020 1028", "America/Juneau"));
-	}
-
-	@Test
 	void ensureOuputOfGivenDateTimeWithLocaleGERMANYAndPattern_ddMinusMMMinusyyAndHH_mm() {
 		Instant initialDay = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		assertEquals("13.05.20 18:12", DateTimeUtil.getDateTimeString(initialDay, Locale.GERMANY, "dd.MM.yy", "HH:mm"));
