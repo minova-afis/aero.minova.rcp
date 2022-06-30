@@ -4,9 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Locale;
 
 public class DateTimeUtil {
@@ -19,24 +17,16 @@ public class DateTimeUtil {
 		return getDateTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input);
 	}
 
-	public static Instant getDateTime(Instant todayNow, String input) {
-		return getDateTime(todayNow, input, Locale.getDefault());
+	public static Instant getDateTime(String input, Locale locale, String dateUtilPattern, String timeUtilPattern) {
+		return getDateTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, locale, dateUtilPattern, timeUtilPattern);
 	}
 
 	public static Instant getDateTime(Instant todayNow, String input, Locale locale) {
-		return getDateTime(todayNow, input, locale, "", "", "UTC");
+		return getDateTime(todayNow, input, locale, "", "");
 	}
 
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern) {
-		return getDateTime(todayNow, input, locale, dateUtilPattern, timeUtilPattern, "UTC");
-	}
-
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String zoneId) {
-		return getDateTime(todayNow, input, locale, "", "", zoneId);
-	}
-
-	public static Instant getDateTime(Instant todayNow, String input, String zoneId) {
-		return getDateTime(todayNow, input, Locale.getDefault(), "", "", zoneId);
+	public static Instant getDateTime(Instant todayNow, String input) {
+		return getDateTime(todayNow, input, Locale.getDefault(), "", "");
 	}
 
 	public static String getDateTimeString(Instant instant, Locale locale, String datePattern, String timePattern) {
@@ -55,11 +45,10 @@ public class DateTimeUtil {
 	 * @param input
 	 * @return dateTime oder null wenn die Eingabe unzulässig ist
 	 */
-	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern, String zoneId) {
+	public static Instant getDateTime(Instant todayNow, String input, Locale locale, String dateUtilPattern, String timeUtilPattern) {
 		String[] splitInput = null;
 		Instant dateIn;
 		Instant timeIn;
-		Instant dateTime;
 		LocalDate dateLocal;
 		LocalTime timeLocal;
 
@@ -93,15 +82,7 @@ public class DateTimeUtil {
 			return null;
 		}
 
-		try {
-			ZoneId zI = ZoneId.of(zoneId);
-			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
-		} catch (Exception e) {
-			// Invalid ZoneId;
-			return null;
-		}
-
-		return dateTime;
+		return LocalDateTime.of(dateLocal, timeLocal).toInstant(ZoneOffset.UTC);
 	}
 
 }

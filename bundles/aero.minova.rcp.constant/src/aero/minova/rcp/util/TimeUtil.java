@@ -207,8 +207,7 @@ public class TimeUtil {
 		if (timeUtilPref != null && !timeUtilPref.isBlank()) {
 			dtf = DateTimeFormatter.ofPattern(timeUtilPref, locale);
 		}
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"));
-		return localDateTime.format(dtf);
+		return LocalDateTime.ofInstant(instant, ZoneId.of("UTC")).format(dtf);
 	}
 
 	private static Instant changeHours(Instant instant, String[] splits) {

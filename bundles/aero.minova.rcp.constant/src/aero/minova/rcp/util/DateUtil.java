@@ -111,7 +111,7 @@ public class DateUtil {
 	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
 		String[] formulars = splitInput(input);
 		LocalDateTime startOfToday = null;
-
+		
 		if (formulars.length > 0) {
 			startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
 		}
