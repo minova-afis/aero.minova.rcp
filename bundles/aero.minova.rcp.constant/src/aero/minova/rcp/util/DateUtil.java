@@ -109,7 +109,13 @@ public class DateUtil {
 	}
 
 	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
-		String[] formulars = splitInput(input);
+
+		String[] formulars;
+		if (Character.isDigit(input.charAt(0))) {
+			formulars = splitInput(input);
+		} else {
+			formulars = splitInput(getDateString(today, locale, datePattern) + input);
+		}
 		LocalDateTime startOfToday = null;
 
 		if (formulars.length > 0) {
@@ -127,7 +133,7 @@ public class DateUtil {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
 				}
 			}
-		} catch (DateTimeException | NullPointerException e ) {
+		} catch (DateTimeException | NullPointerException e) {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
