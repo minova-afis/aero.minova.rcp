@@ -919,10 +919,14 @@ public class WFCDetailCASRequestsUtil {
 
 		// SubFelder von Param-String Feldern entfernen
 		List<MField> toRemove = new ArrayList<>();
+		List<MField> toTraverse = new ArrayList<>();
 		for (MField mField : mDetail.getFields()) {
 			if (mField instanceof MParamStringField && mField.getMSection().equals(mSection)) {
 				toRemove.addAll(((MParamStringField) mField).getSubMFields());
 				((MParamStringField) mField).clearSubMFields();
+			}
+			if (mField.getMSection().equals(mSection) && !toRemove.contains(mField)) {
+				toTraverse.add(mField);
 			}
 		}
 		mSection.getTabList().removeAll(toRemove);
@@ -931,9 +935,7 @@ public class WFCDetailCASRequestsUtil {
 
 		List<MField> visibleMFields = new ArrayList<>();
 
-		List<MField> toTraverse = new ArrayList<>();
 		List<MParamStringField> paramStringFields = new ArrayList<>();
-		toTraverse.addAll(mSection.getTabList());
 		for (MField f : toTraverse) {
 			if (f.isVisible()) {
 				visibleMFields.add(f);
