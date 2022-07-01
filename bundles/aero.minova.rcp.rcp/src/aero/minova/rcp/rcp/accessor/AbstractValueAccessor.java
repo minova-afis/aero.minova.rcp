@@ -35,7 +35,7 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 	@Inject
 	IEventBroker broker;
 
-	public AbstractValueAccessor(MField field, Control control) {
+	protected AbstractValueAccessor(MField field, Control control) {
 		super();
 		this.field = field;
 		this.control = control;
