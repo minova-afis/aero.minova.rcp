@@ -95,7 +95,7 @@ public class DateTimeUtil {
 
 		try {
 			ZoneId zI = ZoneId.of(zoneId);
-			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
+			dateTime = LocalDateTime.ofInstant(LocalDateTime.of(dateLocal, timeLocal).toInstant(ZoneOffset.UTC), zI).toInstant(ZoneOffset.UTC);
 		} catch (Exception e) {
 			// Invalid ZoneId;
 			return null;
