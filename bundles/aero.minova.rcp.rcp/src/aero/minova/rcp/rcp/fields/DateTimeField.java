@@ -59,7 +59,7 @@ public class DateTimeField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateTimeUtil.getDateTime(Instant.now(), entry, locale);
+				Instant date = DateTimeUtil.getDateTime(Instant.now(), entry, locale, timezone);
 				if (date == null && !entry.isEmpty()) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
