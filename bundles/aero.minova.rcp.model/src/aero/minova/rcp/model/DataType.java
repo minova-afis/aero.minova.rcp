@@ -9,5 +9,6 @@ public enum DataType {
 	ZONED, //
 	BOOLEAN, //
 	FILTER, //
-	REFERENCE
+	REFERENCE, //
+	PERIOD
 }

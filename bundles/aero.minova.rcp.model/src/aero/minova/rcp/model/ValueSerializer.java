@@ -3,6 +3,8 @@ package aero.minova.rcp.model;
 import java.lang.reflect.Type;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
@@ -61,8 +63,15 @@ public class ValueSerializer implements JsonSerializer<Value> {
 		case REFERENCE:
 			ReferenceValue rv = (ReferenceValue) value;
 			return new JsonPrimitive("r-" + rv.getReferenceValue() + "-" + rv.getRowNumber() + "-" + rv.getColumnName());
+		case PERIOD:
+			PeriodValue pv = (PeriodValue) value;
+			JsonObject o = new JsonObject();
+			o.add("base", serialize(new Value(pv.getBaseValue())));
+			o.add("userInput", pv.getUserInput() != null ? new JsonPrimitive(pv.getUserInput()) : JsonNull.INSTANCE);
+			o.add("due", serialize(pv.getDueDate()));
+			return new JsonPrimitive("s-" + o.toString());
 		default:
-			System.err.println("Value " + value.getType() + " nicht bekannt");
+			System.err.println("Value " + value.getType() + " nicht bekannt (ValueSerializer)");
 			return null;
 		}
 	}
