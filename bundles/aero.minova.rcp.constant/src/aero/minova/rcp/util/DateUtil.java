@@ -118,6 +118,13 @@ public class DateUtil {
 		}
 		LocalDateTime startOfToday = null;
 
+		System.out.println(today + " " + input + " " + locale + " " + datePattern);
+		System.out.println("Splitted Input:");
+		for (String s : formulars) {
+			System.out.println(s);
+		}
+		System.out.println("-----");
+
 		if (formulars.length > 0) {
 			startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
 		}
@@ -134,6 +141,7 @@ public class DateUtil {
 				}
 			}
 		} catch (DateTimeException | NullPointerException e) {
+			e.printStackTrace();
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}
@@ -145,6 +153,7 @@ public class DateUtil {
 					LocalDate ld = LocalDate.parse(input, dtf);
 					startOfToday = ld.atStartOfDay();
 				} catch (Exception e) {
+					e.printStackTrace();
 					// TODO: handle exception
 				}
 			} else {
@@ -157,6 +166,7 @@ public class DateUtil {
 						startOfToday = ld.atStartOfDay();
 						break;
 					} catch (Exception e) {
+						e.printStackTrace();
 						// dann war is nicht in diesem Format
 					}
 				}
