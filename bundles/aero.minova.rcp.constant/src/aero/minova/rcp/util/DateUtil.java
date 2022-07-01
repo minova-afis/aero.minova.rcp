@@ -111,7 +111,7 @@ public class DateUtil {
 	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
 
 		String[] formulars;
-		if (Character.isDigit(input.charAt(0))) {
+		if (input.length() == 0 || Character.isDigit(input.charAt(0))) {
 			formulars = splitInput(input);
 		} else {
 			formulars = splitInput(getDateString(today, locale, datePattern) + input);
