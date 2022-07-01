@@ -1,7 +1,9 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -56,6 +58,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
+		String timezone = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.STRING, "", locale);
 
 		if (canonicalValue instanceof FilterValue) {
 			FilterValue cv = (FilterValue) canonicalValue;
@@ -73,12 +76,12 @@ public class FilterDisplayConverter extends DisplayConverter {
 					val = TimeUtil.getTimeString(cv.getFilterValue().getInstantValue(), locale, timeUtil);
 					break;
 				case DATETIME:
-					val = DateTimeUtil.getDateTimeString(cv.getFilterValue().getInstantValue(), locale, dateUtil, timeUtil);
+					val = DateTimeUtil.getDateTimeString(cv.getFilterValue().getInstantValue(), locale, dateUtil, timeUtil, timezone);
 					break;
 				}
 				break;
 			case ZONED:
-				val = DateTimeUtil.getDateTimeString(cv.getFilterValue().getInstantValue(), locale, dateUtil, timeUtil);
+				val = DateTimeUtil.getDateTimeString(cv.getFilterValue().getInstantValue(), locale, dateUtil, timeUtil, timezone);
 				break;
 			case DOUBLE:
 				NumberFormat formatter = NumberFormat.getInstance(locale);
@@ -97,6 +100,9 @@ public class FilterDisplayConverter extends DisplayConverter {
 
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
+		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
+		String timezone = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.STRING, "", locale);
+
 		if (displayValue instanceof String) {
 			String valueString = (String) displayValue;
 
@@ -135,12 +141,12 @@ public class FilterDisplayConverter extends DisplayConverter {
 						filterValue = TimeUtil.getTime(filterValueString);
 						break;
 					case DATETIME:
-						filterValue = DateTimeUtil.getDateTime(filterValueString);
+						filterValue = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), filterValueString, locale, timezone);
 						break;
 					}
 					break;
 				case ZONED:
-					filterValue = DateTimeUtil.getDateTime(filterValueString);
+					filterValue = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), filterValueString, locale, timezone);
 					break;
 				case INTEGER:
 					filterValue = Integer.parseInt(filterValueString);

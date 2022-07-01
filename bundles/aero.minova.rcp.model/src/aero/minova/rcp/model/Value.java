@@ -29,6 +29,10 @@ public class Value implements Serializable {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
 	String timePattern;
+	
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	String timezone;
 
 	public Value(Object valueNew) {
 		if (valueNew instanceof Integer) {
@@ -65,14 +69,14 @@ public class Value implements Serializable {
 			if (z.getYear() == 1900 && z.getDayOfMonth() == 1 && z.getMonthValue() == 1) {
 				return TimeUtil.getTimeString(i, locale, timePattern);
 			}
-			return DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern);
+			return DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern, timezone);
 		case INSTANT:
 			Instant i2 = (Instant) value;
 			LocalDateTime d1 = LocalDateTime.ofEpochSecond(i2.getEpochSecond(), i2.getNano(), ZoneOffset.UTC);
 			if (d1.getYear() == 1900 && d1.getDayOfMonth() == 1 && d1.getMonthValue() == 1) {
 				return TimeUtil.getTimeString(i2, locale, timePattern);
 			}
-			return DateTimeUtil.getDateTimeString(i2, locale, datePattern, timePattern);
+			return DateTimeUtil.getDateTimeString(i2, locale, datePattern, timePattern, timezone);
 		default:
 			break;
 		}
@@ -97,7 +101,7 @@ public class Value implements Serializable {
 				returnValue = DateUtil.getDateString(i, locale, datePattern);
 				break;
 			case DATETIME:
-				returnValue = DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern);
+				returnValue = DateTimeUtil.getDateTimeString(i, locale, datePattern, timePattern, timezone);
 				break;
 			}
 			break;
@@ -111,7 +115,7 @@ public class Value implements Serializable {
 				returnValue = DateUtil.getDateString(i2, locale, datePattern);
 				break;
 			case DATETIME:
-				returnValue = DateTimeUtil.getDateTimeString(i2, locale, datePattern, timePattern);
+				returnValue = DateTimeUtil.getDateTimeString(i2, locale, datePattern, timePattern, timezone);
 				break;
 			}
 			break;

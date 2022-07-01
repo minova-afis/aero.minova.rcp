@@ -66,7 +66,7 @@ public class TimeUtil {
 	public static Instant getTime(String input, String timeUtilPref) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, Locale.getDefault());
 	}
-
+	
 	public static Instant getTime(String input, String timeUtilPref, Locale locale) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, locale);
 	}

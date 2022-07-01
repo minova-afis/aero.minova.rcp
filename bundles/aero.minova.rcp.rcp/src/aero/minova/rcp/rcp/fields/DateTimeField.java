@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ import aero.minova.rcp.rcp.accessor.DateTimeValueAccessor;
 import aero.minova.rcp.util.DateTimeUtil;
 
 public class DateTimeField {
-	
+
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective,
 			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -59,11 +60,11 @@ public class DateTimeField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				Instant date = DateTimeUtil.getDateTime(Instant.now(), entry, locale, timezone);
+				Instant date = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), entry, locale, timezone);
 				if (date == null && !entry.isEmpty()) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				} else {
-					result.add(DateTimeUtil.getDateTimeString(date, locale, dateUtil, timeUtil));
+					result.add(DateTimeUtil.getDateTimeString(date, locale, dateUtil, timeUtil, timezone));
 					field.setValue(new Value(date), true);
 				}
 				return result;
@@ -77,7 +78,7 @@ public class DateTimeField {
 			Text text2 = new Text(composite, SWT.BORDER);
 			text = text2;
 			ToolTip tooltip = new ToolTip(text2.getShell(), SWT.ICON_INFORMATION);
-			text2.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil));
+			text2.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil, timezone));
 			text2.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusGained(FocusEvent e) {
@@ -106,7 +107,7 @@ public class DateTimeField {
 		} else {
 			TextAssist text2 = new TextAssist(composite, SWT.BORDER, contentProvider);
 			text = text2;
-			text2.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil));
+			text2.setMessage(DateTimeUtil.getDateTimeString(of.toInstant(ZoneOffset.UTC), locale, dateUtil, timeUtil, timezone));
 			text2.setNumberOfLines(1);
 			text2.setData(TRANSLATE_LOCALE, locale);
 			text2.addFocusListener(new FocusAdapter() {
@@ -139,7 +140,6 @@ public class DateTimeField {
 		text.setLayoutData(fd);
 		text.setData(CssData.CSSDATA_KEY,
 				new CssData(CssType.DATE_TIME_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), false));
-		
 
 		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
 

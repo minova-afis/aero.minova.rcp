@@ -99,6 +99,9 @@ public class PrintIndexHandler {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
 	public String timeUtilPref;
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	public String timezone;
 
 	private boolean pdfFolderExists;
 
@@ -320,7 +323,7 @@ public class PrintIndexHandler {
 							Object colVal = gbo.getDescriptor().get(i);
 							colValString = colVal.toString();
 							if (colVal instanceof Instant) {
-								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, CustomLocale.getLocale(), dateUtilPref, timeUtilPref);
+								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone);
 							}
 							tableTitle += colName + ": " + colValString + ", ";
 						}
@@ -456,7 +459,7 @@ public class PrintIndexHandler {
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
 		xml.append("<PrintDate><![CDATA["
-				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0"), CustomLocale.getLocale(), dateUtilPref, timeUtilPref) + "]]></PrintDate>\n");
+				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone) + "]]></PrintDate>\n");
 	}
 
 }
