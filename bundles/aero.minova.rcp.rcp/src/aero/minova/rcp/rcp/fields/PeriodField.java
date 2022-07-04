@@ -58,7 +58,7 @@ public class PeriodField {
 		dueDate.setData(CssData.CSSDATA_KEY, new CssData(CssType.DATE_FIELD, 4, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), false));
 
 		MField temp = new MTextField();
-		temp.setLabel("@Interval");
+		temp.setLabel("@PeriodField.Interval");
 		label = FieldLabel.create(composite, temp);
 		FieldLabel.layout(label, dueDate, row, 3, field.getNumberRowsSpanned());
 

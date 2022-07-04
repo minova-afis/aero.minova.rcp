@@ -92,12 +92,10 @@ public class PeriodValueAccessor extends AbstractValueAccessor {
 
 	private void setDateText(Control control, Locale locale, Instant date) {
 		LocalDate localDate = LocalDate.ofInstant(date, ZoneId.of("UTC"));
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
-		if (dateUtil.equals("")) {
-			// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
+		if (dateUtil == null || dateUtil.equals("")) {
 			setText(control, localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)));
 		} else {
-			// Bei der Formatierung geschehen fehler, wir erhalten das Milienium zurück
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(dateUtil, locale);
 			setText(control, localDate.format(dtf));
 		}
 	}
