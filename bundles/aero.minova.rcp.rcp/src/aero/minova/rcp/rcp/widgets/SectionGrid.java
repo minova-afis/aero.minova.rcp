@@ -814,6 +814,9 @@ public class SectionGrid {
 				int position = Integer.parseInt(keyValue[0].trim());
 				int width = Integer.parseInt(keyValue[1].trim());
 				order.add(position);
+				if (width < 0) {
+					continue;
+				}
 				bodyDataLayer.setColumnWidthByPosition(position, width);
 			}
 			// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
