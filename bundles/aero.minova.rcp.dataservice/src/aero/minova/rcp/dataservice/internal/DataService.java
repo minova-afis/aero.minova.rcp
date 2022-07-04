@@ -401,7 +401,13 @@ public class DataService implements IDataService {
 		Table error = new Table();
 		error.setName(ERROR);
 		error.addColumn(new Column("Message", DataType.STRING));
-		error.addRow(RowBuilder.newRow().withValue(serverAnswer.getMessage()).create());
+		String message = "Internal Server Error"; // Default Fehler
+		if (serverAnswer.getMessage() != null) {
+			message = serverAnswer.getMessage();
+		} else if (serverAnswer.getError() != null) {
+			message = serverAnswer.getError();
+		}
+		error.addRow(RowBuilder.newRow().withValue(message).create());
 
 		return new ErrorObject(error, username, sourceName);
 	}
