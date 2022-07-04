@@ -74,7 +74,8 @@ public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 
 			if (column.getType().equals(DataType.BOOLEAN)) {
 				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
-			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
+			} else if ((column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null)
+					|| formColumns.get(column.getName()).getPeriod() != null) {
 				configureShortDateCell(configRegistry, i, SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX);
 				configureShortDateCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortTime() != null) {

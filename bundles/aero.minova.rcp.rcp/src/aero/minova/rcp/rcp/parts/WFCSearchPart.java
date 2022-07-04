@@ -59,6 +59,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IMinovaJsonService;
+import aero.minova.rcp.form.model.xsd.Column;
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
@@ -435,10 +436,11 @@ public class WFCSearchPart extends WFCFormPart {
 				Value v = r.getValue(i);
 				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					FilterValue fv = (FilterValue) v;
+					Column c = form.getIndexView().getColumn().get(i);
 					Instant inst;
-					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
+					if (c.getShortTime() != null) {
 						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
-					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
+					} else if (c.getShortDate() != null || c.getPeriod() != null) {
 						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
 					} else {
 						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());

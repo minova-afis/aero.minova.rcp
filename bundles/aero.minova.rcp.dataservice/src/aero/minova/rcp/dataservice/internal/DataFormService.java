@@ -220,7 +220,7 @@ public class DataFormService implements IDataFormService {
 	}
 
 	/**
-	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element zurück
+	 * Diese Methode ließt die Column ein und gibt das zugehörige DataType Element zurück
 	 *
 	 * @param c
 	 *            aero.minova.rcp.form.model.xsd.Column;
@@ -231,7 +231,7 @@ public class DataFormService implements IDataFormService {
 			return DataType.INTEGER;
 		} else if (c.getBoolean() != null) {
 			return DataType.BOOLEAN;
-		} else if (c.getText() != null) {
+		} else if (c.getText() != null || c.getPeriod() != null) {
 			return DataType.STRING;
 		} else if (c.getShortTime() != null || c.getLongTime() != null) {
 			return DataType.INSTANT;
