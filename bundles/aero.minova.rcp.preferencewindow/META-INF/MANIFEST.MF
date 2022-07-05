@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.e4.core.di.annotations,
  javax.inject;bundle-version="1.0.0",
  org.eclipse.e4.core.di;bundle-version="1.7.800",
  aero.minova.rcp.constant,
- aero.minova.rcp.form.setup
+ aero.minova.rcp.form.setup,
+ aero.minova.rcp.dataservice
 Export-Package: aero.minova.rcp.preferencewindow.builder,
  aero.minova.rcp.preferencewindow.control
 Import-Package: aero.minova.rcp.dataservice,
