@@ -440,7 +440,7 @@ public class WFCSearchPart extends WFCFormPart {
 					Instant inst;
 					if (c.getShortTime() != null) {
 						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
-					} else if (c.getShortDate() != null || c.getPeriod() != null) {
+					} else if (c.getShortDate() != null) {
 						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
 					} else {
 						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());

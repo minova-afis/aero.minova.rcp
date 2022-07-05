@@ -14,7 +14,6 @@
 			<xs:element name="long-time" />
 			<xs:element name="date-time" />
 			<xs:element name="week-day" />
-			<xs:element name="period" />
 			<xs:element name="money" type="money" />
 		</xs:choice>
 		<xs:attribute name="name" type="xs:NCName" use="required">

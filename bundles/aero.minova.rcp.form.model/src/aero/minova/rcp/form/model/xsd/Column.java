@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="long-time" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *         &lt;element name="date-time" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *         &lt;element name="week-day" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
- *         &lt;element name="period" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *         &lt;element name="money" type="{}money"/&gt;
  *       &lt;/choice&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
@@ -78,7 +77,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "longTime",
     "dateTime",
     "weekDay",
-    "period",
     "money"
 })
 public class Column {
@@ -101,7 +99,6 @@ public class Column {
     protected Object dateTime;
     @XmlElement(name = "week-day")
     protected Object weekDay;
-    protected Object period;
     protected Money money;
     @XmlAttribute(name = "name", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -393,30 +390,6 @@ public class Column {
      */
     public void setWeekDay(Object value) {
         this.weekDay = value;
-    }
-
-    /**
-     * Ruft den Wert der period-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getPeriod() {
-        return period;
-    }
-
-    /**
-     * Legt den Wert der period-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setPeriod(Object value) {
-        this.period = value;
     }
 
     /**

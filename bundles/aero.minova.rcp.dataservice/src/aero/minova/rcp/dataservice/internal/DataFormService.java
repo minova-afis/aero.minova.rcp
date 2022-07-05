@@ -231,7 +231,7 @@ public class DataFormService implements IDataFormService {
 			return DataType.INTEGER;
 		} else if (c.getBoolean() != null) {
 			return DataType.BOOLEAN;
-		} else if (c.getText() != null || c.getPeriod() != null) {
+		} else if (c.getText() != null) {
 			return DataType.STRING;
 		} else if (c.getShortTime() != null || c.getLongTime() != null) {
 			return DataType.INSTANT;
