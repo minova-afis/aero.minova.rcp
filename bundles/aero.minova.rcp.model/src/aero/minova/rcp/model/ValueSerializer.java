@@ -1,6 +1,7 @@
 package aero.minova.rcp.model;
 
 import java.lang.reflect.Type;
+import java.time.Instant;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -34,6 +35,9 @@ public class ValueSerializer implements JsonSerializer<Value> {
 
 	public static JsonElement serialize(Value value, boolean useUserValues) {
 		if (value == null || value.getValue() == null) {
+			if (value != null && value.getType().equals(DataType.PERIOD)) { // Bei PeriodValue kann (base)Value null sein, aber dueDate trotzdem gesetzt
+				return new JsonPrimitive("s-" + serializePeriodValue((PeriodValue) value).toString());
+			}
 			return null;
 		}
 		switch (value.getType()) {
@@ -64,16 +68,21 @@ public class ValueSerializer implements JsonSerializer<Value> {
 			ReferenceValue rv = (ReferenceValue) value;
 			return new JsonPrimitive("r-" + rv.getReferenceValue() + "-" + rv.getRowNumber() + "-" + rv.getColumnName());
 		case PERIOD:
-			PeriodValue pv = (PeriodValue) value;
-			JsonObject o = new JsonObject();
-			o.add("base", serialize(new Value(pv.getBaseValue())));
-			o.add("userInput", pv.getUserInput() != null ? new JsonPrimitive(pv.getUserInput()) : JsonNull.INSTANCE);
-			o.add("due", serialize(pv.getDueDate()));
-			return new JsonPrimitive("s-" + o.toString());
+			return new JsonPrimitive("s-" + serializePeriodValue((PeriodValue) value).toString());
 		default:
 			System.err.println("Value " + value.getType() + " nicht bekannt (ValueSerializer)");
 			return null;
 		}
+	}
+
+	private static JsonObject serializePeriodValue(PeriodValue pv) {
+		Instant due = pv.getDueDate() != null ? pv.getDueDate().getInstantValue() : null;
+
+		JsonObject o = new JsonObject();
+		o.add("base", pv.getBaseValue() != null ? new JsonPrimitive(pv.getBaseValue().toString()) : JsonNull.INSTANCE);
+		o.add("userInput", pv.getUserInput() != null ? new JsonPrimitive(pv.getUserInput()) : JsonNull.INSTANCE);
+		o.add("due", due != null ? new JsonPrimitive(due.toString()) : JsonNull.INSTANCE);
+		return o;
 	}
 
 }

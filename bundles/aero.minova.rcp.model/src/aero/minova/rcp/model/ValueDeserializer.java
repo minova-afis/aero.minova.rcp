@@ -55,18 +55,18 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 
 				Instant startInstant = null;
 				if (start != null) {
-					startInstant = deserialize(start).getInstantValue();
+					startInstant = Instant.parse(start);
 				}
 				Instant dueInstant = null;
 				if (due != null) {
-					dueInstant = deserialize(due).getInstantValue();
+					dueInstant = Instant.parse(due);
 				}
 
 				return new PeriodValue(startInstant, userInput, dueInstant);
 			} catch (Exception e) {
 				// Anscheinend kein PeriodValue
 			}
-			
+
 			// Dann normalen StringValue zurückgeben
 			return new Value(value, DataType.STRING);
 		case "i":
