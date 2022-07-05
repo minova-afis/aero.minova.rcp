@@ -76,7 +76,7 @@ public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
 		for (Column column : columns.subList(1, columns.size())) {
 			if (column.getType().equals(DataType.BOOLEAN)) {
 				configureBooleanCell(configRegistry, i++, true);
-			} else if ((column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null)) {
+			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
 				configureShortDateCell(configRegistry, i++);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortTime() != null) {
 				configureShortTimeCell(configRegistry, i++);
