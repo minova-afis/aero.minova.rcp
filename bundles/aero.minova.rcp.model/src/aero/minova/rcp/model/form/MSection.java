@@ -15,7 +15,7 @@ public class MSection {
 	private MDetail mDetail;
 	// Liste an allen mit Tab erreichbaren Feldern der Section. Festlegen dieser
 	// anhand der Preferences
-	private List<MField> tabList = new ArrayList<>();
+	private List<MField> mFields = new ArrayList<>();
 	// ID dieser Page ("Head" für Head)
 	private String id;
 	// Text für diese Page
@@ -73,15 +73,23 @@ public class MSection {
 	}
 
 	public List<MField> getTabList() {
+		List<MField> tabList = new ArrayList<>();
+
+		for (MField f : mFields) {
+			if (f.isVisible() && !f.isReadOnly()) {
+				tabList.add(f);
+			}
+		}
+
 		return tabList;
 	}
 
-	public void setTabList(List<MField> tabList) {
-		this.tabList = tabList;
+	public void setMFieldList(List<MField> mFields) {
+		this.mFields = mFields;
 	}
 
-	public void addTabField(MField mField) {
-		this.tabList.add(mField);
+	public void addMField(MField mField) {
+		this.mFields.add(mField);
 	}
 
 	public String getId() {
@@ -118,6 +126,12 @@ public class MSection {
 
 	public void setVisible(boolean visible) {
 		sectionAccessor.setVisible(visible);
+	}
+
+	public void updateTabList() {
+		if (sectionAccessor != null) {
+			sectionAccessor.updateTabList();
+		}
 	}
 
 }

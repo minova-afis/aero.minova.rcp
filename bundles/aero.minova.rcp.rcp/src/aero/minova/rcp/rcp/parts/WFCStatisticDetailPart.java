@@ -246,7 +246,7 @@ public class WFCStatisticDetailPart {
 		mFields.sort((m1, m2) -> m1.getSqlIndex().compareTo(m2.getSqlIndex()));
 		for (MField f : mFields) {
 			mDetail.putField(f);
-			mSection.addTabField(f);
+			mSection.addMField(f);
 		}
 		layoutSectionClient(mFields);
 	}
@@ -289,7 +289,7 @@ public class WFCStatisticDetailPart {
 
 		// Tab-Liste
 		TabUtil.sortTabList(mSection);
-		clientComposite.setTabList(TabUtil.getTabListForSectionComposite(mSection, clientComposite));
+		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(section, mSection, selectAllControls));
 
 		// Übersetzen und zeichen

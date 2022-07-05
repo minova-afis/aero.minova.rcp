@@ -623,7 +623,7 @@ public class WFCDetailPart extends WFCFormPart {
 		// Sortieren der Fields nach Tab-Index.
 		TabUtil.sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections.
-		clientComposite.setTabList(TabUtil.getTabListForSectionComposite(mSection, clientComposite));
+		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		// Setzen der TabListe der Sections im Part.
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(section, mSection, selectAllControls));
 
@@ -1024,7 +1024,7 @@ public class WFCDetailPart extends WFCFormPart {
 			f.setMSection(mSection);
 
 			if (field.isVisible()) {
-				mSection.addTabField(f);
+				mSection.addMField(f);
 			}
 
 			return f;

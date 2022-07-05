@@ -969,8 +969,8 @@ public class WFCDetailCASRequestsUtil {
 
 		// Sortieren der Fields nach Tab-Index.
 		TabUtil.sortTabList(mSection);
-		// Setzen der TabListe für die einzelnen Sections.
-		clientComposite.setTabList(TabUtil.getTabListForSectionComposite(mSection, clientComposite));
+		// Setzen der TabListe für die einzelnen Sections
+		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		// Setzen der TabListe der Sections im Part.
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
 
