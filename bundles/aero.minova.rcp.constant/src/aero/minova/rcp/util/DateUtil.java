@@ -108,12 +108,19 @@ public class DateUtil {
 		return getDate(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC), input, locale, datePattern);
 	}
 
-	public static Instant getDate(Instant today, String input, Locale locale, String datePattern) {
-		String[] formulars = splitInput(input);
+	public static Instant getDate(Instant baseDate, String input, Locale locale, String datePattern) {
+
+		String[] formulars;
+		if (input.length() == 0 || Character.isDigit(input.charAt(0))) {
+			formulars = splitInput(input);
+		} else {
+			// z.B. bei +2w als Ausgangsdatum als Basis nehmen
+			formulars = splitInput(getDateString(baseDate, Locale.GERMAN, datePattern) + input);
+		}
 		LocalDateTime startOfToday = null;
 
 		if (formulars.length > 0) {
-			startOfToday = LocalDate.ofInstant(today, ZoneId.of("UTC")).atStartOfDay();
+			startOfToday = LocalDate.ofInstant(baseDate, ZoneId.of("UTC")).atStartOfDay();
 		}
 
 		int pos = 0;
@@ -121,13 +128,13 @@ public class DateUtil {
 			if (formulars.length > 0) {
 				if (formulars[0].matches("\\d*")) {
 					// Es beginnt mit eine Tagesangabe
-					startOfToday = LocalDate.ofInstant(getNumericDate(today, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
+					startOfToday = LocalDate.ofInstant(getNumericDate(baseDate, formulars[pos++], datePattern), ZoneId.of("UTC")).atStartOfDay();
 				}
 				while (pos < formulars.length && startOfToday != null) {
 					startOfToday = addRelativeDate(startOfToday, formulars[pos++]);
 				}
 			}
-		} catch (DateTimeException | NullPointerException e ) {
+		} catch (DateTimeException | NullPointerException e) {
 			// Es ließ sich wohl nicht korrekt konvertieren
 			startOfToday = null;
 		}

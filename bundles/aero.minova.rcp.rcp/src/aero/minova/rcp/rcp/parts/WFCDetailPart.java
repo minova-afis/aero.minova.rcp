@@ -101,6 +101,7 @@ import aero.minova.rcp.model.form.MLabelText;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MPeriodField;
 import aero.minova.rcp.model.form.MRadioField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
@@ -119,6 +120,7 @@ import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.fields.LabelTextField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.PeriodField;
 import aero.minova.rcp.rcp.fields.RadioField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
@@ -1110,6 +1112,8 @@ public class WFCDetailPart extends WFCFormPart {
 			RadioField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MLabelText) {
 			LabelTextField.createBold(composite, field, row, column, mPerspective);
+		} else if (field instanceof MPeriodField) {
+			PeriodField.create(composite, field, row, locale, mPerspective);
 		}
 	}
 

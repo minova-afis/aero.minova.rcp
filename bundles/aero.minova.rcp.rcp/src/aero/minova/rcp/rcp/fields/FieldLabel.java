@@ -17,7 +17,7 @@ import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.form.MField;
 
 @SuppressWarnings("restriction")
-public abstract class FieldLabel {
+public interface FieldLabel {
 
 	public static Label create(Composite composite, MField field) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();

@@ -36,6 +36,10 @@ public class ModelToViewModel {
 			// Param-String Felder werden nicht angezeigt
 			f.setNumberRowsSpanned(0);
 		}
+		if (f instanceof MPeriodField) {
+			// Felder mit Periode benötigen immer 4 Spalten
+			f.setNumberColumnsSpanned(4);
+		}
 		if (field.getTabIndex() != null) {
 			f.setTabIndex(field.getTabIndex().intValue());
 		}
@@ -138,6 +142,10 @@ public class ModelToViewModel {
 			MParamStringField f = new MParamStringField(locale);
 			f.setSubFields(field.getParamString().getField());
 			return f;
+		}
+
+		if (field.getPeriod() != null) {
+			return new MPeriodField();
 		}
 
 		if (field.getEditor() != null) {

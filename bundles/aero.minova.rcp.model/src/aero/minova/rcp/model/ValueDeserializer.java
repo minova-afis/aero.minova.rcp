@@ -7,7 +7,9 @@ import java.time.ZonedDateTime;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 import aero.minova.rcp.constants.Constants;
 
@@ -43,6 +45,29 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		case "m":
 			return new Value(Double.parseDouble(value), DataType.BIGDECIMAL);
 		case "s":
+
+			try {
+				// Handelt es sich um ein PeriodValue?
+				JsonObject o = (JsonObject) new JsonParser().parse(value);
+				String start = o.get("base").isJsonNull() ? null : o.get("base").getAsString();
+				String userInput = o.get("userInput").isJsonNull() ? null : o.get("userInput").getAsString();
+				String due = o.get("due").isJsonNull() ? null : o.get("due").getAsString();
+
+				Instant startInstant = null;
+				if (start != null) {
+					startInstant = Instant.parse(start);
+				}
+				Instant dueInstant = null;
+				if (due != null) {
+					dueInstant = Instant.parse(due);
+				}
+
+				return new PeriodValue(startInstant, userInput, dueInstant);
+			} catch (Exception e) {
+				// Anscheinend kein PeriodValue
+			}
+
+			// Dann normalen StringValue zurückgeben
 			return new Value(value, DataType.STRING);
 		case "i":
 			return new Value(Instant.parse(value), DataType.INSTANT);
@@ -71,7 +96,7 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 
 			return new ReferenceValue(referenceID, rowNumber, columnName);
 		default:
-			System.err.println("Value mit prefix " + typeString + " nicht bekannt");
+			System.err.println("Value mit prefix " + typeString + " nicht bekannt (ValueDeserializer)");
 			break;
 		}
 		return null;

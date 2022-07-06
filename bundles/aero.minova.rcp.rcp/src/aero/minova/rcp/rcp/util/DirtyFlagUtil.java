@@ -35,6 +35,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MPeriodField;
 
 public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 
@@ -95,6 +96,10 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 					}
 				} else if (mfield instanceof MParamStringField) {
 					if (!((MParamStringField) mfield).isNullValue()) {
+						return true;
+					}
+				} else if (mfield instanceof MPeriodField) {
+					if (!((MPeriodField) mfield).isNullValue()) {
 						return true;
 					}
 				} else if (mfield.getValue() != null) {

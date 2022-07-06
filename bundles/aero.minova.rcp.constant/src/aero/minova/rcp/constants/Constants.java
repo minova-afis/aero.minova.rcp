@@ -179,4 +179,11 @@ public class Constants {
 	public static final String SETTINGS_PROPERTIES = "SettingsProperties";
 	public static final String SETTINGS_DEFAULT_CONNECTION_STRING = "defaultConnectionString";
 
+	// Aus FieldUtil
+	public static final String TRANSLATE_LOCALE = "aero.minova.rcp.translate.locale";
+	public static final String TRANSLATE_PROPERTY = "aero.minova.rcp.translate.property";
+	public static final String FIELD_MIN_VALUE = "aero.minova.rcp.field.minimum";
+	public static final String FIELD_MAX_VALUE = "aero.minova.rcp.field.maximum";
+	public static final String FIELD_DECIMALS = "aero.minova.rcp.field.decimals";
+
 }

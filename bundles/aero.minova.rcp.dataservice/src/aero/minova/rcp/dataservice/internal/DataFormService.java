@@ -220,7 +220,7 @@ public class DataFormService implements IDataFormService {
 	}
 
 	/**
-	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element zurück
+	 * Diese Methode ließt die Column ein und gibt das zugehörige DataType Element zurück
 	 *
 	 * @param c
 	 *            aero.minova.rcp.form.model.xsd.Column;
