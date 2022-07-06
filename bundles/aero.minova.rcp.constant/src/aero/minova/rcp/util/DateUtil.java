@@ -109,6 +109,9 @@ public class DateUtil {
 	}
 
 	public static Instant getDate(Instant baseDate, String input, Locale locale, String datePattern) {
+		if (datePattern == null) {
+			datePattern = defaultPattern;
+		}
 
 		String[] formulars;
 		if (input.length() == 0 || Character.isDigit(input.charAt(0))) {
