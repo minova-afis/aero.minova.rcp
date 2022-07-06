@@ -271,18 +271,22 @@ public class WFCDetailPart extends WFCFormPart {
 		public String formSuffix;
 		public String id;
 		public String icon;
+		public boolean isVisible;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
 			if (headOrPageOrGrid instanceof Head) {
 				isHead = true;
 				id = "Head";
+				isVisible = true;
 			} else if (headOrPageOrGrid instanceof Page) {
 				id = ((Page) headOrPageOrGrid).getId();
 				icon = ((Page) headOrPageOrGrid).getIcon();
+				isVisible = ((Page) headOrPageOrGrid).isVisible();
 			} else {
 				id = ((Grid) headOrPageOrGrid).getId();
 				icon = ((Grid) headOrPageOrGrid).getIcon();
+				isVisible = true;
 			}
 		}
 
@@ -579,6 +583,9 @@ public class WFCDetailPart extends WFCFormPart {
 		if (Boolean.parseBoolean(minimizedString)) {
 			minimizeSection(section);
 		}
+
+		// Sichtbarkeit entsprechend der Maske setzen
+		mSection.setVisible(headOrPageOrGrid.isVisible);
 
 		detailWidth = section.getCssStyler().getSectionWidth();
 		section.requestLayout();
