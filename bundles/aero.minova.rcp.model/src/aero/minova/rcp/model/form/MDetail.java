@@ -118,6 +118,10 @@ public class MDetail {
 	}
 
 	public MSection getPage(String id) {
+		return getSection(id);
+	}
+
+	public MSection getSection(String id) {
 		for (MSection m : mSectionList) {
 			if (Objects.equals(m.getId(), id)) {
 				return m;
