@@ -1,6 +1,7 @@
 package aero.minova.rcp.dataservice;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
@@ -156,4 +157,7 @@ public interface IDataService {
 	 */
 	String getSiteParameter(String key, String defaultVal);
 
+	HttpClient.Builder getHttpClientBuilder();
+	
+	URI getServer();
 }

@@ -114,6 +114,8 @@ public class DataService implements IDataService {
 	private static final boolean DISABLE_FILE_UPDATE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/disablefileupdate"));
 
 	private HttpClient httpClient;
+	private HttpClient.Builder httpClientBuilder;
+
 	private Gson gson;
 
 	private String username = null;// "admin";
@@ -164,9 +166,10 @@ public class DataService implements IDataService {
 				}
 			};
 			// TODO: fix certificate-problems
-			httpClient = HttpClient.newBuilder()//
+			httpClientBuilder = HttpClient.newBuilder()//
 					.sslContext(disabledSslVerificationContext())//
-					.authenticator(authentication).build();
+					.authenticator(authentication);
+			httpClient = httpClientBuilder.build();
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -668,6 +671,16 @@ public class DataService implements IDataService {
 	}
 
 	@Override
+	public HttpClient.Builder getHttpClientBuilder() {
+		return httpClientBuilder;
+	}
+	
+	@Override
+	public URI getServer() {
+		return server;
+	}
+	
+	@Override
 	public CompletableFuture<String> getCachedFileContent(String filename) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -878,7 +891,7 @@ public class DataService implements IDataService {
 	public String getUserName() {
 		return username;
 	}
-
+	
 	@Override
 	public void setLogger(Logger logger) {
 		this.logger = logger;
