@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ### Änderung
 - Tabliste einer Section updaten, wenn sich read-only eines Feldes ändert
+- IDataService um Methoden getHttpClientBuilder() und getServer() erweitert
 
 ### Bugfixes
 - Exception vermeiden, wenn kein Datepattern gegeben ist
