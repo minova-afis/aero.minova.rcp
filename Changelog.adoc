@@ -16,11 +16,19 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ### Änderung
 - Tabliste einer Section updaten, wenn sich read-only eines Feldes ändert
+
+### Bugfixes
+- Exception vermeiden, wenn eine Section keine ID hat
+
+## [12.1.1] - 2022-07-1
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Änderung
 - IDataService um Methoden getHttpClientBuilder() und getServer() erweitert
 
 ### Bugfixes
 - Exception vermeiden, wenn kein Datepattern gegeben ist
-- Exception vermeiden, wenn eine Section keine ID hat
 - Radioboxen unter Windows nutzbar machen
 
 ## [12.1.0] - 2022-07-06
