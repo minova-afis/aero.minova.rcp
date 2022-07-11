@@ -20,6 +20,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 ### Bugfixes
 - Exception vermeiden, wenn kein Datepattern gegeben ist
 - Exception vermeiden, wenn eine Section keine ID hat
+- Radioboxen unter Windows nutzbar machen
 
 ## [12.1.0] - 2022-07-06
 
