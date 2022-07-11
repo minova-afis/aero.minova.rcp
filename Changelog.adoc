@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ### Änderung
 - Tabliste einer Section updaten, wenn sich read-only eines Feldes ändert
+- Nach Tab/Enter automatisch zu ausgewählten Feld scrollen
 
 ### Bugfixes
 - Exception vermeiden, wenn eine Section keine ID hat
