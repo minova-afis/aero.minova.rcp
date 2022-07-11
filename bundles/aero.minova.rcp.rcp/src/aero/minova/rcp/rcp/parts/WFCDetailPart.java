@@ -344,6 +344,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
 		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolled.setShowFocusedControl(true);
 		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
 		DetailLayout detailLayout = new DetailLayout();
 		wrap.setLayout(detailLayout);
