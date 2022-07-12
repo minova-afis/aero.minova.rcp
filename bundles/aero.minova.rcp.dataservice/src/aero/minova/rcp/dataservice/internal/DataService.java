@@ -38,6 +38,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.osgi.framework.BundleContext;
@@ -78,6 +80,7 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.util.ErrorObject;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 
 @Component
 public class DataService implements IDataService {
@@ -101,8 +104,6 @@ public class DataService implements IDataService {
 	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 	public static final String ERROR = "Error";
 
-	private static int timeoutDuration = 15;
-	private static int timeoutDurationOpenNotification = 1;
 	private int minTimeBetweenError = 3;
 	Map<String, Long> timeOfLastErrorMessage = new HashMap<>();
 
@@ -127,6 +128,8 @@ public class DataService implements IDataService {
 	private Map<String, String> siteParameters;
 
 	EventAdmin eventAdmin;
+
+	private IEclipsePreferences preferences;
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
@@ -180,6 +183,8 @@ public class DataService implements IDataService {
 				.registerTypeAdapter(Column.class, new ColumnSerializer()) //
 				.setPrettyPrinting() //
 				.create();
+
+		preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 	}
 
 	private void initSiteParameters() {
@@ -245,7 +250,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/index")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.method("POST", BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
 		log("CAS Request Table:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), searchTable, false);
 
@@ -273,7 +278,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/x-procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
 		log("CAS Call Transaction List:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), procedureList);
 
@@ -320,7 +325,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
 		log("CAS Call Procedure:\n" + request.toString() + "\n" + body.replaceAll("\\s", ""), table, true);
 
@@ -450,7 +455,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * 2)).build();
 
 		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getValue().toString() + ".xml");
 		try {
@@ -536,7 +541,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(timeoutDuration * 2)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * 2)).build();
 
 		Path path = getStoragePath().resolve(fileName);
 		try {
@@ -564,7 +569,7 @@ public class DataService implements IDataService {
 		String method = "File Async";
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/read?path=" + fileName))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 		Path localFile = getStoragePath().resolve(fileName);
 
 		log("CAS Request " + method + ":\n" + request + "\n" + fileName);
@@ -622,8 +627,12 @@ public class DataService implements IDataService {
 			return true;
 		}
 
-		if (DISABLE_FILE_UPDATE) { // Wenn diese Option gesetzt ist sollen Files nicht geupdated werden
+		if (DISABLE_FILE_UPDATE) { // Wenn diese Option gesetzt ist sollen Files NIE geupdated werden
 			return false;
+		}
+
+		if (preferences.getBoolean(ApplicationPreferences.DISABLE_FILE_CACHE, false)) { // Wenn diese Option gesetzt ist sollen Files IMMER geupdated werden
+			return true;
 		}
 
 		String serverHash;
@@ -649,7 +658,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<String> getServerHashForFile(String filename) {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("files/hash?path=" + filename))//
 				.header(CONTENT_TYPE, APPLICATION_OCTET_STREAM) //
-				.timeout(Duration.ofSeconds(timeoutDuration)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
 		log("CAS Request Server Hash for File:\n" + request + "\n" + filename);
 
@@ -674,12 +683,12 @@ public class DataService implements IDataService {
 	public HttpClient.Builder getHttpClientBuilder() {
 		return httpClientBuilder;
 	}
-	
+
 	@Override
 	public URI getServer() {
 		return server;
 	}
-	
+
 	@Override
 	public CompletableFuture<String> getCachedFileContent(String filename) {
 		return CompletableFuture.supplyAsync(() -> {
@@ -895,16 +904,6 @@ public class DataService implements IDataService {
 	@Override
 	public void setLogger(Logger logger) {
 		this.logger = logger;
-	}
-
-	@Override
-	public void setTimeout(int timeout) {
-		timeoutDuration = timeout;
-	}
-
-	@Override
-	public void setTimeoutOpenNotification(int timeoutOpen) {
-		timeoutDurationOpenNotification = timeoutOpen;
 	}
 
 	@Override
