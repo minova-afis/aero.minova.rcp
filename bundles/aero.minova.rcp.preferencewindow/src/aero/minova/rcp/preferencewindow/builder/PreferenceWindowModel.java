@@ -122,11 +122,6 @@ public class PreferenceWindowModel {
 		psd.add(new PreferenceDescriptor(ApplicationPreferences.TIME_UTIL, translationService.translate("@Preferences.TimeUtilPattern", null), null, 0.2,
 				DisplayType.TIME_UTIL, ""));
 
-		psd = new PreferenceSectionDescriptor("ExpertMode", translationService.translate("@Preferences.ExpertMode", null), 0.4);
-		ptd.add(psd);
-		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_HIDDEN_SECTIONS, //
-				translationService.translate("@Preferences.ShowHiddenSections", null), null, 0.1, DisplayType.CHECK, false));
-
 		return ptd;
 	}
 
@@ -189,6 +184,14 @@ public class PreferenceWindowModel {
 //				DisplayType.CHECK, true));
 //		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_CHANGED_ROWS, translationService.translate("@Preferences.CHANGED.ShowChangedRows", null),
 //				0.5, DisplayType.CHECK, true));
+
+		psd = new PreferenceSectionDescriptor("ExpertMode", translationService.translate("@Preferences.ExpertMode", null), 0.7);
+		ptd.add(psd);
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.SHOW_HIDDEN_SECTIONS, //
+				translationService.translate("@Preferences.ShowHiddenSections", null), null, 0.1, DisplayType.CHECK, false));
+		psd.add(new PreferenceDescriptor(ApplicationPreferences.DISABLE_FILE_CACHE, //
+				translationService.translate("@Preferences.DisableFileCache", null),
+				translationService.translate("@Preferences.DisableFileCache.Tooltip", null), 0.2, DisplayType.CHECK, false));
 
 		return ptd;
 	}

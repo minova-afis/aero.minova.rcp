@@ -2,6 +2,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="handleDataService" immediate="true" name="aero.minova.rcp.translate.service.WFCTranslationDownloadService">
    <reference bind="getDataService" interface="aero.minova.rcp.dataservice.IDataService" name="getDataService"/>
    <reference bind="getDummyService" interface="aero.minova.rcp.dataservice.IDummyService" name="getDummyService"/>
-   <reference bind="registerEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="registerEventAdmin" unbind="unregisterEventAdmin"/>
+   <reference bind="registerEventAdmin" interface="org.osgi.service.event.EventAdmin" name="registerEventAdmin" unbind="unregisterEventAdmin"/>
    <implementation class="aero.minova.rcp.translate.service.WFCTranslationDownloadService"/>
 </scr:component>

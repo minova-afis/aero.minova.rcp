@@ -272,5 +272,10 @@ public class ApplicationPreferences {
 	 */
 	public static final String INDEX_LIMIT = "IndexLimit";
 
+	/*
+	 * Wenn diese Option gesetzt ist werden alle Dateien immer neu vom CAS geladen, der Hash wird ignoriert
+	 */
+	public static final String DISABLE_FILE_CACHE = "DisableFileCache";
+
 	private ApplicationPreferences() {}
 }
