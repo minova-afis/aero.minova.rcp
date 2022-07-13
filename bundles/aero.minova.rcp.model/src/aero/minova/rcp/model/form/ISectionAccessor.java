@@ -4,4 +4,6 @@ public interface ISectionAccessor {
 
 	public void setVisible(boolean visible);
 
+	void updateTabList();
+
 }

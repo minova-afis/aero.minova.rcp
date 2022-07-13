@@ -354,11 +354,18 @@ public abstract class MField {
 			cssClass = Constants.CSS_READONLY;
 		} else if (!required) {
 			cssClass = Constants.CSS_STANDARD;
+		} else {
+			cssClass = Constants.CSS_REQUIRED;
 		}
 
 		isValid(); // Überprüfen und Farbe entsprechend setzen
 		if (valueAccessor != null) {
 			valueAccessor.setEditable(!readOnly); // Editierbarkeit entsprechend updaten
+		}
+
+		// Tabliste updaten, damit Feld (nicht) angesprungen werden kann
+		if (mSection != null) {
+			mSection.updateTabList();
 		}
 	}
 

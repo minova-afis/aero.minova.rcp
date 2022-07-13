@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.helper.IHelper;
@@ -117,8 +118,12 @@ public class MDetail {
 	}
 
 	public MSection getPage(String id) {
+		return getSection(id);
+	}
+
+	public MSection getSection(String id) {
 		for (MSection m : mSectionList) {
-			if (m.getId().equals(id)) {
+			if (Objects.equals(m.getId(), id)) {
 				return m;
 			}
 		}

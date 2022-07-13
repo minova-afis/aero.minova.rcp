@@ -32,15 +32,13 @@ public class TabUtil {
 	}
 
 	/**
-	 * Gibt einen Array mit den Controls für die TabListe des Composites der Section zurück.
+	 * Updated die Tab-Liste eines SectionComposites.
 	 *
-	 * @param mSection
-	 *            der Section
 	 * @param composite
 	 *            der Section
 	 * @return Array mit Controls
 	 */
-	public static Control[] getTabListForSectionComposite(MSection mSection, Composite composite) {
+	public static void updateTabListOfSectionComposite(Composite composite) {
 
 		List<Control> tabList = new ArrayList<>();
 
@@ -56,7 +54,7 @@ public class TabUtil {
 			}
 		}
 
-		return tabList.toArray(new Control[0]);
+		composite.setTabList(tabList.toArray(new Control[0]));
 	}
 
 	/**
@@ -114,7 +112,7 @@ public class TabUtil {
 				return 1;
 			}
 		});
-		mSection.setTabList(tabList);
+		mSection.setMFieldList(tabList);
 	}
 
 	/**
