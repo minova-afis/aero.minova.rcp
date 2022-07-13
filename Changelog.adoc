@@ -23,6 +23,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ### Bugfixes
 - Exception vermeiden, wenn eine Section keine ID hat
+- Die korrekte TimeZone verwenden, dass bei Eingabe von "0 0" im DateTimeField die korrekte Zeit wiedergegeben wird
 
 ## [12.1.1] - 2022-07-1
 
