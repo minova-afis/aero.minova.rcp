@@ -1,6 +1,9 @@
 package aero.minova.rcp.rcp.parts;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,6 +68,8 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
+import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.nattable.MinovaSearchConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
@@ -91,7 +96,11 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	MPart mPart;
-
+	
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	String timezone;
+	
 	private Table data;
 	private NatTable natTable;
 
@@ -441,7 +450,7 @@ public class WFCSearchPart extends WFCFormPart {
 					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
 						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
 					} else {
-						inst = DateTimeUtil.getDateTime(fv.getUserInputWithoutOperator());
+						inst = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), fv.getUserInputWithoutOperator(), CustomLocale.getLocale(), timezone);
 					}
 
 					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);

@@ -15,8 +15,8 @@ public class DateTimeUtil {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static Instant getDateTime(String input) {
-		return getDateTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input);
+	public static Instant getDateTime(String input, String timezone) {
+		return getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), input);
 	}
 
 	public static Instant getDateTime(Instant todayNow, String input) {
@@ -39,8 +39,9 @@ public class DateTimeUtil {
 		return getDateTime(todayNow, input, Locale.getDefault(), "", "", zoneId);
 	}
 
-	public static String getDateTimeString(Instant instant, Locale locale, String datePattern, String timePattern) {
-
+	public static String getDateTimeString(Instant instant, Locale locale, String datePattern, String timePattern, String timezone) {
+		
+		instant = LocalDateTime.ofInstant(instant, ZoneId.of(timezone)).toInstant(ZoneOffset.UTC);
 		String part1 = DateUtil.getDateString(instant, locale, datePattern);
 		String part2 = TimeUtil.getTimeString(instant, locale, timePattern);
 		return part1 + " " + part2;
@@ -85,6 +86,7 @@ public class DateTimeUtil {
 		} else {
 			return null;
 		}
+		
 
 		if (null != dateIn && null != timeIn) {
 			dateLocal = LocalDate.ofInstant(dateIn, ZoneOffset.UTC);
@@ -94,8 +96,8 @@ public class DateTimeUtil {
 		}
 
 		try {
-			ZoneId zI = ZoneId.of(zoneId);
-			dateTime = ZonedDateTime.of(LocalDateTime.of(dateLocal, timeLocal), zI).toInstant();
+			ZonedDateTime zdt = ZonedDateTime.of(dateLocal, timeLocal, ZoneId.of(zoneId));
+			dateTime = LocalDateTime.ofInstant(zdt.toInstant(), ZoneId.of("UTC")).toInstant(ZoneOffset.UTC);
 		} catch (Exception e) {
 			// Invalid ZoneId;
 			return null;

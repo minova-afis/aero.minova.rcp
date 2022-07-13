@@ -19,6 +19,8 @@ public class DateTimeDisplayConverter extends DisplayConverter {
 	private Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 	private String dateUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.DATE_UTIL, DisplayType.DATE_UTIL, "", locale);
 	private String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
+	private String timezone = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.STRING, "", locale);
+
 
 	public DateTimeDisplayConverter(Locale locale) {
 		this.locale = locale;
@@ -28,7 +30,7 @@ public class DateTimeDisplayConverter extends DisplayConverter {
 	public Object canonicalToDisplayValue(Object canonicalValue) {
 		if (canonicalValue instanceof Instant) {
 			IEclipsePreferences node = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
-			return DateTimeUtil.getDateTimeString((Instant) canonicalValue, locale, dateUtil, timeUtil);
+			return DateTimeUtil.getDateTimeString((Instant) canonicalValue, locale, dateUtil, timeUtil, timezone);
 		}
 		return null;
 	}
@@ -36,7 +38,7 @@ public class DateTimeDisplayConverter extends DisplayConverter {
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
 		if (displayValue instanceof String && !((String) displayValue).isBlank()) {
-			Instant res = DateTimeUtil.getDateTime((String) displayValue);
+			Instant res = DateTimeUtil.getDateTime((String) displayValue, timezone);
 			if (res != null) {
 				return res;
 			} else {

@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -19,11 +20,16 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
+import javax.inject.*;
 
 public class DateTimeValueAccessor extends AbstractValueAccessor {
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	String timezone;
+
 	public DateTimeValueAccessor(MField field, Control control) {
-				super(field, control);
+		super(field, control);
 	}
 
 	@Override
@@ -37,7 +43,7 @@ public class DateTimeValueAccessor extends AbstractValueAccessor {
 			setText(control, "");
 		} else {
 			Instant date = value.getInstantValue();
-			LocalDateTime localDateTime = LocalDateTime.ofInstant(date, ZoneId.of("UTC"));
+			LocalDateTime localDateTime = LocalDateTime.ofInstant(date, ZoneId.of(timezone));
 			String pattern = dateUtil + " " + timeUtil;
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
 			if (dateUtil.isBlank() && timeUtil.isBlank()) {
@@ -52,7 +58,7 @@ public class DateTimeValueAccessor extends AbstractValueAccessor {
 			}
 		}
 	}
-	
+
 	private void setText(Control control, String text) {
 		if (control instanceof TextAssist) {
 			((TextAssist) control).setText(text);

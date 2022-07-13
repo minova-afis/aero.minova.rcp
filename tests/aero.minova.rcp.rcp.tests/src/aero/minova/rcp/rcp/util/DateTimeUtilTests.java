@@ -277,6 +277,6 @@ class DateTimeUtilTests {
 	@Test
 	void ensureOuputOfGivenDateTimeWithLocaleGERMANYAndPattern_ddMinusMMMinusyyAndHH_mm() {
 		Instant initialDay = LocalDate.of(2020, MAY, 13).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
-		assertEquals("13.05.20 18:12", DateTimeUtil.getDateTimeString(initialDay, Locale.GERMANY, "dd.MM.yy", "HH:mm"));
+		assertEquals("13.05.20 20:12", DateTimeUtil.getDateTimeString(initialDay, Locale.GERMANY, "dd.MM.yy", "HH:mm", "Europe/Berlin"));
 	}
 }
