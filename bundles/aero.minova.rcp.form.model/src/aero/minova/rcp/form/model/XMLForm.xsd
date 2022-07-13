@@ -358,6 +358,7 @@
 				<xs:element name="boolean" type="boolean" />
 				<xs:element name="color" type="color" />
 				<xs:element name="label-text"/>
+				<xs:element name="period"/>
 				<xs:element name="radiobox" type="radiobox"/>
 			</xs:choice>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="msg">

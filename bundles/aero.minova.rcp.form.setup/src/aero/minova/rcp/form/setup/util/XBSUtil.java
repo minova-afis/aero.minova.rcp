@@ -12,7 +12,11 @@ public class XBSUtil {
 	private XBSUtil() {}
 
 	/**
-	 * Liefert die ERSTE Node mit dem angegebenen Namen aus den Preferences
+	 * Liefert die ERSTE Node mit dem angegebenen Namen aus den Preferences. Zum Auslesen der Preferences:
+	 * 
+	 * <pre>
+	 * Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
+	 * </pre>
 	 *
 	 * @param preferences
 	 *            aus der .xbs ausgelesenen Preferences
@@ -71,21 +75,35 @@ public class XBSUtil {
 	}
 
 	/**
-	 * Liefert die Map einer Node der .xbs zurück.
+	 * Liefert die Map einer Node der .xbs zurück. Zum Auslesen der Preferences:
+	 * 
+	 * <pre>
+	 * Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
+	 * </pre>
 	 *
 	 * @param preferences
 	 * @return
 	 */
 	public static Map<String, String> getMapOfNode(Preferences preferences, String name) {
+		Node settingsNode = getNodeWithName(preferences, name);
+		if (settingsNode == null) {
+			return new HashMap<>();
+		}
+
+		return getMapOfNode(settingsNode);
+	}
+
+	/**
+	 * Liefert die Map einer Node der .xbs zurück.
+	 *
+	 * @param node
+	 * @return
+	 */
+	public static Map<String, String> getMapOfNode(Node node) {
 
 		Map<String, String> map = new HashMap<>();
 
-		Node settingsNode = getNodeWithName(preferences, name);
-		if (settingsNode == null) {
-			return map;
-		}
-
-		aero.minova.rcp.form.setup.xbs.Map prefMap = settingsNode.getMap();
+		aero.minova.rcp.form.setup.xbs.Map prefMap = node.getMap();
 		for (Entry e : prefMap.getEntry()) {
 			map.put(e.getKey(), e.getValue());
 		}

@@ -82,4 +82,25 @@ public class FileUtil {
 		}
 	}
 
+	/**
+	 * Löscht ein Verzeichnis mit allen Unterdateien. Wenn beim löschen einer Datei ein Fehler auftritt wird dieser abgefangen, und versucht die restlichen
+	 * Dateien zu löschen
+	 * 
+	 * @param file
+	 */
+	public static void deleteDir(File file) {
+		File[] contents = file.listFiles();
+		if (contents != null) {
+			for (File f : contents) {
+				deleteDir(f);
+			}
+		}
+
+		try {
+			file.delete();
+		} catch (Exception e) {
+			// Exception abfangen, damit Rest gelöscht werden kann
+		}
+	}
+
 }

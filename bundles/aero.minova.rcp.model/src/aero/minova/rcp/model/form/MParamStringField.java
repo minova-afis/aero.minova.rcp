@@ -111,4 +111,24 @@ public class MParamStringField extends MField implements ValueChangeListener {
 		return cacheValue != null ? cacheValue : new Value("");
 	}
 
+	/**
+	 * Liefert true, wenn alle Kinderfelder null Values haben -> Dieses Feld hat effektiv null als Value <br>
+	 * Erklärung: MParamStringFelder geben als Value immer den Parameter String ({0-0-0}{1-0-0}{2-7-14}20220629020000...) zurück. Deshalb gibt es diese Methode,
+	 * die überprüft ob alle Unterfelder null sind.
+	 * 
+	 * @return
+	 */
+	public boolean isNullValue() {
+		for (MField subMField : subMFields) {
+			if (subMField instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
+				if (Boolean.TRUE.equals(subMField.getValue().getBooleanValue())) {
+					return false;
+				}
+			} else if (subMField.getValue() != null) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

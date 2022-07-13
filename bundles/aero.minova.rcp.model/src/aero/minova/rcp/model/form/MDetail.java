@@ -254,6 +254,12 @@ public class MDetail {
 		}
 	}
 
+	public void resetAllFieldsVisibility() {
+		for (MField f : fields.values()) {
+			f.resetVisibility();
+		}
+	}
+
 	public void commitAndCloseGridEditors() {
 		for (MGrid g : grids.values()) {
 			g.closeEditor();

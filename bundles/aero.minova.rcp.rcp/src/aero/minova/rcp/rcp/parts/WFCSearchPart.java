@@ -117,6 +117,9 @@ public class WFCSearchPart extends WFCFormPart {
 	public void createComposite(Composite parent, IEclipseContext context) {
 		new FormToolkit(parent.getDisplay());
 		getForm();
+		if (form == null) {
+			return;
+		}
 
 		// "&" Spalte erstellen
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
@@ -264,6 +267,9 @@ public class WFCSearchPart extends WFCFormPart {
 	 */
 	@PersistTableSelection
 	public void savePrefs(@Named("SaveRowConfig") boolean saveRowConfig, @Named("ConfigName") String name) {
+		if (form == null) {
+			return;
+		}
 
 		saveNattable();
 		String tableName = getData().getName();

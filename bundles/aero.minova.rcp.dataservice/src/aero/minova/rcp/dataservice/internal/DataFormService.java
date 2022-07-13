@@ -3,24 +3,18 @@ package aero.minova.rcp.dataservice.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
 
-import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.XmlProcessor;
@@ -35,7 +29,6 @@ import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.util.ErrorObject;
 
 @Component
 public class DataFormService implements IDataFormService {
@@ -44,8 +37,6 @@ public class DataFormService implements IDataFormService {
 	IDataService dataService;
 
 	EventAdmin eventAdmin;
-
-	private List<String> requestedForms = new ArrayList<>();
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
@@ -229,7 +220,7 @@ public class DataFormService implements IDataFormService {
 	}
 
 	/**
-	 * Diese Methode leißt die Colum ein und gibt das zugehörige DataType Element zurück
+	 * Diese Methode ließt die Column ein und gibt das zugehörige DataType Element zurück
 	 *
 	 * @param c
 	 *            aero.minova.rcp.form.model.xsd.Column;
@@ -264,34 +255,23 @@ public class DataFormService implements IDataFormService {
 			formContent = dataService.getHashedFile(name).join();
 		} catch (Exception e) {
 			// Datei/Hash für Datei konnte nicht vom Server geladen werden, Versuchen lokale Datei zu nutzen
-			try {
-				formContent = dataService.getCachedFileContent(name).get();
-				// Fehlermeldung nur einmal pro Form zeigen
-				if (!requestedForms.contains(name)) {
-					postError(new ErrorObject("msg.WFCUsingLocalMask", dataService.getUserName(), e));
-				}
-			} catch (InterruptedException | ExecutionException e1) {
-				if (!requestedForms.contains(name)) {
-					postError(new ErrorObject("msg.WFCCouldntLoadMask", dataService.getUserName(), e1));
-				}
-			}
+			formContent = readLocalFile(name);
 		}
 
 		try {
 			form = XmlProcessor.get(formContent, Form.class);
 		} catch (JAXBException ex) {
-			throw new RuntimeException(ex);
+			dataService.getLogger().error(ex);
 		}
 
-		requestedForms.add(name);
 		return form;
 	}
 
-	public void postError(ErrorObject message) {
-		Dictionary<String, Object> data = new Hashtable<>(2);
-		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWCONNECTIONERRORMESSAGE);
-		data.put(IEventBroker.DATA, message);
-		Event event = new Event(Constants.BROKER_SHOWCONNECTIONERRORMESSAGE, data);
-		eventAdmin.postEvent(event);
+	private String readLocalFile(String name) {
+		try {
+			return dataService.getCachedFileContent(name).get();
+		} catch (InterruptedException | ExecutionException e1) {
+			return "";
+		}
 	}
 }

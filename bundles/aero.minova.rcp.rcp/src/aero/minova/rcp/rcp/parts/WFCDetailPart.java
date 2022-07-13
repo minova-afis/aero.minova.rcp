@@ -26,14 +26,10 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
@@ -42,8 +38,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -97,10 +91,6 @@ import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
 import aero.minova.rcp.model.Column;
-import aero.minova.rcp.model.event.GridChangeEvent;
-import aero.minova.rcp.model.event.GridChangeListener;
-import aero.minova.rcp.model.event.ValueChangeEvent;
-import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MBooleanField;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDateTimeField;
@@ -111,6 +101,7 @@ import aero.minova.rcp.model.form.MLabelText;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MPeriodField;
 import aero.minova.rcp.model.form.MRadioField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
@@ -129,20 +120,19 @@ import aero.minova.rcp.rcp.fields.FieldUtil;
 import aero.minova.rcp.rcp.fields.LabelTextField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.PeriodField;
 import aero.minova.rcp.rcp.fields.RadioField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
+import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 @SuppressWarnings("restriction")
-public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, GridChangeListener {
-
-	@Inject
-	protected UISynchronize sync;
+public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
@@ -164,8 +154,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	private MDetail mDetail = new MDetail();
 
-	private boolean dirtyFlag;
-
 	@Inject
 	private MPart mPart;
 
@@ -174,15 +162,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private Locale locale;
 
 	@Inject
-	EPartService partService;
-
-	@Inject
 	private ECommandService commandService;
 
 	@Inject
 	private EHandlerService handlerService;
 	private LocalResourceManager resManager;
 	private WFCDetailCASRequestsUtil casRequestsUtil;
+	private DirtyFlagUtil dirtyFlagUtil;
 
 	private IEclipseContext appContext;
 
@@ -193,7 +179,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	@Inject
 	EModelService eModelService;
+
 	MApplication mApplication;
+
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
 	private ScrolledComposite scrolled;
 
@@ -210,13 +198,25 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		mApplication = mApp;
 		getForm();
 
+		if (form == null) {
+			return;
+		}
+
 		if (form.getDetail() == null) {
 			mPart.setVisible(false);
 			return;
 		}
 
+		// DiryFlagUtil erstellen und in Kontext setzten
+		dirtyFlagUtil = ContextInjectionFactory.make(DirtyFlagUtil.class, mPart.getContext());
+		mPerspective.getContext().set(DirtyFlagUtil.class, dirtyFlagUtil);
+
 		layoutForm(parent);
+
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
+		ContextInjectionFactory.inject(mDetail.getDetailAccessor(), mPerspective.getContext()); // In Context, damit Injection verfügbar ist
+		mPerspective.getContext().set(MDetail.class, mDetail); // MDetail per Injection ermöglichen
+
 		mDetail.setClearAfterSave(form.getDetail().isClearAfterSave());
 
 		// Label und Icon aus Maske setzten
@@ -235,32 +235,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (mDetail.getHelper() != null) {
 			mDetail.getHelper().setControls(mDetail);
 		}
-
-		// Handler, der Dialog anzeigt wenn versucht wird, die Anwendung mit ungespeicherten Änderungen zu schließen. Außerdem wird
-		// "RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION" wieder auf false gesetzt, damit die Nachricht beim nächsten Starten wieder angezeigt wird
-		IWindowCloseHandler handler = mWindow -> {
-			@SuppressWarnings("unchecked")
-			List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
-			if (pList != null && !pList.isEmpty()) {
-				StringBuilder listString = new StringBuilder();
-				for (MPerspective mPerspective : pList) {
-					listString.append(" - " + translationService.translate(mPerspective.getLabel(), null) + "\n");
-				}
-				MessageDialog dialog = new MessageDialog(Display.getDefault().getActiveShell(), translationService.translate("@msg.ChangesDialog", null), null,
-						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
-						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
-
-				boolean res = dialog.open() == 0;
-				if (res) {
-					prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
-				}
-				return res;
-			}
-			prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
-
-			return true;
-		};
-		window.getContext().set(IWindowCloseHandler.class, handler);
 
 		openRestoringUIDialog();
 	}
@@ -299,18 +273,22 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		public String formSuffix;
 		public String id;
 		public String icon;
+		public boolean isVisible;
 
 		public HeadOrPageOrGridWrapper(Object headOrPageOrGrid) {
 			this.headOrPageOrGrid = headOrPageOrGrid;
 			if (headOrPageOrGrid instanceof Head) {
 				isHead = true;
 				id = "Head";
+				isVisible = true;
 			} else if (headOrPageOrGrid instanceof Page) {
 				id = ((Page) headOrPageOrGrid).getId();
 				icon = ((Page) headOrPageOrGrid).getIcon();
+				isVisible = ((Page) headOrPageOrGrid).isVisible();
 			} else {
 				id = ((Grid) headOrPageOrGrid).getId();
 				icon = ((Grid) headOrPageOrGrid).getIcon();
+				isVisible = true;
 			}
 		}
 
@@ -366,6 +344,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 		// Wir wollen eine horizontale Scrollbar, damit auch bei breiten Details alles erreichbar ist
 		scrolled = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolled.setShowFocusedControl(true);
 		Composite wrap = new Composite(scrolled, SWT.NO_SCROLL);
 		DetailLayout detailLayout = new DetailLayout();
 		wrap.setLayout(detailLayout);
@@ -607,6 +586,9 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		if (Boolean.parseBoolean(minimizedString)) {
 			minimizeSection(section);
 		}
+
+		// Sichtbarkeit entsprechend der Maske setzen
+		mSection.setVisible(headOrPageOrGrid.isVisible);
 
 		detailWidth = section.getCssStyler().getSectionWidth();
 		section.requestLayout();
@@ -1002,7 +984,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 				String suffix = headOrPage.isOP ? headOrPage.formSuffix + "." : "";
 				MField mField = createMField(field, mSection, suffix);
-				if (field.isVisible()) {
+				if (mField.isVisible()) {
 					visibleMFields.add(mField);
 				}
 
@@ -1010,7 +992,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 					for (Field f : ((MParamStringField) mField).getSubFields()) {
 						MField subfield = createMField(f, mSection, suffix);
 						((MParamStringField) mField).addSubMField(subfield);
-						if (f.isVisible()) {
+						if (subfield.isVisible()) {
 							visibleMFields.add(subfield);
 						}
 					}
@@ -1045,13 +1027,13 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 		String fieldName = suffix + field.getName();
 		try {
 			MField f = ModelToViewModel.convert(field, locale);
-			f.addValueChangeListener(this);
+			f.addValueChangeListener(dirtyFlagUtil);
 			f.setName(fieldName);
 
 			getDetail().putField(f);
+			f.setMSection(mSection);
 
 			if (field.isVisible()) {
-				f.setMSection(mSection);
 				mSection.addTabField(f);
 			}
 
@@ -1065,7 +1047,7 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 	private void createGrid(Composite composite, MSection mSection, MinovaSection section, IEclipseContext context, Object fieldOrGrid) {
 		SectionGrid sg = new SectionGrid(composite, section, (Grid) fieldOrGrid, mDetail);
 		MGrid mGrid = createMGrid((Grid) fieldOrGrid, mSection);
-		mGrid.addGridChangeListener(this);
+		mGrid.addGridChangeListener(dirtyFlagUtil);
 		GridAccessor gA = new GridAccessor(mGrid);
 		gA.setSectionGrid(sg);
 		mGrid.setGridAccessor(gA);
@@ -1131,6 +1113,8 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 			RadioField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MLabelText) {
 			LabelTextField.createBold(composite, field, row, column, mPerspective);
+		} else if (field instanceof MPeriodField) {
+			PeriodField.create(composite, field, row, locale, mPerspective);
 		}
 	}
 
@@ -1149,85 +1133,6 @@ public class WFCDetailPart extends WFCFormPart implements ValueChangeListener, G
 
 	public WFCDetailCASRequestsUtil getRequestUtil() {
 		return casRequestsUtil;
-	}
-
-	private void setDirtyFlag(boolean dirtyFlag) {
-		this.dirtyFlag = dirtyFlag;
-
-		mPart.setDirty(dirtyFlag);
-		@SuppressWarnings("unchecked")
-		List<MPerspective> pList = (List<MPerspective>) appContext.get(Constants.DIRTY_PERSPECTIVES);
-
-		if (dirtyFlag) {
-			if (pList == null) {
-				pList = new ArrayList<>();
-				appContext.set(Constants.DIRTY_PERSPECTIVES, pList);
-			}
-			if (!pList.contains(mPerspective)) {
-				pList.add(mPerspective);
-				refreshToolbar();
-			}
-		} else {
-			if (pList != null) {
-				pList.remove(mPerspective);
-				refreshToolbar();
-			}
-		}
-	}
-
-	/**
-	 * True wenn es Änderungen gab, False ansonsten
-	 *
-	 * @return
-	 */
-	public boolean getDirtyFlag() {
-		return dirtyFlag;
-	}
-
-	public void refreshToolbar() {
-		List<MTrimBar> findElements = eModelService.findElements(mwindow, "aero.minova.rcp.rcp.trimbar.0", MTrimBar.class);
-		MTrimBar tBar = findElements.get(0);
-		Composite c = (Composite) (tBar.getChildren().get(0)).getWidget();
-		if (c == null) {
-			return;
-		}
-		ToolBar tb = (ToolBar) c.getChildren()[0];
-
-		String perspectiveLabel = translationService.translate(mPerspective.getLabel(), null);
-		for (ToolItem item : tb.getItems()) {
-			if (item.getText().replace("*", "").equals(perspectiveLabel)) {
-				item.setText((dirtyFlag ? "*" : "") + perspectiveLabel);
-			}
-		}
-		tb.requestLayout();
-	}
-
-	@Override
-	public void gridChange(GridChangeEvent evt) {
-		checkDirtyFlag();
-	}
-
-	@Override
-	public void valueChange(ValueChangeEvent evt) {
-		checkDirtyFlag();
-	}
-
-	@Inject
-	@Optional
-	public void checkDirtyFromBroker(@UIEventTopic(Constants.BROKER_CHECKDIRTY) String message) {
-		MPerspective activePerspective = eModelService.getActivePerspective(mwindow);
-		if (activePerspective.equals(mPerspective)) {
-			checkDirtyFlag();
-		}
-	}
-
-	private void checkDirtyFlag() {
-		if (casRequestsUtil != null) {
-			boolean setDirty = casRequestsUtil.checkDirty();
-			if (this.dirtyFlag != setDirty) {
-				setDirtyFlag(setDirty);
-			}
-		}
 	}
 
 	@PersistState

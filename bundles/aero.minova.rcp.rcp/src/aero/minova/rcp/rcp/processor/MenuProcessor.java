@@ -31,8 +31,8 @@ import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
 import aero.minova.rcp.form.setup.util.XBSUtil;
 import aero.minova.rcp.form.setup.xbs.Map;
-import aero.minova.rcp.form.setup.xbs.Node;
 import aero.minova.rcp.form.setup.xbs.Preferences;
+import aero.minova.rcp.form.setup.xbs.Preferences.Root;
 
 public class MenuProcessor {
 
@@ -49,10 +49,10 @@ public class MenuProcessor {
 		this.modelService = modelService;
 		this.mApplication = mApplication;
 
+		// MDI (für Menü) herunterladen und parsen
 		try {
-			CompletableFuture<String> exceptionally = dataService.getHashedFile(Constants.MDI_FILE_NAME);
-			String void1 = exceptionally.get();
-			processXML(void1);
+			String mdiString = dataService.getHashedFile(Constants.MDI_FILE_NAME).get();
+			processXML(mdiString);
 		} catch (Exception e) {
 			e.printStackTrace();
 			handleNoMDI(dataService);
@@ -63,25 +63,28 @@ public class MenuProcessor {
 			handleNoMDI(dataService);
 		}
 
+		// XBS (für weitere Einstellungen, z.B. OPs, Drucks, Statistiken, ...) herunterladen und parsen
 		try {
 			CompletableFuture<String> xbsFuture = dataService.getHashedFile(Constants.XBS_FILE_NAME);
 			String xbsContent = xbsFuture.get();
 			Preferences preferences = XmlProcessor.get(xbsContent, Preferences.class);
-			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
-			Node settingsNode = XBSUtil.getNodeWithName(preferences, "settings");
-			if (settingsNode != null && settingsNode.getMap() != null && settingsNode.getMap().getEntry() != null) {
-				Map map = settingsNode.getMap();
-				for (aero.minova.rcp.form.setup.xbs.Map.Entry e : map.getEntry()) {
-					if (e.getKey().equalsIgnoreCase("CustomerID")) {
-						context.set("aero.minova.rcp.customerid", e.getValue());
-					} else if (e.getKey().equalsIgnoreCase("ApplicationID")) {
-						context.set("aero.minova.rcp.applicationid", e.getValue());
-					}
-				}
-			}
 
+			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
+
+			java.util.Map<String, String> mapOfNode = XBSUtil.getMapOfNode(preferences, "settings");
+			if (mapOfNode.containsKey("CustomerID")) {
+				context.set("aero.minova.rcp.customerid", mapOfNode.get("CustomerID"));
+			}
+			if (mapOfNode.containsKey("ApplicationID")) {
+				context.set("aero.minova.rcp.applicationid", mapOfNode.get("ApplicationID"));
+			}
 		} catch (InterruptedException | ExecutionException | JAXBException e) {
-			e.printStackTrace();
+			// Bei Fehler leere preference erstellen, siehe #1267
+			Preferences preferences = new Preferences();
+			preferences.setRoot(new Root());
+			preferences.getRoot().setMap(new Map());
+
+			mApplication.getTransientData().put(Constants.XBS_FILE_NAME, preferences);
 		}
 	}
 

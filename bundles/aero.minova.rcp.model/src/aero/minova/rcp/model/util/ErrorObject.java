@@ -66,14 +66,19 @@ public class ErrorObject {
 	public String getProcedureOrView() {
 		if (procedureOrView != null) {
 			return procedureOrView;
-		} else if (errorTable.getColumnCount() > 1) {
+		} else if (errorTable != null && errorTable.getColumnCount() > 1) {
 			return errorTable.getRows().get(0).getValue(1).getStringValue();
 		}
 		return null;
 	}
 
 	public String getMessage() {
-		return message;
+		if (message != null) {
+			return message;
+		} else if (errorTable != null) {
+			return errorTable.getRows().get(0).getValue(0).getStringValue();
+		}
+		return null;
 	}
 
 	public void setMessage(String message) {

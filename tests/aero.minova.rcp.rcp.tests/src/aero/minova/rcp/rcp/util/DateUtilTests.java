@@ -35,6 +35,13 @@ public class DateUtilTests {
 	}
 
 	@Test
+	public void testGetDate2w() {
+		Instant bithday = LocalDate.of(1967, MAY, 1).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
+		Instant expected = LocalDate.of(1967, MAY, 15).atStartOfDay().toInstant(ZoneOffset.UTC);
+		assertEquals(expected, DateUtil.getDate(bithday, "+2w"));
+	}
+
+	@Test
 	public void testGetDate0() {
 		Instant bithday = LocalDate.of(1967, MAY, 23).atStartOfDay().plusHours(18).plusMinutes(12).toInstant(ZoneOffset.UTC);
 		Instant expected = LocalDate.of(1967, MAY, 23).atStartOfDay().toInstant(ZoneOffset.UTC);

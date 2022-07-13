@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import aero.minova.rcp.dataservice.IDataService;
+import aero.minova.rcp.dataservice.internal.FileUtil;
 
 public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 
@@ -125,11 +126,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 
 				if (confirmRestart.open() == 0) {
 					context.set(IWorkbench.PERSIST_STATE, false);
-					try {
-						FileUtils.deleteDirectory(dataService.getStoragePath().toAbsolutePath().toFile());
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+					FileUtil.deleteDir(dataService.getStoragePath().toAbsolutePath().toFile());
 					workbench.restart();
 				}
 			}
