@@ -112,6 +112,8 @@ public class Manager {
 		preferences.putInt(ApplicationPreferences.MAX_CHARS, maxCharacter);
 		boolean gridTabNavigation = preferences.getBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, true);
 		preferences.putBoolean(ApplicationPreferences.GRID_TAB_NAVIGATION, gridTabNavigation);
+		boolean disableFileCache = preferences.getBoolean(ApplicationPreferences.DISABLE_FILE_CACHE, false);
+		preferences.putBoolean(ApplicationPreferences.DISABLE_FILE_CACHE, disableFileCache);
 		String fd = preferences.get(ApplicationPreferences.INDEX_FONT, null);
 		if ("".equals(fd)) {
 			fd = null;

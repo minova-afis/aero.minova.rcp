@@ -1,8 +1,8 @@
 package aero.minova.rcp.dataservice;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -139,10 +139,6 @@ public interface IDataService {
 	void setLogger(Logger logger);
 
 	Logger getLogger();
-
-	void setTimeout(int timeout);
-
-	void setTimeoutOpenNotification(int timeoutOpenNotification);
 
 	void sendLogs();
 

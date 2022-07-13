@@ -136,17 +136,6 @@ public class WFCDetailCASRequestsUtil {
 		this.wfcDetailPart = wfcDetailPart;
 		this.selectedOptionPages = new HashMap<>();
 		this.selectedGrids = new HashMap<>();
-
-		// Timeouts aus Einstellungen lesen, in DataService setzten und Listener hinzufügen
-		dataService.setTimeout(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15));
-		dataService.setTimeoutOpenNotification(preferences.getInt(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION, 1));
-		preferences.addPreferenceChangeListener(event -> {
-			if (event.getKey().equals(ApplicationPreferences.TIMEOUT_CAS)) {
-				dataService.setTimeout(Integer.parseInt((String) event.getNewValue()));
-			} else if (event.getKey().equals(ApplicationPreferences.TIMEOUT_OPEN_NOTIFICATION)) {
-				dataService.setTimeoutOpenNotification(Integer.parseInt((String) event.getNewValue()));
-			}
-		});
 	}
 
 	/**
