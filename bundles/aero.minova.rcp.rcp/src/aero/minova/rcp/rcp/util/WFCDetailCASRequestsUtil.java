@@ -908,24 +908,21 @@ public class WFCDetailCASRequestsUtil {
 
 		// SubFelder von Param-String Feldern entfernen
 		List<MField> toRemove = new ArrayList<>();
-		List<MField> toTraverse = new ArrayList<>();
 		for (MField mField : mDetail.getFields()) {
 			if (mField instanceof MParamStringField && mField.getMSection().equals(mSection)) {
 				toRemove.addAll(((MParamStringField) mField).getSubMFields());
 				((MParamStringField) mField).clearSubMFields();
 			}
-			if (mField.getMSection().equals(mSection) && !toRemove.contains(mField)) {
-				toTraverse.add(mField);
-			}
 		}
-		mSection.getTabList().removeAll(toRemove);
-		MinovaSection section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
+		mSection.getMFields().removeAll(toRemove);
 		mDetail.getFields().removeAll(toRemove);
 
 		List<MField> visibleMFields = new ArrayList<>();
 
 		List<MParamStringField> paramStringFields = new ArrayList<>();
-		for (MField f : toTraverse) {
+		List<MField> tmp = new ArrayList<>();
+		tmp.addAll(mSection.getMFields());
+		for (MField f : tmp) {
 			if (f.isVisible()) {
 				visibleMFields.add(f);
 			}
@@ -947,6 +944,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Ganzen Body/ Client Area der Section entfernen
+		MinovaSection section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
 		section.getClient().dispose();
 
 		// Neuen Body erstellen
