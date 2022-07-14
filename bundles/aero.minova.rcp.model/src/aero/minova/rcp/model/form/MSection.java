@@ -13,8 +13,7 @@ public class MSection {
 	private String status;
 	// Das übergeordnete Element, welches alle Sections enthält
 	private MDetail mDetail;
-	// Liste an allen mit Tab erreichbaren Feldern der Section. Festlegen dieser
-	// anhand der Preferences
+	// Liste aller MFields der Section
 	private List<MField> mFields = new ArrayList<>();
 	// ID dieser Page ("Head" für Head)
 	private String id;
@@ -132,6 +131,10 @@ public class MSection {
 		if (sectionAccessor != null) {
 			sectionAccessor.updateTabList();
 		}
+	}
+
+	public List<MField> getMFields() {
+		return mFields;
 	}
 
 }
