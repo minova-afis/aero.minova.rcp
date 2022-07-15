@@ -147,6 +147,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	}
 
 	public void updatePossibleValues() {
+
+		// Für Read-Only Lookups müssen die Werte nicht angefragt werden, da sie eh nicht per Hand eingetragen werden können
+		if (field.isReadOnly()) {
+			return;
+		}
+
 		LookupComposite up = ((LookupComposite) control);
 		CompletableFuture<List<LookupValue>> listLookup = dataService.listLookup((MLookupField) field, true);
 

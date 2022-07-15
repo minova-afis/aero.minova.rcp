@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ### Änderung
 - Index nach Blockieren neu Laden, wenn Einstellung gesetzt ist
+- Aufruf zum Auflisten der Werte bei Read-Only Lookups nicht ausführen
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
