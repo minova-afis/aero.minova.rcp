@@ -14,8 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ## [Unreleased]
 
+### Änderung
+- Index nach Blockieren neu Laden, wenn Einstellung gesetzt ist
+
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
+
 
 ## [12.2.1] - 2022-07-14
 
