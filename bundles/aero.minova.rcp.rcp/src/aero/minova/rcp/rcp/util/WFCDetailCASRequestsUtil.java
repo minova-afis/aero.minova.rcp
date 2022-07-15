@@ -197,7 +197,7 @@ public class WFCDetailCASRequestsUtil {
 						}
 					}
 
-					updateSelectedEntry();
+					updateSelectedEntry(false);
 					sendEventToHelper(ActionCode.AFTERREAD);
 				}
 			}));
@@ -308,17 +308,30 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Verarbeitung der empfangenen Tabelle des CAS mit Bindung der Detailfelder mit den daraus erhaltenen Daten
+	 * Setzt die Werte aus der selectedTable und selectedOptionPages in die Felder
+	 * 
+	 * @param emptyFieldsNotInTable
+	 *            Wenn true, werden Felder, die nicht in selectedTable/selectedOptionPages vorkommen auf Wert null gesetzt. Wenn false bleiben sie unverändert
 	 */
-	public void updateSelectedEntry() {
+	public void updateSelectedEntry(boolean emptyFieldsNotInTable) {
+		List<MField> checkedFields = new ArrayList<>();
+
 		// Hauptmaske
 		if (selectedTable != null) {
-			setFieldsFromTable(null, selectedTable);
+			checkedFields.addAll(setFieldsFromTable(null, selectedTable));
 		}
 
 		// Option Pages
 		for (Entry<String, Table> e : getSelectedOptionPages().entrySet()) {
-			setFieldsFromTable(e.getKey(), e.getValue());
+			checkedFields.addAll(setFieldsFromTable(e.getKey(), e.getValue()));
+		}
+
+		if (emptyFieldsNotInTable) {
+			for (MField f : mDetail.getFields()) {
+				if (!checkedFields.contains(f)) {
+					f.setValue(null, false);
+				}
+			}
 		}
 
 		// Revert Button updaten
@@ -328,19 +341,18 @@ public class WFCDetailCASRequestsUtil {
 	/*
 	 * Updatet die Felder mit der übergebenen Tabelle
 	 */
-	private void setFieldsFromTable(String opName, Table table) {
+	private List<MField> setFieldsFromTable(String opName, Table table) {
+		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
 			MField c = mDetail.getField(name);
-			if (c != null && c.getConsumer() != null) {
-				try {
-					c.indicateWaiting();
-					c.setValue(table.getRows().get(0).getValue(i), false);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			if (c != null) {
+				checkedFields.add(c);
+				c.setValue(table.getRows().get(0).getValue(i), false);
 			}
 		}
+
+		return checkedFields;
 	}
 
 	public void updateSelectedGrids() {
@@ -715,7 +727,7 @@ public class WFCDetailCASRequestsUtil {
 				} else if (ta != null) {
 					selectedTable = ta.getResultSet();
 					if (!selectedTable.getRows().isEmpty()) {
-						updateSelectedEntry();
+						updateSelectedEntry(false);
 					} else {
 						broker.send(Constants.BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE, ta);
 					}
@@ -824,7 +836,7 @@ public class WFCDetailCASRequestsUtil {
 	public void revertEntry(@UIEventTopic(Constants.BROKER_REVERTENTRY) MPerspective perspective) {
 		if (perspective == this.perspective) {
 			sendEventToHelper(ActionCode.BEFOREREVERT);
-			updateSelectedEntry();
+			updateSelectedEntry(true);
 			updateSelectedGrids();
 			sendEventToHelper(ActionCode.AFTERREVERT);
 		}
