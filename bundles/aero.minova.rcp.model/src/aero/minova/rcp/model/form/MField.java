@@ -2,11 +2,9 @@ package aero.minova.rcp.model.form;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
-import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
@@ -283,18 +281,6 @@ public abstract class MField {
 
 	public DataType getDataType() {
 		return dataType;
-	}
-
-	/**
-	 * Wenn das Feld anzeigen soll, dass wir auf Daten warten, muss dieses Methode aufgerufen werden. Dabei wird auch der Wert
-	 * {@link #setValue(Value, boolean)}} auf null gesetzt.
-	 */
-	public void indicateWaiting() {
-		setValue(null, false);
-	}
-
-	public Consumer<Table> getConsumer() {
-		return table -> setValue(table.getRows().get(0).getValue(sqlIndex), false);
 	}
 
 	public IValueAccessor getValueAccessor() {
