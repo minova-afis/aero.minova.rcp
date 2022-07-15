@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ## [Unreleased]
 
+### Änderung
+- Index nach Blockieren neu Laden, wenn Einstellung gesetzt ist
+
 ## [12.2.1] - 2022-07-14
 
 **ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
