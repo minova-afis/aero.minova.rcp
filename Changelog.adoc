@@ -14,8 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ## [Unreleased]
 
+### Änderung
+- Index nach Blockieren neu Laden, wenn Einstellung gesetzt ist
+
 ### Bugfixes
 - Indexdruck mit DateTimeSpalten ermöglichen, Datums-/Zeitformat und Zeitzone aus Einstellungen nutzen
+
 
 ## [12.2.1] - 2022-07-14
 

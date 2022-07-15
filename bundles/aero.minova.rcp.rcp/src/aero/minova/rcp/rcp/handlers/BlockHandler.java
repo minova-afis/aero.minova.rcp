@@ -6,10 +6,14 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Evaluate;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
@@ -28,6 +32,7 @@ import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
 public class BlockHandler implements ValueChangeListener {
@@ -47,6 +52,16 @@ public class BlockHandler implements ValueChangeListener {
 	MField keyLong;
 	MField blocked;
 	boolean firstCall = true;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_RELOAD_INDEX)
+	boolean autoReloadIndex;
+
+	@Inject
+	private ECommandService commandService;
+
+	@Inject
+	private EHandlerService handlerService;
 
 	/**
 	 * Button entsprechend der Maske anzeigen
@@ -119,6 +134,12 @@ public class BlockHandler implements ValueChangeListener {
 		} catch (InterruptedException | ExecutionException e) {
 			// Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
 			broker.post(Constants.BROKER_RELOADFIELDS, null);
+		}
+
+		// ggf Index neu laden
+		if (autoReloadIndex) {
+			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
+			handlerService.executeHandler(cmd);
 		}
 	}
 
