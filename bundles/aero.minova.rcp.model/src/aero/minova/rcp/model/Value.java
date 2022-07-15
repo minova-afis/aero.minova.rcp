@@ -7,11 +7,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
-import javax.inject.Inject;
-
-import org.eclipse.e4.core.di.extensions.Preference;
-
-import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.TimeUtil;
@@ -21,18 +16,6 @@ public class Value implements Serializable {
 
 	private final DataType type;
 	private final Object value;
-
-	@Inject
-	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DATE_UTIL)
-	String datePattern;
-
-	@Inject
-	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
-	String timePattern;
-	
-	@Inject
-	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
-	String timezone;
 
 	public Value(Object valueNew) {
 		if (valueNew instanceof Integer) {
@@ -53,7 +36,7 @@ public class Value implements Serializable {
 		this.value = valueNew;
 	}
 
-	public String getValueString(Locale locale) {
+	public String getValueString(Locale locale, String datePattern, String timePattern, String timezone) {
 		String returnValue = "";
 		switch (type) {
 		case DOUBLE:
@@ -83,9 +66,9 @@ public class Value implements Serializable {
 		return returnValue;
 	}
 
-	public String getValueString(Locale locale, DateTimeType dateTimeType) {
+	public String getValueString(Locale locale, DateTimeType dateTimeType, String datePattern, String timePattern, String timezone) {
 		if (dateTimeType == null) {
-			return getValueString(locale);
+			return getValueString(locale, datePattern, timePattern, timezone);
 		}
 
 		String returnValue = "";
