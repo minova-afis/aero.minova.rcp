@@ -32,7 +32,6 @@ public class PDFGenerator {
 	private PDFGenerator() {}
 
 	public static URL createPdfFile(String xmlDataString, File stylesheet, URL pdf) throws IOException, SAXException, TransformerException {
-		System.out.println("Create pdf file ...");
 
 		// File erstellen -> bei Fehler mit "_1", "_2", ...
 		pdf = new Path(FileUtil.createFile(pdf.getFile())).toFile().toURI().toURL();
