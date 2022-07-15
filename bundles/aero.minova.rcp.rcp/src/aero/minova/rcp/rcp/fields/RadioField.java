@@ -5,6 +5,7 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -104,7 +105,12 @@ public class RadioField {
 			button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					field.setValue(new Value(button.getData(Constants.CONTROL_VALUE)), true);
+					String name = (String) button.getData(Constants.CONTROL_VALUE);
+					if (Objects.equals(field.getValue(), new Value(name))) {
+						field.setValue(null, true);
+					} else {
+						field.setValue(new Value(name), true);
+					}
 				}
 			});
 		}
