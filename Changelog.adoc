@@ -19,6 +19,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
+- Revert mit vorbelegten Feldern funktioniert nun wie erwartet
 
 
 ## [12.2.1] - 2022-07-14
