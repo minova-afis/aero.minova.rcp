@@ -216,7 +216,7 @@ public class PrintIndexHandler {
 			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, false, xmlRootTag, title);
 
 			try {
-				Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title + "_Index.pdf");
+				Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title.replace(" ", "_") + "_Index.pdf");
 				Files.createDirectories(pathPDF.getParent());
 
 				pathPDF = Path.of(FileUtil.createFile(pathPDF.toString()));
@@ -459,7 +459,8 @@ public class PrintIndexHandler {
 				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
 				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
 		xml.append("<PrintDate><![CDATA["
-				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone) + "]]></PrintDate>\n");
+				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
+				+ "]]></PrintDate>\n");
 	}
 
 }
