@@ -283,7 +283,8 @@ public class MGrid {
 	}
 
 	public void setValue(int columnIndex, int rowIndex, Value newValue) {
-		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, columnIndex, rowIndex, getDataTable().getValue(columnIndex, rowIndex), newValue, false);
+		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, getDataTable().getRows().get(rowIndex), columnIndex, rowIndex,
+				getDataTable().getValue(columnIndex, rowIndex), newValue, false);
 		getDataTable().setValue(columnIndex, rowIndex, newValue);
 		fire(gridChangeEvent);
 	}
@@ -306,5 +307,32 @@ public class MGrid {
 
 	public Value getValue(int col, int row) {
 		return getDataTable().getValue(col, row);
+	}
+
+	/**
+	 * Liefert eine Liste mit allen Zeilen, die neu eingefügt wurden
+	 * 
+	 * @return
+	 */
+	public List<Row> getRowsToInsert() {
+		return gridAccessor.getRowsToInsert();
+	}
+
+	/**
+	 * Liefert eine Liste mit allen Zeilen, die verändert wurden
+	 * 
+	 * @return
+	 */
+	public List<Row> getRowsToUpdate() {
+		return gridAccessor.getRowsToUpdate();
+	}
+
+	/**
+	 * Liefert eine Liste mit allen Zeilen, die gelöscht wurden
+	 * 
+	 * @return
+	 */
+	public List<Row> getRowsToDelete() {
+		return gridAccessor.getRowsToDelete();
 	}
 }

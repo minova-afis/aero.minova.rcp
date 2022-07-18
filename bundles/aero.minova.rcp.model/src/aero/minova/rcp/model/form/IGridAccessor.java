@@ -40,4 +40,10 @@ public interface IGridAccessor {
 	void addValidation(IGridValidator validator, List<Integer> columnsToValidate);
 
 	void clearGrid();
+
+	List<Row> getRowsToInsert();
+
+	List<Row> getRowsToUpdate();
+
+	List<Row> getRowsToDelete();
 }
