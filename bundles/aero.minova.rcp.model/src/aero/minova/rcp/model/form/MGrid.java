@@ -283,7 +283,8 @@ public class MGrid {
 	}
 
 	public void setValue(int columnIndex, int rowIndex, Value newValue) {
-		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, columnIndex, rowIndex, getDataTable().getValue(columnIndex, rowIndex), newValue, false);
+		GridChangeEvent gridChangeEvent = new GridChangeEvent(this, getDataTable().getRows().get(rowIndex), columnIndex, rowIndex,
+				getDataTable().getValue(columnIndex, rowIndex), newValue, false);
 		getDataTable().setValue(columnIndex, rowIndex, newValue);
 		fire(gridChangeEvent);
 	}
