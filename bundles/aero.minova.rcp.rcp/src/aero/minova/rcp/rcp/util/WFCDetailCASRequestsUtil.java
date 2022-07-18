@@ -862,7 +862,10 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
-		((AbstractValueAccessor) mDetail.getMSectionList().get(0).getTabList().get(0).getValueAccessor()).getControl().setFocus();
+		List<MField> tabList = mDetail.getMSectionList().get(0).getTabList();
+		if (!tabList.isEmpty()) {
+			((AbstractValueAccessor) tabList.get(0).getValueAccessor()).getControl().setFocus();
+		}
 	}
 
 	public Table getSelectedTable() {
