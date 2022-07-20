@@ -229,7 +229,7 @@ public class WFCDetailCASRequestsUtil {
 					} else { // Default Verhalten, entsprechenden Wert über Namen aus keyTable holen, erster Primary bekommt KeyLong
 						int index = keyTable.getColumnIndex(f.getName());
 						if (firstPrimary) {
-							index = keyTable.getColumnIndex("KeyLong");
+							index = keyTable.getColumnIndex(Constants.TABLE_KEYLONG);
 						}
 
 						if (index >= 0) {

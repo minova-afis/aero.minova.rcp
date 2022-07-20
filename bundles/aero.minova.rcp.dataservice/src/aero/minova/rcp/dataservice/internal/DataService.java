@@ -96,12 +96,6 @@ public class DataService implements IDataService {
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	private static final String CONTENT_TYPE = "Content-Type";
-	public static final String TABLE_KEYTEXT = "KeyText";
-	public static final String TABLE_KEYLONG = "KeyLong";
-	public static final String TABLE_DESCRIPTION = "Description";
-	public static final String TABLE_LASTACTION = "LastAction";
-	public static final String TABLE_COUNT = "Count";
-	public static final String TABLE_FILTERLASTACTION = "FilterLastAction";
 	public static final String ERROR = "Error";
 
 	private int minTimeBetweenError = 3;
@@ -190,9 +184,9 @@ public class DataService implements IDataService {
 	private void initSiteParameters() {
 		siteParameters = new HashMap<>();
 		Table requestTable = TableBuilder.newTable("tSiteParameter") //
-				.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
 				.withColumn("Value", DataType.STRING)//
-				.withColumn(TABLE_LASTACTION, DataType.INTEGER).create();
+				.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER).create();
 		Row row = RowBuilder.newRow() //
 				.withValue(null) //
 				.withValue(null) //
@@ -721,7 +715,7 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> resolveGridLookup(String tableName, boolean useCache) {
-		return getLookupValuesFromTable(tableName, TABLE_DESCRIPTION, null, null, true, useCache);
+		return getLookupValuesFromTable(tableName, Constants.TABLE_DESCRIPTION, null, null, true, useCache);
 	}
 
 	@Override
@@ -751,10 +745,10 @@ public class DataService implements IDataService {
 		}
 
 		Table t = TableBuilder.newTable(tableName) //
-				.withColumn(TABLE_KEYLONG, DataType.INTEGER)//
-				.withColumn(TABLE_KEYTEXT, DataType.STRING)//
+				.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
+				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
 				.withColumn(lookupDescriptionColumnName, DataType.STRING)//
-				.withColumn(TABLE_LASTACTION, DataType.INTEGER)//
+				.withColumn(Constants.TABLE_LASTACTION, DataType.INTEGER)//
 				.create();
 		Row row = RowBuilder.newRow() //
 				.withValue(keyLong) //
@@ -817,18 +811,18 @@ public class DataService implements IDataService {
 		Row row = RowBuilder.newRow().create();
 
 		if (resolve) {
-			t.addColumn(new Column(TABLE_KEYLONG, DataType.INTEGER));
+			t.addColumn(new Column(Constants.TABLE_KEYLONG, DataType.INTEGER));
 			row.addValue(new Value(keyLong));
 
-			t.addColumn(new Column(TABLE_KEYTEXT, DataType.STRING));
+			t.addColumn(new Column(Constants.TABLE_KEYTEXT, DataType.STRING));
 			row.addValue(new Value(keyText));
 
-			t.addColumn(new Column(TABLE_FILTERLASTACTION, DataType.BOOLEAN));
+			t.addColumn(new Column(Constants.TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(true));
 		} else {
-			t.addColumn(new Column(TABLE_COUNT, DataType.INTEGER));
+			t.addColumn(new Column(Constants.TABLE_COUNT, DataType.INTEGER));
 			row.addValue(null);
-			t.addColumn(new Column(TABLE_FILTERLASTACTION, DataType.BOOLEAN));
+			t.addColumn(new Column(Constants.TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(true));
 			if (field.getLookupParameters() != null) {
 				for (String paramName : field.getLookupParameters()) {
@@ -900,7 +894,7 @@ public class DataService implements IDataService {
 	public String getUserName() {
 		return username;
 	}
-	
+
 	@Override
 	public void setLogger(Logger logger) {
 		this.logger = logger;
