@@ -25,15 +25,9 @@ public class Constants {
 	public static final String TRANSACTION_PARENT = "transactionParent";
 
 	public static final String CONTROL_FIELD = "field";
-	public static final String CONTROL_OPTIONS = "options";
-	public static final String CONTROL_CONSUMER = "consumer";
-	public static final String CONTROL_LOOKUPCONSUMER = "lookupConsumer";
-	public static final String CONTROL_KEYLONG = "keyLong";
 	public static final String CONTROL_DATATYPE = "dataType";
-	public static final String CONTROL_DECIMALS = "decimals";
 	public static final String CONTROL_VALUE = "value";
 	public static final String CONTROL_ID = "id";
-	public static final String CONTROL_MDETAIL = "mDetail";
 	public static final String CONTROL_GRID_BUTTON_ID = "grid_button_id";
 	public static final String CONTROL_GRID_BUTTON_INSERT = "grid_button_insert";
 	public static final String CONTROL_GRID_BUTTON_DELETE = "grid_button_delete";
