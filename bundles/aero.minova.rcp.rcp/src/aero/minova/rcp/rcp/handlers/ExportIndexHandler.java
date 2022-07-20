@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -23,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
 import aero.minova.rcp.util.IOUtil;
@@ -37,13 +39,25 @@ public class ExportIndexHandler {
 	@Inject
 	private TranslationService translationService;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DATE_UTIL)
+	String datePattern;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
+	String timePattern;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	String timezone;
+
 	public enum ExportTo {
 		CLIPBOARD, FILE, EXCEL
 	}
 
 	public static final String COMMAND_ACTION = "aero.minova.rcp.rcp.commandparameter.exportto";
 
-	private static final StringBuffer setNatTableDatatToStringBuffer(Object wfcPart) {
+	private final StringBuffer setNatTableDatatToStringBuffer(Object wfcPart) {
 		final StringBuffer csv = new StringBuffer();
 		WFCIndexPart indexPart = (WFCIndexPart) wfcPart;
 		SortedList<Row> sortedList = indexPart.getSortedList();
@@ -108,15 +122,8 @@ public class ExportIndexHandler {
 
 	/**
 	 * Speichert den Zeilen-Inhalt als CSV (analog der Methode in {@link Table})
-	 *
-	 * @param csv
-	 *            StringBuffer, in den die Daten geschrieben werden
-	 * @param tabSeparated
-	 *            wenn true, werden Felder mit Tab getrennt. Bei false werden Felder mit Komma getrennt und die Werte mit "" umschlossen
-	 * @author wild
-	 * @since 11.8.0
 	 */
-	protected static void saveIntoCSV(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList, StringBuffer csv, boolean tabSeparated) {
+	protected void saveIntoCSV(SortedList<Row> rows, List<String> cHaederList, List<Integer> columnReorderList, StringBuffer csv, boolean tabSeparated) {
 		if (csv != null && rows != null && rows.iterator().hasNext()) {
 			// In der Zwischenablage werden die Werte nicht mit Gänsefüßchen umschlossen
 			final String brackets = tabSeparated ? "" : "\"";
@@ -144,7 +151,7 @@ public class ExportIndexHandler {
 					}
 					csv.append(brackets);
 					if (r.getValue(d) != null) {
-						csv.append(r.getValue(d).getValueString(CustomLocale.getLocale()));
+						csv.append(r.getValue(d).getValueString(CustomLocale.getLocale(), datePattern, timePattern, timezone));
 					}
 
 					csv.append(brackets);
