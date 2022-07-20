@@ -41,7 +41,7 @@ public class DeleteDetailHandler {
 	public boolean canExecute(MPart part, @Named(IServiceConstants.ACTIVE_SELECTION) @Optional Object selection) {
 		if (part.getObject() instanceof WFCDetailPart) {
 			MDetail detail = ((WFCDetailPart) part.getObject()).getDetail();
-			return detail.getField("KeyLong").getValue() != null;
+			return detail.getPrimaryFields().get(0).getValue() != null;
 		}
 		return false;
 	}
