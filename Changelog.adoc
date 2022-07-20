@@ -22,6 +22,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
 - Revert mit vorbelegten Feldern funktioniert nun wie erwartet
 - Indexdruck von Masken mit Leerzeichen im Titel ermöglichen
+- Zum Überprüfen, ob ein Datensatz im Detail geladen ist, erstes primary-Feld nutzen, statt fest Feld mit "KeyLong". Damit kann auch in Masken ohne "KeyLong" Feld gelöscht werden
 
 
 ## [12.2.1] - 2022-07-14
