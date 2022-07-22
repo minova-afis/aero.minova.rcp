@@ -7,4 +7,5 @@ Automatic-Module-Name: aero.minova.rcp.model.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.junit,
  aero.minova.rcp.model,
- com.google.gson
+ com.google.gson,
+ org.junit.jupiter.api
