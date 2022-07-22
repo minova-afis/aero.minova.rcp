@@ -21,7 +21,7 @@ public class TimeUtilTests {
 	@Test
 	public void testStartofDayGerman() {
 		Instant instant = LocalDate.of(1900, JANUARY, 1).atStartOfDay().toInstant(ZoneOffset.UTC);
-		assertEquals("00:00", TimeUtil.getTimeString(instant, Locale.GERMANY, "hh:mm"));
+		assertEquals("00:00", TimeUtil.getTimeString(instant, Locale.GERMANY, "HH:mm"));
 	}
 
 	@Test
