@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.transform.TransformerException;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
@@ -71,6 +72,9 @@ public class PrintIndexHandler {
 
 	@Inject
 	private EPartService ePartService;
+
+	@Inject
+	private MPerspective mPerspective;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.CREATE_XML_XS)
@@ -207,7 +211,8 @@ public class PrintIndexHandler {
 			}
 
 			try {
-				TableXSLCreator tableCreator = new TableXSLCreator(translationService, this, ePartService);
+				TableXSLCreator tableCreator = new TableXSLCreator(this, ePartService);
+				ContextInjectionFactory.inject(tableCreator, mPerspective.getContext());
 				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, path_reports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
 				e.printStackTrace();
@@ -379,13 +384,13 @@ public class PrintIndexHandler {
 						}
 						xml.append(numberFormat.format(r.getValue(d).getDoubleValue()));
 					} else if (r.getValue(d).getType() == DataType.INTEGER) {
-						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale()));
+						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone));
 					} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
 						xml.append(1);
 					} else {
 						// Information über Instant Formatierung wird übergeben
 						xml.append("<![CDATA[");
-						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), c.getDateTimeType()));
+						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), c.getDateTimeType(), dateUtilPref, timeUtilPref, timezone));
 						xml.append("]]>");
 					}
 				}

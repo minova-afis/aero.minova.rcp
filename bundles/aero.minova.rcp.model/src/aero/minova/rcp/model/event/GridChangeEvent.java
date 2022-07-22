@@ -3,6 +3,7 @@ package aero.minova.rcp.model.event;
 import java.util.EventObject;
 
 import aero.minova.rcp.constants.GridChangeType;
+import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MGrid;
 
@@ -10,9 +11,9 @@ public class GridChangeEvent extends EventObject {
 
 	private static final long serialVersionUID = 202107061438L;
 
-	private final MGrid grid;
-	private final int column;
-	private final int row;
+	private final Row row;
+	private final int columnIndex;
+	private final int rowIndex;
 	private final Value oldValue;
 	private final Value newValue;
 	private final boolean user;
@@ -26,9 +27,9 @@ public class GridChangeEvent extends EventObject {
 	 */
 	public GridChangeEvent(MGrid grid, boolean user) {
 		super(grid);
-		this.grid = grid;
-		this.column = -1;
-		this.row = -1;
+		this.row = null;
+		this.columnIndex = -1;
+		this.rowIndex = -1;
 		this.oldValue = null;
 		this.newValue = null;
 		this.user = user;
@@ -40,15 +41,15 @@ public class GridChangeEvent extends EventObject {
 	 * 
 	 * @param grid
 	 * @param row
+	 * @param rowIndex
 	 * @param user
 	 * @param changeType
 	 */
-	public GridChangeEvent(MGrid grid, int row, boolean user, GridChangeType changeType) {
-
+	public GridChangeEvent(MGrid grid, Row row, int rowIndex, boolean user, GridChangeType changeType) {
 		super(grid);
-		this.grid = grid;
-		this.column = -1;
 		this.row = row;
+		this.columnIndex = -1;
+		this.rowIndex = rowIndex;
 		this.oldValue = null;
 		this.newValue = null;
 		this.user = user;
@@ -65,11 +66,11 @@ public class GridChangeEvent extends EventObject {
 	 * @param newValue
 	 * @param user
 	 */
-	public GridChangeEvent(MGrid grid, int column, int row, Value oldValue, Value newValue, boolean user) {
+	public GridChangeEvent(MGrid grid, Row row, int columnIndex, int rowIndex, Value oldValue, Value newValue, boolean user) {
 		super(grid);
-		this.grid = grid;
-		this.column = column;
 		this.row = row;
+		this.columnIndex = columnIndex;
+		this.rowIndex = rowIndex;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 		this.user = user;
@@ -77,15 +78,15 @@ public class GridChangeEvent extends EventObject {
 	}
 
 	public MGrid getGrid() {
-		return grid;
+		return (MGrid) getSource();
 	}
 
 	public int getColumn() {
-		return column;
+		return columnIndex;
 	}
 
 	public int getRow() {
-		return row;
+		return rowIndex;
 	}
 
 	public Value getOldValue() {
@@ -102,5 +103,9 @@ public class GridChangeEvent extends EventObject {
 
 	public GridChangeType getChangeType() {
 		return changeType;
+	}
+
+	public Row getChangedRow() {
+		return row;
 	}
 }

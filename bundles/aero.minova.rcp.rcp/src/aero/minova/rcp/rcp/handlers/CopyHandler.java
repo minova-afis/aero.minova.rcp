@@ -49,7 +49,7 @@ public class CopyHandler {
 	@CanExecute
 	public boolean canExecute(MPart part, @Named(IServiceConstants.ACTIVE_SELECTION) @Optional Object selection) {
 		detail = (WFCDetailPart) part.getObject();
-		return detail.getDetail().getField(Constants.TABLE_KEYLONG).getValue() != null;
+		return detail.getDetail().getPrimaryFields().get(0).getValue() != null;
 	}
 
 	@Execute

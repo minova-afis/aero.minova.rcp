@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
@@ -14,6 +17,7 @@ import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.handlers.PrintIndexHandler;
 import aero.minova.rcp.rcp.parts.WFCSearchPart;
@@ -23,15 +27,27 @@ import aero.minova.rcp.util.IOUtil;
 
 public class TableXSLCreator extends CommonPrint {
 
+	@Inject
 	private TranslationService translationService;
 	private WFCSearchPart searchPart;
 	private PrintIndexHandler printHandler;
 
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.DATE_UTIL)
+	String datePattern;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIME_UTIL)
+	String timePattern;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	String timezone;
+
 	// Templates
 	private static HashMap<String, String> templates = new HashMap<>();
 
-	public TableXSLCreator(TranslationService translationService2, PrintIndexHandler printHandler, EPartService ePartService) {
-		this.translationService = translationService2;
+	public TableXSLCreator(PrintIndexHandler printHandler, EPartService ePartService) {
 		this.printHandler = printHandler;
 		this.searchPart = (WFCSearchPart) ePartService.findPart("aero.minova.rcp.rcp.part.search").getObject();
 	}
@@ -243,7 +259,7 @@ public class TableXSLCreator extends CommonPrint {
 				final FilterValue v = (FilterValue) v1;
 				String value = v.getOperatorValue();
 				if (v.getFilterValue() != null) {
-					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale(), ci.column.getDateTimeType());
+					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale(), ci.column.getDateTimeType(), datePattern, timePattern, timezone);
 				}
 
 				searchCriteria = getTemplate("SearchCriteria");
@@ -278,7 +294,7 @@ public class TableXSLCreator extends CommonPrint {
 				final FilterValue v = (FilterValue) v1;
 				String value = v.getOperatorValue();
 				if (v.getFilterValue() != null) {
-					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale());
+					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale(), datePattern, timePattern, timezone);
 				}
 
 				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));

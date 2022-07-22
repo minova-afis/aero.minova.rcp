@@ -88,7 +88,7 @@ public class BlockHandler implements ValueChangeListener {
 	private void init(MPart part) {
 		this.mPart = part;
 		this.detail = (WFCDetailPart) part.getObject();
-		this.keyLong = detail.getDetail().getField("KeyLong");
+		this.keyLong = detail.getDetail().getField(Constants.TABLE_KEYLONG);
 		this.blocked = detail.getDetail().getField("Blocked");
 		blocked.addValueChangeListener(this);
 

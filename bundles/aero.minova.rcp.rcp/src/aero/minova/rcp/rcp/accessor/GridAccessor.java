@@ -112,4 +112,19 @@ public class GridAccessor implements aero.minova.rcp.model.form.IGridAccessor {
 	public void clearGrid() {
 		sg.clearGrid();
 	}
+
+	@Override
+	public List<Row> getRowsToInsert() {
+		return sg.getRowsToInsert();
+	}
+
+	@Override
+	public List<Row> getRowsToUpdate() {
+		return sg.getRowsToUpdate();
+	}
+
+	@Override
+	public List<Row> getRowsToDelete() {
+		return sg.getRowsToDelete();
+	}
 }

@@ -159,9 +159,8 @@ public class PrintDetailHandler {
 		// Ist ein Datensatz gewählt?
 		WFCDetailPart wfcDetail = (WFCDetailPart) mpart.getObject();
 		MDetail detail = wfcDetail.getDetail();
-		MField field = detail.getField("KeyLong");
 
-		return field.getValue() != null;
+		return detail.getPrimaryFields().get(0).getValue() != null;
 
 	}
 
@@ -174,11 +173,11 @@ public class PrintDetailHandler {
 		// Keylong-Wert finden
 		String maskName = mPerspective.getPersistedState().get(Constants.FORM_NAME);
 		WFCDetailPart wfcDetail = (WFCDetailPart) mpart.getObject();
-		MField field = wfcDetail.getDetail().getField("KeyLong");
+		MField field = wfcDetail.getDetail().getPrimaryFields().get(0);
 		int integerValue = field.getValue().getIntegerValue();
 
 		// Tabelle ans CAS aufbauen
-		Table table = TableBuilder.newTable(procedureNames.get(maskName)).withColumn("KeyLong", DataType.STRING).create();
+		Table table = TableBuilder.newTable(procedureNames.get(maskName)).withColumn(field.getName(), DataType.STRING).create();
 		Row row = RowBuilder.newRow().withValue("" + integerValue).create();
 		table.addRow(row);
 

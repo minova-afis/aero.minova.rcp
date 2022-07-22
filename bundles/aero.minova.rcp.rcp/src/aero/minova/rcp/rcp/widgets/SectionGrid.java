@@ -363,7 +363,7 @@ public class SectionGrid {
 
 				if (super.doCommand(command)) {
 					Value newVal = dataTable.getRows().get(row).getValue(col);
-					fireChange(new GridChangeEvent(gridAccessor.getMGrid(), col, row, oldVal, newVal, true));
+					fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().get(row), col, row, oldVal, newVal, true));
 
 					if (!rowsToUpdate.contains(r) && !rowsToInsert.contains(r)) {
 						rowsToUpdate.add(r);
@@ -575,7 +575,7 @@ public class SectionGrid {
 		for (Row r : dataTable.getRows()) {
 			if (!originalRows.contains(r)) {
 				rowsToInsert.add(r);
-				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().indexOf(r), false, GridChangeType.INSERT));
+				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), r, dataTable.getRows().indexOf(r), false, GridChangeType.INSERT));
 			}
 		}
 
@@ -667,7 +667,7 @@ public class SectionGrid {
 	public Row addNewRow() {
 		Row newRow = dataTable.addRow();
 		rowsToInsert.add(newRow);
-		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
+		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), newRow, dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
 		updateNatTable();
 		return newRow;
 	}
@@ -735,7 +735,7 @@ public class SectionGrid {
 				rowsToDelete.add(sortedList.get(i));
 				rowsToUpdate.remove(sortedList.get(i));
 				rowsToInsert.remove(sortedList.get(i));
-				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), i, false, GridChangeType.DELETE));
+				fireChange(new GridChangeEvent(gridAccessor.getMGrid(), sortedList.get(i), i, true, GridChangeType.DELETE));
 			}
 		}
 		updateNatTable();

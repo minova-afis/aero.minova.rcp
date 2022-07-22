@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Deactivate;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupEntry;
@@ -89,11 +90,11 @@ public class LocalDatabaseService {
 		if (conn != null) {
 			if (name != null) {
 				Table t = new Table();
-				Column collumn = new Column("KeyLong", DataType.INTEGER);
+				Column collumn = new Column(Constants.TABLE_KEYLONG, DataType.INTEGER);
 				t.addColumn(collumn);
-				collumn = new Column("KeyText", DataType.STRING);
+				collumn = new Column(Constants.TABLE_KEYTEXT, DataType.STRING);
 				t.addColumn(collumn);
-				collumn = new Column("Description", DataType.STRING);
+				collumn = new Column(Constants.TABLE_DESCRIPTION, DataType.STRING);
 				t.addColumn(collumn);
 				try {
 					s = conn.createStatement();
@@ -139,12 +140,12 @@ public class LocalDatabaseService {
 					s = conn.createStatement();
 					rs = s.executeQuery("SELECT * FROM AllLookupvalues WHERE Lookup ='" + name + "'AND KeyLong ='" + keyLong + "'");
 					while (rs.next()) {
-						map.put("KeyLong", rs.getInt(3));
-						map.put("KeyText", rs.getString(4));
+						map.put(Constants.TABLE_KEYLONG, rs.getInt(3));
+						map.put(Constants.TABLE_KEYTEXT, rs.getString(4));
 						if (rs.getString(5).equals("")) {
-							map.put("Description", null);
+							map.put(Constants.TABLE_DESCRIPTION, null);
 						} else {
-							map.put("Description", rs.getString(5));
+							map.put(Constants.TABLE_DESCRIPTION, rs.getString(5));
 						}
 
 					}
@@ -153,7 +154,7 @@ public class LocalDatabaseService {
 					e.printStackTrace();
 					return null;
 				}
-				if (map.get("KeyLong") != null) {
+				if (map.get(Constants.TABLE_KEYLONG) != null) {
 					return map;
 				} else {
 					return null;
@@ -189,10 +190,10 @@ public class LocalDatabaseService {
 					while (i < table.getRows().size()) {
 						Row r = table.getRows().get(i);
 						insertEntryOfLookup.setString(1, name);
-						insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
-						insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
-						if (r.getValue(table.getColumnIndex("Description")) != null) {
-							insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex("Description")).getStringValue());
+						insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+						insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+						if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+							insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
 						} else {
 							insertEntryOfLookup.setString(4, "");
 						}
@@ -225,7 +226,7 @@ public class LocalDatabaseService {
 			if (table != null || name != null) {
 				try {
 					Row row = table.getRows().get(0);
-					int keyLong = row.getValue(table.getColumnIndex("KeyLong")).getIntegerValue();
+					int keyLong = row.getValue(table.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue();
 					Map<String, Object> found = getResultsForKeyLong(name, keyLong);
 					if (found == null) {
 						insertEntryOfLookup = conn.prepareStatement("INSERT INTO AllLookupvalues(Lookup, KeyLong, KeyText, Description) VALUES (?, ?, ?, ?)");
@@ -233,10 +234,10 @@ public class LocalDatabaseService {
 						while (i < table.getRows().size()) {
 							Row r = table.getRows().get(i);
 							insertEntryOfLookup.setString(1, name);
-							insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex("KeyLong")).getIntegerValue());
-							insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex("KeyText")).getStringValue());
-							if (r.getValue(table.getColumnIndex("Description")) != null) {
-								insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex("Description")).getStringValue());
+							insertEntryOfLookup.setInt(2, r.getValue(table.getColumnIndex(Constants.TABLE_KEYLONG)).getIntegerValue());
+							insertEntryOfLookup.setString(3, r.getValue(table.getColumnIndex(Constants.TABLE_KEYTEXT)).getStringValue());
+							if (r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)) != null) {
+								insertEntryOfLookup.setString(4, r.getValue(table.getColumnIndex(Constants.TABLE_DESCRIPTION)).getStringValue());
 							} else {
 								insertEntryOfLookup.setString(4, "");
 							}
@@ -283,7 +284,8 @@ public class LocalDatabaseService {
 	public void updateResolveValue(String lookupName, Value keyLong, Value keyText, Value description) {
 		int rowCount = 0;
 
-		if (conn == null) return; // da können wir nichts tun
+		if (conn == null)
+			return; // da können wir nichts tun
 
 		try {
 			if (updateLookupResolveValue == null) {
@@ -295,18 +297,23 @@ public class LocalDatabaseService {
 			}
 
 			updateLookupResolveValue.setString(1, keyText.getStringValue());
-			if (description == null) updateLookupResolveValue.setNull(2, Types.VARCHAR);
-			else updateLookupResolveValue.setString(2, description.getStringValue());
+			if (description == null)
+				updateLookupResolveValue.setNull(2, Types.VARCHAR);
+			else
+				updateLookupResolveValue.setString(2, description.getStringValue());
 			updateLookupResolveValue.setString(3, lookupName);
 			updateLookupResolveValue.setInt(4, keyLong.getIntegerValue());
 			rowCount = updateLookupResolveValue.executeUpdate();
-			if (rowCount > 0) return;
+			if (rowCount > 0)
+				return;
 
 			insertLookupResolveValue.setString(1, lookupName);
 			insertLookupResolveValue.setInt(2, keyLong.getIntegerValue());
 			insertLookupResolveValue.setString(3, keyText.getStringValue());
-			if (description == null) insertLookupResolveValue.setNull(4, Types.VARCHAR);
-			else insertLookupResolveValue.setString(4, description.getStringValue());
+			if (description == null)
+				insertLookupResolveValue.setNull(4, Types.VARCHAR);
+			else
+				insertLookupResolveValue.setString(4, description.getStringValue());
 			insertLookupResolveValue.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -323,16 +330,18 @@ public class LocalDatabaseService {
 	 * @return null, wenn der Wert nicht lokal gespeichert ist
 	 */
 	public LookupEntry resolveValue(String lookupName, Value keyLong) {
-		if (conn == null) return null;
-		if (keyLong == null) return new LookupEntry(0, "", null);
+		if (conn == null)
+			return null;
+		if (keyLong == null)
+			return new LookupEntry(0, "", null);
 
 		try {
 			if (selectLookupResolveValue == null)
 				selectLookupResolveValue = conn.prepareStatement("SELECT KeyText, Description FROM LookupResolveValues WHERE Lookup = ? AND KeyLong = ?");
-			
+
 			selectLookupResolveValue.setString(1, lookupName);
 			selectLookupResolveValue.setInt(2, keyLong.getIntegerValue());
-			
+
 			ResultSet resultSet = selectLookupResolveValue.executeQuery();
 			if (resultSet.first()) {
 				return new LookupEntry(keyLong.getIntegerValue(), resultSet.getString(1), (String) resultSet.getObject(2));
@@ -340,7 +349,7 @@ public class LocalDatabaseService {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
