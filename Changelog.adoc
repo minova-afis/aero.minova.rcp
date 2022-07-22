@@ -17,11 +17,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 ### Änderung
 - Index nach Blockieren neu Laden, wenn Einstellung gesetzt ist
 - Aufruf zum Auflisten der Werte bei Read-Only Lookups nicht ausführen
+- Tests für ParamStringUtil
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
 - Revert mit vorbelegten Feldern funktioniert nun wie erwartet
 - Indexdruck von Masken mit Leerzeichen im Titel ermöglichen
+- ParamString Felder speichern nun ShortDate/-Time Werte korrekt
 
 
 ## [12.2.1] - 2022-07-14
