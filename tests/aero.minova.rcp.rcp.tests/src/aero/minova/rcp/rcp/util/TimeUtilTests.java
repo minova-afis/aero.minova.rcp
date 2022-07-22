@@ -17,6 +17,13 @@ import org.junit.Test;
 import aero.minova.rcp.util.TimeUtil;
 
 public class TimeUtilTests {
+
+	@Test
+	public void testStartofDayGerman() {
+		Instant instant = LocalDate.of(1900, JANUARY, 1).atStartOfDay().toInstant(ZoneOffset.UTC);
+		assertEquals("000000", TimeUtil.getTimeString(instant, Locale.GERMANY, "hhmmss"));
+	}
+
 	@Test
 	public void testGetTimeString1_59() {
 		Instant instant = LocalDateTime.of(1900, JANUARY, 1, 1, 59).toInstant(ZoneOffset.UTC);
@@ -147,7 +154,7 @@ public class TimeUtilTests {
 		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(20).toInstant(ZoneOffset.UTC);
 		assertEquals(expected, TimeUtil.getTime(now, "08:00 PM", "hh:mm a", Locale.US));
 	}
-	
+
 	@Test
 	public void entryNachm() {
 		Instant now = Instant.now();
