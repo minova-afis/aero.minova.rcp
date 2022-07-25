@@ -29,6 +29,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - ParamString Felder speichern nun ShortDate/-Time Werte korrekt
 - Zum Überprüfen, ob ein Datensatz im Detail geladen ist, erstes primary-Feld nutzen, statt fest Feld mit "KeyLong". Damit kann auch in Masken ohne "KeyLong" Feld gelöscht werden
 - Indexdruck mit DateTimeSpalten ermöglichen, Datums-/Zeitformat und Zeitzone aus Einstellungen nutzen
+- Beschreibung von Lookups in Wizards anzeigen
 
 
 ## [12.2.1] - 2022-07-14
