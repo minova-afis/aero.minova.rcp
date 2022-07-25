@@ -260,6 +260,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		mField.setLookupTable(lookup.getTable());
 		mField.setLookupProcedurePrefix(lookup.getProcedurePrefix());
 		mField.setLookupDescription(lookup.getDescriptionName());
+		mField.setNumberColumnsSpanned(4);
 		for (TypeParam typeParam : lookup.getParam()) {
 			mField.addLookupParameter(typeParam.getFieldName());
 		}
