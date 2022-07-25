@@ -82,8 +82,18 @@ public class Constants {
 	public static final String BROKER_ACTIVEROWS = "aero/minova/rcp/ActiveRows";
 	public static final String RECEIVED_TICKET = "aero/minova/rcp/WFCReceivedTicket";
 	public static final String BROKER_CHECKDIRTY = "aero/minova/rcp/checkDirty";
+
+	/**
+	 * Benutzt mit einem ErrorObject, öffnet einen einfachen Fehler-Dialog
+	 */
 	public static final String BROKER_SHOWERROR = "aero/minova/rcp/ShowError";
+	/**
+	 * Benutzt mit einem String, öffnet eine Benachrichtigungs-Popup rechts unten
+	 */
 	public static final String BROKER_SHOWNOTIFICATION = "aero/minova/rcp/ShowNotification";
+	/**
+	 * Benutzt mit einem String, öffnet einen Fehler-Dialog
+	 */
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
 	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
 	public static final String BROKER_PROCEDUREWITHTABLEERROR = "aero/minova/rcp/ProcedureWithTableError";
