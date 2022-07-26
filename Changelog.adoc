@@ -21,6 +21,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - GridChangeEvent um die geänderte Zeile erweitert
 - RowsToInsert/ RowsToUpdate/ RowsToDelete über MGrid abrufbar gemacht
 - Bump maven-deploy-plugin from 2.8.2 to 3.0.0
+- Anfragen/Antworten ans/vom CAS im Login-Dialog Loggen
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
