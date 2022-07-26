@@ -28,13 +28,13 @@ public class TestZoneIdTests {
 	@Test
 	public void testGermanZones() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
-		assertEquals(202, zones.size());
+		assertEquals(198, zones.size());
 	}
 
 	@Test
 	public void testGermanyZones() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMANY);
-		assertEquals(202, zones.size());
+		assertEquals(198, zones.size());
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class TestZoneIdTests {
 	@Test
 	public void testListSize() {
 		List<String> zones = CustomTimeZone.getTimeZones(Locale.GERMAN);
-		assertEquals(202, zones.size());
+		assertEquals(198, zones.size());
 	}
 
 	@Test
