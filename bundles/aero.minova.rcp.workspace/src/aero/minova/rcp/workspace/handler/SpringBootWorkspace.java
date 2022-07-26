@@ -248,7 +248,10 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 					.sslContext(disabledSslVerificationContext())//
 					.authenticator(authentication).build();
 
+			logger.info("CAS Request Ping: \n" + request.toString());
 			HttpResponse<String> answer = httpClient.send(request, BodyHandlers.ofString());
+
+			logger.info("CAS Answer Ping: \n" + answer.toString());
 			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
 				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
 			}
