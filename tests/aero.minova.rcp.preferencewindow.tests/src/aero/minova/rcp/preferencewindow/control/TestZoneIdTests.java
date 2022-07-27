@@ -26,28 +26,10 @@ public class TestZoneIdTests {
 	}
 
 	@Test
-	public void testGermanZones() {
-		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
-		assertEquals(198, zones.size());
-	}
-
-	@Test
-	public void testGermanyZones() {
-		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMANY);
-		assertEquals(198, zones.size());
-	}
-
-	@Test
 	public void testGetIdENGLISH() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.US);
 		assertNotNull(CustomTimeZone.getId(zones, "Central European Time", Locale.US));
 		assertEquals("Europe/Monaco", CustomTimeZone.getId(zones, "Central European Time", Locale.US).toString());
-	}
-
-	@Test
-	public void testListSize() {
-		List<String> zones = CustomTimeZone.getTimeZones(Locale.GERMAN);
-		assertEquals(198, zones.size());
 	}
 
 	@Test
