@@ -18,18 +18,11 @@
         <tycho.version>2.7.4</tycho.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-    </properties>
 
-    <dependencies>
-        <dependency>
-            <!--  must be on the classpath test coverage  -->
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <version>0.8.8</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/report-aggregate/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
 
     <build>
         <pluginManagement>
@@ -144,10 +137,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
 
@@ -179,5 +168,6 @@
         <module>libs</module>
         <module>tests</module>
 
+        <module>report-aggregate</module>
     </modules>
 </project>

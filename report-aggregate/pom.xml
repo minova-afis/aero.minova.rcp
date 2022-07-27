@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>aero.minova.rcp.tests</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>aero.minova.rcp.report-aggregate</artifactId>
+    <description>Aggregate Coverage Report</description>
 
     <parent>
         <groupId>aero.minova.rcp</groupId>
@@ -11,20 +11,21 @@
         <relativePath>../</relativePath>
     </parent>
 
-    <modules>
-        <module>aero.minova.rcp.rcp.tests</module>
-        <module>aero.minova.rcp.xml.tests</module>
-        <module>aero.minova.rcp.uitests</module>
-    </modules>
-
     <dependencies>
         <dependency>
-            <!--  must be on the classpath test coverage  -->
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <version>0.8.8</version>
-            <scope>test</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>aero.minova.rcp.xml.tests</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>aero.minova.rcp.rcp.tests</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>aero.minova.rcp.uitests</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -40,11 +41,6 @@
                         <goals>
                             <goal>report-aggregate</goal>
                         </goals>
-                        <configuration>
-                            <formats>
-                                <format>XML</format>
-                            </formats>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
