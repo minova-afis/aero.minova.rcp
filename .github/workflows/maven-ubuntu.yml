@@ -10,27 +10,68 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  ACCOUNT: minova-afis
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: 11
-        distribution: 'adopt'
-    - run: sudo apt-get install xvfb
-    - name: Cache local Maven repository
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
-    - name: Build with Maven
-      run: xvfb-run mvn clean verify -DskipTests=true --fae --file pom.xml -T4
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+          java-package: 'jdk'
+          cache: 'maven'
+
+      - run: sudo apt-get install xvfb
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Maven build and SonarQube scan
+        run: |
+          xvfb-run \
+          mvn --batch-mode --no-transfer-progress \
+            clean verify \
+            dependency-check:aggregate \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \ 
+            -DskipTests=true --fae -T4 \
+            --file pom.xml
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
+
+      - name: Store report of Dependency Check
+        uses: actions/upload-artifact@v2
+        with:
+          name: dependency-check-report.html
+          path: target/dependency-check-report.html
 
 #    - uses: actions/upload-artifact@v2
 #      with:
