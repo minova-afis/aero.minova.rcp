@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - master
-      - scr_sonarqube
   pull_request:
   workflow_dispatch:
 
@@ -53,8 +52,7 @@ jobs:
             org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
             -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-            -P all-tests \
-            --fae -T4 \
+            -DskipTests=true --fae -T4 \
             --file pom.xml \
             --settings .github/settings.xml
         env:
