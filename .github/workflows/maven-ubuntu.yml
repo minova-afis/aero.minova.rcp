@@ -55,7 +55,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           xvfb-run -- \
-          mvn --batch-mode --no-transfer-progress \
+          mvn -X --batch-mode --no-transfer-progress \
             clean verify \
             dependency-check:aggregate \
             org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
