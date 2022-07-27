@@ -61,8 +61,11 @@ jobs:
             -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
             -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \ 
             -DskipTests=true --fae -T4 \
-            --file pom.xml
+            --file pom.xml \
+            --settings .github/settings.xml
         env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
