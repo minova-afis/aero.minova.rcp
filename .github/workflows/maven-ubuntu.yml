@@ -36,14 +36,6 @@ jobs:
 
       - run: sudo apt-get install xvfb
 
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       - name: Cache SonarQube packages
         uses: actions/cache@v1
         with:
@@ -55,7 +47,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           xvfb-run -- \
-          mvn -X --batch-mode --no-transfer-progress \
+          mvn -U --batch-mode --no-transfer-progress \
             clean verify \
             dependency-check:aggregate \
             org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
