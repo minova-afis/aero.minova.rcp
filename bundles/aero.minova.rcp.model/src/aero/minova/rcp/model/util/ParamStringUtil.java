@@ -2,7 +2,7 @@ package aero.minova.rcp.model.util;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.util.DateTimeUtil;
 
 public class ParamStringUtil {
 
@@ -39,7 +40,7 @@ public class ParamStringUtil {
 				switch (v.getType()) {
 				case BIGDECIMAL:
 					Double bdv = v.getBigDecimalValue();
-					output.append("{" + i + "-" + IVariantType.VARIANT_DOUBLE + "-" + bdv.toString().length() + "}" + bdv);
+					output.append("{" + i + "-" + IVariantType.VARIANT_DOUBLE + "-" + bdv.toString().length() + "}" + bdv.toString());
 					break;
 				case BOOLEAN:
 					Boolean bv = v.getBooleanValue();
@@ -47,17 +48,16 @@ public class ParamStringUtil {
 					break;
 				case DOUBLE:
 					Double dv = v.getDoubleValue();
-					output.append("{" + i + "-" + IVariantType.VARIANT_DOUBLE + "-" + dv.toString().length() + "}" + dv);
+					output.append("{" + i + "-" + IVariantType.VARIANT_DOUBLE + "-" + dv.toString().length() + "}" + dv.toString());
 					break;
 				case FILTER:
 					// Nur für Suche benötigt
 					break;
 				case INSTANT:
 					Instant instantv = v.getInstantValue();
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN).withLocale(locale).withZone(ZoneId.systemDefault());
-					String dateString = formatter.format(instantv);
-					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateString.length() + "}" + dateString);
-
+					String dateTimeString = DateTimeUtil.getDateTimeString(instantv, locale, "yyyyMMdd", "HHmmss", "UTC");
+					dateTimeString = dateTimeString.replace(" ", "");
+					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateTimeString.length() + "}" + dateTimeString);
 					break;
 				case INTEGER:
 					Integer iv = v.getIntegerValue();
@@ -69,9 +69,9 @@ public class ParamStringUtil {
 					break;
 				case ZONED:
 					ZonedDateTime zdtv = v.getZonedDateTimeValue();
-					formatter = DateTimeFormatter.ofPattern(PATTERN);
-					dateString = zdtv.format(formatter);
-					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateString.length() + "}" + dateString);
+					dateTimeString = DateTimeUtil.getDateTimeString(zdtv.toInstant(), locale, "yyyyMMdd", "HHmmss", "UTC");
+					dateTimeString = dateTimeString.replace(" ", "");
+					output.append("{" + i + "-" + IVariantType.VARIANT_DATE + "-" + dateTimeString.length() + "}" + dateTimeString);
 					break;
 				default:
 					output.append("{" + i + "-" + IVariantType.VARIANT_OBJECT + "-" + v.getValue().toString().length() + "}" + v.getValue().toString());
@@ -104,24 +104,24 @@ public class ParamStringUtil {
 				newVar = parameter;
 				break;
 			case IVariantType.VARIANT_INT:
-				newVar = new Integer(parameter);
+				newVar = Integer.parseInt(parameter);
 				break;
 			case IVariantType.VARIANT_DOUBLE:
-				newVar = new Double(parameter);
+				newVar = Double.parseDouble(parameter);
 				break;
 			case IVariantType.VARIANT_SHORT:
-				newVar = new Short(parameter);
+				newVar = Short.parseShort(parameter);
 				break;
 			case IVariantType.VARIANT_BOOLEAN:
-				newVar = Boolean.valueOf(parameter.equals("1") ? true : false);
+				newVar = Boolean.valueOf(parameter.equals("1"));
 				break;
 			case IVariantType.VARIANT_OBJECT:
 				if (length == 14) {
-					newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, locale)).atZone(ZoneId.systemDefault()).toInstant();
+					newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, locale)).atZone(ZoneOffset.UTC).toInstant();
 				}
 				break;
 			case IVariantType.VARIANT_DATE:
-				newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, locale)).atZone(ZoneId.systemDefault()).toInstant();
+				newVar = LocalDateTime.parse(parameter, DateTimeFormatter.ofPattern(PATTERN, locale)).atZone(ZoneOffset.UTC).toInstant();
 				break;
 			case IVariantType.VARIANT_EMPTY:
 				newVar = null;

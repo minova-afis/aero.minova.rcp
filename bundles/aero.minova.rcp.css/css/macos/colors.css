@@ -2,6 +2,7 @@
 Canvas, CTabItem, DetailComposite, ExpandableComposite, LayoutComposite,
 	MinovaSection, NatTable, ScrolledComposite, Section, ToolBar  {
 	color: #404040;
+	background-color:  #ececec; /* Standard eclipse 2021-09 macos */
 }
 Section, MinovaSection {
 	border-color-titlebar: black;
@@ -14,7 +15,7 @@ CTabItem:selected {
 	background-color: white;
 }
 
-Label, Text, Button, Button.Description, Label.Description, Section.Description  {
+Label, Text, Button, Button.Description, Label.Description, Section.Description, Table  {
 	color: #404040;
 }
 
@@ -38,4 +39,9 @@ Label#SplashLabel {
 Text#Console {
 	background-color: black;
 	color: white;
+}
+
+Shell, FlatButton, TitledSeparator {
+	color: #404040;
+	background-color:  #ececec; /* Standard eclipse 2021-09 macos */
 }

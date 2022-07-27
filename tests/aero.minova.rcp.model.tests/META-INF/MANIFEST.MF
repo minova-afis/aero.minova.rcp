@@ -2,9 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: aero.minova.rcp.model.tests
-Bundle-Version: 12.0.0.qualifier
+Bundle-Version: 12.2.1.qualifier
 Automatic-Module-Name: aero.minova.rcp.model.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.junit,
  aero.minova.rcp.model,
- com.google.gson
+ com.google.gson,
+ org.junit.jupiter.api

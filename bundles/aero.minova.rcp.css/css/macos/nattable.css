@@ -39,6 +39,20 @@ NatTable > .COLUMN_HEADER:select {
 	text-align: left;
 }
 
+NatTable > .ROW_HEADER {
+	cell-background-color: RGB(240, 240, 240);
+	font-style: normal;
+	font-family: VERDANA;
+	color: #404040;
+}
+
+NatTable > .BODY {
+	cell-background-color: white;
+	font-style: normal;
+	font-family: VERDANA;
+	color: #404040;
+}
+
 NatTable > .BODY:select {
     painter-resolution: false;
 	cell-background-color: yellow;
