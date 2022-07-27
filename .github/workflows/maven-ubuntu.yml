@@ -47,7 +47,6 @@ jobs:
       - name: Maven build and SonarQube scan
         run: |
           cd $GITHUB_WORKSPACE
-#          xvfb-run -- \
           mvn -U --batch-mode --no-transfer-progress \
             clean verify \
             dependency-check:aggregate \
