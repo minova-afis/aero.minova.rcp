@@ -10,6 +10,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  ACCOUNT: minova-afis
+
 jobs: 
   build:
     runs-on: windows-latest
@@ -41,9 +44,9 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build with Maven
+      - name: Build with Maven and SonarQube scan
         run: |
-          mvn clean verify -P all-tests dependency-check:aggregate org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} surefire-report:report --fae --file pom.xml --settings .github/settings.xml
+          mvn --batch-mode --no-transfer-progress clean verify -P all-tests dependency-check:aggregate org.sonarsource.scanner.maven:sonar-maven-plugin:sonar "-Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}}" "-Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}}" surefire-report:report --fae --file pom.xml --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}

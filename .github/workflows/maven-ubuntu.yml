@@ -10,9 +10,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  ACCOUNT: minova-afis
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,37 +33,17 @@ jobs:
 
       - run: sudo apt-get install xvfb
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Maven build and SonarQube scan
+      - name: Maven build
         run: |
           cd $GITHUB_WORKSPACE
           xvfb-run -- \
           mvn --batch-mode --no-transfer-progress verify \
-            dependency-check:aggregate \
-            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
-            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
             -DskipTests=true --fae -T4 \
             --file pom.xml \
             --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
-
-      - name: Store report of Dependency Check
-        uses: actions/upload-artifact@v2
-        with:
-          name: dependency-check-report.html
-          path: target/dependency-check-report.html
 
 #    - uses: actions/upload-artifact@v2
 #      with:
