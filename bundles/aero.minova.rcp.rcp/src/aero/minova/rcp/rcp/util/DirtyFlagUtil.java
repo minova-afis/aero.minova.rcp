@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -141,10 +142,26 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 					continue;
 				}
 
-				if (!c.getValue().equals(sV)) {
+				if (!Objects.equals(c.getValue(), sV)) {
 					return true;
 				}
-			} else if ((c.getValue() == null && sV != null) || (c.getValue() != null && !c.getValue().equals(sV))) {
+			} else if (c instanceof MParamStringField) {
+				if (sV == null && ((MParamStringField) c).isNullValue()) { // Auch "leeren" ParamString Wert prüfen
+					continue;
+				}
+
+				if (!Objects.equals(c.getValue(), sV)) {
+					return true;
+				}
+			} else if (c instanceof MPeriodField) {
+				if (sV == null && ((MPeriodField) c).isNullValue()) { // Auch "leeren" Period Wert prüfen
+					continue;
+				}
+
+				if (!Objects.equals(c.getValue(), sV)) {
+					return true;
+				}
+			} else if (!Objects.equals(c.getValue(), sV)) {
 				return true;
 			}
 		}
@@ -157,11 +174,23 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 		for (Field field : fieldsToCheck) {
 			MField mfield = mDetail.getField(fieldPrefix + field.getName());
 
+			if (checkedFields.contains(mfield)) {
+				continue;
+			}
+
 			if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
-				if (!checkedFields.contains(mfield) && Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
+				if (Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
 					return true;
 				}
-			} else if (!checkedFields.contains(mfield) && mfield.getValue() != null) {
+			} else if (mfield instanceof MParamStringField) {
+				if (!((MParamStringField) mfield).isNullValue()) { // Auch "leeren" ParamString Wert prüfen
+					return true;
+				}
+			} else if (mfield instanceof MPeriodField) {
+				if (!((MPeriodField) mfield).isNullValue()) { // Auch "leeren" Period Wert prüfen
+					return true;
+				}
+			} else if (mfield.getValue() != null) {
 				return true;
 			}
 		}
