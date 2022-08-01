@@ -199,6 +199,7 @@ public class WFCDetailCASRequestsUtil {
 
 					updateSelectedEntry(false);
 					sendEventToHelper(ActionCode.AFTERREAD);
+					broker.send(Constants.BROKER_CHECKDIRTY, "");
 				}
 			}));
 		});
