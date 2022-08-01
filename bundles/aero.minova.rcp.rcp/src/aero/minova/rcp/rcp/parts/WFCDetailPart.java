@@ -630,8 +630,6 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Erstellen der Field des Section.
 		createFields(clientComposite, headOrPageOrGrid, mSection, section);
-		// Sortieren der Fields nach Tab-Index.
-		TabUtil.sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections.
 		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		// Setzen der TabListe der Sections im Part.

@@ -94,28 +94,6 @@ public class TabUtil {
 	}
 
 	/**
-	 * Sortiert die Tab Reihenfolge der Fields in der Section(Page)
-	 *
-	 * @param mSection
-	 *            die Section in der die Fields sortiert werden müssen
-	 * @param traverseListener
-	 *            der zuzuweisende TraverseListener für die Fields
-	 */
-	public static void sortTabList(MSection mSection) {
-		List<MField> tabList = mSection.getTabList();
-		Collections.sort(tabList, (f1, f2) -> {
-			if (f1.getTabIndex() == f2.getTabIndex()) {
-				return 0;
-			} else if (f1.getTabIndex() < f2.getTabIndex()) {
-				return -1;
-			} else {
-				return 1;
-			}
-		});
-		mSection.setMFieldList(tabList);
-	}
-
-	/**
 	 * Gibt einen Array mit den Controls für die TabListe der Section zurück. Wenn SelectAllControls gesetzt ist, wird das SectionControl(der Twistie) mit in
 	 * den Array gesetzt.
 	 *

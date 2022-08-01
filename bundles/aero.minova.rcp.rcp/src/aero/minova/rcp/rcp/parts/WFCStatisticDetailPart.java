@@ -288,7 +288,6 @@ public class WFCStatisticDetailPart {
 		createUIFields(mFields, clientComposite);
 
 		// Tab-Liste
-		TabUtil.sortTabList(mSection);
 		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(section, mSection, selectAllControls));
 

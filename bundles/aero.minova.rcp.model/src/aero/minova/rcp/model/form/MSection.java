@@ -1,6 +1,7 @@
 package aero.minova.rcp.model.form;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
@@ -79,6 +80,16 @@ public class MSection {
 				tabList.add(f);
 			}
 		}
+
+		Collections.sort(tabList, (f1, f2) -> {
+			if (f1.getTabIndex() == f2.getTabIndex()) {
+				return 0;
+			} else if (f1.getTabIndex() < f2.getTabIndex()) {
+				return -1;
+			} else {
+				return 1;
+			}
+		});
 
 		return tabList;
 	}
