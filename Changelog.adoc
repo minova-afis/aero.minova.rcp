@@ -28,6 +28,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - Tests für ValueDe-/Serializer
 - Unnötige Tests für die Anzahl an TimeZones entfernen, PreferencewindowTests beim Bauen ausführen
 - Einstellung des Dark-Modes unter MacOS ignorieren
+- Code smells, Bugs und Security Hotspots mit Hilfe von Sonarqube entfernen
 
 
 ### Bugfixes
