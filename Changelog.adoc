@@ -28,6 +28,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - Tests für ValueDe-/Serializer
 - Unnötige Tests für die Anzahl an TimeZones entfernen, PreferencewindowTests beim Bauen ausführen
 - Einstellung des Dark-Modes unter MacOS ignorieren
+- Code smells, Bugs und Security Hotspots mit Hilfe von Sonarqube entfernen
 
 
 ### Bugfixes
@@ -38,6 +39,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - Zum Überprüfen, ob ein Datensatz im Detail geladen ist, erstes primary-Feld nutzen, statt fest Feld mit "KeyLong". Damit kann auch in Masken ohne "KeyLong" Feld gelöscht werden
 - Indexdruck mit DateTimeSpalten ermöglichen, Datums-/Zeitformat und Zeitzone aus Einstellungen nutzen
 - Beschreibung von Lookups in Wizards anzeigen
+- DirtyFlag verbessern 
+** Flag nach Laden eines Datensatzes neu berechnen 
+** `null` Values von ParamString und Period korrekt überprüfen
+- ParamString verbessern
+** Weitere Felder im selben Abschnitt ermöglichen
+** Unterfelder entfernen, wenn null-Form aufgerufen wird
+** Nach Neuzeichnen der Section selbes Feld wieder auswählen
 
 
 ## [12.2.1] - 2022-07-14

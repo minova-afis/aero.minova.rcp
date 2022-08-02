@@ -134,7 +134,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	/**
 	 * Erstellt ein MField <br>
 	 * Achtung: Für Lookups Methode createMLookupField verwenden!
-	 * 
+	 *
 	 * @param composite
 	 * @param dataType
 	 * @param dateTimeType
@@ -190,6 +190,9 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	}
 
 	private void initField(String label, boolean required, MField mField) {
+		if (mField == null) {
+			return;
+		}
 		mField.setLabel(label);
 		mField.setName(label);
 		mField.setRequired(required);
@@ -201,7 +204,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 	/**
 	 * Erstellt das UI-Feld
-	 * 
+	 *
 	 * @param mField
 	 * @param dateTimeType
 	 * @param composite
@@ -314,7 +317,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 	/**
 	 * Erstellt ein Composite mit dem MinovaLayout. Für Wizardpages mit "normalen" Feldern.
-	 * 
+	 *
 	 * @param parent
 	 * @return
 	 */
@@ -336,7 +339,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 	/**
 	 * Erstellt ein Composite für Wizardpages mit Tabelle
-	 * 
+	 *
 	 * @param parent
 	 * @return
 	 */

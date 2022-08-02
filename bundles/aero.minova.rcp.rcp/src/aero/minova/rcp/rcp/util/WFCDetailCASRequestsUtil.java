@@ -30,6 +30,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.constants.Constants;
@@ -64,6 +65,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
+import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -199,6 +201,7 @@ public class WFCDetailCASRequestsUtil {
 
 					updateSelectedEntry(false);
 					sendEventToHelper(ActionCode.AFTERREAD);
+					broker.send(Constants.BROKER_CHECKDIRTY, "");
 				}
 			}));
 		});
@@ -921,6 +924,13 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	public void redrawSection(MSection mSection) {
 
+		// Selektiertes Feld herausfinden, um es nach dem Neu-Zeichnen wieder auszuwählen
+		Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
+		MField focussed = null;
+		if (focussedControl != null && !focussedControl.isDisposed()) {
+			focussed = (MField) focussedControl.getData(Constants.CONTROL_FIELD);
+		}
+
 		// SubFelder von Param-String Feldern entfernen
 		List<MField> toRemove = new ArrayList<>();
 		for (MField mField : mDetail.getFields()) {
@@ -971,19 +981,27 @@ public class WFCDetailCASRequestsUtil {
 		// Felder zeichnen
 		wfcDetailPart.createUIFields(visibleMFields, clientComposite);
 
-		// Sortieren der Fields nach Tab-Index.
-		TabUtil.sortTabList(mSection);
 		// Setzen der TabListe für die einzelnen Sections
 		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		// Setzen der TabListe der Sections im Part.
 		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
 
-		// Zwischengespeicherten Wert wieder eintragen
+		// Vorherige Wert wieder in UI eintragen
+		for (MField f : mSection.getMFields()) {
+			if (f.getValueAccessor() != null) {
+				f.getValueAccessor().setValue(f.getValue(), false);
+			}
+		}
 		paramStringFields.stream().forEach(f -> f.setValue(new Value(f.getCacheValue().getStringValue() + " "), false));
 
 		section.requestLayout();
 		section.style();
 		TranslateUtil.translate(clientComposite, translationService, wfcDetailPart.getLocale());
+
+		// Zuvor selektiertes Feld wieder auswählen
+		if (focussed != null && focussed.getValueAccessor() != null && !((AbstractValueAccessor) focussed.getValueAccessor()).getControl().isDisposed()) {
+			((AbstractValueAccessor) focussed.getValueAccessor()).getControl().setFocus();
+		}
 
 	}
 
@@ -994,22 +1012,24 @@ public class WFCDetailCASRequestsUtil {
 	 * @param formName
 	 */
 	public void updateParamStringField(MParamStringField mParamString, String formName) {
-		Form f = dataFormService.getForm(formName);
 
 		List<Field> subfields = new ArrayList<>();
 
-		for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
-			List<Object> fieldsOrGrids = new ArrayList<>();
+		if (formName != null) {
+			Form f = dataFormService.getForm(formName);
+			for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
+				List<Object> fieldsOrGrids = new ArrayList<>();
 
-			if (o instanceof Head) {
-				fieldsOrGrids = ((Head) o).getFieldOrGrid();
-			} else if (o instanceof Page) {
-				fieldsOrGrids = ((Page) o).getFieldOrGrid();
-			}
+				if (o instanceof Head) {
+					fieldsOrGrids = ((Head) o).getFieldOrGrid();
+				} else if (o instanceof Page) {
+					fieldsOrGrids = ((Page) o).getFieldOrGrid();
+				}
 
-			for (Object fieldOrGrid : fieldsOrGrids) {
-				if (fieldOrGrid instanceof Field) {
-					subfields.add((Field) fieldOrGrid);
+				for (Object fieldOrGrid : fieldsOrGrids) {
+					if (fieldOrGrid instanceof Field) {
+						subfields.add((Field) fieldOrGrid);
+					}
 				}
 			}
 		}
