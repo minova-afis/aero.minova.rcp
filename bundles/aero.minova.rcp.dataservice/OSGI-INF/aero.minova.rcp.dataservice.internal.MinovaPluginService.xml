@@ -5,5 +5,6 @@
    </service>
    <reference bind="getDataService" interface="aero.minova.rcp.dataservice.IDataService" name="getDataService"/>
    <reference bind="getDummyService" interface="aero.minova.rcp.dataservice.IDummyService" name="getDummyService"/>
+   <reference bind="getLogger" interface="org.eclipse.e4.core.services.log.Logger" name="getLogger"/>
    <implementation class="aero.minova.rcp.dataservice.internal.MinovaPluginService"/>
 </scr:component>
