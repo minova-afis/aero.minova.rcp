@@ -2,6 +2,8 @@ package aero.minova.rcp.constants;
 
 public class Constants {
 
+	private Constants() {}
+
 	// Parts
 	public static final String SEARCH_PART = "aero.minova.rcp.rcp.part.search";
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
@@ -105,10 +107,31 @@ public class Constants {
 	public static final String BROKER_UPDATECOLUMNS = "aero/minova/rcp/UpdateColumns";
 
 	// Operatoren
-	public static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", "null", "!null" };
-	public static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", "null", "!null" };
-	public static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "null", "!null" };
-	public static final String[] WILDCARD_OPERATORS = { "_", "%" };
+	public static final String NULL = "null";
+	public static final String NOT_NULL = "!null";
+	protected static final String[] OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "!~", "~", NULL, NOT_NULL };
+
+	public static String[] getOperators() {
+		return OPERATORS;
+	}
+
+	protected static final String[] STRING_OPERATORS = { "<>", "=", "!~", "~", NULL, NOT_NULL };
+
+	public static String[] getStringOperators() {
+		return STRING_OPERATORS;
+	}
+
+	protected static final String[] NUMBER_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", NULL, NOT_NULL };
+
+	public static String[] getNumberOperators() {
+		return NUMBER_OPERATORS;
+	}
+
+	protected static final String[] WILDCARD_OPERATORS = { "_", "%" };
+
+	public static String[] getWildcardOperators() {
+		return WILDCARD_OPERATORS;
+	}
 
 	// SeachCriteria
 	public static final String SEARCHCRITERIA_DEFAULT = "DEFAULT";

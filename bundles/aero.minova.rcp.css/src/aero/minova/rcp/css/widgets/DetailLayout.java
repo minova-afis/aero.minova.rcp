@@ -16,26 +16,26 @@ public class DetailLayout extends Layout {
 	/**
 	 * spacing specifies the number of points between the edge of one cell and the edge of its neighbouring cell. The default value is 5.
 	 */
-	public int spacing = 5;
+	public static final int SPACING = 5;
 	/**
 	 * marginLeft specifies the number of points of horizontal margin that will be placed along the left edge of the layout. The default value is 3.
 	 */
-	public int marginLeft = 3;
+	public static final int MARGIN_LEFT = 3;
 
 	/**
 	 * marginTop specifies the number of points of vertical margin that will be placed along the top edge of the layout. The default value is 3.
 	 */
-	public int marginTop = 3;
+	public static final int MARGIN_TOP = 3;
 
 	/**
 	 * marginRight specifies the number of points of horizontal margin that will be placed along the right edge of the layout. The default value is 3.
 	 */
-	public int marginRight = 3;
+	public static final int MARGIN_RIGHT = 3;
 
 	/**
 	 * marginBottom specifies the number of points of vertical margin that will be placed along the bottom edge of the layout. The default value is 3.
 	 */
-	public int marginBottom = 3;
+	public static final int MARGIN_BOTTOM = 3;
 
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
@@ -74,14 +74,14 @@ public class DetailLayout extends Layout {
 			Control control = children[i];
 			ICssStyler styler = ((MinovaSection) control).getCssStyler();
 			MinovaSectionData data = (MinovaSectionData) control.getLayoutData();
-			if (data != null && data.visible && !data.horizontalFill) {
+			if (data != null && data.isVisible() && !data.isHorizontalFill()) {
 				Point size = control.computeSize(styler.getSectionWidth(), SWT.DEFAULT, flushCache);
 				initData(data, size);
 				columnChildren[columnChildrenCount] = children[i];
 				columnData[columnChildrenCount] = data;
 				columnChildrenCount++;
 				maxColumnWidth = Math.max(maxColumnWidth, size.x);
-			} else if (data != null && data.visible) {
+			} else if (data != null && data.isVisible()) {
 				Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);
 				initData(data, size);
 				horizontalFillChildren[horizontalFillChildrenCount] = children[i];
@@ -104,11 +104,11 @@ public class DetailLayout extends Layout {
 	}
 
 	private void initData(MinovaSectionData data, Point size) {
-		data.column = 0;
-		data.width = size.x;
-		data.height = size.y;
-		data.top = 0;
-		data.left = 0;
+		data.setColumn(0);
+		data.setWidth(size.x);
+		data.setHeight(size.y);
+		data.setTop(0);
+		data.setLeft(0);
 	}
 
 	private Point layoutColumn(MinovaSectionData[] detailData, int size, int width) {
@@ -116,33 +116,33 @@ public class DetailLayout extends Layout {
 		int totalHeight = 0;
 		int maxWidth = 0;
 		for (int i = 0; i < size; i++) {
-			totalHeight += detailData[i].height;
-			maxWidth = max(detailData[i].width, maxWidth);
+			totalHeight += detailData[i].getHeight();
+			maxWidth = max(detailData[i].getWidth(), maxWidth);
 		}
 
 		// Spaltenanzahl ermitteln
-		int columns = max(1, (width - marginLeft - marginRight - spacing) / maxWidth);
-		columns = max(1, (width - marginLeft - marginRight - spacing * (columns - 1)) / maxWidth);
+		int columns = max(1, (width - MARGIN_LEFT - MARGIN_RIGHT - SPACING) / maxWidth);
+		columns = max(1, (width - MARGIN_LEFT - MARGIN_RIGHT - SPACING * (columns - 1)) / maxWidth);
 
 		int averageHeight = totalHeight / columns + 1;
 		int lastBottomPosition = 0;
 		int column = 0;
 		for (int i = 0; i < size; i++) {
 			MinovaSectionData lv = detailData[i];
-			if (lv.height / 2 + lastBottomPosition <= averageHeight || column == columns - 1) {
-				lv.column = column;
-				lv.top = lastBottomPosition;
-				lastBottomPosition += lv.height;
+			if (lv.getHeight() / 2 + lastBottomPosition <= averageHeight || column == columns - 1) {
+				lv.setColumn(column);
+				lv.setTop(lastBottomPosition);
+				lastBottomPosition += lv.getHeight();
 			} else {
 				column++;
-				lv.column = column;
-				lv.top = 0;
-				lastBottomPosition = lv.height;
+				lv.setColumn(column);
+				lv.setTop(0);
+				lastBottomPosition = lv.getHeight();
 			}
 		}
 		maxWidth = 0;
-		int left = marginLeft;
-		int top = marginTop;
+		int left = MARGIN_LEFT;
+		int top = MARGIN_TOP;
 		int columnWidth = 0;
 		int maxHeight = 0;
 		int maxHeightElementCount = 0;
@@ -151,20 +151,20 @@ public class DetailLayout extends Layout {
 		column = 0;
 		for (int i = 0; i < size; i++) {
 			MinovaSectionData lv = detailData[i];
-			if (lv.column != column) {
+			if (lv.getColumn() != column) {
 				column++;
-				left += columnWidth + spacing;
-				top = marginTop;
+				left += columnWidth + SPACING;
+				top = MARGIN_TOP;
 				maxWidth += columnWidth;
 				columnWidth = 0;
 				columnHeight = 0;
 				elementCount = 0;
 			}
-			lv.left = left;
-			lv.top = top;
-			top += lv.height + spacing;
-			columnWidth = max(lv.width, columnWidth);
-			columnHeight += lv.height;
+			lv.setLeft(left);
+			lv.setTop(top);
+			top += lv.getHeight() + SPACING;
+			columnWidth = max(lv.getWidth(), columnWidth);
+			columnHeight += lv.getHeight();
 			elementCount++;
 			if (maxHeight < columnHeight || (maxHeight == columnHeight && elementCount > maxHeightElementCount)) {
 				maxHeight = max(columnHeight, maxHeight);
@@ -172,29 +172,29 @@ public class DetailLayout extends Layout {
 			}
 		}
 		maxWidth += columnWidth;
-		maxWidth += marginLeft + (column) * spacing + marginRight;
-		maxHeight += marginTop + (maxHeightElementCount - 1) * spacing + marginBottom;
+		maxWidth += MARGIN_LEFT + (column) * SPACING + MARGIN_RIGHT;
+		maxHeight += MARGIN_TOP + (maxHeightElementCount - 1) * SPACING + MARGIN_BOTTOM;
 		return new Point(maxWidth, maxHeight);
 	}
 
 	private Point layoutHorizontalFill(MinovaSectionData[] horizontalFillData, int horizontalFillChildrenCount, Point size, int parentWidth) {
-		int width = max(size.x, parentWidth) - marginLeft - marginRight;
-		int top = size.y - marginBottom;
+		int width = max(size.x, parentWidth) - MARGIN_LEFT - MARGIN_RIGHT;
+		int top = size.y - MARGIN_BOTTOM;
 		for (int i = 0; i < horizontalFillChildrenCount; i++) {
 			MinovaSectionData dd = horizontalFillData[i];
-			dd.left = marginLeft;
-			dd.width = width;
-			dd.top = top + spacing;
-			top += dd.height + spacing;
+			dd.setLeft(MARGIN_LEFT);
+			dd.setWidth(width);
+			dd.setTop(top + SPACING);
+			top += dd.getHeight() + SPACING;
 		}
-		return new Point(width + marginLeft + marginRight, top + marginBottom);
+		return new Point(width + MARGIN_LEFT + MARGIN_RIGHT, top + MARGIN_BOTTOM);
 	}
 
 	private void move(Control[] controls) {
 		for (int i = 0; i < controls.length; i++) {
 			Control control = controls[i];
 			MinovaSectionData detailData = (MinovaSectionData) control.getLayoutData();
-			control.setBounds(detailData.left, detailData.top, detailData.width, detailData.height);
+			control.setBounds(detailData.getLeft(), detailData.getTop(), detailData.getWidth(), detailData.getHeight());
 		}
 	}
 
@@ -206,16 +206,16 @@ public class DetailLayout extends Layout {
 	@Override
 	public String toString() {
 		String string = "DetailLayout {";
-		if (marginLeft != 0)
-			string += "marginLeft=" + marginLeft + " ";
-		if (marginTop != 0)
-			string += "marginTop=" + marginTop + " ";
-		if (marginRight != 0)
-			string += "marginRight=" + marginRight + " ";
-		if (marginBottom != 0)
-			string += "marginBottom=" + marginBottom + " ";
-		if (spacing != 0)
-			string += "spacing=" + spacing + " ";
+		if (MARGIN_LEFT != 0)
+			string += "marginLeft=" + MARGIN_LEFT + " ";
+		if (MARGIN_TOP != 0)
+			string += "marginTop=" + MARGIN_TOP + " ";
+		if (MARGIN_RIGHT != 0)
+			string += "marginRight=" + MARGIN_RIGHT + " ";
+		if (MARGIN_BOTTOM != 0)
+			string += "marginBottom=" + MARGIN_BOTTOM + " ";
+		if (SPACING != 0)
+			string += "spacing=" + SPACING + " ";
 		string = string.trim();
 		string += "}";
 		return string;

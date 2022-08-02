@@ -47,6 +47,8 @@ public class MinovaCTabFolderPropertyHandler extends AbstractCSSPropertySWTHandl
 			case 54:
 				height = 70;
 				break;
+			default: // Darf nicht vorkommen
+				break;
 			}
 		} else if (dpi >= 192) {
 			switch (height) {
@@ -59,6 +61,8 @@ public class MinovaCTabFolderPropertyHandler extends AbstractCSSPropertySWTHandl
 			case 40:
 			case 54:
 				height = 70;
+				break;
+			default: // Darf nicht vorkommen
 				break;
 			}
 		}

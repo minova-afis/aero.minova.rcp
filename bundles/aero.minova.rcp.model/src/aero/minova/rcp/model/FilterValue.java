@@ -79,7 +79,7 @@ public class FilterValue extends Value {
 
 	public String getUserInputWithoutOperator() {
 		String regEx = "[";
-		for (String operator : Constants.OPERATORS) {
+		for (String operator : Constants.getOperators()) {
 			regEx += "(" + operator + ")";
 		}
 		regEx += "]";

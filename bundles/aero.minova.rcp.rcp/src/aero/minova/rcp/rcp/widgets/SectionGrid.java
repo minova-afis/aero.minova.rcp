@@ -656,12 +656,12 @@ public class SectionGrid {
 
 	public void fillHorizontal() {
 		MinovaSectionData rd = (MinovaSectionData) section.getLayoutData();
-		rd.horizontalFill = !rd.horizontalFill;
+		rd.setHorizontalFill(!rd.isHorizontalFill());
 		section.requestLayout();
 
 		// Zustand speichern, damit wiederhergestellt werden kann
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".horizontalFill";
-		prefsDetailSections.put(key, rd.horizontalFill + "");
+		prefsDetailSections.put(key, rd.isHorizontalFill() + "");
 	}
 
 	public Row addNewRow() {

@@ -567,13 +567,13 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Order setzen und sectionCount erhöhen
 		sectionCount++;
-		sectionData.order = sectionCount;
+		sectionData.setOrder(sectionCount);
 
 		// Alten Zustand wiederherstellen
 		// HorizontalFill
 		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
 		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
-		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
+		sectionData.setHorizontalFill(Boolean.parseBoolean(horizontalFillString));
 
 		// Ein-/Ausgeklappt
 		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";

@@ -1,7 +1,7 @@
 package aero.minova.rcp.css;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -43,7 +43,7 @@ public class MinovaSectionStyler implements ICssStyler {
 	 * @return Liste mit den Controls, die über {@link CssData} verfügen.
 	 */
 	private List<Control> getStylableControls() {
-		Vector<Control> controls = new Vector<>();
+		List<Control> controls = new ArrayList<>();
 		for (Control control : section.getChildren()) {
 			if (control instanceof Composite) {
 				Composite composite = (Composite) control;
@@ -80,7 +80,7 @@ public class MinovaSectionStyler implements ICssStyler {
 	 * setzt die Breite der Section
 	 */
 	private void setSectionWidth() {
-		((MinovaSectionData) section.getLayoutData()).width = getSectionWidth();
+		((MinovaSectionData) section.getLayoutData()).setWidth(getSectionWidth());
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class MinovaSectionStyler implements ICssStyler {
 				break;
 			case LABEL:
 			default:
-				styleLabel(fd, cd);
+				styleLabel(fd);
 				break;
 			}
 		}
@@ -137,11 +137,10 @@ public class MinovaSectionStyler implements ICssStyler {
 	}
 
 	private void styleLabelTextBoldField(FormData fd, CssData cd) {
-		fd.right.offset = sectionSpacing * -1;
-		fd.top.offset = cd.row * rowHeight;
+		styleLabelTextField(fd, cd);
 	}
 
-	private void styleLabel(FormData fd, CssData cd) {
+	private void styleLabel(FormData fd) {
 		fd.right.offset = sectionSpacing * -1;
 	}
 

@@ -112,10 +112,10 @@ public class FilterDisplayConverter extends DisplayConverter {
 			case ZONED:
 			case INTEGER:
 			case DOUBLE:
-				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.NUMBER_OPERATORS);
+				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.getNumberOperators());
 				break;
 			case STRING:
-				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.STRING_OPERATORS);
+				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.getStringOperators());
 				break;
 			default:
 				operatorPos = 0;
@@ -141,12 +141,14 @@ public class FilterDisplayConverter extends DisplayConverter {
 						filterValue = TimeUtil.getTime(filterValueString);
 						break;
 					case DATETIME:
-						filterValue = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), filterValueString, locale, timezone);
+						filterValue = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), filterValueString, locale,
+								timezone);
 						break;
 					}
 					break;
 				case ZONED:
-					filterValue = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), filterValueString, locale, timezone);
+					filterValue = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), filterValueString, locale,
+							timezone);
 					break;
 				case INTEGER:
 					filterValue = Integer.parseInt(filterValueString);
@@ -192,7 +194,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 	}
 
 	private boolean containsWildcard(String filterValue) {
-		for (String wildcard : Constants.WILDCARD_OPERATORS) {
+		for (String wildcard : Constants.getWildcardOperators()) {
 			if (filterValue.contains(wildcard)) {
 				return true;
 			}

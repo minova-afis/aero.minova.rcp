@@ -7,6 +7,8 @@ import java.util.Locale;
 
 public class Tools {
 
+	private Tools() {}
+
 	public static void openURL(String url) throws Exception {
 		if (url == null || url.isEmpty()) {
 			throw new Exception("Cannot open empty/null location");
@@ -14,23 +16,12 @@ public class Tools {
 
 		// FIXME hier wird AWT verwendet
 		// vl. sollten wir lieber so was in der Art verwenden:
-		// Runtime.getRuntime().exec("cmd.exe /c start url");
+		// Runtime.getRuntime().exec("cmd.exe /c start url")
 		// das ist aber betriebssystemabhängig
 
 		// Desktop.isDesktopSupported() wirft meistens beim 1. Versuch eine XC, ab dann funktionierts
 		// Um dem Nutzer die Fehlermeldung zu ersparen, probieren wirs gleich mehrmals
-		Boolean isDesktopSupported = null;
-		int tries = 3;
-		while (isDesktopSupported == null) {
-			if (tries-- > 0) {
-				try {
-					isDesktopSupported = Desktop.isDesktopSupported();
-				} catch (final Throwable t) {}
-			} else {
-				// letzter Versuch ohne try/catch
-				isDesktopSupported = Desktop.isDesktopSupported();
-			}
-		}
+		boolean isDesktopSupported = checkDesktopSupported();
 
 		if (isDesktopSupported) {
 			try {
@@ -53,5 +44,23 @@ public class Tools {
 		} else {
 			throw new Exception("Desktop not supported");
 		}
+	}
+
+	private static boolean checkDesktopSupported() {
+		Boolean isDesktopSupported = null;
+		int tries = 3;
+		while (isDesktopSupported == null) {
+			if (tries-- > 0) {
+				try {
+					isDesktopSupported = Desktop.isDesktopSupported();
+				} catch (final Exception t) {
+					// Weiter, machen 3 Versuche
+				}
+			} else {
+				// letzter Versuch ohne try/catch
+				isDesktopSupported = Desktop.isDesktopSupported();
+			}
+		}
+		return isDesktopSupported;
 	}
 }
