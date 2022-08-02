@@ -66,10 +66,11 @@ public class ZipService {
 		if (!Files.isDirectory(dir.toPath(), LinkOption.NOFOLLOW_LINKS)) {
 			return;
 		}
-		for (File file : dir.listFiles())
+		for (File file : dir.listFiles()) {
 			if (!file.isDirectory()) {
 				file.delete();
 			}
+		}
 	}
 
 	public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
@@ -102,7 +103,7 @@ public class ZipService {
 						Files.copy(path, zs);
 						zs.closeEntry();
 					} catch (IOException e) {
-						throw new RuntimeException(e);
+						// Fehler abfangen
 					}
 				});
 			}

@@ -45,8 +45,6 @@ public class WFCTranslationService extends TranslationService {
 	private String applicationId = "SIS";
 	private Properties resources = new Properties();
 
-	private Properties usedProperties = new Properties();
-
 	volatile boolean updateRequired = true;
 
 	@Inject
