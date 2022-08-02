@@ -139,7 +139,7 @@ public class MenuUITest {
 	}
 
 	protected static IEclipseContext getEclipseContext() {
-		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(MenuTest.class).getBundleContext());
+		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(MenuUITest.class).getBundleContext());
 		return serviceContext.get(IWorkbench.class).getApplication().getContext();
 	}
 
