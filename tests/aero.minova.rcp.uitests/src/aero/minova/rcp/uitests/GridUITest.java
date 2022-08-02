@@ -17,7 +17,6 @@ import org.eclipse.swtbot.swt.finder.junit5.SWTBotJunit5Extension;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -128,7 +127,9 @@ class GridUITest {
 	@Test
 	public void ensureDataEntryCanBeCreated() {
 		// Do not start on Linux
-		Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Linux"));
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
 
 		// Auf "Optimieren" Klicken, damit mehr Einträge im Index angezeigt werden können
 		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
@@ -154,7 +155,9 @@ class GridUITest {
 	public void testGridFunctions() {
 
 		// Do not start on Linux
-		Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Linux"));
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
 
 		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
