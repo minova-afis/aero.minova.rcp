@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -105,7 +104,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 				try {
 					Desktop.getDesktop().open(dataService.getStoragePath().toAbsolutePath().toFile());
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					logger.error(e1);
 				}
 			}
 		});

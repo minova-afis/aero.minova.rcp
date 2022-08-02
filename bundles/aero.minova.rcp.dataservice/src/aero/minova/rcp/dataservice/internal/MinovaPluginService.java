@@ -101,7 +101,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 			Bundle installBundle = bundleContext.installBundle(newestPlugin.toUri().toString());
 			installBundle.start(Bundle.START_ACTIVATION_POLICY);
 		} catch (BundleException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
