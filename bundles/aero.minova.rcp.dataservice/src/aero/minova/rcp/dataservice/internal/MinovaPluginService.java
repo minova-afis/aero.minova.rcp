@@ -41,11 +41,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 	@Reference
 	void getDataService(IDataService dataService) {
 		this.dataService = dataService;
-	}
-
-	@Reference
-	void getLogger(Logger logger) {
-		this.logger = logger;
+		logger = dataService.getLogger();
 	}
 
 	@Override
