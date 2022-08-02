@@ -21,6 +21,9 @@ import java.nio.charset.Charset;
  * Input/Output Utilities
  */
 public class IOUtil {
+
+	private IOUtil() {}
+
 	/**
 	 * Kopiert eine Datei
 	 * 
@@ -29,21 +32,10 @@ public class IOUtil {
 	 * @throws IOException
 	 */
 	public static void copyFile(File in, File out) throws IOException {
-		FileInputStream fileInputStreamIn = new FileInputStream(in);
-		FileChannel inChannel = fileInputStreamIn.getChannel();
-		FileOutputStream fileOutputStreamOut = new FileOutputStream(out);
-		FileChannel outChannel = fileOutputStreamOut.getChannel();
-		try {
+		try (FileInputStream fileInputStreamIn = new FileInputStream(in); FileOutputStream fileOutputStreamOut = new FileOutputStream(out)) {
+			FileChannel inChannel = fileInputStreamIn.getChannel();
+			FileChannel outChannel = fileOutputStreamOut.getChannel();
 			inChannel.transferTo(0, inChannel.size(), outChannel);
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			if (fileInputStreamIn != null) {
-				fileInputStreamIn.close();
-			}
-			if (fileOutputStreamOut != null) {
-				fileOutputStreamOut.close();
-			}
 		}
 	}
 
@@ -54,7 +46,7 @@ public class IOUtil {
 	 */
 	public static String open(BufferedReader br) throws IOException {
 		char[] chars = new char[1024];
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int length = 0;
 		while ((length = br.read(chars)) != -1) {
 			sb.append(String.copyValueOf(chars, 0, length));
@@ -80,8 +72,7 @@ public class IOUtil {
 	 */
 	public static String open(String fileName) {
 		try {
-			String text = openLoud(fileName);
-			return text;
+			return openLoud(fileName);
 		} catch (Exception ex) {
 			return null;
 		}
@@ -94,14 +85,16 @@ public class IOUtil {
 	 */
 	public static String openLoud(String fileName) throws IOException {
 		char[] chars = new char[1024];
-		StringBuffer sb = new StringBuffer();
-		BufferedReader br = new BufferedReader(new FileReader(fileName));
-		int length = 0;
-		while ((length = br.read(chars)) != -1) {
-			sb.append(String.copyValueOf(chars, 0, length));
-			chars = new char[1024];
+		StringBuilder sb = new StringBuilder();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName));) {
+			int length = 0;
+			while ((length = br.read(chars)) != -1) {
+				sb.append(String.copyValueOf(chars, 0, length));
+				chars = new char[1024];
+			}
 		}
-		br.close();
+
 		return sb.toString();
 	}
 
@@ -110,10 +103,8 @@ public class IOUtil {
 	 */
 	public static void preparePath(String path) throws IOException {
 		File dir = new File(path);
-		if (!dir.exists()) {
-			if (!dir.mkdirs()) {
-				throw new IOException("Path '" + dir + "' could not be created");
-			}
+		if (!dir.exists() && !dir.mkdirs()) {
+			throw new IOException("Path '" + dir + "' could not be created");
 		}
 		if (!dir.isDirectory()) {
 			throw new IOException("'" + dir + "' is not a directory");
@@ -156,23 +147,13 @@ public class IOUtil {
 		if (fileName == null) {
 			throw new IOException("No file name defined!");
 		}
-		BufferedInputStream bis = null;
-		BufferedOutputStream bos = null;
-		try {
+
+		try (BufferedInputStream bis = new BufferedInputStream(is); BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fileName))) {
 			// falls InputStream bereits schon mal gelesen wurde, müssen wir den Positionszeiger zurücksetzen, sonst wird von dort aus weiter gelesen!
 			is.reset();
-			bis = new BufferedInputStream(is);
-			bos = new BufferedOutputStream(new FileOutputStream(fileName));
 			int data;
 			while ((data = bis.read()) != -1) {
 				bos.write(data);
-			}
-		} finally {
-			if (bis != null) {
-				bis.close();
-			}
-			if (bos != null) {
-				bos.close();
 			}
 		}
 	}
@@ -193,10 +174,10 @@ public class IOUtil {
 	 * Speichert den übergebenen Text in die angegebene Datei, Fehler werden weitergegeben
 	 */
 	public static void saveLoud(String text, String fileName) throws IOException {
-		BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
-		bw.write(text);
-		bw.flush();
-		bw.close();
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+			bw.write(text);
+			bw.flush();
+		}
 	}
 
 	/**
@@ -231,9 +212,9 @@ public class IOUtil {
 	 * @since 10.38.0
 	 */
 	public static void saveLoud(String text, String fileName, String charset) throws IOException {
-		Writer fileWriter = new OutputStreamWriter(new FileOutputStream(fileName), Charset.forName(charset));
-		fileWriter.write(text);
-		fileWriter.flush();
-		fileWriter.close();
+		try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream(fileName), Charset.forName(charset))) {
+			fileWriter.write(text);
+			fileWriter.flush();
+		}
 	}
 }
