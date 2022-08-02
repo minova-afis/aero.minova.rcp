@@ -74,7 +74,7 @@ public class RadioField {
 		fdG.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		comp.setLayoutData(fdG);
 
-		CssData cssDataComposite = new CssData(CssType.LABEL_TEXT_FIELD, column, row + 1, 4, (int) Math.ceil((double) radioField.getRadiobuttons().size() / 4),
+		CssData cssDataComposite = new CssData(CssType.LABEL_TEXT_FIELD, column, row, 4, (int) Math.ceil((double) radioField.getRadiobuttons().size() / 3),
 				true);
 		comp.setData(CssData.CSSDATA_KEY, cssDataComposite);
 
@@ -92,8 +92,8 @@ public class RadioField {
 			b.setValueAccessor(valueAccessor);
 
 			FormData fd = new FormData();
-			fd.top = new FormAttachment(comp, (int) Math.floor(indexInList / 4) * ICssStyler.CSS_ROW_HEIGHT);
-			fd.left = new FormAttachment((int) ((indexInList * 25) % 100));
+			fd.top = new FormAttachment(comp, (int) (FieldUtil.MARGIN_TOP + (row + (Math.floor(indexInList / 3)) * ICssStyler.CSS_ROW_HEIGHT)));
+			fd.left = new FormAttachment((int) (25 * (indexInList % 3 + 1)));
 			button.setLayoutData(fd);
 
 			button.setData(TRANSLATE_PROPERTY, optionLabel);
