@@ -38,7 +38,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           xvfb-run -- \
           mvn --batch-mode --no-transfer-progress verify \
-            -DskipTests=true --fae -T4 \
+            --fae -T4 \
             --file pom.xml \
             --settings .github/settings.xml
         env:
