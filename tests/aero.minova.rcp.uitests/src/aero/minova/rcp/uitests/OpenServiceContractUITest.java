@@ -34,7 +34,7 @@ import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.uitests.util.UITestUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
-public class OpenServiceContractTest {
+public class OpenServiceContractUITest {
 
 	private SWTWorkbenchBot bot;
 

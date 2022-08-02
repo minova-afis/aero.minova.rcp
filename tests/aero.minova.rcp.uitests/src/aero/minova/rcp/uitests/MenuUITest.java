@@ -41,7 +41,7 @@ import aero.minova.rcp.form.menu.mdi.MenuType;
 
 @SuppressWarnings("restriction")
 @ExtendWith(SWTBotJunit5Extension.class)
-public class MenuTest {
+public class MenuUITest {
 
 	private static SWTWorkbenchBot bot;
 	TranslationService translationService;
@@ -138,7 +138,7 @@ public class MenuTest {
 	}
 
 	protected static IEclipseContext getEclipseContext() {
-		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(MenuTest.class).getBundleContext());
+		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(MenuUITest.class).getBundleContext());
 		return serviceContext.get(IWorkbench.class).getApplication().getContext();
 	}
 

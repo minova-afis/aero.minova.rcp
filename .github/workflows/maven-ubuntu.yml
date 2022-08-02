@@ -33,17 +33,30 @@ jobs:
 
       - run: sudo apt-get install xvfb
 
-      - name: Maven build
+      - name: Build with Maven and SonarQube scan
         run: |
           cd $GITHUB_WORKSPACE
           xvfb-run -- \
           mvn --batch-mode --no-transfer-progress verify \
-            -DskipTests=true --fae -T4 \
+            dependency-check:aggregate org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
+            surefire-report:report \
+            --fae -T4 \
             --file pom.xml \
             --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
+
+      - name: Store report of Dependency Check
+        uses: actions/upload-artifact@v2
+        with:
+          name: dependency-check-report.html
+          path: target/dependency-check-report.html
 
 #    - uses: actions/upload-artifact@v2
 #      with:

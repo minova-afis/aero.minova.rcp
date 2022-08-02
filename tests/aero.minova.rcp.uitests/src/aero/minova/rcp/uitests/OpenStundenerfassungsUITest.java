@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
@@ -18,7 +17,6 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +26,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.uitests.util.UITestUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
-class OpenStundenerfassungsTest {
+class OpenStundenerfassungsUITest {
 
 	private SWTWorkbenchBot bot;
 
@@ -85,7 +83,10 @@ class OpenStundenerfassungsTest {
 	@Test
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten (Nicht Ubuntu)")
 	void deleteRowAndRevertSearch() {
-		Assumptions.assumeFalse(SWT.getPlatform().equals("gtk"));
+		// Do not start on Linux
+		if (System.getProperty("os.name").startsWith("Linux")) {
+			return;
+		}
 
 		open();
 		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue
