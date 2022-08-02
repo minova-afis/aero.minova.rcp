@@ -443,8 +443,7 @@ public class WFCIndexPart extends WFCFormPart {
 		bodyLayerStack.getBodyDataLayer().initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(), true);
 
 		// build the Summary Row
-		summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(), configRegistry,
-				false);
+		summaryRowLayer = new FixedSummaryRowLayer(bodyLayerStack.getGlazedListsEventLayer(), bodyLayerStack.getViewportLayer(), configRegistry, false);
 		getSummaryRowLayer().setHorizontalCompositeDependency(false);
 		CompositeLayer summaryComposite = new CompositeLayer(1, 2);
 		summaryComposite.setChildLayer("SUMMARY", getSummaryRowLayer(), 0, 0);
@@ -548,7 +547,7 @@ public class WFCIndexPart extends WFCFormPart {
 		return bodyLayerStack.getSelectionLayer();
 	}
 
-	public BodyLayerStack<Row> getBodyLayerStack() {
+	public BodyLayerStack getBodyLayerStack() {
 		return this.bodyLayerStack;
 	}
 
@@ -679,9 +678,9 @@ public class WFCIndexPart extends WFCFormPart {
 			try {
 				Thread.sleep(sleepMillis);
 			} catch (InterruptedException e) {
-			    // Restore interrupted state...
-			    Thread.currentThread().interrupt();
-			  }
+				// Restore interrupted state...
+				Thread.currentThread().interrupt();
+			}
 
 			// Ausgewählten Zeilen müssen gefiltert werden, um Gruppen-Zeilen zu entfernen
 			List<Row> c = getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
