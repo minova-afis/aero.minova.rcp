@@ -58,16 +58,13 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 	@Override
 	public void verifyText(VerifyEvent e) {
-		if (!isFocussed())
-		 {
+		if (!isFocussed()) {
 			return; // Wir sind aktiv, wenn der Control den Focus hat
 		}
-		if (verificationActive)
-		 {
+		if (verificationActive) {
 			return; // diese Methode setzt einen neuen Wert
 		}
-		if (!e.doit)
-		 {
+		if (!e.doit) {
 			return; // anscheinend hat schon jemand reagiert
 		}
 
@@ -166,15 +163,13 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
 					doit = false;
 				}
-			} else if (keyCode == SWT.BS && decimals > 0) {
-				if (textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal Trennzeichen gelöscht werden soll
-					doit = false;
-				}
-			}
-		} else if (!textBefore.isEmpty() && !insertion.isEmpty()) {
-			if (dfs.getDecimalSeparator() == insertion.charAt(0)) {
+			} else if (keyCode == SWT.BS && decimals > 0 && textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal
+																																// Trennzeichen gelöscht werden
+																																// soll
 				doit = false;
 			}
+		} else if (!textBefore.isEmpty() && !insertion.isEmpty() && dfs.getDecimalSeparator() == insertion.charAt(0)) {
+			doit = false;
 		}
 
 		if (doit) {
@@ -301,27 +296,24 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		int decimalCaretPostion = text.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
 		int countGroupingSeperator = getGroupingSeperatorCount(text, dfs) - getGroupingSeperatorCount(textBefore, dfs);
 
-		// Wenn gelöscht wird
-		if (keyCode == SWT.BS || keyCode == SWT.DEL) {
-			// Wenn mit Backspace gelöscht wird
-			if (keyCode == SWT.BS) {
-				if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
-					newCaretPosition = caretPosition - 1;
-				} else {
-					newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
+		// Wenn mit Backspace gelöscht wird
+		if (keyCode == SWT.BS) {
+			if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
+				newCaretPosition = caretPosition - 1;
+			} else {
+				newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
 
-				}
 			}
-			// Wenn mit ENTF gelöscht wird
-			else if (SWT.DEL == keyCode) {
-				if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
-						|| (text.length() == textBefore.length() && caretPosition < decimalCaretPostion)) {
-					newCaretPosition = caretPosition + 1;
-				} else if (countGroupingSeperator == 0) {
-					newCaretPosition = caretPosition;
-				} else {
-					newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
-				}
+		}
+		// Wenn mit ENTF gelöscht wird
+		else if (SWT.DEL == keyCode) {
+			if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
+					|| (text.length() == textBefore.length() && caretPosition < decimalCaretPostion)) {
+				newCaretPosition = caretPosition + 1;
+			} else if (countGroupingSeperator == 0) {
+				newCaretPosition = caretPosition;
+			} else {
+				newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
 			}
 		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
 			newCaretPosition = decimalCaretPostion;
