@@ -19,6 +19,7 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -150,6 +151,9 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	MPart mpart;
 
+	@Inject
+	Logger logger;
+
 	private SortHeaderLayer<Object> sortHeaderLayer;
 
 	private GroupByHeaderLayer groupByHeaderLayer;
@@ -236,9 +240,8 @@ public class WFCIndexPart extends WFCFormPart {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
-
 	}
 
 	@LoadTableSelection

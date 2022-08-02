@@ -71,7 +71,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 				String profil = prefs.get(WorkspaceAccessPreferences.PROFILE, null);
 				text.setText(profil);
 			} catch (StorageException e1) {
-				e1.printStackTrace();
+				logger.error(e1);
 			}
 		} else {
 			text.setText(translationService.translate("@msg.NotSet", null));

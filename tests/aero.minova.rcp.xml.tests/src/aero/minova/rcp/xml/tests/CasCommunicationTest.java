@@ -48,14 +48,13 @@ public class CasCommunicationTest {
 
 //	@Test
 	public void getAuthentificationIndexHTML() throws Exception {
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/index.html"))
-				.build();
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/index.html")).build();
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
 			System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 		assertEquals(200, response.statusCode());
@@ -63,15 +62,13 @@ public class CasCommunicationTest {
 
 //	@Test
 	public void getRestAPI() throws Exception {
-		String body = "{\n" + "    \"name\": \"vWorkingTimeIndex2\",\n" + "    \"columns\": [\n" + "        {\n"
-				+ "            \"name\": \"EmployeeText\",\n" + "            \"type\": \"STRING\"\n" + "        }\n"
-				+ "        , {\n" + "            \"name\": \"CustomerText\",\n" + "            \"type\": \"STRING\"\n"
-				+ "        }\n" + "        , {\n" + "            \"name\": \"ChargedQuantity\",\n"
-				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"&\",\n" + "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n"
-				+ "    \"rows\": [\n" + "        {\n" + "            \"values\" : [\n"
-				+ "                \"s-like %\"\n" + "                ,\"s-SKY\"\n" + "                , \"s->=1\"\n"
-				+ "                , \"b-false\"\n" + "            ]\n" + "        }\n" + "    ]\n" + "}";
+		String body = "{\n" + "    \"name\": \"vWorkingTimeIndex2\",\n" + "    \"columns\": [\n" + "        {\n" + "            \"name\": \"EmployeeText\",\n"
+				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"CustomerText\",\n"
+				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"ChargedQuantity\",\n"
+				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"&\",\n"
+				+ "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n" + "    \"rows\": [\n" + "        {\n" + "            \"values\" : [\n"
+				+ "                \"s-like %\"\n" + "                ,\"s-SKY\"\n" + "                , \"s->=1\"\n" + "                , \"b-false\"\n"
+				+ "            ]\n" + "        }\n" + "    ]\n" + "}";
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/index")) //
 				.header("Content-Type", "application/json") //
@@ -83,7 +80,7 @@ public class CasCommunicationTest {
 			response = httpClient.send(request, BodyHandlers.ofString());
 			System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 
@@ -97,17 +94,14 @@ public class CasCommunicationTest {
 
 //	@Test
 	public void postProcedureWithResultSet() throws Exception {
-		String body = "{\n" + "    \"name\": \"spWorkingTimeServiceResolve\",\n" + "    \"columns\": [\n"
-				+ "        {\n" + "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n"
-				+ "        }\n" + "        , {\n" + "            \"name\": \"KeyText\",\n"
-				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"FilterLastAction\",\n" + "            \"type\": \"BOOLEAN\"\n"
-				+ "        }\n" + "    ],\n" + "    \"rows\": [\n" + "        {\n" + "            \"values\" : [\n"
-				+ "                \"n-31\"\n" + "                , null\n" + "                , \"b-0\"\n"
+		String body = "{\n" + "    \"name\": \"spWorkingTimeServiceResolve\",\n" + "    \"columns\": [\n" + "        {\n"
+				+ "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n"
+				+ "            \"name\": \"KeyText\",\n" + "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n"
+				+ "            \"name\": \"FilterLastAction\",\n" + "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n" + "    \"rows\": [\n"
+				+ "        {\n" + "            \"values\" : [\n" + "                \"n-31\"\n" + "                , null\n" + "                , \"b-0\"\n"
 				+ "            ]\n" + "        }\n" + "    ]\n" + "}";
 
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;
@@ -115,7 +109,7 @@ public class CasCommunicationTest {
 			response = httpClient.send(request, BodyHandlers.ofString());
 			System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 		assertTrue(response.body().length() > 0);
@@ -131,36 +125,27 @@ public class CasCommunicationTest {
 
 //	@Test
 	public void postProcedureWithReturnCode() throws Exception {
-		String body = "{\n" + "    \"name\": \"spInsertWorkingTime\",\n" + "    \"columns\": [\n" + "        {\n"
-				+ "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n"
-				+ "        , {\n" + "            \"name\": \"EmployeeKey\",\n" + "            \"type\": \"INTEGER\"\n"
-				+ "        }\n" + "        , {\n" + "            \"name\": \"ServiceContractKey\",\n"
-				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"OrderReceiverrKey\",\n" + "            \"type\": \"INTEGER\"\n"
-				+ "        }\n" + "        , {\n" + "            \"name\": \"ServiceObjectKey\",\n"
-				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"ServiceKey\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n"
-				+ "        , {\n" + "            \"name\": \"BookingDate\",\n" + "            \"type\": \"INSTANT\"\n"
-				+ "        }\n" + "        , {\n" + "            \"name\": \"StartDate\",\n"
-				+ "            \"type\": \"INSTANT\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"EndDate\",\n" + "            \"type\": \"INSTANT\"\n" + "        }\n"
-				+ "        , {\n" + "            \"name\": \"RenderedQuantity\",\n"
-				+ "            \"type\": \"DOUBLE\"\n" + "        }\n" + "        , {\n"
-				+ "            \"name\": \"ChargedQuantity\",\n" + "            \"type\": \"DOUBLE\"\n" + "        }\n"
-				+ "        , {\n" + "            \"name\": \"Description\",\n" + "            \"type\": \"STRING\"\n"
-				+ "        }\n" + "        , {\n" + "            \"name\": \"Spelling\",\n"
-				+ "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n" + "    \"rows\": [\n"
-				+ "        {\n" + "            \"values\" : [\n" + "                \"n-1\"\n"
-				+ "                , \"n-1\"\n" + "                , \"n-81\"\n" + "                , \"n-1\"\n"
-				+ "                , \"n-8\"\n" + "                , \"n-31\"\n"
-				+ "                , \"i-2020-08-05T00:00:00.00Z\"\n"
-				+ "                , \"i-2020-08-05T16:00:00.00Z\"\n"
-				+ "                , \"i-2020-08-05T17:00:00.00Z\"\n" + "                , \"d-1\"\n"
-				+ "                , \"d-0.5\"\n" + "                , \"s-Test via CAS\"\n"
-				+ "                , \"b-0\"\n" + "            ]\n" + "        }\n" + "    ]\n" + "}";
+		String body = "{\n" + "    \"name\": \"spInsertWorkingTime\",\n" + "    \"columns\": [\n" + "        {\n" + "            \"name\": \"KeyLong\",\n"
+				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"EmployeeKey\",\n"
+				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"ServiceContractKey\",\n"
+				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"OrderReceiverrKey\",\n"
+				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"ServiceObjectKey\",\n"
+				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"ServiceKey\",\n"
+				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"BookingDate\",\n"
+				+ "            \"type\": \"INSTANT\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"StartDate\",\n"
+				+ "            \"type\": \"INSTANT\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"EndDate\",\n"
+				+ "            \"type\": \"INSTANT\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"RenderedQuantity\",\n"
+				+ "            \"type\": \"DOUBLE\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"ChargedQuantity\",\n"
+				+ "            \"type\": \"DOUBLE\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"Description\",\n"
+				+ "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"Spelling\",\n"
+				+ "            \"type\": \"BOOLEAN\"\n" + "        }\n" + "    ],\n" + "    \"rows\": [\n" + "        {\n" + "            \"values\" : [\n"
+				+ "                \"n-1\"\n" + "                , \"n-1\"\n" + "                , \"n-81\"\n" + "                , \"n-1\"\n"
+				+ "                , \"n-8\"\n" + "                , \"n-31\"\n" + "                , \"i-2020-08-05T00:00:00.00Z\"\n"
+				+ "                , \"i-2020-08-05T16:00:00.00Z\"\n" + "                , \"i-2020-08-05T17:00:00.00Z\"\n" + "                , \"d-1\"\n"
+				+ "                , \"d-0.5\"\n" + "                , \"s-Test via CAS\"\n" + "                , \"b-0\"\n" + "            ]\n" + "        }\n"
+				+ "    ]\n" + "}";
 
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://mintest.minova.com:8084/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
 		HttpResponse<String> response = null;
@@ -168,7 +153,7 @@ public class CasCommunicationTest {
 			response = httpClient.send(request, BodyHandlers.ofString());
 			System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertEquals(500, response.statusCode());
 	}
@@ -182,7 +167,7 @@ public class CasCommunicationTest {
 			response = httpClient.send(request, BodyHandlers.ofString());
 			System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 		assertEquals(200, response.statusCode());

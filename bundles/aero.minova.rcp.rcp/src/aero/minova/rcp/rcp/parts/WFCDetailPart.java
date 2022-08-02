@@ -24,6 +24,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -179,6 +180,9 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
 	EModelService eModelService;
+
+	@Inject
+	Logger logger;
 
 	MApplication mApplication;
 
@@ -402,7 +406,7 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			logger.error(e1);
 		}
 
 		if (iHelper == null) {
@@ -434,11 +438,11 @@ public class WFCDetailPart extends WFCFormPart {
 								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
 								addOPFromGrid(opGrid, parent, op);
 							} catch (JAXBException e1) {
-								e1.printStackTrace();
+								logger.error(e1);
 							}
 						}
 					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
+						logger.error(e);
 					} catch (NoSuchFieldException e) {
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 					}
@@ -1153,7 +1157,7 @@ public class WFCDetailPart extends WFCFormPart {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e1) {
-			e1.printStackTrace();
+			logger.error(e1);
 		}
 	}
 

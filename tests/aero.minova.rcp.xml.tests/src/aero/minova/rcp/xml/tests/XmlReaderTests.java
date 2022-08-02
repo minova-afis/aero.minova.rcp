@@ -23,7 +23,6 @@ class XmlReaderTests {
 	private DataFormService dfs;
 	private Path path;
 
-
 	@BeforeEach
 	public void setup() {
 		dfs = new DataFormService();
@@ -45,7 +44,7 @@ class XmlReaderTests {
 		try {
 			form = XmlProcessor.get(content, Form.class);
 		} catch (Exception e) {
-			e.printStackTrace();
+			// Weiter
 		}
 
 		assertNotNull(form);
@@ -56,7 +55,7 @@ class XmlReaderTests {
 		assertEquals(DataType.STRING, dfs.getDataType(column.get(4)));
 		assertEquals(DataType.INSTANT, dfs.getDataType(column.get(5)));
 		assertEquals(DataType.INSTANT, dfs.getDataType(column.get(6)));// Short-Date
-		assertEquals(DataType.INSTANT, dfs.getDataType(column.get(7)));//Short-Time
+		assertEquals(DataType.INSTANT, dfs.getDataType(column.get(7)));// Short-Time
 		assertEquals(DataType.DOUBLE, dfs.getDataType(column.get(8)));
 		assertEquals(DataType.BOOLEAN, dfs.getDataType(column.get(12)));
 

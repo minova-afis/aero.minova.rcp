@@ -149,7 +149,7 @@ public class FileWorkspace extends WorkspaceHandler {
 				sysNode.exportNode(connectionOS);
 				connectionOS.close();
 			} catch (IOException | BackingStoreException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			throw new WorkspaceException(MessageFormat.format("connection.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 		}
@@ -160,7 +160,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			InputStream prefsIS = new FileInputStream(applicationXbs);
 			Preferences.importPreferences(prefsIS);
 		} catch (IOException | InvalidPreferencesFormatException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -174,7 +174,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			sysNode.exportNode(applicationOS);
 			applicationOS.close();
 		} catch (IOException | BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		throw new WorkspaceException(MessageFormat.format("application.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 	}

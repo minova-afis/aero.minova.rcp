@@ -16,6 +16,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -46,6 +47,9 @@ public class NotificationAndErrorAddon {
 	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
+
+	@Inject
+	Logger logger;
 
 	private static final String ERROR = "Error";
 	private static final String DEFAULT = "DEFAULT";
@@ -131,7 +135,7 @@ public class NotificationAndErrorAddon {
 					try {
 						params.add("" + NumberFormat.getInstance(locale).parse(v.getStringValue()).intValue());
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.error(e);
 					}
 					break;
 				case "f.iso":
@@ -141,7 +145,7 @@ public class NotificationAndErrorAddon {
 					try {
 						params.add("" + NumberFormat.getInstance(locale).parse(v.getStringValue()).floatValue());
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.error(e);
 					}
 					break;
 				case "d.iso":
@@ -149,7 +153,7 @@ public class NotificationAndErrorAddon {
 						Date parsedDate = new SimpleDateFormat("yyyyMMdd").parse(v.getStringValue());
 						params.add(DateUtil.getDateString(parsedDate.toInstant(), locale, null));
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.error(e);
 					}
 					break;
 				case "d":
@@ -157,7 +161,7 @@ public class NotificationAndErrorAddon {
 						Date parsedDate = new SimpleDateFormat("ddMMyyyy").parse(v.getStringValue());
 						params.add(DateUtil.getDateString(parsedDate.toInstant(), locale, null));
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.error(e);
 					}
 					break;
 				case DEFAULT: // Spalte mit DEFAULT-String -> kein Param

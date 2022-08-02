@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -38,23 +39,25 @@ public class MenuProcessor {
 
 	private EModelService modelService;
 	private MApplication mApplication;
+	private Logger logger;
 
 	private String usingLocalMenu = "There was no response from the server. Application data may be out of date. Consider checking your connection and restarting the application.";
 	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
 	private int menuId = 0;
 
 	@Inject
-	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication, IEclipseContext context) {
+	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication, IEclipseContext context, Logger logger) {
 
 		this.modelService = modelService;
 		this.mApplication = mApplication;
+		this.logger = logger;
 
 		// MDI (für Menü) herunterladen und parsen
 		try {
 			String mdiString = dataService.getHashedFile(Constants.MDI_FILE_NAME).get();
 			processXML(mdiString);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			handleNoMDI(dataService);
 		}
 
@@ -119,7 +122,7 @@ public class MenuProcessor {
 			}
 
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 

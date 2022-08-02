@@ -9,6 +9,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
@@ -37,6 +38,9 @@ public class DynamicButtonHandler {
 	@Inject
 	protected IMinovaPluginService pluginService;
 
+	@Inject
+	Logger logger;
+
 	@Execute
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CLAZZ) String className,
 			@Optional @Named(Constants.PARAMETER) String parameter, MPart mPart) {
@@ -55,7 +59,7 @@ public class DynamicButtonHandler {
 				wizardDialog.setTranslationService(translationService);
 				wizardDialog.open();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		} else if (Constants.PROCEDURE.equals(className)) {
 			Procedure p = (Procedure) context.get(parameter);
@@ -93,8 +97,8 @@ public class DynamicButtonHandler {
 					iWizard = (IMinovaWizard) bundleContext.getService(serviceReference);
 				}
 			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e);
 		}
 
 		if (iWizard == null) {

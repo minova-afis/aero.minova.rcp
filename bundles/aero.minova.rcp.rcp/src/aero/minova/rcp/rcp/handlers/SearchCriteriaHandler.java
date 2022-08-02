@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -40,17 +41,6 @@ public class SearchCriteriaHandler {
 	public static final String COMMAND_ACTION = "aero.minova.rcp.rcp.commandparameter.criteriaaction";
 	public static final String COMMAND_NAME = "aero.minova.rcp.rcp.commandparameter.criterianame";
 
-	/**
-	 * @param action
-	 *            (not used)
-	 * @param part
-	 * @return
-	 */
-	@CanExecute
-	public boolean canExecute(@Named(COMMAND_ACTION) final String action, final MPart part) {
-		return part.getObject() != null;
-	}
-
 	@Inject
 	TranslationService translationService;
 
@@ -61,7 +51,21 @@ public class SearchCriteriaHandler {
 	@Inject
 	private EPartService partService;
 
+	@Inject
+	Logger logger;
+
 	Preferences loadedTablePrefs = InstanceScope.INSTANCE.getNode(Constants.LAST_LOADED_SEARCHCRITERIA);
+
+	/**
+	 * @param action
+	 *            (not used)
+	 * @param part
+	 * @return
+	 */
+	@CanExecute
+	public boolean canExecute(@Named(COMMAND_ACTION) final String action, final MPart part) {
+		return part.getObject() != null;
+	}
 
 	@Execute
 	public void execute(@Named(COMMAND_ACTION) final String action, @Optional @Named(COMMAND_NAME) String name, final MPart part,
@@ -119,7 +123,7 @@ public class SearchCriteriaHandler {
 					break;
 				}
 			} catch (final Exception ex) {
-				ex.printStackTrace();
+				logger.error(ex);
 			}
 		}
 	}

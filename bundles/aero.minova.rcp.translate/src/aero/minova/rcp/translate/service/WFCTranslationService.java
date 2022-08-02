@@ -85,7 +85,7 @@ public class WFCTranslationService extends TranslationService {
 				}
 			}
 		} catch (NullPointerException e) {
-			e.printStackTrace();
+			// Weitermachen
 		}
 
 		return translate(key);
@@ -213,7 +213,7 @@ public class WFCTranslationService extends TranslationService {
 			try (BufferedInputStream targetStream = new BufferedInputStream(new FileInputStream(file))) {
 				resources.load(targetStream);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		}
 	}

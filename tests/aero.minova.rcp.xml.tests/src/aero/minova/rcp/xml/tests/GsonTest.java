@@ -1,11 +1,9 @@
 package aero.minova.rcp.xml.tests;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -83,22 +81,14 @@ class GsonTest {
 
 //	@Test
 	void blabla() {
-		Instant now = Instant.parse("2020-08-04T22:00:00Z");
-		System.out.println(now);
 
 		String s = null;
 		String userDir = System.getProperty("user.home");
-		String p = userDir
-				+ "/git/aero.minova.rcp/tests/aero.minova.rcp.xml.tests/src/aero/minova/rcp/xml/tests/examplejson.json";
+		String p = userDir + "/git/aero.minova.rcp/tests/aero.minova.rcp.xml.tests/src/aero/minova/rcp/xml/tests/examplejson.json";
 		try {
-			// FileReader fr = new FileReader(f);
 			s = new String(Files.readAllBytes(Paths.get(p)));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// Weiter
 		}
 
 		Gson gson = new Gson();

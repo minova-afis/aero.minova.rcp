@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
@@ -28,6 +29,9 @@ public class SearchCriteriaLoadHandler {
 	@Inject
 	@Preference
 	private IEclipsePreferences prefs;
+
+	@Inject
+	Logger logger;
 
 	@AboutToShow
 	public void aboutToShow(EModelService service, List<MMenuElement> items, MPart mpart) {
@@ -56,7 +60,7 @@ public class SearchCriteriaLoadHandler {
 					}
 				}
 			} catch (BackingStoreException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 
 		}
