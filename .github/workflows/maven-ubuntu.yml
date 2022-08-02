@@ -40,7 +40,7 @@ jobs:
           mvn --batch-mode --no-transfer-progress verify \
             dependency-check:aggregate org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
-            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}}" \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
             surefire-report:report \
             --fae -T4 \
             --file pom.xml \
