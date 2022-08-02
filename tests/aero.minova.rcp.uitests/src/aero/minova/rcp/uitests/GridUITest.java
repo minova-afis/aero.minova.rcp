@@ -34,6 +34,10 @@ import aero.minova.rcp.uitests.util.UITestUtil;
 @ExtendWith(SWTBotJunit5Extension.class)
 class GridUITest {
 
+	private static final String ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN = "Ändern von Zeilen fehlgeschlagen";
+
+	private static final String OS_NAME = "os.name";
+
 	private SWTWorkbenchBot bot;
 
 	private WFCDetailPart wfcPart;
@@ -113,13 +117,13 @@ class GridUITest {
 	void ensureToolbarsAreNotEmpty() {
 
 		// Toolbarbuttons finden
-		SWTBotView searchPart = bot.partById(Constants.SEARCH_PART);
+		searchPart = bot.partById(Constants.SEARCH_PART);
 		assertFalse(searchPart.getToolbarButtons().isEmpty());
 
-		SWTBotView indexPart = bot.partById(Constants.INDEX_PART);
+		indexPart = bot.partById(Constants.INDEX_PART);
 		assertFalse(indexPart.getToolbarButtons().isEmpty());
 
-		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
+		detailPart = bot.partById(Constants.DETAIL_PART);
 		assertFalse(detailPart.getToolbarButtons().isEmpty());
 
 	}
@@ -127,12 +131,12 @@ class GridUITest {
 	@Test
 	public void ensureDataEntryCanBeCreated() {
 		// Do not start on Linux
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (System.getProperty(OS_NAME).startsWith("Linux")) {
 			return;
 		}
 
 		// Auf "Optimieren" Klicken, damit mehr Einträge im Index angezeigt werden können
-		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
+		detailPart = bot.partById(Constants.DETAIL_PART);
 		List<SWTBotToolbarButton> detailToolbarButtons = detailPart.getToolbarButtons();
 		detailToolbarButtons.get(6);
 
@@ -155,11 +159,11 @@ class GridUITest {
 	public void testGridFunctions() {
 
 		// Do not start on Linux
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (System.getProperty(OS_NAME).startsWith("Linux")) {
 			return;
 		}
 
-		SWTBotView detailPart = bot.partById(Constants.DETAIL_PART);
+		detailPart = bot.partById(Constants.DETAIL_PART);
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
 
 		Table table = wfcPart.getDetail().getGrid("GraduationStep").getDataTable();
@@ -184,12 +188,12 @@ class GridUITest {
 		assertEquals(2, table.getRows().size(), "Löschen von Zeilen fehlgeschlagen");
 
 		// Unter Mac werden die Werte die in Nattables geschrieben werden angehängt
-		if (System.getProperty("os.name").startsWith("Mac OS")) {
-			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
-			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
+		if (System.getProperty(OS_NAME).startsWith("Mac OS")) {
+			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
+			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
 		} else {
-			assertEquals(1, table.getRows().get(0).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
-			assertEquals(1, table.getRows().get(1).getValue(3).getDoubleValue(), "Ändern von Zeilen fehlgeschlagen");
+			assertEquals(1, table.getRows().get(0).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
+			assertEquals(1, table.getRows().get(1).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
 		}
 
 		// Eintrag wieder löschen
