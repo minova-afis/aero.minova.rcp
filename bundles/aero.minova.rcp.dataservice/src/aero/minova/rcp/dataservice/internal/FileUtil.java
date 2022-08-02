@@ -46,9 +46,9 @@ public class FileUtil {
 				}
 
 				// Ansonsten leeren String in das File schreiben
-				FileOutputStream writer = new FileOutputStream(path);
-				writer.write(("").getBytes());
-				writer.close();
+				try (FileOutputStream writer = new FileOutputStream(path);) {
+					writer.write(("").getBytes());
+				}
 			}
 		} catch (IOException e) {
 			return createFile(path, number + 1);
@@ -67,7 +67,7 @@ public class FileUtil {
 			try {
 				return HashService.hashFile(file);
 			} catch (IOException e) {
-				e.printStackTrace();
+				// Fehler abfangen
 			}
 			return "-1";
 		});
@@ -75,10 +75,8 @@ public class FileUtil {
 
 	public static void ensureFoldersExist(File file) {
 		File folder = file.getParentFile();
-		if (!folder.exists()) {
-			if (!folder.mkdirs()) {
-				ensureFoldersExist(folder.getParentFile());
-			}
+		if (!folder.exists() && !folder.mkdirs()) {
+			ensureFoldersExist(folder.getParentFile());
 		}
 	}
 

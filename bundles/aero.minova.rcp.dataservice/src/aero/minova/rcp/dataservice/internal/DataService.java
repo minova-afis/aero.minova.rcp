@@ -168,7 +168,7 @@ public class DataService implements IDataService {
 					.authenticator(authentication);
 			httpClient = httpClientBuilder.build();
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 
 		gson = new GsonBuilder() //
@@ -455,7 +455,7 @@ public class DataService implements IDataService {
 		try {
 			Files.createDirectories(path.getParent());
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
@@ -505,7 +505,7 @@ public class DataService implements IDataService {
 				downloadFile(filename).join();
 			}
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return getCachedFileContent(filename);
 	}
@@ -522,7 +522,7 @@ public class DataService implements IDataService {
 				}
 			}
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			logger.error(e);
 			return false;
 		}
 		return true;
@@ -540,8 +540,8 @@ public class DataService implements IDataService {
 		Path path = getStoragePath().resolve(fileName);
 		try {
 			Files.createDirectories(path.getParent());
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			logger.error(e);
 		}
 		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
@@ -692,7 +692,7 @@ public class DataService implements IDataService {
 					return Files.readString(cachedFile.toPath());
 				}
 			} catch (IOException | URISyntaxException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			throw new CompletionException("File not found", null);
 		});
@@ -937,7 +937,7 @@ public class DataService implements IDataService {
 			});
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -1020,7 +1020,7 @@ public class DataService implements IDataService {
 				sqlString = SQLStringUtil.prepareViewString(table);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 
 		if (LOG_SQL_STRING) {
@@ -1037,7 +1037,7 @@ public class DataService implements IDataService {
 					sqlStringBuilder.append(SQLStringUtil.prepareProcedureString(e.getTable()) + "\n");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			String sqlString = sqlStringBuilder.toString().strip();
 			body = body + "\n" + sqlString;
