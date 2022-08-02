@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.parts;
 
+import static org.eclipse.nebula.widgets.nattable.selection.SelectionUtils.getSelectedRowObjects;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +66,6 @@ import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent
 import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
@@ -79,7 +80,6 @@ import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeCollapseAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.command.TreeExpandAllCommand;
 import org.eclipse.nebula.widgets.nattable.tree.config.TreeLayerExpandCollapseKeyBindings;
-import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -150,7 +150,7 @@ public class WFCIndexPart extends WFCFormPart {
 	@Inject
 	MPart mpart;
 
-	private SortHeaderLayer sortHeaderLayer;
+	private SortHeaderLayer<Object> sortHeaderLayer;
 
 	private GroupByHeaderLayer groupByHeaderLayer;
 
@@ -176,7 +176,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		parent.setLayout(new GridLayout());
 
-		natTable = createNatTable(parent, form, getData(), selectionService, mPerspective.getContext());
+		natTable = createNatTable(parent, form, getData(), mPerspective.getContext());
 		loadPrefs(Constants.LAST_STATE, autoLoadIndex);
 	}
 
@@ -204,31 +204,31 @@ public class WFCIndexPart extends WFCFormPart {
 		String tableName = form.getIndexView().getSource();
 
 		// Spaltenanordung und -breite
-		String size = "";
+		StringBuilder size = new StringBuilder();
 		for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
-			size += i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";";
+			size.append(i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";");
 
 		}
-		prefs.put(tableName + "." + name + ".index.size", size);
+		prefs.put(tableName + "." + name + ".index.size", size.toString());
 
 		// Sortierung
-		String sort = "";
+		StringBuilder sort = new StringBuilder();
 		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
-			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+			sort.append(i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";");
 		}
-		prefs.put(tableName + "." + name + ".index.sortby", sort);
+		prefs.put(tableName + "." + name + ".index.sortby", sort.toString());
 
 		// Gruppierung
-		String group = "";
+		StringBuilder group = new StringBuilder();
 		if (expandGroups) {
-			group += 1 + ";";
+			group.append(1 + ";");
 		} else {
-			group += 0 + ";";
+			group.append(0 + ";");
 		}
 		for (int i : getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes()) {
-			group += i + ";";
+			group.append(i + ";");
 		}
-		prefs.put(tableName + "." + name + ".index.groupby", group);
+		prefs.put(tableName + "." + name + ".index.groupby", group.toString());
 
 		// Sichtbarkeit
 		prefs.put(tableName + "." + name + ".index.hidden", bodyLayerStack.columnHideShowLayer.getHiddenColumnIndexes().toString());
@@ -312,7 +312,7 @@ public class WFCIndexPart extends WFCFormPart {
 		string = prefs.get(tableName + "." + name + ".index.hidden", null);
 		if (string != null && !string.equals("")) {
 			String replace = string.replaceAll("^\\[|]$", "");
-			replace = replace.replaceAll(", ", ",");
+			replace = replace.replace(", ", ",");
 			List<String> stringIndices = new ArrayList<>(Arrays.asList(replace.split(",")));
 			for (int i = 0; i < data.getColumnCount(); i++) {
 				boolean hidden = stringIndices.contains(i + "");
@@ -410,7 +410,7 @@ public class WFCIndexPart extends WFCFormPart {
 		bodyLayerStack.columnHideShowLayer.hideColumnPositions(positions);
 	}
 
-	public NatTable createNatTable(Composite parent, Form form, Table table, ESelectionService selectionService, IEclipseContext context) {
+	public NatTable createNatTable(Composite parent, Form form, Table table, IEclipseContext context) {
 
 		this.context = context;
 
@@ -522,12 +522,9 @@ public class WFCIndexPart extends WFCFormPart {
 						}
 						return false;
 					}
-				}, new IMouseAction() {
-					@Override
-					public void run(NatTable natTable, MouseEvent event) {
-						int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y);
-						natTable.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
-					}
+				}, (natTableDummy, event) -> {
+					int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y);
+					natTableDummy.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
 				});
 			}
 		});
@@ -536,8 +533,6 @@ public class WFCIndexPart extends WFCFormPart {
 
 		natTable.configure();
 		// Hier können wir das Theme setzen
-//		ThemeConfiguration darkThemeConfig = new DarkNatTableThemeConfiguration();
-//		natTable.setTheme(darkThemeConfig);
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		return natTable;
@@ -577,7 +572,7 @@ public class WFCIndexPart extends WFCFormPart {
 
 		private TreeLayer treeLayer;
 
-		private GlazedListsEventLayer glazedListsEventLayer;
+		private GlazedListsEventLayer<T> glazedListsEventLayer;
 
 		private ViewportLayer viewportLayer;
 
@@ -623,7 +618,7 @@ public class WFCIndexPart extends WFCFormPart {
 			setUnderlyingLayer(viewportLayer);
 		}
 
-		public GlazedListsEventLayer getGlazedListsEventLayer() {
+		public GlazedListsEventLayer<T> getGlazedListsEventLayer() {
 			return glazedListsEventLayer;
 		}
 
@@ -683,12 +678,13 @@ public class WFCIndexPart extends WFCFormPart {
 			try {
 				Thread.sleep(sleepMillis);
 			} catch (InterruptedException e) {
-				return;
+				// Restore interrupted state...
+				Thread.currentThread().interrupt();
 			}
 
 			// Ausgewählten Zeilen müssen gefiltert werden, um Gruppen-Zeilen zu entfernen
-			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
-			List<Row> collection = (List<Row>) c.stream().filter(p -> (p instanceof Row)).collect(Collectors.toList());
+			List<Row> c = getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List<Row> collection = c.stream().filter(Row.class::isInstance).collect(Collectors.toList());
 
 			Table t = dataFormService.getTableFromFormIndex(form);
 			for (Row r : collection) {
@@ -698,11 +694,12 @@ public class WFCIndexPart extends WFCFormPart {
 				context.set(Constants.BROKER_ACTIVEROWS, t);
 			}
 		}
+
 	}
 
 	/**
 	 * Lädt die Liste von Zeilen in die Nattable.
-	 * 
+	 *
 	 * @param list
 	 * @param add
 	 *            true: Liste wird unten angehängt; false: Alte Einträge werden verworfen
