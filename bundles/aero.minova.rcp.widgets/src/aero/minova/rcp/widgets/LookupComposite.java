@@ -265,16 +265,19 @@ public class LookupComposite extends Composite {
 				field.setValue(null, true);
 			} else if (field.getValue() instanceof LookupValue) {
 				field.setValue(null, true);
+
 				// Den Eingetragenen Text wieder ins Textfeld setzten
-				text.setText(string);
-				text.setSelection(text.getText().length());
+				if (!text.isDisposed()) {
+					text.setText(string);
+					text.setSelection(text.getText().length());
+				}
 			}
 
 			if (string.length() == 0) {
 				popup.setVisible(false);
-				return;
+			} else if (!text.isDisposed()) {
+				showAllElements(string);
 			}
-			showAllElements(string);
 		};
 	}
 
