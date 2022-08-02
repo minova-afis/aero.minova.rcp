@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SWTBotJunit5Extension.class)
-public class ExitHandlerTest {
+public class ExitHandlerUITest {
 
 	private static SWTBot bot;
 

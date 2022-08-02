@@ -41,7 +41,7 @@ import aero.minova.rcp.form.menu.mdi.MenuType;
 
 @SuppressWarnings("restriction")
 @ExtendWith(SWTBotJunit5Extension.class)
-public class MenuTest {
+public class MenuUITest {
 
 	private static SWTWorkbenchBot bot;
 	TranslationService translationService;

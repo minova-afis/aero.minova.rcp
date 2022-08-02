@@ -33,7 +33,7 @@ import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.uitests.util.UITestUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
-class GridTest {
+class GridUITest {
 
 	private SWTWorkbenchBot bot;
 

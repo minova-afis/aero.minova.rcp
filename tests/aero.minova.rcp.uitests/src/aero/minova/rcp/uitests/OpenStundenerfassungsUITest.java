@@ -28,7 +28,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.uitests.util.UITestUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
-class OpenStundenerfassungsTest {
+class OpenStundenerfassungsUITest {
 
 	private SWTWorkbenchBot bot;
 

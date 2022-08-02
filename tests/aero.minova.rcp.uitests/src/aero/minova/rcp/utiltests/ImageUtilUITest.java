@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 
-class ImageUtilTest {
+class ImageUtilUITest {
 
 	@BeforeEach
 	void init() {
