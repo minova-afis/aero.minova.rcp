@@ -44,7 +44,7 @@ public class FileUtil {
 			} else {
 
 				// Versuchen, das File zu löschen und neu erstellen
-				if (file.delete() && file.createNewFile()) {
+				if (deleteFile(file) && file.createNewFile()) {
 					return path;
 				}
 
@@ -57,6 +57,15 @@ public class FileUtil {
 			return createFile(path, number + 1);
 		}
 		return path;
+	}
+
+	public static boolean deleteFile(File file) {
+		try {
+			Files.delete(file.toPath());
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	/**
