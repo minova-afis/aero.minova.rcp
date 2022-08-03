@@ -140,7 +140,6 @@ public class DataFormService implements IDataFormService {
 				Field f = (Field) o;
 				fields.add(f);
 			}
-			// TODO:Grid verarbeiten
 		}
 
 		// Nach SQL-Index sortieren und nur Felder mit SQL-Index >= 0 zurückgeben
@@ -270,8 +269,12 @@ public class DataFormService implements IDataFormService {
 	private String readLocalFile(String name) {
 		try {
 			return dataService.getCachedFileContent(name).get();
-		} catch (InterruptedException | ExecutionException e1) {
-			return "";
+		} catch (ExecutionException e1) {
+			dataService.getLogger().error(e1);
+		} catch (InterruptedException e) {
+			dataService.getLogger().error(e);
+			Thread.currentThread().interrupt();
 		}
+		return "";
 	}
 }

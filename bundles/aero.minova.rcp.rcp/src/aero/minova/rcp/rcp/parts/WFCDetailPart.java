@@ -441,8 +441,11 @@ public class WFCDetailPart extends WFCFormPart {
 								logger.error(e1);
 							}
 						}
-					} catch (InterruptedException | ExecutionException e) {
+					} catch (ExecutionException e) {
 						logger.error(e);
+					} catch (InterruptedException e) {
+						logger.error(e);
+						Thread.currentThread().interrupt();
 					} catch (NoSuchFieldException e) {
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 					}

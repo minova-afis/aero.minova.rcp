@@ -34,7 +34,7 @@ import aero.minova.rcp.uitests.util.UITestUtil;
 @ExtendWith(SWTBotJunit5Extension.class)
 class GridUITest {
 
-	private static final String ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN = "Ändern von Zeilen fehlgeschlagen";
+	private static final String AENDERN_VON_ZEILEN_FEHLGESCHLAGEN = "Ändern von Zeilen fehlgeschlagen";
 
 	private static final String OS_NAME = "os.name";
 
@@ -189,11 +189,11 @@ class GridUITest {
 
 		// Unter Mac werden die Werte die in Nattables geschrieben werden angehängt
 		if (System.getProperty(OS_NAME).startsWith("Mac OS")) {
-			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
-			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
+			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), AENDERN_VON_ZEILEN_FEHLGESCHLAGEN);
+			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), AENDERN_VON_ZEILEN_FEHLGESCHLAGEN);
 		} else {
-			assertEquals(1, table.getRows().get(0).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
-			assertEquals(1, table.getRows().get(1).getValue(3).getDoubleValue(), ÄNDERN_VON_ZEILEN_FEHLGESCHLAGEN);
+			assertEquals(1, table.getRows().get(0).getValue(3).getDoubleValue(), AENDERN_VON_ZEILEN_FEHLGESCHLAGEN);
+			assertEquals(1, table.getRows().get(1).getValue(3).getDoubleValue(), AENDERN_VON_ZEILEN_FEHLGESCHLAGEN);
 		}
 
 		// Eintrag wieder löschen

@@ -1,5 +1,7 @@
 package aero.minova.rcp.preferencewindow.control;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.log.Logger;
@@ -65,8 +67,9 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		text.setLayoutData(textGridData);
 
 		// Auslesen des PrimaryWorksapces
-		if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-			ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
+		Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
+		if (savedPrimaryWorkspaceAccessData.isPresent()) {
+			ISecurePreferences prefs = savedPrimaryWorkspaceAccessData.get();
 			try {
 				String profil = prefs.get(WorkspaceAccessPreferences.PROFILE, null);
 				text.setText(profil);

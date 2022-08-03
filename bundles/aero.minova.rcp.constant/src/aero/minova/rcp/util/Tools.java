@@ -5,13 +5,15 @@ import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 
+import aero.minova.rcp.exceptions.ToolsException;
+
 public class Tools {
 
 	private Tools() {}
 
-	public static void openURL(String url) throws Exception {
+	public static void openURL(String url) {
 		if (url == null || url.isEmpty()) {
-			throw new Exception("Cannot open empty/null location");
+			throw new ToolsException("Cannot open empty/null location");
 		}
 
 		// FIXME hier wird AWT verwendet
@@ -34,15 +36,15 @@ public class Tools {
 					// Datei öffnen
 					final File f = new File(url);
 					if (!f.exists()) {
-						throw new Exception("File not found " + url);
+						throw new ToolsException("File not found " + url);
 					}
 					Desktop.getDesktop().open(f);
 				}
 			} catch (final Exception e) {
-				throw new Exception("Error occured during the view:\r\n" + e.getMessage(), e);
+				throw new ToolsException("Error occured during the view:\r\n" + e.getMessage(), e);
 			}
 		} else {
-			throw new Exception("Desktop not supported");
+			throw new ToolsException("Desktop not supported");
 		}
 	}
 

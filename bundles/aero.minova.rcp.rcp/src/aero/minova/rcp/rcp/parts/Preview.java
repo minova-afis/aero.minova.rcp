@@ -109,6 +109,9 @@ public class Preview {
 		// lasse dem Thread Zeit, den Zugriff auf die geöffnete Datei zu schließen
 		try {
 			Thread.sleep(1);
-		} catch (InterruptedException e) {}
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
+		}
 	}
 }

@@ -205,7 +205,12 @@ public class DataService implements IDataService {
 					}
 				}
 			}
-		} catch (InterruptedException | ExecutionException e) {}
+		} catch (ExecutionException e) {
+			logger.error(e);
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	private static SSLContext disabledSslVerificationContext() {
@@ -449,7 +454,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * 2)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * (long) 2)).build();
 
 		Path path = getStoragePath().resolve("reports/" + table.getName() + table.getRows().get(0).getValue(0).getValue().toString() + ".xml");
 		try {
@@ -500,12 +505,19 @@ public class DataService implements IDataService {
 		try {
 			if (checkIfUpdateIsRequired(filename)) {
 				logCache(filename + " need to download / update the file ");
+
 				// File löschen, damit es komplett aktualisiert wird
-				getStoragePath().resolve(filename).toFile().delete();
+				if (getStoragePath().resolve(filename).toFile().exists()) {
+					Files.delete(getStoragePath().resolve(filename));
+				}
+
 				downloadFile(filename).join();
 			}
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			logger.error(e);
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
 		}
 		return getCachedFileContent(filename);
 	}
@@ -521,8 +533,12 @@ public class DataService implements IDataService {
 					ZipService.unzipFile(this.getStoragePath().resolve(zipname).toFile(), this.getStoragePath().toString());
 				}
 			}
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			logger.error(e);
+			return false;
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
 			return false;
 		}
 		return true;
@@ -535,7 +551,7 @@ public class DataService implements IDataService {
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
 				.header(CONTENT_TYPE, "application/json") //
 				.POST(BodyPublishers.ofString(body))//
-				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * 2)).build();
+				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * (long) 2)).build();
 
 		Path path = getStoragePath().resolve(fileName);
 		try {

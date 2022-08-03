@@ -18,12 +18,6 @@ public class CustomPWPasswordText extends CustomPWText {
 	}
 
 	/**
-	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWText#addVerifyListeners()
-	 */
-	@Override
-	public void addVerifyListeners() {}
-
-	/**
 	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWWidget#check()
 	 */
 	@Override

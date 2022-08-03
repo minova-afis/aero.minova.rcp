@@ -137,14 +137,10 @@ public class PrintUtil {
 	 * @param preview
 	 */
 	public static void showFile(String urlString, Preview preview) {
-		try {
-			if (preview == null) {
-				Tools.openURL(urlString);
-			} else {
-				preview.openURL(urlString);
-			}
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
+		if (preview == null) {
+			Tools.openURL(urlString);
+		} else {
+			preview.openURL(urlString);
 		}
 	}
 

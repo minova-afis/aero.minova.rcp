@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 
 import aero.minova.rcp.dataservice.HashService;
 
 public class FileUtil {
+	private FileUtil() {}
 
 	/**
 	 * Erstellt eine Datei. Falls sie existiert, wird sie geleert. <br>
@@ -36,12 +38,13 @@ public class FileUtil {
 				if (file.getParentFile() != null) {
 					file.getParentFile().mkdirs();
 				}
-				file.createNewFile();
+				if (!file.createNewFile()) { // Fehler beim Erstellen, nächste Nummer ausprobieren
+					throw new IOException();
+				}
 			} else {
 
 				// Versuchen, das File zu löschen und neu erstellen
-				if (file.delete()) {
-					file.createNewFile();
+				if (file.delete() && file.createNewFile()) {
 					return path;
 				}
 
@@ -95,7 +98,7 @@ public class FileUtil {
 		}
 
 		try {
-			file.delete();
+			Files.delete(file.toPath());
 		} catch (Exception e) {
 			// Exception abfangen, damit Rest gelöscht werden kann
 		}

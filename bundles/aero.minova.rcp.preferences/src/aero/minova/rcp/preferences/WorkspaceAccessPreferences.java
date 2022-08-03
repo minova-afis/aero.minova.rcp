@@ -90,13 +90,14 @@ public class WorkspaceAccessPreferences {
 	}
 
 	public static void resetDefaultWorkspace(Logger logger) {
-		ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-		try {
-			prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
-			prefs.flush();
-		} catch (StorageException | IOException e1) {
-			logger.debug(e1, "Could not reset default workspace.");
-		}
+		WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).ifPresent(prefs -> {
+			try {
+				prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
+				prefs.flush();
+			} catch (StorageException | IOException e1) {
+				logger.debug(e1, "Could not reset default workspace.");
+			}
+		});
 	}
 
 	public static Optional<ISecurePreferences> getSavedPrimaryWorkspaceAccessData(Logger logger) {

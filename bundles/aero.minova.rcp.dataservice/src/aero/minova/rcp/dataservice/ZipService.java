@@ -62,13 +62,13 @@ public class ZipService {
 		}
 	}
 
-	private static void deleteChildrenInTargetFolder(File dir) {
+	private static void deleteChildrenInTargetFolder(File dir) throws IOException {
 		if (!Files.isDirectory(dir.toPath(), LinkOption.NOFOLLOW_LINKS)) {
 			return;
 		}
 		for (File file : dir.listFiles()) {
 			if (!file.isDirectory()) {
-				file.delete();
+				Files.delete(file.toPath());
 			}
 		}
 	}

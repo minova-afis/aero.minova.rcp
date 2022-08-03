@@ -47,17 +47,17 @@ public class DynamicButtonHandler {
 
 		if (Constants.WIZARD.equals(className)) {
 			try {
-
 				IMinovaWizard wizard = findWizard(parameter);
+				if (wizard != null) {
+					MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
 
-				MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
+					ContextInjectionFactory.inject(wizard, context);
+					wizard.setOriginalMDetail(detail);
 
-				ContextInjectionFactory.inject(wizard, context);
-				wizard.setOriginalMDetail(detail);
-
-				MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, wizard);
-				wizardDialog.setTranslationService(translationService);
-				wizardDialog.open();
+					MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, wizard);
+					wizardDialog.setTranslationService(translationService);
+					wizardDialog.open();
+				}
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -102,7 +102,8 @@ public class DynamicButtonHandler {
 		}
 
 		if (iWizard == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.WizardNotFound", null));
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+					translationService.translate("@msg.WizardNotFound", null));
 		}
 
 		return iWizard;
