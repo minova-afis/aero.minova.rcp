@@ -313,10 +313,11 @@ public class WFCIndexPart extends WFCFormPart {
 
 		// Sichtbarkeit
 		string = prefs.get(tableName + "." + name + ".index.hidden", null);
-		if (string != null && !string.equals("")) {
-			String replace = string.replaceAll("^\\[|]$", "");
-			replace = replace.replace(", ", ",");
+		if (string != null && !string.isBlank()) {
+			String replace = string.replace("[", "").replace("]", "");
+			replace = replace.replace(", ", ",").trim();
 			List<String> stringIndices = new ArrayList<>(Arrays.asList(replace.split(",")));
+
 			for (int i = 0; i < data.getColumnCount(); i++) {
 				boolean hidden = stringIndices.contains(i + "");
 				data.getColumns().get(i).setVisible(!hidden);

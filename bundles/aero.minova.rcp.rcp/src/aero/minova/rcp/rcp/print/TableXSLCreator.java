@@ -27,6 +27,7 @@ import aero.minova.rcp.util.IOUtil;
 
 public class TableXSLCreator extends CommonPrint {
 
+	private static final String COLUMN_NAME = "%%ColumnName%%";
 	@Inject
 	private TranslationService translationService;
 	private WFCSearchPart searchPart;
@@ -58,7 +59,7 @@ public class TableXSLCreator extends CommonPrint {
 	 * @param groupByIndicesReordered
 	 * @throws ReportCreationException
 	 */
-	public String createXSL(String xmlRootTag, String reportName, List<ColumnInfo> colConfig, ReportConfiguration reportConf, Path path_reports,
+	public String createXSL(String xmlRootTag, String reportName, List<ColumnInfo> colConfig, ReportConfiguration reportConf, Path pathReports,
 			List<Integer> groupByIndicesReordered) throws ReportCreationException {
 
 		if (reportConf == null) {
@@ -86,7 +87,7 @@ public class TableXSLCreator extends CommonPrint {
 
 		final Orientation ori = reportConf.calculatePageOrientation(getPrintedRowWidth(colConfig, reportConf));
 		final String xslData = getTemplate(ori);
-		return interpolateXslData(xmlRootTag, reportName, cols, reportConf, path_reports, xslData);
+		return interpolateXslData(xmlRootTag, reportName, cols, reportConf, pathReports, xslData);
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class TableXSLCreator extends CommonPrint {
 	 */
 	protected List<ColumnInfo> filterInvisibleColumns(List<ColumnInfo> cols, ReportConfiguration conf) {
 		final List<ColumnInfo> toRet = new ArrayList<>();
-		if (cols == null || cols.size() == 0) {
+		if (cols == null || cols.isEmpty()) {
 			return toRet;
 		}
 		// wir gehen erst mal davon aus, dass wir Platz für Querformat haben sollte Hochformat von der Breite her reichen, wird später noch umgestellt
@@ -117,7 +118,13 @@ public class TableXSLCreator extends CommonPrint {
 			}
 		}
 
-		if (toRet.size() > 0 && mmLeft > conf.CELL_PADDING_MM) {
+		filterColumns(conf, toRet, mmLeft, mmUsed);
+
+		return toRet;
+	}
+
+	private void filterColumns(ReportConfiguration conf, final List<ColumnInfo> toRet, int mmLeft, int mmUsed) {
+		if (!toRet.isEmpty() && mmLeft > conf.CELL_PADDING_MM) {
 			if (mmUsed <= conf.getAvailPortraitWidth()) {
 				// Hochformat reicht!
 				mmLeft = conf.getAvailPortraitWidth() - mmUsed;
@@ -127,8 +134,6 @@ public class TableXSLCreator extends CommonPrint {
 				toRet.add(new ColumnInfo(null, pxEmpty));
 			}
 		}
-
-		return toRet;
 	}
 
 	/**
@@ -137,26 +142,14 @@ public class TableXSLCreator extends CommonPrint {
 	 * @throws ReportCreationException
 	 */
 	private String getCellDefinition(final List<ColumnInfo> cols, final boolean asSum) throws ReportCreationException {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		String text;
 		for (int i = 0; i < cols.size(); i++) {
 			final ColumnInfo ci = cols.get(i);
 			final String name = ci.column == null ? ""
 					: translationService.translate(PrintUtil.prepareTranslation(ci.column), null).replaceAll("[^a-zA-Z0-9]", "");
 
-			if (ci.column == null) {
-				text = getTemplate("CellEmptyDefinition");
-			} else if (asSum) {
-				// Die erste Spalte gilt als "Überschrift"
-				text = (i == 0 ? "" : getTemplate("SumCellDefinition").replace("%%ColumnName%%", name));
-			} else if (ci.column.getType().equals(DataType.BOOLEAN)) {
-				text = getTemplate("CellBoolDefinition").replace("%%ColumnName%%", name);
-			} else {
-				text = getTemplate("CellDefinition").replace("%%ColumnName%%", name);
-				if (ci.column.getType().equals(DataType.STRING)) {
-					text = text.replace("wrap-option=\"no-wrap\"", "");
-				}
-			}
+			text = getText(asSum, i, ci, name);
 
 			boolean isNumeric = false;
 			if (ci.column != null && (ci.column.getType() == DataType.INTEGER || ci.column.getType() == DataType.DOUBLE)) {
@@ -169,13 +162,31 @@ public class TableXSLCreator extends CommonPrint {
 		return sb.toString();
 	}
 
+	private String getText(final boolean asSum, int i, final ColumnInfo ci, final String name) throws ReportCreationException {
+		String text;
+		if (ci.column == null) {
+			text = getTemplate("CellEmptyDefinition");
+		} else if (asSum) {
+			// Die erste Spalte gilt als "Überschrift"
+			text = (i == 0 ? "" : getTemplate("SumCellDefinition").replace(COLUMN_NAME, name));
+		} else if (ci.column.getType().equals(DataType.BOOLEAN)) {
+			text = getTemplate("CellBoolDefinition").replace(COLUMN_NAME, name);
+		} else {
+			text = getTemplate("CellDefinition").replace(COLUMN_NAME, name);
+			if (ci.column.getType().equals(DataType.STRING)) {
+				text = text.replace("wrap-option=\"no-wrap\"", "");
+			}
+		}
+		return text;
+	}
+
 	/**
 	 * Liefert die XSL-Spaltenbeschreibung in Form eines Strings Die Breiten werden dabei prozentuell zur IndexView-Breite berechnet
 	 *
 	 * @throws ReportCreationException
 	 */
 	private static String getColumnDefinition(final List<ColumnInfo> cols, final ReportConfiguration conf) throws ReportCreationException {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		for (final ColumnInfo ci : cols) {
 			final int absSize = getPrintedRowWidth(ci, conf);
 			final String colDef = getTemplate("ColumnDefinition").replace("%%Size%%", "" + absSize);
@@ -219,15 +230,14 @@ public class TableXSLCreator extends CommonPrint {
 			fontFactor = conf.guiFont.getSize2D() / conf.standardFont.getSize2D();
 		}
 
-		final int iColSize = (int) (dColSize * dpiFactor * fontFactor);
-		return iColSize;
+		return (int) (dColSize * dpiFactor * fontFactor);
 	}
 
 	/**
 	 * Liefert die gesamte Breite der Spalten beim Drucken in mm
 	 */
 	private static int getPrintedRowWidth(final List<ColumnInfo> cols, final ReportConfiguration conf) {
-		if (cols == null || cols.size() == 0) {
+		if (cols == null || cols.isEmpty()) {
 			return 0;
 		}
 		int sumSize = 0;
@@ -246,7 +256,9 @@ public class TableXSLCreator extends CommonPrint {
 	 * @throws ReportCreationException
 	 */
 	private String getSearchCriteria(final ColumnInfo ci) throws ReportCreationException {
-		String searchCriteria, searchCriterias = "", searchCriteriaText;
+		StringBuilder searchCriterias = new StringBuilder();
+		String searchCriteria;
+		String searchCriteriaText;
 		Table searchTable = searchPart.getData();
 		boolean first = true;
 		if (searchTable != null && ci.column != null) {
@@ -263,14 +275,13 @@ public class TableXSLCreator extends CommonPrint {
 				}
 
 				searchCriteria = getTemplate("SearchCriteria");
-				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));
-				searchCriteriaText += value;
+				searchCriteriaText = getAndOrString(first, and) + value;
 				searchCriteria = searchCriteria.replace("%%CriteriaText%%", replaceSpecialChars(searchCriteriaText));
-				searchCriterias += searchCriteria + "\r\n";
+				searchCriterias.append(searchCriteria + "\r\n");
 				first = false;
 			}
 		}
-		return searchCriterias;
+		return searchCriterias.toString();
 	}
 
 	/**
@@ -281,7 +292,9 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return einen String mit den Suchkriterien
 	 */
 	private String getSearchCriteriaValue(final ColumnInfo ci) {
-		String searchCriteria, searchCriterias = "", searchCriteriaText;
+		StringBuilder searchCriterias = new StringBuilder();
+		String searchCriteria;
+		String searchCriteriaText;
 		Table searchTable = searchPart.getData();
 		boolean first = true;
 		if (searchTable != null && ci.column != null) {
@@ -297,14 +310,20 @@ public class TableXSLCreator extends CommonPrint {
 					value += " " + v.getFilterValue().getValueString(CustomLocale.getLocale(), datePattern, timePattern, timezone);
 				}
 
-				searchCriteriaText = (first ? "" : (and.getBooleanValue() ? "& " : "| "));
-				searchCriteriaText += value;
+				searchCriteriaText = getAndOrString(first, and) + value;
 				searchCriteria = replaceSpecialChars(searchCriteriaText);
-				searchCriterias += searchCriteria;
+				searchCriterias.append(searchCriteria);
 				first = false;
 			}
 		}
-		return searchCriterias;
+		return searchCriterias.toString();
+	}
+
+	private String getAndOrString(boolean first, final Value and) {
+		String searchCriteriaText;
+		String operator = (Boolean.TRUE.equals(and.getBooleanValue()) ? "& " : "| ");
+		searchCriteriaText = (first ? "" : operator);
+		return searchCriteriaText;
 	}
 
 	/**
@@ -315,20 +334,20 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 */
 	private String getSearchCriteriaValues(final List<ColumnInfo> cols) {
-		String toRet = "";
+		StringBuilder toRet = new StringBuilder();
 		for (final ColumnInfo ci : cols) {
 			if (ci != null && ci.column != null) {
 				final String colName = translationService.translate(PrintUtil.prepareTranslation(ci.column), null).replaceAll("[^a-zA-Z0-9]", "");
 				final String scValues = getSearchCriteriaValue(ci);
-				if (scValues != null && scValues != "") {
-					if (toRet != "") {
-						toRet += ",\n";
+				if (scValues != null && !scValues.isBlank()) {
+					if (toRet.length() != 0) {
+						toRet.append(",\n");
 					}
-					toRet += colName + ": " + scValues;
+					toRet.append(colName + ": " + scValues);
 				}
 			}
 		}
-		return toRet;
+		return toRet.toString();
 	}
 
 	/**
@@ -340,8 +359,8 @@ public class TableXSLCreator extends CommonPrint {
 	 * @return
 	 * @throws ReportCreationException
 	 */
-	private String getTableTitle(final List<ColumnInfo> cols, final ReportConfiguration conf) throws ReportCreationException {
-		String toRet = "";
+	private String getTableTitle(final List<ColumnInfo> cols) throws ReportCreationException {
+		StringBuilder toRet = new StringBuilder();
 		String text;
 		boolean isFirstRow = true;
 		for (ColumnInfo ci : cols) {
@@ -356,11 +375,11 @@ public class TableXSLCreator extends CommonPrint {
 			text = text.replace("%%BorderLeftStyle%%", isFirstRow ? "solid" : "none");
 			text = text.replace("%%BorderRightStyle%%", lastColumn ? "solid" : "none");
 			text = text.replace("%%SearchCriterias%%", printHandler.hideSearchCriterias ? "" : getSearchCriteria(ci));
-			toRet += text + "\r\n";
+			toRet.append(text + "\r\n");
 			isFirstRow = false;
 		}
 
-		return toRet;
+		return toRet.toString();
 	}
 
 	/**
@@ -372,8 +391,7 @@ public class TableXSLCreator extends CommonPrint {
 	 */
 	private static String getTemplate(final Orientation ori) throws ReportCreationException {
 		final String templateName = "PDFReportIndex_" + ((ori == Orientation.LANDSCAPE) ? "Wide" : "Portrait");
-		final String template = getTemplate(templateName);
-		return template;
+		return getTemplate(templateName);
 	}
 
 	/**
@@ -412,7 +430,7 @@ public class TableXSLCreator extends CommonPrint {
 	public String interpolateXslData(String xmlRootTag, String reportName, List<ColumnInfo> cols, ReportConfiguration conf, Path path, String xslData)
 			throws ReportCreationException {
 		final String columnDefinition = getColumnDefinition(cols, conf);
-		final String tableTitle = getTableTitle(cols, conf);
+		final String tableTitle = getTableTitle(cols);
 		final String cellDefinition = getCellDefinition(cols, false);
 		final String sumCellDefinition = getCellDefinition(cols, true);
 		final String encoding = "UTF-8";

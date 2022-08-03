@@ -348,8 +348,8 @@ public class WFCSearchPart extends WFCFormPart {
 		// Sichtbarkeit
 		string = prefs.get(tableName + "." + name + ".search.hidden", null);
 		if (string != null && !string.equals("")) {
-			String replace = string.replaceAll("^\\[|]$", "");
-			replace = replace.replaceAll(", ", ",");
+			String replace = string.replace("[", "").replace("]", "");
+			replace = replace.replace(", ", ",").trim();
 			List<String> stringIndices = new ArrayList<>(Arrays.asList(replace.split(",")));
 			for (int i = 0; i < data.getColumnCount(); i++) {
 				boolean hidden = stringIndices.contains(i + "");
