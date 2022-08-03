@@ -9,6 +9,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
@@ -37,25 +38,28 @@ public class DynamicButtonHandler {
 	@Inject
 	protected IMinovaPluginService pluginService;
 
+	@Inject
+	Logger logger;
+
 	@Execute
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CLAZZ) String className,
 			@Optional @Named(Constants.PARAMETER) String parameter, MPart mPart) {
 
 		if (Constants.WIZARD.equals(className)) {
 			try {
-
 				IMinovaWizard wizard = findWizard(parameter);
+				if (wizard != null) {
+					MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
 
-				MDetail detail = ((WFCDetailPart) mPart.getObject()).getDetail();
+					ContextInjectionFactory.inject(wizard, context);
+					wizard.setOriginalMDetail(detail);
 
-				ContextInjectionFactory.inject(wizard, context);
-				wizard.setOriginalMDetail(detail);
-
-				MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, wizard);
-				wizardDialog.setTranslationService(translationService);
-				wizardDialog.open();
+					MinovaWizardDialog wizardDialog = new MinovaWizardDialog(shell, wizard);
+					wizardDialog.setTranslationService(translationService);
+					wizardDialog.open();
+				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		} else if (Constants.PROCEDURE.equals(className)) {
 			Procedure p = (Procedure) context.get(parameter);
@@ -93,12 +97,13 @@ public class DynamicButtonHandler {
 					iWizard = (IMinovaWizard) bundleContext.getService(serviceReference);
 				}
 			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			logger.error(e);
 		}
 
 		if (iWizard == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.WizardNotFound", null));
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+					translationService.translate("@msg.WizardNotFound", null));
 		}
 
 		return iWizard;

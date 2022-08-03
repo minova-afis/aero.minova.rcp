@@ -9,6 +9,7 @@ import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -61,6 +62,9 @@ public class PrintStatisticHandler implements ValueChangeListener {
 
 	@Inject
 	MApplication mApplication;
+
+	@Inject
+	Logger logger;
 
 	public static final String PROCEDURENAME = "procedurename";
 	public static final String REPORTNAME = "reportname";
@@ -151,7 +155,7 @@ public class PrintStatisticHandler implements ValueChangeListener {
 					disablePreview);
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error(ex);
 			ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
 					translationService.translate("@msg.ErrorShowingFile", null), ex);
 		}

@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -32,6 +33,9 @@ public class Preview {
 
 	@Inject
 	private MPart part;
+
+	@Inject
+	Logger logger;
 
 	private Browser browser;
 
@@ -72,7 +76,7 @@ public class Preview {
 		part.setVisible(true);
 		part.getParent().setSelectedElement(part);
 
-		System.out.println(MessageFormat.format("verwende Browser {0} um URL {1} zu öffnen", browser.getBrowserType(), url));
+		logger.info(MessageFormat.format("verwende Browser {0} um URL {1} zu öffnen", browser.getBrowserType(), url));
 		loadPage(url);
 	}
 
@@ -101,10 +105,13 @@ public class Preview {
 	 */
 	public void clear() {
 		loadPage("about:blank");
-		System.out.println("--Setting blank");
+		logger.info("--Setting blank");
 		// lasse dem Thread Zeit, den Zugriff auf die geöffnete Datei zu schließen
 		try {
 			Thread.sleep(1);
-		} catch (InterruptedException e) {}
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
+		}
 	}
 }

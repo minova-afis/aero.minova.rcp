@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -96,11 +97,14 @@ public class WFCSearchPart extends WFCFormPart {
 
 	@Inject
 	MPart mPart;
-	
+
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	String timezone;
-	
+
+	@Inject
+	Logger logger;
+
 	private Table data;
 	private NatTable natTable;
 
@@ -289,7 +293,7 @@ public class WFCSearchPart extends WFCFormPart {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -344,8 +348,8 @@ public class WFCSearchPart extends WFCFormPart {
 		// Sichtbarkeit
 		string = prefs.get(tableName + "." + name + ".search.hidden", null);
 		if (string != null && !string.equals("")) {
-			String replace = string.replaceAll("^\\[|]$", "");
-			replace = replace.replaceAll(", ", ",");
+			String replace = string.replace("[", "").replace("]", "");
+			replace = replace.replace(", ", ",").trim();
 			List<String> stringIndices = new ArrayList<>(Arrays.asList(replace.split(",")));
 			for (int i = 0; i < data.getColumnCount(); i++) {
 				boolean hidden = stringIndices.contains(i + "");
@@ -450,7 +454,8 @@ public class WFCSearchPart extends WFCFormPart {
 					} else if (form.getIndexView().getColumn().get(i).getShortDate() != null) {
 						inst = DateUtil.getDate(fv.getUserInputWithoutOperator());
 					} else {
-						inst = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), fv.getUserInputWithoutOperator(), CustomLocale.getLocale(), timezone);
+						inst = DateTimeUtil.getDateTime(LocalDateTime.now(ZoneId.of(timezone)).toInstant(ZoneOffset.UTC), fv.getUserInputWithoutOperator(),
+								CustomLocale.getLocale(), timezone);
 					}
 
 					r.setValue(new FilterValue(fv.getOperatorValue(), inst, fv.getUserInput()), i);

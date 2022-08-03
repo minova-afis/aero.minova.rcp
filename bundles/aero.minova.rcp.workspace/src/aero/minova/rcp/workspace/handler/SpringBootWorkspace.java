@@ -101,7 +101,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			try {
 				checkCredentials(getPassword());
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 
@@ -120,7 +120,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
 			} catch (IllegalStateException | IOException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			URL workspaceURL = Platform.getInstanceLocation().getURL();
 			File workspaceDir = new File(workspaceURL.getPath());
@@ -148,7 +148,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						break;
 					}
 				} catch (StorageException | IOException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 
@@ -167,14 +167,14 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						break;
 					}
 				} catch (StorageException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 		}
 		try {
 			checkCredentials(workspaceData.getPassword());
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 

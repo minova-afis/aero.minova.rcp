@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -22,13 +23,10 @@ public class ZipService {
 	 * @throws IOException
 	 */
 	public static void unzipFile(File fileZip, String destDirName) throws IOException {
-
 		int lastIndexOf = fileZip.toString().lastIndexOf('.');
 		String pathseparator = File.separator;
 		int pathIndex = fileZip.toString().lastIndexOf(pathseparator);
-		
 
-		
 		String targetDir = fileZip.toString().substring(pathIndex + 1, lastIndexOf);
 
 		deleteChildrenInTargetFolder(Path.of(destDirName, targetDir).toFile());
@@ -64,14 +62,15 @@ public class ZipService {
 		}
 	}
 
-	private static void deleteChildrenInTargetFolder(File dir) {
+	private static void deleteChildrenInTargetFolder(File dir) throws IOException {
 		if (!Files.isDirectory(dir.toPath(), LinkOption.NOFOLLOW_LINKS)) {
 			return;
 		}
-		for(File file: dir.listFiles()) 
+		for (File file : dir.listFiles()) {
 			if (!file.isDirectory()) {
-				file.delete();
+				Files.delete(file.toPath());
 			}
+		}
 	}
 
 	public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
@@ -95,16 +94,19 @@ public class ZipService {
 
 		try (ZipOutputStream zs = new ZipOutputStream(Files.newOutputStream(p))) {
 			Path pp = Paths.get(sourceDirPath);
-			Files.walk(pp).filter(path -> !Files.isDirectory(path)).forEach(path -> {
-				ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
-				try {
-					zs.putNextEntry(zipEntry);
-					Files.copy(path, zs);
-					zs.closeEntry();
-				} catch (IOException e) {
-					System.err.println(e);
-				}
-			});
+
+			try (Stream<Path> walk = Files.walk(pp)) {
+				walk.filter(path -> !Files.isDirectory(path)).forEach(path -> {
+					ZipEntry zipEntry = new ZipEntry(pp.relativize(path).toString());
+					try {
+						zs.putNextEntry(zipEntry);
+						Files.copy(path, zs);
+						zs.closeEntry();
+					} catch (IOException e) {
+						// Fehler abfangen
+					}
+				});
+			}
 		}
 	}
 }

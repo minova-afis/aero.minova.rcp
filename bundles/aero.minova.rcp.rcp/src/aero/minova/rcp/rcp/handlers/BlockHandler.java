@@ -131,9 +131,11 @@ public class BlockHandler implements ValueChangeListener {
 				// Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
 				broker.post(Constants.BROKER_RELOADFIELDS, null);
 			}
-		} catch (InterruptedException | ExecutionException e) {
-			// Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
+		} catch (ExecutionException e) { // Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
 			broker.post(Constants.BROKER_RELOADFIELDS, null);
+		} catch (InterruptedException e) { // Bei Misserfolg Felder neu laden, damit blockiert richtig gesetzt wird
+			broker.post(Constants.BROKER_RELOADFIELDS, null);
+			Thread.currentThread().interrupt();
 		}
 
 		// ggf Index neu laden

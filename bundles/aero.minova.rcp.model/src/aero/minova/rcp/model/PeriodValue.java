@@ -30,8 +30,16 @@ public class PeriodValue extends Value {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
+		result = prime * result + ((userInput == null) ? 0 : userInput.hashCode());
+		return result;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
 		if (!(obj instanceof PeriodValue)) {
 			return false;
 		}

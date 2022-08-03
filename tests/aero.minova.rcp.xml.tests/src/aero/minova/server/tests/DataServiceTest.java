@@ -100,7 +100,7 @@ class DataServiceTest {
 			long count = list.filter(f -> f.toString().contains("aero.minova.invoice.helper")).count();
 			assertEquals(1, count, "Jar file nicht oder mehrfach vorhanden");
 		} catch (IOException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 	}
 

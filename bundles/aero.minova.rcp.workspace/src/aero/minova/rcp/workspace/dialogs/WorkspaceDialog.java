@@ -102,7 +102,9 @@ public class WorkspaceDialog extends Dialog {
 						applicationArea.setText("");
 					}
 					loadProfileData();
-				} catch (NullPointerException ex) {}
+				} catch (NullPointerException ex) {
+					logger.error(ex);
+				}
 			}
 		});
 
@@ -116,12 +118,12 @@ public class WorkspaceDialog extends Dialog {
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
+				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText(), logger);
 				try {
 					// Workspace Ordner löschen
 					FileUtils.deleteDirectory(new File(applicationArea.getText().replace("file:", "")));
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					logger.error(e1);
 				}
 				profile.clearSelection();
 				profile.removeAll();

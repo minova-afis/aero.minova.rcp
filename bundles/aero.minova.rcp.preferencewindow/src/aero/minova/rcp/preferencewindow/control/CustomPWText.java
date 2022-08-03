@@ -56,7 +56,7 @@ public abstract class CustomPWText extends CustomPWWidget {
 	/**
 	 * Add the verify listeners
 	 */
-	public abstract void addVerifyListeners();
+	public void addVerifyListeners() {}
 
 	/**
 	 * @return the value of the data typed by the user in the correct format

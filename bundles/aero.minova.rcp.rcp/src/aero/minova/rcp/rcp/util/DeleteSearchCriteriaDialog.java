@@ -42,7 +42,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 	private Button delete;
 
 	private String criteriaName;
-	
+
 	Preferences loadedTablePrefs = InstanceScope.INSTANCE.getNode(Constants.LAST_LOADED_SEARCHCRITERIA);
 
 	public DeleteSearchCriteriaDialog(Shell parent, TranslationService translationService, IEclipsePreferences prefs, String tableName) {
@@ -108,12 +108,11 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 					try {
 						prefs.flush();
 					} catch (BackingStoreException e1) {
-						System.out.println("probleme mit dem Löschen der Kriterien!");
-						e1.printStackTrace();
+						// Fehler beim Persistieren
 					}
 					String prefValue = loadedTablePrefs.get(Constants.LAST_SEARCHCRITERIA, prefCriteriaName);
-					if(prefCriteriaName.equals(prefValue)) {
-						loadedTablePrefs.remove(Constants.LAST_SEARCHCRITERIA);						
+					if (prefCriteriaName.equals(prefValue)) {
+						loadedTablePrefs.remove(Constants.LAST_SEARCHCRITERIA);
 					}
 					criterias.remove(criteriaName);
 					viewer.refresh();
@@ -132,6 +131,7 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 
 	private List<String> getCriteriaNames() {
 		List<String> criterias = new ArrayList<>();
+
 		try {
 			String[] keys = prefs.keys();
 			for (String s : keys) {
@@ -142,8 +142,9 @@ public class DeleteSearchCriteriaDialog extends Dialog {
 				}
 			}
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			// Fehler beim Auslesen
 		}
+
 		return criterias;
 	}
 

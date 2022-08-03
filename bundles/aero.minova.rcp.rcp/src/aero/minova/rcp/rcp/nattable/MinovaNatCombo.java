@@ -20,8 +20,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -133,26 +131,20 @@ public class MinovaNatCombo extends NatCombo {
 		gridData = new GridData(GridData.BEGINNING, SWT.FILL, false, true);
 		iconCanvas.setLayoutData(gridData);
 
-		iconCanvas.addPaintListener(new PaintListener() {
+		iconCanvas.addPaintListener(event -> {
+			GC gc = event.gc;
 
-			@Override
-			public void paintControl(PaintEvent event) {
-				GC gc = event.gc;
+			Rectangle iconCanvasBounds = iconCanvas.getBounds();
+			Rectangle iconImageBounds = iconImage.getBounds();
+			int horizontalAlignmentPadding = CellStyleUtil.getHorizontalAlignmentPadding(HorizontalAlignmentEnum.CENTER, iconCanvasBounds,
+					iconImageBounds.width);
+			int verticalAlignmentPadding = CellStyleUtil.getVerticalAlignmentPadding(VerticalAlignmentEnum.MIDDLE, iconCanvasBounds, iconImageBounds.height);
+			gc.drawImage(iconImage, horizontalAlignmentPadding, verticalAlignmentPadding);
 
-				Rectangle iconCanvasBounds = iconCanvas.getBounds();
-				Rectangle iconImageBounds = iconImage.getBounds();
-				int horizontalAlignmentPadding = CellStyleUtil.getHorizontalAlignmentPadding(HorizontalAlignmentEnum.CENTER, iconCanvasBounds,
-						iconImageBounds.width);
-				int verticalAlignmentPadding = CellStyleUtil.getVerticalAlignmentPadding(VerticalAlignmentEnum.MIDDLE, iconCanvasBounds,
-						iconImageBounds.height);
-				gc.drawImage(iconImage, horizontalAlignmentPadding, verticalAlignmentPadding);
-
-				Color originalFg = gc.getForeground();
-				gc.setForeground(GUIHelper.COLOR_WIDGET_BORDER);
-				gc.drawRectangle(0, 0, iconCanvasBounds.width - 1, iconCanvasBounds.height - 1);
-				gc.setForeground(originalFg);
-			}
-
+			Color originalFg = gc.getForeground();
+			gc.setForeground(GUIHelper.COLOR_WIDGET_BORDER);
+			gc.drawRectangle(0, 0, iconCanvasBounds.width - 1, iconCanvasBounds.height - 1);
+			gc.setForeground(originalFg);
 		});
 
 		iconCanvas.addMouseListener(new MouseAdapter() {
@@ -257,9 +249,6 @@ public class MinovaNatCombo extends NatCombo {
 					if (multiselect && isCtrlPressed) {
 						boolean isSelected = dropdownTable.isSelected(itemTableIndex);
 						selectionStateMap.put(chosenItem.getText(), isSelected);
-						if (useCheckbox) {
-							chosenItem.setChecked(isSelected);
-						}
 					} else {
 						// A single item was selected. Clear all previous state
 						for (String item : itemList) {
@@ -305,7 +294,6 @@ public class MinovaNatCombo extends NatCombo {
 		data.left = new FormAttachment(0);
 		data.right = new FormAttachment(100);
 
-		data = new FormData();
 		dropDownLayoutData.top = new FormAttachment(this.dropdownShell, 0, SWT.TOP);
 		this.dropdownTable.setLayoutData(dropDownLayoutData);
 
@@ -313,7 +301,7 @@ public class MinovaNatCombo extends NatCombo {
 
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				if (null != element && element instanceof String) {
+				if (element instanceof String) {
 					WildcardMatcher matcher = new WildcardMatcher(text.getText().toLowerCase());
 					return matcher.matches(((String) element).toLowerCase());
 				}
@@ -326,8 +314,7 @@ public class MinovaNatCombo extends NatCombo {
 			setItems(this.itemList.toArray(new String[] {}));
 		}
 
-		// apply the listeners that were registered before the creation of the
-		// dropdown control
+		// apply the listeners that were registered before the creation of the dropdown control
 		applyDropdownListener();
 
 		setDropdownSelection(getTextAsArray());

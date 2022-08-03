@@ -126,7 +126,7 @@ public class LifeCycle {
 				try {
 					workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 				} catch (URISyntaxException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 
 				if (workspaceLocation == null) {
@@ -208,7 +208,7 @@ public class LifeCycle {
 				dataService.setCredentials(argUser, argPW, argURL, workspaceLocation);
 				return true;
 			} catch (URISyntaxException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 
@@ -246,7 +246,7 @@ public class LifeCycle {
 					workbenchContext.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, true);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 	}
@@ -266,7 +266,7 @@ public class LifeCycle {
 			Files.deleteIfExists(Path.of(workspaceLocation)
 					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.detailsections.prefs"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -283,7 +283,7 @@ public class LifeCycle {
 			readOut = in.readLine();
 			return readOut;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return "";
 	}
@@ -297,7 +297,7 @@ public class LifeCycle {
 		try {
 			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		Objects.requireNonNull(workspaceLocation);
 		dataService.setLogger(logger);

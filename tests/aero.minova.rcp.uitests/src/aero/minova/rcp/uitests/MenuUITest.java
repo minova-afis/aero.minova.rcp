@@ -106,7 +106,6 @@ public class MenuUITest {
 				counter = checkEntries(menuEntries, counter, menuOrEntry);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}

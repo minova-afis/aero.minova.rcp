@@ -315,7 +315,7 @@ public class PerspectiveControl {
 		try {
 			prefsToolbarOrder.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 

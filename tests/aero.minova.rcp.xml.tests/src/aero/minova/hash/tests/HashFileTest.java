@@ -77,7 +77,7 @@ class HashFileTest {
 
 	@Test
 	@DisplayName("Ensure that two directories with ame content have same hash")
-	void ensureThatWeHasTwoDirectoriesTheSame() throws IOException {
+	void ensureThatWeHashTwoDirectoriesTheSame() throws IOException {
 		// Used https://passwordsgenerator.net/md5-hash-generator/ to calculate the
 		// hashcode with lower case flag set
 		String hashedDir1 = HashService.hashDirectory(Path.of("resources", "copy1"));

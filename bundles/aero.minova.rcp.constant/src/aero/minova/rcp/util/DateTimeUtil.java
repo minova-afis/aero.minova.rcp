@@ -40,7 +40,7 @@ public class DateTimeUtil {
 	}
 
 	public static String getDateTimeString(Instant instant, Locale locale, String datePattern, String timePattern, String timezone) {
-		
+
 		instant = LocalDateTime.ofInstant(instant, ZoneId.of(timezone)).toInstant(ZoneOffset.UTC);
 		String part1 = DateUtil.getDateString(instant, locale, datePattern);
 		String part2 = TimeUtil.getTimeString(instant, locale, timePattern);
@@ -86,7 +86,6 @@ public class DateTimeUtil {
 		} else {
 			return null;
 		}
-		
 
 		if (null != dateIn && null != timeIn) {
 			dateLocal = LocalDate.ofInstant(dateIn, ZoneOffset.UTC);
@@ -99,7 +98,7 @@ public class DateTimeUtil {
 			ZonedDateTime zdt = ZonedDateTime.of(dateLocal, timeLocal, ZoneId.of(zoneId));
 			dateTime = LocalDateTime.ofInstant(zdt.toInstant(), ZoneId.of("UTC")).toInstant(ZoneOffset.UTC);
 		} catch (Exception e) {
-			// Invalid ZoneId;
+			// Invalid ZoneId
 			return null;
 		}
 

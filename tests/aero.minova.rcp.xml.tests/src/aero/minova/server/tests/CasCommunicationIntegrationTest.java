@@ -14,7 +14,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -104,7 +103,7 @@ class CasCommunicationIntegrationTest {
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 		assertEquals(302, response.statusCode());
@@ -126,7 +125,7 @@ class CasCommunicationIntegrationTest {
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 		assertTrue(response.body().length() > 0);
@@ -167,9 +166,8 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertEquals(500, response.statusCode());
 	}
@@ -181,9 +179,8 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertNotNull(response);
 		assertEquals(200, response.statusCode());
@@ -201,9 +198,8 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 		assertEquals(200, response.statusCode());
 	}
@@ -220,9 +216,8 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = null;
 		try {
 			response = httpClient.send(request, BodyHandlers.ofString());
-			// System.out.println(response.body());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 
 		assertEquals(HttpClient.Version.HTTP_1_1, response.version());
@@ -233,11 +228,8 @@ class CasCommunicationIntegrationTest {
 	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
 		String username = "tästuser";
 		String password = "täst";
-		System.out.println("Username: " + username + ", passwort: " + password);
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
-
-		System.out.println("Default Charset=" + Charset.defaultCharset());
 
 		Authenticator authenticator = new Authenticator() {
 			@Override
@@ -260,7 +252,7 @@ class CasCommunicationIntegrationTest {
 		try {
 			response = build.send(request, BodyHandlers.ofString());
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			// Weiter
 		}
 
 		assertEquals(200, response.statusCode());

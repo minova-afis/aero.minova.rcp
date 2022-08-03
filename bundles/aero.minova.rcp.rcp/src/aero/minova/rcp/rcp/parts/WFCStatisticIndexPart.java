@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -119,6 +120,9 @@ public class WFCStatisticIndexPart {
 	@Inject
 	MApplication mApplication;
 
+	@Inject
+	Logger logger;
+
 	private Table data;
 
 	private NatTable natTable;
@@ -158,7 +162,7 @@ public class WFCStatisticIndexPart {
 		data.getColumns().get(3).setLabel(description);
 
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
-		Node statisticNode = XBSUtil.getNodeWithName(preferences, "Statistic");
+		Node statisticNode = XBSUtil.getNodeWithName(preferences, STATISTIC);
 		for (Node n : statisticNode.getNode()) {
 			Row row = RowBuilder.newRow().withValue("").withValue("").withValue("").withValue("").create();
 			row.setValue(new Value(n.getName()), 0);
@@ -336,36 +340,35 @@ public class WFCStatisticIndexPart {
 		String tableName = STATISTIC;
 
 		// Spaltenanordung und -breite
-		String size = "";
+		StringBuilder size = new StringBuilder();
 		for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
-			size += i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";";
-
+			size.append(i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";");
 		}
-		prefs.put(tableName + "." + name + ".index.size", size);
+		prefs.put(tableName + "." + name + ".index.size", size.toString());
 
 		// Sortierung
-		String sort = "";
+		StringBuilder sort = new StringBuilder();
 		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
-			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+			sort.append(i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";");
 		}
-		prefs.put(tableName + "." + name + ".index.sortby", sort);
+		prefs.put(tableName + "." + name + ".index.sortby", sort.toString());
 
 		// Gruppierung
-		String group = "";
+		StringBuilder group = new StringBuilder();
 		if (expandGroups) {
-			group += 1 + ";";
+			group.append(1 + ";");
 		} else {
-			group += 0 + ";";
+			group.append(0 + ";");
 		}
 		for (int i : groupByHeaderLayer.getGroupByModel().getGroupByColumnIndexes()) {
-			group += i + ";";
+			group.append(i + ";");
 		}
-		prefs.put(tableName + "." + name + ".index.groupby", group);
+		prefs.put(tableName + "." + name + ".index.groupby", group.toString());
 
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 
 	}
@@ -559,6 +562,7 @@ public class WFCStatisticIndexPart {
 			try {
 				Thread.sleep(sleepMillis);
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				return;
 			}
 

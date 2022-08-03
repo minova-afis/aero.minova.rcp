@@ -1,5 +1,7 @@
 package aero.minova.rcp.model;
 
+import java.util.Objects;
+
 import aero.minova.rcp.constants.Constants;
 
 /**
@@ -27,8 +29,7 @@ import aero.minova.rcp.constants.Constants;
  */
 public class FilterValue extends Value {
 
-	// public final String filterOperator;
-	private final Value filterValue;
+	private final Value valueToFilterBy;
 	private final String userInput;
 
 	private static final long serialVersionUID = 202102221518L;
@@ -37,10 +38,42 @@ public class FilterValue extends Value {
 		super(operator, DataType.FILTER);
 		this.userInput = userInput;
 		if (value == null) {
-			this.filterValue = null;
+			this.valueToFilterBy = null;
 		} else {
-			this.filterValue = new Value(value);
+			this.valueToFilterBy = new Value(value);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return ValueSerializer.serialize(this).toString();
+	}
+
+	public Value getFilterValue() {
+		return valueToFilterBy;
+	}
+
+	public String getUserInput() {
+		return userInput;
+	}
+
+	public String getUserInputWithoutOperator() {
+		StringBuilder regEx = new StringBuilder();
+		regEx.append("[");
+		for (String operator : Constants.getOperators()) {
+			regEx.append("(" + operator + ")");
+		}
+		regEx.append("]");
+		return userInput.replaceAll(regEx.toString(), "").trim();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((userInput == null) ? 0 : userInput.hashCode());
+		result = prime * result + ((valueToFilterBy == null) ? 0 : valueToFilterBy.hashCode());
+		return result;
 	}
 
 	@Override
@@ -52,37 +85,15 @@ public class FilterValue extends Value {
 		if (v == null) {
 			return false;
 		}
-		if (this.filterValue == null && v.filterValue == null) {
+		if (this.valueToFilterBy == null && v.valueToFilterBy == null) {
 			if (this.userInput.equals(v.userInput)) {
 				return super.equals(obj);
 			} else {
 				return false;
 			}
-		} else if (this.filterValue == null && v.filterValue != null || this.filterValue != null && v.filterValue == null) {
+		} else if (this.valueToFilterBy == null && v.valueToFilterBy != null || this.valueToFilterBy != null && v.valueToFilterBy == null) {
 			return false;
 		}
-		return super.equals(obj) && this.filterValue.equals(v.filterValue);
-	}
-
-	@Override
-	public String toString() {
-		return ValueSerializer.serialize(this).toString();
-	}
-
-	public Value getFilterValue() {
-		return filterValue;
-	}
-
-	public String getUserInput() {
-		return userInput;
-	}
-
-	public String getUserInputWithoutOperator() {
-		String regEx = "[";
-		for (String operator : Constants.OPERATORS) {
-			regEx += "(" + operator + ")";
-		}
-		regEx += "]";
-		return userInput.replaceAll(regEx, "").trim();
+		return super.equals(obj) && Objects.equals(this.valueToFilterBy, v.valueToFilterBy);
 	}
 }
