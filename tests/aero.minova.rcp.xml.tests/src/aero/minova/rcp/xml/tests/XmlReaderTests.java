@@ -32,21 +32,15 @@ class XmlReaderTests {
 	@Test
 	@DisplayName("Ensure that the WorkingTime.xml file for the test is present")
 	void ensureThatLocalWorkingTimeFileIsPresent() throws IOException {
-		assertTrue(path.toFile().exists(), "WorkingTime.xml should be prent for the tests");
+		assertTrue(path.toFile().exists(), "WorkingTime.xml should be present for the tests");
 	}
 
 	@Test
 	@DisplayName("Ensure DataFormService can convert WorkingTime.xml to the correct data type")
 	void dataServiceConvertColumnToDataType() throws Exception {
 
-		Form form = null;
 		String content = Files.readString(path);
-		try {
-			form = XmlProcessor.get(content, Form.class);
-		} catch (Exception e) {
-			// Weiter
-		}
-
+		Form form = XmlProcessor.get(content, Form.class);
 		assertNotNull(form);
 		List<Column> column = form.getIndexView().getColumn();
 		assertEquals(15, column.size());
@@ -58,6 +52,5 @@ class XmlReaderTests {
 		assertEquals(DataType.INSTANT, dfs.getDataType(column.get(7)));// Short-Time
 		assertEquals(DataType.DOUBLE, dfs.getDataType(column.get(8)));
 		assertEquals(DataType.BOOLEAN, dfs.getDataType(column.get(12)));
-
 	}
 }

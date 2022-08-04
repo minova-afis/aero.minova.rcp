@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -119,26 +120,34 @@ public class LifeCycle {
 	 */
 	private URI loginDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog) {
 		try {
-			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-			if (!Platform.getInstanceLocation().isSet()) {
-				Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+			Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
+			if (savedPrimaryWorkspaceAccessData.isPresent()) {
+				ISecurePreferences sPrefs = savedPrimaryWorkspaceAccessData.get();
+				if (!Platform.getInstanceLocation().isSet()) {
+					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
 
-				try {
-					workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-				} catch (URISyntaxException e) {
-					logger.error(e);
-				}
+					workspaceLocation = parseURI(workspaceLocation);
 
-				if (workspaceLocation == null) {
-					WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
-					workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
-				} else {
-					workspaceLocation = checkDefaultWorkspace(workspaceLocation, workspaceDialog, sPrefs);
+					if (workspaceLocation == null) {
+						WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
+						workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+					} else {
+						workspaceLocation = checkDefaultWorkspace(workspaceLocation, workspaceDialog, sPrefs);
+					}
 				}
 			}
 		} catch (Exception e) {
 			logger.error(e);
 			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+		}
+		return workspaceLocation;
+	}
+
+	private URI parseURI(URI workspaceLocation) {
+		try {
+			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+		} catch (URISyntaxException e) {
+			logger.error(e);
 		}
 		return workspaceLocation;
 	}
@@ -165,13 +174,12 @@ public class LifeCycle {
 			dataService.setLogger(logger);
 			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
-			workspaceDialog = new WorkspaceDialog(null, logger, sPrefs.name());
-			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
-			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, logger, sPrefs.name());
+			defaultDialog.setDefaultConnectionString(defaultConnectionString);
+			workspaceLocation = loadWorkspaceConfigManually(defaultDialog, workspaceLocation);
 		}
 
 		return workspaceLocation;
-
 	}
 
 	/**

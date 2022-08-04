@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -21,6 +22,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -38,6 +40,7 @@ import aero.minova.rcp.dataservice.internal.CacheUtil;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
+import aero.minova.rcp.util.OSUtil;
 
 public class LookupComposite extends Composite {
 
@@ -64,6 +67,9 @@ public class LookupComposite extends Composite {
 	@Inject
 	private TranslationService translationService;
 
+	@Inject
+	Logger logger;
+
 	private long popupTime;
 
 	/**
@@ -86,11 +92,8 @@ public class LookupComposite extends Composite {
 
 		final int[] events = new int[] { SWT.Move, SWT.FocusOut };
 		for (final int event : events) {
-			getShell().addListener(event, e -> {
-				popup.setVisible(false);
-			});
+			getShell().addListener(event, e -> popup.setVisible(false));
 		}
-
 	}
 
 	private void addTextListener() {
@@ -117,7 +120,7 @@ public class LookupComposite extends Composite {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (System.getProperty("os.name").startsWith("Linux") && popupTime == -1) {
+				if (OSUtil.isLinux() && popupTime == -1) {
 					return;
 				}
 				text.selectAll();
@@ -160,37 +163,44 @@ public class LookupComposite extends Composite {
 	private Listener createKeyDownListener() {
 		return event -> {
 			if (popupIsOpen()) {
-				switch (event.keyCode) {
-				case SWT.ARROW_DOWN:
-					int index = (table.getSelectionIndex() + 1) % table.getItemCount();
-					table.setSelection(index);
-					event.doit = false;
-					break;
-				case SWT.ARROW_UP:
-					index = table.getSelectionIndex() - 1;
-					if (index < 0) {
-						index = table.getItemCount() - 1;
-					}
-					table.setSelection(index);
-					event.doit = false;
-					break;
-				case SWT.CR:
-				case SWT.KEYPAD_CR:
-					if (popup.isVisible() && table.getSelectionIndex() != -1) {
-						text.setText(table.getSelection()[0].getText());
-						popup.setVisible(false);
-					}
-					break;
-				case SWT.ESC:
-					popup.setVisible(false);
-					break;
-				}
+				traverseTable(event);
 			} else {
 				if (event.keyCode == SWT.ARROW_DOWN || ((event.stateMask & SWT.CTRL) != 0) && (event.keyCode == SWT.SPACE)) {
 					showAllElements(text.getText());
 				}
 			}
 		};
+	}
+
+	private void traverseTable(Event event) {
+		switch (event.keyCode) {
+		case SWT.ARROW_DOWN:
+			int index = (table.getSelectionIndex() + 1) % table.getItemCount();
+			table.setSelection(index);
+			event.doit = false;
+			break;
+		case SWT.ARROW_UP:
+			index = table.getSelectionIndex() - 1;
+			if (index < 0) {
+				index = table.getItemCount() - 1;
+			}
+			table.setSelection(index);
+			event.doit = false;
+			break;
+		case SWT.CR:
+		case SWT.KEYPAD_CR:
+			if (popup.isVisible() && table.getSelectionIndex() != -1) {
+				text.setText(table.getSelection()[0].getText());
+				popup.setVisible(false);
+			}
+			break;
+		case SWT.ESC:
+			popup.setVisible(false);
+			break;
+		default:
+			// do nothing
+			break;
+		}
 	}
 
 	public void showAllElements(String value) {
@@ -289,7 +299,7 @@ public class LookupComposite extends Composite {
 			if (LookupComposite.this.isDisposed() || LookupComposite.this.getDisplay().isDisposed()) {
 				return;
 			}
-			if (System.getProperty("os.name").startsWith("Linux") && popupTime > System.currentTimeMillis()) {
+			if (OSUtil.isLinux() && popupTime > System.currentTimeMillis()) {
 				text.setFocus();
 				popupTime = -1;
 				return;
@@ -473,7 +483,7 @@ public class LookupComposite extends Composite {
 	 */
 	public void setText(final String text) {
 		checkWidget();
-		if (System.getProperty("os.name").startsWith("Linux") && popupTime > System.currentTimeMillis()) {
+		if (OSUtil.isLinux() && popupTime > System.currentTimeMillis()) {
 			return;
 		}
 		this.text.setData(SETTEXT_KEY, Boolean.TRUE);
@@ -541,7 +551,12 @@ public class LookupComposite extends Composite {
 					List<LookupValue> l = listLookup.get();
 					contentProvider.setValues(l);
 					gettingData = false;
-				} catch (InterruptedException | ExecutionException e) {}
+				} catch (ExecutionException e) {
+					logger.error(e);
+				} catch (InterruptedException e) {
+					logger.error(e);
+					Thread.currentThread().interrupt();
+				}
 			} else {
 				MinovaNotifier.show(Display.getCurrent().getActiveShell(), translationService.translate("@msg.ActiveRequest", null),
 						translationService.translate("@Notification", null));
@@ -580,18 +595,15 @@ public class LookupComposite extends Composite {
 	}
 
 	/**
-	 * False, wenn es eine Änderung gab oder mehr als 5 Sekunden zwischen zwei Anfragen vergangen sind.
+	 * False, wenn es eine Änderung gab oder mehr als 2 Sekunden zwischen zwei Anfragen vergangen sind.
 	 */
 	private boolean checkLastState() {
 		String state = CacheUtil.getNameList((MField) this.getData(Constants.CONTROL_FIELD));
 		if (!state.equals(lastRequestState)) {
 			return false;
 		}
-		long time = System.currentTimeMillis();
-		if (time - lastRequestTime >= 2000) {
-			return false;
-		}
-		return true;
+
+		return System.currentTimeMillis() - lastRequestTime < 2000;
 	}
 
 	public List<LookupValue> getPopupValues() {

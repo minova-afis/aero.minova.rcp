@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -48,7 +46,7 @@ class CasCommunicationIntegrationTest {
 	private Gson gson;
 
 	@BeforeEach
-	public void setup() throws UnsupportedEncodingException {
+	public void setup() throws Exception {
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		authentication = new Authenticator() {
@@ -57,7 +55,7 @@ class CasCommunicationIntegrationTest {
 				return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
 			}
 		};
-		// TODO: fix certificate-problems
+
 		httpClient = HttpClient.newBuilder()//
 				.sslContext(disabledSslVerificationContext())//
 				.version(HttpClient.Version.HTTP_2) //
@@ -70,7 +68,7 @@ class CasCommunicationIntegrationTest {
 				.create();
 	}
 
-	private static SSLContext disabledSslVerificationContext() {
+	private static SSLContext disabledSslVerificationContext() throws NoSuchAlgorithmException, KeyManagementException {
 		// Remove certificate validation
 		SSLContext sslContext = null;
 
@@ -87,24 +85,16 @@ class CasCommunicationIntegrationTest {
 			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
 		} };
 
-		try {
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustAllCerts, new SecureRandom());
-		} catch (NoSuchAlgorithmException | KeyManagementException e) {
-			throw new RuntimeException(e);
-		}
+		sslContext = SSLContext.getInstance("TLS");
+		sslContext.init(null, trustAllCerts, new SecureRandom());
+
 		return sslContext;
 	}
 
 	@Test
 	void getAuthentificationIndexHTML() throws Exception {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server)).build();
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
+		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 		assertNotNull(response);
 		assertEquals(302, response.statusCode());
 	}
@@ -121,12 +111,8 @@ class CasCommunicationIntegrationTest {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
+		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+
 		assertNotNull(response);
 		assertTrue(response.body().length() > 0);
 		SqlProcedureResult sql = gson.fromJson(response.body(), SqlProcedureResult.class);
@@ -163,31 +149,24 @@ class CasCommunicationIntegrationTest {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/data/procedure")) //
 				.header("Content-Type", "application/json") //
 				.POST(BodyPublishers.ofString(body)).build();
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
+		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+
 		assertEquals(500, response.statusCode());
 	}
 
 	@Test
-	void ensureLoginWorks() {
+	void ensureLoginWorks() throws Exception {
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/login")).build();
 		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
+		response = httpClient.send(request, BodyHandlers.ofString());
+
 		assertNotNull(response);
 		assertEquals(200, response.statusCode());
 	}
 
 	@Test
-	void getIndexData() {
+	void getIndexData() throws Exception {
 		String body = "{\"name\":\"xvcorWorkingTimeIndex2\",\"columns\":[{\"name\":\"\\u0026\",\"type\":\"BOOLEAN\",\"outputType\":\"OUTPUT\",\"label\":\"\\u0026\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"KeyLong\",\"type\":\"INTEGER\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.KeyLong\",\"decimals\":0,\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"EmployeeText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.EmployeeText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"CustomerText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.CustomerText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ProjectText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ProjectText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ServiceText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ServiceText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"BookingDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.BookingDate\",\"dateTimeType\":\"DATE\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"StartDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.StartDate\",\"dateTimeType\":\"TIME\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"EndDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.EndDate\",\"dateTimeType\":\"TIME\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"RenderedQuantity\",\"type\":\"DOUBLE\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.RenderedQuantity\",\"decimals\":2,\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ChargedQuantity\",\"type\":\"DOUBLE\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ChargedQuantity\",\"decimals\":2,\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"Description\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.Description\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ServiceContractText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ServiceContractText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"Assigned\",\"type\":\"BOOLEAN\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.Assigned\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"LastDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.LastDate\",\"dateTimeType\":\"DATETIME\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"InvoiceText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.InvoiceText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true}],\"rows\":[{\"values\":[\"b-false\",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}]}";
 
 		String url = server + "/data/index";
@@ -195,37 +174,27 @@ class CasCommunicationIntegrationTest {
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body)).build();
 
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
+		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
+
 	}
 
 	@Test
 	@DisplayName("CAS Issue #184, HTTP Version 1")
-	void ensureThatTheServerUsesAnAncientProtocol() {
+	void ensureThatTheServerUsesAnAncientProtocol() throws Exception {
 		String body = "";
 		String url = server + "/data/index";
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
 				.header("Content-Type", "application/json") //
 				.method("GET", BodyPublishers.ofString(body)).build();
 
-		HttpResponse<String> response = null;
-		try {
-			response = httpClient.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
-
+		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 		assertEquals(HttpClient.Version.HTTP_1_1, response.version());
 	}
 
 	@Test
 	@DisplayName("Passwort mit Umlaut, WFC Issue #743")
-	void ensureLoginWithUmlautInPassword() throws UnsupportedEncodingException {
+	void ensureLoginWithUmlautInPassword() throws Exception {
 		String username = "tästuser";
 		String password = "täst";
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
@@ -248,14 +217,7 @@ class CasCommunicationIntegrationTest {
 				.header("Content-Type", "application/xml; charset=utf-8") //
 				.method("GET", BodyPublishers.ofString(body)).build();
 
-		HttpResponse<String> response = null;
-		try {
-			response = build.send(request, BodyHandlers.ofString());
-		} catch (IOException | InterruptedException e) {
-			// Weiter
-		}
-
+		HttpResponse<String> response = build.send(request, BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
 	}
-
 }

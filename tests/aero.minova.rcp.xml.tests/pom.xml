@@ -21,10 +21,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
                 <version>${tycho.version}</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <excludes>
-                        <!-- Tests trying to access the server-->
-                        <exclude>ReadDetailFromMaskTest</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

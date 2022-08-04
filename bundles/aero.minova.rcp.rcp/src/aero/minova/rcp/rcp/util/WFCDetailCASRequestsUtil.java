@@ -20,6 +20,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -101,6 +102,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	IEventBroker broker;
+
+	@Inject
+	Logger logger;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_RELOAD_INDEX)
@@ -649,7 +653,12 @@ public class WFCDetailCASRequestsUtil {
 			CompletableFuture<List<TransactionResultEntry>> transactionResult = dataService.callTransactionAsync(procedureList);
 			try {
 				deleteEntry(transactionResult.get());
-			} catch (InterruptedException | ExecutionException e) {}
+			} catch (ExecutionException e) {
+				logger.error(e);
+			} catch (InterruptedException e) {
+				logger.error(e);
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 
