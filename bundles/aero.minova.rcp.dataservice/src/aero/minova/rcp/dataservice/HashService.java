@@ -54,7 +54,7 @@ public class HashService {
 				try {
 					md.update(hashFile(f.toFile()).getBytes());
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					throw new RuntimeException("Error while trying to Hash File " + f.getFileName(), e);
 				}
 			});
 		}
