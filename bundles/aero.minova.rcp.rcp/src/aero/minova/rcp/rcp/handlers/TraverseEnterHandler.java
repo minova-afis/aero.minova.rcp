@@ -23,10 +23,7 @@ import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Twistie;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Column;
@@ -158,7 +155,7 @@ public class TraverseEnterHandler {
 			popupOpen = lookup.popupIsOpen();
 		}
 
-		Composite comp = getCompositeFromSection(fcSection);
+		Composite comp = (Composite) fcSection.getClient();
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
@@ -238,7 +235,7 @@ public class TraverseEnterHandler {
 
 			for (MSection mSection : mDetail.getMSectionList()) {
 				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
-				Composite compo = getCompositeFromSection(section);
+				Composite compo = (Composite) section.getClient();
 				List<Control> tabList = Arrays.asList(compo.getTabList());
 				Control fc = getNextRequiredControl(tabList);
 
@@ -251,25 +248,6 @@ public class TraverseEnterHandler {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Findet das Composite, dass die Felder enthält.
-	 * 
-	 * @param section
-	 * @return Das Composite, dass die Felder enthält. NICHT null, jede Section hat ein gewünschtes Composite
-	 */
-	private Composite getCompositeFromSection(Section section) {
-		System.out.println("---");
-		System.out.println(section.getClient());
-
-		for (Control child : section.getChildren()) {
-			if (child instanceof Composite && !(child instanceof ToolBar) && !(child instanceof ImageHyperlink) && !(child instanceof Twistie)) {
-				System.out.println(child);
-				return (Composite) child;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -325,7 +303,7 @@ public class TraverseEnterHandler {
 	 */
 	private Control getNextRequiredControlOtherSection(List<Section> sectionList) {
 		for (Section section : sectionList) {
-			Composite compo = getCompositeFromSection(section);
+			Composite compo = (Composite) section.getClient();
 			List<Control> tabList = Arrays.asList(compo.getTabList());
 			Control fc = getNextRequiredControl(tabList);
 			if (fc != null) {
