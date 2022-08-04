@@ -1,7 +1,7 @@
 # Changelog
 All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
-Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
+Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 Mögliche Tags für Änderungen:
 
@@ -10,7 +10,7 @@ Mögliche Tags für Änderungen:
 - `Bugfixes` für Ausbessern von Fehlern
 - `Doku` für neue/geänderte Dokumentation
 
-Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https://github.com/minova-afis/aero.minova.rcp/releases[Releasenotes] kopiert.
+Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenotes](https://github.com/minova-afis/aero.minova.rcp/releases) kopiert.
 
 ## [Unreleased]
 
@@ -40,13 +40,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - Zum Überprüfen, ob ein Datensatz im Detail geladen ist, erstes primary-Feld nutzen, statt fest Feld mit "KeyLong". Damit kann auch in Masken ohne "KeyLong" Feld gelöscht werden
 - Indexdruck mit DateTimeSpalten ermöglichen, Datums-/Zeitformat und Zeitzone aus Einstellungen nutzen
 - Beschreibung von Lookups in Wizards anzeigen
-- DirtyFlag verbessern 
-** Flag nach Laden eines Datensatzes neu berechnen 
-** `null` Values von ParamString und Period korrekt überprüfen
+- DirtyFlag verbessern  
+  - Flag nach Laden eines Datensatzes neu berechnen 
+  - `null` Values von ParamString und Period korrekt überprüfen
 - ParamString verbessern
-** Weitere Felder im selben Abschnitt ermöglichen
-** Unterfelder entfernen, wenn null-Form aufgerufen wird
-** Nach Neuzeichnen der Section selbes Feld wieder auswählen
+  - Weitere Felder im selben Abschnitt ermöglichen
+  - Unterfelder entfernen, wenn null-Form aufgerufen wird
+  - Nach Neuzeichnen der Section selbes Feld wieder auswählen
 
 
 ## [12.2.1] - 2022-07-14
@@ -119,6 +119,4 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die link:https:/
 - Kopfsection in Statistik-Ansicht wird sofort nach dem Erstellen gestylt
 
 ### Doku
-- link:https://github.com/minova-afis/aero.minova.rcp/wiki/Erstellen-von-Grids-in-XML-Maske[Erstellen von Grids in XML Maske]
-
-
+- [Erstellen von Grids in XML Maske](https://github.com/minova-afis/aero.minova.rcp/wiki/Erstellen-von-Grids-in-XML-Maske)
