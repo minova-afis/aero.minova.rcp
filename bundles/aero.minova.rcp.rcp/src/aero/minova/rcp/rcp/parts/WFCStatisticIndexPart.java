@@ -91,6 +91,7 @@ import aero.minova.rcp.rcp.nattable.MinovaStatisticConfiguration;
 import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.util.OSUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -247,7 +248,7 @@ public class WFCStatisticIndexPart {
 				// multi
 				int keyMask = SWT.MOD3;
 				// für Linux andere Tastenkombi definieren
-				if (System.getProperty("os.name").startsWith("Linux")) {
+				if (OSUtil.isLinux()) {
 					keyMask |= SWT.MOD2;
 				}
 				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));

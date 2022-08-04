@@ -28,6 +28,7 @@ import aero.minova.rcp.model.PeriodValue;
 import aero.minova.rcp.model.form.MPeriodField;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.util.DateUtil;
+import aero.minova.rcp.util.OSUtil;
 
 public class PeriodComposite extends Composite {
 
@@ -112,7 +113,7 @@ public class PeriodComposite extends Composite {
 		Control text;
 		LocalDateTime time = LocalDateTime.of(LocalDate.of(2000, 01, 01), LocalTime.of(11, 59));
 
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (OSUtil.isLinux()) {
 			text = createLinuxControl(composite, contentProvider, dueField, time);
 		} else {
 			text = createTextAssistControl(composite, contentProvider, dueField, time);

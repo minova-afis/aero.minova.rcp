@@ -4,7 +4,11 @@ public class OSUtil {
 	private OSUtil() {}
 
 	public static boolean isLinux() {
-		return System.getProperty("os.name").startsWith("Linux");
+		return System.getProperty("os.name").toLowerCase().startsWith("linux");
+	}
+
+	public static boolean isMac() {
+		return System.getProperty("os.name").toLowerCase().startsWith("mac");
 	}
 
 }
