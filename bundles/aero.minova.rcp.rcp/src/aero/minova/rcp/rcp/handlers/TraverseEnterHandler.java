@@ -253,9 +253,19 @@ public class TraverseEnterHandler {
 		}
 	}
 
+	/**
+	 * Findet das Composite, dass die Felder enthält.
+	 * 
+	 * @param section
+	 * @return Das Composite, dass die Felder enthält. NICHT null, jede Section hat ein gewünschtes Composite
+	 */
 	private Composite getCompositeFromSection(Section section) {
+		System.out.println("---");
+		System.out.println(section.getClient());
+
 		for (Control child : section.getChildren()) {
 			if (child instanceof Composite && !(child instanceof ToolBar) && !(child instanceof ImageHyperlink) && !(child instanceof Twistie)) {
+				System.out.println(child);
 				return (Composite) child;
 			}
 		}
