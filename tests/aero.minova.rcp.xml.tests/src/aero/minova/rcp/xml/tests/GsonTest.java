@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -81,7 +82,7 @@ class GsonTest {
 	}
 
 	@Test
-	void readExample() throws Exception {
+	void readExample() throws IOException  {
 
 		String content = Files.readString(path);
 		Gson gson = new Gson();

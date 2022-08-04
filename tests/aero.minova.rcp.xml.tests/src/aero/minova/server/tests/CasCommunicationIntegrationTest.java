@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -46,7 +48,7 @@ class CasCommunicationIntegrationTest {
 	private Gson gson;
 
 	@BeforeEach
-	public void setup() throws Exception {
+	public void setup() throws UnsupportedEncodingException, KeyManagementException, NoSuchAlgorithmException {
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		String encodedPW = new String(password.getBytes(), StandardCharsets.ISO_8859_1.toString());
 		authentication = new Authenticator() {
@@ -92,7 +94,7 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	void getAuthentificationIndexHTML() throws Exception {
+	void getAuthentificationIndexHTML() throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server)).build();
 		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 		assertNotNull(response);
@@ -100,7 +102,7 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	void postProcedureWithResultSet() throws Exception {
+	void postProcedureWithResultSet() throws IOException, InterruptedException {
 		String body = "{\n" + "    \"name\": \"xpcorWorkingTimeServiceResolve\",\n" + "    \"columns\": [\n" + "        {\n"
 				+ "            \"name\": \"KeyLong\",\n" + "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n"
 				+ "            \"name\": \"KeyText\",\n" + "            \"type\": \"STRING\"\n" + "        }\n" + "        , {\n"
@@ -125,7 +127,7 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	void postProcedureWithReturnCode() throws Exception {
+	void postProcedureWithReturnCode() throws IOException, InterruptedException {
 		String body = "{\n" + "    \"name\": \"xpcorInsertWorkingTime\",\n" + "    \"columns\": [\n" + "        {\n" + "            \"name\": \"KeyLong\",\n"
 				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"EmployeeKey\",\n"
 				+ "            \"type\": \"INTEGER\"\n" + "        }\n" + "        , {\n" + "            \"name\": \"ServiceContractKey\",\n"
@@ -155,7 +157,7 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	void ensureLoginWorks() throws Exception {
+	void ensureLoginWorks() throws IOException, InterruptedException {
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "/login")).build();
 		HttpResponse<String> response = null;
@@ -166,7 +168,7 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	void getIndexData() throws Exception {
+	void getIndexData() throws IOException, InterruptedException {
 		String body = "{\"name\":\"xvcorWorkingTimeIndex2\",\"columns\":[{\"name\":\"\\u0026\",\"type\":\"BOOLEAN\",\"outputType\":\"OUTPUT\",\"label\":\"\\u0026\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"KeyLong\",\"type\":\"INTEGER\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.KeyLong\",\"decimals\":0,\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"EmployeeText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.EmployeeText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"CustomerText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.CustomerText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ProjectText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ProjectText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ServiceText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ServiceText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"BookingDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.BookingDate\",\"dateTimeType\":\"DATE\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"StartDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.StartDate\",\"dateTimeType\":\"TIME\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"EndDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.EndDate\",\"dateTimeType\":\"TIME\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"RenderedQuantity\",\"type\":\"DOUBLE\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.RenderedQuantity\",\"decimals\":2,\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ChargedQuantity\",\"type\":\"DOUBLE\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ChargedQuantity\",\"decimals\":2,\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"Description\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.Description\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"ServiceContractText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.ServiceContractText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"Assigned\",\"type\":\"BOOLEAN\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.Assigned\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"LastDate\",\"type\":\"INSTANT\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.LastDate\",\"dateTimeType\":\"DATETIME\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true},{\"name\":\"InvoiceText\",\"type\":\"STRING\",\"outputType\":\"OUTPUT\",\"label\":\"@WorkingTime.InvoiceText\",\"readOnly\":false,\"required\":false,\"isLookup\":false,\"visible\":true}],\"rows\":[{\"values\":[\"b-false\",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}]}";
 
 		String url = server + "/data/index";
@@ -181,7 +183,7 @@ class CasCommunicationIntegrationTest {
 
 	@Test
 	@DisplayName("CAS Issue #184, HTTP Version 1")
-	void ensureThatTheServerUsesAnAncientProtocol() throws Exception {
+	void ensureThatTheServerUsesAnAncientProtocol() throws IOException, InterruptedException {
 		String body = "";
 		String url = server + "/data/index";
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
@@ -194,7 +196,7 @@ class CasCommunicationIntegrationTest {
 
 	@Test
 	@DisplayName("Passwort mit Umlaut, WFC Issue #743")
-	void ensureLoginWithUmlautInPassword() throws Exception {
+	void ensureLoginWithUmlautInPassword() throws IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
 		String username = "tästuser";
 		String password = "täst";
 		String encodedUser = new String(username.getBytes(), StandardCharsets.ISO_8859_1.toString());

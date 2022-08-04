@@ -2,6 +2,7 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -9,10 +10,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -22,12 +23,10 @@ import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
-import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Column;
@@ -37,8 +36,6 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.preferences.ApplicationPreferences;
-import aero.minova.rcp.preferencewindow.builder.DisplayType;
-import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
@@ -51,6 +48,14 @@ import aero.minova.rcp.widgets.LookupComposite;
  * @author bauer
  */
 public class TraverseEnterHandler {
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED)
+	boolean lookupEnterSelectsNextRequired;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED)
+	boolean enterSelectsFirstRequired;
 
 	@Inject
 	@Named(TranslationService.LOCALE)
@@ -129,11 +134,6 @@ public class TraverseEnterHandler {
 	 * @param popupOpen
 	 */
 	private void getNextRequired(Control control, MDetail mDetail, boolean popupOpen) {
-		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-		boolean lookupEnterSelectsNextRequired = (boolean) InstancePreferenceAccessor.getValue(preferences,
-				ApplicationPreferences.LOOKUP_ENTER_SELECTS_NEXT_REQUIRED, DisplayType.CHECK, true, locale);
-		boolean enterSelectsFirstRequired = (boolean) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.ENTER_SELECTS_FIRST_REQUIRED,
-				DisplayType.CHECK, true, locale);
 
 		Control focussedControl = null;
 
@@ -144,10 +144,7 @@ public class TraverseEnterHandler {
 		}
 
 		// Wir holen uns das MField des selektierten Felds.
-		Control fc = null;
-		Composite comp = null;
 		Section fcSection = null;
-
 		if (focussedControl instanceof NatTable) {
 			fcSection = (Section) focussedControl.getData(Constants.GRID_DATA_SECTION);
 			((NatTable) focussedControl).commitAndCloseActiveCellEditor();
@@ -161,12 +158,7 @@ public class TraverseEnterHandler {
 			popupOpen = lookup.popupIsOpen();
 		}
 
-		for (Control children : fcSection.getChildren()) {
-			if (children instanceof Composite && !(children instanceof ToolBar) && !(children instanceof ImageHyperlink) && !(children instanceof Twistie)) {
-				comp = (Composite) children;
-				break;
-			}
-		}
+		Composite comp = getCompositeFromSection(fcSection);
 
 		// Wir prüfen ob die Preference LookupEnterSelectsNextRequired nicht gesetzt ist und das Lookup offen ist.
 		if (!lookupEnterSelectsNextRequired && popupOpen) {
@@ -204,35 +196,32 @@ public class TraverseEnterHandler {
 			}
 
 			if (!cellSelected) {
-				Control[] tabListArrayFromFocussedControlSection = comp.getTabList();
-				List<Control> tabListFromFocussedControlSection = arrayToList(tabListArrayFromFocussedControlSection);
+				List<Control> tabListFromFocussedControlSection = Arrays.asList(comp.getTabList());
 				List<Section> sectionList = ((DetailAccessor) mDetail.getDetailAccessor()).getSectionList();
 
 				// [0,1,2,3,4,5,6,7,8,9] --> sublist(0,5) = [0,1,2,3,4]
 				int indexFocussedControl = tabListFromFocussedControlSection.indexOf(focussedControl);
-				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(indexFocussedControl + 1, tabListFromFocussedControlSection.size()));
+				Control fc = getNextRequiredControl(
+						tabListFromFocussedControlSection.subList(indexFocussedControl + 1, tabListFromFocussedControlSection.size()));
 				if (fc != null) {
 					return;
 				}
 
 				int indexFocussedControlSection = sectionList.indexOf(fcSection);
-				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
+				fc = getNextRequiredControlOtherSection(sectionList.subList(indexFocussedControlSection + 1, sectionList.size()));
 				if (fc != null) {
 					return;
 				}
 
-				fc = getNextRequiredControlOtherSection(focussedControl, sectionList.subList(0, indexFocussedControlSection + 1));
+				fc = getNextRequiredControlOtherSection(sectionList.subList(0, indexFocussedControlSection + 1));
 				if (fc != null) {
 					return;
 				}
 
 				fc = getNextRequiredControl(tabListFromFocussedControlSection.subList(0, indexFocussedControl + 1));
-				if (fc == null) {
-					if (focussedControl instanceof LookupComposite) {
-						lookup = (LookupComposite) focussedControl;
-						lookup.closePopup();
-					}
-					return;
+				if (fc == null && focussedControl instanceof LookupComposite) {
+					lookup = (LookupComposite) focussedControl;
+					lookup.closePopup();
 				}
 			}
 		} else {
@@ -248,27 +237,29 @@ public class TraverseEnterHandler {
 			}
 
 			for (MSection mSection : mDetail.getMSectionList()) {
-				Composite compo = null;
 				Section section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
-				for (Control children : section.getChildren()) {
-					if (children instanceof Composite && !(children instanceof ToolBar || children instanceof Twistie || children instanceof ImageHyperlink)) {
-						compo = (Composite) children;
-						break;
-					}
-				}
-				List<Control> tabList = arrayToList(compo.getTabList());
-				fc = getNextRequiredControl(tabList);
+				Composite compo = getCompositeFromSection(section);
+				List<Control> tabList = Arrays.asList(compo.getTabList());
+				Control fc = getNextRequiredControl(tabList);
+
 				if (fc != null) {
 					if (focussedControl instanceof LookupComposite) {
 						lookup = (LookupComposite) focussedControl;
 						lookup.closePopup();
 					}
 					return;
-				} else {
-					continue;
 				}
 			}
 		}
+	}
+
+	private Composite getCompositeFromSection(Section section) {
+		for (Control child : section.getChildren()) {
+			if (child instanceof Composite && !(child instanceof ToolBar) && !(child instanceof ImageHyperlink) && !(child instanceof Twistie)) {
+				return (Composite) child;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -322,24 +313,17 @@ public class TraverseEnterHandler {
 	 *            Liste mit Sections
 	 * @return
 	 */
-	private Control getNextRequiredControlOtherSection(Control focussedControl, List<Section> sectionList) {
-		Control fc = null;
-		Composite compo = null;
+	private Control getNextRequiredControlOtherSection(List<Section> sectionList) {
 		for (Section section : sectionList) {
-			for (Control children : section.getChildren()) {
-				if (children instanceof Composite
-						&& !(children instanceof Label || children instanceof ToolBar || children instanceof ImageHyperlink || children instanceof Twistie)) {
-					compo = (Composite) children;
-				}
-			}
-			List<Control> tabList = arrayToList(compo.getTabList());
-			fc = getNextRequiredControl(tabList);
+			Composite compo = getCompositeFromSection(section);
+			List<Control> tabList = Arrays.asList(compo.getTabList());
+			Control fc = getNextRequiredControl(tabList);
 			if (fc != null) {
 				return fc;
 			}
 		}
 
-		return fc;
+		return null;
 	}
 
 	/**
@@ -367,8 +351,9 @@ public class TraverseEnterHandler {
 
 			// Nächstes leeres Pflichtfeld nach der selektierten Zelle in der selben Row ermitteln
 			for (int ic = ics + 1; ic < selectionLayer.getColumnCount(); ic++) {
-				if (selectEmptyRequiredCell(natTable, dataTable, selectionLayer, irs, ics, countFromSelectedCell))
+				if (selectEmptyRequiredCell(natTable, dataTable, selectionLayer, irs, ics)) {
 					return true;
+				}
 			}
 		}
 
@@ -376,14 +361,15 @@ public class TraverseEnterHandler {
 		// irs kann 0 oder der Rowindex der selektierten Zelle sein
 		for (int ir = irs + 1; ir < selectionLayer.getRowCount(); ir++) {
 			for (int ic = -1; ic < selectionLayer.getColumnCount(); ic++) {
-				if (selectEmptyRequiredCell(natTable, dataTable, selectionLayer, ir, ic, false))
+				if (selectEmptyRequiredCell(natTable, dataTable, selectionLayer, ir, ic)) {
 					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	private boolean selectEmptyRequiredCell(NatTable natTable, Table dataTable, SelectionLayer selectionLayer, int irs, int ic, boolean cellSelected) {
+	private boolean selectEmptyRequiredCell(NatTable natTable, Table dataTable, SelectionLayer selectionLayer, int irs, int ic) {
 		List<Column> visibleColumns = new ArrayList<>();
 		for (Column column : dataTable.getColumns()) {
 			if (column.isVisible()) {
@@ -394,24 +380,15 @@ public class TraverseEnterHandler {
 		for (int i = ic + 1; i < selectionLayer.getColumnCount(); i++) {
 			int index = selectionLayer.getColumnIndexByPosition(i);
 			Column column = dataTable.getColumns().get(index);
-			if (column.isRequired()) {
-				if (dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())) == null
-						|| dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
-					natTable.setFocus();
-					return natTable.doCommand(new SelectCellCommand(selectionLayer, i, irs, false, false));
-				}
+			if (column.isRequired() && dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())) == null
+					|| dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
+				natTable.setFocus();
+				return natTable.doCommand(new SelectCellCommand(selectionLayer, i, irs, false, false));
 			}
 		}
 
 		return false;
-	}
 
-	private List<Control> arrayToList(Control[] tabListArray) {
-		List<Control> tabList = new ArrayList<>();
-		for (Control control : tabListArray) {
-			tabList.add(control);
-		}
-		return tabList;
 	}
 
 	private void setLookupValue(MField field, LookupComposite lookup) {

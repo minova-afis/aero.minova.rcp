@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -84,7 +85,7 @@ class DataServiceTest {
 
 	@Test
 	@DisplayName("Ensure we can download aero.minova.invoice.helper")
-	void ensureDownloadOfPlugin() throws Exception {
+	void ensureDownloadOfPlugin() throws IOException {
 		boolean hashedZip = dataService.getHashedZip("plugins.zip");
 		assertTrue(hashedZip);
 		Path storagePath = dataService.getStoragePath();

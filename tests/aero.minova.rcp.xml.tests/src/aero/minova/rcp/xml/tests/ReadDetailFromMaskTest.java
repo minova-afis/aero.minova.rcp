@@ -2,8 +2,11 @@ package aero.minova.rcp.xml.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import javax.xml.bind.JAXBException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +28,7 @@ class ReadDetailFromMaskTest {
 	}
 
 	@Test
-	void checkColumnNames() throws Exception {
+	void checkColumnNames() throws IOException, JAXBException {
 		String content = Files.readString(path);
 		Form form = XmlProcessor.get(content, Form.class);
 		Table tableFromFormDetail = dfs.getTableFromFormDetail(form, "Read");
@@ -47,7 +50,7 @@ class ReadDetailFromMaskTest {
 	}
 
 	@Test
-	void dataServiceReadDataWithProcedureSuffix() throws Exception {
+	void dataServiceReadDataWithProcedureSuffix() throws IOException, JAXBException {
 		String content = Files.readString(path);
 		Form form = XmlProcessor.get(content, Form.class);
 		form.getDetail().setProcedurePrefix("xtsap");
@@ -56,7 +59,7 @@ class ReadDetailFromMaskTest {
 	}
 
 	@Test
-	void dataServiceReadOptionpage() throws Exception {
+	void dataServiceReadOptionpage() throws IOException, JAXBException {
 		String content = Files.readString(path);
 		Form form = XmlProcessor.get(content, Form.class);
 		form.setIndexView(null);

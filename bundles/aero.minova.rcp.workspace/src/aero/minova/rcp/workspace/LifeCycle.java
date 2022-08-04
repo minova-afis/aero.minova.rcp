@@ -132,7 +132,7 @@ public class LifeCycle {
 						WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
 						workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 					} else {
-						workspaceLocation = checkDefaultWorkspace(workspaceLocation, workspaceDialog, sPrefs);
+						workspaceLocation = checkDefaultWorkspace(workspaceLocation, sPrefs);
 					}
 				}
 			}
@@ -161,7 +161,7 @@ public class LifeCycle {
 	 * @return
 	 * @throws StorageException
 	 */
-	private URI checkDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog, ISecurePreferences sPrefs) throws StorageException {
+	private URI checkDefaultWorkspace(URI workspaceLocation, ISecurePreferences sPrefs) throws StorageException {
 		String username = sPrefs.get(WorkspaceAccessPreferences.USER, null);
 		String pw = sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null);
 		String url = sPrefs.get(WorkspaceAccessPreferences.URL, null);
