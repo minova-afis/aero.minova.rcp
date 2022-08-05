@@ -33,7 +33,7 @@ public class SelectSearchPart {
 		if (searchPart == null) {
 			return;
 		}
-		NatTable natTable = searchPart.getNatTable();
+		NatTable natTable = searchPart.getNattable();
 		if (natTable == null) {
 			return;
 		}

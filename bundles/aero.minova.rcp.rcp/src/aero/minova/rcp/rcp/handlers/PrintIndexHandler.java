@@ -29,6 +29,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByObject;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.summary.IGroupBySummaryProvider;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
@@ -158,7 +159,7 @@ public class PrintIndexHandler {
 			columnReorderLayer.getColumnIndexOrder();
 
 			// Gruppierung
-			TreeList<Row> treeList = indexPart.getBodyLayerStack().getBodyDataLayer().getTreeList();
+			TreeList<Row> treeList = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
 			List<Integer> groupByIndicesReordered = new ArrayList<>();
 
@@ -347,7 +348,8 @@ public class PrintIndexHandler {
 
 					// Tabelle wird nur für "tiefste" Gruppe gedruckt
 					if (gbo.getDescriptor().containsKey(groupByIndices.get(groupByIndices.size() - 1))) {
-						addRows(xml, indexPart.getBodyLayerStack().getBodyDataLayer().getItemsInGroup(gbo), colConfig, columnReorderList, numberFormat);
+						addRows(xml, ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo), colConfig, columnReorderList,
+								numberFormat);
 					}
 
 					// Zusammenfassung als String erstellen und für später speichern
@@ -413,11 +415,12 @@ public class PrintIndexHandler {
 
 		for (int i = 0; i < colConfig.size(); i++) {
 			LabelStack labelStack = layer.getConfigLabelsByPosition(i, rowIndex);
-			IGroupBySummaryProvider<Row> summaryProvider = indexPart.getBodyLayerStack().getBodyDataLayer().getGroupBySummaryProvider(labelStack);
+			IGroupBySummaryProvider<Row> summaryProvider = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer())
+					.getGroupBySummaryProvider(labelStack);
 
 			if (summaryProvider != null) {
 				int columnIndex = columnReorderList.get(i);
-				List<Row> children = indexPart.getBodyLayerStack().getBodyDataLayer().getItemsInGroup(gbo);
+				List<Row> children = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo);
 				Object summary = summaryProvider.summarize(columnIndex, children);
 				if (summary instanceof Double) {
 					summary = numberFormat.format(summary);
