@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -90,94 +91,14 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 	private boolean checkFields() {
 		// Prüfung der mFields ob es einen Value ≠ null gibt
 		if (casUtil.getSelectedTable() == null || casUtil.getSelectedTable().getRows().isEmpty()) {
-			for (MField mfield : mDetail.getFields()) {
-				if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
-					if (Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
-						return true;
-					}
-				} else if (mfield instanceof MParamStringField) {
-					if (!((MParamStringField) mfield).isNullValue()) {
-						return true;
-					}
-				} else if (mfield instanceof MPeriodField) {
-					if (!((MPeriodField) mfield).isNullValue()) {
-						return true;
-					}
-				} else if (mfield.getValue() != null) {
-					return true;
-				}
-			}
-			return false;
+			return checkFieldsEmpty(mDetail.getFields());
 		}
 
 		return checkFieldsWithTable(casUtil.getSelectedTable(), form);
 	}
 
-	/**
-	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
-	 */
-	private boolean checkFieldsWithTable(Table t, Form f) {
-		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
-		List<MField> checkedFields = new ArrayList<>();
-		for (int i = 0; i < t.getColumnCount(); i++) {
-			MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
-			checkedFields.add(c);
-			Value sV = t.getRows().get(0).getValue(i);
-			if (c == null) {
-				continue;
-			}
-			if (c instanceof MLookupField) {
-				// LU mit index 0 gibt es nie
-				if (c.getValue() == null && sV != null && sV.getIntegerValue() == 0) {
-					continue;
-				}
-
-				if (sV == null && c.getValue() != null || //
-						sV != null && c.getValue() == null || //
-						c.getValue() != null && !c.getValue().getIntegerValue().equals(sV.getIntegerValue())) {
-					return true;
-				}
-			} else if (c instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> spezielle Prüfung
-				if (sV == null && !c.getValue().getBooleanValue()) { // TableValue null -> Booleanfeld Wert soll false sein
-					continue;
-				}
-
-				if (!Objects.equals(c.getValue(), sV)) {
-					return true;
-				}
-			} else if (c instanceof MParamStringField) {
-				if (sV == null && ((MParamStringField) c).isNullValue()) { // Auch "leeren" ParamString Wert prüfen
-					continue;
-				}
-
-				if (!Objects.equals(c.getValue(), sV)) {
-					return true;
-				}
-			} else if (c instanceof MPeriodField) {
-				if (sV == null && ((MPeriodField) c).isNullValue()) { // Auch "leeren" Period Wert prüfen
-					continue;
-				}
-
-				if (!Objects.equals(c.getValue(), sV)) {
-					return true;
-				}
-			} else if (!Objects.equals(c.getValue(), sV)) {
-				return true;
-			}
-		}
-
-		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
-		return checkFieldsEmpty(dataFormService.getFieldsFromForm(f), fieldPrefix, checkedFields);
-	}
-
-	private boolean checkFieldsEmpty(List<Field> fieldsToCheck, String fieldPrefix, List<MField> checkedFields) {
-		for (Field field : fieldsToCheck) {
-			MField mfield = mDetail.getField(fieldPrefix + field.getName());
-
-			if (checkedFields.contains(mfield)) {
-				continue;
-			}
-
+	private boolean checkFieldsEmpty(Collection<MField> fields) {
+		for (MField mfield : fields) {
 			if (mfield instanceof MBooleanField) { // Boolean Felder haben nie null Wert -> Prüfung auf false
 				if (Boolean.TRUE.equals(mfield.getValue().getBooleanValue())) {
 					return true;
@@ -195,6 +116,73 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Vergleicht Feld-Wert mit Wert aus Tabelle (vom CAS oder vorbelegte Werte aus Helpern)
+	 */
+	private boolean checkFieldsWithTable(Table t, Form f) {
+		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
+		List<MField> checkedFields = new ArrayList<>();
+		for (int i = 0; i < t.getColumnCount(); i++) {
+			MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
+			checkedFields.add(c);
+			if (c == null) {
+				continue;
+			}
+
+			Value sV = t.getRows().get(0).getValue(i);
+			if (!checkFieldWithValue(c, sV)) {
+				return true;
+			}
+
+		}
+
+		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
+		return checkFieldsEmpty(dataFormService.getFieldsFromForm(f), fieldPrefix, checkedFields);
+	}
+
+	/**
+	 * @param mField
+	 * @param value
+	 * @return true, wenn die Werte zusammenpassen, false wenn sie NICHT passen
+	 */
+	private boolean checkFieldWithValue(MField mField, Value value) {
+
+		if (mField instanceof MLookupField) {
+			// LU mit index 0 gibt es nie
+			if (mField.getValue() == null && value != null && value.getIntegerValue() == 0) {
+				return true;
+			}
+
+			// Solang KeyLong und Integerwert gleich sind sind LookupFelder nicht dirty
+			return !(value == null && mField.getValue() != null || //
+					value != null && mField.getValue() == null || //
+					mField.getValue() != null && !mField.getValue().getIntegerValue().equals(value.getIntegerValue()));
+		} else if (mField instanceof MBooleanField && value == null && Boolean.TRUE.equals(!mField.getValue().getBooleanValue())) {
+			// TableValue null ->Booleanfeld Wert soll false sein
+			return true;
+		} else if (mField instanceof MParamStringField && value == null && ((MParamStringField) mField).isNullValue()) {
+			// Auch "leeren" ParamString Wert prüfen
+			return true;
+		} else if (mField instanceof MPeriodField && value == null && ((MPeriodField) mField).isNullValue()) {
+			// Auch "leeren" Period Wert prüfen
+			return true;
+		}
+
+		return Objects.equals(mField.getValue(), value);
+	}
+
+	private boolean checkFieldsEmpty(List<Field> allFields, String fieldPrefix, List<MField> checkedFields) {
+		List<MField> fieldsToCheck = new ArrayList<>();
+		for (Field field : allFields) {
+			MField mfield = mDetail.getField(fieldPrefix + field.getName());
+
+			if (!checkedFields.contains(mfield)) {
+				fieldsToCheck.add(mfield);
+			}
+		}
+		return checkFieldsEmpty(fieldsToCheck);
 	}
 
 	private boolean checkOPs() {

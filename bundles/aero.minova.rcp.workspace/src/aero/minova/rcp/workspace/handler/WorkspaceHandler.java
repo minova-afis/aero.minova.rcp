@@ -85,10 +85,12 @@ public abstract class WorkspaceHandler {
 		String profile = node.get(WorkspaceAccessPreferences.PROFILE, "N/A");
 
 		WorkspaceHandler instance = newInstance(profile, connection, logger);
-		instance.workspaceData.setConnection(new URL(connection));
-		instance.workspaceData.setProfile(node.get("profile", "unknown"));
-		instance.workspaceData.setUsername(node.get("username", ""));
-		instance.workspaceData.setInBackingStore(true);
+		if (instance != null) {
+			instance.workspaceData.setConnection(new URL(connection));
+			instance.workspaceData.setProfile(node.get("profile", "unknown"));
+			instance.workspaceData.setUsername(node.get("username", ""));
+			instance.workspaceData.setInBackingStore(true);
+		}
 
 		return instance;
 	}
@@ -104,7 +106,7 @@ public abstract class WorkspaceHandler {
 	 * @param workspaceDir
 	 */
 	protected void checkDir(File workspaceDir, String name) {
-		File dataDir = new File(workspaceDir.getAbsolutePath() + "/" + name);
+		File dataDir = new File(workspaceDir.getAbsolutePath(), name);
 		if (!dataDir.exists()) {
 			dataDir.mkdir();
 			logger.info(MessageFormat.format("Verzeichnis {0} im Workspace {1} neu angelegt.", name, workspaceDir));

@@ -30,13 +30,12 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.uitests.util.UITestUtil;
+import aero.minova.rcp.util.OSUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
 class GridUITest {
 
 	private static final String AENDERN_VON_ZEILEN_FEHLGESCHLAGEN = "Ändern von Zeilen fehlgeschlagen";
-
-	private static final String OS_NAME = "os.name";
 
 	private SWTWorkbenchBot bot;
 
@@ -131,7 +130,7 @@ class GridUITest {
 	@Test
 	public void ensureDataEntryCanBeCreated() {
 		// Do not start on Linux
-		if (System.getProperty(OS_NAME).startsWith("Linux")) {
+		if (OSUtil.isLinux()) {
 			return;
 		}
 
@@ -159,7 +158,7 @@ class GridUITest {
 	public void testGridFunctions() {
 
 		// Do not start on Linux
-		if (System.getProperty(OS_NAME).startsWith("Linux")) {
+		if (OSUtil.isLinux()) {
 			return;
 		}
 
@@ -188,7 +187,7 @@ class GridUITest {
 		assertEquals(2, table.getRows().size(), "Löschen von Zeilen fehlgeschlagen");
 
 		// Unter Mac werden die Werte die in Nattables geschrieben werden angehängt
-		if (System.getProperty(OS_NAME).startsWith("Mac OS")) {
+		if (OSUtil.isLinux()) {
 			assertEquals(222, table.getRows().get(0).getValue(3).getDoubleValue(), AENDERN_VON_ZEILEN_FEHLGESCHLAGEN);
 			assertEquals(422, table.getRows().get(1).getValue(3).getDoubleValue(), AENDERN_VON_ZEILEN_FEHLGESCHLAGEN);
 		} else {

@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Control;
 
 import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
+import aero.minova.rcp.util.OSUtil;
 
 /**
  * Diese Klasse kann MinovaSections stylen.
@@ -170,7 +171,7 @@ public class MinovaSectionStyler implements ICssStyler {
 		// Höhe
 		if (cd.numberRowsSpanned > 1) {
 			// Mehrzeilige Textfelder verhalten sich unter Mac und Windows unterschiedlich
-			if (System.getProperty("os.name").startsWith("Mac OS")) {
+			if (OSUtil.isMac()) {
 				fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing;
 				fd.top.offset = (int) (cd.row * rowHeight + sectionSpacing * 0.5);
 			} else {

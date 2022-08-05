@@ -40,18 +40,21 @@ public class TimeUtil {
 	 */
 	public static void setShortcuts(String hour, String minute) {
 		// Es muss immer genau ein Zeichen übergeben werden
-		if (hour.length() != 1)
+		if (hour.length() != 1) {
 			throw new IllegalArgumentException("Shortcut for hour must have length of 1!");
-		if (minute.length() != 1)
+		}
+		if (minute.length() != 1) {
 			throw new IllegalArgumentException("Shortcut for minute must have length of 1!");
+		}
 
 		// nur Kleinbuchstaben zulassen
 		hour = hour.toLowerCase();
 		minute = minute.toLowerCase();
 
 		// keine Symbol darf doppelt verwendet werden
-		if (hour.equals(minute))
+		if (hour.equals(minute)) {
 			throw new IllegalArgumentException("Shortcut for day and month must be different!");
+		}
 
 		// jetzt können wir uns die Werte merken
 		TimeUtil.hour = hour;
@@ -66,7 +69,7 @@ public class TimeUtil {
 	public static Instant getTime(String input, String timeUtilPref) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, Locale.getDefault());
 	}
-	
+
 	public static Instant getTime(String input, String timeUtilPref, Locale locale) {
 		return getTime(LocalDateTime.now().toInstant(ZoneOffset.UTC), input, timeUtilPref, locale);
 	}
@@ -135,7 +138,7 @@ public class TimeUtil {
 				String formatted = lt.format(dtf);
 				now = Instant.parse(formatted);
 			} catch (Exception e) {
-				// TODO: handle exception
+				// Mit dem Pattern konnte nicht geparsed werden
 			}
 		} else {
 			// Testen verschiedener Format Styles, um eine passende Formatierung zu finden.
@@ -180,8 +183,9 @@ public class TimeUtil {
 		while (input.length() > 0) {
 			matcher = pattern.matcher(input);
 			boolean b = matcher.find();
-			if (!b)
+			if (!b) {
 				break;
+			}
 			String result = matcher.group(0);
 			splits.add(checkMissingHour(result));
 			input = input.substring(result.length());
@@ -196,10 +200,11 @@ public class TimeUtil {
 	}
 
 	private static String checkMissingHour(String result) {
-		if ((result.endsWith("+") || result.endsWith("-")))
+		if ((result.endsWith("+") || result.endsWith("-"))) {
 			return result + hour;
-		else
+		} else {
 			return result;
+		}
 	}
 
 	public static String getTimeString(Instant instant, Locale locale, String timeUtilPref) {
@@ -230,8 +235,10 @@ public class TimeUtil {
 				skipFirst = true;
 			}
 			for (int i = 0; i < splits.length; i++) {
-				if (correctInput == true) {
-					if (i == 0 && skipFirst == true) {} else {
+				if (correctInput) {
+					if (i == 0 && skipFirst) {
+						// Ersten überspringen
+					} else {
 						lt = addRelativeDate(lt, splits[i]);
 						if (lt == null) {
 							correctInput = false;
@@ -239,9 +246,9 @@ public class TimeUtil {
 					}
 				}
 			}
-			lt = lt.truncatedTo(ChronoUnit.MINUTES);
-			lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 			if (correctInput) {
+				lt = lt.truncatedTo(ChronoUnit.MINUTES);
+				lt = lt.withYear(1900).withMonth(1).withDayOfMonth(1);
 				instant = lt.toInstant(ZoneId.of("UTC").getRules().getOffset(lt));
 			} else {
 				instant = null;
@@ -289,16 +296,17 @@ public class TimeUtil {
 	private static Instant getTimeFromNumbers(String input) {
 		Integer hours = 0;
 		Integer minutes = 0;
-		String clearInput = "";
+		StringBuilder clearInputBuilder = new StringBuilder();
 		String regex = "([" + shortcuts + "])";
 
 		for (char c : input.toCharArray()) {
 			if (Character.isLetter(c) && !String.valueOf(c).matches(regex)) {
 				continue;
 			}
-			clearInput = clearInput + String.valueOf(c);
+			clearInputBuilder.append(String.valueOf(c));
 		}
 
+		String clearInput = clearInputBuilder.toString();
 		String[] subStrings = clearInput.split("[\\:/\\s]");
 
 		if (subStrings.length == 2) {
@@ -313,7 +321,7 @@ public class TimeUtil {
 		if (subStrings.length < 2) {
 			clearInput = clearInput.replaceAll("[\\:/\\s]", "");
 			int[] timeList = checkNumbersForTime(clearInput);
-			if (timeList != null) {
+			if (timeList.length == 2) {
 				hours = timeList[0];
 				minutes = timeList[1];
 			} else {
@@ -333,39 +341,32 @@ public class TimeUtil {
 	private static int[] checkNumbersForTime(String input) {
 		String hour = "";
 		String minutesString = "";
-		int[] time = null;
+		int[] time = new int[2];
 
 		try {
 			switch (input.length()) {
 			case 1:
-				time = new int[2];
-				time[0] = Integer.valueOf(input);
-				time[1] = 0;
-				return time;
 			case 2:
-				time = new int[2];
 				time[0] = Integer.valueOf(input);
 				time[1] = 0;
 				return time;
 			case 3:
-				time = new int[2];
 				hour = String.valueOf(input.charAt(0));
 				time[0] = Integer.valueOf(hour);
 				minutesString = input.substring(1);
 				time[1] = Integer.valueOf(minutesString);
 				return time;
 			case 4:
-				time = new int[2];
 				hour = input.substring(0, 2);
 				time[0] = Integer.valueOf(hour);
 				minutesString = input.substring(2);
 				time[1] = Integer.valueOf(minutesString);
 				return time;
+			default:
+				return new int[0];
 			}
 		} catch (Exception e) {
-			return null;
+			return new int[0];
 		}
-
-		return null;
 	}
 }

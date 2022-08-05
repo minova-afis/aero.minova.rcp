@@ -1,14 +1,15 @@
 package aero.minova.rcp.xml.tests;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import javax.xml.bind.JAXBException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.dataservice.internal.DataFormService;
@@ -19,25 +20,17 @@ class ReadDetailFromMaskTest {
 
 	private DataFormService dfs;
 
+	private Path path = Path.of("resources", "work", "WorkingTime.xml");
+
 	@BeforeEach
 	public void setup() {
 		dfs = new DataFormService();
 	}
 
 	@Test
-	void dataServiceConvertColumnToDataType() throws Exception {
-		String userDir = System.getProperty("user.home");
-
-		Form form = null;
-		try {
-			XmlProcessor xmlProcessor = new XmlProcessor();
-			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
-					Form.class);
-
-		} catch (SAXException | IOException e) {
-			e.printStackTrace();
-		}
+	void checkColumnNames() throws IOException, JAXBException {
+		String content = Files.readString(path);
+		Form form = XmlProcessor.get(content, Form.class);
 		Table tableFromFormDetail = dfs.getTableFromFormDetail(form, "Read");
 		assertEquals(13, tableFromFormDetail.getColumnCount());
 		assertEquals("KeyLong", tableFromFormDetail.getColumnName(0));
@@ -53,46 +46,24 @@ class ReadDetailFromMaskTest {
 		assertEquals("ChargedQuantity", tableFromFormDetail.getColumnName(10));
 		assertEquals("Description", tableFromFormDetail.getColumnName(11));
 		assertEquals("Spelling", tableFromFormDetail.getColumnName(12));
-		assertEquals("spReadWorkingTime", tableFromFormDetail.getName());
+		assertEquals("xpcorReadWorkingTime", tableFromFormDetail.getName());
 	}
 
 	@Test
-	void dataServiceReadDataWithProcedureSuffix() throws Exception {
-		String userDir = System.getProperty("user.home");
-
-		Form form = null;
-		try {
-			XmlProcessor xmlProcessor = new XmlProcessor();
-			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
-					Form.class);
-
-		} catch (SAXException | IOException e) {
-			e.printStackTrace();
-		}
-
+	void dataServiceReadDataWithProcedureSuffix() throws IOException, JAXBException {
+		String content = Files.readString(path);
+		Form form = XmlProcessor.get(content, Form.class);
 		form.getDetail().setProcedurePrefix("xtsap");
 		Table tableFromFormDetail = dfs.getTableFromFormDetail(form, "Read");
 		assertEquals("xtsapReadWorkingTime", tableFromFormDetail.getName());
 	}
 
 	@Test
-	void dataServiceReadOptionpage() throws Exception {
-		String userDir = System.getProperty("user.home");
-
-		Form form = null;
-		try {
-			XmlProcessor xmlProcessor = new XmlProcessor();
-			form = (Form) xmlProcessor.load(new File(userDir
-					+ "/git/aero.minova.rcp/bundles/aero.minova.rcp.rcp/src/aero/minova/rcp/rcp/parts/WorkingTime.xml"),
-					Form.class);
-
-		} catch (SAXException | IOException e) {
-			e.printStackTrace();
-		}
+	void dataServiceReadOptionpage() throws IOException, JAXBException {
+		String content = Files.readString(path);
+		Form form = XmlProcessor.get(content, Form.class);
 		form.setIndexView(null);
 		Table tableFromFormDetail = dfs.getTableFromFormDetail(form, "Read");
-		assertEquals("opReadWorkingTime", tableFromFormDetail.getName());
+		assertEquals("xpcorReadWorkingTime", tableFromFormDetail.getName());
 	}
-
 }

@@ -6,8 +6,11 @@ import org.osgi.service.prefs.Preferences;
 
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
+import aero.minova.rcp.util.OSUtil;
 
 public class ComboHeightAdjust {
+
+	private ComboHeightAdjust() {}
 
 	private static Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 	private static String fontSize = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.FONT_ICON_SIZE, DisplayType.COMBO, "M",
@@ -16,7 +19,7 @@ public class ComboHeightAdjust {
 	public static int getComboHeight() {
 		int size = SWT.DEFAULT;
 
-		if (System.getProperty("os.name").toLowerCase().startsWith("mac")) {
+		if (OSUtil.isMac()) {
 			switch (fontSize) {
 			case "S":
 				size = 16;
