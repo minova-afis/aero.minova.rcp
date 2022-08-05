@@ -593,6 +593,7 @@
 			<!-- Kein Head mehr, deshalb mindestens 1 Page -->
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="page" type="page" />
 			<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="browser"/>
 		</xs:sequence>
 		<!-- Entweder oder -->
 		<xs:attribute name="procedure-suffix" type="xs:NCName" />
@@ -1526,6 +1527,42 @@
 				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
 				<xs:element maxOccurs="1" minOccurs="0" name="events" type="events" />
 			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="browser">
+		<xs:annotation>
+			<xs:documentation>Erstellt eine Browser</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
+				<xs:choice maxOccurs="1" minOccurs="1">
+					<xs:choice maxOccurs="unbounded" minOccurs="0">
+						<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
+					</xs:choice>
+				</xs:choice>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events" />
+			</xs:sequence>
+			<xs:attribute default="" name="title" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>Browser-Überschrift vom Browser.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="icon" type="xs:NCName">
+				<xs:annotation>
+					<xs:documentation>TabPage-Icon, wenn es sich um ein Stand-Alone
+						Browser handelt
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="id" type="xs:NCName" use="required">
+				<xs:annotation>
+					<xs:documentation>ID, die für die Referenzierung verwendet werden
+						kann.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
