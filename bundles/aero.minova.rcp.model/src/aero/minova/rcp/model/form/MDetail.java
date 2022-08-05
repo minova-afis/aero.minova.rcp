@@ -20,6 +20,7 @@ public class MDetail {
 	private HashMap<String, MField> fields = new HashMap<>();
 	private List<MField> primaryFields = new ArrayList<>();
 	private HashMap<String, MGrid> grids = new HashMap<>();
+	private HashMap<String, MBrowser> browsers = new HashMap<>();
 	private HashMap<String, MButton> buttons = new HashMap<>();
 	private List<MSection> mSectionList = new ArrayList<>();
 
@@ -81,6 +82,34 @@ public class MDetail {
 	 */
 	public MGrid getGrid(String name) {
 		return grids.get(name);
+	}
+
+	public HashMap<String, MBrowser> getBrowsers() {
+		return browsers;
+	}
+	
+	/**
+	 * Ein neuer MBrowser dem Detail hinzufügen.
+	 *
+	 * @param g
+	 *            das MGrid
+	 */
+	public void putBrowser(MBrowser b) {
+		if (b == null) {
+			return;
+		}
+		browsers.put(b.getId(), b);
+	}
+	
+	/**
+	 * Liefert den MBrowser mit der ID
+	 *
+	 * @param id
+	 *            Id des Browser
+	 * @return den MBrowser
+	 */
+	public MBrowser getBrowser(String id) {
+		return browsers.get(id);
 	}
 
 	public void putButton(MButton b) {
