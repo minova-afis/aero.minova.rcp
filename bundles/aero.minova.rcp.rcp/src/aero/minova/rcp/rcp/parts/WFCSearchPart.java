@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -53,14 +52,13 @@ public class WFCSearchPart extends WFCNattablePart {
 
 	protected SortedList<Row> sortedList;
 
-	@PostConstruct
+	@Override
 	public void createComposite(Composite parent) {
 		new FormToolkit(parent.getDisplay());
 		getForm();
 		if (form == null) {
 			return;
 		}
-		context = mPerspective.getContext();
 
 		// "&" Spalte erstellen
 		aero.minova.rcp.form.model.xsd.Column xsdColumn = new aero.minova.rcp.form.model.xsd.Column();
@@ -81,7 +79,7 @@ public class WFCSearchPart extends WFCNattablePart {
 
 		sortedList = bodyLayerStack.getSortedList();
 
-		loadPrefs(Constants.LAST_STATE);
+		restorePrefs(Constants.LAST_STATE);
 	}
 
 	@Override
@@ -95,7 +93,7 @@ public class WFCSearchPart extends WFCNattablePart {
 	}
 
 	@Override
-	protected void addNattableConfiguratione(NatTable natTable) {
+	protected void addNattableConfiguration(NatTable natTable) {
 
 		bodyLayerStack.getBodyDataLayer().unregisterCommandHandler(UpdateDataCommand.class);
 		bodyLayerStack.getBodyDataLayer().registerCommandHandler(new UpdateDataCommandHandler(bodyLayerStack.getBodyDataLayer()) {

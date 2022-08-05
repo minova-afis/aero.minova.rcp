@@ -26,12 +26,11 @@ public abstract class MinovaColumnConfiguration extends AbstractRegistryConfigur
 	}
 
 	public void initFormFields() {
-		formColumns = new HashMap<>();
-
 		if (form == null) {
 			return;
 		}
 
+		formColumns = new HashMap<>();
 		List<aero.minova.rcp.form.model.xsd.Column> column = form.getIndexView().getColumn();
 		for (aero.minova.rcp.form.model.xsd.Column column2 : column) {
 			formColumns.put(column2.getName(), column2);

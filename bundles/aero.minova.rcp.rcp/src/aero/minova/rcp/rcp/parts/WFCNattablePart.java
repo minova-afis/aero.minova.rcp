@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -242,7 +243,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		natTable.addConfiguration(mcc);
 		bodyLayerStack.columnHideShowLayer.hideColumnPositions(mcc.getHiddenColumns());
 
-		addNattableConfiguratione(natTable);
+		addNattableConfiguration(natTable);
 
 		if (useSummaryRow()) {
 			NattableSummaryUtil.configureSummary(form, natTable, bodyLayerStack.getSortedList(), columnPropertyAccessor);
@@ -281,9 +282,17 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		return natTable;
 	}
 
+	@PostConstruct
+	public void init(Composite parent) {
+		context = mPerspective.getContext();
+		createComposite(parent);
+	}
+
+	protected abstract void createComposite(Composite parent);
+
 	protected abstract SingleClickSortConfiguration getSingleClickSortConfiguration();
 
-	protected abstract void addNattableConfiguratione(NatTable natTable);
+	protected abstract void addNattableConfiguration(NatTable natTable);
 
 	protected abstract boolean useGroupBy();
 
@@ -421,10 +430,6 @@ public abstract class WFCNattablePart extends WFCFormPart {
 	 */
 	@PersistTableSelection
 	public void savePrefs(@Named("SaveRowConfig") boolean saveRowConfig, @Named("ConfigName") String name) {
-		if (form == null) {
-			return;
-		}
-
 		saveNattable();
 
 		// Eingabe in Suche Speichern
@@ -434,7 +439,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 
 		// UI Speichern
 		if (saveRowConfig) {
-			String prefix = getPersistPrefix(name, form.getIndexView().getSource());
+			String prefix = getPersistPrefix(name, form);
 			saveUI(prefix);
 		}
 
@@ -445,12 +450,18 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		}
 	}
 
-	private String getPersistPrefix(String name, String tableName) {
+	private String getPersistPrefix(String name, Form form) {
 		String nattableName = "nattable";
+		String tableName = "table";
 		if (this instanceof WFCSearchPart) {
 			nattableName = "search";
-		} else if (this instanceof WFCIndexPart || this instanceof WFCStatisticIndexPart) {
+			tableName = form.getIndexView().getSource();
+		} else if (this instanceof WFCStatisticIndexPart) {
 			nattableName = "index";
+			tableName = "Statistic";
+		} else if (this instanceof WFCIndexPart) {
+			nattableName = "index";
+			tableName = form.getIndexView().getSource();
 		}
 
 		return tableName + "." + name + "." + nattableName + ".";
@@ -493,7 +504,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 	}
 
 	@LoadTableSelection
-	public void loadPrefs(@Named("ConfigName") String name) {
+	public void restorePrefs(@Named("ConfigName") String name) {
 
 		saveNattable();
 
@@ -508,7 +519,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			}
 		}
 
-		String prefix = getPersistPrefix(name, form.getIndexView().getSource());
+		String prefix = getPersistPrefix(name, form);
 
 		// Spaltenanordung und -breite
 		restoreOrderAndSize(prefix);

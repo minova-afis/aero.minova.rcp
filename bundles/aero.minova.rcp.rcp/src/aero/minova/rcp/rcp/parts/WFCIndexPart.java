@@ -5,7 +5,6 @@ import static org.eclipse.nebula.widgets.nattable.selection.SelectionUtils.getSe
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -14,7 +13,6 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataCommandHandler;
@@ -54,23 +52,20 @@ public class WFCIndexPart extends WFCNattablePart {
 
 	protected SelectionThread selectionThread;
 
-	@PostConstruct
-	public void createComposite(Composite parent, EModelService modelService) {
+	@Override
+	public void createComposite(Composite parent) {
 		new FormToolkit(parent.getDisplay());
 		getForm();
 		if (form == null) {
 			return;
 		}
-
-		context = mPerspective.getContext();
-
 		data = dataFormService.getTableFromFormIndex(form);
 
 		parent.setLayout(new GridLayout());
 
 		natTable = createNatTable(parent, form, getData());
 
-		loadPrefs(Constants.LAST_STATE);
+		restorePrefs(Constants.LAST_STATE);
 		if (autoLoadIndex) {
 			ParameterizedCommand cmd = commandService.createCommand("aero.minova.rcp.rcp.command.loadindex", null);
 			handlerService.executeHandler(cmd);
@@ -140,7 +135,7 @@ public class WFCIndexPart extends WFCNattablePart {
 	}
 
 	@Override
-	protected void addNattableConfiguratione(NatTable natTable) {
+	protected void addNattableConfiguration(NatTable natTable) {
 
 		bodyLayerStack.getSelectionLayer().addConfiguration(new DefaultRowSelectionLayerConfiguration());
 

@@ -1,10 +1,23 @@
 package aero.minova.rcp.rcp.parts;
 
-import javax.annotation.PostConstruct;
+import java.util.List;
+
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
+import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
+import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
+import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -19,10 +32,13 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaColumnConfiguration;
 import aero.minova.rcp.rcp.nattable.MinovaStatisticConfiguration;
+import aero.minova.rcp.rcp.util.NatTableUtil;
+import aero.minova.rcp.util.OSUtil;
 
-public class WFCStatisticIndexPart extends WFCIndexPart {
+public class WFCStatisticIndexPart extends WFCNattablePart {
 
 	private static final String STATISTIC = "Statistic";
 
@@ -32,12 +48,18 @@ public class WFCStatisticIndexPart extends WFCIndexPart {
 	@Inject
 	MApplication mApplication;
 
-	@PostConstruct
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
+	protected int tableSelectionBuffer;
+
+	protected SelectionThread selectionThread;
+
+	@Override
 	public void createComposite(Composite parent) {
 		parent.setLayout(new GridLayout());
 		createStatisticDataFromXBS();
 		natTable = createNatTable(parent, null, data);
-		loadPrefs(Constants.LAST_STATE);
+		restorePrefs(Constants.LAST_STATE);
 	}
 
 	/**
@@ -55,6 +77,9 @@ public class WFCStatisticIndexPart extends WFCIndexPart {
 		data.getColumns().get(1).setLabel(name);
 		data.getColumns().get(2).setLabel(type);
 		data.getColumns().get(3).setLabel(description);
+		data.getColumns().get(1).setVisible(true);
+		data.getColumns().get(2).setVisible(true);
+		data.getColumns().get(3).setVisible(true);
 
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node statisticNode = XBSUtil.getNodeWithName(preferences, STATISTIC);
@@ -82,11 +107,85 @@ public class WFCStatisticIndexPart extends WFCIndexPart {
 
 	@Override
 	public MinovaColumnConfiguration createColumnConfiguration(Table table) {
-		// TODO?
-		// Wir brauchen die erste Spalte mit dem Namen der Statistik nicht für den Anwender sondern nur Intern!
-		// bodyLayerStack.columnHideShowLayer.hideColumnPositions(0);
-
 		return new MinovaStatisticConfiguration(table.getColumns());
+	}
+
+	class SelectionThread extends Thread {
+		private int sleepMillis;
+
+		/*
+		 * Thread, der für sleepMillis Millisekunden schläft und danach die Daten ins Detail lädt, wenn er nicht unterbrochen wurde
+		 */
+		public SelectionThread(int sleepMillis) {
+			this.sleepMillis = sleepMillis;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(sleepMillis);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return;
+			}
+
+			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			if (c.get(0) instanceof Row) {
+				broker.post(Constants.BROKER_SELECTSTATISTIC, c.get(0));
+			}
+		}
+	}
+
+	@Override
+	protected SingleClickSortConfiguration getSingleClickSortConfiguration() {
+		return new SingleClickSortConfiguration() {
+			@Override
+			public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+				// normal
+				uiBindingRegistry.registerFirstSingleClickBinding(new ColumnHeaderClickEventMatcher(SWT.NONE, 1), new SortColumnAction(false));
+
+				// multi
+				int keyMask = SWT.MOD3;
+				// für Linux andere Tastenkombi definieren
+				if (OSUtil.isLinux()) {
+					keyMask |= SWT.MOD2;
+				}
+				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));
+			}
+		};
+	}
+
+	@Override
+	protected void addNattableConfiguration(NatTable natTable) {
+		bodyLayerStack.getSelectionLayer().addConfiguration(new DefaultRowSelectionLayerConfiguration());
+
+		bodyLayerStack.getSelectionLayer().addLayerListener(event -> {
+			if (event instanceof RowSelectionEvent) {
+				if (selectionThread != null) {
+					selectionThread.interrupt();
+				}
+				selectionThread = new SelectionThread(tableSelectionBuffer);
+				selectionThread.start();
+			} else if (event instanceof RowStructuralRefreshEvent) {
+				NatTableUtil.resizeRows(natTable);
+			}
+		});
+
+	}
+
+	@Override
+	protected boolean useGroupBy() {
+		return true;
+	}
+
+	@Override
+	protected boolean useSortingHeader() {
+		return true;
+	}
+
+	@Override
+	protected boolean useSummaryRow() {
+		return false;
 	}
 
 }
