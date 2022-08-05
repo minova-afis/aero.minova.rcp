@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="head" type="{}head" minOccurs="0"/&gt;
  *         &lt;element name="page" type="{}page" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}grid" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}browser" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="procedure-suffix" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="procedure-prefix" type="{http://www.w3.org/2001/XMLSchema}NCName" default="xpcor" /&gt;
@@ -78,7 +79,8 @@ public class Detail {
     @XmlElements({
         @XmlElement(name = "head", type = Head.class),
         @XmlElement(name = "page", type = Page.class),
-        @XmlElement(name = "grid", type = Grid.class)
+        @XmlElement(name = "grid", type = Grid.class),
+        @XmlElement(name = "browser", type = Browser.class)
     })
     protected List<Object> headAndPageAndGrid;
     @XmlAttribute(name = "procedure-suffix")
@@ -151,6 +153,7 @@ public class Detail {
      * {@link Head }
      * {@link Page }
      * {@link Grid }
+     * {@link Browser }
      * 
      * 
      */

@@ -110,6 +110,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Browser }
+     * 
+     */
+    public Browser createBrowser() {
+        return new Browser();
+    }
+
+    /**
      * Create an instance of {@link Column }
      * 
      */
