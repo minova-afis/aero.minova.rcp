@@ -276,7 +276,6 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		}
 
 		natTable.configure();
-		// Hier können wir das Theme setzen
 		natTable.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		return natTable;
@@ -534,7 +533,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		restoreGroupBy(prefix);
 	}
 
-	private void restoreGroupBy(String prefix) {
+	protected void restoreGroupBy(String prefix) {
 		String string = prefs.get(prefix + "groupby", null);
 		if (string == null || string.isBlank()) {
 			return;
@@ -553,7 +552,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		}
 	}
 
-	private void restoreSorting(String prefix) {
+	protected void restoreSorting(String prefix) {
 		String string = prefs.get(prefix + "sortby", null);
 		if (string == null || string.isBlank()) {
 			return;
@@ -570,7 +569,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 
 	}
 
-	private void restoreHidden(String prefix) {
+	protected void restoreHidden(String prefix) {
 		String string = prefs.get(prefix + "hidden", null);
 		if (string == null || string.isBlank()) {
 			return;
@@ -587,7 +586,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		updateColumns(""); // UI updaten
 	}
 
-	private void restoreOrderAndSize(String prefix) {
+	protected void restoreOrderAndSize(String prefix) {
 		String string = prefs.get(prefix + "size", null);
 		if (string == null || string.isBlank()) {
 			return;

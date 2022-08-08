@@ -188,4 +188,8 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 		return false;
 	}
 
+	@Override
+	protected void restoreHidden(String prefix) {
+		// Im statistic Part können Spalten nicht ausgeblendet werden
+	}
 }
