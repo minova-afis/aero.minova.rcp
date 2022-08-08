@@ -2,7 +2,6 @@ package aero.minova.rcp.rcp.nattable;
 
 import java.util.List;
 
-import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
@@ -15,12 +14,10 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 
 import aero.minova.rcp.model.Column;
 
-public class MinovaStatisticConfiguration extends AbstractRegistryConfiguration {
-
-	private List<Column> columns;
+public class MinovaStatisticConfiguration extends MinovaColumnConfiguration {
 
 	public MinovaStatisticConfiguration(List<Column> columns) {
-		this.columns = columns;
+		super(columns, null);
 	}
 
 	@Override

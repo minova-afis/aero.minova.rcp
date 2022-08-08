@@ -1,13 +1,9 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
@@ -28,37 +24,11 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Row;
-import aero.minova.rcp.preferencewindow.control.CustomLocale;
 
-public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
-
-	private List<Column> columns;
-	private Locale locale = CustomLocale.getLocale();
-	private Form form;
-	private Map<String, aero.minova.rcp.form.model.xsd.Column> formColumns;
+public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 
 	public MinovaIndexConfiguration(List<Column> columns, Form form) {
-		this.columns = columns;
-		this.form = form;
-		initFormFields();
-	}
-
-	public void initFormFields() {
-		formColumns = new HashMap<>();
-		List<aero.minova.rcp.form.model.xsd.Column> column = form.getIndexView().getColumn();
-		for (aero.minova.rcp.form.model.xsd.Column column2 : column) {
-			formColumns.put(column2.getName(), column2);
-		}
-	}
-
-	public List<Integer> getHiddenColumns() {
-		List<Integer> hiddenCols = new ArrayList<>();
-		for (Column c : columns) {
-			if (!c.isVisible()) {
-				hiddenCols.add(columns.indexOf(c));
-			}
-		}
-		return hiddenCols;
+		super(columns, form);
 	}
 
 	@Override
@@ -108,10 +78,11 @@ public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 					summaryProvider = (columnIndex, children) -> {
 						double total = 0;
 						for (Row r : children) {
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null)
+							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
 								total += r.getValue(columnIndex).getIntegerValue();
-							else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
+							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
 								total += r.getValue(columnIndex).getDoubleValue();
+							}
 						}
 						return total / children.size();
 					};
@@ -126,11 +97,13 @@ public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 						double max = Double.MIN_VALUE;
 						for (Row r : children) {
 							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-								if (r.getValue(columnIndex).getIntegerValue() > max)
+								if (r.getValue(columnIndex).getIntegerValue() > max) {
 									max = r.getValue(columnIndex).getIntegerValue();
+								}
 							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null
-									&& r.getValue(columnIndex).getDoubleValue() > max)
+									&& r.getValue(columnIndex).getDoubleValue() > max) {
 								max = r.getValue(columnIndex).getDoubleValue();
+							}
 
 						}
 						return max;
@@ -142,11 +115,13 @@ public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 						double min = Double.MAX_VALUE;
 						for (Row r : children) {
 							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-								if (r.getValue(columnIndex).getIntegerValue() < min)
+								if (r.getValue(columnIndex).getIntegerValue() < min) {
 									min = r.getValue(columnIndex).getIntegerValue();
+								}
 							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null
-									&& r.getValue(columnIndex).getDoubleValue() < min)
+									&& r.getValue(columnIndex).getDoubleValue() < min) {
 								min = r.getValue(columnIndex).getDoubleValue();
+							}
 
 						}
 						return min;
@@ -157,10 +132,11 @@ public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 					summaryProvider = (columnIndex, children) -> {
 						double total = 0;
 						for (Row r : children) {
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null)
+							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
 								total += r.getValue(columnIndex).getIntegerValue();
-							else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
+							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
 								total += r.getValue(columnIndex).getDoubleValue();
+							}
 						}
 						return total;
 					};
@@ -175,10 +151,11 @@ public class MinovaIndexConfiguration extends AbstractRegistryConfiguration {
 				summaryProvider = (columnIndex, children) -> {
 					double total = 0;
 					for (Row r : children) {
-						if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null)
+						if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
 							total += r.getValue(columnIndex).getIntegerValue();
-						else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null)
+						} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
 							total += r.getValue(columnIndex).getDoubleValue();
+						}
 					}
 					return total;
 				};
