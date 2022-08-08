@@ -95,6 +95,7 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 					break;
 				}
 			}
+			data.addRow(row);
 		}
 	}
 
@@ -106,7 +107,7 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 
 		@Override
 		protected void doSelectionAction() {
-			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List<Object> c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
 			if (c.get(0) instanceof Row) {
 				broker.post(Constants.BROKER_SELECTSTATISTIC, c.get(0));
 			}

@@ -6,7 +6,7 @@ public abstract class SelectionThread extends Thread {
 	/*
 	 * Thread, der für sleepMillis Millisekunden schläft und danach die Daten ins Detail lädt, wenn er nicht unterbrochen wurde
 	 */
-	public SelectionThread(int sleepMillis) {
+	protected SelectionThread(int sleepMillis) {
 		this.sleepMillis = sleepMillis;
 	}
 
