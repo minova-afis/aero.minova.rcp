@@ -235,9 +235,9 @@ public class WFCDetailPart extends WFCFormPart {
 		mPerspective.getContext().set(Constants.DETAIL_WIDTH, detailWidth);
 		TranslateUtil.translate(composite, translationService, locale);
 
-		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
-		if (mDetail.getHelper() != null) {
-			mDetail.getHelper().setControls(mDetail);
+		// Helpers erst initialisieren, wenn casRequestsUtil erstellt wurde
+		for (IHelper helper : mDetail.getHelpers()) {
+			helper.setControls(mDetail);
 		}
 
 		openRestoringUIDialog();
@@ -412,7 +412,7 @@ public class WFCDetailPart extends WFCFormPart {
 		if (iHelper == null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
 		} else {
-			getDetail().setHelper(iHelper);
+			getDetail().addHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
@@ -483,6 +483,8 @@ public class WFCDetailPart extends WFCFormPart {
 						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
 			}
 		}
+
+		initializeHelper(opForm.getHelperClass());
 	}
 
 	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) throws NoSuchFieldException {
