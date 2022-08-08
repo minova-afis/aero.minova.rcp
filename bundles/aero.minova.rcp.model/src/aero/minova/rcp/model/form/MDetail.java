@@ -22,14 +22,10 @@ public class MDetail {
 	private HashMap<String, MGrid> grids = new HashMap<>();
 	private HashMap<String, MButton> buttons = new HashMap<>();
 	private List<MSection> mSectionList = new ArrayList<>();
-
-	private IHelper helper;
-
+	private List<IHelper> helpers = new ArrayList<>();
 	private Map<String, Form> optionPages = new HashMap<>();
 	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
-
 	private IDetailAccessor detailAccessor;
-
 	private boolean clearAfterSave;
 
 	/**
@@ -162,12 +158,12 @@ public class MDetail {
 		return optionPages.values();
 	}
 
-	public IHelper getHelper() {
-		return helper;
+	public List<IHelper> getHelpers() {
+		return helpers;
 	}
 
-	public void setHelper(IHelper helper) {
-		this.helper = helper;
+	public void addHelper(IHelper helper) {
+		helpers.add(helper);
 	}
 
 	public boolean allFieldsAndGridsValid() {

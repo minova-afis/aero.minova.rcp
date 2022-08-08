@@ -63,6 +63,7 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MParamStringField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
@@ -903,8 +904,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	private void sendEventToHelper(@UIEventTopic(Constants.BROKER_SENDEVENTTOHELPER) ActionCode code) {
-		if (mDetail.getHelper() != null) {
-			mDetail.getHelper().handleDetailAction(code);
+		for (IHelper helper : mDetail.getHelpers()) {
+			helper.handleDetailAction(code);
 		}
 	}
 
