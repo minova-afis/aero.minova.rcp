@@ -21,7 +21,6 @@ import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommand;
 import org.eclipse.nebula.widgets.nattable.edit.command.UpdateDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
-import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
@@ -85,11 +84,6 @@ public class WFCSearchPart extends WFCNattablePart {
 	@Override
 	public MinovaColumnConfiguration createColumnConfiguration(Table table) {
 		return new MinovaSearchConfiguration(table.getColumns(), form);
-	}
-
-	@Override
-	protected SingleClickSortConfiguration getSingleClickSortConfiguration() {
-		return new SingleClickSortConfiguration();
 	}
 
 	@Override
@@ -215,5 +209,4 @@ public class WFCSearchPart extends WFCNattablePart {
 		sortedList.clear();
 		sortedList.addAll(getData().getRows());
 	}
-
 }

@@ -20,12 +20,6 @@ import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupBy
 import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
-import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
-import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
-import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -38,7 +32,6 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaColumnConfiguration;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
-import aero.minova.rcp.util.OSUtil;
 
 public class WFCIndexPart extends WFCNattablePart {
 
@@ -72,66 +65,9 @@ public class WFCIndexPart extends WFCNattablePart {
 		}
 	}
 
-	/**
-	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table, diese wird dann an den CAS als Anfrage übergeben.
-	 */
-	@Inject
-	@Optional
-	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Table resultTable) {
-		MPerspective activePerspective = modelService.getActivePerspective(context.get(MWindow.class));
-		if (!activePerspective.equals(mPerspective)) {
-			return;
-		}
-
-		// clear the group by summary cache so the new summary calculation gets triggered
-		((GroupByDataLayer) bodyLayerStack.getBodyDataLayer()).clearCache();
-
-		// Daten in Nattable schreiben. Wenn Page != 1 werden die Zeilen nur angehängt
-		updateData(resultTable.getRows(), resultTable.getMetaData().getPage() != 1);
-
-		if (resultTable.getRows().isEmpty()) {
-			MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
-					translationService.translate("@msg.NoRecordsLoaded", null));
-		}
-	}
-
-	/**
-	 * Lädt die Liste von Zeilen in die Nattable.
-	 *
-	 * @param list
-	 * @param add
-	 *            true: Liste wird unten angehängt; false: Alte Einträge werden verworfen
-	 */
-	public void updateData(List<Row> list, boolean add) {
-		if (!add) {
-			bodyLayerStack.getSortedList().clear();
-		}
-		bodyLayerStack.getSortedList().addAll(list);
-		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
-	}
-
 	@Override
 	public MinovaColumnConfiguration createColumnConfiguration(Table table) {
 		return new MinovaIndexConfiguration(table.getColumns(), form);
-	}
-
-	@Override
-	protected SingleClickSortConfiguration getSingleClickSortConfiguration() {
-		return new SingleClickSortConfiguration() {
-			@Override
-			public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-				// normal
-				uiBindingRegistry.registerFirstSingleClickBinding(new ColumnHeaderClickEventMatcher(SWT.NONE, 1), new SortColumnAction(false));
-
-				// multi
-				int keyMask = SWT.MOD3;
-				// für Linux andere Tastenkombi definieren
-				if (OSUtil.isLinux()) {
-					keyMask |= SWT.MOD2;
-				}
-				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));
-			}
-		};
 	}
 
 	@Override
@@ -205,4 +141,41 @@ public class WFCIndexPart extends WFCNattablePart {
 		return true;
 	}
 
+	/**
+	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table, diese wird dann an den CAS als Anfrage übergeben.
+	 */
+	@Inject
+	@Optional
+	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Table resultTable) {
+		MPerspective activePerspective = modelService.getActivePerspective(context.get(MWindow.class));
+		if (!activePerspective.equals(mPerspective)) {
+			return;
+		}
+
+		// clear the group by summary cache so the new summary calculation gets triggered
+		((GroupByDataLayer) bodyLayerStack.getBodyDataLayer()).clearCache();
+
+		// Daten in Nattable schreiben. Wenn Page != 1 werden die Zeilen nur angehängt
+		updateData(resultTable.getRows(), resultTable.getMetaData().getPage() != 1);
+
+		if (resultTable.getRows().isEmpty()) {
+			MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
+					translationService.translate("@msg.NoRecordsLoaded", null));
+		}
+	}
+
+	/**
+	 * Lädt die Liste von Zeilen in die Nattable.
+	 *
+	 * @param list
+	 * @param add
+	 *            true: Liste wird unten angehängt; false: Alte Einträge werden verworfen
+	 */
+	public void updateData(List<Row> list, boolean add) {
+		if (!add) {
+			bodyLayerStack.getSortedList().clear();
+		}
+		bodyLayerStack.getSortedList().addAll(list);
+		natTable.refresh(false); // Damit Summary-Row richtig aktualisiert wird
+	}
 }

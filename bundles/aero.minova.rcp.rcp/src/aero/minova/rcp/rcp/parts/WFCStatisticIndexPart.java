@@ -12,12 +12,6 @@ import org.eclipse.nebula.widgets.nattable.layer.event.RowStructuralRefreshEvent
 import org.eclipse.nebula.widgets.nattable.selection.SelectionUtils;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
-import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
-import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
-import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -36,21 +30,20 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaColumnConfiguration;
 import aero.minova.rcp.rcp.nattable.MinovaStatisticConfiguration;
 import aero.minova.rcp.rcp.util.NatTableUtil;
-import aero.minova.rcp.util.OSUtil;
 
 public class WFCStatisticIndexPart extends WFCNattablePart {
 
 	private static final String STATISTIC = "Statistic";
 
 	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
+	protected int tableSelectionBuffer;
+
+	@Inject
 	IEventBroker broker;
 
 	@Inject
 	MApplication mApplication;
-
-	@Inject
-	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
-	protected int tableSelectionBuffer;
 
 	protected SelectionThread selectionThread;
 
@@ -105,11 +98,6 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 		}
 	}
 
-	@Override
-	public MinovaColumnConfiguration createColumnConfiguration(Table table) {
-		return new MinovaStatisticConfiguration(table.getColumns());
-	}
-
 	class SelectionThread extends Thread {
 		private int sleepMillis;
 
@@ -137,22 +125,8 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 	}
 
 	@Override
-	protected SingleClickSortConfiguration getSingleClickSortConfiguration() {
-		return new SingleClickSortConfiguration() {
-			@Override
-			public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-				// normal
-				uiBindingRegistry.registerFirstSingleClickBinding(new ColumnHeaderClickEventMatcher(SWT.NONE, 1), new SortColumnAction(false));
-
-				// multi
-				int keyMask = SWT.MOD3;
-				// für Linux andere Tastenkombi definieren
-				if (OSUtil.isLinux()) {
-					keyMask |= SWT.MOD2;
-				}
-				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));
-			}
-		};
+	public MinovaColumnConfiguration createColumnConfiguration(Table table) {
+		return new MinovaStatisticConfiguration(table.getColumns());
 	}
 
 	@Override
@@ -170,7 +144,6 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 				NatTableUtil.resizeRows(natTable);
 			}
 		});
-
 	}
 
 	@Override

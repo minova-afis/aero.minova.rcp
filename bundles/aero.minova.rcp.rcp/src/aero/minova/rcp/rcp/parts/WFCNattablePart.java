@@ -64,7 +64,9 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.event.ColumnHeaderClickEventMatcher;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
@@ -91,6 +93,7 @@ import aero.minova.rcp.rcp.util.LoadTableSelection;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 import aero.minova.rcp.rcp.util.NattableSummaryUtil;
 import aero.minova.rcp.rcp.util.PersistTableSelection;
+import aero.minova.rcp.util.OSUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -99,11 +102,11 @@ import ca.odell.glazedlists.TransformedList;
 public abstract class WFCNattablePart extends WFCFormPart {
 
 	@Inject
-	protected ESelectionService selectionService;
-
-	@Inject
 	@Preference
 	protected IEclipsePreferences prefs;
+
+	@Inject
+	protected ESelectionService selectionService;
 
 	@Inject
 	protected ECommandService commandService;
@@ -117,28 +120,8 @@ public abstract class WFCNattablePart extends WFCFormPart {
 	@Inject
 	private IMinovaJsonService mjs;
 
-	protected NatTable natTable;
 	@Inject
 	protected TranslationService translationService;
-
-	protected MinovaColumnPropertyAccessor columnPropertyAccessor;
-
-	protected ColumnHeaderLayer columnHeaderLayer;
-	protected GroupByHeaderLayer groupByHeaderLayer;
-
-	protected boolean expandGroups = false;
-	protected BodyLayerStack<Row> bodyLayerStack;
-	protected SortHeaderLayer<Object> sortHeaderLayer;
-
-	protected Table data;
-
-	protected IEclipseContext context;
-
-	protected FixedSummaryRowLayer summaryRowLayer;
-
-	protected DefaultColumnHeaderDataLayer columnHeaderDataLayer;
-
-	protected MinovaColumnConfiguration mcc;
 
 	@Inject
 	protected MPart mPart;
@@ -146,9 +129,76 @@ public abstract class WFCNattablePart extends WFCFormPart {
 	@Inject
 	protected Logger logger;
 
-	protected GridLayer gridLayer;
+	protected IEclipseContext context;
 
+	protected NatTable natTable;
+	protected MinovaColumnPropertyAccessor columnPropertyAccessor;
+	protected ColumnHeaderLayer columnHeaderLayer;
+	protected GroupByHeaderLayer groupByHeaderLayer;
+	protected BodyLayerStack<Row> bodyLayerStack;
+	protected SortHeaderLayer<Object> sortHeaderLayer;
+	protected FixedSummaryRowLayer summaryRowLayer;
+	protected DefaultColumnHeaderDataLayer columnHeaderDataLayer;
+	protected MinovaColumnConfiguration mcc;
+	protected GridLayer gridLayer;
 	protected DefaultRowHeaderDataLayer rowHeaderDataLayer;
+
+	protected Table data;
+
+	protected boolean expandGroups = false;
+
+	/**
+	 * Layout des Composites setzten, muss {@link #createNatTable(Composite, Form, Table) createNatTable} aufrufen
+	 * 
+	 * @param parent
+	 */
+	protected abstract void createComposite(Composite parent);
+
+	/**
+	 * Hier können weitere Konfigurationen zur Nattable hinzugefügt werden. Z.B. der Selection Mode oder Listener auf Events
+	 * 
+	 * @param natTable
+	 */
+	protected abstract void addNattableConfiguration(NatTable natTable);
+
+	/**
+	 * Hier muss die {@link MinovaColumnConfiguration} zurückgegeben werden, die für die Nattable genutzt werden soll
+	 * 
+	 * @param table
+	 * @return
+	 */
+	public abstract MinovaColumnConfiguration createColumnConfiguration(Table table);
+
+	/**
+	 * Sollen Spalten Gruppiert werden können?
+	 * 
+	 * @return
+	 */
+	protected abstract boolean useGroupBy();
+
+	/**
+	 * Sollen Spalten Sortiert werden können?
+	 * 
+	 * @return
+	 */
+	protected abstract boolean useSortingHeader();
+
+	/**
+	 * Sollen es eine Zusammenfassungs-Zeile geben?
+	 * 
+	 * @return
+	 */
+	protected abstract boolean useSummaryRow();
+
+	//////////////////////////////
+	// Erstellen der Tabelle /////
+	//////////////////////////////
+
+	@PostConstruct
+	public void init(Composite parent) {
+		context = mPerspective.getContext();
+		createComposite(parent);
+	}
 
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
 
@@ -237,7 +287,9 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		natTable.setConfigRegistry(configRegistry);
 		natTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
-		natTable.addConfiguration(getSingleClickSortConfiguration());
+		if (useSortingHeader()) {
+			natTable.addConfiguration(getSortConfig());
+		}
 
 		mcc = createColumnConfiguration(table);
 		natTable.addConfiguration(mcc);
@@ -256,23 +308,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			natTable.addConfiguration(new TreeLayerExpandCollapseKeyBindings(bodyLayerStack.getTreeLayer(), bodyLayerStack.getSelectionLayer()));
 
 			// Bei Doppelklick auf ein gruppiertes Element diese Gruppierung entfernen
-			natTable.addConfiguration(new AbstractUiBindingConfiguration() {
-				@Override
-				public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
-					uiBindingRegistry.registerDoubleClickBinding(new MouseEventMatcher(SWT.NONE, GroupByHeaderLayer.GROUP_BY_REGION) {
-						@Override
-						public boolean matches(NatTable natTable, MouseEvent event, LabelStack regionLabels) {
-							if (super.matches(natTable, event, regionLabels)) {
-								return groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y) >= 0;
-							}
-							return false;
-						}
-					}, (natTableDummy, event) -> {
-						int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y);
-						natTableDummy.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
-					});
-				}
-			});
+			natTable.addConfiguration(getDoubleClickConfig());
 		}
 
 		natTable.configure();
@@ -281,23 +317,43 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		return natTable;
 	}
 
-	@PostConstruct
-	public void init(Composite parent) {
-		context = mPerspective.getContext();
-		createComposite(parent);
+	private AbstractUiBindingConfiguration getDoubleClickConfig() {
+		return new AbstractUiBindingConfiguration() {
+			@Override
+			public void configureUiBindings(UiBindingRegistry uiBindingRegistry) {
+				uiBindingRegistry.registerDoubleClickBinding(new MouseEventMatcher(SWT.NONE, GroupByHeaderLayer.GROUP_BY_REGION) {
+					@Override
+					public boolean matches(NatTable natTable, MouseEvent event, LabelStack regionLabels) {
+						if (super.matches(natTable, event, regionLabels)) {
+							return groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y) >= 0;
+						}
+						return false;
+					}
+				}, (natTableDummy, event) -> {
+					int groupByColumnIndex = groupByHeaderLayer.getGroupByColumnIndexAtXY(event.x, event.y);
+					natTableDummy.doCommand(new UngroupByColumnIndexCommand(groupByColumnIndex));
+				});
+			}
+		};
 	}
 
-	protected abstract void createComposite(Composite parent);
+	private SingleClickSortConfiguration getSortConfig() {
+		return new SingleClickSortConfiguration() {
+			@Override
+			public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+				// normal
+				uiBindingRegistry.registerFirstSingleClickBinding(new ColumnHeaderClickEventMatcher(SWT.NONE, 1), new SortColumnAction(false));
 
-	protected abstract SingleClickSortConfiguration getSingleClickSortConfiguration();
-
-	protected abstract void addNattableConfiguration(NatTable natTable);
-
-	protected abstract boolean useGroupBy();
-
-	protected abstract boolean useSortingHeader();
-
-	protected abstract boolean useSummaryRow();
+				// multi
+				int keyMask = SWT.MOD3;
+				// für Linux andere Tastenkombi definieren
+				if (OSUtil.isLinux()) {
+					keyMask |= SWT.MOD2;
+				}
+				uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(keyMask), new SortColumnAction(true));
+			}
+		};
+	}
 
 	/**
 	 * Always encapsulate the body layer stack in an AbstractLayerTransform to ensure that the index transformations are performed in later commands.
@@ -410,7 +466,9 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		}
 	}
 
-	public abstract MinovaColumnConfiguration createColumnConfiguration(Table table);
+	//////////////////////////////
+	// Persistieren //////////////
+	//////////////////////////////
 
 	@PersistState
 	public void persistState() {
@@ -619,6 +677,10 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
 	}
 
+	//////////////////////////////
+	// Weitere Table Funktionalitäten
+	//////////////////////////////
+
 	/**
 	 * Setzt die größe der Spalten aus dem sichtbaren Bereiches im Index-Bereich auf die Maximale Breite des Inhalts.
 	 *
@@ -668,16 +730,32 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		bodyLayerStack.columnHideShowLayer.hideColumnPositions(positions);
 	}
 
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		if (columnPropertyAccessor != null) {
+			columnPropertyAccessor.translate(translationService);
+			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
+			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
+				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
+			}
+		}
+	}
+
+	//////////////////////////////
+	// Getter ////////////////////
+	//////////////////////////////
+
+	public Table getData() {
+		return data;
+	}
+
 	public SortedList<Row> getSortedList() {
 		return bodyLayerStack.getSortedList();
 	}
 
 	public ColumnHeaderLayer getColumnHeaderLayer() {
 		return columnHeaderLayer;
-	}
-
-	public Table getData() {
-		return data;
 	}
 
 	public GroupByHeaderLayer getGroupByHeaderLayer() {
@@ -702,18 +780,6 @@ public abstract class WFCNattablePart extends WFCFormPart {
 
 	public BodyLayerStack getBodyLayerStack() {
 		return this.bodyLayerStack;
-	}
-
-	@Inject
-	@Optional
-	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
-		if (columnPropertyAccessor != null) {
-			columnPropertyAccessor.translate(translationService);
-			String[] propertyNames = columnPropertyAccessor.getPropertyNames();
-			for (int i = 0; i < columnPropertyAccessor.getColumnCount(); i++) {
-				columnHeaderLayer.renameColumnIndex(i, columnPropertyAccessor.getTableHeadersMap().get(propertyNames[i]));
-			}
-		}
 	}
 
 	public void refreshNatTable() {
