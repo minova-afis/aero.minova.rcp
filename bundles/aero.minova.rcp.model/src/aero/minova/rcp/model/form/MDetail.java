@@ -22,14 +22,10 @@ public class MDetail {
 	private HashMap<String, MGrid> grids = new HashMap<>();
 	private HashMap<String, MButton> buttons = new HashMap<>();
 	private List<MSection> mSectionList = new ArrayList<>();
-
 	private List<IHelper> helpers = new ArrayList<>();
-
 	private Map<String, Form> optionPages = new HashMap<>();
 	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
-
 	private IDetailAccessor detailAccessor;
-
 	private boolean clearAfterSave;
 
 	/**
