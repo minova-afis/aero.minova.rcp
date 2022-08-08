@@ -31,6 +31,7 @@ import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaColumnConfiguration;
 import aero.minova.rcp.rcp.nattable.MinovaIndexConfiguration;
+import aero.minova.rcp.rcp.nattable.SelectionThread;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 
 public class WFCIndexPart extends WFCNattablePart {
@@ -80,7 +81,7 @@ public class WFCIndexPart extends WFCNattablePart {
 				if (selectionThread != null) {
 					selectionThread.interrupt();
 				}
-				selectionThread = new SelectionThread(tableSelectionBuffer);
+				selectionThread = new IndexSelection(tableSelectionBuffer);
 				selectionThread.start();
 			} else if (event instanceof RowStructuralRefreshEvent) {
 				NatTableUtil.resizeRows(natTable);
@@ -93,25 +94,14 @@ public class WFCIndexPart extends WFCNattablePart {
 
 	}
 
-	class SelectionThread extends Thread {
-		private int sleepMillis;
+	class IndexSelection extends SelectionThread {
 
-		/*
-		 * Thread, der für sleepMillis Millisekunden schläft und danach die Daten ins Detail lädt, wenn er nicht unterbrochen wurde
-		 */
-		public SelectionThread(int sleepMillis) {
-			this.sleepMillis = sleepMillis;
+		public IndexSelection(int sleepMillis) {
+			super(sleepMillis);
 		}
 
 		@Override
-		public void run() {
-			try {
-				Thread.sleep(sleepMillis);
-			} catch (InterruptedException e) {
-				// Restore interrupted state...
-				Thread.currentThread().interrupt();
-			}
-
+		protected void doSelectionAction() {
 			// Ausgewählten Zeilen müssen gefiltert werden, um Gruppen-Zeilen zu entfernen
 			List c = getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
 			List<Row> collection = (List<Row>) c.stream().filter(Row.class::isInstance).collect(Collectors.toList());

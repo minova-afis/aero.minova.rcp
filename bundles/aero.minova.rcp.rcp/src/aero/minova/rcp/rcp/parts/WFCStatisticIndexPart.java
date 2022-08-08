@@ -29,6 +29,7 @@ import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.nattable.MinovaColumnConfiguration;
 import aero.minova.rcp.rcp.nattable.MinovaStatisticConfiguration;
+import aero.minova.rcp.rcp.nattable.SelectionThread;
 import aero.minova.rcp.rcp.util.NatTableUtil;
 
 public class WFCStatisticIndexPart extends WFCNattablePart {
@@ -94,29 +95,17 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 					break;
 				}
 			}
-			data.addRow(row);
 		}
 	}
 
-	class SelectionThread extends Thread {
-		private int sleepMillis;
+	class StatisticSelection extends SelectionThread {
 
-		/*
-		 * Thread, der für sleepMillis Millisekunden schläft und danach die Daten ins Detail lädt, wenn er nicht unterbrochen wurde
-		 */
-		public SelectionThread(int sleepMillis) {
-			this.sleepMillis = sleepMillis;
+		public StatisticSelection(int sleepMillis) {
+			super(sleepMillis);
 		}
 
 		@Override
-		public void run() {
-			try {
-				Thread.sleep(sleepMillis);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return;
-			}
-
+		protected void doSelectionAction() {
 			List c = SelectionUtils.getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
 			if (c.get(0) instanceof Row) {
 				broker.post(Constants.BROKER_SELECTSTATISTIC, c.get(0));
@@ -138,7 +127,7 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 				if (selectionThread != null) {
 					selectionThread.interrupt();
 				}
-				selectionThread = new SelectionThread(tableSelectionBuffer);
+				selectionThread = new StatisticSelection(tableSelectionBuffer);
 				selectionThread.start();
 			} else if (event instanceof RowStructuralRefreshEvent) {
 				NatTableUtil.resizeRows(natTable);
