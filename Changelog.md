@@ -31,6 +31,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Code smells, Bugs und Security Hotspots mit Hilfe von Sonarqube entfernen
 - Ersten drei Radioboxen in selbe Zeile wie Label
 - Nicht mehr benötigte und fehlerhafte Datei AFIS_MDI.mdi entfernen
+- Mehrere Helper pro Maske unterstützen, auch Helper aus OPs nutzen
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
