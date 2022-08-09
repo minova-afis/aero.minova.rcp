@@ -84,8 +84,8 @@ public class MDetail {
 		return grids.get(name);
 	}
 
-	public HashMap<String, MBrowser> getBrowsers() {
-		return browsers;
+	public Collection<MBrowser> getBrowsers() {
+		return browsers.values();
 	}
 	
 	/**

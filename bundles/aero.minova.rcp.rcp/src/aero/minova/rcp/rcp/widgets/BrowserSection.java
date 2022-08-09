@@ -1,37 +1,24 @@
 package aero.minova.rcp.rcp.widgets;
 
-import static aero.minova.rcp.rcp.fields.FieldUtil.MARGIN_BORDER;
-
 import java.text.MessageFormat;
-
-import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.css.CssData;
-import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.css.ICssStyler;
-import aero.minova.rcp.rcp.fields.FieldUtil;
-import aero.minova.rcp.rcp.parts.Preview;
 
 public class BrowserSection {
 
 	IEclipsePreferences prefsDetailSections = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_DETAILSECTIONS);
-
-	@Inject
-	private MWindow mwindow;
 
 	private Composite composite;
 	private Browser browser;
@@ -49,7 +36,7 @@ public class BrowserSection {
 		fd.left = new FormAttachment(0);
 		fd.height = ICssStyler.CSS_ROW_HEIGHT * 10;
 		browser.setLayoutData(fd);
-
+		
 		browser.addProgressListener(new ProgressListener() {
 			@Override
 			public void completed(ProgressEvent event) {

@@ -55,6 +55,7 @@ import aero.minova.rcp.model.TransactionResultEntry;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
+import aero.minova.rcp.model.form.MBrowser;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
@@ -65,10 +66,12 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
+import aero.minova.rcp.rcp.accessor.BrowserAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
 import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
+import aero.minova.rcp.rcp.widgets.BrowserSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 
 public class WFCDetailCASRequestsUtil {
@@ -806,6 +809,12 @@ public class WFCDetailCASRequestsUtil {
 		for (MGrid g : mDetail.getGrids()) {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.clearGrid();
+		}
+
+		// Browser leeren
+		for (MBrowser b : mDetail.getBrowsers()) {
+			BrowserSection bs = ((BrowserAccessor) b.getBrowserAccessor()).getBrowserSection();
+			bs.clear();
 		}
 
 		// Revert Button updaten
