@@ -83,7 +83,9 @@ public class ImageUtil {
 		URL url = null;
 		try {
 			url = URI.create(location).toURL();
-		} catch (MalformedURLException | IllegalArgumentException e) {}
+		} catch (MalformedURLException | IllegalArgumentException e) {
+			// Bei Fehler null Image zurückgeben
+		}
 		return ImageDescriptor.createFromURL(url);
 	}
 
@@ -107,19 +109,39 @@ public class ImageUtil {
 	}
 
 	private static String findIcon(String icon, String iconSize) {
-		String iconWithoutExtension = icon.toLowerCase().replace(".png", "").replace(".ico", "");
 
 		// Zuerst im Images-Ordner des aero.minova.rcp.images Plugins suchen
+		String imagesPluginResult = checkImagesPlugin(icon, iconSize);
+		if (imagesPluginResult != null) {
+			return imagesPluginResult;
+		}
+
+		// Ansonsten im heruntergelandenen Images Ordner suchen
+		String imagesFolderResult = checkImagesFolder(icon, iconSize);
+		if (imagesFolderResult != null) {
+			return imagesFolderResult;
+		}
+
+		// Wenn nichts gefunden wurde ursprünglichen Text zurückgeben
+		return icon;
+	}
+
+	private static String checkImagesPlugin(String icon, String iconSize) {
 		Bundle bundle = Platform.getBundle("aero.minova.rcp.images");
 		URL localURL = FileLocator.find(bundle, new Path("images/" + icon + "/" + iconSize));
 		if (localURL != null) {
 			try {
 				return localURL.toURI().toString();
-			} catch (URISyntaxException e) {}
+			} catch (URISyntaxException e) {
+				return null;
+			}
 		}
+		return null;
+	}
 
-		// Ansonsten im heruntergelandenen Images Ordner suchen
-		bundle = FrameworkUtil.getBundle(ImageUtil.class);
+	private static String checkImagesFolder(String icon, String iconSize) {
+		String iconWithoutExtension = icon.toLowerCase().replace(".png", "").replace(".ico", "");
+		Bundle bundle = FrameworkUtil.getBundle(ImageUtil.class);
 		ServiceReference<IDataService> serviceReference = bundle.getBundleContext().getServiceReference(IDataService.class);
 		IDataService service = bundle.getBundleContext().getService(serviceReference);
 		Objects.requireNonNull(service);
@@ -140,9 +162,7 @@ public class ImageUtil {
 				return resolve.toUri().toString();
 			}
 		}
-
-		// Wenn nichts gefunden wurde ursprünglichen Text zurückgeben
-		return icon;
+		return null;
 	}
 
 	/**
@@ -246,6 +266,8 @@ public class ImageUtil {
 				case 48:
 					calculatedSize = 64;
 					break;
+				default: // Sollte nicht vorkommen
+					break;
 				}
 			} else if (dpi == 192) {
 				switch (calculatedSize) {
@@ -258,6 +280,8 @@ public class ImageUtil {
 				case 32:
 				case 48:
 					calculatedSize = 64;
+					break;
+				default: // Sollte nicht vorkommen
 					break;
 				}
 			}

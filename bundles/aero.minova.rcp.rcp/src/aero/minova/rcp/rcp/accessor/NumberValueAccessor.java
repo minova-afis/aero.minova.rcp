@@ -287,7 +287,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int ostart, int oend, int decimals,
 			int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
 
-		if (textBefore != null && !textBefore.isEmpty()) {
+		if (!textBefore.isEmpty()) {
 			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
 		}
 

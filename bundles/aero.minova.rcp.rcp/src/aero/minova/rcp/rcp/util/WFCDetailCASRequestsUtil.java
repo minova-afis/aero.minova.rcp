@@ -20,6 +20,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -63,6 +64,7 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MParamStringField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
+import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
@@ -104,6 +106,9 @@ public class WFCDetailCASRequestsUtil {
 
 	@Inject
 	IEventBroker broker;
+
+	@Inject
+	Logger logger;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_RELOAD_INDEX)
@@ -652,7 +657,12 @@ public class WFCDetailCASRequestsUtil {
 			CompletableFuture<List<TransactionResultEntry>> transactionResult = dataService.callTransactionAsync(procedureList);
 			try {
 				deleteEntry(transactionResult.get());
-			} catch (InterruptedException | ExecutionException e) {}
+			} catch (ExecutionException e) {
+				logger.error(e);
+			} catch (InterruptedException e) {
+				logger.error(e);
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 
@@ -903,8 +913,8 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	private void sendEventToHelper(@UIEventTopic(Constants.BROKER_SENDEVENTTOHELPER) ActionCode code) {
-		if (mDetail.getHelper() != null) {
-			mDetail.getHelper().handleDetailAction(code);
+		for (IHelper helper : mDetail.getHelpers()) {
+			helper.handleDetailAction(code);
 		}
 	}
 

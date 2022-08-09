@@ -1,15 +1,11 @@
 package aero.minova.rcp.rcp.nattable;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
@@ -27,38 +23,12 @@ import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.DateTimeType;
-import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.widgets.BooleanCheckBoxPainter;
 
-public class MinovaSearchConfiguration extends AbstractRegistryConfiguration {
-
-	private List<Column> columns;
-	private Locale locale = CustomLocale.getLocale();
-	private Form form;
-	private Map<String, aero.minova.rcp.form.model.xsd.Column> formColumns;
+public class MinovaSearchConfiguration extends MinovaColumnConfiguration {
 
 	public MinovaSearchConfiguration(List<Column> columns, Form form) {
-		this.columns = columns;
-		this.form = form;
-		initFormFields();
-	}
-
-	public void initFormFields() {
-		formColumns = new HashMap<>();
-		List<aero.minova.rcp.form.model.xsd.Column> column = form.getIndexView().getColumn();
-		for (aero.minova.rcp.form.model.xsd.Column column2 : column) {
-			formColumns.put(column2.getName(), column2);
-		}
-	}
-
-	public List<Integer> getHiddenColumns() {
-		List<Integer> hiddenCols = new ArrayList<>();
-		for (Column c : columns) {
-			if (!c.isVisible()) {
-				hiddenCols.add(columns.indexOf(c));
-			}
-		}
-		return hiddenCols;
+		super(columns, form);
 	}
 
 	@Override

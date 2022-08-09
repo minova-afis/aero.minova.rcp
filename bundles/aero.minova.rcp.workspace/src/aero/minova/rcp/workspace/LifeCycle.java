@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -119,26 +120,34 @@ public class LifeCycle {
 	 */
 	private URI loginDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog) {
 		try {
-			ISecurePreferences sPrefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-			if (!Platform.getInstanceLocation().isSet()) {
-				Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
+			Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
+			if (savedPrimaryWorkspaceAccessData.isPresent()) {
+				ISecurePreferences sPrefs = savedPrimaryWorkspaceAccessData.get();
+				if (!Platform.getInstanceLocation().isSet()) {
+					Platform.getInstanceLocation().set(new URL(sPrefs.get(WorkspaceAccessPreferences.APPLICATION_AREA, null)), false);
 
-				try {
-					workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				}
+					workspaceLocation = parseURI(workspaceLocation);
 
-				if (workspaceLocation == null) {
-					WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
-					workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
-				} else {
-					workspaceLocation = checkDefaultWorkspace(workspaceLocation, workspaceDialog, sPrefs);
+					if (workspaceLocation == null) {
+						WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
+						workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+					} else {
+						workspaceLocation = checkDefaultWorkspace(workspaceLocation, sPrefs);
+					}
 				}
 			}
 		} catch (Exception e) {
 			logger.error(e);
 			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+		}
+		return workspaceLocation;
+	}
+
+	private URI parseURI(URI workspaceLocation) {
+		try {
+			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
+		} catch (URISyntaxException e) {
+			logger.error(e);
 		}
 		return workspaceLocation;
 	}
@@ -152,7 +161,7 @@ public class LifeCycle {
 	 * @return
 	 * @throws StorageException
 	 */
-	private URI checkDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog, ISecurePreferences sPrefs) throws StorageException {
+	private URI checkDefaultWorkspace(URI workspaceLocation, ISecurePreferences sPrefs) throws StorageException {
 		String username = sPrefs.get(WorkspaceAccessPreferences.USER, null);
 		String pw = sPrefs.get(WorkspaceAccessPreferences.PASSWORD, null);
 		String url = sPrefs.get(WorkspaceAccessPreferences.URL, null);
@@ -165,13 +174,12 @@ public class LifeCycle {
 			dataService.setLogger(logger);
 			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
-			workspaceDialog = new WorkspaceDialog(null, logger, sPrefs.name());
-			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
-			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
+			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, logger, sPrefs.name());
+			defaultDialog.setDefaultConnectionString(defaultConnectionString);
+			workspaceLocation = loadWorkspaceConfigManually(defaultDialog, workspaceLocation);
 		}
 
 		return workspaceLocation;
-
 	}
 
 	/**
@@ -208,7 +216,7 @@ public class LifeCycle {
 				dataService.setCredentials(argUser, argPW, argURL, workspaceLocation);
 				return true;
 			} catch (URISyntaxException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 
@@ -246,7 +254,7 @@ public class LifeCycle {
 					workbenchContext.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, true);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 	}
@@ -266,7 +274,7 @@ public class LifeCycle {
 			Files.deleteIfExists(Path.of(workspaceLocation)
 					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.detailsections.prefs"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -283,7 +291,7 @@ public class LifeCycle {
 			readOut = in.readLine();
 			return readOut;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return "";
 	}
@@ -297,7 +305,7 @@ public class LifeCycle {
 		try {
 			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		Objects.requireNonNull(workspaceLocation);
 		dataService.setLogger(logger);

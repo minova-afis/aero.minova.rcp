@@ -1,7 +1,5 @@
 package aero.minova.rcp.uitests.util;
 
-import java.util.List;
-
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.workbench.IWorkbench;
@@ -11,6 +9,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.osgi.framework.FrameworkUtil;
 
 public class UITestUtil {
+	private UITestUtil() {}
 
 	public static void sleep() {
 		sleep(1000);
@@ -19,7 +18,9 @@ public class UITestUtil {
 	public static void sleep(Integer milliseconds) {
 		try {
 			Thread.sleep(milliseconds);
-		} catch (InterruptedException e) {}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	public static void loadIndex(SWTBotToolbarButton loadToolbarButton) {

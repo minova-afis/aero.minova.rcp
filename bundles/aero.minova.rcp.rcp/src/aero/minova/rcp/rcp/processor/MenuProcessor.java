@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -36,29 +37,35 @@ import aero.minova.rcp.form.setup.xbs.Preferences.Root;
 
 public class MenuProcessor {
 
+	private static final String PERSIST_STATE = "persistState";
 	private EModelService modelService;
 	private MApplication mApplication;
+	private Logger logger;
 
 	private String usingLocalMenu = "There was no response from the server. Application data may be out of date. Consider checking your connection and restarting the application.";
 	private String couldntLoadMenu = "There was no response from the server. The application isn't loaded properly. Please check your connection and restart the application.";
 	private int menuId = 0;
 
 	@Inject
-	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication, IEclipseContext context) {
+	public MenuProcessor(EModelService modelService, IDataService dataService, MApplication mApplication, IEclipseContext context, Logger logger) {
 
 		this.modelService = modelService;
 		this.mApplication = mApplication;
+		this.logger = logger;
 
 		// MDI (für Menü) herunterladen und parsen
 		try {
 			String mdiString = dataService.getHashedFile(Constants.MDI_FILE_NAME).get();
 			processXML(mdiString);
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			handleNoMDI(dataService);
 		}
 
-		File application = new File(dataService.getStoragePath() + "/" + Constants.MDI_FILE_NAME);
+		File application = new File(dataService.getStoragePath().resolve(Constants.MDI_FILE_NAME).toString());
 		if (!application.exists()) {
 			handleNoMDI(dataService);
 		}
@@ -78,7 +85,10 @@ public class MenuProcessor {
 			if (mapOfNode.containsKey("ApplicationID")) {
 				context.set("aero.minova.rcp.applicationid", mapOfNode.get("ApplicationID"));
 			}
-		} catch (InterruptedException | ExecutionException | JAXBException e) {
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
+		} catch (ExecutionException | JAXBException e) {
 			// Bei Fehler leere preference erstellen, siehe #1267
 			Preferences preferences = new Preferences();
 			preferences.setRoot(new Root());
@@ -95,7 +105,7 @@ public class MenuProcessor {
 		menuContribution.setParentId("org.eclipse.ui.main.menu");
 		menuContribution.setPositionInParent("after=additions");
 		menuContribution.setElementId("generated" + menuId++);
-		menuContribution.getPersistedState().put("persistState", "false");
+		menuContribution.getPersistedState().put(PERSIST_STATE, "false");
 		mApplication.getMenuContributions().add(menuContribution);
 		try {
 			mainMDI = XmlProcessor.get(fileContent, Main.class);
@@ -119,7 +129,7 @@ public class MenuProcessor {
 			}
 
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -132,21 +142,20 @@ public class MenuProcessor {
 	 * @param modelService
 	 * @param mApplication
 	 */
-	private MMenu createMenu(MenuType menu_MDI, HashMap<String, Action> actions_MDI, EModelService modelService, MApplication mApplication) {
+	private MMenu createMenu(MenuType menuMDI, HashMap<String, Action> actionsMDI, EModelService modelService, MApplication mApplication) {
 
 		MMenu menuGen = modelService.createModelElement(MMenu.class);
-		menuGen.getPersistedState().put("persistState", String.valueOf(false));
+		menuGen.getPersistedState().put(PERSIST_STATE, String.valueOf(false));
 		menuGen.setElementId("generated" + menuId++);
-		menuGen.setLabel(menu_MDI.getText());
+		menuGen.setLabel(menuMDI.getText());
 
-		// TODO Sortierung des MENUS aus der MDI beachten!!!
-		if (!menu_MDI.getEntryOrMenu().isEmpty() && menu_MDI.getEntryOrMenu() != null) {
-			for (Object object : menu_MDI.getEntryOrMenu()) {
+		if (!menuMDI.getEntryOrMenu().isEmpty() && menuMDI.getEntryOrMenu() != null) {
+			for (Object object : menuMDI.getEntryOrMenu()) {
 				if (object instanceof Entry) {
 					Entry entryMDI = (Entry) object;
 					if (!entryMDI.getType().equals("separator")) {
 						String id2 = ((Action) entryMDI.getId()).getId();
-						MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actions_MDI.get(id2), modelService, mApplication);
+						MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actionsMDI.get(id2), modelService, mApplication);
 						menuGen.getChildren().add(handledMenuItem);
 					}
 
@@ -169,7 +178,7 @@ public class MenuProcessor {
 	private MHandledMenuItem createMenuEntry(Entry entryMDI, Action actionMDI, EModelService modelService, MApplication mApplication) {
 
 		MHandledMenuItem handledMenuItem = modelService.createModelElement(MHandledMenuItem.class);
-		handledMenuItem.getPersistedState().put("persistState", String.valueOf(false));
+		handledMenuItem.getPersistedState().put(PERSIST_STATE, String.valueOf(false));
 
 		MCommand command = mApplication.getCommand("aero.minova.rcp.rcp.command.openform");
 		handledMenuItem.setCommand(command);
@@ -217,7 +226,11 @@ public class MenuProcessor {
 		try {
 			processXML(dataService.getCachedFileContent(Constants.MDI_FILE_NAME).get());
 			showConnectionErrorMessage(usingLocalMenu);
-		} catch (InterruptedException | ExecutionException e1) {
+		} catch (InterruptedException e) {
+			logger.error(e);
+			showConnectionErrorMessage(couldntLoadMenu);
+			Thread.currentThread().interrupt();
+		} catch (ExecutionException e1) {
 			showConnectionErrorMessage(couldntLoadMenu);
 		}
 	}

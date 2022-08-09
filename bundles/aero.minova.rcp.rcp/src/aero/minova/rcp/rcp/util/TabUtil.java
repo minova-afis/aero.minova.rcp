@@ -72,10 +72,10 @@ public class TabUtil {
 		}
 
 		Collections.sort(tabList, (f1, f2) -> {
-			int order1 = ((MinovaSectionData) f1.getLayoutData()).order;
-			int order2 = ((MinovaSectionData) f2.getLayoutData()).order;
-			boolean hFill1 = ((MinovaSectionData) f1.getLayoutData()).horizontalFill;
-			boolean hFill2 = ((MinovaSectionData) f2.getLayoutData()).horizontalFill;
+			int order1 = ((MinovaSectionData) f1.getLayoutData()).getOrder();
+			int order2 = ((MinovaSectionData) f2.getLayoutData()).getOrder();
+			boolean hFill1 = ((MinovaSectionData) f1.getLayoutData()).isHorizontalFill();
+			boolean hFill2 = ((MinovaSectionData) f2.getLayoutData()).isHorizontalFill();
 
 			if (hFill1 && !hFill2) {
 				return 1;

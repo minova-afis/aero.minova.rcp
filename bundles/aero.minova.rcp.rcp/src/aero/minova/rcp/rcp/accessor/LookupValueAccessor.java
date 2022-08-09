@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
@@ -25,13 +25,14 @@ import aero.minova.rcp.widgets.LookupComposite;
 
 public class LookupValueAccessor extends AbstractValueAccessor {
 
-	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.rcp/debug/lookupvalueaccessor"));
-
 	@Inject
 	IDataService dataService;
 
 	@Inject
 	UISynchronize sync;
+
+	@Inject
+	Logger logger;
 
 	public LookupValueAccessor(MField field, LookupComposite control) {
 		super(field, control);
@@ -61,23 +62,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 		if (control.isDisposed()) {
 			return;
 		}
-		if (LOG) {
-			try {
-				System.out.println("updateControlFromValue " + value.toString());
-			} catch (NullPointerException npe) {
-				System.out.println("updateControlFromValue null");
-			}
-
-		}
 
 		if (value == null) {
 			((LookupComposite) control).getDescription().setText("");
 			((LookupComposite) control).setText("");
 			if (((LookupComposite) control).getEditable()) {
 				((LookupComposite) control).setMessage("...");
-				if (LOG) {
-					System.out.println("Lookup " + ((LookupComposite) control).getLabel().getText() + " ist null");
-				}
 			}
 			return;
 		}
@@ -87,9 +77,6 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			((LookupComposite) control).getDescription().setText(lv.description);
 			((LookupComposite) control).setText(lv.keyText);
 			((LookupComposite) control).setMessage("...");
-			if (LOG) {
-				System.out.println("Lookup " + ((LookupComposite) control).getLabel().getText() + " ist leer");
-			}
 		} else {
 			Integer keyLong = null;
 			String keyText = null;
@@ -162,7 +149,12 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			if (l.size() == 1) {
 				field.setValue(l.get(0), true);
 			}
-		} catch (InterruptedException | ExecutionException e) {}
+		} catch (ExecutionException e) {
+			logger.error(e);
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	/**

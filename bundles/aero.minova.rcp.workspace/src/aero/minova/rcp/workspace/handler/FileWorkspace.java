@@ -5,13 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.prefs.BackingStoreException;
@@ -62,108 +61,122 @@ public class FileWorkspace extends WorkspaceHandler {
 			// Anwendungsdefinition prüfen
 			File applicationXbs = new File(appDir.getAbsolutePath() + "/application.xbs");
 			if (!applicationXbs.exists()) {
-				try {
-					// Wir schreiben mal eine Beispieldatei
-					Preferences sysNode = Preferences.userRoot();
-					sysNode = sysNode.node("/aero.minova/application");
-					sysNode.put("profile", "EXAMPLE");
-					FileOutputStream applicationOS = new FileOutputStream(applicationXbs);
-					sysNode.exportNode(applicationOS);
-					applicationOS.close();
-				} catch (IOException | BackingStoreException e) {
-					e.printStackTrace();
-				}
-				throw new WorkspaceException(MessageFormat.format("application.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
+				createApplicationXBS(appDir, applicationXbs);
 			}
 
 			// Anwendungsdefinition einlesen
 			Preferences prefs = Preferences.systemRoot();
-			try {
-				InputStream prefsIS = new FileInputStream(applicationXbs);
-				Preferences.importPreferences(prefsIS);
-			} catch (IOException | InvalidPreferencesFormatException e) {
-				e.printStackTrace();
-			}
+			readPrefs(applicationXbs);
 			prefs = prefs.node("/aero.minova/application");
 			workspaceData.setProfile(prefs.get("profile", "N/A"));
 
 			// Datenbankdefinition prüfen
 			File connectionXbs = new File(appDir.getAbsolutePath() + "/connection.xbs");
-			if (!connectionXbs.exists()) {
-				try {
-					// Wir schreiben mal eine Beispieldatei
-					Preferences sysNode = Preferences.userRoot();
-					sysNode = sysNode.node("/aero.minova/connection");
-					sysNode.put("url", "jdbc:jtds:sqlserver://localhost/SIS");
-					sysNode.put("driver", "net.sourceforge.jtds.jdbc.Driver");
-					FileOutputStream connectionOS = new FileOutputStream(connectionXbs);
-					sysNode.exportNode(connectionOS);
-					connectionOS.close();
-				} catch (IOException | BackingStoreException e) {
-					e.printStackTrace();
-				}
-				throw new WorkspaceException(MessageFormat.format("connection.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
-			}
+			createConnectionXBS(appDir, connectionXbs);
 
 			// Datenbankdefinition einlesen
 			prefs = Preferences.userRoot();
-			try {
-				InputStream prefsIS = new FileInputStream(connectionXbs);
-				Preferences.importPreferences(prefsIS);
-			} catch (IOException | InvalidPreferencesFormatException e) {
-				e.printStackTrace();
-			}
+			readPrefs(connectionXbs);
 			prefs = prefs.node("aero.minova/connection");
 
 			// Datenbanktreiber sicherheitshalber nochmals laden
 			String driverClassname = prefs.get("driver", null);
-			if (driverClassname != null) {
-				try {
-					Class.forName(driverClassname);
-				} catch (ClassNotFoundException e) {
-					throw new WorkspaceException("Driver class exception", e);
-				}
-			}
+			checkDriver(driverClassname);
 
 			// Verbindungeinstallung prüfen
-			String connectionString = prefs.get("url", null);
+			connectionString = prefs.get("url", null);
 			if (connectionString == null) {
 				throw new WorkspaceException("No url defined");
 			}
 			setConnectionString(connectionString);
 
 			// Verbindung mit Benutzername und Passwort versuchen
-			Connection connection = null;
-			try {
-				if (username == null || username.length() == 0) {
-					connection = DriverManager.getConnection(connectionString);
-				} else {
-					connection = DriverManager.getConnection(connectionString, username, password);
-				}
-			} catch (SQLException e) {
-				throw new WorkspaceException(MessageFormat.format("No connection to server {0} for user {1} possible ", connectionString, username));
-			}
+			Connection connection = checkConnection(username, password);
 
 			// Benutzername in der DB auslesen
-			PreparedStatement statement;
-			String sqlQuery = "select current_user username";
-			try {
-				statement = connection.prepareStatement(sqlQuery);
-				ResultSet resultSet = statement.executeQuery();
-//				if (resultSet.next()) {
-//					setRemoteUsername(resultSet.getString("username"));
-//				}
-				statement.close();
-				connection.close();
-			} catch (SQLException e) {
-				throw new WorkspaceException(MessageFormat.format("Error retrieving username please try statement ' {0}'", sqlQuery));
-			}
+			selectUser(connection);
 
 			// Wir sind erfolgreich an der Datenabnk angemeldet
 			return true;
 		} catch (URISyntaxException e) {
 			throw new WorkspaceException("Error connecting to application", e);
 		}
+	}
+
+	private void selectUser(Connection connection) throws WorkspaceException {
+		String sqlQuery = "select current_user username";
+		try (PreparedStatement statement = connection.prepareStatement(sqlQuery)) {
+			statement.executeQuery();
+			connection.close();
+		} catch (SQLException e) {
+			throw new WorkspaceException(MessageFormat.format("Error retrieving username please try statement ' {0}'", sqlQuery));
+		}
+	}
+
+	private Connection checkConnection(String username, String password) throws WorkspaceException {
+		Connection connection = null;
+		try {
+			if (username == null || username.length() == 0) {
+				connection = DriverManager.getConnection(connectionString);
+			} else {
+				connection = DriverManager.getConnection(connectionString, username, password);
+			}
+		} catch (SQLException e) {
+			throw new WorkspaceException(MessageFormat.format("No connection to server {0} for user {1} possible ", connectionString, username));
+		}
+		return connection;
+	}
+
+	private void checkDriver(String driverClassname) throws WorkspaceException {
+		if (driverClassname != null) {
+			try {
+				Class.forName(driverClassname);
+			} catch (ClassNotFoundException e) {
+				throw new WorkspaceException("Driver class exception", e);
+			}
+		}
+	}
+
+	private void createConnectionXBS(File appDir, File connectionXbs) throws WorkspaceException {
+		if (!connectionXbs.exists()) {
+			try {
+				// Wir schreiben mal eine Beispieldatei
+				Preferences sysNode = Preferences.userRoot();
+				sysNode = sysNode.node("/aero.minova/connection");
+				sysNode.put("url", "jdbc:jtds:sqlserver://localhost/SIS");
+				sysNode.put("driver", "net.sourceforge.jtds.jdbc.Driver");
+				FileOutputStream connectionOS = new FileOutputStream(connectionXbs);
+				sysNode.exportNode(connectionOS);
+				connectionOS.close();
+			} catch (IOException | BackingStoreException e) {
+				logger.error(e);
+			}
+			throw new WorkspaceException(MessageFormat.format("connection.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
+		}
+	}
+
+	private void readPrefs(File applicationXbs) {
+		try {
+			InputStream prefsIS = new FileInputStream(applicationXbs);
+			Preferences.importPreferences(prefsIS);
+		} catch (IOException | InvalidPreferencesFormatException e) {
+			logger.error(e);
+		}
+	}
+
+	private void createApplicationXBS(File appDir, File applicationXbs) throws WorkspaceException {
+		try {
+			// Wir schreiben mal eine Beispieldatei
+			Preferences sysNode = Preferences.userRoot();
+			sysNode = sysNode.node("/aero.minova/application");
+			sysNode.put("profile", "EXAMPLE");
+			FileOutputStream applicationOS = new FileOutputStream(applicationXbs);
+			sysNode.exportNode(applicationOS);
+			applicationOS.close();
+		} catch (IOException | BackingStoreException e) {
+			logger.error(e);
+		}
+		throw new WorkspaceException(MessageFormat.format("application.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 	}
 
 	@Override
@@ -181,20 +194,13 @@ public class FileWorkspace extends WorkspaceHandler {
 			String defaultPath = System.getProperty("user.home");
 
 			// build the desired path for the workspace
-			String path = defaultPath + "/" + LifeCycle.DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
+			String path = Path.of(defaultPath, LifeCycle.DEFAULT_CONFIG_FOLDER, workspaceData.getWorkspaceHashHex()).toString();
 			URL instanceLocationUrl;
 			try {
 				instanceLocationUrl = new URL("file", null, path);
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (IllegalStateException | IOException e) {
+				logger.error(e);
 			}
 			URL workspaceURL = Platform.getInstanceLocation().getURL();
 			File workspaceDir = new File(workspaceURL.getPath());

@@ -36,7 +36,6 @@ public class PWLocale extends CustomPWWidget {
 
 	private final List<String> dataL;
 	private CCombo comboCountries;
-	private CCombo comboLanguage;
 	private IEclipseContext context;
 	TranslationService translationService;
 
@@ -54,8 +53,9 @@ public class PWLocale extends CustomPWWidget {
 		this.context = context;
 		this.translationService = translationService;
 		Locale l = context.get(Locale.class);
-		if (l == null)
+		if (l == null) {
 			l = Locale.getDefault();
+		}
 		dataL = CustomLocale.getLanguages(l, CustomLocale.getLanguageTagListOfi18n(dataService));
 	}
 
@@ -69,10 +69,8 @@ public class PWLocale extends CustomPWWidget {
 		String language = PreferenceWindow.getInstance().getValueFor(ApplicationPreferences.LOCALE_LANGUAGE).toString();
 		Locale[] locales = CustomLocale.getLocales();
 		for (Locale l : locales) {
-			if (language.equals(l.getDisplayLanguage(l))) {
-				if (!l.getDisplayCountry(l).equals("") && !countries.contains(l.getDisplayCountry(l))) {
-					countries.add(l.getDisplayCountry(l));
-				}
+			if (language.equals(l.getDisplayLanguage(l)) && !l.getDisplayCountry(l).equals("") && !countries.contains(l.getDisplayCountry(l))) {
+				countries.add(l.getDisplayCountry(l));
 			}
 		}
 		Collections.sort(countries);
@@ -101,7 +99,7 @@ public class PWLocale extends CustomPWWidget {
 		cmpL.setLayoutData(cmpGridData);
 		addControl(cmpL);
 
-		comboLanguage = new CCombo(cmpL, SWT.BORDER | SWT.READ_ONLY);
+		CCombo comboLanguage = new CCombo(cmpL, SWT.BORDER | SWT.READ_ONLY);
 		GridData languageData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		languageData.heightHint = ComboHeightAdjust.getComboHeight();
 		comboLanguage.setLayoutData(languageData);
@@ -130,7 +128,7 @@ public class PWLocale extends CustomPWWidget {
 
 		});
 
-		Label icon = new Label(cmpL, SWT.NONE);
+		new Label(cmpL, SWT.NONE);
 
 		// Label für Landauswahl erstellen
 		final Label countryLabel = new Label(parent, SWT.NONE);
@@ -164,12 +162,13 @@ public class PWLocale extends CustomPWWidget {
 		}
 
 		comboCountries.addListener(SWT.Modify, event -> {
-			if (!comboCountries.getText().equals(null) && !comboCountries.getText().equals(""))
+			if (comboCountries.getText() != null && !comboCountries.getText().isBlank()) {
 				PreferenceWindow.getInstance().setValue(ApplicationPreferences.COUNTRY,
 						comboCountries.getItem(comboCountries.indexOf(comboCountries.getText())));
+			}
 		});
 
-		Label iconC = new Label(cmpC, SWT.NONE);
+		new Label(cmpC, SWT.NONE);
 
 		return comboLanguage;
 	}

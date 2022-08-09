@@ -43,6 +43,8 @@ import aero.minova.rcp.workspace.WorkspaceException;
 @SuppressWarnings("restriction")
 public class SpringBootWorkspace extends WorkspaceHandler {
 
+	private static final String XXXXXXXXXXXXXXXXXXXX = "xxxxxxxxxxxxxxxxxxxx";
+
 	private static final String KEYSTORE_FILE_NAME = "keystore.p12";
 
 	private static final int TIMEOUT_DURATION = 15;
@@ -96,12 +98,12 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	@Override
 	public void open() throws WorkspaceException {
 
-		if (!getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+		if (!getPassword().equals(XXXXXXXXXXXXXXXXXXXX)) {
 			// Entwender das Passwort ist null/leer oder es wurde manuell eingetragten / geändert
 			try {
 				checkCredentials(getPassword());
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 
@@ -115,12 +117,12 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				if (!getApplicationArea().isEmpty()) {
 					instanceLocationUrl = new URL(getApplicationArea());
 				} else {
-					String path = defaultPath + "/" + LifeCycle.DEFAULT_CONFIG_FOLDER + "/" + workspaceData.getWorkspaceHashHex() + "/";
-					instanceLocationUrl = new URL("file", null, path);
+					Path path = Path.of(defaultPath, LifeCycle.DEFAULT_CONFIG_FOLDER, workspaceData.getWorkspaceHashHex());
+					instanceLocationUrl = new URL("file", null, path.toString());
 				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
 			} catch (IllegalStateException | IOException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			URL workspaceURL = Platform.getInstanceLocation().getURL();
 			File workspaceDir = new File(workspaceURL.getPath());
@@ -136,7 +138,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				try {
 					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
 
-						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+						if (getPassword().isEmpty() || getPassword().equals(XXXXXXXXXXXXXXXXXXXX)) {
 							// ausgelesendes Passwort vom Store nehmen
 							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
 						} else {
@@ -148,7 +150,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						break;
 					}
 				} catch (StorageException | IOException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 
@@ -157,7 +159,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
 				try {
 					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
-						if (getPassword().isEmpty() || getPassword().equals("xxxxxxxxxxxxxxxxxxxx")) {
+						if (getPassword().isEmpty() || getPassword().equals(XXXXXXXXXXXXXXXXXXXX)) {
 							// ausgelesendes Passwort vom Store nehmen
 							workspaceData.setPassword(store.get(WorkspaceAccessPreferences.PASSWORD, null));
 						} else {
@@ -167,14 +169,14 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						break;
 					}
 				} catch (StorageException e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 		}
 		try {
 			checkCredentials(workspaceData.getPassword());
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -260,6 +262,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		} catch (IOException e) {
 			throw new WorkspaceException("IOException " + e.getMessage() + "\nUser or Password incorrect?");
 		} catch (InterruptedException i) {
+			Thread.currentThread().interrupt();
 			throw new WorkspaceException("InterruptedException " + i.getMessage());
 		} catch (IllegalArgumentException i) {
 			throw new WorkspaceException("IllegalArgumentException " + i.getMessage() + "\ninvalid URL?");

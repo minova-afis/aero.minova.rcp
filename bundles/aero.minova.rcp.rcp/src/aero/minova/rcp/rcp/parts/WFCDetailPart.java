@@ -24,6 +24,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -185,6 +186,9 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	EModelService eModelService;
 
+	@Inject
+	Logger logger;
+
 	MApplication mApplication;
 
 	private List<SectionGrid> sectionGrids = new ArrayList<>();
@@ -237,9 +241,9 @@ public class WFCDetailPart extends WFCFormPart {
 		mPerspective.getContext().set(Constants.DETAIL_WIDTH, detailWidth);
 		TranslateUtil.translate(composite, translationService, locale);
 
-		// Helper erst initialisieren, wenn casRequestsUtil erstellt wurde
-		if (mDetail.getHelper() != null) {
-			mDetail.getHelper().setControls(mDetail);
+		// Helpers erst initialisieren, wenn casRequestsUtil erstellt wurde
+		for (IHelper helper : mDetail.getHelpers()) {
+			helper.setControls(mDetail);
 		}
 
 		openRestoringUIDialog();
@@ -333,13 +337,13 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			logger.error(e1);
 		}
 
 		if (iHelper == null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
 		} else {
-			getDetail().setHelper(iHelper);
+			getDetail().addHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		}
 	}
@@ -365,11 +369,14 @@ public class WFCDetailPart extends WFCFormPart {
 								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
 								addOPFromGrid(opGrid, parent, op);
 							} catch (JAXBException e1) {
-								e1.printStackTrace();
+								logger.error(e1);
 							}
 						}
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
+					} catch (ExecutionException e) {
+						logger.error(e);
+					} catch (InterruptedException e) {
+						logger.error(e);
+						Thread.currentThread().interrupt();
 					} catch (NoSuchFieldException e) {
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
 					}
@@ -407,6 +414,8 @@ public class WFCDetailPart extends WFCFormPart {
 						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
 			}
 		}
+
+		initializeHelper(opForm.getHelperClass());
 	}
 
 	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) throws NoSuchFieldException {
@@ -498,13 +507,13 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// Order setzen und sectionCount erhöhen
 		sectionCount++;
-		sectionData.order = sectionCount;
+		sectionData.setOrder(sectionCount);
 
 		// Alten Zustand wiederherstellen
 		// HorizontalFill
 		String prefsHorizontalFillKey = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".horizontalFill";
 		String horizontalFillString = prefsDetailSections.get(prefsHorizontalFillKey, "false");
-		sectionData.horizontalFill = Boolean.parseBoolean(horizontalFillString);
+		sectionData.setHorizontalFill(Boolean.parseBoolean(horizontalFillString));
 
 		// Ein-/Ausgeklappt
 		String prefsExpandedString = form.getTitle() + "." + headOrPageOrGrid.getTranslationText() + ".expanded";
@@ -1113,7 +1122,7 @@ public class WFCDetailPart extends WFCFormPart {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e1) {
-			e1.printStackTrace();
+			logger.error(e1);
 		}
 	}
 

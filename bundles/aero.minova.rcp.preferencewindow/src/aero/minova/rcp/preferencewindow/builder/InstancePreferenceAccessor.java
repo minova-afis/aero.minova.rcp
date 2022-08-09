@@ -83,13 +83,13 @@ public class InstancePreferenceAccessor {
 			preferences.put(preferenceKey, (String) value);
 			break;
 		case INTEGER:
-			preferences.putInt(preferenceKey, Integer.valueOf((int) value));
+			preferences.putInt(preferenceKey, (int) value);
 			break;
 		case FLOAT:
-			preferences.putFloat(preferenceKey, Float.valueOf((float) value));
+			preferences.putFloat(preferenceKey, (float) value);
 			break;
 		case CHECK:
-			preferences.putBoolean(preferenceKey, Boolean.valueOf((boolean) value));
+			preferences.putBoolean(preferenceKey, (boolean) value);
 			break;
 		case FONT:
 			if (value != null) {

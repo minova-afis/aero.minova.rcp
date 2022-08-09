@@ -12,14 +12,13 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class HashService {
 
 	/**
-	 * Calculates the MD5 hash code of a file. SHA-256 would calculate a 256 bit
-	 * long hash code while MD5 only produces a 128 bit long hash code of the file
-	 * content. To minimize network traffic we use MD5, also because MD5 is
-	 * considered faster as SHA-256.
+	 * Calculates the MD5 hash code of a file. SHA-256 would calculate a 256 bit long hash code while MD5 only produces a 128 bit long hash code of the file
+	 * content. To minimize network traffic we use MD5, also because MD5 is considered faster as SHA-256.
 	 * 
 	 * @param f
 	 * @return MD5 calculated string
@@ -42,23 +41,23 @@ public class HashService {
 		return String.format(fx, new BigInteger(1, md.digest()));
 	}
 
-	public static String hashDirectory(Path path) throws IOException
-	{
+	public static String hashDirectory(Path path) throws IOException {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("MD5 is not available, check Java installation");
 		}
-		Files.walk(path).filter(f -> f.toFile().isFile()).forEach(f -> {
-			try {
-				md.update(hashFile(f.toFile()).getBytes());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-		
 
+		try (Stream<Path> walk = Files.walk(path)) {
+			walk.filter(f -> f.toFile().isFile()).forEach(f -> {
+				try {
+					md.update(hashFile(f.toFile()).getBytes());
+				} catch (IOException e) {
+					throw new RuntimeException("Error while trying to Hash File " + f.getFileName(), e);
+				}
+			});
+		}
 
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
 		return String.format(fx, new BigInteger(1, md.digest()));
@@ -68,16 +67,14 @@ public class HashService {
 	public interface ThrowingConsumer<T, E extends Exception> {
 		void accept(T t) throws E;
 	}
-	
-	static <T> Consumer<T> throwingConsumerWrapper(
-			  ThrowingConsumer<T, Exception> throwingConsumer) {
-			 
-			    return i -> {
-			        try {
-			            throwingConsumer.accept(i);
-			        } catch (Exception ex) {
-			            throw new RuntimeException(ex);
-			        }
-			    };
+
+	static <T> Consumer<T> throwingConsumerWrapper(ThrowingConsumer<T, Exception> throwingConsumer) {
+		return i -> {
+			try {
+				throwingConsumer.accept(i);
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
 			}
+		};
+	}
 }

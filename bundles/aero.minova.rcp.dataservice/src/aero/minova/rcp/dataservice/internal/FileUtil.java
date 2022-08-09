@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 
 import aero.minova.rcp.dataservice.HashService;
 
 public class FileUtil {
+	private FileUtil() {}
 
 	/**
 	 * Erstellt eine Datei. Falls sie existiert, wird sie geleert. <br>
@@ -36,24 +38,34 @@ public class FileUtil {
 				if (file.getParentFile() != null) {
 					file.getParentFile().mkdirs();
 				}
-				file.createNewFile();
+				if (!file.createNewFile()) { // Fehler beim Erstellen, nächste Nummer ausprobieren
+					throw new IOException();
+				}
 			} else {
 
 				// Versuchen, das File zu löschen und neu erstellen
-				if (file.delete()) {
-					file.createNewFile();
+				if (deleteFile(file) && file.createNewFile()) {
 					return path;
 				}
 
 				// Ansonsten leeren String in das File schreiben
-				FileOutputStream writer = new FileOutputStream(path);
-				writer.write(("").getBytes());
-				writer.close();
+				try (FileOutputStream writer = new FileOutputStream(path);) {
+					writer.write(("").getBytes());
+				}
 			}
 		} catch (IOException e) {
 			return createFile(path, number + 1);
 		}
 		return path;
+	}
+
+	public static boolean deleteFile(File file) {
+		try {
+			Files.delete(file.toPath());
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -67,7 +79,7 @@ public class FileUtil {
 			try {
 				return HashService.hashFile(file);
 			} catch (IOException e) {
-				e.printStackTrace();
+				// Fehler abfangen
 			}
 			return "-1";
 		});
@@ -75,10 +87,8 @@ public class FileUtil {
 
 	public static void ensureFoldersExist(File file) {
 		File folder = file.getParentFile();
-		if (!folder.exists()) {
-			if (!folder.mkdirs()) {
-				ensureFoldersExist(folder.getParentFile());
-			}
+		if (!folder.exists() && !folder.mkdirs()) {
+			ensureFoldersExist(folder.getParentFile());
 		}
 	}
 
@@ -97,7 +107,7 @@ public class FileUtil {
 		}
 
 		try {
-			file.delete();
+			Files.delete(file.toPath());
 		} catch (Exception e) {
 			// Exception abfangen, damit Rest gelöscht werden kann
 		}

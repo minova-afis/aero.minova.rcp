@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Locale;
+import java.util.Objects;
 
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
@@ -209,14 +210,26 @@ public class Value implements Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
-		Value v = null;
-		if (obj instanceof Value) {
-			v = (Value) obj;
+		if (this == obj) {
+			return true;
 		}
-		if (v == null) {
-			return false; // wir sind gesetzt und vergleichen mit null -> false
+		if (obj == null) {
+			return false;
 		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Value v = (Value) obj;
 
 		if (v.getValue() instanceof LookupValue && value instanceof Integer) {
 			return ((LookupValue) v.getValue()).getKeyLong().equals(value);
@@ -228,9 +241,9 @@ public class Value implements Serializable {
 		if (value == null && v.value != null) {
 			return false;
 		} else if (value == null && v.value == null) {
-			return this.type == v.type && this.getClass().equals(v.getClass());
+			return this.type == v.type;
 		}
 
-		return (this.type == v.type && this.value.equals(v.value) && this.getClass().equals(v.getClass()));
+		return (this.type == v.type && Objects.equals(this.value, v.value));
 	}
 }

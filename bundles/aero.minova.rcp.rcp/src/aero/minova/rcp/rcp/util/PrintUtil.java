@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -66,7 +65,7 @@ public class PrintUtil {
 					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(mPerspective, modelService, partService));
 				}
 			} catch (IOException | SAXException | TransformerException e) {
-				e.printStackTrace();
+				dataService.getLogger().error(e);
 				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
 						translationService.translate("@msg.ErrorShowingFile", null), e);
 			}
@@ -99,7 +98,9 @@ public class PrintUtil {
 					}
 				}
 			}
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// XSL nicht gefunden
+		}
 
 		return xslPathNew;
 	}
@@ -136,22 +137,10 @@ public class PrintUtil {
 	 * @param preview
 	 */
 	public static void showFile(String urlString, Preview preview) {
-		if (urlString != null) {
-			System.out.println(MessageFormat.format("versuche {0} anzuzeigen", urlString));
-			try {
-				if (preview == null) {
-					System.out.println(MessageFormat.format("öffne {0} auf dem Desktop", urlString));
-					Tools.openURL(urlString);
-				} else {
-					System.out.println(MessageFormat.format("öffne {0} im Preview-Fenster", urlString));
-					preview.openURL(urlString);
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				System.out.println("Error occured during the file open");
-			}
+		if (preview == null) {
+			Tools.openURL(urlString);
 		} else {
-			System.out.println("kann Datei NULL nicht anzeigen");
+			preview.openURL(urlString);
 		}
 	}
 

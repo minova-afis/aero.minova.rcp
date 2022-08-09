@@ -43,13 +43,14 @@ import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.ShortDateValueAccessor;
 import aero.minova.rcp.util.DateUtil;
+import aero.minova.rcp.util.OSUtil;
 
 public class ShortDateField {
 
 	private ShortDateField() {
 		throw new IllegalStateException("Utility class");
 	}
-	
+
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, String timezone, MPerspective perspective,
 			TranslationService translationService) {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
@@ -77,7 +78,7 @@ public class ShortDateField {
 		};
 		Control text;
 		LocalDateTime time = LocalDateTime.of(LocalDate.of(2000, 01, 01), LocalTime.of(11, 59));
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (OSUtil.isLinux()) {
 			Text text2 = new Text(composite, SWT.BORDER);
 			text = text2;
 			ToolTip tooltip = new ToolTip(text2.getShell(), SWT.ICON_INFORMATION);
@@ -88,6 +89,7 @@ public class ShortDateField {
 					text2.selectAll();
 					tooltip.setAutoHide(false);
 				}
+
 				@Override
 				public void focusLost(FocusEvent e) {
 					tooltip.setAutoHide(true);
@@ -143,7 +145,7 @@ public class ShortDateField {
 		text.setLayoutData(fd);
 		text.setData(CssData.CSSDATA_KEY,
 				new CssData(CssType.DATE_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(), false));
-		
+
 		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
 
 		return text;

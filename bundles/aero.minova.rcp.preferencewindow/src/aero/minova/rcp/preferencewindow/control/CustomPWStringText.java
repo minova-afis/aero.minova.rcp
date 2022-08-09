@@ -9,19 +9,14 @@ public class CustomPWStringText extends CustomPWText {
 	/**
 	 * Constructor
 	 * 
-	 * @param label associated label
-	 * @param propertyKey associated key
-	 * @param key 
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
+	 * @param key
 	 */
 	public CustomPWStringText(final String label, @Optional String tooltip, final String propertyKey) {
 		super(label, tooltip, propertyKey);
-	}
-
-	/**
-	 * @see org.eclipse.nebula.widgets.opal.preferencewindow.widgets.PWText#addVerifyListeners()
-	 */
-	@Override
-	public void addVerifyListeners() {
 	}
 
 	/**
@@ -34,7 +29,8 @@ public class CustomPWStringText extends CustomPWText {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), "");
 		} else {
 			if (!(value instanceof String)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a stringtext");
+				throw new UnsupportedOperationException(
+						"The property '" + getCustomPropertyKey() + "' has to be a String because it is associated to a stringtext");
 			}
 		}
 	}
@@ -44,9 +40,6 @@ public class CustomPWStringText extends CustomPWText {
 	 */
 	@Override
 	public Object convertValue() {
-		if(text.getText().equals(null)) {
-			return "";
-		}
 		return this.text.getText();
 	}
 
@@ -57,5 +50,4 @@ public class CustomPWStringText extends CustomPWText {
 	public int getStyle() {
 		return SWT.NONE;
 	}
-
 }

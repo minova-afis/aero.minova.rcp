@@ -28,9 +28,7 @@ public class WorkspaceAccessPreferences {
 	private static final String WORKSPACES = "aero.minova.rcp.workspace";
 	public static final String IS_PRIMARY_WORKSPACE = "isPrimaryWorkspace";
 
-	public WorkspaceAccessPreferences() {
-		throw new UnsupportedOperationException();
-	}
+	private WorkspaceAccessPreferences() {}
 
 	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password, String profile, String applicationArea,
 			boolean isPrimaryWorksace) {
@@ -60,7 +58,7 @@ public class WorkspaceAccessPreferences {
 		}
 	}
 
-	public static void deleteSavedWorkspace(String name) {
+	public static void deleteSavedWorkspace(String name, Logger logger) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
 				.node(WORKSPACES);
@@ -71,7 +69,7 @@ public class WorkspaceAccessPreferences {
 			try {
 				node.flush();
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 	}
@@ -92,13 +90,14 @@ public class WorkspaceAccessPreferences {
 	}
 
 	public static void resetDefaultWorkspace(Logger logger) {
-		ISecurePreferences prefs = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).get();
-		try {
-			prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
-			prefs.flush();
-		} catch (StorageException | IOException e1) {
-			logger.debug(e1, "Could not reset default workspace.");
-		}
+		WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).ifPresent(prefs -> {
+			try {
+				prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
+				prefs.flush();
+			} catch (StorageException | IOException e1) {
+				logger.debug(e1, "Could not reset default workspace.");
+			}
+		});
 	}
 
 	public static Optional<ISecurePreferences> getSavedPrimaryWorkspaceAccessData(Logger logger) {

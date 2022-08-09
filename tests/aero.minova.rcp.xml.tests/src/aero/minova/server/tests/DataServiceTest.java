@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.junit.FixMethodOrder;
@@ -60,9 +61,8 @@ class DataServiceTest {
 	@Test
 	@DisplayName("Ensures the server returns not 200 for files that do not exit")
 	void ensureThatWeThrowAnExceptionForMissingFiles() {
-		assertThrows(RuntimeException.class, () -> {
-			dataService.getServerHashForFile("test").join();
-		});
+		CompletableFuture<String> serverHashForFile = dataService.getServerHashForFile("test");
+		assertThrows(RuntimeException.class, () -> serverHashForFile.join());
 	}
 
 	@Test
@@ -80,17 +80,13 @@ class DataServiceTest {
 		// second call should read the cached file
 		String secondVersion = dataService.getHashedFile("application.mdi").join();
 
-		// TODO Check that really the hash version was used, maybe Mockito can be used
-		// to wrap the data service?
 		assertEquals(firstVersion, secondVersion);
 	}
 
 	@Test
 	@DisplayName("Ensure we can download aero.minova.invoice.helper")
-	void ensureDownloadOfPlugin() {
+	void ensureDownloadOfPlugin() throws IOException {
 		boolean hashedZip = dataService.getHashedZip("plugins.zip");
-		// TODO Check that really the hash version was used, maybe Mockito can be used
-		// to wrap the data service?
 		assertTrue(hashedZip);
 		Path storagePath = dataService.getStoragePath();
 		Path path = Paths.get(storagePath.toString(), "plugins");
@@ -99,8 +95,6 @@ class DataServiceTest {
 		try (Stream<Path> list = Files.list(path)) {
 			long count = list.filter(f -> f.toString().contains("aero.minova.invoice.helper")).count();
 			assertEquals(1, count, "Jar file nicht oder mehrfach vorhanden");
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

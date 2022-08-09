@@ -1,7 +1,6 @@
 package aero.minova.rcp.rcp.widgets;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +19,7 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -119,6 +119,7 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationConfiguration;
 import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
+import aero.minova.rcp.rcp.util.CustomComparator;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -147,6 +148,8 @@ public class SectionGrid {
 	private MWindow mwindow;
 	@Inject
 	private IEventBroker broker;
+	@Inject
+	Logger logger;
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
@@ -161,12 +164,10 @@ public class SectionGrid {
 
 	private SortedList<Row> sortedList;
 	private SelectionLayer selectionLayer;
-	private ColumnHideShowLayer columnHideShowLayer;
 
 	private LocalResourceManager resManager;
 
 	private IButtonAccessor deleteToolItemAccessor;
-	private IButtonAccessor insertToolItemAccessor;
 
 	private GridAccessor gridAccessor;
 
@@ -309,9 +310,7 @@ public class SectionGrid {
 		mButton.setButtonAccessor(bA);
 		mDetail.putButton(mButton);
 
-		if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_INSERT)) {
-			insertToolItemAccessor = bA;
-		} else if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
+		if (btn.getId().equals(Constants.CONTROL_GRID_BUTTON_DELETE)) {
 			deleteToolItemAccessor = bA;
 		}
 
@@ -377,7 +376,7 @@ public class SectionGrid {
 		eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
-		columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
+		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
 		selectionLayer = new SelectionLayer(columnHideShowLayer);
 
 		// Delete Button updaten (nur aktiviert, wenn eine Zelle gewählt ist)
@@ -516,7 +515,7 @@ public class SectionGrid {
 			String commandName = Constants.AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND;
 			execButtonHandler(Constants.CONTROL_GRID_BUTTON_OPTIMIZEHEIGHT, commandName);
 		});
-		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), (natTable, event) -> {
+		getNatTable().getUiBindingRegistry().registerKeyBinding(new KeyEventMatcher(SWT.CR), (matchedTable, event) -> {
 			Map<String, String> parameter = new HashMap<>();
 			ParameterizedCommand command = commandService.createCommand("aero.minova.rcp.rcp.command.traverseenter", parameter);
 			handlerService.executeHandler(command);
@@ -650,18 +649,18 @@ public class SectionGrid {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
 	public void fillHorizontal() {
 		MinovaSectionData rd = (MinovaSectionData) section.getLayoutData();
-		rd.horizontalFill = !rd.horizontalFill;
+		rd.setHorizontalFill(!rd.isHorizontalFill());
 		section.requestLayout();
 
 		// Zustand speichern, damit wiederhergestellt werden kann
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY) + ".horizontalFill";
-		prefsDetailSections.put(key, rd.horizontalFill + "");
+		prefsDetailSections.put(key, rd.isHorizontalFill() + "");
 	}
 
 	public Row addNewRow() {
@@ -753,26 +752,6 @@ public class SectionGrid {
 		natTable.commitAndCloseActiveCellEditor();
 	}
 
-	private class CustomComparator implements Comparator<Object> {
-		@Override
-		public int compare(Object o1, Object o2) {
-			if (o1 == null) {
-				if (o2 == null) {
-					return 0;
-				} else {
-					return -1;
-				}
-			} else if (o2 == null) {
-				return 1;
-			} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
-																														// gleiche Klasse haben
-				return ((Comparable) o1).compareTo(o2);
-			} else {
-				return o1.toString().compareTo(o2.toString());
-			}
-		}
-	}
-
 	public void saveState() {
 
 		String key = form.getTitle() + "." + section.getData(FieldUtil.TRANSLATE_PROPERTY);
@@ -795,7 +774,7 @@ public class SectionGrid {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 
 	}

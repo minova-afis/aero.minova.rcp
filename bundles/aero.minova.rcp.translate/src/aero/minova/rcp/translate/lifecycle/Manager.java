@@ -6,6 +6,7 @@ import java.util.Locale;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.internal.services.BundleTranslationProvider;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -40,7 +41,8 @@ public class Manager {
 		// welche die mit % anfangen unter der Haube von dem Minova Übersetztungsservice
 		// verwendet)
 		Object currentTranslationService = context.get(TranslationService.class);
-		if ("org.eclipse.e4.core.internal.services.BundleTranslationProvider".equals(currentTranslationService.getClass().getName())) {
+
+		if (currentTranslationService instanceof BundleTranslationProvider) {
 			WFCTranslationService translationService = ContextInjectionFactory.make(WFCTranslationService.class, context);
 			translationService.setTranslationService((TranslationService) currentTranslationService);
 			context.set(TranslationService.class, translationService);

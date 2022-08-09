@@ -5,32 +5,25 @@ import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 
+import aero.minova.rcp.exceptions.ToolsException;
+
 public class Tools {
 
-	public static void openURL(String url) throws Exception {
+	private Tools() {}
+
+	public static void openURL(String url) {
 		if (url == null || url.isEmpty()) {
-			throw new Exception("Cannot open empty/null location");
+			throw new ToolsException("Cannot open empty/null location");
 		}
 
 		// FIXME hier wird AWT verwendet
 		// vl. sollten wir lieber so was in der Art verwenden:
-		// Runtime.getRuntime().exec("cmd.exe /c start url");
+		// Runtime.getRuntime().exec("cmd.exe /c start url")
 		// das ist aber betriebssystemabhängig
 
 		// Desktop.isDesktopSupported() wirft meistens beim 1. Versuch eine XC, ab dann funktionierts
 		// Um dem Nutzer die Fehlermeldung zu ersparen, probieren wirs gleich mehrmals
-		Boolean isDesktopSupported = null;
-		int tries = 3;
-		while (isDesktopSupported == null) {
-			if (tries-- > 0) {
-				try {
-					isDesktopSupported = Desktop.isDesktopSupported();
-				} catch (final Throwable t) {}
-			} else {
-				// letzter Versuch ohne try/catch
-				isDesktopSupported = Desktop.isDesktopSupported();
-			}
-		}
+		boolean isDesktopSupported = checkDesktopSupported();
 
 		if (isDesktopSupported) {
 			try {
@@ -43,15 +36,33 @@ public class Tools {
 					// Datei öffnen
 					final File f = new File(url);
 					if (!f.exists()) {
-						throw new Exception("File not found " + url);
+						throw new ToolsException("File not found " + url);
 					}
 					Desktop.getDesktop().open(f);
 				}
 			} catch (final Exception e) {
-				throw new Exception("Error occured during the view:\r\n" + e.getMessage(), e);
+				throw new ToolsException("Error occured during the view:\r\n" + e.getMessage(), e);
 			}
 		} else {
-			throw new Exception("Desktop not supported");
+			throw new ToolsException("Desktop not supported");
 		}
+	}
+
+	private static boolean checkDesktopSupported() {
+		Boolean isDesktopSupported = null;
+		int tries = 3;
+		while (isDesktopSupported == null) {
+			if (tries-- > 0) {
+				try {
+					isDesktopSupported = Desktop.isDesktopSupported();
+				} catch (final Exception t) {
+					// Weiter, machen 3 Versuche
+				}
+			} else {
+				// letzter Versuch ohne try/catch
+				isDesktopSupported = Desktop.isDesktopSupported();
+			}
+		}
+		return isDesktopSupported;
 	}
 }

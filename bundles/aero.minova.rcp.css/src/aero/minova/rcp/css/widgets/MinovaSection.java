@@ -77,7 +77,7 @@ public class MinovaSection extends Section {
 	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
-		((MinovaSectionData) this.getLayoutData()).visible = visible;
+		((MinovaSectionData) this.getLayoutData()).setVisible(visible);
 		this.getParent().requestLayout();
 	}
 

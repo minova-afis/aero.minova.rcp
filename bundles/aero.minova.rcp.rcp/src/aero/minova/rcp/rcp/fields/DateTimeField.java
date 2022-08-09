@@ -45,6 +45,7 @@ import aero.minova.rcp.preferencewindow.builder.DisplayType;
 import aero.minova.rcp.preferencewindow.builder.InstancePreferenceAccessor;
 import aero.minova.rcp.rcp.accessor.DateTimeValueAccessor;
 import aero.minova.rcp.util.DateTimeUtil;
+import aero.minova.rcp.util.OSUtil;
 
 public class DateTimeField {
 
@@ -74,7 +75,7 @@ public class DateTimeField {
 
 		Control text;
 		LocalDateTime of = LocalDateTime.of(LocalDate.of(2020, 12, 12), LocalTime.of(22, 55));
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (OSUtil.isLinux()) {
 			Text text2 = new Text(composite, SWT.BORDER);
 			text = text2;
 			ToolTip tooltip = new ToolTip(text2.getShell(), SWT.ICON_INFORMATION);

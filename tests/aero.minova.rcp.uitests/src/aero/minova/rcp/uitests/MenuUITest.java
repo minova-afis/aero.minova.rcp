@@ -38,6 +38,7 @@ import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
+import aero.minova.rcp.util.OSUtil;
 
 @SuppressWarnings("restriction")
 @ExtendWith(SWTBotJunit5Extension.class)
@@ -55,7 +56,7 @@ public class MenuUITest {
 
 	@Test
 	public void openPreferencesAndTestMenu() {
-		if (System.getProperty("os.name").startsWith("Linux")) {
+		if (OSUtil.isLinux()) {
 			return;
 		}
 
@@ -106,7 +107,6 @@ public class MenuUITest {
 				counter = checkEntries(menuEntries, counter, menuOrEntry);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}

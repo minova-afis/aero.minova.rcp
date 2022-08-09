@@ -1,14 +1,12 @@
 package aero.minova.rcp.xml.tests;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -31,6 +29,8 @@ import aero.minova.rcp.model.ValueSerializer;
 class GsonTest {
 
 	private Table t;
+
+	private Path path = Path.of("resources", "work", "examplejson.json");
 
 	@BeforeEach
 	public void setup() {
@@ -81,26 +81,10 @@ class GsonTest {
 		assertNotNull(t);
 	}
 
-//	@Test
-	void blabla() {
-		Instant now = Instant.parse("2020-08-04T22:00:00Z");
-		System.out.println(now);
+	@Test
+	void readExample() throws IOException  {
 
-		String s = null;
-		String userDir = System.getProperty("user.home");
-		String p = userDir
-				+ "/git/aero.minova.rcp/tests/aero.minova.rcp.xml.tests/src/aero/minova/rcp/xml/tests/examplejson.json";
-		try {
-			// FileReader fr = new FileReader(f);
-			s = new String(Files.readAllBytes(Paths.get(p)));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		String content = Files.readString(path);
 		Gson gson = new Gson();
 		gson = new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
@@ -108,7 +92,7 @@ class GsonTest {
 				.setPrettyPrinting() //
 				.create();
 
-		SqlProcedureResult sql = gson.fromJson(s, SqlProcedureResult.class);
+		SqlProcedureResult sql = gson.fromJson(content, SqlProcedureResult.class);
 		assertNotNull(sql.getOutputParameters().getRows());
 	}
 
