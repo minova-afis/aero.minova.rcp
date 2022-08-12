@@ -255,7 +255,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 			logger.info("CAS Answer Ping: \n" + answer.toString());
 			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
-				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
+				throw new WorkspaceException("Unexpected Answer, please check Server!");
 			}
 		} catch (ConnectException e) {
 			logger.error(e);
@@ -269,10 +269,10 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			throw new WorkspaceException("InterruptedException " + e.getMessage());
 		} catch (IllegalArgumentException e) {
 			logger.error(e);
-			throw new WorkspaceException("IllegalArgumentException " + e.getMessage() + "\ninvalid URL?");
+			throw new WorkspaceException("IllegalArgumentException " + e.getMessage() + "\nInvalid URL?");
 		} catch (NullPointerException e) {
 			logger.error(e);
-			throw new WorkspaceException("NullPointerException " + e.getMessage() + "Please enter Password again");
+			throw new WorkspaceException("NullPointerException " + e.getMessage() + "\nPlease enter Password again");
 		}
 	}
 
