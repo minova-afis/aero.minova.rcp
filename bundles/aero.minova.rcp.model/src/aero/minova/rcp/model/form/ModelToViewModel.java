@@ -11,6 +11,8 @@ import aero.minova.rcp.model.KeyType;
 
 public class ModelToViewModel {
 
+	private ModelToViewModel() {}
+
 	public static MField convert(Field field, Locale locale) {
 		MField f = initializeModelField(field, locale);
 
