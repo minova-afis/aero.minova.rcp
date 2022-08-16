@@ -43,5 +43,9 @@ public enum CssType {
 	/**
 	 * Label Text Felder FETT
 	 */
-	LABEL_TEXT_BOLD_FIELD;
+	LABEL_TEXT_BOLD_FIELD,
+	/**
+	 * Radio-Felder
+	 */
+	RADIO_FIELD;
 }
