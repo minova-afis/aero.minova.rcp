@@ -191,7 +191,7 @@ public class MinovaSectionStyler implements ICssStyler {
 		for (Control child : comp.getChildren()) {
 			if (child instanceof Button) {
 				FormData childFD = (FormData) child.getLayoutData();
-				childFD.top.offset = i / 3 * rowHeight;
+				childFD.top.offset = i / 3 * rowHeight + sectionSpacing;
 				i++;
 			}
 		}
