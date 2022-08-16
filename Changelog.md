@@ -29,7 +29,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Unnötige Tests für die Anzahl an TimeZones entfernen, PreferencewindowTests beim Bauen ausführen
 - Einstellung des Dark-Modes unter MacOS ignorieren
 - Code smells, Bugs und Security Hotspots mit Hilfe von Sonarqube entfernen
-- Ersten drei Radioboxen in selbe Zeile wie Label
+- Ersten drei Radioboxen in selbe Zeile wie Label, Label rechtsbündig
 - Nicht mehr benötigte und fehlerhafte Datei AFIS_MDI.mdi entfernen
 - Mehrere Helper pro Maske unterstützen, auch Helper aus OPs nutzen
 - Fehler bei Login Loggen, Verwirrende Meldung ("too many authentication attempts") entfernen 

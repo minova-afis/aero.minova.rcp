@@ -803,8 +803,8 @@ public class WFCDetailCASRequestsUtil {
 		// Felder leeren
 		selectedTable = null;
 		getSelectedOptionPages().clear();
+		setKeys(null);
 		for (MField f : mDetail.getFields()) {
-			setKeys(null);
 			f.setValue(null, false);
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);
