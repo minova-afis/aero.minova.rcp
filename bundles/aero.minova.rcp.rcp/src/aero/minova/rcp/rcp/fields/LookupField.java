@@ -95,6 +95,10 @@ public class LookupField {
 
 		lookupControl.addTraverseListener(e -> {
 			Text text = ((Text) e.getSource());
+			if (text.isDisposed()) {
+				return;
+			}
+
 			LookupComposite t = (LookupComposite) text.getParent();
 			switch (e.detail) {
 			case SWT.TRAVERSE_TAB_PREVIOUS:
