@@ -33,6 +33,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Nicht mehr benötigte und fehlerhafte Datei AFIS_MDI.mdi entfernen
 - Mehrere Helper pro Maske unterstützen, auch Helper aus OPs nutzen
 - Fehler bei Login Loggen, Verwirrende Meldung ("too many authentication attempts") entfernen 
+- Bei nicht-pflicht Lookups einzigen Wert nicht automatisch eintragen
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
