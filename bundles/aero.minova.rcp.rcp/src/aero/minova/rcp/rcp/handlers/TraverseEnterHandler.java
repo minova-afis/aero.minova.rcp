@@ -192,7 +192,7 @@ public class TraverseEnterHandler {
 				((SelectionLayer) natTable.getData(Constants.GRID_DATA_SELECTIONLAYER)).clear();
 			}
 
-			if (!cellSelected) {
+			if (!cellSelected && !comp.isDisposed()) {
 				List<Control> tabListFromFocussedControlSection = Arrays.asList(comp.getTabList());
 				List<Section> sectionList = ((DetailAccessor) mDetail.getDetailAccessor()).getSectionList();
 

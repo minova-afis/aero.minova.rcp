@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,7 @@ import aero.minova.rcp.rcp.accessor.GridAccessor;
 import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.widgets.LookupComposite;
 
 public class WFCDetailCASRequestsUtil {
 
@@ -804,11 +806,15 @@ public class WFCDetailCASRequestsUtil {
 		selectedTable = null;
 		getSelectedOptionPages().clear();
 		setKeys(null);
-		for (MField f : mDetail.getFields()) {
-			f.setValue(null, false);
-			if (f instanceof MLookupField) {
-				((MLookupField) f).setOptions(null);
+		try {
+			for (MField f : mDetail.getFields()) {
+				f.setValue(null, false);
+				if (f instanceof MLookupField) {
+					((MLookupField) f).setOptions(null);
+				}
 			}
+		} catch (ConcurrentModificationException e) {
+			// Bei ParamString Feldern kann eine ConcurrentModificationException auftreten
 		}
 
 		// Grids leeren
