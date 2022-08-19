@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.jface.dialogs.PlainMessageDialog;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -27,6 +28,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.dataservice.internal.FileUtil;
 
@@ -35,13 +37,11 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	@Inject
 	Logger logger;
 
-	IDataService dataService;
-
-	TranslationService translationService;
-
 	IEclipseContext context;
-
-	private IWorkbench workbench;
+	IDataService dataService;
+	TranslationService translationService;
+	IWorkbench workbench;
+	IStylingEngine engine;
 
 	/**
 	 * Constructor
@@ -54,13 +54,13 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	 * @param iEclipseContext
 	 * @param dataService2
 	 */
-	public TextButtonForCurrentWorkspace(final String label, final String tooltip, final String propertyKey, final TranslationService translationService,
-			IDataService dataService, IEclipseContext context, IWorkbench workbench) {
+	public TextButtonForCurrentWorkspace(final String label, final String tooltip, final String propertyKey, IEclipseContext context) {
 		super(label, tooltip, propertyKey, 2, false);
-		this.translationService = translationService;
-		this.dataService = dataService;
 		this.context = context;
-		this.workbench = workbench;
+		this.translationService = context.get(TranslationService.class);
+		this.dataService = context.get(IDataService.class);
+		this.engine = context.get(IStylingEngine.class);
+		this.workbench = context.get(IWorkbench.class);
 	}
 
 	/**
@@ -68,31 +68,11 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 	 */
 	@Override
 	public Control build(final Composite parent) {
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(getLabel());
-		label.setToolTipText(getTooltip());
-		addControl(label);
-		final GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
-		labelGridData.horizontalIndent = getIndent();
-		label.setLayoutData(labelGridData);
 
-		Composite cmp = new Composite(parent, SWT.NONE);
-		cmp.setLayout(new GridLayout(3, false));
-		addControl(cmp);
+		// Aktueller Workspace
+		Composite cmp = createTextFieldWithLabel(parent, getLabel(), getTooltip(), dataService.getStoragePath().toAbsolutePath().toString());
 
-		final Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
-		text.setToolTipText(getTooltip());
-		addControl(text);
-		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
-		textGridData.widthHint = 250;
-		text.setLayoutData(textGridData);
-
-		if (dataService != null) {
-			text.setText(dataService.getStoragePath().toAbsolutePath().toString());
-		} else {
-			text.setText(translationService.translate("Not found", null));
-		}
-
+		// Workspace Öffnen Knopf
 		final Button openButton = new Button(cmp, SWT.PUSH);
 		GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		openButton.setText(translationService.translate("@Action.Open", null));
@@ -109,6 +89,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			}
 		});
 
+		// Workspace Löschen Knopf
 		final Button deleteButton = new Button(cmp, SWT.PUSH);
 		buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		deleteButton.setText(translationService.translate("@Action.Delete", null));
@@ -131,7 +112,39 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 			}
 		});
 
+		// Aktueller User
+		createTextFieldWithLabel(parent, translationService.translate("@Preferences.CurrentUser", null), null, dataService.getUserName());
+
+		// Aktuelle Connection
+		createTextFieldWithLabel(parent, translationService.translate("@Preferences.CurrentConnection", null), null, dataService.getServer().toString());
+
 		return deleteButton;
+	}
+
+	private Composite createTextFieldWithLabel(final Composite parent, String labelText, String tooltipText, String textFieldContent) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(labelText);
+		label.setToolTipText(tooltipText);
+		addControl(label);
+		GridData labelGridData = new GridData(SWT.END, SWT.CENTER, false, false);
+		labelGridData.horizontalIndent = getIndent();
+		label.setLayoutData(labelGridData);
+
+		Composite cmp = new Composite(parent, SWT.NONE);
+		cmp.setLayout(new GridLayout(3, false));
+		addControl(cmp);
+
+		Text text = new Text(cmp, SWT.BORDER | SWT.READ_ONLY);
+		text.setToolTipText(tooltipText);
+		addControl(text);
+		GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
+		textGridData.widthHint = 250;
+		text.setLayoutData(textGridData);
+		engine.setClassname(text, Constants.CSS_READONLY);
+
+		text.setText(textFieldContent);
+
+		return cmp;
 	}
 
 	/**

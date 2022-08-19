@@ -283,10 +283,9 @@ public class ApplicationPreferenceWindowHandler {
 			break;
 		case CUSTOMCHECK:
 			if (pref.getKey().equals("DefaultWorkspace")) {
-				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), pref.getTooltip(), key, translationService).setIndent(25);
+				widget = new TextButtonForDefaultWorkspace(pref.getLabel(), pref.getTooltip(), key, application.getContext()).setIndent(25);
 			} else {
-				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), pref.getTooltip(), key, translationService, dataService, application.getContext(),
-						workbench).setIndent(25);
+				widget = new TextButtonForCurrentWorkspace(pref.getLabel(), pref.getTooltip(), key, application.getContext()).setIndent(25);
 			}
 			break;
 		case DATE_UTIL:
