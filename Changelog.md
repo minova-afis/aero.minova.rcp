@@ -35,6 +35,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Fehler bei Login Loggen, Verwirrende Meldung ("too many authentication attempts") entfernen 
 - Bei nicht-pflicht Lookups einzigen Wert nicht automatisch eintragen
 - Hinweis "Keine Datensätze geladen" als Benachrichtigungs-Popup anzeigen
+- Connection-String und Username in Einstellungen anzeigen
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 
