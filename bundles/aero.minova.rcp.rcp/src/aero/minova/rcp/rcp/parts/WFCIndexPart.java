@@ -10,10 +10,10 @@ import javax.inject.Inject;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
@@ -22,7 +22,6 @@ import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionL
 import org.eclipse.nebula.widgets.nattable.selection.event.RowSelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import aero.minova.rcp.constants.Constants;
@@ -43,6 +42,9 @@ public class WFCIndexPart extends WFCNattablePart {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TABLE_SELECTION_BUFFER_MS)
 	protected int tableSelectionBuffer;
+
+	@Inject
+	IEventBroker broker;
 
 	protected SelectionThread selectionThread;
 
@@ -149,8 +151,7 @@ public class WFCIndexPart extends WFCNattablePart {
 		updateData(resultTable.getRows(), resultTable.getMetaData().getPage() != 1);
 
 		if (resultTable.getRows().isEmpty()) {
-			MessageDialog.openInformation(Display.getDefault().getActiveShell(), translationService.translate("@Information", null),
-					translationService.translate("@msg.NoRecordsLoaded", null));
+			broker.post(Constants.BROKER_SHOWNOTIFICATION, "@msg.NoRecordsLoaded");
 		}
 	}
 
