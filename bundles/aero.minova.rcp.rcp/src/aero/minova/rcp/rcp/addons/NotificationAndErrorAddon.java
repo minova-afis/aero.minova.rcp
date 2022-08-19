@@ -196,7 +196,7 @@ public class NotificationAndErrorAddon {
 	 * @param message
 	 */
 	public void openNotificationPopup(String message) {
-		if (!shell.getDisplay().isDisposed()) {
+		if (shell != null && !shell.getDisplay().isDisposed()) {
 			MinovaNotifier.show(shell, getTranslation(message), getTranslation("Notification"));
 		}
 	}
