@@ -189,6 +189,7 @@ public class Constants {
 	public static final String OPTION_PAGE = "OptionPage";
 	public static final String OPTION_PAGE_GRID = "OptionPageGrid";
 	public static final String GRID = "Grid";
+	public static final String OPTION_PAGE_QUOTE_ENTRY_SYMBOL = "*";
 
 	// Commands
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_GRIDBUTTONCOMMAND = "aero.minova.rcp.rcp.command.gridbuttoncommand";

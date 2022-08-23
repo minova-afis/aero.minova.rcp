@@ -120,6 +120,7 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.util.CustomComparator;
+import aero.minova.rcp.rcp.util.StringToValueUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -665,6 +666,7 @@ public class SectionGrid {
 
 	public Row addNewRow() {
 		Row newRow = dataTable.addRow();
+		setValuesAccordingToXBS(newRow);
 		rowsToInsert.add(newRow);
 		fireChange(new GridChangeEvent(gridAccessor.getMGrid(), newRow, dataTable.getRows().size() - 1, true, GridChangeType.INSERT));
 		updateNatTable();
@@ -710,12 +712,33 @@ public class SectionGrid {
 	}
 
 	private void setReferenceOrMainValue(Row r, Map<String, Value> primaryKeys, String mainFieldName, int indexInRow) {
-		if (primaryKeys == null) { // Bei Insert ReferenceValue
+		if (mainFieldName.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+			// Statischer Wert, Keys müssen nicht geändert werden
+		} else if (primaryKeys == null) { // Bei Insert ReferenceValue
 			ReferenceValue v = new ReferenceValue(Constants.TRANSACTION_PARENT, mainFieldName);
 			r.setValue(v, indexInRow);
 		} else { // Bei Update Wert aus der Hauptmaske
 			Value v = mDetail.getField(mainFieldName).getValue();
 			r.setValue(v, indexInRow);
+		}
+	}
+
+	/**
+	 * Setzt die Values, wie sie in der XBS gegeben sind. Entweder einen statischen Wert, oder den Wert eines Feldes aus der Hauptmaske.
+	 * 
+	 * @param r
+	 */
+	private void setValuesAccordingToXBS(Row r) {
+		for (Entry<String, String> e : getFieldnameToValue().entrySet()) {
+			int indexInRow = dataTable.getColumnIndex(e.getKey());
+			if (e.getValue().startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+				Value v = StringToValueUtil.stringToValue(e.getValue().substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()),
+						dataTable.getColumns().get(indexInRow).getType());
+				r.setValue(v, indexInRow);
+			} else {
+				Value v = mDetail.getField(e.getValue()).getValue();
+				r.setValue(v, indexInRow);
+			}
 		}
 	}
 
