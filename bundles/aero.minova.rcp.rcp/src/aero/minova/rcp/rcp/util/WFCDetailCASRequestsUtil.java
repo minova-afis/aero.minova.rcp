@@ -289,7 +289,7 @@ public class WFCDetailCASRequestsUtil {
 			// Spalte für Feld finden
 			if (useColumnName) {
 				indexInRow = keyTable.getColumnIndex(f.getName());
-			} else if (keysToValue.containsKey(f.getName())) {
+			} else if (keysToValue.containsKey(f.getName()) && !keysToValue.get(f.getName()).startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
 				MField correspondingField = mDetail.getField(keysToValue.get(f.getName()));
 				indexInRow = keyTable.getColumnIndex(correspondingField.getName());
 			}
@@ -451,6 +451,23 @@ public class WFCDetailCASRequestsUtil {
 		Row r = rb.create();
 		formTable.addRow(r);
 		return formTable;
+	}
+
+	public void setValuesAccordingToXBS() {
+		for (Form optionPage : mDetail.getOptionPages()) {
+			String optionPageName = optionPage.getDetail().getProcedureSuffix();
+			for (Entry<String, String> e : mDetail.getOptionPageKeys(optionPageName).entrySet()) {
+				String value = e.getValue();
+				MField opField = mDetail.getField(optionPageName + "." + e.getKey());
+
+				if (value.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+					Value v = StringToValueUtil.stringToValue(value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()), opField.getDataType());
+					opField.setValue(v, false);
+				} else {
+					opField.setValue(mDetail.getField(value).getValue(), false);
+				}
+			}
+		}
 	}
 
 	private Table getInsertUpdateTable(Form buildForm) {
@@ -826,6 +843,9 @@ public class WFCDetailCASRequestsUtil {
 			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 			sg.clearGrid();
 		}
+
+		// In XBS gegebene Felder wieder füllen
+		setValuesAccordingToXBS();
 
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
