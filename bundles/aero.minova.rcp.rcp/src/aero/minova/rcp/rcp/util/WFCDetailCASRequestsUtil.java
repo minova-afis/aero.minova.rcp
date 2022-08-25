@@ -46,7 +46,6 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.Column;
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.ReferenceValue;
@@ -472,7 +471,7 @@ public class WFCDetailCASRequestsUtil {
 						Value v = StaticXBSValueUtil.stringToValue(value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()), opField.getDataType(),
 								opField.getDateTimeType(), translationService, timezone);
 						opField.setValue(v, false);
-						addValueToDirtyCheck(v, e.getKey(), opField.getDataType(), optionPageName);
+						setValueAsCleanForDirtyFlag(v, e.getKey(), optionPageName);
 					} catch (Exception exception) {
 						NoSuchFieldException error = new NoSuchFieldException("String \"" + value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length())
 								+ "\" can't be parsed to Type \"" + opField.getDataType() + "\" of Field \"" + e.getKey() + "\"! (As defined in .xbs)");
@@ -481,7 +480,7 @@ public class WFCDetailCASRequestsUtil {
 					}
 				} else {
 					opField.setValue(mDetail.getField(value).getValue(), false);
-					addValueToDirtyCheck(mDetail.getField(value).getValue(), e.getKey(), opField.getDataType(), optionPageName);
+					setValueAsCleanForDirtyFlag(mDetail.getField(value).getValue(), e.getKey(), optionPageName);
 				}
 			}
 		}
@@ -1119,7 +1118,18 @@ public class WFCDetailCASRequestsUtil {
 		}
 	}
 
-	public void addValueToDirtyCheck(Value v, String columnName, DataType dataType, String opName) {
+	/**
+	 * Mit dieser Methode können Values gesetzt werden, sodass sie vom Dirty-Flag als "clean" angesehen werden. Solange das Feld also diesen Wert hat springt
+	 * das Dirty-Flag für dieses nicht an. Das kann z.B. in Helpern genutzt werden, um Felder vorzubelegen.
+	 * 
+	 * @param v
+	 *            Wert, der als clean angesehen werden soll
+	 * @param fieldName
+	 *            Name des Feldes. Für Felder in OptionPages OHNE den Prefix (Name der OptionPage)
+	 * @param opName
+	 *            ProcedureSuffix der OptionPage in der das Feld ist, oder null für Feld der Hauptmaske
+	 */
+	public void setValueAsCleanForDirtyFlag(Value v, String fieldName, String opName) {
 
 		Table t = null;
 		if (opName != null) {
@@ -1138,14 +1148,15 @@ public class WFCDetailCASRequestsUtil {
 		Row r = t.getRows().get(0);
 
 		// Spalte existiert noch nicht, muss erstellt werden
-		if (t.getColumnIndex(columnName) == -1) {
+		if (t.getColumnIndex(fieldName) == -1) {
 			t.getRows().clear();
-			t.addColumn(new Column(columnName, dataType));
+			String suffix = opName != null ? opName + "." : "";
+			t.addColumn(new Column(fieldName, mDetail.getField(suffix + fieldName).getDataType()));
 			r.addValue(v);
 			t.addRow(r);
 		}
 
-		t.setValue(columnName, r, v);
+		t.setValue(fieldName, r, v);
 
 		if (opName != null) {
 			selectedOptionPages.put(opName, t);
