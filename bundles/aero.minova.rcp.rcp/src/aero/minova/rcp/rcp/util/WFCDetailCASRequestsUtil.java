@@ -45,6 +45,8 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
+import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.ReferenceValue;
@@ -114,6 +116,10 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX)
 	boolean showDiscardDialogIndex;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	public String timezone;
 
 	@Inject
 	DirtyFlagUtil dirtyFlagUtil;
@@ -461,10 +467,21 @@ public class WFCDetailCASRequestsUtil {
 				MField opField = mDetail.getField(optionPageName + "." + e.getKey());
 
 				if (value.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
-					Value v = StringToValueUtil.stringToValue(value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()), opField.getDataType());
-					opField.setValue(v, false);
+
+					try {
+						Value v = StaticXBSValueUtil.stringToValue(value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()), opField.getDataType(),
+								opField.getDateTimeType(), translationService, timezone);
+						opField.setValue(v, false);
+						addValueToDirtyCheck(v, e.getKey(), opField.getDataType(), optionPageName);
+					} catch (Exception exception) {
+						NoSuchFieldException error = new NoSuchFieldException("String \"" + value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length())
+								+ "\" can't be parsed to Type \"" + opField.getDataType() + "\" of Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+						logger.error(error);
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", error.getMessage());
+					}
 				} else {
 					opField.setValue(mDetail.getField(value).getValue(), false);
+					addValueToDirtyCheck(mDetail.getField(value).getValue(), e.getKey(), opField.getDataType(), optionPageName);
 				}
 			}
 		}
@@ -1100,6 +1117,43 @@ public class WFCDetailCASRequestsUtil {
 				f.setReadOnly(true);
 			}
 		}
+	}
+
+	public void addValueToDirtyCheck(Value v, String columnName, DataType dataType, String opName) {
+
+		Table t = null;
+		if (opName != null) {
+			if (selectedOptionPages != null) {
+				t = selectedOptionPages.get(opName);
+			}
+		} else {
+			t = selectedTable;
+		}
+
+		if (t == null) {
+			t = new Table();
+			t.addRow();
+		}
+
+		Row r = t.getRows().get(0);
+
+		// Spalte existiert noch nicht, muss erstellt werden
+		if (t.getColumnIndex(columnName) == -1) {
+			t.getRows().clear();
+			t.addColumn(new Column(columnName, dataType));
+			r.addValue(v);
+			t.addRow(r);
+		}
+
+		t.setValue(columnName, r, v);
+
+		if (opName != null) {
+			selectedOptionPages.put(opName, t);
+		} else {
+			selectedTable = t;
+		}
+
+		broker.post(Constants.BROKER_CHECKDIRTY, ""); // Check triggern
 	}
 
 	/**

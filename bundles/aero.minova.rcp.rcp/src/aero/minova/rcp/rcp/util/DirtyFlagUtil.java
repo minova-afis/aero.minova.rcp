@@ -76,7 +76,8 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 	boolean dirtyFlag;
 
 	/**
-	 * Prüfung ob eine Wertänderung in Feldern oder Grids stattgefunden hat.
+	 * Prüfung ob eine Wertänderung in Feldern oder Grids stattgefunden hat. Achtung: Das Dirty-Flag wird NICHT geupdated. Dafür
+	 * broker.post(Constants.BROKER_CHECKDIRTY, ""); nutzen
 	 *
 	 * @return true wenn es eine Änderung gab, false ansonsten.
 	 */
@@ -91,10 +92,22 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 	private boolean checkFields() {
 		// Prüfung der mFields ob es einen Value ≠ null gibt
 		if (casUtil.getSelectedTable() == null || casUtil.getSelectedTable().getRows().isEmpty()) {
-			return checkFieldsEmpty(mDetail.getFields());
+			return checkFieldsEmpty(dataFormService.getFieldsFromForm(form), "", new ArrayList<>());
 		}
 
 		return checkFieldsWithTable(casUtil.getSelectedTable(), form);
+	}
+
+	private boolean checkFieldsEmpty(List<Field> allFields, String fieldPrefix, List<MField> checkedFields) {
+		List<MField> fieldsToCheck = new ArrayList<>();
+		for (Field field : allFields) {
+			MField mfield = mDetail.getField(fieldPrefix + field.getName());
+
+			if (!checkedFields.contains(mfield)) {
+				fieldsToCheck.add(mfield);
+			}
+		}
+		return checkFieldsEmpty(fieldsToCheck);
 	}
 
 	private boolean checkFieldsEmpty(Collection<MField> fields) {
@@ -135,7 +148,6 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 			if (!checkFieldWithValue(c, sV)) {
 				return true;
 			}
-
 		}
 
 		// Sind die Felder in der Maske, die nicht in der ausgelesenen Tabelle sind, leer?
@@ -171,18 +183,6 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 		}
 
 		return Objects.equals(mField.getValue(), value);
-	}
-
-	private boolean checkFieldsEmpty(List<Field> allFields, String fieldPrefix, List<MField> checkedFields) {
-		List<MField> fieldsToCheck = new ArrayList<>();
-		for (Field field : allFields) {
-			MField mfield = mDetail.getField(fieldPrefix + field.getName());
-
-			if (!checkedFields.contains(mfield)) {
-				fieldsToCheck.add(mfield);
-			}
-		}
-		return checkFieldsEmpty(fieldsToCheck);
 	}
 
 	private boolean checkOPs() {
