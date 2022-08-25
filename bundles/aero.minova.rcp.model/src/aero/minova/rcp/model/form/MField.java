@@ -5,6 +5,7 @@ import java.util.List;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.DateTimeType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
@@ -37,6 +38,7 @@ public abstract class MField {
 	private String lookupDescription;
 	private List<String> lookupParameters;
 	private final DataType dataType;
+	private DateTimeType dateTimeType;
 	private MDetail mDetail;
 	private boolean originalRequired;
 	private boolean required;
@@ -508,5 +510,13 @@ public abstract class MField {
 
 	public void setLabelText(boolean b) {
 		labelText = b;
+	}
+
+	public DateTimeType getDateTimeType() {
+		return dateTimeType;
+	}
+
+	public void setDateTimeType(DateTimeType dateTimeType) {
+		this.dateTimeType = dateTimeType;
 	}
 }
