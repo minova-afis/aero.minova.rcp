@@ -14,6 +14,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.3.0] - 2022-08-25
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
 ### Neu
 - CI pipeline mit SonarQube einrichten
 
