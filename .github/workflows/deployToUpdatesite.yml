@@ -33,7 +33,7 @@ jobs:
         
         
     - name: Build with Maven 
-      run: mvn clean verify -DskipTests=true --file pom.xml 
+      run: mvn clean verify -DskipTests=true --file pom.xml --settings .github/settings.xml
     - name: Deploy 🚀
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUBACTION_TOKEN_SECRET }}
