@@ -25,6 +25,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -81,6 +82,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.prefs.BackingStoreException;
@@ -120,7 +122,7 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.util.CustomComparator;
-import aero.minova.rcp.rcp.util.StringToValueUtil;
+import aero.minova.rcp.rcp.util.StaticXBSValueUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -155,6 +157,10 @@ public class SectionGrid {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
 	boolean gridTabNavigation;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	public String timezone;
 
 	private NatTable natTable;
 	private Table dataTable;
@@ -732,9 +738,18 @@ public class SectionGrid {
 		for (Entry<String, String> e : getFieldnameToValue().entrySet()) {
 			int indexInRow = dataTable.getColumnIndex(e.getKey());
 			if (e.getValue().startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
-				Value v = StringToValueUtil.stringToValue(e.getValue().substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()),
-						dataTable.getColumns().get(indexInRow).getType());
-				r.setValue(v, indexInRow);
+				Column c = dataTable.getColumns().get(indexInRow);
+				try {
+					Value v = StaticXBSValueUtil.stringToValue(e.getValue().substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()), c.getType(),
+							c.getDateTimeType(), translationService, timezone);
+					r.setValue(v, indexInRow);
+				} catch (Exception exception) {
+					NoSuchFieldException error = new NoSuchFieldException(
+							"String \"" + e.getValue().substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()) + "\" can't be parsed to Type \""
+									+ c.getType() + "\" of Column \"" + c.getName() + "\"! (As defined in .xbs)");
+					logger.error(error);
+					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", error.getMessage());
+				}
 			} else {
 				Value v = mDetail.getField(e.getValue()).getValue();
 				r.setValue(v, indexInRow);
