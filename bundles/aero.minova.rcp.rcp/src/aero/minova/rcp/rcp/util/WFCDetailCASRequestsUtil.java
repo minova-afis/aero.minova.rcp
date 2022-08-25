@@ -476,7 +476,7 @@ public class WFCDetailCASRequestsUtil {
 						NoSuchFieldException error = new NoSuchFieldException("String \"" + value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length())
 								+ "\" can't be parsed to Type \"" + opField.getDataType() + "\" of Field \"" + e.getKey() + "\"! (As defined in .xbs)");
 						logger.error(error);
-						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", error.getMessage());
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), ERROR, error.getMessage());
 					}
 				} else {
 					opField.setValue(mDetail.getField(value).getValue(), false);
@@ -1133,9 +1133,7 @@ public class WFCDetailCASRequestsUtil {
 
 		Table t = null;
 		if (opName != null) {
-			if (selectedOptionPages != null) {
-				t = selectedOptionPages.get(opName);
-			}
+			t = selectedOptionPages.get(opName);
 		} else {
 			t = selectedTable;
 		}
