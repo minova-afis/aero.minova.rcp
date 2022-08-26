@@ -8,6 +8,7 @@ public class Constants {
 	public static final String SEARCH_PART = "aero.minova.rcp.rcp.part.search";
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
+	public static final String DETAIL_TOOLBAR = "aero.minova.rcp.rcp.part.details.toolbar";
 
 	public static final String SEARCH_TABLE = "NatTableDataSearchArea";
 
