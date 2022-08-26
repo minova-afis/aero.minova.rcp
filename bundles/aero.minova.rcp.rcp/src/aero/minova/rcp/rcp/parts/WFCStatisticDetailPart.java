@@ -155,7 +155,7 @@ public class WFCStatisticDetailPart {
 	 * @param title
 	 */
 	private void layoutSection() {
-		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, translationService);
 		section.setData(TRANSLATE_PROPERTY, "@" + STATISTIC);
 		MinovaSectionData sectionData = new MinovaSectionData();
 		section.setLayoutData(sectionData);

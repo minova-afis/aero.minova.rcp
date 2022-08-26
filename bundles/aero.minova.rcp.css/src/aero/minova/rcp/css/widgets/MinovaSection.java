@@ -1,5 +1,6 @@
 package aero.minova.rcp.css.widgets;
 
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -12,6 +13,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.css.MinovaSectionStyler;
+import aero.minova.rcp.util.ScreenshotUtil;
 
 public class MinovaSection extends Section {
 	private ICssStyler cssStyler;
@@ -22,7 +24,7 @@ public class MinovaSection extends Section {
 
 	private boolean minimized;
 
-	public MinovaSection(Composite parent, int style) {
+	public MinovaSection(Composite parent, int style, TranslationService translationService) {
 		super(parent, style);
 
 		cssStyler = new MinovaSectionStyler(this);
@@ -60,6 +62,9 @@ public class MinovaSection extends Section {
 				});
 			}
 		});
+
+		// Rechtsklick-Menü für Screenshot erstellen
+		this.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, this, imageLink.getText(), translationService));
 	}
 
 	public void setImage(final Image image) {
