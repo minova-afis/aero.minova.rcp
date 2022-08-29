@@ -255,11 +255,11 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	@Optional
 	/**
-	 * Sobald das Toolbar-Widget des Detail-Parts erstellt wird rechtsklick-Menü zum Erstellen eines Screenshots hinzufügen
+	 * Sobald das Toolbar-Widget des Detail-Parts erstellt wird Rechtsklick-Menü zum Erstellen eines Screenshots hinzufügen
 	 * 
 	 * @param event
 	 */
-	public void subscribeTopicPartActivation(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
+	public void subscribeTopicWidgetChange(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
 
 		// Nur SET-Event der Detail-Toolbar herausfiltern
 		Object element = event.getProperty(EventTags.ELEMENT);
