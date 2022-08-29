@@ -1,6 +1,9 @@
 package aero.minova.rcp.exceptions;
 
 public class ToolsException extends RuntimeException {
+
+	private static final long serialVersionUID = 202208120927L;
+
 	public ToolsException(String errorMessage) {
 		super(errorMessage);
 	}

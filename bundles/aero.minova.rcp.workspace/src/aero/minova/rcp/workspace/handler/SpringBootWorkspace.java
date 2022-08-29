@@ -255,19 +255,24 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 			logger.info("CAS Answer Ping: \n" + answer.toString());
 			if (((answer.statusCode() <= 199) || (answer.statusCode() >= 300))) {
-				throw new WorkspaceException("Unerwartete Antwort, bitte Server überprüfen!");
+				throw new WorkspaceException("Unexpected Answer, please check Server!");
 			}
-		} catch (ConnectException ex) {
-			throw new WorkspaceException("ConnectException " + ex.getMessage());
+		} catch (ConnectException e) {
+			logger.error(e);
+			throw new WorkspaceException("ConnectException " + e.getMessage());
 		} catch (IOException e) {
-			throw new WorkspaceException("IOException " + e.getMessage() + "\nUser or Password incorrect?");
-		} catch (InterruptedException i) {
+			logger.error(e);
+			throw new WorkspaceException("IOException\nUser, Password or Server incorrect?");
+		} catch (InterruptedException e) {
+			logger.error(e);
 			Thread.currentThread().interrupt();
-			throw new WorkspaceException("InterruptedException " + i.getMessage());
-		} catch (IllegalArgumentException i) {
-			throw new WorkspaceException("IllegalArgumentException " + i.getMessage() + "\ninvalid URL?");
+			throw new WorkspaceException("InterruptedException " + e.getMessage());
+		} catch (IllegalArgumentException e) {
+			logger.error(e);
+			throw new WorkspaceException("IllegalArgumentException " + e.getMessage() + "\nInvalid URL?");
 		} catch (NullPointerException e) {
-			throw new WorkspaceException("NullPointerException " + e.getMessage() + "Please enter Password again");
+			logger.error(e);
+			throw new WorkspaceException("NullPointerException " + e.getMessage() + "\nPlease enter Password again");
 		}
 	}
 

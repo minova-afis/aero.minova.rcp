@@ -15,6 +15,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Neu
+- Statische Werte können über XBS konfiguriert werden
+
+## [12.3.0] - 2022-08-25
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Neu
 - CI pipeline mit SonarQube einrichten
 - Browser Section, für die Darstellung von Attachments im Detail
 
@@ -30,10 +37,14 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Unnötige Tests für die Anzahl an TimeZones entfernen, PreferencewindowTests beim Bauen ausführen
 - Einstellung des Dark-Modes unter MacOS ignorieren
 - Code smells, Bugs und Security Hotspots mit Hilfe von Sonarqube entfernen
-- Ersten drei Radioboxen in selbe Zeile wie Label
+- Ersten drei Radioboxen in selbe Zeile wie Label, Label rechtsbündig
 - Nicht mehr benötigte und fehlerhafte Datei AFIS_MDI.mdi entfernen
 - Mehrere Helper pro Maske unterstützen, auch Helper aus OPs nutzen
 - PageOrHeadOrGridWrapper ausgelagert in eigene Klasse, SectionWrapper
+- Fehler bei Login Loggen, Verwirrende Meldung ("too many authentication attempts") entfernen 
+- Bei nicht-pflicht Lookups einzigen Wert nicht automatisch eintragen
+- Hinweis "Keine Datensätze geladen" als Benachrichtigungs-Popup anzeigen
+- Connection-String und Username in Einstellungen anzeigen
 
 ### Bugfixes
 - Auswahl von Radioboxen komplett entfernen, wenn ein bereits ausgewähltes Element geklickt wird 

@@ -9,10 +9,8 @@ import java.util.Objects;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.ButtonFactory;
-import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,7 +25,6 @@ import org.eclipse.swt.widgets.Label;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
-import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MBooleanField;
@@ -46,19 +43,7 @@ public class RadioField {
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
 		MRadioField radioField = (MRadioField) field;
 
-		// Radiobox Label erstellen, dass über die gesamte breite geht
-		Label label = LabelFactory.newLabel(SWT.LEFT).text(field.getLabel()).create(composite);
-		label.setData(TRANSLATE_PROPERTY, field.getLabel());
-		label.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "Description");
-
-		FormData fdL = new FormData();
-		fdL.right = new FormAttachment(100, -MARGIN_BORDER);
-		fdL.left = new FormAttachment(0);
-		fdL.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
-		label.setLayoutData(fdL);
-
-		CssData cssDataLabel = new CssData(CssType.LABEL_TEXT_FIELD, column, row, 4, 1, true);
-		label.setData(CssData.CSSDATA_KEY, cssDataLabel);
+		Label label = FieldLabel.create(composite, field);
 
 		RadioValueAccessor rva = new RadioValueAccessor(radioField, label);
 		ContextInjectionFactory.inject(rva, perspective.getContext());
@@ -70,12 +55,11 @@ public class RadioField {
 
 		FormData fdG = new FormData();
 		fdG.right = new FormAttachment(100, -MARGIN_BORDER);
-		fdG.left = new FormAttachment(0);
+		fdG.left = new FormAttachment(25);
 		fdG.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
 		comp.setLayoutData(fdG);
 
-		CssData cssDataComposite = new CssData(CssType.LABEL_TEXT_FIELD, column, row, 4, (int) Math.ceil((double) radioField.getRadiobuttons().size() / 3),
-				true);
+		CssData cssDataComposite = new CssData(CssType.RADIO_FIELD, column, row, 4, field.getNumberRowsSpanned(), true);
 		comp.setData(CssData.CSSDATA_KEY, cssDataComposite);
 
 		for (MBooleanField b : radioField.getRadiobuttons()) {
@@ -92,8 +76,8 @@ public class RadioField {
 			b.setValueAccessor(valueAccessor);
 
 			FormData fd = new FormData();
-			fd.top = new FormAttachment(comp, (int) (FieldUtil.MARGIN_TOP + (row + (Math.floor(indexInList / 3)) * ICssStyler.CSS_ROW_HEIGHT)));
-			fd.left = new FormAttachment((int) (25 * (indexInList % 3 + 1)));
+			fd.top = new FormAttachment(composite, FieldUtil.MARGIN_TOP + row * FieldUtil.COLUMN_HEIGHT);
+			fd.left = new FormAttachment((int) (33.33 * (indexInList % 3)));
 			button.setLayoutData(fd);
 
 			button.setData(TRANSLATE_PROPERTY, optionLabel);
@@ -115,7 +99,7 @@ public class RadioField {
 			});
 		}
 
+		FieldLabel.layout(label, comp, row, column, field.getNumberRowsSpanned());
 		return label;
 	}
-
 }

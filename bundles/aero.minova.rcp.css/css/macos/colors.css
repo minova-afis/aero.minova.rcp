@@ -41,7 +41,7 @@ Text#Console {
 	color: white;
 }
 
-Shell, FlatButton, TitledSeparator {
+Shell, FlatButton, TitledSeparator, List {
 	color: #404040;
 	background-color:  #ececec; /* Standard eclipse 2021-09 macos */
 }

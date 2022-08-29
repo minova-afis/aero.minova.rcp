@@ -119,26 +119,32 @@ public class Table {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 
 		Table other = (Table) obj;
 
 		// Namen vergleichen
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 
 		// Spalten vergleichen
 		if (columns == null) {
-			if (other.columns != null)
+			if (other.columns != null) {
 				return false;
+			}
 		} else if (columns.size() != other.columns.size()) {
 			return false;
 		} else {
@@ -151,8 +157,9 @@ public class Table {
 
 		// Zeilen vergleichen
 		if (rows == null) {
-			if (other.rows != null)
+			if (other.rows != null) {
 				return false;
+			}
 		} else if (rows.size() != other.rows.size()) {
 			return false;
 		} else {
@@ -196,7 +203,15 @@ public class Table {
 
 	@Override
 	public String toString() {
-		return "Table " + name;
+		StringBuilder columnsString = new StringBuilder("\n");
+		for (Column c : columns) {
+			columnsString.append(c + " ");
+		}
+		StringBuilder rowString = new StringBuilder("\n");
+		for (Row r : rows) {
+			rowString.append(r + "\n");
+		}
+		return "Table " + name + columnsString.toString() + rowString.toString();
 	}
 
 	public void setValue(String columnName, int rowIndex, Value newValue) {

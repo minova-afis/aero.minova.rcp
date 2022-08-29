@@ -45,6 +45,7 @@ import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
+import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
 import aero.minova.rcp.model.ReferenceValue;
@@ -117,6 +118,10 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SHOW_DISCARD_CHANGES_DIALOG_INDEX)
 	boolean showDiscardDialogIndex;
+
+	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
+	public String timezone;
 
 	@Inject
 	DirtyFlagUtil dirtyFlagUtil;
@@ -292,7 +297,7 @@ public class WFCDetailCASRequestsUtil {
 			// Spalte für Feld finden
 			if (useColumnName) {
 				indexInRow = keyTable.getColumnIndex(f.getName());
-			} else if (keysToValue.containsKey(f.getName())) {
+			} else if (keysToValue.containsKey(f.getName()) && !keysToValue.get(f.getName()).startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
 				MField correspondingField = mDetail.getField(keysToValue.get(f.getName()));
 				indexInRow = keyTable.getColumnIndex(correspondingField.getName());
 			}
@@ -320,7 +325,7 @@ public class WFCDetailCASRequestsUtil {
 
 	/**
 	 * Setzt die Werte aus der selectedTable und selectedOptionPages in die Felder
-	 * 
+	 *
 	 * @param emptyFieldsNotInTable
 	 *            Wenn true, werden Felder, die nicht in selectedTable/selectedOptionPages vorkommen auf Wert null gesetzt. Wenn false bleiben sie unverändert
 	 */
@@ -454,6 +459,34 @@ public class WFCDetailCASRequestsUtil {
 		Row r = rb.create();
 		formTable.addRow(r);
 		return formTable;
+	}
+
+	public void setValuesAccordingToXBS() {
+		for (Form optionPage : mDetail.getOptionPages()) {
+			String optionPageName = optionPage.getDetail().getProcedureSuffix();
+			for (Entry<String, String> e : mDetail.getOptionPageKeys(optionPageName).entrySet()) {
+				String value = e.getValue();
+				MField opField = mDetail.getField(optionPageName + "." + e.getKey());
+
+				if (value.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+
+					try {
+						Value v = StaticXBSValueUtil.stringToValue(value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()), opField.getDataType(),
+								opField.getDateTimeType(), translationService, timezone);
+						opField.setValue(v, false);
+						setValueAsCleanForDirtyFlag(v, e.getKey(), optionPageName);
+					} catch (Exception exception) {
+						NoSuchFieldException error = new NoSuchFieldException("String \"" + value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length())
+								+ "\" can't be parsed to Type \"" + opField.getDataType() + "\" of Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+						logger.error(error);
+						MessageDialog.openError(Display.getCurrent().getActiveShell(), ERROR, error.getMessage());
+					}
+				} else {
+					opField.setValue(mDetail.getField(value).getValue(), false);
+					setValueAsCleanForDirtyFlag(mDetail.getField(value).getValue(), e.getKey(), optionPageName);
+				}
+			}
+		}
 	}
 
 	private Table getInsertUpdateTable(Form buildForm) {
@@ -803,11 +836,20 @@ public class WFCDetailCASRequestsUtil {
 			return;
 		}
 
-		// Felder leeren
 		selectedTable = null;
 		getSelectedOptionPages().clear();
+		setKeys(null);
+
+		// Entfernen der Sub-Fields von den paramString Feldern
+		ArrayList<MField> paramfields = new ArrayList<>();
 		for (MField f : mDetail.getFields()) {
-			setKeys(null);
+			if (f instanceof MParamStringField) {
+				paramfields.addAll(((MParamStringField) f).getSubMFields());
+			}
+		}
+		mDetail.getFields().removeAll(paramfields);
+		// Felder auf Null setzen!
+		for (MField f : mDetail.getFields()) {
 			f.setValue(null, false);
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);
@@ -826,6 +868,9 @@ public class WFCDetailCASRequestsUtil {
 			BrowserSection bs = ((BrowserAccessor) b.getBrowserAccessor()).getBrowserSection();
 			bs.clear();
 		}
+		
+		// In XBS gegebene Felder wieder füllen
+		setValuesAccordingToXBS();
 
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
@@ -1080,6 +1125,53 @@ public class WFCDetailCASRequestsUtil {
 				f.setReadOnly(true);
 			}
 		}
+	}
+
+	/**
+	 * Mit dieser Methode können Values gesetzt werden, sodass sie vom Dirty-Flag als "clean" angesehen werden. Solange das Feld also diesen Wert hat springt
+	 * das Dirty-Flag für dieses nicht an. Das kann z.B. in Helpern genutzt werden, um Felder vorzubelegen.
+	 * 
+	 * @param v
+	 *            Wert, der als clean angesehen werden soll
+	 * @param fieldName
+	 *            Name des Feldes. Für Felder in OptionPages OHNE den Prefix (Name der OptionPage)
+	 * @param opName
+	 *            ProcedureSuffix der OptionPage in der das Feld ist, oder null für Feld der Hauptmaske
+	 */
+	public void setValueAsCleanForDirtyFlag(Value v, String fieldName, String opName) {
+
+		Table t = null;
+		if (opName != null) {
+			t = selectedOptionPages.get(opName);
+		} else {
+			t = selectedTable;
+		}
+
+		if (t == null) {
+			t = new Table();
+			t.addRow();
+		}
+
+		Row r = t.getRows().get(0);
+
+		// Spalte existiert noch nicht, muss erstellt werden
+		if (t.getColumnIndex(fieldName) == -1) {
+			t.getRows().clear();
+			String suffix = opName != null ? opName + "." : "";
+			t.addColumn(new Column(fieldName, mDetail.getField(suffix + fieldName).getDataType()));
+			r.addValue(v);
+			t.addRow(r);
+		}
+
+		t.setValue(fieldName, r, v);
+
+		if (opName != null) {
+			selectedOptionPages.put(opName, t);
+		} else {
+			selectedTable = t;
+		}
+
+		broker.post(Constants.BROKER_CHECKDIRTY, ""); // Check triggern
 	}
 
 	/**

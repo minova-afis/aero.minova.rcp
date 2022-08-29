@@ -53,8 +53,8 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				setFocussed(true);
 				((DetailAccessor) field.getDetail().getDetailAccessor()).setSelectedControl(control);
+				setFocussed(true);
 			}
 		});
 	}

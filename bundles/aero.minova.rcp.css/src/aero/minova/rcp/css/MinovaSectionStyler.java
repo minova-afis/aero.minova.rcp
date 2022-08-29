@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -124,6 +125,9 @@ public class MinovaSectionStyler implements ICssStyler {
 			case LABEL_TEXT_BOLD_FIELD:
 				styleLabelTextBoldField(fd, cd);
 				break;
+			case RADIO_FIELD:
+				styleRadioField(fd, cd, c);
+				break;
 			case LABEL:
 			default:
 				styleLabel(fd);
@@ -176,6 +180,19 @@ public class MinovaSectionStyler implements ICssStyler {
 				fd.top.offset = (int) (cd.row * rowHeight + sectionSpacing * 0.5);
 			} else {
 				fd.height = rowHeight * cd.numberRowsSpanned - sectionSpacing * 2;
+			}
+		}
+	}
+
+	private void styleRadioField(FormData fd, CssData cd, Control parent) {
+		fd.top.offset = cd.row * rowHeight;
+		Composite comp = (Composite) parent;
+		int i = 0;
+		for (Control child : comp.getChildren()) {
+			if (child instanceof Button) {
+				FormData childFD = (FormData) child.getLayoutData();
+				childFD.top.offset = i / 3 * rowHeight + sectionSpacing;
+				i++;
 			}
 		}
 	}

@@ -247,6 +247,9 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		openRestoringUIDialog();
+
+		// In XBS gegebene Felder füllen
+		casRequestsUtil.setValuesAccordingToXBS();
 	}
 
 	/**
@@ -405,13 +408,23 @@ public class WFCDetailPart extends WFCFormPart {
 		for (Entry<String, String> e : keynamesToValues.entrySet()) {
 			String opFieldName = opForm.getDetail().getProcedureSuffix() + "." + e.getKey();
 			String mainFieldName = e.getValue();
+
 			if (mDetail.getField(opFieldName) == null) {
-				throw new NoSuchFieldException(
+				NoSuchFieldException error = new NoSuchFieldException(
 						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+				logger.error(error);
+				throw error;
 			}
+
+			if (mainFieldName.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+				continue;
+			}
+
 			if (mDetail.getField(mainFieldName) == null) {
-				throw new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
+				NoSuchFieldException error = new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
 						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
+				logger.error(error);
+				throw error;
 			}
 		}
 
@@ -421,8 +434,8 @@ public class WFCDetailPart extends WFCFormPart {
 	private void addOPFromGrid(Grid opGrid, Composite parent, Node opNode) throws NoSuchFieldException {
 		SectionWrapper wrapper = new SectionWrapper(opGrid);
 		layoutSection(parent, wrapper);
-
 		addKeysFromXBSToGrid(opGrid, opNode);
+		initializeHelper(opGrid.getHelperClass());
 	}
 
 	/**
@@ -446,12 +459,19 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 		for (Entry<String, String> e : keynamesToValues.entrySet()) {
 			if (!sgColumnNames.contains(e.getKey())) {
-				throw new NoSuchFieldException(
+				NoSuchFieldException error = new NoSuchFieldException(
 						"Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
+				logger.error(error);
+				throw error;
+			}
+			if (e.getValue().startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+				continue;
 			}
 			if (mDetail.getField(e.getValue()) == null) {
-				throw new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \"" + sg.getDataTable().getName()
-						+ "\"! (As defined in .xbs)");
+				NoSuchFieldException error = new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \""
+						+ sg.getDataTable().getName() + "\"! (As defined in .xbs)");
+				logger.error(error);
+				throw error;
 			}
 		}
 	}

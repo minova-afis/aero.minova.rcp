@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.nebula.widgets.opal.preferencewindow.PreferenceWindow;
@@ -20,6 +22,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 
 public class TextButtonForDefaultWorkspace extends CustomPWWidget {
@@ -28,6 +31,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 	Logger logger;
 
 	TranslationService translationService;
+	IStylingEngine engine;
 
 	/**
 	 * Constructor
@@ -37,9 +41,10 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 	 * @param propertyKey
 	 *            associated key
 	 */
-	public TextButtonForDefaultWorkspace(final String label, final String tooltip, final String propertyKey, final TranslationService translationService) {
+	public TextButtonForDefaultWorkspace(final String label, final String tooltip, final String propertyKey, final IEclipseContext context) {
 		super(label, tooltip, propertyKey, 2, false);
-		this.translationService = translationService;
+		this.translationService = context.get(TranslationService.class);
+		this.engine = context.get(IStylingEngine.class);
 	}
 
 	/**
@@ -65,6 +70,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		final GridData textGridData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
 		textGridData.widthHint = 250;
 		text.setLayoutData(textGridData);
+		engine.setClassname(text, Constants.CSS_READONLY);
 
 		// Auslesen des PrimaryWorksapces
 		Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
@@ -80,6 +86,7 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 			text.setText(translationService.translate("@msg.NotSet", null));
 		}
 
+		// Standard-Workspace Zurücksetzten Knopf
 		final Button button = new Button(cmp, SWT.PUSH);
 		final GridData buttonGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		button.setText(translationService.translate("@Action.Reset", null));
@@ -106,12 +113,8 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
 		if (value == null) {
 			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Boolean.valueOf(false));
-		} else {
-			if (!(value instanceof Boolean)) {
-				throw new UnsupportedOperationException(
-						"The property '" + getCustomPropertyKey() + "' has to be a Boolean because it is associated to a checkbox");
-			}
+		} else if (!(value instanceof Boolean)) {
+			throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a Boolean because it is associated to a checkbox");
 		}
 	}
-
 }

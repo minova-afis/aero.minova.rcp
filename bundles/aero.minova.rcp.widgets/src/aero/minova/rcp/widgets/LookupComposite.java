@@ -424,7 +424,11 @@ public class LookupComposite extends Composite {
 	@Override
 	public boolean setFocus() {
 		checkWidget();
-		return text.setFocus();
+		try {
+			return text.setFocus();
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	/**

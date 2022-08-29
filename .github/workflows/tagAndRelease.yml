@@ -29,7 +29,10 @@ jobs:
 
     # Version in der Pom.xml und allen anderen Paketen inkrementieren und Commiten
     - name: Increment Version 
-      run: mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="${{ github.event.inputs.version }}.qualifier"
+      run: mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="${{ github.event.inputs.version }}.qualifier" --settings .github/settings.xml
+      env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
     - name: Git commit Version 
       run: |
        git config user.email "erlanger@minova.com"
@@ -56,7 +59,10 @@ jobs:
         
     # Bauen
     - name: Build with Maven 
-      run: mvn --batch-mode --update-snapshots verify --file pom.xml
+      run: mvn --batch-mode --update-snapshots verify --file pom.xml --settings .github/settings.xml
+      env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
     
     # Test reports
     - name: Publish Unit Test Results

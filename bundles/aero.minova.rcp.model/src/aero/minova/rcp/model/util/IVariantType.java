@@ -7,7 +7,7 @@ public interface IVariantType {
 	/** Integer Objekt */
 	public final static int VARIANT_INT = 3;
 
-	/** Integer Objekt */
+	/** Double Objekt */
 	public final static int VARIANT_DOUBLE = 5;
 
 	/** Short Objekt */
