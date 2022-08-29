@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Statische Werte können über XBS konfiguriert werden
+- Screenshots von Sections und der Detail-Toolbar können über Rechtsklick erstellt werden
 
 ## [12.3.0] - 2022-08-25
 
