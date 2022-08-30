@@ -440,7 +440,6 @@ public class WFCDetailPart extends WFCFormPart {
 		SectionWrapper wrapper = new SectionWrapper(opGrid);
 		layoutSection(parent, wrapper);
 		addKeysFromXBSToGrid(opGrid, opNode);
-		initializeHelper(opGrid.getHelperClass());
 	}
 
 	private void addOPFromBrowser(Browser opBrowser, Composite parent, Node opNode) {
