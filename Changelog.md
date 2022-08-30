@@ -61,7 +61,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
   - Weitere Felder im selben Abschnitt ermöglichen
   - Unterfelder entfernen, wenn null-Form aufgerufen wird
   - Nach Neuzeichnen der Section selbes Feld wieder auswählen
-
+- Doppelte Initialisierung von Helper entfernt
 
 ## [12.2.1] - 2022-07-14
 
