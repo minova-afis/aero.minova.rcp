@@ -16,6 +16,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Statische Werte können über XBS konfiguriert werden
+- Browser Section, für die Darstellung von Attachments im Detail
+
+### Bugfixes
+- Doppelte Initialisierung von Helper entfernt
 
 ## [12.3.0] - 2022-08-25
 
@@ -23,7 +27,6 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - CI pipeline mit SonarQube einrichten
-- Browser Section, für die Darstellung von Attachments im Detail
 
 ### Änderung
 - Index nach Blockieren neu Laden, wenn Einstellung gesetzt ist
@@ -61,7 +64,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
   - Weitere Felder im selben Abschnitt ermöglichen
   - Unterfelder entfernen, wenn null-Form aufgerufen wird
   - Nach Neuzeichnen der Section selbes Feld wieder auswählen
-- Doppelte Initialisierung von Helper entfernt
+
 
 ## [12.2.1] - 2022-07-14
 
