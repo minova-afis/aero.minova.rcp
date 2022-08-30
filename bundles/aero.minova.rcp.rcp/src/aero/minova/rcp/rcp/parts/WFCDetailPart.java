@@ -369,8 +369,13 @@ public class WFCDetailPart extends WFCFormPart {
 						} catch (IllegalArgumentException e) {
 							try {
 								String opContent = dataService.getHashedFile(op.getName()).get();
-								Grid opGrid = XmlProcessor.get(opContent, Grid.class);
-								addOPFromGrid(opGrid, parent, op);
+								try {
+									Grid opGrid = XmlProcessor.get(opContent, Grid.class);
+									addOPFromGrid(opGrid, parent, op);
+								} catch (IllegalArgumentException e2) {
+									Browser opBrowser = XmlProcessor.get(opContent, Browser.class);
+									addOPFromBrowser(opBrowser, parent, op);
+								}
 							} catch (JAXBException e1) {
 								logger.error(e1);
 							}
@@ -436,6 +441,11 @@ public class WFCDetailPart extends WFCFormPart {
 		layoutSection(parent, wrapper);
 		addKeysFromXBSToGrid(opGrid, opNode);
 		initializeHelper(opGrid.getHelperClass());
+	}
+
+	private void addOPFromBrowser(Browser opBrowser, Composite parent, Node opNode) {
+		SectionWrapper wrapper = new SectionWrapper(opBrowser);
+		layoutSection(parent, wrapper);
 	}
 
 	/**
@@ -917,13 +927,13 @@ public class WFCDetailPart extends WFCFormPart {
 		mgrid.setFields(mFields);
 		return mgrid;
 	}
-	
+
 	private MBrowser createMBrowser(Browser browser, MSection section) {
-		
+
 		if (browser.getId() == null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Browser has no ID!");
 		}
-		
+
 		MBrowser mBrowser = new MBrowser(browser.getId());
 		mBrowser.setTitle(browser.getTitle());
 		final ImageDescriptor browserImageDescriptor = ImageUtil.getImageDescriptor(browser.getIcon(), false);
