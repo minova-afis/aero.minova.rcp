@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -12,6 +13,8 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+
+import javax.inject.Inject;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.ICssStyler;
@@ -23,6 +26,9 @@ public class BrowserSection {
 	private Composite composite;
 	private Browser browser;
 	private boolean loading;
+	
+	@Inject
+	Logger logger;
 
 	public BrowserSection(Composite composite) {
 		this.composite = composite;
@@ -56,7 +62,7 @@ public class BrowserSection {
 	 * @param url
 	 */
 	public void openURL(String url) {
-		System.out.println(MessageFormat.format("verwende Browser {0} um URL {1} zu öffnen", browser.getBrowserType(), url));
+		logger.info(MessageFormat.format("verwende Browser {0} um URL {1} zu öffnen", browser.getBrowserType(), url));
 		loadPage(url);
 	}
 
@@ -85,7 +91,7 @@ public class BrowserSection {
 	 */
 	public void clear() {
 		loadPage("about:blank");
-		System.out.println("--Setting blank");
+		logger.info("--Setting blank");
 		// lasse dem Thread Zeit, den Zugriff auf die geöffnete Datei zu schließen
 		try {
 			Thread.sleep(1);
