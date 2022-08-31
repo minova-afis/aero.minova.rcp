@@ -504,7 +504,6 @@ public class WFCDetailPart extends WFCFormPart {
 		HeadOrPageOrGridWrapper wrapper = new HeadOrPageOrGridWrapper(opGrid);
 		layoutSection(parent, wrapper);
 		addKeysFromXBSToGrid(opGrid, opNode);
-		initializeHelper(opGrid.getHelperClass());
 	}
 
 	/**
