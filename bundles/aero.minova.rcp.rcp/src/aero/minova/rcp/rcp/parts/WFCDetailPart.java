@@ -374,7 +374,7 @@ public class WFCDetailPart extends WFCFormPart {
 									addOPFromGrid(opGrid, parent, op);
 								} catch (IllegalArgumentException e2) {
 									Browser opBrowser = XmlProcessor.get(opContent, Browser.class);
-									addOPFromBrowser(opBrowser, parent, op);
+									addOPFromBrowser(opBrowser, parent);
 								}
 							} catch (JAXBException e1) {
 								logger.error(e1);
@@ -442,7 +442,7 @@ public class WFCDetailPart extends WFCFormPart {
 		addKeysFromXBSToGrid(opGrid, opNode);
 	}
 
-	private void addOPFromBrowser(Browser opBrowser, Composite parent, Node opNode) {
+	private void addOPFromBrowser(Browser opBrowser, Composite parent) {
 		SectionWrapper wrapper = new SectionWrapper(opBrowser);
 		layoutSection(parent, wrapper);
 	}
