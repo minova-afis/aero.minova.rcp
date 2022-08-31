@@ -26,7 +26,7 @@ public class BrowserSection {
 	private Composite composite;
 	private Browser browser;
 	private boolean loading;
-	
+
 	@Inject
 	Logger logger;
 
@@ -36,13 +36,13 @@ public class BrowserSection {
 
 	public void createBrowser() {
 		browser = new Browser(composite, SWT.BORDER);
-		
+
 		FormData fd = new FormData();
 		fd.right = new FormAttachment(100);
 		fd.left = new FormAttachment(0);
 		fd.height = ICssStyler.CSS_ROW_HEIGHT * 10;
 		browser.setLayoutData(fd);
-		
+
 		browser.addProgressListener(new ProgressListener() {
 			@Override
 			public void completed(ProgressEvent event) {
@@ -95,6 +95,9 @@ public class BrowserSection {
 		// lasse dem Thread Zeit, den Zugriff auf die geöffnete Datei zu schließen
 		try {
 			Thread.sleep(1);
-		} catch (InterruptedException e) {}
+		} catch (InterruptedException e) {
+			logger.error(e);
+			Thread.currentThread().interrupt();
+		}
 	}
 }
