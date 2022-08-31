@@ -369,13 +369,7 @@ public class WFCDetailPart extends WFCFormPart {
 						} catch (IllegalArgumentException e) {
 							try {
 								String opContent = dataService.getHashedFile(op.getName()).get();
-								try {
-									Grid opGrid = XmlProcessor.get(opContent, Grid.class);
-									addOPFromGrid(opGrid, parent, op);
-								} catch (IllegalArgumentException e2) {
-									Browser opBrowser = XmlProcessor.get(opContent, Browser.class);
-									addOPFromBrowser(opBrowser, parent);
-								}
+								addOPForGridOrBrowser(parent, op, opContent);
 							} catch (JAXBException e1) {
 								logger.error(e1);
 							}
@@ -390,6 +384,16 @@ public class WFCDetailPart extends WFCFormPart {
 					}
 				}
 			}
+		}
+	}
+
+	private void addOPForGridOrBrowser(Composite parent, Node op, String opContent) throws JAXBException, NoSuchFieldException {
+		try {
+			Grid opGrid = XmlProcessor.get(opContent, Grid.class);
+			addOPFromGrid(opGrid, parent, op);
+		} catch (IllegalArgumentException e2) {
+			Browser opBrowser = XmlProcessor.get(opContent, Browser.class);
+			addOPFromBrowser(opBrowser, parent);
 		}
 	}
 
