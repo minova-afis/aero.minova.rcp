@@ -17,6 +17,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Neu
 - Statische Werte können über XBS konfiguriert werden
 
+### Bugfixes
+- Helper für OP-Grids nicht doppelt hinzufügen
+
 ## [12.3.0] - 2022-08-25
 
 **ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
