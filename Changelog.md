@@ -17,6 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Neu
 - Statische Werte können über XBS konfiguriert werden
 - Browser Section, für die Darstellung von Attachments im Detail
+- PageOrHeadOrGridWrapper ausgelagert in eigene Klasse, SectionWrapper
 
 ### Bugfixes
 - Doppelte Initialisierung von Helper entfernt
@@ -46,7 +47,6 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Ersten drei Radioboxen in selbe Zeile wie Label, Label rechtsbündig
 - Nicht mehr benötigte und fehlerhafte Datei AFIS_MDI.mdi entfernen
 - Mehrere Helper pro Maske unterstützen, auch Helper aus OPs nutzen
-- PageOrHeadOrGridWrapper ausgelagert in eigene Klasse, SectionWrapper
 - Fehler bei Login Loggen, Verwirrende Meldung ("too many authentication attempts") entfernen 
 - Bei nicht-pflicht Lookups einzigen Wert nicht automatisch eintragen
 - Hinweis "Keine Datensätze geladen" als Benachrichtigungs-Popup anzeigen
