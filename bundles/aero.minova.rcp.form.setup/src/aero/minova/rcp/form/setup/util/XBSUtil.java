@@ -65,9 +65,11 @@ public class XBSUtil {
 	public static Map<String, String> getKeynamesToValues(Node node) {
 		Map<String, String> namesToValues = new HashMap<>();
 
-		for (Entry entry : node.getMap().getEntry()) {
-			if (!entry.getKey().contains("visible")) {
-				namesToValues.put(entry.getKey(), entry.getValue());
+		if (null != node.getMap()) {
+			for (Entry entry : node.getMap().getEntry()) {
+				if (!entry.getKey().contains("visible")) {
+					namesToValues.put(entry.getKey(), entry.getValue());
+				}
 			}
 		}
 
