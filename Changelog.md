@@ -16,6 +16,11 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Statische Werte können über XBS konfiguriert werden
+- Browser Section, für die Darstellung von Attachments im Detail
+- PageOrHeadOrGridWrapper ausgelagert in eigene Klasse, SectionWrapper
+
+### Bugfixes
+- Doppelte Initialisierung von Helper entfernt
 
 ### Bugfixes
 - Helper für OP-Grids nicht doppelt hinzufügen
