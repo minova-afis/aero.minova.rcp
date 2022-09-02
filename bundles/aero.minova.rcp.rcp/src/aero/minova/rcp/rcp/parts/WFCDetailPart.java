@@ -965,7 +965,7 @@ public class WFCDetailPart extends WFCFormPart {
 				createGrid(composite, mSection, section, context, fieldOrGrid);
 
 			} else if (fieldOrGrid instanceof Browser) {
-				createBrowser(composite, mSection, fieldOrGrid);
+				createBrowser(composite, mSection, fieldOrGrid, context);
 			} else {
 
 				Field field = (Field) fieldOrGrid;
@@ -990,7 +990,7 @@ public class WFCDetailPart extends WFCFormPart {
 		createUIFields(visibleMFields, composite);
 	}
 
-	private void createBrowser(Composite composite, MSection mSection, Object fieldOrGrid) {
+	private void createBrowser(Composite composite, MSection mSection, Object fieldOrGrid, IEclipseContext context) {
 		BrowserSection browserSection = new BrowserSection(composite);
 		browserSection.createBrowser();
 		MBrowser mBrowser = createMBrowser((Browser) fieldOrGrid, mSection);
@@ -1000,6 +1000,8 @@ public class WFCDetailPart extends WFCFormPart {
 		mBrowser.setBrowserAccessor(browserAccessor);
 		mSection.getmDetail().putBrowser(mBrowser);
 		browserSections.add(browserSection);
+
+		ContextInjectionFactory.inject(browserSection, context); // In Context injected, damit Injection in der Klasse verfügbar ist
 	}
 
 	public void createUIFields(List<MField> mFields, Composite clientComposite) {
