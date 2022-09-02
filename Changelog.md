@@ -15,6 +15,17 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Neu
+
+### Änderung
+
+### Bugfixes
+
+
+## [12.4.0] - 2022-09-02
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Neu
 - Statische Werte können über XBS konfiguriert werden
 - Browser Section, für die Darstellung von Attachments im Detail
 - PageOrHeadOrGridWrapper ausgelagert in eigene Klasse, SectionWrapper
