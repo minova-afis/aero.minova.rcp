@@ -19,7 +19,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Änderung
 
 ### Bugfixes
-
+- Dateien im Browser Widget werden in voler Größe angezeigt
 
 ## [12.4.0] - 2022-09-02
 
