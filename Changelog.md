@@ -19,7 +19,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Änderung
 
 ### Bugfixes
-- Dateien im Browser Widget werden in voller Größe angezeigt
+
 
 ## [12.4.1] - 05.09.2022
 
