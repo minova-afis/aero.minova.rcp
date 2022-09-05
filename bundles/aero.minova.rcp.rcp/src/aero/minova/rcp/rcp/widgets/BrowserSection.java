@@ -74,7 +74,21 @@ public class BrowserSection {
 	 */
 	private boolean loadPage(String url) {
 		Display display = Display.getCurrent();
-		boolean set = browser.setUrl(url); // URL content loading is asynchronous
+		boolean set = browser.setText("<!DOCTYPE html>\n" //
+				+ "<html>\n" //
+				+ "<head>\n" //
+				+ "<style>\n" //
+				+ "img { \n" //
+				+ "  width: 100%; \n" //
+				+ "  height: 100%; \n" //
+				+ "}\n" //
+				+ "</style>\n" //
+				+ "</head>\n" //
+				+ "<body>\n" //
+				+ "<img src=\'" + url + "' alt=\"HTML5 Icon\">\n" //
+				+ "</body>\n" //
+				+ "</html>" //
+				, true);
 		loading = true;
 		while (loading) { // Add synchronous behavior: wait till it finishes loading
 			if (!display.readAndDispatch()) {
