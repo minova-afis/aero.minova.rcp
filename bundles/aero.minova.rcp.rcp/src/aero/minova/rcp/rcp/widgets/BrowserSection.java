@@ -85,7 +85,7 @@ public class BrowserSection {
 				+ "</style>\n" //
 				+ "</head>\n" //
 				+ "<body>\n" //
-				+ "<img src=\'" + url + "' alt=\"HTML5 Icon\">\n" //
+				+ "<img src=\'" + url + "'\">\n" //
 				+ "</body>\n" //
 				+ "</html>" //
 				, true);
