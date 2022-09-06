@@ -212,6 +212,12 @@ public class WFCDetailCASRequestsUtil {
 						}
 					}
 
+					// Alle Browser im Detailbereich leeren
+					for (MBrowser mB : mDetail.getBrowsers()) {
+						BrowserAccessor bA = (BrowserAccessor) mB.getBrowserAccessor();
+						bA.getBrowserSection().clear();
+					}
+
 					updateSelectedEntry(false);
 					sendEventToHelper(ActionCode.AFTERREAD);
 					broker.send(Constants.BROKER_CHECKDIRTY, "");
@@ -868,7 +874,7 @@ public class WFCDetailCASRequestsUtil {
 			BrowserSection bs = ((BrowserAccessor) b.getBrowserAccessor()).getBrowserSection();
 			bs.clear();
 		}
-		
+
 		// In XBS gegebene Felder wieder füllen
 		setValuesAccordingToXBS();
 
