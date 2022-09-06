@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Uitests
 Bundle-SymbolicName: aero.minova.rcp.uitests
-Bundle-Version: 12.4.0.qualifier
+Bundle-Version: 12.4.1.qualifier
 Automatic-Module-Name: aero.minova.rcp.uitests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.eclipse.swtbot.e4.finder;bundle-version="3.1.0",
