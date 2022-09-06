@@ -21,7 +21,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 
 
-## [12.4.1] - 05.09.2022
+## [12.4.1] - 06.09.2022
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
 
 ### Neu
 
