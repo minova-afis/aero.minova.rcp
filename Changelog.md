@@ -21,6 +21,17 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - Browser wird beim Aufrufen einer READ-Prozedur geleert
 
+## [12.4.2] - 07.09.2022
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Neu
+
+### Änderung
+
+### Bugfixes
+- Browser wird beim Aufrufen einer READ-Prozedur geleert
+
 ## [12.4.1] - 06.09.2022
 
 **ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
