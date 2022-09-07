@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Fop 1.1 Plugin
 Bundle-SymbolicName: aero.minova.libs.fop;singleton:=true
-Bundle-Version: 12.4.1.qualifier
+Bundle-Version: 12.4.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: lib/avalon-framework-4.2.0.jar,
  lib/batik-all-1.7.jar,
