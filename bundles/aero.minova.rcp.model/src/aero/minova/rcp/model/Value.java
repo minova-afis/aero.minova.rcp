@@ -1,6 +1,7 @@
 package aero.minova.rcp.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -25,6 +26,8 @@ public class Value implements Serializable {
 			type = DataType.BOOLEAN;
 		} else if (valueNew instanceof Double || valueNew instanceof Float) {
 			type = DataType.DOUBLE;
+		} else if (valueNew instanceof BigDecimal) {
+			type = DataType.BIGDECIMAL;
 		} else if (valueNew instanceof String) {
 			type = DataType.STRING;
 		} else if (valueNew instanceof Instant) {
@@ -176,8 +179,8 @@ public class Value implements Serializable {
 		return type == DataType.DOUBLE ? (Double) value : null;
 	}
 
-	public Double getBigDecimalValue() {
-		return type == DataType.BIGDECIMAL ? (Double) value : null;
+	public BigDecimal getBigDecimalValue() {
+		return type == DataType.BIGDECIMAL ? (BigDecimal) value : null;
 	}
 
 	public Instant getInstantValue() {
