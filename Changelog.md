@@ -19,7 +19,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Änderung
 
 ### Bugfixes
-- Browser wird beim Aufrufen einer READ-Prozedur geleert
+
 
 ## [12.4.2] - 07.09.2022
 
