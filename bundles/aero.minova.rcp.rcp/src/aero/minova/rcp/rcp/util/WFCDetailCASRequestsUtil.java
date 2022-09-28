@@ -242,9 +242,14 @@ public class WFCDetailCASRequestsUtil {
 					if (!sg.getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus keyTable
 						if (sg.getFieldnameToValue().containsKey(f.getName())) {
 							found = true;
-							String fieldNameInMain = sg.getFieldnameToValue().get(f.getName());
-							Row row = keyTable.getRows().get(0);
-							Value v = row.getValue(keyTable.getColumnIndex(fieldNameInMain));
+							String valueFromXBS = sg.getFieldnameToValue().get(f.getName());
+							Value v = null;
+							if (!valueFromXBS.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+								Row row = keyTable.getRows().get(0);
+								v = row.getValue(keyTable.getColumnIndex(valueFromXBS));
+							} else {
+								v = new Value(valueFromXBS.substring(1), sg.getDataTable().getColumn(f.getName()).getType());
+							}
 							gridRowBuilder.withValue(v);
 						}
 
