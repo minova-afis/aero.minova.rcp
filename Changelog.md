@@ -19,7 +19,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Änderung
 
 ### Bugfixes
-
+- Auslesen von festen Werten aus xbs korrigiert
 
 ## [12.4.2] - 07.09.2022
 
