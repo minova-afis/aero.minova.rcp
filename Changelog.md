@@ -18,6 +18,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderung
 
+- Tabelle tSiteParameter NICHT schon beim Starten anfragen. Tabelle wird erst angefragt, wenn ein Helper einen Wert tatsächlich benötigt. Damit werden Exceptions verhindert, wenn ein Projekt nicht auf data.schema aufbaut.
+
 ### Bugfixes
 - Auslesen von festen Werten aus xbs korrigiert
 
