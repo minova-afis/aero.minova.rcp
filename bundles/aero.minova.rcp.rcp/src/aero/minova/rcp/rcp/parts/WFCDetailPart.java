@@ -904,7 +904,9 @@ public class WFCDetailPart extends WFCFormPart {
 	private MGrid createMGrid(Grid grid, MSection section) {
 
 		if (grid.getId() == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Grid " + grid.getProcedureSuffix() + " has no ID!");
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
+					"Grid " + grid.getProcedureSuffix() + " has no ID! Please add an id in the xml mask");
+			logger.error("Grid " + grid.getProcedureSuffix() + " has no ID! Please add an id in the xml mask");
 		}
 
 		MGrid mgrid = new MGrid(grid.getId());
@@ -1074,8 +1076,10 @@ public class WFCDetailPart extends WFCFormPart {
 	public void showErrorMissingSQLIndex(Field field, String fieldname, NullPointerException e) {
 		if (field.getSqlIndex() == null) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", "Field " + fieldname + " has no SQL-Index!");
+			logger.error("Field " + fieldname + " has no SQL-Index!");
 		} else {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
+			logger.error(e.getMessage());
 		}
 	}
 
