@@ -205,7 +205,11 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 			if (insertion.length() > 0) {
 				// wir müssen etwas einfügen
-				text = text.substring(0, start) + insertion + text.substring(start);
+				if(textBefore.charAt(0) == '0') {
+					text = insertion + text.substring(1);
+				} else {
+					text = text.substring(0, start) + insertion + text.substring(start);
+				}
 			}
 
 			// text auf dezimal Trennzeichen prüfen
