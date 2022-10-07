@@ -92,7 +92,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		if (insertion.matches("([0-9]*)|([\\" + dfs.getGroupingSeparator() + dfs.getDecimalSeparator() + "]*)")) {
+		if (insertion.matches("([0-9]*)|([\\" + dfs.getGroupingSeparator() + dfs.getDecimalSeparator() + "]*)|([\\-+]*)")) {
 			Result r = new Result();
 
 			try {
@@ -155,6 +155,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		StringBuilder sb = new StringBuilder();
 		int originalStart = start;
 		int originalEnd = end;
+		boolean negative = false;
 
 		// Löschen von Dezimal- und Grupierungstrennzeichen abfangen
 		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && start + 1 == end) {
@@ -170,6 +171,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty() && dfs.getDecimalSeparator() == insertion.charAt(0)) {
 			doit = false;
+		}
+
+		if (insertion.contains("-") || textBefore.contains("-")) {
+			if (insertion.contains("+")) {
+				negative = false;
+			} else {
+				negative = true;
+			}
 		}
 
 		if (doit) {
@@ -194,7 +203,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			textBefore = sb.toString();
 
 			// insertion von überflüssigen Zeichen befreien
-			insertion = insertion.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
+			insertion = insertion.replaceAll("[\\" + dfs.getGroupingSeparator() + "]|[\\-+]", "");
 
 			if (start != end) {
 				// wir müssen etwas herausschneiden
@@ -205,8 +214,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 			if (insertion.length() > 0) {
 				// wir müssen etwas einfügen
-				if(textBefore.charAt(0) == '0') {
-					text = insertion + text.substring(1);
+				if (!textBefore.isEmpty() && textBefore.charAt(0) == '0') {
+					text = insertion + text.substring(0);
 				} else {
 					text = text.substring(0, start) + insertion + text.substring(start);
 				}
@@ -228,39 +237,57 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			text = textBefore;
 		}
 
-		if (decimals > 0) {
-			try {
-				result.value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')), field.getDataType());
-				if (field.getDataType().equals(DataType.BIGDECIMAL)) {
-					result.text = numberFormat.format(result.value.getBigDecimalValue());
-				} else {
-					result.text = numberFormat.format(result.value.getDoubleValue());
-				}
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
-						caretPosition, numberFormat, dfs);
-			} catch (NumberFormatException e) {
-				result.value = new Value(0.0, field.getDataType());
-				if (field.getDataType().equals(DataType.BIGDECIMAL)) {
-					result.text = numberFormat.format(result.value.getBigDecimalValue());
-				} else {
-					result.text = numberFormat.format(result.value.getDoubleValue());
-				}
-				result.caretPosition = 1;
-			}
-		} else {
-			try {
-				result.value = new Value(Integer.parseInt(text));
-				result.text = numberFormat.format(result.value.getIntegerValue());
-				result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
-						caretPosition, numberFormat, dfs);
-			} catch (NumberFormatException e) {
-				result.value = null;
-				result.text = "";
-				result.caretPosition = 0;
-			}
+		try {
+			result.value = newValue(text, negative, field.getDataType(), dfs);
+			result.text = getValueString(numberFormat, field.getDataType(), result.value);
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
+					caretPosition, numberFormat, dfs);
+		} catch (NumberFormatException e) {
+			result.value = null;
+			result.text = "";
+			result.caretPosition = 0;
 		}
 
 		return result;
+	}
+
+	private Value newValue(String text, boolean negative, DataType type, DecimalFormatSymbols dfs) {
+		Value value = null;
+
+		switch (type) {
+		case INTEGER:
+			if (negative) {
+				value = new Value(Integer.parseInt(text) * -1);
+			} else {
+				value = new Value(Integer.parseInt(text));
+			}
+			break;
+		case DOUBLE:
+		case BIGDECIMAL:
+			if (negative) {
+				value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')) * -1, type);
+			} else {
+				value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')), type);
+			}
+			break;
+		default:
+			break;
+		}
+
+		return value;
+	}
+
+	private String getValueString(NumberFormat format, DataType type, Value value) {
+		switch (type) {
+		case INTEGER:
+			return format.format(value.getIntegerValue());
+		case DOUBLE:
+			return format.format(value.getDoubleValue());
+		case BIGDECIMAL:
+			return format.format(value.getBigDecimalValue());
+		default:
+			return null;
+		}
 	}
 
 	/**
