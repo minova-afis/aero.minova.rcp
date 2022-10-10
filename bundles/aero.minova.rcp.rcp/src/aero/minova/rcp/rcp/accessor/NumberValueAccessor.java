@@ -156,6 +156,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		int originalStart = start;
 		int originalEnd = end;
 		boolean negative = false;
+		String originalInsertion = insertion;
+		String originalTextBefore = textBefore;
 
 		// Löschen von Dezimal- und Grupierungstrennzeichen abfangen
 		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && start + 1 == end) {
@@ -240,8 +242,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		try {
 			result.value = newValue(text, negative, field.getDataType(), dfs);
 			result.text = getValueString(numberFormat, field.getDataType(), result.value);
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, keyCode, start, end, originalStart, originalEnd, decimals,
-					caretPosition, numberFormat, dfs);
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, originalInsertion, originalTextBefore, keyCode, start, end, originalStart, originalEnd,
+					decimals, caretPosition, numberFormat, dfs);
 		} catch (NumberFormatException e) {
 			result.value = null;
 			result.text = "";
@@ -315,8 +317,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int ostart, int oend, int decimals,
-			int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
+	public int getNewCaretPosition(String text, String textBefore, String insertion, String originalInsertion, String originalTextBefore , int keyCode, int start, int end, int ostart,
+			int oend, int decimals, int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
 
 		if (!textBefore.isEmpty()) {
 			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
@@ -346,6 +348,10 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			} else {
 				newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
 			}
+		} else if (originalInsertion.contains("-")) {
+			newCaretPosition = caretPosition + 1;
+		} else if (originalInsertion.contains("+") && originalTextBefore.contains("-")) {
+			newCaretPosition = caretPosition - 1;
 		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
 			newCaretPosition = decimalCaretPostion;
 		} else {
