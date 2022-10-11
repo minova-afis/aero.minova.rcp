@@ -99,12 +99,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				r = processInput(insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
 			} catch (Exception exception) {
 				NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-				r.value = new Value(0.0, field.getDataType());
-				if (field.getDataType().equals(DataType.BIGDECIMAL)) {
-					r.text = numberFormat.format(r.value.getBigDecimalValue());
-				} else {
-					r.text = numberFormat.format(r.value.getDoubleValue());
-				}
+				r.value = newValue("0", false, field.getDataType(), dfs);
+				r.text = getValueString(numberFormat, field.getDataType(), r.value);
 				r.caretPosition = 1;
 			}
 
@@ -216,11 +212,11 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 
 			if (insertion.length() > 0) {
 				// wir müssen etwas einfügen
-				if (!textBefore.isEmpty() && textBefore.charAt(0) == '0') {
-					if(decimals == 0) {
+				if (!textBefore.isEmpty() && textBefore.charAt(0) == '0' && caretPosition <= 1) {
+					if (decimals == 0) {
 						text = insertion;
 					} else {
-						text = insertion + text.substring(1);
+						text = insertion + textBefore.substring(1);
 					}
 				} else {
 					text = text.substring(0, start) + insertion + text.substring(start);
@@ -246,8 +242,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		try {
 			result.value = newValue(text, negative, field.getDataType(), dfs);
 			result.text = getValueString(numberFormat, field.getDataType(), result.value);
-			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, originalInsertion, originalTextBefore, keyCode, start, end, originalStart, originalEnd,
-					decimals, caretPosition, numberFormat, dfs);
+			result.caretPosition = getNewCaretPosition(result.text, textBefore, insertion, originalInsertion, originalTextBefore, keyCode, start, end,
+					originalStart, originalEnd, decimals, caretPosition, numberFormat, dfs);
 		} catch (NumberFormatException e) {
 			result.value = null;
 			result.text = "";
@@ -321,8 +317,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public int getNewCaretPosition(String text, String textBefore, String insertion, String originalInsertion, String originalTextBefore , int keyCode, int start, int end, int ostart,
-			int oend, int decimals, int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
+	public int getNewCaretPosition(String text, String textBefore, String insertion, String originalInsertion, String originalTextBefore, int keyCode,
+			int start, int end, int ostart, int oend, int decimals, int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
 
 		if (!textBefore.isEmpty()) {
 			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
