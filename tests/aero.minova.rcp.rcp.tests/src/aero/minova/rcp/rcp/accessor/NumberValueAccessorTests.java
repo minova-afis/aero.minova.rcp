@@ -12,6 +12,98 @@ import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor.Result;
 
 class NumberValueAccessorTests {
+	
+	// ================================================================================
+	// Testfall für die Eingabe von negativen Zahlen
+	// ================================================================================
+
+	@Test
+	void testMakeNegativNumberPositiveDoubleField() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"+", // insertion
+				2, // start
+				2, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"-132,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("132,00", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+	
+	@Test
+	void testNegativeInsertionDoubleField() {
+		MNumberField field = new MNumberField(2);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"-", // insertion
+				2, // start
+				2, // end
+				0, // keyCode
+				2, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"132,00", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("-132,00", result.text);
+		assertEquals(3, result.caretPosition);
+	}
+
+	@Test
+	void testMakeNegativNumberPositiveIntegerField() {
+		MNumberField field = new MNumberField(0);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"+", // insertion
+				2, // start
+				2, // end
+				0, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				3, // caretPosition
+				"-132", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("132", result.text);
+		assertEquals(2, result.caretPosition);
+	}
+	
+	@Test
+	void testNegativeInsertionIntegerField() {
+		MNumberField field = new MNumberField(0);
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+
+		Result result = numberValueAccessor.processInput(//
+				"-", // insertion
+				2, // start
+				2, // end
+				0, // keyCode
+				0, // decimals
+				Locale.GERMANY, // locale
+				2, // caretPosition
+				"132", // textBefore
+				decimalFormatSymbols, //
+				true//
+		);
+		assertEquals("-132", result.text);
+		assertEquals(3, result.caretPosition);
+	}
 
 	// ================================================================================
 	// Testfall aus Issue #1166, verbessert auf komplettes Leeren des Feldes
@@ -19,7 +111,7 @@ class NumberValueAccessorTests {
 
 	@Test
 	void testCompleteBSIntegerField() {
-		MNumberField field = new MNumberField(2);
+		MNumberField field = new MNumberField(0);
 		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
