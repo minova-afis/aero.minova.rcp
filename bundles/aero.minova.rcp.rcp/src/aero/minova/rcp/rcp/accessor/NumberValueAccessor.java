@@ -217,7 +217,11 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if (insertion.length() > 0) {
 				// wir müssen etwas einfügen
 				if (!textBefore.isEmpty() && textBefore.charAt(0) == '0') {
-					text = insertion + text.substring(0);
+					if(decimals == 0) {
+						text = insertion;
+					} else {
+						text = insertion + text.substring(1);
+					}
 				} else {
 					text = text.substring(0, start) + insertion + text.substring(start);
 				}
@@ -335,7 +339,6 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 				newCaretPosition = caretPosition - 1;
 			} else {
 				newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
-
 			}
 		}
 		// Wenn mit ENTF gelöscht wird
