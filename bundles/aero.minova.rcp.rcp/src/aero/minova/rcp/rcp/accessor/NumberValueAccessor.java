@@ -253,6 +253,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		return result;
 	}
 
+	/**
+	 * Diese Methode liefert ein Value zurück, für den übergebenen DataType und Wert.
+	 * 
+	 * @param text Wert aus dem das VAlue gebildet werden soll
+	 * @param negative true - negative Zahl
+	 * @param type DataType des Fields
+	 * @param dfs DecimalFormatSymbols
+	 * @return Value für den entsprechenden DataType
+	 */
 	private Value newValue(String text, boolean negative, DataType type, DecimalFormatSymbols dfs) {
 		Value value = null;
 
@@ -279,6 +288,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		return value;
 	}
 
+	/**
+	 * Gibt den String des übergebenen Values für den richtigen DataType zurück
+	 * 
+	 * @param format NumberFormat für die Formatierung
+	 * @param type	DataType des Fields
+	 * @param value	das Value das zum String werden soll
+	 * @return String des übergebeben Values
+	 */
 	private String getValueString(NumberFormat format, DataType type, Value value) {
 		switch (type) {
 		case INTEGER:
