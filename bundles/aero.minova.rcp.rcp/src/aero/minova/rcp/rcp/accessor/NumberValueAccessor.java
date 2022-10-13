@@ -171,6 +171,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			doit = false;
 		}
 
+		// Prüfen ob die Eingabe ein Minus enthält oder die Zahl im Field negativ ist
+		// negativ = true Zahl bleibt negativ oder wird negativ gesetzt am Ende
 		if (insertion.contains("-") || textBefore.contains("-")) {
 			if (insertion.contains("+")) {
 				negative = false;
@@ -211,13 +213,16 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			}
 
 			if (insertion.length() > 0) {
-				// wir müssen etwas einfügen
+				// die Zahl vor dem Komma ist nur 0 und wird durch die Eingabe ersetzt
 				if (!textBefore.isEmpty() && textBefore.charAt(0) == '0' && caretPosition <= 1) {
+					// 0 in Integer Feldern ersetzten
 					if (decimals == 0) {
 						text = insertion;
+						// 0 in Double/ BigDecimal Feldern ersetzen
 					} else {
 						text = insertion + textBefore.substring(1);
 					}
+					// wir müssen etwas einfügen
 				} else {
 					text = text.substring(0, start) + insertion + text.substring(start);
 				}
@@ -231,11 +236,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 					text = text.substring(0, text.length() - decimalOverLength);
 				}
 			}
-
 		} else {
-
+			// vorherige Zahl von Gruppierungsseperatoren bereinigen
 			textBefore = textBefore.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
-
 			text = textBefore;
 		}
 
@@ -256,10 +259,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	/**
 	 * Diese Methode liefert ein Value zurück, für den übergebenen DataType und Wert.
 	 * 
-	 * @param text Wert aus dem das VAlue gebildet werden soll
-	 * @param negative true - negative Zahl
-	 * @param type DataType des Fields
-	 * @param dfs DecimalFormatSymbols
+	 * @param text
+	 *            Wert aus dem das VAlue gebildet werden soll
+	 * @param negative
+	 *            true - negative Zahl
+	 * @param type
+	 *            DataType des Fields
+	 * @param dfs
+	 *            DecimalFormatSymbols
 	 * @return Value für den entsprechenden DataType
 	 */
 	private Value newValue(String text, boolean negative, DataType type, DecimalFormatSymbols dfs) {
@@ -291,9 +298,12 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	/**
 	 * Gibt den String des übergebenen Values für den richtigen DataType zurück
 	 * 
-	 * @param format NumberFormat für die Formatierung
-	 * @param type	DataType des Fields
-	 * @param value	das Value das zum String werden soll
+	 * @param format
+	 *            NumberFormat für die Formatierung
+	 * @param type
+	 *            DataType des Fields
+	 * @param value
+	 *            das Value das zum String werden soll
 	 * @return String des übergebeben Values
 	 */
 	private String getValueString(NumberFormat format, DataType type, Value value) {
