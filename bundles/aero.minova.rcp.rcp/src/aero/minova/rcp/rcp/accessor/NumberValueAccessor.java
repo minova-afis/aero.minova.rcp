@@ -156,17 +156,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		String originalTextBefore = textBefore;
 
 		// Löschen von Dezimal- und Grupierungstrennzeichen abfangen
-		if (!textBefore.isEmpty() && (keyCode == SWT.BS || keyCode == SWT.DEL) && start + 1 == end) {
-			if (keyCode == SWT.DEL) {
-				if (textBefore.charAt(caretPosition) == dfs.getDecimalSeparator() // prüft ob ein dezimal oder Gruppierungs trennzeichen
-						|| textBefore.charAt(caretPosition) == dfs.getGroupingSeparator()) { // entfernt werden soll
-					doit = false;
-				}
-			} else if (keyCode == SWT.BS && decimals > 0 && textBefore.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {// prüft ob ein dezimal
-																																// Trennzeichen gelöscht werden
-																																// soll
-				doit = false;
-			}
+		if (!textBefore.isEmpty() && start + 1 == end) {
+			doit = shouldSymbolBeDeleted(keyCode, caretPosition, textBefore, dfs, decimals);
 		} else if (!textBefore.isEmpty() && !insertion.isEmpty() && dfs.getDecimalSeparator() == insertion.charAt(0)) {
 			doit = false;
 		}
@@ -174,9 +165,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// Prüfen ob die Eingabe ein Minus enthält oder die Zahl im Field negativ ist
 		// negativ = true Zahl bleibt negativ oder wird negativ gesetzt am Ende
 		if (insertion.contains("-") || textBefore.contains("-")) {
-			if (insertion.contains("+")) {
-				negative = false;
-			} else {
+			if (!insertion.contains("+") || shouldSymbolBeDeleted(keyCode, caretPosition, originalTextBefore, dfs, decimals)) {
 				negative = true;
 			}
 		}
@@ -316,6 +305,40 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			return format.format(value.getBigDecimalValue());
 		default:
 			return null;
+		}
+	}
+
+	/**
+	 * Diese Methode liefert "true" zurück, wenn beim Löschen ein Dezimal- oder Gruppierungstrennzeichen entfernt werden soll. Dabei wird auf die verschiedenen
+	 * Löscharten geachtet und entsprechend die zu Löschende Position ermittelt.
+	 * 
+	 * @param keyCode,
+	 *            gibt an welcher Key auf der Tastatur gedrückt wurde
+	 * @param caretPosition
+	 *            position im Feld
+	 * @param text
+	 *            Einhalt des Feldes
+	 * @param dfs,
+	 *            liefert die benötigten Trennzeichen nach angegebenen Locale
+	 * @param decimals,
+	 *            Anzahl an Dezimalstellen
+	 * @return boolean, true= es soll ein Dezimal- oder Gruppierungstrennzeichen gelöscht
+	 */
+	private boolean shouldSymbolBeDeleted(int keyCode, int caretPosition, String text, DecimalFormatSymbols dfs, int decimals) {
+		switch (keyCode) {
+		case SWT.BS:
+			if (decimals > 0 && (text.charAt(caretPosition - 1) == dfs.getDecimalSeparator() || text.charAt(caretPosition - 1) == '-')) {
+				return false;
+			}
+			return true;
+		case SWT.DEL:
+			if ((text.charAt(caretPosition) == dfs.getDecimalSeparator() || text.charAt(caretPosition) == dfs.getGroupingSeparator())
+					|| (text.charAt(caretPosition) == '-')) {
+				return false;
+			}
+			return true;
+		default:
+			return true;
 		}
 	}
 
