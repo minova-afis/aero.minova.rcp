@@ -165,7 +165,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// Prüfen ob die Eingabe ein Minus enthält oder die Zahl im Field negativ ist
 		// negativ = true Zahl bleibt negativ oder wird negativ gesetzt am Ende
 		if (insertion.contains("-") || textBefore.contains("-")) {
-			if (!insertion.contains("+") || shouldSymbolBeDeleted(keyCode, caretPosition, originalTextBefore, dfs, decimals)) {
+			if (!insertion.contains("+") && getCharacterForDeletion(keyCode, textBefore, caretPosition) != '-') {
 				negative = true;
 			}
 		}
@@ -229,6 +229,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			// vorherige Zahl von Gruppierungsseperatoren bereinigen
 			textBefore = textBefore.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
 			text = textBefore;
+			negative = false;
 		}
 
 		try {
@@ -322,24 +323,35 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	 *            liefert die benötigten Trennzeichen nach angegebenen Locale
 	 * @param decimals,
 	 *            Anzahl an Dezimalstellen
-	 * @return boolean, true= es soll ein Dezimal- oder Gruppierungstrennzeichen gelöscht
+	 * @return boolean, true = es soll ein Dezimal- oder Gruppierungstrennzeichen gelöscht
 	 */
 	private boolean shouldSymbolBeDeleted(int keyCode, int caretPosition, String text, DecimalFormatSymbols dfs, int decimals) {
 		switch (keyCode) {
 		case SWT.BS:
-			if (decimals > 0 && (text.charAt(caretPosition - 1) == dfs.getDecimalSeparator() || text.charAt(caretPosition - 1) == '-')) {
+			if (decimals > 0 && text.charAt(caretPosition - 1) == dfs.getDecimalSeparator()) {
 				return false;
 			}
 			return true;
 		case SWT.DEL:
-			if ((text.charAt(caretPosition) == dfs.getDecimalSeparator() || text.charAt(caretPosition) == dfs.getGroupingSeparator())
-					|| (text.charAt(caretPosition) == '-')) {
+			if (text.charAt(caretPosition) == dfs.getDecimalSeparator() || text.charAt(caretPosition) == dfs.getGroupingSeparator()) {
 				return false;
 			}
 			return true;
 		default:
 			return true;
 		}
+	}
+
+	private Character getCharacterForDeletion(int keyCode, String text, int caretPosition) {
+		Character character;
+		// Charakter beim Löschen mit der Backspace Taste
+		if (keyCode == SWT.BS) {
+			character = text.charAt(caretPosition - 1);
+			// Charakter beim Entfernen mit der Entfernen Taste
+		} else {
+			character = text.charAt(caretPosition);
+		}
+		return character;
 	}
 
 	/**
@@ -389,15 +401,15 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		}
 		// Wenn mit ENTF gelöscht wird
 		else if (SWT.DEL == keyCode) {
-			if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
-					|| (text.length() == textBefore.length() && caretPosition < decimalCaretPostion)) {
+			if ((originalTextBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || originalTextBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
+					|| (text.length() == originalTextBefore.length()) && caretPosition < decimalCaretPostion)) {
 				newCaretPosition = caretPosition + 1;
-			} else if (countGroupingSeperator == 0) {
+			} else if (countGroupingSeperator == 0 || getCharacterForDeletion(keyCode, originalTextBefore, caretPosition) == '-') {
 				newCaretPosition = caretPosition;
 			} else {
 				newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
 			}
-		} else if (originalInsertion.contains("-")) {
+		} else if (originalInsertion.contains("-") && !originalTextBefore.contains("-")) {
 			newCaretPosition = caretPosition + 1;
 		} else if (originalInsertion.contains("+") && originalTextBefore.contains("-")) {
 			newCaretPosition = caretPosition - 1;
