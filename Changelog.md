@@ -22,6 +22,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Bugfixes
 - Auslesen von festen Werten aus xbs korrigiert
+- Index-Druck: 
+  - Summary-Row ausbessern, Summary an richtigen Spalte anzeigen
+  - Doubles formattieren wie in Maske angegeben
 
 ## [12.4.2] - 07.09.2022
 
