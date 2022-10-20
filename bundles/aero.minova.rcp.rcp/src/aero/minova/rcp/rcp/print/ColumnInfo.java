@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.print;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,9 @@ public class ColumnInfo {
 
 	/** Felddefinition, die sich auf die Spalte bezieht */
 	public final Column column;
+
+	/** Formattiert einen Double **/
+	public NumberFormat numberFormat;
 
 	private ReportConfiguration reportConf;
 
