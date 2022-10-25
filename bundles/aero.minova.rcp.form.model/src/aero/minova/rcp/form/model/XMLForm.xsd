@@ -261,6 +261,19 @@
 		<xs:attribute name="min-value" type="xs:float" use="optional" />
 		<xs:attribute name="max-value" type="xs:float" use="optional" />
 	</xs:complexType>
+	<xs:complexType name="quantity">
+		<xs:attribute default="0" name="decimals" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:minInclusive value="0" />
+					<xs:maxInclusive value="11" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="min-value" type="xs:float" use="optional" />
+		<xs:attribute name="max-value" type="xs:float" use="optional" />
+		<xs:attribute name="unit-field-name" type="xs:NCName"/>
+	</xs:complexType>
 	<xs:complexType name="radio">
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
