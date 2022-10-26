@@ -4,20 +4,15 @@ import aero.minova.rcp.model.DataType;
 
 public class MQuantityField extends MField {
 
-	private String unitField;
+	private String unitFieldName;
 
-	public MQuantityField(int decimals, String unitField) {
+	public MQuantityField(int decimals, String unitFieldName) {
 		super(decimals);
-		this.unitField = unitField;
+		this.unitFieldName = unitFieldName;
 	}
 
-	public MQuantityField(int decimals, DataType dataType, String unitField) {
-		super(decimals, dataType);
-		this.unitField = unitField;
-	}
-
-	public String getUnitField() {
-		return unitField;
+	public String getUnitFieldName() {
+		return unitFieldName;
 	}
 
 	@Override
