@@ -62,6 +62,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
@@ -75,6 +76,7 @@ import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.QuantityField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
@@ -331,6 +333,8 @@ public class WFCStatisticDetailPart {
 			LookupField.create(clientComposite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(clientComposite, field, row, column, mPerspective);
+		} else if (field instanceof MQuantityField) {
+			QuantityField.create(clientComposite, (MQuantityField)field, row, column, locale, mPerspective);
 		}
 	}
 
