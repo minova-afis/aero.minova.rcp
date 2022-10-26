@@ -366,6 +366,7 @@
 				<xs:element name="week-day" />
 				<xs:element name="editor" type="editor" />
 				<xs:element name="money" type="money" />
+				<xs:element name="quantity" type="quantity" />
 				<xs:element name="param-string" type="param-string" />
 				<xs:element name="void" />
 				<xs:element name="boolean" type="boolean" />
@@ -471,6 +472,7 @@
 		<xs:attribute default="true" name="visible" type="xs:boolean" use="optional" />
 		<xs:attribute name="unit-text" type="xs:string" use="optional" />
 		<xs:attribute default="false" name="read-only" type="xs:boolean" use="optional" />
+		<xs:attribute name="unit-field-name" type="xs:string" use="optional" />
 		<!--xs:attribute name="length" type="xs:integer"/ -->
 	</xs:complexType>
 	<xs:complexType name="layout-table">

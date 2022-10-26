@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;element name="week-day" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *           &lt;element name="editor" type="{}editor"/&gt;
  *           &lt;element name="money" type="{}money"/&gt;
+ *           &lt;element name="quantity" type="{}quantity"/&gt;
  *           &lt;element name="param-string" type="{}param-string"/&gt;
  *           &lt;element name="void" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *           &lt;element name="boolean" type="{}boolean"/&gt;
@@ -126,6 +127,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="unit-text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="read-only" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="unit-field-name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -148,6 +150,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "weekDay",
     "editor",
     "money",
+    "quantity",
     "paramString",
     "_void",
     "_boolean",
@@ -178,6 +181,7 @@ public class Field {
     protected Object weekDay;
     protected Editor editor;
     protected Money money;
+    protected Quantity quantity;
     @XmlElement(name = "param-string")
     protected ParamString paramString;
     @XmlElement(name = "void")
@@ -227,6 +231,8 @@ public class Field {
     protected String unitText;
     @XmlAttribute(name = "read-only")
     protected java.lang.Boolean readOnly;
+    @XmlAttribute(name = "unit-field-name")
+    protected String unitFieldName;
 
     /**
      * Ruft den Wert der number-Eigenschaft ab.
@@ -538,6 +544,30 @@ public class Field {
      */
     public void setMoney(Money value) {
         this.money = value;
+    }
+
+    /**
+     * Ruft den Wert der quantity-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Quantity }
+     *     
+     */
+    public Quantity getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * Legt den Wert der quantity-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Quantity }
+     *     
+     */
+    public void setQuantity(Quantity value) {
+        this.quantity = value;
     }
 
     /**
@@ -1139,6 +1169,30 @@ public class Field {
      */
     public void setReadOnly(java.lang.Boolean value) {
         this.readOnly = value;
+    }
+
+    /**
+     * Ruft den Wert der unitFieldName-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getUnitFieldName() {
+        return unitFieldName;
+    }
+
+    /**
+     * Legt den Wert der unitFieldName-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setUnitFieldName(String value) {
+        this.unitFieldName = value;
     }
 
 

@@ -150,6 +150,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Quantity }
+     * 
+     */
+    public Quantity createQuantity() {
+        return new Quantity();
+    }
+
+    /**
      * Create an instance of {@link Radio }
      * 
      */
