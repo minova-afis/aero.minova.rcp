@@ -1124,7 +1124,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MPeriodField) {
 			PeriodField.create(composite, field, row, locale, mPerspective);
 		} else if (field instanceof MQuantityField) {
-			QuantityField.create(composite, (MQuantityField)field, row, column, locale, mPerspective);
+			QuantityField.create(composite, (MQuantityField)field, row, column, locale, mPerspective, translationService);
 		}
 	}
 

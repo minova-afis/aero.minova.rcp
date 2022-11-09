@@ -334,7 +334,7 @@ public class WFCStatisticDetailPart {
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(clientComposite, field, row, column, mPerspective);
 		} else if (field instanceof MQuantityField) {
-			QuantityField.create(clientComposite, (MQuantityField)field, row, column, locale, mPerspective);
+			QuantityField.create(clientComposite, (MQuantityField)field, row, column, locale, mPerspective, translationService);
 		}
 	}
 
