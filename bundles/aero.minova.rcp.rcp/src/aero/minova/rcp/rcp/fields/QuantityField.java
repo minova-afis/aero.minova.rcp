@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.jface.widgets.LabelFactory;
@@ -34,8 +35,9 @@ import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
 
 public class QuantityField {
-	
-	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective) {
+
+	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective,
+			TranslationService translationService) {
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
 
 		Label label = FieldLabel.create(composite, field);
