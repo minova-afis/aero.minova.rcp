@@ -251,7 +251,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 			c = TextField.create(composite, mField, row, column, mPerspective);
 			break;
 		case QUANTITY:
-			c = QuantityField.create(composite, (MQuantityField) mField, row, column, locale, mPerspective);
+			c = QuantityField.create(composite, (MQuantityField) mField, row, column, locale, mPerspective, translationService);
 		}
 
 		if (c != null) {
