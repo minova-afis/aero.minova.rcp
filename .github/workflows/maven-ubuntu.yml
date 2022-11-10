@@ -48,13 +48,13 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
 
       - name: SonarQube scan
-        if: steps.branch-name.outputs.ref_branch == 'main'
         run: |
-          GITHUB_REF="" mvn --batch-mode --no-transfer-progress \
+          mvn --batch-mode --no-transfer-progress \
             dependency-check:aggregate \
             sonar:sonar \
             -P repo-github -P all-tests \
             -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
             --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
