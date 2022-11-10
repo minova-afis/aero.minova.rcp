@@ -345,7 +345,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 	private Character getCharacterForDeletion(int keyCode, String text, int caretPosition) {
 		Character character;
 		// Charakter beim Löschen mit der Backspace Taste
-		if (keyCode == SWT.BS) {
+		if (keyCode == SWT.BS && caretPosition != 0) {
 			character = text.charAt(caretPosition - 1);
 			// Charakter beim Entfernen mit der Entfernen Taste
 		} else {
