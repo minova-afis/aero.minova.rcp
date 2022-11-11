@@ -165,7 +165,9 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// Prüfen ob die Eingabe ein Minus enthält oder die Zahl im Field negativ ist
 		// negativ = true Zahl bleibt negativ oder wird negativ gesetzt am Ende
 		if (insertion.contains("-") || textBefore.contains("-")) {
-			if (!insertion.contains("+") && getCharacterForDeletion(keyCode, textBefore, caretPosition) != '-') {
+			if (insertion.contains("+") || getCharacterForDeletion(keyCode, textBefore, caretPosition, end - start == textBefore.length()).equals("-")) {
+				negative = false;
+			} else {
 				negative = true;
 			}
 		}
@@ -342,14 +344,14 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		}
 	}
 
-	private Character getCharacterForDeletion(int keyCode, String text, int caretPosition) {
-		Character character;
+	private String getCharacterForDeletion(int keyCode, String text, int caretPosition, boolean completlyMarked) {
+		String character = "";
 		// Charakter beim Löschen mit der Backspace Taste
-		if (keyCode == SWT.BS && caretPosition != 0) {
-			character = text.charAt(caretPosition - 1);
+		if (keyCode == SWT.BS && caretPosition != 0 && !completlyMarked) {
+			character = String.valueOf(text.charAt(caretPosition - 1));
 			// Charakter beim Entfernen mit der Entfernen Taste
-		} else {
-			character = text.charAt(caretPosition);
+		} else if (keyCode == SWT.DEL && caretPosition < text.length() && !completlyMarked) {
+			character = String.valueOf(text.charAt(caretPosition));
 		}
 		return character;
 	}
@@ -404,7 +406,8 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 			if ((originalTextBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || originalTextBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
 					|| (text.length() == originalTextBefore.length()) && caretPosition < decimalCaretPostion)) {
 				newCaretPosition = caretPosition + 1;
-			} else if (countGroupingSeperator == 0 || getCharacterForDeletion(keyCode, originalTextBefore, caretPosition) == '-') {
+			} else if (countGroupingSeperator == 0
+					|| getCharacterForDeletion(keyCode, originalTextBefore, caretPosition, oend - ostart == textBefore.length()) == "-") {
 				newCaretPosition = caretPosition;
 			} else {
 				newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
