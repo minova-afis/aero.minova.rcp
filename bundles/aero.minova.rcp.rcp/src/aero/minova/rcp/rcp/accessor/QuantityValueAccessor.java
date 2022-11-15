@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Control;
@@ -33,7 +34,7 @@ public class QuantityValueAccessor extends AbstractValueAccessor implements Veri
 			return;
 		}
 		if (value == null) {
-			((Text) control).setText("");
+			setText(control, "");
 		} else {
 			int decimals = field.getDecimals();
 			Locale locale = (Locale) control.getData(FieldUtil.TRANSLATE_LOCALE);
@@ -48,15 +49,23 @@ public class QuantityValueAccessor extends AbstractValueAccessor implements Veri
 			value = new Value(value.getStringValue().substring(value.getStringValue().indexOf(m.start())), field.getDataType());
 
 			if (value.getType().equals(DataType.DOUBLE)) {
-				((Text) control).setText(numberFormat.format(value.getDoubleValue()));
+				setText(control, numberFormat.format(value.getDoubleValue()));
 			} else if (value.getType().equals(DataType.BIGDECIMAL)) {
-				((Text) control).setText(numberFormat.format(value.getBigDecimalValue()));
+				setText(control, numberFormat.format(value.getBigDecimalValue()));
 			} else {
-				((Text) control).setText(numberFormat.format(value.getIntegerValue()));
+				setText(control, numberFormat.format(value.getIntegerValue()));
 			}
 		}
 	}
-	
+
+	private void setText(Control control, String text) {
+		if (control instanceof TextAssist) {
+			((TextAssist) control).setText(text);
+		} else if (control instanceof Text) {
+			((Text) control).setText(text);
+		}
+	}
+
 	@Override
 	public void verifyText(VerifyEvent e) {
 		if (!isFocussed()) {
