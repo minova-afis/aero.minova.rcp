@@ -14,7 +14,7 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
 
 public class NumberFormatUtil {
-	
+
 	public static class Result {
 		public String text;
 		public int caretPosition;
@@ -47,8 +47,8 @@ public class NumberFormatUtil {
 	 *            {@link DecimalFormatSymbols} des aktuellen locale
 	 * @return
 	 */
-	public static Result processInput(MField field, String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition, String textBefore,
-			DecimalFormatSymbols dfs, boolean rangeSelected) {
+	public static Result processInput(MField field, String insertion, int start, int end, int keyCode, int decimals, Locale locale, int caretPosition,
+			String textBefore, DecimalFormatSymbols dfs, boolean rangeSelected) {
 		Result result = new Result();
 		String text;
 		boolean doit = true;
@@ -122,9 +122,7 @@ public class NumberFormatUtil {
 			}
 
 		} else {
-
 			textBefore = textBefore.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
-
 			text = textBefore;
 		}
 
@@ -161,6 +159,66 @@ public class NumberFormatUtil {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Diese Methode liefert ein Value zurück, für den übergebenen DataType und Wert.
+	 * 
+	 * @param text
+	 *            Wert aus dem das VAlue gebildet werden soll
+	 * @param negative
+	 *            true - negative Zahl
+	 * @param type
+	 *            DataType des Fields
+	 * @param dfs
+	 *            DecimalFormatSymbols
+	 * @return Value für den entsprechenden DataType
+	 */
+	public static Value newValue(String text, boolean negative, DataType type, DecimalFormatSymbols dfs) {
+		Value value = null;
+
+		switch (type) {
+		case INTEGER:
+			value = new Value(Integer.parseInt(text));
+			break;
+		case DOUBLE:
+		case BIGDECIMAL:
+			value = new Value(Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.')), type);
+			break;
+		default:
+			break;
+		}
+
+		return value;
+	}
+
+	/**
+	 * Gibt den String des übergebenen Values für den richtigen DataType zurück
+	 * 
+	 * @param format
+	 *            NumberFormat für die Formatierung
+	 * @param type
+	 *            DataType des Fields
+	 * @param value
+	 *            das Value das zum String werden soll
+	 * @return String des übergebeben Values
+	 */
+	public static String getValueString(NumberFormat format, DataType type, Value value) {
+		switch (type) {
+		case INTEGER:
+			return format.format(value.getIntegerValue());
+		case DOUBLE:
+			return format.format(value.getDoubleValue());
+		case BIGDECIMAL:
+			return format.format(value.getBigDecimalValue());
+		default:
+			return null;
+		}
+	}
+
+	public static String clearNumberFromGroupingSymbols(String entry, Locale locale) {
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+		return entry.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
 	}
 
 	/**
@@ -264,5 +322,32 @@ public class NumberFormatUtil {
 		}
 		return groupingSeperatorCount;
 	}
-}
 
+	public static String[] splitNumberUnitEntry(String entry, MField field) {
+		String numbers = entry;
+		String unit = "";
+		String[] numberAndUnit = new String[2];
+
+		try {
+			numbers = entry.substring(0, findFirstLetterPosition(entry));
+			unit = entry.substring(findFirstLetterPosition(entry));
+		} catch (Exception e) {
+			// Nothing to handle
+		}
+
+		numberAndUnit[0] = numbers;
+		numberAndUnit[1] = unit;
+
+		return numberAndUnit;
+	}
+
+	public static int findFirstLetterPosition(String input) {
+		for (int i = 0; i < input.length(); i++) {
+			if (Character.isLetter(input.charAt(i))) {
+				return i;
+			}
+		}
+		return -1; // not found
+	}
+
+}
