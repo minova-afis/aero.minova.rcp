@@ -326,7 +326,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		container.setLayout(new DetailLayout());
 		setControl(container); // Von wizard benötigt
 
-		MinovaSection section = new MinovaSection(container, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, translationService);
+		MinovaSection section = new MinovaSection(container, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, mPerspective);
 		MinovaSectionData sectionData = new MinovaSectionData();
 		section.setLayoutData(sectionData);
 
