@@ -9,6 +9,8 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.NUMBER_WIDTH;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +40,7 @@ import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
+import aero.minova.rcp.rcp.util.NumberFormatUtil;
 import aero.minova.rcp.util.OSUtil;
 
 public class QuantityField {
@@ -53,19 +56,25 @@ public class QuantityField {
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				String numbers = entry;
-				String unit = "";
+				int decimals = field.getDecimals();
 
-				try {
-					numbers = entry.substring(0, findFirstLetterPosition(entry));
-					unit = entry.substring(findFirstLetterPosition(entry));
-				} catch (Exception e) {
-					// Nothing to handle
-				}
+				NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+				numberFormat.setMaximumFractionDigits(decimals);
+				numberFormat.setMinimumFractionDigits(decimals);
+				numberFormat.setGroupingUsed(true);
+				
+				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
 
+				String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry, field);
+				String number = numberAndUnit[0];
+				String unit = numberAndUnit[1];
+
+				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+				Value value = NumberFormatUtil.newValue(number, false, field.getDataType(), dfs);
 				try {
-					result.add(String.valueOf(Double.parseDouble(numbers)) + " " + unit);
-					field.setValue(new Value(Double.parseDouble(numbers)), true);
+					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
+					field.setValue(value, true);
+					field.setUnitText(unit);
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				}
@@ -74,8 +83,7 @@ public class QuantityField {
 			}
 
 		};
-
-		Label unit = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
+		Label unitLabel = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
 
@@ -119,12 +127,18 @@ public class QuantityField {
 				@Override
 				public void focusGained(FocusEvent e) {
 					text2.selectAll();
+					text2.setText(NumberFormatUtil.clearNumberFromGroupingSymbols(text2.getText(), locale));
 				}
 
 				@Override
 				public void focusLost(FocusEvent e) {
 					if (text2.getText().isBlank()) {
 						field.setValue(null, true);
+					} else {
+						// Eventuelle neue Einheit setzen
+						if (!field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
+							unitLabel.setText(field.getUnitText());
+						}
 					}
 				}
 			});
@@ -161,20 +175,11 @@ public class QuantityField {
 		text.setData(CssData.CSSDATA_KEY, new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
 				field.isFillToRight() || field.isFillHorizontal()));
 
-		unit.setData(TRANSLATE_PROPERTY, unitText);
-		unit.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "DescriptionLabel");
-		unit.setLayoutData(unitFormData);
+		unitLabel.setData(TRANSLATE_PROPERTY, unitText);
+		unitLabel.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "DescriptionLabel");
+		unitLabel.setLayoutData(unitFormData);
 
 		return text;
-	}
-
-	public static int findFirstLetterPosition(String input) {
-		for (int i = 0; i < input.length(); i++) {
-			if (Character.isLetter(input.charAt(i))) {
-				return i;
-			}
-		}
-		return -1; // not found
 	}
 
 }
