@@ -276,7 +276,8 @@ public class WFCDetailPart extends WFCFormPart {
 		// Screenshot-Möglichkeit zu Toolbar hinzufügen
 		Control toolbar = (Control) mPart.getToolbar().getWidget();
 		if (toolbar != null && toolbar.getListeners(SWT.MenuDetect).length == 0) { // Nur einmal Menü hinzufügen
-			toolbar.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, toolbar, "Toolbar " + mPerspective.getLocalizedLabel(), translationService));
+			toolbar.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, toolbar,
+					mPerspective.getPersistedState().get(Constants.FORM_NAME).replace(".xml", "") + "_Toolbar", translationService));
 		}
 	}
 
@@ -530,10 +531,10 @@ public class WFCDetailPart extends WFCFormPart {
 		MinovaSectionData sectionData = new MinovaSectionData();
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead()) {
-			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, translationService);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, mPerspective);
 			headSection = section;
 		} else {
-			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE, translationService);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE, mPerspective);
 			section.getImageLink().addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
@@ -543,6 +544,7 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 		section.setLayoutData(sectionData);
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
+		section.setData(Constants.SECTION_NAME, headOrPageOrGrid.getId());
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.getIcon(), false);
 		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {
