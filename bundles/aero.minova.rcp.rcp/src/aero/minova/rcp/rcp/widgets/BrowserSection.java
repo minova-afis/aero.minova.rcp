@@ -2,6 +2,8 @@ package aero.minova.rcp.rcp.widgets;
 
 import java.text.MessageFormat;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.log.Logger;
@@ -13,8 +15,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-
-import javax.inject.Inject;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.ICssStyler;
@@ -74,7 +74,21 @@ public class BrowserSection {
 	 */
 	private boolean loadPage(String url) {
 		Display display = Display.getCurrent();
-		boolean set = browser.setUrl(url); // URL content loading is asynchronous
+		boolean set = browser.setText("<!DOCTYPE html>\n" //
+				+ "<html>\n" //
+				+ "<head>\n" //
+				+ "<style>\n" //
+				+ "img { \n" //
+				+ "  width: 100%; \n" //
+				+ "  height: 100%; \n" //
+				+ "}\n" //
+				+ "</style>\n" //
+				+ "</head>\n" //
+				+ "<body>\n" //
+				+ "<img src=\'" + url + "'\">\n" //
+				+ "</body>\n" //
+				+ "</html>" //
+				, true);
 		loading = true;
 		while (loading) { // Add synchronous behavior: wait till it finishes loading
 			if (!display.readAndDispatch()) {

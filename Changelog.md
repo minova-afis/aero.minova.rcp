@@ -15,13 +15,48 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Neu
+
+### Änderung
+
+- Tabelle tSiteParameter NICHT schon beim Starten anfragen. Tabelle wird erst angefragt, wenn ein Helper einen Wert tatsächlich benötigt. Damit werden Exceptions verhindert, wenn ein Projekt nicht auf data.schema aufbaut.
+
+### Bugfixes
+- Auslesen von festen Werten aus xbs korrigiert
+- Index-Druck: 
+  - Summary-Row ausbessern, Summary an richtigen Spalte anzeigen
+  - Doubles formattieren wie in Maske angegeben
+
+## [12.4.2] - 07.09.2022
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Neu
+
+### Änderung
+
+### Bugfixes
+- Browser wird beim Aufrufen einer READ-Prozedur geleert
+
+## [12.4.1] - 06.09.2022
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Neu
+
+### Änderung
+
+### Bugfixes
+- Dateien im Browser Widget werden in voller Größe angezeigt
+
+## [12.4.0] - 2022-09-02
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+### Neu
 - Statische Werte können über XBS konfiguriert werden
 - Screenshots von Sections, Parts und der Detail-Toolbar können über Rechtsklick erstellt werden
 - Browser Section, für die Darstellung von Attachments im Detail
 - PageOrHeadOrGridWrapper ausgelagert in eigene Klasse, SectionWrapper
-
-### Bugfixes
-- Doppelte Initialisierung von Helper entfernt
 
 ### Bugfixes
 - Helper für OP-Grids nicht doppelt hinzufügen

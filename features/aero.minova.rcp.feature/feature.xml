@@ -2,7 +2,7 @@
 <feature
       id="aero.minova.rcp.feature"
       label="Feature aero.minova.rcp.feature"
-      version="12.3.0.qualifier"
+      version="12.4.2.qualifier"
       provider-name="Minova Information Services GmbH">
 
    <description url="http://www.example.com/description">

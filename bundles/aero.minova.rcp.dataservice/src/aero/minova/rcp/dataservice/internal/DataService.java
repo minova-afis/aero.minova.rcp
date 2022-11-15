@@ -119,7 +119,7 @@ public class DataService implements IDataService {
 
 	private URI workspacePath;
 
-	private Map<String, String> siteParameters;
+	private Map<String, String> siteParameters = new HashMap<>();;
 
 	EventAdmin eventAdmin;
 
@@ -141,7 +141,6 @@ public class DataService implements IDataService {
 		this.server = URI.create(server.endsWith("/") ? server : server.concat("/"));
 		this.workspacePath = workspacePath;
 		init();
-		initSiteParameters();
 
 		// im Falle der Unit tests haben wir keinen bundle context
 		if (FrameworkUtil.getBundle(this.getClass()) != null) {
@@ -182,7 +181,6 @@ public class DataService implements IDataService {
 	}
 
 	private void initSiteParameters() {
-		siteParameters = new HashMap<>();
 		Table requestTable = TableBuilder.newTable("tSiteParameter") //
 				.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
 				.withColumn("Value", DataType.STRING)//
@@ -963,7 +961,7 @@ public class DataService implements IDataService {
 			return siteParameters.get(key);
 		}
 
-		// Nochmal versuchen, die SiteParameter abzurufen, wenn Wert nicht gefunden wurde
+		// Die SiteParameter abrufen, wenn Wert nicht gefunden wurde
 		initSiteParameters();
 		if (siteParameters.containsKey(key)) {
 			return siteParameters.get(key);
