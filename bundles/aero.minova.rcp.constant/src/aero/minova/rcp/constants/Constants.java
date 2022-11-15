@@ -9,6 +9,7 @@ public class Constants {
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";
 	public static final String DETAIL_PART = "aero.minova.rcp.rcp.part.details";
 	public static final String DETAIL_TOOLBAR = "aero.minova.rcp.rcp.part.details.toolbar";
+	public static final String STATISTICDETAIL_TOOLBAR = "aero.minova.rcp.rcp.part.statisticdetails.toolbar";
 
 	public static final String SEARCH_TABLE = "NatTableDataSearchArea";
 
@@ -185,6 +186,7 @@ public class Constants {
 	public static final String DIRTY_PERSPECTIVES = "DirtyPerspectives";
 
 	public static final String SECTION_WIDTH = "SectionWidth";
+	public static final String SECTION_NAME = "SectionName";
 	public static final String DETAIL_WIDTH = "Detail_Width";
 	public static final String OPTION_PAGES = "OptionPages";
 	public static final String OPTION_PAGE = "OptionPage";
