@@ -67,7 +67,7 @@ public class ScreenshotUtil {
 		String directory = prefs.get("directory", null);
 
 		// Dialog öffnen
-		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+		final FileDialog fd = new FileDialog(Display.getCurrent().getShells()[0], SWT.SAVE);
 		fd.setText(translationService.translate("@SaveScreenshot.Title", null));
 		fd.setFilterExtensions(new String[] { "*.png" });
 		fd.setFilterNames(new String[] { "Bilddateien(*.png)" });
