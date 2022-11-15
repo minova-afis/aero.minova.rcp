@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.widgets.DetailLayout;
 import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
@@ -329,6 +330,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		MinovaSection section = new MinovaSection(container, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, mPerspective);
 		MinovaSectionData sectionData = new MinovaSectionData();
 		section.setLayoutData(sectionData);
+		section.setData(Constants.SECTION_NAME, "Wizard");
 
 		Composite composite = new Composite(section, SWT.None);
 		composite.setLayout(new FormLayout());
