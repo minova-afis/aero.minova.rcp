@@ -75,6 +75,7 @@ public class QuantityField {
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 					field.setValue(value, true);
 					field.setUnitText(unit);
+					field.getDetail().getField(field.getUnitFieldName()).setValue(new Value(unit), true);
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				}
