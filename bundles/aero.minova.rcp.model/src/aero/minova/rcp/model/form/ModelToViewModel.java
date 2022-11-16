@@ -101,7 +101,7 @@ public class ModelToViewModel {
 		}
 		
 		if (field.getQuantity() != null) {
-			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getUnitFieldName());
+			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName());
 			if (field.getQuantity().getMaxValue() != null) {
 				f.setMaximumValue(field.getMoney().getMaxValue().doubleValue());
 			}
