@@ -15,6 +15,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Neu
+- Screenshots von Sections und der Detail-Toolbar können über Rechtsklick erstellt werden
 
 ### Änderung
 

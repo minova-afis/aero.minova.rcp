@@ -1,5 +1,8 @@
 package aero.minova.rcp.css.widgets;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.translation.TranslationService;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -10,8 +13,10 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
 
+import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.css.MinovaSectionStyler;
+import aero.minova.rcp.util.ScreenshotUtil;
 
 public class MinovaSection extends Section {
 	private ICssStyler cssStyler;
@@ -22,7 +27,7 @@ public class MinovaSection extends Section {
 
 	private boolean minimized;
 
-	public MinovaSection(Composite parent, int style) {
+	public MinovaSection(Composite parent, int style, MPerspective mPerspective) {
 		super(parent, style);
 
 		cssStyler = new MinovaSectionStyler(this);
@@ -50,7 +55,7 @@ public class MinovaSection extends Section {
 				doubleClick = false;
 				// Erst sichergehen, dass es sich nicht um einen Doppelklick handelt
 				Display.getDefault().timerExec(Display.getDefault().getDoubleClickTime(), () -> {
-					if (!doubleClick) {
+					if (!doubleClick && e.button == 1) {
 						if (!isExpanded()) {
 							setExpanded(true);
 						} else if (MinovaSection.this.getExpandable()) {
@@ -60,6 +65,13 @@ public class MinovaSection extends Section {
 				});
 			}
 		});
+
+		// Rechtsklick-Menü für Screenshot erstellen
+		TranslationService ts = mPerspective.getContext().get(TranslationService.class);
+		String maskTitle = mPerspective.getPersistedState().get(Constants.FORM_NAME).replace(".xml", "");
+		this.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, this, maskTitle + "_" + this.getData(Constants.SECTION_NAME), ts));
+		this.imageLink.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, this, maskTitle + "_" + this.getData(Constants.SECTION_NAME), ts));
+
 	}
 
 	public void setImage(final Image image) {
