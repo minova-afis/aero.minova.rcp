@@ -152,19 +152,21 @@ public class DataFormService implements IDataFormService {
 		DataType type = null;
 		DateTimeType dateTimeType = null;
 		Integer decimals = null;
-		if (f.getPercentage() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
+		if (f.getPercentage() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)
+				|| (f.getQuantity() != null && f.getQuantity().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
 			if (f.getNumber() != null) {
 				decimals = f.getNumber().getDecimals();
-			} else if (f.getMoney() != null) {
-				decimals = f.getMoney().getDecimals();
 			} else if (f.getPercentage() != null) {
 				decimals = f.getPercentage().getDecimals();
+			} else if (f.getQuantity() != null) {
+				decimals = f.getQuantity().getDecimals();
 			}
-		} else if (f.getNumber() != null || f.getLookup() != null) {
+		} else if (f.getNumber() != null || f.getLookup() != null || f.getQuantity() != null) {
 			type = DataType.INTEGER;
 		} else if (f.getMoney() != null) {
 			type = DataType.BIGDECIMAL;
+			decimals = f.getMoney().getDecimals();
 		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
 		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {
