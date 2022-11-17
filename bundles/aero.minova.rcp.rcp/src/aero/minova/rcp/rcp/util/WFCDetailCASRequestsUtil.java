@@ -378,11 +378,7 @@ public class WFCDetailCASRequestsUtil {
 				checkedFields.add(c);
 				if (c instanceof MQuantityField) {
 					int columnI = table.getColumnIndex(((MQuantityField) c).getUnitFieldName());
-					if (table.getRows().get(0).getValue(columnI) != null) {
-						c.setUnitText(table.getRows().get(0).getValue(columnI).getStringValue());
-					} else {
-						c.setUnitText(((MQuantityField) c).getOriginalUnit());
-					}
+					c.setUnitText(table.getRows().get(0).getValue(columnI).getStringValue());
 				}
 				c.setValue(table.getRows().get(0).getValue(i), false);
 			}
