@@ -63,6 +63,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
@@ -375,6 +376,14 @@ public class WFCDetailCASRequestsUtil {
 			MField c = mDetail.getField(name);
 			if (c != null) {
 				checkedFields.add(c);
+				if (c instanceof MQuantityField) {
+					int columnI = table.getColumnIndex(((MQuantityField) c).getUnitFieldName());
+					if (table.getRows().get(0).getValue(columnI) != null) {
+						c.setUnitText(table.getRows().get(0).getValue(columnI).getStringValue());
+					} else {
+						c.setUnitText(((MQuantityField) c).getOriginalUnit());
+					}
+				}
 				c.setValue(table.getRows().get(0).getValue(i), false);
 			}
 		}
