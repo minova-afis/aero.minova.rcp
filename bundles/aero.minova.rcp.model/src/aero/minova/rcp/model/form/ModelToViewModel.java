@@ -99,18 +99,18 @@ public class ModelToViewModel {
 			}
 			return f;
 		}
-		
+
 		if (field.getQuantity() != null) {
-			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName());
+			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName(), field.getUnitText());
 			if (field.getQuantity().getMaxValue() != null) {
-				f.setMaximumValue(field.getMoney().getMaxValue().doubleValue());
+				f.setMaximumValue(field.getQuantity().getMaxValue().doubleValue());
 			}
 			if (field.getQuantity().getMinValue() != null) {
-				f.setMinimumValue(field.getMoney().getMinValue().doubleValue());
+				f.setMinimumValue(field.getQuantity().getMinValue().doubleValue());
 			}
 			return f;
 		}
-		
+
 		if (field.getPercentage() != null) {
 			return new MNumberField(field.getPercentage().getDecimals());
 		}
