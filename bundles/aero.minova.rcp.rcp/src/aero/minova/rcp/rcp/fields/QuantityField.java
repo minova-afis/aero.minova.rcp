@@ -38,6 +38,8 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.event.ValueChangeEvent;
+import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
 import aero.minova.rcp.rcp.util.NumberFormatUtil;
@@ -47,7 +49,7 @@ public class QuantityField {
 
 	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective,
 			TranslationService translationService) {
-		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
+		String unitText = field.getOriginalUnit() == null ? "" : field.getOriginalUnit();
 
 		Label label = FieldLabel.create(composite, field);
 
@@ -62,7 +64,7 @@ public class QuantityField {
 				numberFormat.setMaximumFractionDigits(decimals);
 				numberFormat.setMinimumFractionDigits(decimals);
 				numberFormat.setGroupingUsed(true);
-				
+
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
 
 				String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry, field);
@@ -85,8 +87,19 @@ public class QuantityField {
 
 		};
 		Label unitLabel = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
+		field.getDetail().getField(field.getUnitFieldName()).setValue(new Value(unitText), true);
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
+
+		field.addValueChangeListener(new ValueChangeListener() {
+
+			@Override
+			public void valueChange(ValueChangeEvent evt) {
+				if (!field.getUnitText().equals(unitText)) {
+					unitLabel.setText(field.getUnitText());
+				}
+			}
+		});
 
 		Control text;
 		if (OSUtil.isLinux()) {
