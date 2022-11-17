@@ -27,6 +27,7 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -36,8 +37,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -72,6 +76,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.event.Event;
 import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
@@ -138,6 +143,7 @@ import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 import aero.minova.rcp.rcp.widgets.BrowserSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
+import aero.minova.rcp.util.ScreenshotUtil;
 
 @SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
@@ -252,6 +258,29 @@ public class WFCDetailPart extends WFCFormPart {
 
 		// In XBS gegebene Felder füllen
 		casRequestsUtil.setValuesAccordingToXBS();
+	}
+
+	@Inject
+	@Optional
+	/**
+	 * Sobald das Toolbar-Widget des Detail-Parts erstellt wird Rechtsklick-Menü zum Erstellen eines Screenshots hinzufügen
+	 * 
+	 * @param event
+	 */
+	public void subscribeTopicWidgetChange(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
+
+		// Nur SET-Event der Detail-Toolbar herausfiltern
+		Object element = event.getProperty(EventTags.ELEMENT);
+		if (!UIEvents.isSET(event) || !(element instanceof MToolBar) || !((MToolBar) element).getElementId().equals(Constants.DETAIL_TOOLBAR)) {
+			return;
+		}
+
+		// Screenshot-Möglichkeit zu Toolbar hinzufügen
+		Control toolbar = (Control) mPart.getToolbar().getWidget();
+		if (toolbar != null && toolbar.getListeners(SWT.MenuDetect).length == 0) { // Nur einmal Menü hinzufügen
+			toolbar.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, toolbar,
+					mPerspective.getPersistedState().get(Constants.FORM_NAME).replace(".xml", "") + "_Toolbar", translationService));
+		}
 	}
 
 	/**
@@ -504,10 +533,10 @@ public class WFCDetailPart extends WFCFormPart {
 		MinovaSectionData sectionData = new MinovaSectionData();
 		MinovaSection section;
 		if (headOrPageOrGrid.isHead()) {
-			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, mPerspective);
 			headSection = section;
 		} else {
-			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
+			section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE, mPerspective);
 			section.getImageLink().addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDoubleClick(MouseEvent e) {
@@ -517,6 +546,7 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 		section.setLayoutData(sectionData);
 		section.setData(TRANSLATE_PROPERTY, headOrPageOrGrid.getTranslationText());
+		section.setData(Constants.SECTION_NAME, headOrPageOrGrid.getId());
 
 		ImageDescriptor imageDescriptor = ImageUtil.getImageDescriptor(headOrPageOrGrid.getIcon(), false);
 		if (!imageDescriptor.equals(ImageDescriptor.getMissingImageDescriptor())) {

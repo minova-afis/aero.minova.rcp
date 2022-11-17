@@ -24,8 +24,12 @@ import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -42,6 +46,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.osgi.service.event.Event;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.widgets.DetailLayout;
@@ -83,6 +88,7 @@ import aero.minova.rcp.rcp.fields.TextField;
 import aero.minova.rcp.rcp.handlers.ShowErrorDialogHandler;
 import aero.minova.rcp.rcp.util.TabUtil;
 import aero.minova.rcp.rcp.util.TranslateUtil;
+import aero.minova.rcp.util.ScreenshotUtil;
 import aero.minova.rcp.widgets.MinovaNotifier;
 
 @SuppressWarnings("restriction")
@@ -134,6 +140,9 @@ public class WFCStatisticDetailPart {
 	IEclipseContext partContext;
 
 	@Inject
+	MPart mPart;
+
+	@Inject
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	private Shell shell;
 
@@ -147,6 +156,7 @@ public class WFCStatisticDetailPart {
 		DetailLayout detailLayout = new DetailLayout();
 		parent.setLayout(detailLayout);
 		mPerspective.getContext().set(Constants.DETAIL_LAYOUT, detailLayout);
+		mPerspective.getPersistedState().put(Constants.FORM_NAME, STATISTIC);
 		layoutSection();
 	}
 
@@ -157,8 +167,9 @@ public class WFCStatisticDetailPart {
 	 * @param title
 	 */
 	private void layoutSection() {
-		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
+		section = new MinovaSection(parent, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED, mPerspective);
 		section.setData(TRANSLATE_PROPERTY, "@" + STATISTIC);
+		section.setData(Constants.SECTION_NAME, STATISTIC);
 		MinovaSectionData sectionData = new MinovaSectionData();
 		section.setLayoutData(sectionData);
 
@@ -179,6 +190,28 @@ public class WFCStatisticDetailPart {
 		TranslateUtil.translate(parent, translationService, locale);
 
 		mPerspective.getContext().set(Constants.DETAIL_WIDTH, section.getCssStyler().getSectionWidth());
+	}
+
+	@Inject
+	@Optional
+	/**
+	 * Sobald das Toolbar-Widget des Detail-Parts erstellt wird Rechtsklick-Menü zum Erstellen eines Screenshots hinzufügen
+	 * 
+	 * @param event
+	 */
+	public void subscribeTopicWidgetChange(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
+
+		// Nur SET-Event der Detail-Toolbar herausfiltern
+		Object element = event.getProperty(EventTags.ELEMENT);
+		if (!UIEvents.isSET(event) || !(element instanceof MToolBar) || !((MToolBar) element).getElementId().equals(Constants.STATISTICDETAIL_TOOLBAR)) {
+			return;
+		}
+
+		// Screenshot-Möglichkeit zu Toolbar hinzufügen
+		Control toolbar = (Control) mPart.getToolbar().getWidget();
+		if (toolbar != null && toolbar.getListeners(SWT.MenuDetect).length == 0) { // Nur einmal Menü hinzufügen
+			toolbar.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, toolbar, "Statistic_Toolbar", translationService));
+		}
 	}
 
 	/**
@@ -243,6 +276,7 @@ public class WFCStatisticDetailPart {
 		// Auslesen des Titles
 		section.setText(row.getValue(1).getStringValue());
 		section.setData(TRANSLATE_PROPERTY, row.getValue(1).getStringValue());
+		section.setData(Constants.SECTION_NAME, row.getValue(0).getStringValue());
 
 		// Sortieren der Felder und Erstellen im UI
 		mFields.sort((m1, m2) -> m1.getSqlIndex().compareTo(m2.getSqlIndex()));
