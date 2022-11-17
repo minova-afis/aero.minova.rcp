@@ -3,14 +3,20 @@ package aero.minova.rcp.model.form;
 public class MQuantityField extends MField{
 
 	private String unitFieldName;
+	private String originalUnitText;
 
-	public MQuantityField(int decimals, String unitFieldName) {
+	public MQuantityField(int decimals, String unitFieldName, String unitText) {
 		super(decimals);
 		this.unitFieldName = unitFieldName;
+		this.originalUnitText = unitText;
 	}
 
 	public String getUnitFieldName() {
 		return unitFieldName;
+	}
+
+	public String getOriginalUnitText() {
+		return originalUnitText;
 	}
 
 	@Override
