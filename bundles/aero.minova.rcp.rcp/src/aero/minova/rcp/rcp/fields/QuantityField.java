@@ -40,6 +40,7 @@ import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
+import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
 import aero.minova.rcp.rcp.util.NumberFormatUtil;
@@ -49,7 +50,8 @@ public class QuantityField {
 
 	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective,
 			TranslationService translationService) {
-		String unitText = field.getOriginalUnit() == null ? "" : field.getOriginalUnit();
+		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
+		MField unitField = field.getDetail().getField(field.getUnitFieldName());
 
 		Label label = FieldLabel.create(composite, field);
 
@@ -77,7 +79,11 @@ public class QuantityField {
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 					field.setValue(value, true);
 					field.setUnitText(unit);
-					field.getDetail().getField(field.getUnitFieldName()).setValue(new Value(unit), true);
+					if (unit != null || !unit.isBlank()) {
+						unitField.setValue(new Value(unit), true);
+					} else {
+						unitField.setValue(new Value(unitText), true);
+					}
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				}
@@ -87,7 +93,7 @@ public class QuantityField {
 
 		};
 		Label unitLabel = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
-		field.getDetail().getField(field.getUnitFieldName()).setValue(new Value(unitText), true);
+//		unitField.setValue(new Value(unitText), true);
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
 
@@ -95,7 +101,8 @@ public class QuantityField {
 
 			@Override
 			public void valueChange(ValueChangeEvent evt) {
-				if (!field.getUnitText().equals(unitText)) {
+				// Einheit neu setzen, wenn sie sich geändert hat
+				if (field.getUnitText() != null && !field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
 					unitLabel.setText(field.getUnitText());
 				}
 			}
