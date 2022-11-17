@@ -378,7 +378,7 @@ public class WFCDetailCASRequestsUtil {
 				checkedFields.add(c);
 				if (c instanceof MQuantityField) {
 					int columnI = table.getColumnIndex(((MQuantityField) c).getUnitFieldName());
-					c.setUnitText(table.getRows().get(0).getValue(columnI).getStringValue());
+					c.setUnitText(translationService.translate(table.getRows().get(0).getValue(columnI).getStringValue(), null));
 				}
 				c.setValue(table.getRows().get(0).getValue(i), false);
 			}
@@ -866,6 +866,9 @@ public class WFCDetailCASRequestsUtil {
 		mDetail.getFields().removeAll(paramfields);
 		// Felder auf Null setzen!
 		for (MField f : mDetail.getFields()) {
+			if (f instanceof MQuantityField) {
+				f.setUnitText(translationService.translate(((MQuantityField) f).getOriginalUnitText(), null));
+			}
 			f.setValue(null, false);
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);
