@@ -79,10 +79,10 @@ public class QuantityField {
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 					field.setValue(value, true);
 					field.setUnitText(unit);
-					if (unit != null || !unit.isBlank()) {
-						unitField.setValue(new Value(unit), true);
+					if (unit != null && !unit.isBlank()) {
+						unitField.setValue(new Value(unit), false);
 					} else {
-						unitField.setValue(new Value(unitText), true);
+						unitField.setValue(new Value(unitText), false);
 					}
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
@@ -93,7 +93,6 @@ public class QuantityField {
 
 		};
 		Label unitLabel = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
-//		unitField.setValue(new Value(unitText), true);
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
 
@@ -102,8 +101,8 @@ public class QuantityField {
 			@Override
 			public void valueChange(ValueChangeEvent evt) {
 				// Einheit neu setzen, wenn sie sich geändert hat
-				if (field.getUnitText() != null && !field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
-					unitLabel.setText(field.getUnitText());
+				if (field.getUnitText() != null && !field.getUnitText().isBlank()) {
+					unitLabel.setText(translationService.translate(field.getUnitText(), null));
 				}
 			}
 		});
