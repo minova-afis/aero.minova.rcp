@@ -220,7 +220,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		switch (mField.getDataType()) {
 		case BIGDECIMAL:
 		case DOUBLE:
-			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
+			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective, translationService);
 			break;
 		case BOOLEAN:
 			c = BooleanField.create(composite, mField, row, column, locale, mPerspective);
@@ -243,7 +243,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 			}
 			break;
 		case INTEGER:
-			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective);
+			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective, translationService);
 			break;
 		case REFERENCE:
 			// Sollte nicht vorkommen

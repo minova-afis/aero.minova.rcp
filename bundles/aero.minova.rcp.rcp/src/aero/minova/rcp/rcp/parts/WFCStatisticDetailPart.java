@@ -356,7 +356,7 @@ public class WFCStatisticDetailPart {
 		if (field instanceof MBooleanField) {
 			BooleanField.create(clientComposite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(clientComposite, (MNumberField) field, row, column, locale, mPerspective);
+			NumberField.create(clientComposite, (MNumberField) field, row, column, locale, mPerspective, translationService);
 		} else if (field instanceof MDateTimeField) {
 			DateTimeField.create(clientComposite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortDateField) {
