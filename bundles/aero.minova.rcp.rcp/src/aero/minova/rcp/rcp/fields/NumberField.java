@@ -66,8 +66,8 @@ public class NumberField {
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-				Value value = NumberFormatUtil.newValue(entry, false, field.getDataType(), dfs);
 				try {
+					Value value = NumberFormatUtil.newValue(entry, field.getDataType(), dfs);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value));
 					field.setValue(value, true);
 				} catch (Exception e) {
@@ -81,7 +81,7 @@ public class NumberField {
 		Label unit = LabelFactory.newLabel(SWT.LEFT).text(unitText).create(composite);
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
-		
+
 		Control text;
 		if (OSUtil.isLinux()) {
 			Text text2 = new Text(composite, SWT.BORDER);

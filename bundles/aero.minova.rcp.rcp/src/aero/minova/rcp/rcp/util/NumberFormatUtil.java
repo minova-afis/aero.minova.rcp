@@ -174,12 +174,12 @@ public class NumberFormatUtil {
 	 *            DecimalFormatSymbols
 	 * @return Value für den entsprechenden DataType
 	 */
-	public static Value newValue(String text, boolean negative, DataType type, DecimalFormatSymbols dfs) {
+	public static Value newValue(String text, DataType type, DecimalFormatSymbols dfs) {
 		Value value = null;
 
 		switch (type) {
 		case INTEGER:
-			value = new Value(Integer.parseInt(text));
+				value = new Value(Integer.parseInt(text));
 			break;
 		case DOUBLE:
 		case BIGDECIMAL:

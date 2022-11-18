@@ -74,8 +74,8 @@ public class QuantityField {
 				String unit = numberAndUnit[1];
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-				Value value = NumberFormatUtil.newValue(number, false, field.getDataType(), dfs);
 				try {
+					Value value = NumberFormatUtil.newValue(number, field.getDataType(), dfs);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 					field.setValue(value, true);
 					field.setUnitText(unit);
