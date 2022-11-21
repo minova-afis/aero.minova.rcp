@@ -14,9 +14,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.5.0] - 21.11.2022
+
+**ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
+
+
 ### Neu
 - Screenshots von Sections und der Detail-Toolbar können über Rechtsklick erstellt werden
-
 
 ### Änderung
 
