@@ -5,13 +5,13 @@ http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.rcp.tests</artifactId>
-    <version>12.4.2-SNAPSHOT</version>
+    <version>12.5.0-SNAPSHOT</version>
     <packaging>eclipse-test-plugin</packaging>
 
     <parent>
         <groupId>aero.minova.rcp</groupId>
         <artifactId>aero.minova.rcp.tests</artifactId>
-        <version>12.4.2-SNAPSHOT</version>
+        <version>12.5.0-SNAPSHOT</version>
     </parent>
 
     <build>
