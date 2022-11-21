@@ -29,7 +29,7 @@ jobs:
 
     # Version in der Pom.xml und allen anderen Paketen inkrementieren und Commiten
     - name: Increment Version 
-      run: mvn org.eclipse.tycho:tycho-versions-plugin:2.4.0 -DnewVersion="${{ github.event.inputs.version }}.qualifier" --settings .github/settings.xml
+      run: mvn org.eclipse.tycho:tycho-versions-plugin:2.7.4 -DnewVersion="${{ github.event.inputs.version }}.qualifier" --settings .github/settings.xml
       env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
