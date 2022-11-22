@@ -54,6 +54,7 @@ public abstract class MField {
 	private boolean primary = false;
 	private boolean keyTypeUser = false;
 	private boolean labelText;
+	private boolean useResolveParms = false;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -365,7 +366,7 @@ public abstract class MField {
 	/**
 	 * Ändert die Sichtbarkeit des Feldes. <br>
 	 * Die gesamte Section muss dafür neu gezeichnet werden, also möglichst sparsam einsetzten.
-	 * 
+	 *
 	 * @param visible
 	 */
 	public void setVisible(boolean visible) {
@@ -518,5 +519,13 @@ public abstract class MField {
 
 	public void setDateTimeType(DateTimeType dateTimeType) {
 		this.dateTimeType = dateTimeType;
+	}
+
+	public boolean isUseResolveParms() {
+		return useResolveParms;
+	}
+
+	public void setUseResolveParms(boolean useResolveParms) {
+		this.useResolveParms = useResolveParms;
 	}
 }

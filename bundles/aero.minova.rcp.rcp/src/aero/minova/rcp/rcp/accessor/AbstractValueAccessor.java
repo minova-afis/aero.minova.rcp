@@ -39,7 +39,7 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 		super();
 		this.field = field;
 		this.control = control;
-		if (control == null) {
+		if (control == null || control.isDisposed()) {
 			return;
 		}
 		control.addFocusListener(new FocusListener() {
