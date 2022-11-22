@@ -2,8 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Constant
 Bundle-SymbolicName: aero.minova.rcp.constant;singleton:=true
-Bundle-Version: 12.4.2.qualifier
+Bundle-Version: 12.5.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: aero.minova.rcp.constant
 Export-Package: aero.minova.rcp.constants,
  aero.minova.rcp.util
+Require-Bundle: org.eclipse.swt,
+ org.eclipse.equinox.preferences,
+ org.eclipse.e4.core.services
