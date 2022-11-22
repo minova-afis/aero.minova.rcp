@@ -1,3 +1,4 @@
+
 package aero.minova.rcp.rcp.accessor;
 
 import java.util.function.Predicate;

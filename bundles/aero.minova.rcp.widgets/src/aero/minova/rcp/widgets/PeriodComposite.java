@@ -50,7 +50,7 @@ public class PeriodComposite extends Composite {
 	private Locale locale;
 
 	public PeriodComposite(Composite parent, MPeriodField field, Locale locale) {
-		super(parent, SWT.LEFT);// SWT.NONE
+		super(parent, SWT.NONE);
 		this.field = field;
 		this.locale = locale;
 		this.setData(Constants.TRANSLATE_LOCALE, locale);

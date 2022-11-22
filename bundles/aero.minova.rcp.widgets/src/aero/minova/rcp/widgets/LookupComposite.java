@@ -295,8 +295,8 @@ public class LookupComposite extends Composite {
 	 * @return a listener for the FocusOut event
 	 */
 	private Listener createFocusOutListener() {
-		return event -> Display.getDefault().syncExec(() -> {
-			if (Display.getDefault().isDisposed() || text.isDisposed()) {
+		return event -> LookupComposite.this.getDisplay().asyncExec(() -> {
+			if (LookupComposite.this.isDisposed() || LookupComposite.this.getDisplay().isDisposed()) {
 				return;
 			}
 			if (OSUtil.isLinux() && popupTime > System.currentTimeMillis()) {
@@ -304,7 +304,7 @@ public class LookupComposite extends Composite {
 				popupTime = -1;
 				return;
 			}
-			final Control control = Display.getDefault().getFocusControl();
+			final Control control = LookupComposite.this.getDisplay().getFocusControl();
 			if (control == null || (control != text && control != table && control != popup)) {
 				popup.setVisible(false);
 			}
