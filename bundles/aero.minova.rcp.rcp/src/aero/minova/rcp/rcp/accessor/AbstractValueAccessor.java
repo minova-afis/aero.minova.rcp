@@ -1,4 +1,3 @@
-
 package aero.minova.rcp.rcp.accessor;
 
 import java.util.function.Predicate;
@@ -40,7 +39,7 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 		super();
 		this.field = field;
 		this.control = control;
-		if (control == null || control.isDisposed()) {
+		if (control == null) {
 			return;
 		}
 		control.addFocusListener(new FocusListener() {
