@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.root</artifactId>
-    <version>12.4.2-SNAPSHOT</version>
+    <version>12.5.0-SNAPSHOT</version>
     <name>aero.minova.rcp</name>
     <packaging>pom</packaging>
 
@@ -50,6 +50,11 @@
                 <artifactId>tycho-maven-plugin</artifactId>
                 <version>${tycho.version}</version>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                  <groupId>org.eclipse.tycho</groupId>
+                  <artifactId>tycho-versions-plugin</artifactId>
+                  <version>${tycho.version}</version>
             </plugin>
             <!--Enable the replacement of the SNAPSHOT version in the final product configuration -->
             <plugin>
