@@ -1,6 +1,7 @@
 
 package aero.minova.rcp.form.model.xsd;
 
+import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -29,7 +30,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;/attribute&gt;
  *       &lt;attribute name="min-value" type="{http://www.w3.org/2001/XMLSchema}float" /&gt;
  *       &lt;attribute name="max-value" type="{http://www.w3.org/2001/XMLSchema}float" /&gt;
- *       &lt;attribute name="unit-field-name" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
+ *       &lt;attribute name="unit-field-name" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
+ *       &lt;attribute name="unit-field-sql-index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -47,10 +49,12 @@ public class Quantity {
     protected Float minValue;
     @XmlAttribute(name = "max-value")
     protected Float maxValue;
-    @XmlAttribute(name = "unit-field-name")
+    @XmlAttribute(name = "unit-field-name", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String unitFieldName;
+    @XmlAttribute(name = "unit-field-sql-index", required = true)
+    protected BigInteger unitFieldSqlIndex;
 
     /**
      * Ruft den Wert der decimals-Eigenschaft ab.
@@ -150,6 +154,30 @@ public class Quantity {
      */
     public void setUnitFieldName(String value) {
         this.unitFieldName = value;
+    }
+
+    /**
+     * Ruft den Wert der unitFieldSqlIndex-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link BigInteger }
+     *     
+     */
+    public BigInteger getUnitFieldSqlIndex() {
+        return unitFieldSqlIndex;
+    }
+
+    /**
+     * Legt den Wert der unitFieldSqlIndex-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *     
+     */
+    public void setUnitFieldSqlIndex(BigInteger value) {
+        this.unitFieldSqlIndex = value;
     }
 
 }

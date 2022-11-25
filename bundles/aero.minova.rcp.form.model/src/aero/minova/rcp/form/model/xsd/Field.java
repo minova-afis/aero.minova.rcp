@@ -127,7 +127,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="unit-text" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="read-only" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
- *       &lt;attribute name="unit-field-name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -231,8 +230,6 @@ public class Field {
     protected String unitText;
     @XmlAttribute(name = "read-only")
     protected java.lang.Boolean readOnly;
-    @XmlAttribute(name = "unit-field-name")
-    protected String unitFieldName;
 
     /**
      * Ruft den Wert der number-Eigenschaft ab.
@@ -1169,30 +1166,6 @@ public class Field {
      */
     public void setReadOnly(java.lang.Boolean value) {
         this.readOnly = value;
-    }
-
-    /**
-     * Ruft den Wert der unitFieldName-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getUnitFieldName() {
-        return unitFieldName;
-    }
-
-    /**
-     * Legt den Wert der unitFieldName-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setUnitFieldName(String value) {
-        this.unitFieldName = value;
     }
 
 
