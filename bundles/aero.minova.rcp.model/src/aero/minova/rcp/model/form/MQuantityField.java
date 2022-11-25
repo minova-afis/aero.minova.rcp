@@ -1,18 +1,24 @@
 package aero.minova.rcp.model.form;
 
-public class MQuantityField extends MField{
+public class MQuantityField extends MField {
 
 	private String unitFieldName;
 	private String originalUnitText;
+	private int unitFieldSqlIndex;
 
-	public MQuantityField(int decimals, String unitFieldName, String unitText) {
+	public MQuantityField(int decimals, String unitFieldName, int unitFieldSqlIndex, String unitText) {
 		super(decimals);
 		this.unitFieldName = unitFieldName;
 		this.originalUnitText = unitText;
+		this.unitFieldSqlIndex = unitFieldSqlIndex;
 	}
 
 	public String getUnitFieldName() {
 		return unitFieldName;
+	}
+
+	public int getUnitFieldSqlIndex() {
+		return unitFieldSqlIndex;
 	}
 
 	public String getOriginalUnitText() {
