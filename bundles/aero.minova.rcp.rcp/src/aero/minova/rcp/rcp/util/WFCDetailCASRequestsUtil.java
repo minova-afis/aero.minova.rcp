@@ -377,14 +377,14 @@ public class WFCDetailCASRequestsUtil {
 		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
-			MField c = mDetail.getField(name);
-			if (c != null) {
-				checkedFields.add(c);
-				if (c instanceof MQuantityField) {
-					int columnI = table.getColumnIndex(((MQuantityField) c).getUnitFieldName());
-					c.setUnitText(translationService.translate(table.getRows().get(0).getValue(columnI).getStringValue(), null));
+			MField f = mDetail.getField(name);
+			if (f != null) {
+				checkedFields.add(f);
+				if (f instanceof MQuantityField) {
+					int columnI = table.getColumnIndex(((MQuantityField) f).getUnitFieldName());
+					f.setUnitText(translationService.translate(table.getRows().get(0).getValue(columnI).getStringValue(), null));
 				}
-				c.setValue(table.getRows().get(0).getValue(i), false);
+				f.setValue(table.getRows().get(0).getValue(i), false);
 			}
 		}
 
