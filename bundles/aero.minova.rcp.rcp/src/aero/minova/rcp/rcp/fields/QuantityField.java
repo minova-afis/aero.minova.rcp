@@ -51,7 +51,6 @@ public class QuantityField {
 	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective,
 			TranslationService translationService) {
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
-		MField unitField = field.getDetail().getField(field.getUnitFieldName());
 
 		Label label = FieldLabel.create(composite, field);
 
@@ -78,11 +77,8 @@ public class QuantityField {
 				try {
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 					field.setValue(value, true);
-					field.setUnitText(unit);
 					if (unit != null && !unit.isBlank()) {
-						unitField.setValue(new Value(unit), false);
-					} else {
-						unitField.setValue(new Value(unitText), false);
+						field.setUnitText(unit);
 					}
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
@@ -116,12 +112,21 @@ public class QuantityField {
 				@Override
 				public void focusGained(FocusEvent e) {
 					text2.selectAll();
+					text2.setText(NumberFormatUtil.clearNumberFromGroupingSymbols(text2.getText(), locale));
 					tooltip.setAutoHide(false);
 				}
 
 				@Override
 				public void focusLost(FocusEvent e) {
 					tooltip.setAutoHide(true);
+					if (text2.getText().isBlank()) {
+						field.setValue(null, true);
+					} else {
+						// Eventuelle neue Einheit setzen
+						if (!field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
+							unitLabel.setText(field.getUnitText());
+						}
+					}
 				}
 			});
 			text2.addModifyListener(e -> {
@@ -156,7 +161,7 @@ public class QuantityField {
 						field.setValue(null, true);
 					} else {
 						// Eventuelle neue Einheit setzen
-						if (!field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
+						if (!field.getUnitText().isBlank()) {
 							unitLabel.setText(field.getUnitText());
 						}
 					}
