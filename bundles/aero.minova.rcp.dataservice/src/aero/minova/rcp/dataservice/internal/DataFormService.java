@@ -101,7 +101,6 @@ public class DataFormService implements IDataFormService {
 		// Sortierung der Felder nach sql-index oder der Reihe nach!
 		allFields = allFields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).filter(f -> f.getSqlIndex().intValue() >= 0)
 				.collect(Collectors.toList());
-//		allFields.stream().forEach(f -> dataTable.addColumn(createColumnFromField(f, prefix)));
 		for (Field f : allFields) {
 			dataTable.addColumn(createColumnFromField(f, prefix));
 			if(f.getQuantity() != null) {
