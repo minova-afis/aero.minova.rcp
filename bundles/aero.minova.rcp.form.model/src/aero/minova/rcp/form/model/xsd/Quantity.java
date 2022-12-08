@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="max-value" type="{http://www.w3.org/2001/XMLSchema}float" /&gt;
  *       &lt;attribute name="unit-field-name" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="unit-field-sql-index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
+ *       &lt;attribute name="additional-unit" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -55,6 +56,8 @@ public class Quantity {
     protected String unitFieldName;
     @XmlAttribute(name = "unit-field-sql-index", required = true)
     protected BigInteger unitFieldSqlIndex;
+    @XmlAttribute(name = "additional-unit")
+    protected String additionalUnit;
 
     /**
      * Ruft den Wert der decimals-Eigenschaft ab.
@@ -178,6 +181,30 @@ public class Quantity {
      */
     public void setUnitFieldSqlIndex(BigInteger value) {
         this.unitFieldSqlIndex = value;
+    }
+
+    /**
+     * Ruft den Wert der additionalUnit-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getAdditionalUnit() {
+        return additionalUnit;
+    }
+
+    /**
+     * Legt den Wert der additionalUnit-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setAdditionalUnit(String value) {
+        this.additionalUnit = value;
     }
 
 }
