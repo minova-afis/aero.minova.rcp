@@ -272,6 +272,7 @@
 		<xs:attribute name="max-value" type="xs:float" use="optional" />
 		<xs:attribute name="unit-field-name" type="xs:NCName" use="required"/>
 		<xs:attribute name="unit-field-sql-index" type="xs:integer" use="required"/>
+		<xs:attribute name="additional-unit" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="radio">
 		<xs:attribute name="text" type="xs:string" use="optional">
