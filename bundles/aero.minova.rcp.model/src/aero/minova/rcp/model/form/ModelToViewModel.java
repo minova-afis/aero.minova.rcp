@@ -102,7 +102,9 @@ public class ModelToViewModel {
 		}
 
 		if (field.getQuantity() != null) {
-			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName(), field.getQuantity().getUnitFieldSqlIndex().intValue(), field.getUnitText());
+			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName(),
+					field.getQuantity().getUnitFieldSqlIndex().intValue(), field.getUnitText(),
+					field.getQuantity().getAdditionalUnit() == null ? "" : field.getQuantity().getAdditionalUnit());
 			if (field.getQuantity().getMaxValue() != null) {
 				f.setMaximumValue(field.getQuantity().getMaxValue().doubleValue());
 			}
