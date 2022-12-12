@@ -174,7 +174,7 @@ public class NumberFormatUtil {
 	 *            DecimalFormatSymbols
 	 * @return Value für den entsprechenden DataType
 	 */
-	public static Value newValue(String text, boolean negative, DataType type, DecimalFormatSymbols dfs) {
+	public static Value newValue(String text, DataType type, DecimalFormatSymbols dfs) {
 		Value value = null;
 
 		switch (type) {
