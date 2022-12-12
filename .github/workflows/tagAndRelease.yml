@@ -108,16 +108,17 @@ jobs:
         asset_path: staging/WebFatClient-win32.win32.x86_64.zip
         asset_name: WFC_Windows_${{ github.event.inputs.version }}.zip
         asset_content_type: application/zip
-    - name: Upload Mac zip as Release Asset
-      id: upload-release-asset-mac
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: staging/WebFatClient-macosx.cocoa.x86_64.zip
-        asset_name: WFC_macOS_${{ github.event.inputs.version }}.zip
-        asset_content_type: application/zip
+   # Mac funktioniert noch nicht aus dem Internet zu laden, siehe #273
+   # - name: Upload Mac zip as Release Asset
+   #   id: upload-release-asset-mac
+   #   uses: actions/upload-release-asset@v1
+   #   env:
+   #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   #   with:
+   #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+   #     asset_path: staging/WebFatClient-macosx.cocoa.x86_64.zip
+   #     asset_name: WFC_macOS_${{ github.event.inputs.version }}.zip
+   #     asset_content_type: application/zip
     - name: Upload Linux zip as Release Asset
       id: upload-release-asset-linux
       uses: actions/upload-release-asset@v1

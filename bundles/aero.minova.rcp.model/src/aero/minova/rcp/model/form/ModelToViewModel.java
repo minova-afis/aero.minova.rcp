@@ -6,6 +6,7 @@ import java.util.Locale;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Radio;
 import aero.minova.rcp.form.model.xsd.TypeParam;
+import aero.minova.rcp.form.model.xsd.Unit;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 
@@ -71,6 +72,7 @@ public class ModelToViewModel {
 			MField f = new MLookupField();
 			f.setLookupTable(field.getLookup().getTable());
 			f.setLookupProcedurePrefix(field.getLookup().getProcedurePrefix());
+			f.setUseResolveParms(field.getLookup().isUseResolveParams());
 			f.setLookupDescription(field.getLookup().getDescriptionName());
 			for (TypeParam typeParam : field.getLookup().getParam()) {
 				f.addLookupParameter(typeParam.getFieldName());
@@ -101,7 +103,12 @@ public class ModelToViewModel {
 		}
 
 		if (field.getQuantity() != null) {
-			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName(), field.getUnitText());
+			ArrayList<Unit> additionalUnits = new ArrayList<>();
+			for (Unit u : field.getQuantity().getUnit()) {
+				additionalUnits.add(u);
+			}
+			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName(),
+					field.getQuantity().getUnitFieldSqlIndex().intValue(), field.getUnitText(), additionalUnits);
 			if (field.getQuantity().getMaxValue() != null) {
 				f.setMaximumValue(field.getQuantity().getMaxValue().doubleValue());
 			}

@@ -37,21 +37,20 @@ import org.eclipse.swt.widgets.ToolTip;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
-import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
 import aero.minova.rcp.rcp.util.NumberFormatUtil;
 import aero.minova.rcp.util.OSUtil;
 
 public class QuantityField {
-
+	
 	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective,
 			TranslationService translationService) {
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
-		MField unitField = field.getDetail().getField(field.getUnitFieldName());
 
 		Label label = FieldLabel.create(composite, field);
 
@@ -59,6 +58,9 @@ public class QuantityField {
 
 			@Override
 			public List<String> getContent(String entry) {
+				String number = null;
+				String unit = null;
+				
 				ArrayList<String> result = new ArrayList<>();
 				int decimals = field.getDecimals();
 
@@ -68,22 +70,26 @@ public class QuantityField {
 				numberFormat.setGroupingUsed(true);
 
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
-
-				String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry, field);
-				String number = numberAndUnit[0];
-				String unit = numberAndUnit[1];
+				
+				if(Character.isDigit(entry.charAt(0))) {
+					String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry, field);
+					number = numberAndUnit[0];
+					unit = numberAndUnit[1];
+				}
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 				try {
 					Value value = NumberFormatUtil.newValue(number, field.getDataType(), dfs);
-					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
-					field.setValue(value, true);
-					field.setUnitText(unit);
-					if (unit != null && !unit.isBlank()) {
-						unitField.setValue(new Value(unit), false);
-					} else {
-						unitField.setValue(new Value(unitText), false);
+					if(!unit.isBlank()) {
+						unit = field.getUnitFromEntry(unit);
+						if (unit != null) {
+							field.setUnitText(unit);
+						} else {
+							throw new Exception();
+						}
 					}
+					field.setValue(new QuantityValue(NumberFormatUtil.getNumberObjectFromString(number, field.getDataType(), dfs), unit), true);
+					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				}
@@ -116,12 +122,21 @@ public class QuantityField {
 				@Override
 				public void focusGained(FocusEvent e) {
 					text2.selectAll();
+					text2.setText(NumberFormatUtil.clearNumberFromGroupingSymbols(text2.getText(), locale));
 					tooltip.setAutoHide(false);
 				}
 
 				@Override
 				public void focusLost(FocusEvent e) {
 					tooltip.setAutoHide(true);
+					if (text2.getText().isBlank()) {
+						field.setValue(null, true);
+					} else {
+						// Eventuelle neue Einheit setzen
+						if (!field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
+							unitLabel.setText(field.getUnitText());
+						}
+					}
 				}
 			});
 			text2.addModifyListener(e -> {
@@ -156,7 +171,7 @@ public class QuantityField {
 						field.setValue(null, true);
 					} else {
 						// Eventuelle neue Einheit setzen
-						if (!field.getUnitText().isBlank() && !field.getUnitText().equals(unitText)) {
+						if (!field.getUnitText().isBlank()) {
 							unitLabel.setText(field.getUnitText());
 						}
 					}
@@ -201,5 +216,5 @@ public class QuantityField {
 
 		return text;
 	}
-
+	
 }

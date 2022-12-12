@@ -119,7 +119,7 @@ public class DataService implements IDataService {
 
 	private URI workspacePath;
 
-	private Map<String, String> siteParameters = new HashMap<>();;
+	private Map<String, String> siteParameters = new HashMap<>();
 
 	EventAdmin eventAdmin;
 
@@ -350,7 +350,7 @@ public class DataService implements IDataService {
 	 * - SqlProcedureResult mit negativen Returncode <br>
 	 * - Table mit Namen Error <br>
 	 * - Serverantwort mit HTTP-Code >= 300 <br>
-	 * 
+	 *
 	 * @param body
 	 * @param sourceName
 	 * @return
@@ -833,6 +833,14 @@ public class DataService implements IDataService {
 
 			t.addColumn(new Column(Constants.TABLE_FILTERLASTACTION, DataType.BOOLEAN));
 			row.addValue(new Value(true));
+
+			if (field.getLookupParameters() != null && field.isUseResolveParms()) {
+				for (String paramName : field.getLookupParameters()) {
+					MField paramField = field.getDetail().getField(paramName);
+					t.addColumn(new Column(paramName, paramField.getDataType()));
+					row.addValue(paramField.getValue());
+				}
+			}
 		} else {
 			t.addColumn(new Column(Constants.TABLE_COUNT, DataType.INTEGER));
 			row.addValue(null);
@@ -992,7 +1000,7 @@ public class DataService implements IDataService {
 
 	/**
 	 * Zeigt eine Nachricht als Notification an. Die Nachricht kann ein String oder ein ErrorObject sein
-	 * 
+	 *
 	 * @param message
 	 */
 	public void postNotification(Object message) {

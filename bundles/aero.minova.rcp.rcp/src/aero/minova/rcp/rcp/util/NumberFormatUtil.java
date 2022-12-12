@@ -157,6 +157,31 @@ public class NumberFormatUtil {
 	}
 
 	/**
+	 * Diese Methode liefert ein Object zurück, für den übergebenen String.
+	 * 
+	 * @param text
+	 *            Wert aus dem das VAlue gebildet werden soll
+	 * @param negative
+	 *            true - negative Zahl
+	 * @param type
+	 *            DataType des Fields
+	 * @param dfs
+	 *            DecimalFormatSymbols
+	 * @return Value für den entsprechenden DataType
+	 */
+	public static Object getNumberObjectFromString(String text, DataType type, DecimalFormatSymbols dfs) {
+		switch (type) {
+		case INTEGER:
+			return Integer.parseInt(text);
+		case DOUBLE:
+		case BIGDECIMAL:
+			return Double.parseDouble(text.replace(dfs.getDecimalSeparator(), '.'));
+		default:
+			return null;
+		}
+	}
+
+	/**
 	 * Gibt den String des übergebenen Values für den richtigen DataType zurück
 	 * 
 	 * @param format
