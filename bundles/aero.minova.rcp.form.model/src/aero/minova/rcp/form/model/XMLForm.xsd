@@ -259,7 +259,14 @@
 		<xs:attribute name="min-value" type="xs:float" use="optional" />
 		<xs:attribute name="max-value" type="xs:float" use="optional" />
 	</xs:complexType>
+	<xs:complexType name="unit">
+		<xs:attribute name="unitKeyText" type="xs:string" use="required" />
+		<xs:attribute name="unitText" type="xs:string" use="required"/>
+	</xs:complexType>
 	<xs:complexType name="quantity">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" name="unit" type="unit" />
+		</xs:sequence>
 		<xs:attribute default="0" name="decimals" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
@@ -270,9 +277,8 @@
 		</xs:attribute>
 		<xs:attribute name="min-value" type="xs:float" use="optional" />
 		<xs:attribute name="max-value" type="xs:float" use="optional" />
-		<xs:attribute name="unit-field-name" type="xs:NCName" use="required"/>
-		<xs:attribute name="unit-field-sql-index" type="xs:integer" use="required"/>
-		<xs:attribute name="additional-unit" type="xs:string" use="optional"/>
+		<xs:attribute name="unit-field-name" type="xs:NCName" use="required" />
+		<xs:attribute name="unit-field-sql-index" type="xs:integer" use="required" />
 	</xs:complexType>
 	<xs:complexType name="radio">
 		<xs:attribute name="text" type="xs:string" use="optional">
