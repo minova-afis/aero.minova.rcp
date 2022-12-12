@@ -1,16 +1,20 @@
 package aero.minova.rcp.model.form;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import aero.minova.rcp.form.model.xsd.Unit;
 
 public class MQuantityField extends MField {
 
 	private String unitFieldName;
 	private String originalUnitText;
 	private int unitFieldSqlIndex;
-	private List<String> validUnits = new ArrayList<String>();
+	private HashMap<String, String> validUnits = new HashMap<String, String>();
+	private List<Unit> additionalUnits = new ArrayList<Unit>();
 
-	public MQuantityField(int decimals, String unitFieldName, int unitFieldSqlIndex, String unitText, String additionalUnit) {
+	public MQuantityField(int decimals, String unitFieldName, int unitFieldSqlIndex, String unitText, List<Unit> additionalUnit) {
 		super(decimals);
 		this.unitFieldName = unitFieldName;
 		this.originalUnitText = unitText;
@@ -30,32 +34,40 @@ public class MQuantityField extends MField {
 		return originalUnitText;
 	}
 
-	private void declareValidUnits(String addtionalUnits) {
-		validUnits.add("100L");
-		validUnits.add("BBLS");
-		validUnits.add("cbm");
-		validUnits.add("cbme");
-		validUnits.add("GAL");
-		validUnits.add("KG");
-		validUnits.add("L15");
-		validUnits.add("LEFF");
-		validUnits.add("Stck");
-		validUnits.add("to");
+	private void declareValidUnits(List<Unit> additionalUnit) {
+		validUnits.put("L100", "100L");
+		validUnits.put("B", "BBLS");
+		validUnits.put("BLS", "BBLS");
+		validUnits.put("BBLS", "BBLS");
+		validUnits.put("c", "cbm");
+		validUnits.put("cbm", "cbm");
+		validUnits.put("ce", "cbme");
+		validUnits.put("cbme", "cbme");
+		validUnits.put("G", "GAL");
+		validUnits.put("GAL", "GAL");
+		validUnits.put("K", "KG");
+		validUnits.put("KG", "KG");
+		validUnits.put("L", "L15");
+		validUnits.put("L15", "L15");
+		validUnits.put("LE", "LEFF");
+		validUnits.put("LEFF", "LEFF");
+		validUnits.put("St", "Stck");
+		validUnits.put("Stck", "Stck");
+		validUnits.put("t", "to");
+		validUnits.put("to", "to");
 
-		String[] units = addtionalUnits.split(",");
-		for (String unit : units) {
-			validUnits.add(unit);
+		for (Unit unit : additionalUnit) {
+			validUnits.put(unit.getUnitKeyText(), unit.getUnitText());
 		}
 	}
 
 	public String getUnitFromEntry(String entry) {
 		String validUnit = null;
-		for (String unit : validUnits) {
-			if (unit.toLowerCase().equals(entry.toLowerCase())) {
-				validUnit = unit;
+		for (String unitKeyText : validUnits.keySet()) {
+			if (unitKeyText.toLowerCase().equals(entry.toLowerCase())) {
+				validUnit = validUnits.get(unitKeyText);
 			}
 		}
-
 		return validUnit;
 	}
 

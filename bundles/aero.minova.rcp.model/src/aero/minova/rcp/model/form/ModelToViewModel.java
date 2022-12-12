@@ -6,6 +6,7 @@ import java.util.Locale;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Radio;
 import aero.minova.rcp.form.model.xsd.TypeParam;
+import aero.minova.rcp.form.model.xsd.Unit;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 
@@ -102,9 +103,12 @@ public class ModelToViewModel {
 		}
 
 		if (field.getQuantity() != null) {
+			ArrayList<Unit> additionalUnits = new ArrayList<>();
+			for (Unit u : field.getQuantity().getUnit()) {
+				additionalUnits.add(u);
+			}
 			MField f = new MQuantityField(field.getQuantity().getDecimals(), field.getQuantity().getUnitFieldName(),
-					field.getQuantity().getUnitFieldSqlIndex().intValue(), field.getUnitText(),
-					field.getQuantity().getAdditionalUnit() == null ? "" : field.getQuantity().getAdditionalUnit());
+					field.getQuantity().getUnitFieldSqlIndex().intValue(), field.getUnitText(), additionalUnits);
 			if (field.getQuantity().getMaxValue() != null) {
 				f.setMaximumValue(field.getQuantity().getMaxValue().doubleValue());
 			}
