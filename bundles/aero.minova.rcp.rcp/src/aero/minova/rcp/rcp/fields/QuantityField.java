@@ -79,7 +79,7 @@ public class QuantityField {
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 				try {
-					Value value = NumberFormatUtil.newValue(number, false, field.getDataType(), dfs);
+					Value value = NumberFormatUtil.newValue(number, field.getDataType(), dfs);
 					if(!unit.isBlank()) {
 						unit = field.getUnitFromEntry(unit);
 						if (unit != null) {
