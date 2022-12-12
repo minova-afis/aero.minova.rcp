@@ -37,10 +37,10 @@ import org.eclipse.swt.widgets.ToolTip;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
+import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
-import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
 import aero.minova.rcp.rcp.util.NumberFormatUtil;
@@ -88,8 +88,8 @@ public class QuantityField {
 							throw new Exception();
 						}
 					}
+					field.setValue(new QuantityValue(NumberFormatUtil.getNumberObjectFromString(number, field.getDataType(), dfs), unit), true);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
-					field.setValue(value, true);
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
 				}
