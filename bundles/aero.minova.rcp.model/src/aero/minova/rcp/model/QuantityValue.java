@@ -22,7 +22,7 @@ public class QuantityValue extends Value {
 
 	@Override
 	public String toString() {
-		return MessageFormat.format("QuantityValue [type=" + dataType.toString() +  ", value={0},unit={1}]", String.valueOf(getValue()), unit);
+		return MessageFormat.format("QuantityValue [type=" + dataType.toString() +  ", value={0},unit={1},type={2}]", String.valueOf(getValue()), unit, dataType.toString());
 	}
 	
 }
