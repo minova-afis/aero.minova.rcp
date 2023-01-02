@@ -110,9 +110,8 @@ public class Constants {
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
 	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
-	@Deprecated
-	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
 
+	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
 	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
 	public static final String BROKER_UPDATECOLUMNS = "aero/minova/rcp/UpdateColumns";
 
