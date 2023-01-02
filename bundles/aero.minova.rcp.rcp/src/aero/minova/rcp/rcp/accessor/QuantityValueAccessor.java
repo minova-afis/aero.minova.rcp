@@ -20,15 +20,6 @@ import aero.minova.rcp.rcp.util.NumberFormatUtil;
 
 public class QuantityValueAccessor extends AbstractValueAccessor {
 
-	@Inject
-	IDataService dataService;
-
-	@Inject
-	UISynchronize sync;
-
-	@Inject
-	Logger logger;
-
 	public QuantityValueAccessor(MField field, Control control) {
 		super(field, control);
 	}
