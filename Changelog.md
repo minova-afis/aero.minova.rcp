@@ -19,9 +19,6 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderung
 - Methode callProcedureWithTable deprecated
-
-
-### Änderung
 - Meldung "Letzter Zustand wird wieder hergestellt" entfernen
 
 
