@@ -44,7 +44,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -252,8 +251,6 @@ public class WFCDetailPart extends WFCFormPart {
 			helper.setControls(mDetail);
 		}
 
-		openRestoringUIDialog();
-
 		// In XBS gegebene Felder füllen
 		casRequestsUtil.setValuesAccordingToXBS();
 	}
@@ -278,32 +275,6 @@ public class WFCDetailPart extends WFCFormPart {
 		if (toolbar != null && toolbar.getListeners(SWT.MenuDetect).length == 0) { // Nur einmal Menü hinzufügen
 			toolbar.addMenuDetectListener(e -> ScreenshotUtil.menuDetectAction(e, toolbar,
 					mPerspective.getPersistedState().get(Constants.FORM_NAME).replace(".xml", "") + "_Toolbar", translationService));
-		}
-	}
-
-	/**
-	 * Öffnet den "UI wird wiederhergestellt" Dialog, wenn er diese Session noch nicht geöffnet wurde und die Checkbox "NEVER_SHOW_RESTORING_UI_MESSAGE" nie
-	 * gewählt wurde
-	 */
-	private void openRestoringUIDialog() {
-		String prefName = form.getIndexView().getSource() + "." + Constants.LAST_STATE + ".index.size";
-		boolean stateToLoad = prefs.get(prefName, null) != null; // Gibt es überhaupt etwaszu laden?
-		boolean neverShow = prefs.getBoolean(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, false);
-		boolean shownThisSession = prefs.getBoolean(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, false);
-		// Benötigt für UI-Tests damit sich in ihnen Dialog nicht öffnet, wird in LifeCycle gesetzt
-		boolean neverShowContext = appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE) != null
-				&& (boolean) appContext.get(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE);
-
-		if (stateToLoad && !neverShow && !shownThisSession && !neverShowContext) {
-			MessageDialogWithToggle mdwt = MessageDialogWithToggle.openInformation(Display.getCurrent().getActiveShell(), //
-					translationService.translate("@RestoringUIDialog.Title", null), //
-					translationService.translate("@RestoringUIDialog.InfoText", null), //
-					translationService.translate("@RestoringUIDialog.NeverShowAgain", null), //
-					false, null, null);
-			if (mdwt.getToggleState()) {
-				prefs.put(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, "true");
-			}
-			prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "true");
 		}
 	}
 

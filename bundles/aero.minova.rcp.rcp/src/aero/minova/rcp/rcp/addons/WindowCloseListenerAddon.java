@@ -52,13 +52,8 @@ public class WindowCloseListenerAddon {
 						translationService.translate("@msg.Close.DirtyMessage", null) + listString, MessageDialog.CONFIRM,
 						new String[] { translationService.translate("@Action.Discard", null), translationService.translate("@Abort", null) }, 0);
 
-				boolean res = dialog.open() == 0;
-				if (res) {
-					prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
-				}
-				return res;
+				return dialog.open() == 0;
 			}
-			prefs.put(Constants.RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION, "false");
 
 			return true;
 		};

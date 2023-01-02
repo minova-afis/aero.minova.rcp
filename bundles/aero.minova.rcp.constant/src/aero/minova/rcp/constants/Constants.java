@@ -147,10 +147,7 @@ public class Constants {
 	public static final String LAST_LOADED_SEARCHCRITERIA = "aero.minova.rcp.preferences.lastsearchcriteria";
 	public static final String LAST_SEARCHCRITERIA = "LastLoadedSearchCriteria";
 
-	// Wiederherstellen der UI
 	public static final String LAST_STATE = "LAST_STATE";
-	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
-	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
 
 	public static final String SHOW_WORKSPACE_RESET_MESSAGE = "ShowWorkspaceResetMessage";
 

@@ -21,6 +21,10 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Methode callProcedureWithTable deprecated
 
 
+### Änderung
+- Meldung "Letzter Zustand wird wieder hergestellt" entfernen
+
+
 ## [12.5.0] - 21.11.2022
 
 **ACHTUNG: Dieser Release benötigt mindestes CAS Version 12.38.0. Damit ist er nicht für die Stundenerfassung geeignet!**
