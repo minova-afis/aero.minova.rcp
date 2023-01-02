@@ -762,10 +762,13 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Ruft eine Prozedur mit der übergebenen Tabelle auf. Über den Broker kann auf die Ergebnisse gehört werden
 	 *
+	 * @deprecated Diese Methiode sollte nicht verwendet werden, da sie recht umständlich ist. Stattdessen einfach die Prozedur über den DataService direkt
+	 *             aufrufen.
 	 * @param table
 	 */
 	@Inject
 	@Optional
+	@Deprecated(since = "12.6.0", forRemoval = true)
 	public void callProcedureWithTable(@UIEventTopic(Constants.BROKER_PROCEDUREWITHTABLE) Table table) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective) && table != null) {

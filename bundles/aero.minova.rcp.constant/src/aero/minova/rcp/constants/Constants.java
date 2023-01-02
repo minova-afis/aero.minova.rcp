@@ -99,12 +99,20 @@ public class Constants {
 	 * Benutzt mit einem String, öffnet einen einfachen Fehler-Dialog
 	 */
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
+
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLEERROR = "aero/minova/rcp/ProcedureWithTableError";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESS = "aero/minova/rcp/ProcedureWithTableSuccess";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
+	@Deprecated
 	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
+
 	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
 	public static final String BROKER_UPDATECOLUMNS = "aero/minova/rcp/UpdateColumns";
 
