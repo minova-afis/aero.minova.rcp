@@ -205,7 +205,7 @@ public class NumberFormatUtil {
 	 *            DecimalFormatSymbols
 	 * @return Value für den entsprechenden DataType
 	 */
-	public static Object getNumberObjectFromString(String text, DataType type, DecimalFormatSymbols dfs) {
+	public static Number getNumberObjectFromString(String text, DataType type, DecimalFormatSymbols dfs) {
 		switch (type) {
 		case INTEGER:
 			return Integer.parseInt(text);
