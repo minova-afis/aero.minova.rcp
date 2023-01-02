@@ -50,7 +50,7 @@ public class QuantityValueAccessor extends AbstractValueAccessor {
 			} else {
 				String valueString = NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value);
 
-				String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(valueString, field);
+				String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(valueString);
 				String number = numberAndUnit[0];
 
 				setText(control, number);
