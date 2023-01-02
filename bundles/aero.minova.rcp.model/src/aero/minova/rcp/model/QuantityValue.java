@@ -5,19 +5,13 @@ import java.text.MessageFormat;
 
 public class QuantityValue extends Value {
 	private static final long serialVersionUID = 202212081413L;
-	private final String number;
 	private String unit;
 	private DataType dataType;
 
 	public QuantityValue(String number, String unit, DataType dataType, DecimalFormatSymbols dfs) {
 		super(getNumberObjectFromString(number, dataType, dfs));
-		this.number = number;
 		this.unit = unit == null ? "" : unit;
 		this.dataType = dataType;
-	}
-
-	public String getNumber() {
-		return number;
 	}
 
 	public String getUnit() {
@@ -26,7 +20,7 @@ public class QuantityValue extends Value {
 
 	@Override
 	public String toString() {
-		return MessageFormat.format("QuantityValue [type=" + dataType.toString() +  ", value={0},unit={1}]", number, unit);
+		return MessageFormat.format("QuantityValue [type=" + dataType.toString() +  ", value={0},unit={1}]", String.valueOf(getValue()), unit);
 	}
 	
 	/**
