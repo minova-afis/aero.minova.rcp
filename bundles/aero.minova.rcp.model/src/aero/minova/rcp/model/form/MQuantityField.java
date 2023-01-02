@@ -12,7 +12,6 @@ public class MQuantityField extends MField {
 	private String originalUnitText;
 	private int unitFieldSqlIndex;
 	private HashMap<String, String> validUnits = new HashMap<String, String>();
-	private List<Unit> additionalUnits = new ArrayList<Unit>();
 
 	public MQuantityField(int decimals, String unitFieldName, int unitFieldSqlIndex, String unitText, List<Unit> additionalUnit) {
 		super(decimals);
