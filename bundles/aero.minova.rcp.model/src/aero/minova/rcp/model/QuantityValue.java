@@ -4,8 +4,8 @@ import java.text.MessageFormat;
 
 public class QuantityValue extends Value {
 	private static final long serialVersionUID = 202212081413L;
-	public final Double number;
-	public String unit;
+	private final Double number;
+	private String unit;
 
 	public QuantityValue(Object number, String unit) {
 		super(Double.valueOf(number.toString()));

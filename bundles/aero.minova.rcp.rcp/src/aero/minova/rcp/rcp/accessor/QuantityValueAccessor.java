@@ -39,7 +39,7 @@ public class QuantityValueAccessor extends AbstractValueAccessor {
 
 			if (value instanceof QuantityValue) {
 				QuantityValue qV = (QuantityValue) value;
-				String numberString = numberFormat.format(qV.number);
+				String numberString = numberFormat.format(qV.getNumber());
 				setText(control, numberString);
 
 			} else {
