@@ -87,7 +87,7 @@ public class NumberValueAccessor extends AbstractValueAccessor implements Verify
 		// allegmeine Variablen
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 		if (insertion.matches("([0-9]*)|([\\" + dfs.getGroupingSeparator() + dfs.getDecimalSeparator() + "]*)")) {
-			aero.minova.rcp.rcp.util.NumberFormatUtil.Result r = new Result();
+			Result r = new Result();
 
 			try {
 				r = NumberFormatUtil.processInput(field, insertion, start, end, keyCode, decimals, locale, caretPosition, textBefore, dfs, rangeSelected);
