@@ -3,15 +3,10 @@ package aero.minova.rcp.rcp.accessor;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import javax.inject.Inject;
-
-import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
