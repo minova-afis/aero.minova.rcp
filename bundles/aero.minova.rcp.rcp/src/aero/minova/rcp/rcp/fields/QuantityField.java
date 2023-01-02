@@ -72,7 +72,7 @@ public class QuantityField {
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
 				
 				if(Character.isDigit(entry.charAt(0))) {
-					String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry, field);
+					String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry);
 					number = numberAndUnit[0];
 					unit = numberAndUnit[1];
 				}
