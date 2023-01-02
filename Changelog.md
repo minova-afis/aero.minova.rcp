@@ -17,6 +17,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Neu
 - use-Resolve-Parms Eigenschaft kann ab jetzt in den Lookups verwendet werden. Damit werden die übergebenen Paramter auch in die Resolve-Prozedur übergeben. Zuvor war dies nur für die List-prozeduren möglich!
 
+### Änderung
+- Methode callProcedureWithTable deprecated
+
 
 ## [12.5.0] - 21.11.2022
 
