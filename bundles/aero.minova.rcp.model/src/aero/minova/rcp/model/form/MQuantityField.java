@@ -62,7 +62,7 @@ public class MQuantityField extends MField {
 	public String getUnitFromEntry(String entry) {
 		String validUnit = null;
 		for (String unitKeyText : validUnits.keySet()) {
-			if (unitKeyText.toLowerCase().equals(entry.toLowerCase())) {
+			if (unitKeyText.equalsIgnoreCase(entry.toLowerCase())) {
 				validUnit = validUnits.get(unitKeyText);
 			}
 		}
