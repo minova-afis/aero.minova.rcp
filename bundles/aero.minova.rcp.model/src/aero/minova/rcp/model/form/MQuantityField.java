@@ -53,6 +53,7 @@ public class MQuantityField extends MField {
 		validUnits.put("Stck", "Stck");
 		validUnits.put("t", "to");
 		validUnits.put("to", "to");
+		validUnits.put("KGV", "KGV");
 
 		for (Unit unit : additionalUnit) {
 			validUnits.put(unit.getUnitKeyText(), unit.getUnitText());
