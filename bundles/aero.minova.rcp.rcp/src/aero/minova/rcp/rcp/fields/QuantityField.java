@@ -88,7 +88,7 @@ public class QuantityField {
 							throw new Exception();
 						}
 					}
-					field.setValue(new QuantityValue(NumberFormatUtil.getNumberObjectFromString(number, field.getDataType(), dfs), unit), true);
+					field.setValue(new QuantityValue(number, unit, field.getDataType(), dfs), true);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
