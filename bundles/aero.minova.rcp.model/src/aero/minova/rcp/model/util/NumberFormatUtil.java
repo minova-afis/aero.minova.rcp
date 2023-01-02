@@ -1,4 +1,4 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.model.util;
 
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;

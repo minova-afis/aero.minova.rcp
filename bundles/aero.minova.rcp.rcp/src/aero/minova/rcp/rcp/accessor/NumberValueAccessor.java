@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.util.NumberFormatUtil;
+import aero.minova.rcp.model.util.NumberFormatUtil.Result;
 import aero.minova.rcp.rcp.fields.FieldUtil;
-import aero.minova.rcp.rcp.util.NumberFormatUtil;
-import aero.minova.rcp.rcp.util.NumberFormatUtil.Result;
 
 public class NumberValueAccessor extends AbstractValueAccessor implements VerifyListener {
 

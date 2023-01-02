@@ -42,8 +42,8 @@ import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MQuantityField;
+import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
-import aero.minova.rcp.rcp.util.NumberFormatUtil;
 import aero.minova.rcp.util.OSUtil;
 
 public class QuantityField {

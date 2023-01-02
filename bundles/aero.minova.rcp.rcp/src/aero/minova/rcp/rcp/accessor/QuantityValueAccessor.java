@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.Text;
 import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.fields.FieldUtil;
-import aero.minova.rcp.rcp.util.NumberFormatUtil;
 
 public class QuantityValueAccessor extends AbstractValueAccessor {
 
