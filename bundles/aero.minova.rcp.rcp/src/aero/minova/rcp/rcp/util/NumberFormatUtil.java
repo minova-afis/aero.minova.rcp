@@ -348,7 +348,7 @@ public class NumberFormatUtil {
 		return groupingSeperatorCount;
 	}
 
-	public static String[] splitNumberUnitEntry(String entry, MField field) {
+	public static String[] splitNumberUnitEntry(String entry) {
 		String numbers = entry;
 		String unit = "";
 		String[] numberAndUnit = new String[2];
