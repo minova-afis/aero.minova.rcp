@@ -49,6 +49,7 @@ import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
+import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.ReferenceValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -473,7 +474,7 @@ public class WFCDetailCASRequestsUtil {
 			MField field = mDetail.getField(fieldname);
 			rb.withValue(field.getValue());
 			if(field instanceof MQuantityField) {
-				rb.withValue(new Value(field.getUnitText(), DataType.STRING));
+				rb.withValue(new Value(((QuantityValue) field.getValue()).getUnit(), DataType.STRING));
 				valuePosition++;
 			}
 			valuePosition++;

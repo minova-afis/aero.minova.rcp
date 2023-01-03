@@ -38,7 +38,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.QuantityValue;
-import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.event.ValueChangeEvent;
 import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MQuantityField;
@@ -79,7 +78,6 @@ public class QuantityField {
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 				try {
-					Value value = NumberFormatUtil.newValue(number, field.getDataType(), dfs);
 					if(!unit.isBlank()) {
 						unit = field.getUnitFromEntry(unit);
 						if (unit != null) {
@@ -88,7 +86,8 @@ public class QuantityField {
 							throw new Exception();
 						}
 					}
-					field.setValue(new QuantityValue(number, unit, field.getDataType(), dfs), true);
+					QuantityValue value = new QuantityValue(number, unit.isBlank() ? field.getUnitText() : unit, field.getDataType(), dfs);
+					field.setValue(value, true);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 				} catch (Exception e) {
 					result.add(translationService.translate("@msg.ErrorConverting", null));
