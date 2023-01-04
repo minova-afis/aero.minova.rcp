@@ -243,7 +243,7 @@ public class NumberFormatUtil {
 
 	public static String clearNumberFromGroupingSymbols(String entry, Locale locale) {
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		return entry.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
+		return entry.replaceAll("[\\s*" + dfs.getGroupingSeparator() + "]", "");
 	}
 
 	/**
