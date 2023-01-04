@@ -63,7 +63,7 @@ public class QuantityValue extends Value {
 
 	@Override
 	public String toString() {
-		return MessageFormat.format("QuantityValue [type= {2} , value={0},unit={1},type={2}]", getValue(), unit, getType());
+		return MessageFormat.format("QuantityValue [type= {2} , value={0},unit={1}]", getValue(), unit, getType());
 	}
 
 }
