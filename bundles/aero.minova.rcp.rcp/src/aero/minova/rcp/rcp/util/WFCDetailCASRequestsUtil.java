@@ -383,7 +383,7 @@ public class WFCDetailCASRequestsUtil {
 				checkedFields.add(f);
 				if (f instanceof MQuantityField) {
 					QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
-							table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue(), f.getDataType());
+							table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue());
 					table.setValue(i, 0, value);
 				}
 				f.setValue(table.getValue(i, 0), false);
