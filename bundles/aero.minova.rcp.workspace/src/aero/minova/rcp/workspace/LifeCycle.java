@@ -198,8 +198,6 @@ public class LifeCycle {
 		for (String string : Platform.getApplicationArgs()) {
 			if (string.startsWith("-user=")) {
 				argUser = string.substring(string.indexOf("=") + 1);
-				// In UI-Tests darf sich der "UI wird wiederhergestellt" Dialog nicht öffnen
-				workbenchContext.set(Constants.NEVER_SHOW_RESTORING_UI_MESSAGE, true);
 			}
 			if (string.startsWith("-pw=")) {
 				argPW = string.substring(string.indexOf("=") + 1);

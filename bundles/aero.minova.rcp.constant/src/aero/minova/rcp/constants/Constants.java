@@ -99,11 +99,18 @@ public class Constants {
 	 * Benutzt mit einem String, öffnet einen einfachen Fehler-Dialog
 	 */
 	public static final String BROKER_SHOWERRORMESSAGE = "aero/minova/rcp/ShowErrorMessage";
+
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLE = "aero/minova/rcp/ProcedureWithTable";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLEERROR = "aero/minova/rcp/ProcedureWithTableError";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESS = "aero/minova/rcp/ProcedureWithTableSuccess";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLESUCCESSFINISHED = "aero/minova/rcp/ProcedureWithTableSuccessFinished";
+	@Deprecated
 	public static final String BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE = "aero/minova/rcp/ProcedureWithTableEmptyResponse";
+
 	public static final String BROKER_SELECTSTATISTIC = "aero/minova/rcp/SelectStatistic";
 	public static final String BROKER_SENDEVENTTOHELPER = "aero/minova/rcp/SendEventToHelper";
 	public static final String BROKER_UPDATECOLUMNS = "aero/minova/rcp/UpdateColumns";
@@ -140,10 +147,7 @@ public class Constants {
 	public static final String LAST_LOADED_SEARCHCRITERIA = "aero.minova.rcp.preferences.lastsearchcriteria";
 	public static final String LAST_SEARCHCRITERIA = "LastLoadedSearchCriteria";
 
-	// Wiederherstellen der UI
 	public static final String LAST_STATE = "LAST_STATE";
-	public static final String RESTORING_UI_MESSAGE_SHOWN_THIS_SESSION = "RestoringUIMessageShownThisSession";
-	public static final String NEVER_SHOW_RESTORING_UI_MESSAGE = "NeverShowRestoringUIMessage";
 
 	public static final String SHOW_WORKSPACE_RESET_MESSAGE = "ShowWorkspaceResetMessage";
 

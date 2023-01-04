@@ -1,10 +1,10 @@
 package aero.minova.rcp.model.form;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import aero.minova.rcp.form.model.xsd.Unit;
+import aero.minova.rcp.model.Value;
 
 public class MQuantityField extends MField {
 
@@ -12,7 +12,6 @@ public class MQuantityField extends MField {
 	private String originalUnitText;
 	private int unitFieldSqlIndex;
 	private HashMap<String, String> validUnits = new HashMap<String, String>();
-	private List<Unit> additionalUnits = new ArrayList<Unit>();
 
 	public MQuantityField(int decimals, String unitFieldName, int unitFieldSqlIndex, String unitText, List<Unit> additionalUnit) {
 		super(decimals);
@@ -32,6 +31,13 @@ public class MQuantityField extends MField {
 
 	public String getOriginalUnitText() {
 		return originalUnitText;
+	}
+	
+	@Override
+	protected void checkDataType(Value value) {
+		if (value == null || (value.getQuantityValue() == null)) {
+			super.checkDataType(value);
+		}
 	}
 
 	private void declareValidUnits(List<Unit> additionalUnit) {
@@ -55,6 +61,7 @@ public class MQuantityField extends MField {
 		validUnits.put("Stck", "Stck");
 		validUnits.put("t", "to");
 		validUnits.put("to", "to");
+		validUnits.put("KGV", "KGV");
 
 		for (Unit unit : additionalUnit) {
 			validUnits.put(unit.getUnitKeyText(), unit.getUnitText());
@@ -64,7 +71,7 @@ public class MQuantityField extends MField {
 	public String getUnitFromEntry(String entry) {
 		String validUnit = null;
 		for (String unitKeyText : validUnits.keySet()) {
-			if (unitKeyText.toLowerCase().equals(entry.toLowerCase())) {
+			if (unitKeyText.equalsIgnoreCase(entry)) {
 				validUnit = validUnits.get(unitKeyText);
 			}
 		}

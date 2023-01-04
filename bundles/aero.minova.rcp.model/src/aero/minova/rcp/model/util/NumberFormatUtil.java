@@ -1,9 +1,10 @@
-package aero.minova.rcp.rcp.util;
+package aero.minova.rcp.model.util;
 
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
@@ -169,7 +170,7 @@ public class NumberFormatUtil {
 	 *            DecimalFormatSymbols
 	 * @return Value für den entsprechenden DataType
 	 */
-	public static Object getNumberObjectFromString(String text, DataType type, DecimalFormatSymbols dfs) {
+	public static Number getNumberObjectFromString(String text, DataType type, DecimalFormatSymbols dfs) {
 		switch (type) {
 		case INTEGER:
 			return Integer.parseInt(text);
@@ -207,10 +208,112 @@ public class NumberFormatUtil {
 
 	public static String clearNumberFromGroupingSymbols(String entry, Locale locale) {
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
-		return entry.replaceAll("[\\" + dfs.getGroupingSeparator() + "]", "");
+		return entry.replaceAll("[\\s*" + dfs.getGroupingSeparator() + "]", "");
 	}
 
-	public static String[] splitNumberUnitEntry(String entry, MField field) {
+	/**
+	 * <p>
+	 * Diese Methode ermittelt die neue Caret Position.
+	 * </p>
+	 * <p>
+	 * Die neue Caret Position wird ermittelt anhand des neuen formatierten Textes, des vorherigen Textes, der Eingabe und der vorherigen Caret Position. Wenn
+	 * die Eingabe ein dezimal Trennzeichen ist wird die Caret Position hinter das Trennzeichen gesetzt. Beim Löschen oder Entfernen bleibt die Caret Position
+	 * gleich.
+	 * </p>
+	 *
+	 * @param text
+	 *            der Text, der sich aus insertion und textBefore zusammen setzt und formatiert wurde ({@link Text#getText()})
+	 * @param textBefore
+	 *            der Text, der aktuell (vor Verarbeitung dieses Events) im Feld steht ({@link Text#getText()})
+	 * @param insertion
+	 *            die Benutzereingabe als Zeichenkette (darstellbare Zeichen) ({@link VerifyEvent#text})
+	 * @param keyCode
+	 *            der keyCode der Eingabe. Dies kann ein darstellbares Zeichen sein. Es kann aber auch ein nicht darstellbares Zeichen sein. Wenn die #insertion
+	 *            mehr als ein Zeichen enthält, ist dieser Wert 0 ({@link Event#keyCode})
+	 * @param caretPosition
+	 *            die Position, an der sich der Cursor befindet ({@link Text#getCaretPosition()})
+	 * @param decimalFormatSymbols
+	 *            {@link DecimalFormatSymbols} des aktuellen locale
+	 * @return
+	 */
+	public static int getNewCaretPosition(String text, String textBefore, String insertion, int keyCode, int start, int end, int ostart, int oend, int decimals,
+			int caretPosition, NumberFormat numberFormat, DecimalFormatSymbols dfs) {
+
+		if (!textBefore.isEmpty()) {
+			textBefore = numberFormat.format(Double.parseDouble(textBefore.replace(dfs.getDecimalSeparator(), '.')));
+		}
+
+		int newCaretPosition = 1;
+		String formatted0 = numberFormat.format(0); // stellt die formattierte Zahl 0 mit den jeweiligen dezimal Stellen dar
+		int decimalCaretPostion = text.length() - decimals; // ermittelt die Caret Postion nach dem dezimal Trennzeichen
+		int countGroupingSeperator = getGroupingSeperatorCount(text, dfs) - getGroupingSeperatorCount(textBefore, dfs);
+
+		// Wenn mit Backspace gelöscht wird
+		if (keyCode == SWT.BS) {
+			if (textBefore.length() - decimals <= caretPosition || countGroupingSeperator == 0) {
+				newCaretPosition = caretPosition - 1;
+			} else {
+				newCaretPosition = start + 1 + countGroupingSeperator + getGroupingSeperatorCount(text, dfs);
+
+			}
+		}
+		// Wenn mit ENTF gelöscht wird
+		else if (SWT.DEL == keyCode) {
+			if (textBefore.charAt(caretPosition) == dfs.getGroupingSeparator() || textBefore.charAt(caretPosition) == dfs.getDecimalSeparator()
+					|| (text.length() == textBefore.length() && caretPosition < decimalCaretPostion)) {
+				newCaretPosition = caretPosition + 1;
+			} else if (countGroupingSeperator == 0) {
+				newCaretPosition = caretPosition;
+			} else {
+				newCaretPosition = caretPosition + countGroupingSeperator + getGroupingSeperatorCount(textBefore.substring(ostart, oend), dfs);
+			}
+		} else if (!insertion.isBlank() && insertion.charAt(0) == dfs.getDecimalSeparator()) {
+			newCaretPosition = decimalCaretPostion;
+		} else {
+			// Falls der vorherige Text leer oder 0 ist oder der neue Text 0 ist.
+			if ((textBefore.equals(formatted0) || textBefore.isBlank() || text.equals(formatted0)) && caretPosition < decimalCaretPostion) {
+				newCaretPosition = insertion.length() + countGroupingSeperator;
+			}
+			// Prüft ob man sich hinter dem dezimal Trennzeichen befindet
+			else if (decimalCaretPostion <= caretPosition) {
+				newCaretPosition = caretPosition + insertion.length();
+				if (newCaretPosition >= text.length()) {
+					newCaretPosition = newCaretPosition - (newCaretPosition - text.length());
+				}
+			} else {
+				if (start != end) {
+					newCaretPosition = start + insertion.length() + getGroupingSeperatorCount(text, dfs);
+				} else if (text.length() == textBefore.length() + insertion.length()) {
+					newCaretPosition = caretPosition + insertion.length();
+				} else {
+					newCaretPosition = caretPosition + insertion.length() + countGroupingSeperator;
+				}
+			}
+		}
+
+		return newCaretPosition;
+
+	}
+
+	/**
+	 * Zählt die GroupingSeperator im übergebenen String.
+	 *
+	 * @param text
+	 * @return Anzahl an GroupingSeperatoren
+	 */
+	private static int getGroupingSeperatorCount(String text, DecimalFormatSymbols dfs) {
+		int groupingSeperatorCount = 0;
+		if (text != null && dfs != null) {
+			for (Character gs : text.toCharArray()) {
+				if (dfs.getGroupingSeparator() == gs) {
+					groupingSeperatorCount++;
+				}
+			}
+		}
+		return groupingSeperatorCount;
+	}
+
+	public static String[] splitNumberUnitEntry(String entry) {
 		String numbers = entry;
 		String unit = "";
 		String[] numberAndUnit = new String[2];

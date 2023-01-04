@@ -49,6 +49,7 @@ import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
+import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.ReferenceValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -381,10 +382,11 @@ public class WFCDetailCASRequestsUtil {
 			if (f != null) {
 				checkedFields.add(f);
 				if (f instanceof MQuantityField) {
-					int columnI = table.getColumnIndex(((MQuantityField) f).getUnitFieldName());
-					f.setUnitText(translationService.translate(table.getRows().get(0).getValue(columnI).getStringValue(), null));
+					QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
+							table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue());
+					table.setValue(i, 0, value);
 				}
-				f.setValue(table.getRows().get(0).getValue(i), false);
+				f.setValue(table.getValue(i, 0), false);
 			}
 		}
 
@@ -472,8 +474,8 @@ public class WFCDetailCASRequestsUtil {
 			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + formTable.getColumnName(valuePosition);
 			MField field = mDetail.getField(fieldname);
 			rb.withValue(field.getValue());
-			if(field instanceof MQuantityField) {
-				rb.withValue(new Value(field.getUnitText(), DataType.STRING));
+			if (field instanceof MQuantityField) {
+				rb.withValue(new Value(((QuantityValue) field.getValue()).getUnit(), DataType.STRING));
 				valuePosition++;
 			}
 			valuePosition++;
@@ -776,10 +778,13 @@ public class WFCDetailCASRequestsUtil {
 	/**
 	 * Ruft eine Prozedur mit der übergebenen Tabelle auf. Über den Broker kann auf die Ergebnisse gehört werden
 	 *
+	 * @deprecated Diese Methiode sollte nicht verwendet werden, da sie recht umständlich ist. Stattdessen einfach die Prozedur über den DataService direkt
+	 *             aufrufen.
 	 * @param table
 	 */
 	@Inject
 	@Optional
+	@Deprecated(since = "12.6.0", forRemoval = true)
 	public void callProcedureWithTable(@UIEventTopic(Constants.BROKER_PROCEDUREWITHTABLE) Table table) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(perspective) && table != null) {

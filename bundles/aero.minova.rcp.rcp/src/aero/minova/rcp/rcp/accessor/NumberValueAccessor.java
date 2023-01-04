@@ -7,15 +7,12 @@ import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
-import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.fields.FieldUtil;
-import aero.minova.rcp.rcp.util.NumberFormatUtil;
 
 public class NumberValueAccessor extends AbstractValueAccessor {
-
-//	private boolean verificationActive = false;
 
 	public NumberValueAccessor(MNumberField field, Control control) {
 		super(field, control);

@@ -39,8 +39,8 @@ import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
-import aero.minova.rcp.rcp.util.NumberFormatUtil;
 import aero.minova.rcp.util.OSUtil;
 
 public class NumberField {

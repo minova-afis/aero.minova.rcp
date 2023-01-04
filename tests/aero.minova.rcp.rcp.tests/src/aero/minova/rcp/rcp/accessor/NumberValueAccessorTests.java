@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MNumberField;
-import aero.minova.rcp.rcp.util.NumberFormatUtil;
-import aero.minova.rcp.rcp.util.NumberFormatUtil.Result;
+import aero.minova.rcp.model.util.NumberFormatUtil;
+import aero.minova.rcp.model.util.NumberFormatUtil.Result;
 
 class NumberValueAccessorTests {
 
