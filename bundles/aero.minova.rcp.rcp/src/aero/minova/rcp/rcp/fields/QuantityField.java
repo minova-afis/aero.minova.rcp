@@ -68,7 +68,7 @@ public class QuantityField {
 
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
 
-				if (Character.isDigit(entry.charAt(0))) {
+				if (Character.isDigit(entry.charAt(0)) || entry.charAt(0) == '-') {
 					String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry);
 					number = numberAndUnit[0];
 					unit = numberAndUnit[1];
@@ -169,7 +169,9 @@ public class QuantityField {
 						// Eventuelle neue Einheit setzen
 						if (!field.getUnitText().isBlank()) {
 							unitLabel.setText(field.getUnitText());
-							((QuantityValue) field.getValue()).setUnit(field.getUnitText());
+							if (field.getValue() != null) {
+								((QuantityValue) field.getValue()).setUnit(field.getUnitText());
+							}
 						}
 					}
 				}
