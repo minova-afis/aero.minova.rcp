@@ -39,15 +39,17 @@ public class QuantityValue extends Value {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		Value v = (Value) obj;
+		QuantityValue v = (QuantityValue) obj;
 
 		if (getValue() == null && v.getValue() != null) {
 			return false;
 		} else if (getValue() == null && v.getValue() == null) {
 			return getType() == v.getType();
+		} else if (getUnit() == null && v.getUnit() == null) {
+			return false;
 		}
 
-		return (getType() == v.getType() && Objects.equals(this.getValue(), v.getValue()));
+		return (getType() == v.getType() && Objects.equals(this.getValue(), v.getValue()) && this.getUnit() == v.getUnit());
 	}
 	
 	@Override
