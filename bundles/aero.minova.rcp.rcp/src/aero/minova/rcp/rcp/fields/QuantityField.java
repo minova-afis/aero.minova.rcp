@@ -38,8 +38,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.QuantityValue;
-import aero.minova.rcp.model.event.ValueChangeEvent;
-import aero.minova.rcp.model.event.ValueChangeListener;
 import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
@@ -101,16 +99,12 @@ public class QuantityField {
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
 
-		field.addValueChangeListener(new ValueChangeListener() {
-
-			@Override
-			public void valueChange(ValueChangeEvent evt) {
-				// Einheit neu setzen, wenn sie sich geändert hat
-				if (evt.getNewValue() != null) {
-					String unit = ((QuantityValue) evt.getNewValue()).getUnit();
-					if (unit != null && !unit.isBlank()) {
-						unitLabel.setText(unit);
-					}
+		field.addValueChangeListener(evt -> {
+			// Einheit neu setzen, wenn sie sich geändert hat
+			if (evt.getNewValue() != null) {
+				String unit = ((QuantityValue) evt.getNewValue()).getUnit();
+				if (unit != null && !unit.isBlank()) {
+					unitLabel.setText(unit);
 				}
 			}
 		});
