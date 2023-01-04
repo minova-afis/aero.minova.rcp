@@ -104,6 +104,7 @@ public class QuantityField {
 			if (evt.getNewValue() != null) {
 				String unit = ((QuantityValue) evt.getNewValue()).getUnit();
 				if (unit != null && !unit.isBlank()) {
+					field.setUnitText(unit);
 					unitLabel.setText(unit);
 				}
 			}
