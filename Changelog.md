@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - use-Resolve-Parms Eigenschaft kann ab jetzt in den Lookups verwendet werden. Damit werden die übergebenen Paramter auch in die Resolve-Prozedur übergeben. Zuvor war dies nur für die List-prozeduren möglich!
+- QuantityField. Ein neues Feld für die gleichzeitige Angabe von Wert und Einheit
 
 ### Änderung
 - Methode callProcedureWithTable deprecated
@@ -29,7 +30,6 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Screenshots von Sections und der Detail-Toolbar können über Rechtsklick erstellt werden
-- QuantityField. Ein neues Feld für die gleichzeitige Angabe von Wert und Einheit
 
 ### Änderung
 
