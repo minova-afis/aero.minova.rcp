@@ -51,7 +51,7 @@ public class QuantityValue extends Value {
 
 		return (getType() == v.getType() && Objects.equals(this.getValue(), v.getValue()) && this.getUnit() == v.getUnit());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -63,7 +63,7 @@ public class QuantityValue extends Value {
 
 	@Override
 	public String toString() {
-		return MessageFormat.format("QuantityValue [type= {2} , value={0},unit={1}]", getValue(), unit, getType());
+		return MessageFormat.format("QuantityValue [value={0}, unit={1}, type= {2}]", getValue(), unit, getType());
 	}
 
 }
