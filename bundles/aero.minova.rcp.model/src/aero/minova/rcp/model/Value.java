@@ -203,12 +203,16 @@ public class Value implements Serializable {
 	public Instant getBaseValue() {
 		return type == DataType.PERIOD ? (Instant) value : null;
 	}
+	
+	public Number getQuantityValue() {
+		return type == DataType.QUANTITY ? (Number) value : null;
+	}
 
 	@Override
 	public String toString() {
 		return "Value [type=" + type + ", value=" + value + "]";
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

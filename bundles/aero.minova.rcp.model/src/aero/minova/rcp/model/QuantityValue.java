@@ -9,6 +9,12 @@ public class QuantityValue extends Value {
 	private static final long serialVersionUID = 202212081413L;
 	private String unit;
 	private DataType dataType;
+	
+	public QuantityValue(Number number, String unit, DataType dataType) {
+		super(number);
+		this.unit = unit == null ? "" : unit;
+		this.dataType = dataType;
+	}
 
 	public QuantityValue(String number, String unit, DataType dataType, DecimalFormatSymbols dfs) {
 		super(NumberFormatUtil.getNumberObjectFromString(number, dataType, dfs));
@@ -18,6 +24,11 @@ public class QuantityValue extends Value {
 
 	public String getUnit() {
 		return unit;
+	}
+	
+
+	public void setUnit(String unit) {
+		this.unit = unit;
 	}
 
 	@Override

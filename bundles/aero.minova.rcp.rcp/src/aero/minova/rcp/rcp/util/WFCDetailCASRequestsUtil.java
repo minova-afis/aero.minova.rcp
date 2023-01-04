@@ -382,10 +382,12 @@ public class WFCDetailCASRequestsUtil {
 			if (f != null) {
 				checkedFields.add(f);
 				if (f instanceof MQuantityField) {
-					int columnI = table.getColumnIndex(((MQuantityField) f).getUnitFieldName());
-					f.setUnitText(translationService.translate(table.getRows().get(0).getValue(columnI).getStringValue(), null));
+					QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
+							table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue(), f.getDataType());
+					f.setValue(value, false);
+				} else {
+					f.setValue(table.getRows().get(0).getValue(i), false);
 				}
-				f.setValue(table.getRows().get(0).getValue(i), false);
 			}
 		}
 
@@ -473,7 +475,7 @@ public class WFCDetailCASRequestsUtil {
 			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + formTable.getColumnName(valuePosition);
 			MField field = mDetail.getField(fieldname);
 			rb.withValue(field.getValue());
-			if(field instanceof MQuantityField) {
+			if (field instanceof MQuantityField) {
 				rb.withValue(new Value(((QuantityValue) field.getValue()).getUnit(), DataType.STRING));
 				valuePosition++;
 			}

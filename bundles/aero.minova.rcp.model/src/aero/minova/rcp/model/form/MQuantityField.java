@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import aero.minova.rcp.form.model.xsd.Unit;
+import aero.minova.rcp.model.Value;
 
 public class MQuantityField extends MField {
 
@@ -30,6 +31,13 @@ public class MQuantityField extends MField {
 
 	public String getOriginalUnitText() {
 		return originalUnitText;
+	}
+	
+	@Override
+	protected void checkDataType(Value value) {
+		if (value == null || (value.getQuantityValue() == null)) {
+			super.checkDataType(value);
+		}
 	}
 
 	private void declareValidUnits(List<Unit> additionalUnit) {

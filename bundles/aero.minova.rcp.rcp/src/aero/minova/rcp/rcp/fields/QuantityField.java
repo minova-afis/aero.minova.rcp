@@ -46,7 +46,7 @@ import aero.minova.rcp.rcp.accessor.QuantityValueAccessor;
 import aero.minova.rcp.util.OSUtil;
 
 public class QuantityField {
-	
+
 	public static Control create(Composite composite, MQuantityField field, int row, int column, Locale locale, MPerspective perspective,
 			TranslationService translationService) {
 		String unitText = field.getUnitText() == null ? "" : field.getUnitText();
@@ -59,7 +59,7 @@ public class QuantityField {
 			public List<String> getContent(String entry) {
 				String number = null;
 				String unit = null;
-				
+
 				ArrayList<String> result = new ArrayList<>();
 				int decimals = field.getDecimals();
 
@@ -69,8 +69,8 @@ public class QuantityField {
 				numberFormat.setGroupingUsed(true);
 
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
-				
-				if(Character.isDigit(entry.charAt(0))) {
+
+				if (Character.isDigit(entry.charAt(0))) {
 					String[] numberAndUnit = NumberFormatUtil.splitNumberUnitEntry(entry);
 					number = numberAndUnit[0];
 					unit = numberAndUnit[1];
@@ -78,7 +78,7 @@ public class QuantityField {
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 				try {
-					if(!unit.isBlank()) {
+					if (!unit.isBlank()) {
 						unit = field.getUnitFromEntry(unit);
 						if (unit != null) {
 							field.setUnitText(unit);
@@ -86,7 +86,7 @@ public class QuantityField {
 							throw new Exception();
 						}
 					}
-					QuantityValue value = new QuantityValue(number, unit.isBlank() ? field.getUnitText() : unit, field.getDataType(), dfs);
+					QuantityValue value = new QuantityValue(number, null, field.getDataType(), dfs);
 					field.setValue(value, true);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 				} catch (Exception e) {
@@ -106,8 +106,11 @@ public class QuantityField {
 			@Override
 			public void valueChange(ValueChangeEvent evt) {
 				// Einheit neu setzen, wenn sie sich geändert hat
-				if (field.getUnitText() != null && !field.getUnitText().isBlank()) {
-					unitLabel.setText(translationService.translate(field.getUnitText(), null));
+				if (evt.getNewValue() != null) {
+					String unit = ((QuantityValue) evt.getNewValue()).getUnit();
+					if (unit != null && !unit.isBlank()) {
+						unitLabel.setText(unit);
+					}
 				}
 			}
 		});
@@ -172,6 +175,7 @@ public class QuantityField {
 						// Eventuelle neue Einheit setzen
 						if (!field.getUnitText().isBlank()) {
 							unitLabel.setText(field.getUnitText());
+							((QuantityValue) field.getValue()).setUnit(field.getUnitText());
 						}
 					}
 				}
@@ -215,5 +219,5 @@ public class QuantityField {
 
 		return text;
 	}
-	
+
 }
