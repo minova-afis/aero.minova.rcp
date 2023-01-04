@@ -46,8 +46,10 @@ import aero.minova.rcp.form.model.xsd.Head;
 import aero.minova.rcp.form.model.xsd.Page;
 import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.Column;
+import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
 import aero.minova.rcp.model.OutputType;
+import aero.minova.rcp.model.QuantityValue;
 import aero.minova.rcp.model.ReferenceValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -63,6 +65,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MParamStringField;
+import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
@@ -319,6 +322,9 @@ public class WFCDetailCASRequestsUtil {
 				newKeys.put(f.getName(), row.getValue(indexInRow));
 			} else {
 				builder.withValue(null);
+				if (f.getQuantity() != null) {
+					builder.withValue(null);
+				}
 			}
 
 		}
@@ -372,10 +378,15 @@ public class WFCDetailCASRequestsUtil {
 		List<MField> checkedFields = new ArrayList<>();
 		for (int i = 0; i < table.getColumnCount(); i++) {
 			String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
-			MField c = mDetail.getField(name);
-			if (c != null) {
-				checkedFields.add(c);
-				c.setValue(table.getRows().get(0).getValue(i), false);
+			MField f = mDetail.getField(name);
+			if (f != null) {
+				checkedFields.add(f);
+				if (f instanceof MQuantityField) {
+					QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
+							table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue());
+					table.setValue(i, 0, value);
+				}
+				f.setValue(table.getValue(i, 0), false);
 			}
 		}
 
@@ -463,6 +474,10 @@ public class WFCDetailCASRequestsUtil {
 			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + formTable.getColumnName(valuePosition);
 			MField field = mDetail.getField(fieldname);
 			rb.withValue(field.getValue());
+			if (field instanceof MQuantityField) {
+				rb.withValue(new Value(((QuantityValue) field.getValue()).getUnit(), DataType.STRING));
+				valuePosition++;
+			}
 			valuePosition++;
 		}
 
@@ -509,7 +524,8 @@ public class WFCDetailCASRequestsUtil {
 			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
 			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
 				String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
-				if (mDetail.getField(fieldname).isPrimary()) {
+				boolean isAField = mDetail.getField(fieldname) != null ? true : false;
+				if (isAField && mDetail.getField(fieldname).isPrimary()) {
 					c.setOutputType(OutputType.OUTPUT);
 				}
 			}
@@ -864,6 +880,9 @@ public class WFCDetailCASRequestsUtil {
 		mDetail.getFields().removeAll(paramfields);
 		// Felder auf Null setzen!
 		for (MField f : mDetail.getFields()) {
+			if (f instanceof MQuantityField) {
+				f.setUnitText(translationService.translate(((MQuantityField) f).getOriginalUnitText(), null));
+			}
 			f.setValue(null, false);
 			if (f instanceof MLookupField) {
 				((MLookupField) f).setOptions(null);

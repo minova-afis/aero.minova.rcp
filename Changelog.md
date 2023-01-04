@@ -29,6 +29,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Screenshots von Sections und der Detail-Toolbar können über Rechtsklick erstellt werden
+- QuantityField. Ein neues Feld für die gleichzeitige Angabe von Wert und Einheit
 
 ### Änderung
 

@@ -101,7 +101,15 @@ public class DataFormService implements IDataFormService {
 		// Sortierung der Felder nach sql-index oder der Reihe nach!
 		allFields = allFields.stream().sorted(Comparator.comparing(Field::getSqlIndex)).filter(f -> f.getSqlIndex().intValue() >= 0)
 				.collect(Collectors.toList());
-		allFields.stream().forEach(f -> dataTable.addColumn(createColumnFromField(f, prefix)));
+		for (Field f : allFields) {
+			dataTable.addColumn(createColumnFromField(f, prefix));
+			if(f.getQuantity() != null) {
+				Field qF = new Field();
+				qF.setName(f.getQuantity().getUnitFieldName());
+				qF.setSqlIndex(f.getQuantity().getUnitFieldSqlIndex());
+				dataTable.addColumn(createColumnFromField(qF, prefix));
+			}
+		}
 		return dataTable;
 	}
 
@@ -152,19 +160,21 @@ public class DataFormService implements IDataFormService {
 		DataType type = null;
 		DateTimeType dateTimeType = null;
 		Integer decimals = null;
-		if (f.getPercentage() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)) {
+		if (f.getPercentage() != null || (f.getNumber() != null && f.getNumber().getDecimals() > 0)
+				|| (f.getQuantity() != null && f.getQuantity().getDecimals() > 0)) {
 			type = DataType.DOUBLE;
 			if (f.getNumber() != null) {
 				decimals = f.getNumber().getDecimals();
-			} else if (f.getMoney() != null) {
-				decimals = f.getMoney().getDecimals();
 			} else if (f.getPercentage() != null) {
 				decimals = f.getPercentage().getDecimals();
+			} else if (f.getQuantity() != null) {
+				decimals = f.getQuantity().getDecimals();
 			}
-		} else if (f.getNumber() != null || f.getLookup() != null) {
+		} else if (f.getNumber() != null || f.getLookup() != null || f.getQuantity() != null) {
 			type = DataType.INTEGER;
 		} else if (f.getMoney() != null) {
 			type = DataType.BIGDECIMAL;
+			decimals = f.getMoney().getDecimals();
 		} else if (f.getBoolean() != null) {
 			type = DataType.BOOLEAN;
 		} else if (f.getDateTime() != null || f.getShortDate() != null || f.getShortTime() != null) {

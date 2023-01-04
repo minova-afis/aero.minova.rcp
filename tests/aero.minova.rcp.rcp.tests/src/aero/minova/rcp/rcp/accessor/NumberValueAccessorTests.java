@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MNumberField;
-import aero.minova.rcp.rcp.accessor.NumberValueAccessor.Result;
+import aero.minova.rcp.model.util.NumberFormatUtil;
+import aero.minova.rcp.model.util.NumberFormatUtil.Result;
 
 class NumberValueAccessorTests {
 
@@ -20,10 +21,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testCompleteBSIntegerField() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				0, // start
 				1, // end
@@ -46,10 +47,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testDELAfterKomma() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				2, // start
 				3, // end
@@ -72,10 +73,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testCompleteSelectionWindows() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				0, // start
 				9, // end
@@ -94,10 +95,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testEntfZeroFive() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				0, // start
 				1, // end
@@ -116,10 +117,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testEntfZeroFiveDeleteFive() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				2, // start
 				3, // end
@@ -138,10 +139,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testBSZeroFive() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				0, // start
 				1, // end
@@ -160,10 +161,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testEntfZeroZero() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				0, // start
 				1, // end
@@ -182,10 +183,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testIntCompleteSelection() {
 		MNumberField field = new MNumberField(0);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				0, // start
 				5, // end
@@ -204,10 +205,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testReplaceNumber() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"2", // insertion
 				3, // start
 				5, // end
@@ -226,10 +227,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testEnterKommaZero() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				",", // insertion
 				1, // start
 				1, // end
@@ -248,10 +249,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testEnterKommaFive() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				",", // insertion
 				1, // start
 				1, // end
@@ -270,10 +272,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testNumberAfterKomma() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"2", // insertion
 				2, // start
 				2, // end
@@ -296,10 +299,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testDecimalSeparatorGerman() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"9.000", // insertion
 				0, // start
 				0, // end
@@ -317,10 +321,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testWasWeissIch() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"9", // insertion
 				0, // start
 				0, // end
@@ -338,10 +343,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom99_95To9999_95() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"99", // insertion
 				2, // start
 				2, // end
@@ -360,10 +366,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom0_00To1_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				1, // start
 				1, // end
@@ -383,10 +390,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom1_000To12_000() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"2", // insertion
 				1, // start
 				1, // end
@@ -406,10 +414,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom99_95To999_95() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"9", // insertion
 				2, // start
 				2, // end
@@ -428,10 +437,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom1_C00To1_1C0() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				2, // start
 				2, // end
@@ -450,10 +460,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testInsertComma() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				",", // insertion
 				3, // start
 				3, // end
@@ -473,10 +484,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testDecimalSeparatorEnglish() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"0", // insertion
 				3, // start
 				3, // end
@@ -495,10 +507,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testGetNewValue() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"0", // insertion
 				3, // start
 				3, // end
@@ -516,10 +529,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testGetNewCaretPositionForLocaleUS() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"0", // insertion
 				3, // start
 				3, // end
@@ -537,10 +551,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testGetNewCaretPositionForLocaleGERMANY() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMANY);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"0", // insertion
 				3, // start
 				3, // end
@@ -559,10 +574,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom100_00To1002_00GER() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMANY);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"2", // insertion
 				3, // start
 				3, // end
@@ -582,10 +598,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testFrom100_00To1_002_00US() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"2", // insertion
 				3, // start
 				3, // end
@@ -605,10 +622,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testKeyCode8() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				2, // start
 				3, // end
@@ -632,10 +650,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test0_1c000To0_12c00() {
 		MNumberField field = new MNumberField(4);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"2", // insertion
 				3, // start
 				3, // end
@@ -655,10 +674,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test89c_234_1To897c_234_1() {
 		MNumberField field = new MNumberField(1);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"7", // insertion
 				2, // start
 				2, // end
@@ -678,10 +698,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test1c0_00To17c0_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"7", // insertion
 				1, // start
 				1, // end
@@ -701,10 +722,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testc234_00To1c_234_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				0, // start
 				0, // end
@@ -724,10 +746,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_00cTo1_46c() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"456", // insertion
 				2, // start
 				4, // end
@@ -747,10 +770,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testc234_00To11c_234_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"11", // insertion
 				0, // start
 				0, // end
@@ -770,10 +794,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testc234_00To111c_234_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"111", // insertion
 				0, // start
 				0, // end
@@ -793,10 +818,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testc234_00To1_111c_234_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1111", // insertion
 				0, // start
 				0, // end
@@ -816,10 +842,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testc234_00To1_111_111c_234_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1111111", // insertion
 				0, // start
 				0, // end
@@ -839,10 +866,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testc234_00To2_341_111c_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1111", // insertion
 				3, // start
 				3, // end
@@ -862,10 +890,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testcTo5c_00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"5", // insertion
 				0, // start
 				0, // end
@@ -885,10 +914,11 @@ class NumberValueAccessorTests {
 	@Test
 	void testInsert1_111_111() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1.111.111", // insertion
 				0, // start
 				0, // end
@@ -908,10 +938,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_5c0To1_c00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				2, // start
 				3, // end
@@ -929,10 +960,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_52cTo1_50c() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				3, // start
 				4, // end
@@ -950,10 +982,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test_cse0k00_1_1csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				0, // start
 				0, // end
@@ -973,10 +1006,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test_cs0k00e_1_1csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1", // insertion
 				0, // start
 				4, // end
@@ -996,10 +1030,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test_cs0k00e_1_100csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"100", // insertion
 				0, // start
 				4, // end
@@ -1019,10 +1054,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test_0csk00e_1_100csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"100", // insertion
 				1, // start
 				4, // end
@@ -1042,10 +1078,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test_12pcse345k00_BS_12csep345k00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				3, // start
 				3, // end
@@ -1065,10 +1102,11 @@ class NumberValueAccessorTests {
 	@Test
 	void test_12pcse345k00_DEL_12pcse45k00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
+
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				2, // start
 				3, // end
@@ -1088,10 +1126,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_12p345csek00_DEL_12p345kcse00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				6, // start
 				7, // end
@@ -1111,10 +1149,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_1k234cse_8_1k234cse() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"8", // insertion
 				5, // start
 				5, // end
@@ -1134,10 +1172,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_1k23cse4_8_1k23cse8() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"8", // insertion
 				4, // start
 				5, // end
@@ -1157,10 +1195,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_565csek00_1000_1_000csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1000", // insertion
 				0, // start
 				8, // end
@@ -1180,10 +1218,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_565csek00_100_100csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"100", // insertion
 				0, // start
 				8, // end
@@ -1203,10 +1241,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testcs1_565k00e_1000000_1_000_000csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1000000", // insertion
 				0, // start
 				8, // end
@@ -1226,10 +1264,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testcs1_565k00e_1000k65_1_000csek65() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"1000,65", // insertion
 				0, // start
 				8, // end
@@ -1249,10 +1287,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_cs565ek00_100_100csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"100", // insertion
 				2, // start
 				5, // end
@@ -1272,10 +1310,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_5cs65ek00_100_15_100csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"100", // insertion
 				3, // start
 				5, // end
@@ -1295,10 +1333,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testInsertGroupingSeperator() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				".", // insertion
 				3, // start
 				3, // end
@@ -1318,10 +1356,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testInsertKeyCode127() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				4, // start
 				5, // end
@@ -1341,10 +1379,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testInsertKeyCode8() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				4, // start
 				5, // end
@@ -1364,10 +1402,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test12_3cse56k78_to_12csek78() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				3, // start
 				6, // end
@@ -1387,10 +1425,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test1_234_56cse7k89_to_123_456csek89() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				8, // start
 				9, // end
@@ -1410,10 +1448,10 @@ class NumberValueAccessorTests {
 	@Test
 	void testDELGroupingSeperator() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				5, // start
 				6, // end
@@ -1433,10 +1471,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_cs1ek00_DEL_0csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				0, // start
 				1, // end
@@ -1456,10 +1494,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_s1cek00_BSP_0csek00() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"", // insertion
 				0, // start
 				1, // end
@@ -1479,10 +1517,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_s0ce_s10ec() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"10", // insertion
 				0, // start
 				1, // end
@@ -1502,10 +1540,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_s0ce_s54Point321ec() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"54321", // insertion
 				0, // start
 				1, // end
@@ -1525,10 +1563,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_s0ce_s87Point654Point321ec() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"87654321", // insertion
 				0, // start
 				1, // end
@@ -1548,10 +1586,10 @@ class NumberValueAccessorTests {
 	@Test
 	void test_123sce_1234sec() {
 		MNumberField field = new MNumberField(2);
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, null);
 		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.GERMAN);
 
-		Result result = numberValueAccessor.processInput(//
+		Result result = NumberFormatUtil.processInput(//
+				field, //
 				"4", // insertion
 				3, // start
 				3, // end

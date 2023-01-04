@@ -123,9 +123,6 @@ public abstract class MField {
 	}
 
 	public void setValue(Value value, boolean user) {
-		if (fieldValue != null && fieldValue.equals(value)) {
-			return; // auch true, wenn beide null sind
-		}
 		checkDataType(value);
 
 		Value oldValue = this.fieldValue;

@@ -10,5 +10,6 @@ public enum DataType {
 	BOOLEAN, //
 	FILTER, //
 	REFERENCE, //
-	PERIOD
+	PERIOD, //
+	QUANTITY 
 }

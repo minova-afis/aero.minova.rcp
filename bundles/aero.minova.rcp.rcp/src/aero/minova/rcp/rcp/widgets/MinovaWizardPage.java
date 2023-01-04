@@ -38,6 +38,7 @@ import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
+import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.form.MShortDateField;
 import aero.minova.rcp.model.form.MShortTimeField;
@@ -49,6 +50,7 @@ import aero.minova.rcp.rcp.fields.BooleanField;
 import aero.minova.rcp.rcp.fields.DateTimeField;
 import aero.minova.rcp.rcp.fields.LookupField;
 import aero.minova.rcp.rcp.fields.NumberField;
+import aero.minova.rcp.rcp.fields.QuantityField;
 import aero.minova.rcp.rcp.fields.ShortDateField;
 import aero.minova.rcp.rcp.fields.ShortTimeField;
 import aero.minova.rcp.rcp.fields.TextField;
@@ -249,6 +251,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case STRING:
 			c = TextField.create(composite, mField, row, column, mPerspective);
 			break;
+		case QUANTITY:
+			c = QuantityField.create(composite, (MQuantityField) mField, row, column, locale, mPerspective, translationService);
 		}
 
 		if (c != null) {
