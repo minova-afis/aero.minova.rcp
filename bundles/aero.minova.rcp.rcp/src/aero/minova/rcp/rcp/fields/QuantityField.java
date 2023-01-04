@@ -167,12 +167,9 @@ public class QuantityField {
 					if (text2.getText().isBlank()) {
 						field.setValue(null, true);
 					} else {
-						// Eventuelle neue Einheit setzen
-						if (!field.getUnitText().isBlank()) {
-							unitLabel.setText(field.getUnitText());
-							if (field.getValue() != null) {
-								((QuantityValue) field.getValue()).setUnit(field.getUnitText());
-							}
+						unitLabel.setText(field.getUnitText());
+						if (field.getValue() != null) {
+							((QuantityValue) field.getValue()).setUnit(field.getUnitText());
 						}
 					}
 				}
