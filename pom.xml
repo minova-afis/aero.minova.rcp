@@ -16,6 +16,7 @@
 
     <properties>
         <tycho.version>2.7.4</tycho.version>
+		<java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
