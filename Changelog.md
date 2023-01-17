@@ -16,6 +16,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 
+## [12.7.0] - 17.01.2023
+**ACHTUNG: Ab diesem Release wird JAVA Version 17 benötigt!**
+
 ### Änderung
 - Benötigte Java Version von 11 auf 17 ändern
 - Java 17 statt Java 11 ausliefern
@@ -24,7 +27,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - GitHub Workflows auf Java 17 geupgraded
 - Java Version in den MANIFEST.MFs auf 17 aktualisiert
 
-## [12.6.0] - 09.01.2022
+## [12.6.0] - 09.01.2023
 
 ### Neu
 - use-Resolve-Parms Eigenschaft kann ab jetzt in den Lookups verwendet werden. Damit werden die übergebenen Paramter auch in die Resolve-Prozedur übergeben. Zuvor war dies nur für die List-prozeduren möglich!
