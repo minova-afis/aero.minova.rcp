@@ -24,7 +24,7 @@ jobs:
 
     - uses: actions/setup-java@v2
       with:
-        java-version: '11.0.14'
+        java-version: '17'
         distribution: 'adopt'
 
     # Version in der Pom.xml und allen anderen Paketen inkrementieren und Commiten
