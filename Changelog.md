@@ -14,6 +14,14 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Neu
+
+### Änderung
+- Benötigte Java Version von 11 auf 17 ändern
+- Java 17 statt Java 11 ausliefern
+- JaxB2-Version auf 3.1.0
+- Überall im Projekt Java-Version nutzen, statt hardcoded Version
+
 ## [12.6.0] - 09.01.2022
 
 ### Neu
