@@ -73,7 +73,7 @@ public class ScreenshotUtil {
 		fd.setFilterNames(new String[] { "Bilddateien(*.png)" });
 		fd.setFilterPath(directory);
 		fd.setOverwrite(true);
-		fd.setFileName(filename);
+		fd.setFileName(filename.toLowerCase());
 		final String selected = fd.open();
 
 		if (selected != null) {
