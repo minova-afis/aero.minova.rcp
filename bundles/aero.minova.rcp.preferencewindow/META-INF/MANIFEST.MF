@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Preferencewindow
 Bundle-SymbolicName: aero.minova.rcp.preferencewindow;singleton:=true
-Bundle-Version: 12.5.0.qualifier
+Bundle-Version: 12.7.3.qualifier
 Automatic-Module-Name: aero.minova.rcp.preferencewindow
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.e4.core.di.annotations,
  org.eclipse.e4.ui.workbench;bundle-version="1.11.300",
  org.eclipse.e4.ui.model.workbench,

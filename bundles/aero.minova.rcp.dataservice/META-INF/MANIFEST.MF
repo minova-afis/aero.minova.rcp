@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Dataservice
 Bundle-SymbolicName: aero.minova.rcp.dataservice
-Bundle-Version: 12.5.0.qualifier
+Bundle-Version: 12.7.3.qualifier
 Automatic-Module-Name: aero.minova.rcp.dataservice
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: aero.minova.rcp.model;bundle-version="1.2.0",
  org.eclipse.core.runtime;bundle-version="3.19.0",
  org.eclipse.e4.ui.di,

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.root</artifactId>
-    <version>12.5.0-SNAPSHOT</version>
+    <version>12.7.3-SNAPSHOT</version>
     <name>aero.minova.rcp</name>
     <packaging>pom</packaging>
 
@@ -15,7 +15,8 @@
     </parent>
 
     <properties>
-        <tycho.version>2.7.4</tycho.version>
+        <tycho.version>3.0.1</tycho.version>
+		<java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 

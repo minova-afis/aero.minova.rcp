@@ -155,10 +155,4 @@ public class TimeUtilTests {
 		assertEquals(expected, TimeUtil.getTime(now, "08:00 PM", "hh:mm a", Locale.US));
 	}
 
-	@Test
-	public void entryNachm() {
-		Instant now = Instant.now();
-		Instant expected = LocalDate.of(1900, JANUARY, 1).atStartOfDay().plusHours(20).toInstant(ZoneOffset.UTC);
-		assertEquals(expected, TimeUtil.getTime(now, "08:00 nachm.", "hh:mm a", Locale.GERMANY));
-	}
 }

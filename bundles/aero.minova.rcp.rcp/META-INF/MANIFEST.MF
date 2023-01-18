@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Rcp
 Bundle-SymbolicName: aero.minova.rcp.rcp;singleton:=true
-Bundle-Version: 12.5.0.qualifier
+Bundle-Version: 12.7.3.qualifier
 Export-Package: aero.minova.rcp.rcp.accessor,aero.minova.rcp.rcp.fields,
  aero.minova.rcp.rcp.parts,aero.minova.rcp.rcp.util,aero.minova.rcp.rcp.
  widgets
@@ -33,7 +33,7 @@ Require-Bundle: aero.minova.rcp.form.model,aero.minova.rcp.form.menu,aer
  ipse.osgi.services;bundle-version="3.10.0",jakarta.xml.bind;bundle-vers
  ion="2.3.3",aero.minova.rcp.css;bundle-version="12.0.27",aero.minova.rc
  p.images;bundle-version=12.0.27
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: aero.minova.rcp.rcp
 Import-Package: aero.minova.rcp.constants,aero.minova.rcp.core.ui,aero.m
  inova.rcp.perspectiveswitcher.commands,aero.minova.rcp.perspectiveswitc

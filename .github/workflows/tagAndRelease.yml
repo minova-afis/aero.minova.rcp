@@ -24,7 +24,7 @@ jobs:
 
     - uses: actions/setup-java@v2
       with:
-        java-version: '11.0.14'
+        java-version: '17'
         distribution: 'adopt'
 
     # Version in der Pom.xml und allen anderen Paketen inkrementieren und Commiten
@@ -35,8 +35,8 @@ jobs:
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
     - name: Git commit Version 
       run: |
-       git config user.email "erlanger@minova.com"
-       git config user.name "CE7"
+       git config user.email "service@minova.com"
+       git config user.name "minova-worker"
        git add . 
        git commit -m "Increment Version to ${{ github.event.inputs.version }}, ${{ github.event.inputs.description }}"
        git push
@@ -44,8 +44,8 @@ jobs:
     # Version als tag anlegen
     - name: Tag version
       run: |
-        git config user.email "erlanger@minova.com"
-        git config user.name "CE7"
+        git config user.email "service@minova.com"
+        git config user.name "minova-worker"
         git tag -a "v${{ github.event.inputs.version }}" -m "${{ github.event.inputs.description }}"
         git push --tags
         
@@ -71,15 +71,14 @@ jobs:
       with:
         files: /**/surefire-reports/*.xml
  
-    # Zips hochladen
-    - name: Copy .zip to Stage area
-      run: mkdir staging && cp releng/aero.minova.rcp.product/target/products/*.zip staging
-    - name: Upload .zip 
+    # Zips und Tar.gz hochladen
+    - name: Copy .zip und .tar.gz  to Stage area
+      run: mkdir staging && cp releng/aero.minova.rcp.product/target/products/*.zip staging && cp releng/aero.minova.rcp.product/target/products/*.tar.gz staging
+    - name: Upload .zip und .tar.gz 
       uses: actions/upload-artifact@v2
       with:
         name: aero.minova.rcp ${{ github.event.inputs.version }}
         path: staging
-        
         
     # Release erstellen
     - name: Create Release
@@ -107,7 +106,7 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: staging/WebFatClient-win32.win32.x86_64.zip
         asset_name: WFC_Windows_${{ github.event.inputs.version }}.zip
-        asset_content_type: application/zip
+        asset_content_type: application/.zip
    # Mac funktioniert noch nicht aus dem Internet zu laden, siehe #273
    # - name: Upload Mac zip as Release Asset
    #   id: upload-release-asset-mac
@@ -116,9 +115,9 @@ jobs:
    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
    #   with:
    #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-   #     asset_path: staging/WebFatClient-macosx.cocoa.x86_64.zip
-   #     asset_name: WFC_macOS_${{ github.event.inputs.version }}.zip
-   #     asset_content_type: application/zip
+   #     asset_path: staging/WebFatClient-macosx.cocoa.x86_64.tar.gz
+   #     asset_name: WFC_macOS_${{ github.event.inputs.version }}.tar.gz
+   #     asset_content_type: application/tar.gz
     - name: Upload Linux zip as Release Asset
       id: upload-release-asset-linux
       uses: actions/upload-release-asset@v1
@@ -126,9 +125,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: staging/WebFatClient-linux.gtk.x86_64.zip
-        asset_name: WFC_Linux_${{ github.event.inputs.version }}.zip
-        asset_content_type: application/zip
+        asset_path: staging/WebFatClient-linux.gtk.x86_64.tar.gz
+        asset_name: WFC_Linux_${{ github.event.inputs.version }}.tar.gz
+        asset_content_type: application/tar.gz
         
         
         
