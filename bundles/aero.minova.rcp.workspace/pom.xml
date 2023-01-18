@@ -7,6 +7,6 @@
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.bundles</artifactId>
-		<version>12.7.2-SNAPSHOT</version>
+		<version>12.7.3-SNAPSHOT</version>
 	</parent>
 </project>
