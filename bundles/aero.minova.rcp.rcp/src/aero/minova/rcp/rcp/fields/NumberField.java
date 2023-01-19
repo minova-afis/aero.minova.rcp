@@ -38,6 +38,7 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.CssData;
 import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.model.Value;
+import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
@@ -136,7 +137,7 @@ public class NumberField {
 	 * @param field
 	 * @return
 	 */
-	private static Control getControlForOS(Composite composite, TextAssistContentProvider contentProvider, Locale locale, MNumberField field) {
+	public static Control getControlForOS(Composite composite, TextAssistContentProvider contentProvider, Locale locale, MField field) {
 		Control text;
 		if (OSUtil.isLinux()) {
 			Text text2 = new Text(composite, SWT.BORDER);
