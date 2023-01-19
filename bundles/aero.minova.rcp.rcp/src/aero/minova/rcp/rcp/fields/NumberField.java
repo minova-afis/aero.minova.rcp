@@ -109,6 +109,7 @@ public class NumberField {
 		maximum = maximum == null ? Double.MAX_VALUE : maximum;
 		Double minimum = field.getMinimumValue();
 		minimum = minimum == null ? Double.MIN_VALUE : minimum;
+		text.setOrientation(SWT.RIGHT_TO_LEFT);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.setData(FIELD_DECIMALS, decimals);
 		text.setData(FIELD_MAX_VALUE, maximum);
