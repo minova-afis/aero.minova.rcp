@@ -43,7 +43,10 @@ import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.rcp.accessor.NumberValueAccessor;
 import aero.minova.rcp.util.OSUtil;
 
+@SuppressWarnings("restriction")
 public class NumberField {
+
+	private NumberField() {}
 
 	public static Control create(Composite composite, MNumberField field, int row, int column, Locale locale, MPerspective perspective,
 			TranslationService translationService) {
@@ -51,17 +54,17 @@ public class NumberField {
 
 		Label label = FieldLabel.create(composite, field);
 
+		Integer decimals = field.getDecimals();
+		NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+		numberFormat.setMaximumFractionDigits(decimals);
+		numberFormat.setMinimumFractionDigits(decimals);
+		numberFormat.setGroupingUsed(true);
+
 		TextAssistContentProvider contentProvider = new TextAssistContentProvider() {
 
 			@Override
 			public List<String> getContent(String entry) {
 				ArrayList<String> result = new ArrayList<>();
-				int decimals = field.getDecimals();
-
-				NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-				numberFormat.setMaximumFractionDigits(decimals);
-				numberFormat.setMinimumFractionDigits(decimals);
-				numberFormat.setGroupingUsed(true);
 
 				entry = NumberFormatUtil.clearNumberFromGroupingSymbols(entry, locale);
 
@@ -82,6 +85,57 @@ public class NumberField {
 		FormData textFormData = new FormData();
 		FormData unitFormData = new FormData();
 
+		Control text = getControlForOS(composite, contentProvider, locale, field);
+
+		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, text);
+
+		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
+		IEclipseContext context = perspective.getContext();
+		ContextInjectionFactory.inject(numberValueAccessor, context);
+		field.setValueAccessor(numberValueAccessor);
+
+		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
+
+		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
+		textFormData.left = new FormAttachment((column == 0) ? 25 : 75);
+		textFormData.width = NUMBER_WIDTH;
+
+		unitFormData.top = new FormAttachment(text, 0, SWT.CENTER);
+		unitFormData.left = new FormAttachment(text, FieldUtil.UNIT_GAP, SWT.RIGHT); // etwas Abstand zw. NumberField und Unit
+		unitFormData.right = new FormAttachment((column == 0) ? 50 : 100);
+
+		decimals = decimals == null ? 0 : decimals;
+		Double maximum = field.getMaximumValue();
+		maximum = maximum == null ? Double.MAX_VALUE : maximum;
+		Double minimum = field.getMinimumValue();
+		minimum = minimum == null ? Double.MIN_VALUE : minimum;
+		text.setData(TRANSLATE_LOCALE, locale);
+		text.setData(FIELD_DECIMALS, decimals);
+		text.setData(FIELD_MAX_VALUE, maximum);
+		text.setData(FIELD_MIN_VALUE, minimum);
+		text.setData(Constants.CONTROL_FIELD, field);
+		text.setLayoutData(textFormData);
+
+		text.setData(CssData.CSSDATA_KEY, new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
+				field.isFillToRight() || field.isFillHorizontal()));
+
+		unit.setData(TRANSLATE_PROPERTY, unitText);
+		unit.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "DescriptionLabel");
+		unit.setLayoutData(unitFormData);
+
+		return text;
+	}
+
+	/**
+	 * Diese Methode gibt das für das OS passende Control für das TextFeld zurück.
+	 * 
+	 * @param composite
+	 * @param contentProvider
+	 * @param locale
+	 * @param field
+	 * @return
+	 */
+	private static Control getControlForOS(Composite composite, TextAssistContentProvider contentProvider, Locale locale, MNumberField field) {
 		Control text;
 		if (OSUtil.isLinux()) {
 			Text text2 = new Text(composite, SWT.BORDER);
@@ -99,18 +153,17 @@ public class NumberField {
 					tooltip.setAutoHide(true);
 				}
 			});
+
 			text2.addModifyListener(e -> {
-				try {
-					if (!tooltip.getAutoHide()) {
-						List<String> values = contentProvider.getContent(((Text) e.widget).getText());
-						if (!values.isEmpty()) {
-							tooltip.setText(values.get(0));
-							tooltip.setVisible(true);
-						}
-					} else {
-						tooltip.setText("");
+				if (!tooltip.getAutoHide()) {
+					List<String> values = contentProvider.getContent(((Text) e.widget).getText());
+					if (!values.isEmpty()) {
+						tooltip.setText(values.get(0));
+						tooltip.setVisible(true);
 					}
-				} catch (NullPointerException ex) {}
+				} else {
+					tooltip.setText("");
+				}
 			});
 		} else {
 			TextAssist text2 = new TextAssist(composite, SWT.BORDER, contentProvider);
@@ -133,43 +186,6 @@ public class NumberField {
 				}
 			});
 		}
-		NumberValueAccessor numberValueAccessor = new NumberValueAccessor(field, text);
-
-		// ValueAccessor in den Context injecten, damit IStylingEngine über @Inject verfügbar ist (in AbstractValueAccessor)
-		IEclipseContext context = perspective.getContext();
-		ContextInjectionFactory.inject(numberValueAccessor, context);
-		field.setValueAccessor(numberValueAccessor);
-
-		FieldLabel.layout(label, text, row, column, field.getNumberRowsSpanned());
-
-		textFormData.top = new FormAttachment(composite, MARGIN_TOP + row * COLUMN_HEIGHT);
-		textFormData.left = new FormAttachment((column == 0) ? 25 : 75);
-		textFormData.width = NUMBER_WIDTH;
-
-		unitFormData.top = new FormAttachment(text, 0, SWT.CENTER);
-		unitFormData.left = new FormAttachment(text, FieldUtil.UNIT_GAP, SWT.RIGHT); // etwas Abstand zw. NumberField und Unit
-		unitFormData.right = new FormAttachment((column == 0) ? 50 : 100);
-
-		Integer decimals = field.getDecimals();
-		decimals = decimals == null ? 0 : decimals;
-		Double maximum = field.getMaximumValue();
-		maximum = maximum == null ? Double.MAX_VALUE : maximum;
-		Double minimum = field.getMinimumValue();
-		minimum = minimum == null ? Double.MIN_VALUE : minimum;
-		text.setData(TRANSLATE_LOCALE, locale);
-		text.setData(FIELD_DECIMALS, decimals);
-		text.setData(FIELD_MAX_VALUE, maximum);
-		text.setData(FIELD_MIN_VALUE, minimum);
-		text.setData(Constants.CONTROL_FIELD, field);
-		text.setLayoutData(textFormData);
-
-		text.setData(CssData.CSSDATA_KEY, new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
-				field.isFillToRight() || field.isFillHorizontal()));
-
-		unit.setData(TRANSLATE_PROPERTY, unitText);
-		unit.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY, "DescriptionLabel");
-		unit.setLayoutData(unitFormData);
-
 		return text;
 	}
 
