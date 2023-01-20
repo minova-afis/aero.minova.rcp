@@ -110,7 +110,6 @@ public class NumberField {
 		maximum = maximum == null ? Double.MAX_VALUE : maximum;
 		Double minimum = field.getMinimumValue();
 		minimum = minimum == null ? Double.MIN_VALUE : minimum;
-		text.setOrientation(SWT.RIGHT_TO_LEFT);
 		text.setData(TRANSLATE_LOCALE, locale);
 		text.setData(FIELD_DECIMALS, decimals);
 		text.setData(FIELD_MAX_VALUE, maximum);
@@ -140,7 +139,7 @@ public class NumberField {
 	public static Control getControlForOS(Composite composite, TextAssistContentProvider contentProvider, Locale locale, MField field) {
 		Control text;
 		if (OSUtil.isLinux()) {
-			Text text2 = new Text(composite, SWT.BORDER);
+			Text text2 = new Text(composite, SWT.BORDER | SWT.RIGHT);
 			text = text2;
 			ToolTip tooltip = new ToolTip(text2.getShell(), SWT.ICON_INFORMATION);
 			text2.addFocusListener(new FocusAdapter() {
@@ -168,7 +167,7 @@ public class NumberField {
 				}
 			});
 		} else {
-			TextAssist text2 = new TextAssist(composite, SWT.BORDER, contentProvider);
+			TextAssist text2 = new TextAssist(composite, SWT.BORDER | SWT.RIGHT, contentProvider);
 			text = text2;
 
 			text2.setNumberOfLines(1);
