@@ -135,6 +135,7 @@ public class QuantityField {
 		text.setData(FIELD_MIN_VALUE, minimum);
 		text.setData(Constants.CONTROL_FIELD, field);
 		text.setLayoutData(textFormData);
+		NumberFieldUtil.setMessage(text);
 
 		text.setData(CssData.CSSDATA_KEY, new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
 				field.isFillToRight() || field.isFillHorizontal()));

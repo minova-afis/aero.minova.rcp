@@ -116,6 +116,7 @@ public class NumberField {
 		text.setData(FIELD_MIN_VALUE, minimum);
 		text.setData(Constants.CONTROL_FIELD, field);
 		text.setLayoutData(textFormData);
+		NumberFieldUtil.setMessage(text);
 
 		text.setData(CssData.CSSDATA_KEY, new CssData(CssType.NUMBER_FIELD, column + 1, row, field.getNumberColumnsSpanned(), field.getNumberRowsSpanned(),
 				field.isFillToRight() || field.isFillHorizontal()));
@@ -140,6 +141,7 @@ public class NumberField {
 		Control text;
 		if (OSUtil.isLinux()) {
 			Text text2 = new Text(composite, SWT.BORDER | SWT.RIGHT);
+			text2.setMessage(FIELD_MAX_VALUE);
 			text = text2;
 			ToolTip tooltip = new ToolTip(text2.getShell(), SWT.ICON_INFORMATION);
 			text2.addFocusListener(new FocusAdapter() {
@@ -169,7 +171,7 @@ public class NumberField {
 		} else {
 			TextAssist text2 = new TextAssist(composite, SWT.BORDER | SWT.RIGHT, contentProvider);
 			text = text2;
-
+			
 			text2.setNumberOfLines(1);
 			text2.setData(TRANSLATE_LOCALE, locale);
 			text2.addFocusListener(new FocusAdapter() {
@@ -187,6 +189,7 @@ public class NumberField {
 				}
 			});
 		}
+		
 		return text;
 	}
 

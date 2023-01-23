@@ -3,6 +3,8 @@ package aero.minova.rcp.rcp.fields;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 public class NumberFieldUtil {
@@ -20,10 +22,10 @@ public class NumberFieldUtil {
 	 * 
 	 * @param text
 	 */
-	public static void setMessage(Text text) {
-		int decimals = (int) text.getData(FieldUtil.FIELD_DECIMALS);
-		double maximum = (double) text.getData(FieldUtil.FIELD_MAX_VALUE);
-		Locale locale = (Locale) text.getData(FieldUtil.TRANSLATE_LOCALE);
+	public static void setMessage(Control textControl) {
+		int decimals = (int) textControl.getData(FieldUtil.FIELD_DECIMALS);
+		double maximum = (double) textControl.getData(FieldUtil.FIELD_MAX_VALUE);
+		Locale locale = (Locale) textControl.getData(FieldUtil.TRANSLATE_LOCALE);
 
 		int integer = 0;
 		if (maximum >= Float.MAX_VALUE) {
@@ -41,6 +43,11 @@ public class NumberFieldUtil {
 		numberFormat.setMinimumFractionDigits(decimals);
 		numberFormat.setMaximumIntegerDigits(integer);
 		numberFormat.setMinimumIntegerDigits(integer);
-		text.setMessage(numberFormat.format(0.0d));
+		if (textControl instanceof TextAssist) {
+			((TextAssist) textControl).setMessage(numberFormat.format(0.0d));
+		} else {
+			((Text) textControl).setMessage(numberFormat.format(0.0d));
+		}
+
 	}
 }
