@@ -376,17 +376,20 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	private List<MField> setFieldsFromTable(String opName, Table table) {
 		List<MField> checkedFields = new ArrayList<>();
-		for (int i = 0; i < table.getColumnCount(); i++) {
-			String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
-			MField f = mDetail.getField(name);
-			if (f != null) {
-				checkedFields.add(f);
-				if (f instanceof MQuantityField) {
-					QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
-							table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue());
-					table.setValue(i, 0, value);
+
+		if (table != null) {
+			for (int i = 0; i < table.getColumnCount(); i++) {
+				String name = (opName == null ? "" : opName + ".") + table.getColumnName(i);
+				MField f = mDetail.getField(name);
+				if (f != null) {
+					checkedFields.add(f);
+					if (f instanceof MQuantityField) {
+						QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
+								table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue());
+						table.setValue(i, 0, value);
+					}
+					f.setValue(table.getValue(i, 0), false);
 				}
-				f.setValue(table.getValue(i, 0), false);
 			}
 		}
 

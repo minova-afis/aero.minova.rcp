@@ -30,6 +30,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - GitHub Workflows auf Java 17 geupgraded
 - Java Version in den MANIFEST.MFs auf 17 aktualisiert
 
+### Bugfixes
+- Nullpointer bei fehlerhaften Anfragen verhindern
+
 ## [12.6.0] - 09.01.2023
 
 ### Neu
