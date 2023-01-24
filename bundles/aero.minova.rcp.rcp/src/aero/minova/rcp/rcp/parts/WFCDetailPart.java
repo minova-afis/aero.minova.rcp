@@ -1107,7 +1107,7 @@ public class WFCDetailPart extends WFCFormPart {
 		if (field instanceof MBooleanField) {
 			BooleanField.create(composite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MNumberField) {
-			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective);
+			NumberField.create(composite, (MNumberField) field, row, column, locale, mPerspective, translationService);
 		} else if (field instanceof MDateTimeField) {
 			DateTimeField.create(composite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortDateField) {
@@ -1125,7 +1125,7 @@ public class WFCDetailPart extends WFCFormPart {
 		} else if (field instanceof MPeriodField) {
 			PeriodField.create(composite, field, row, locale, mPerspective);
 		} else if (field instanceof MQuantityField) {
-			QuantityField.create(composite, (MQuantityField)field, row, column, locale, mPerspective, translationService);
+			QuantityField.create(composite, (MQuantityField) field, row, column, locale, mPerspective, translationService);
 		}
 	}
 
