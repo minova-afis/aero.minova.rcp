@@ -137,16 +137,19 @@ public class DirtyFlagUtil implements ValueChangeListener, GridChangeListener {
 	private boolean checkFieldsWithTable(Table t, Form f) {
 		String fieldPrefix = f == form ? "" : f.getDetail().getProcedureSuffix() + "."; // OP-Felder haben OP-Namen als Prefix
 		List<MField> checkedFields = new ArrayList<>();
-		for (int i = 0; i < t.getColumnCount(); i++) {
-			MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
-			checkedFields.add(c);
-			if (c == null) {
-				continue;
-			}
 
-			Value sV = t.getRows().get(0).getValue(i);
-			if (!checkFieldWithValue(c, sV)) {
-				return true;
+		if (t != null) {
+			for (int i = 0; i < t.getColumnCount(); i++) {
+				MField c = mDetail.getField(fieldPrefix + t.getColumnName(i));
+				checkedFields.add(c);
+				if (c == null) {
+					continue;
+				}
+
+				Value sV = t.getRows().get(0).getValue(i);
+				if (!checkFieldWithValue(c, sV)) {
+					return true;
+				}
 			}
 		}
 
