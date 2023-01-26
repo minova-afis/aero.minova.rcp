@@ -31,6 +31,9 @@
     <elements xsi:type="commands:Handler" xmi:id="_ciLBC7bdEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handler.selectdetailpart" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.SelectDetailPart" command="_laMxxbbdEeuZF8ZS2_h9rA">
       <persistedState key="persistState" value="false"/>
     </elements>
+    <elements xsi:type="commands:Handler" xmi:id="_XC1jIJy3Ee2MhuNDMqZCVQ" elementId="aero.minova.rcp.rcp.handler.loadfrommatchcode" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.LoadFromMatchcode" command="_J23REJy3Ee2MhuNDMqZCVQ">
+      <persistedState key="persistState" value="false"/>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_laMxoLbdEeuZF8ZS2_h9rA" featurename="commands" parentElementId="xpath:/">
     <elements xsi:type="commands:Command" xmi:id="_laMxobbdEeuZF8ZS2_h9rA" elementId="org.eclipse.ui.file.exit" commandName="exitCommand">
@@ -124,6 +127,7 @@
       <persistedState key="persistState" value="false"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="__iku8L_AEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.command.traverseenter" commandName="Traverse Enter"/>
+    <elements xsi:type="commands:Command" xmi:id="_J23REJy3Ee2MhuNDMqZCVQ" elementId="aero.minova.rcp.rcp.command.loadfrommatchcode" commandName="Load From Matchcode"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Le0doLbxEeuZF8ZS2_h9rA" featurename="trimBars" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="basic:TrimBar" xmi:id="_Le0dobbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.trimbar.top"/>
@@ -148,6 +152,7 @@
     <elements xsi:type="commands:KeyBinding" xmi:id="_1jziabbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.keybinding.selectdetailpart" keySequence="F6" command="_laMxxbbdEeuZF8ZS2_h9rA">
       <tags>type:user</tags>
     </elements>
+    <elements xsi:type="commands:KeyBinding" xmi:id="_QC7xwJy3Ee2MhuNDMqZCVQ" elementId="aero.minova.rcp.rcp.keybinding.loadfrommatchcode" keySequence="F3" command="_J23REJy3Ee2MhuNDMqZCVQ"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_6zWJYLbxEeuZF8ZS2_h9rA" featurename="snippets" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="advanced:Perspective" xmi:id="_AjQSgLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.perspective.main" selectedElement="_CeFngLbyEeuZF8ZS2_h9rA" label="Snippet">
