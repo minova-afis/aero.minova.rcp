@@ -42,3 +42,4 @@ hs_err_pid*
 .polyglot..META-INF_MANIFEST.MF
 .polyglot.META-INF
 .polyglot.category.xml
+**/.tycho-consumer-pom.xml
