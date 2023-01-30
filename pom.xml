@@ -16,13 +16,9 @@
 
     <properties>
         <tycho.version>3.0.1</tycho.version>
-		<java.version>17</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-
-        <sonar.coverage.jacoco.xmlReportPaths>
-            ${project.basedir}/report-aggregate/target/site/jacoco-aggregate/jacoco.xml
-        </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <build>
@@ -53,9 +49,9 @@
                 <extensions>true</extensions>
             </plugin>
             <plugin>
-                  <groupId>org.eclipse.tycho</groupId>
-                  <artifactId>tycho-versions-plugin</artifactId>
-                  <version>${tycho.version}</version>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-versions-plugin</artifactId>
+                <version>${tycho.version}</version>
             </plugin>
             <!--Enable the replacement of the SNAPSHOT version in the final product configuration -->
             <plugin>
@@ -143,6 +139,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -165,7 +173,6 @@
         <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.rcp.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-
 
     <modules>
         <module>bundles</module>
