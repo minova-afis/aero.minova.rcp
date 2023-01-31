@@ -43,7 +43,6 @@ public class LoadFromMatchcode {
 	@Inject
 	private IDataFormService dataFormService;
 
-
 	@Execute
 	public void execute(MPerspective mPerspective) throws InterruptedException, ExecutionException {
 		MField field = null;
@@ -69,7 +68,7 @@ public class LoadFromMatchcode {
 			}
 		}
 
-		if (field != null) {
+		if (field != null && field.getValue() != null) {
 			((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
 
 			// Tabelle für IndexView Aufruf erstellen
