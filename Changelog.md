@@ -14,6 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Neu
+- Mit F3 kann das Detail für den einegegebenen Matchcode geladen
+
+### Bugfixes
+- Mit Leertaste Sektionen aus- und einklappen
+
 ## [12.7.4] - 31.01.2023
 
 ### Änderung
