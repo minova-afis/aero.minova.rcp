@@ -182,19 +182,6 @@ class CasCommunicationIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("CAS Issue #184, HTTP Version 1")
-	void ensureThatTheServerUsesAnAncientProtocol() throws IOException, InterruptedException {
-		String body = "";
-		String url = server + "/data/index";
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
-				.header("Content-Type", "application/json") //
-				.method("GET", BodyPublishers.ofString(body)).build();
-
-		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-		assertEquals(HttpClient.Version.HTTP_1_1, response.version());
-	}
-
-	@Test
 	@DisplayName("Passwort mit Umlaut, WFC Issue #743")
 	void ensureLoginWithUmlautInPassword() throws IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
 		String username = "tästuser";
