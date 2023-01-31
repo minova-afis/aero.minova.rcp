@@ -1,9 +1,13 @@
 package aero.minova.rcp.css.widgets;
 
+import java.awt.event.KeyListener;
+
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
@@ -63,6 +67,23 @@ public class MinovaSection extends Section {
 						}
 					}
 				});
+			}
+		});
+
+		this.imageLink.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+
+				// Aus- /Einklappen bei drücken von Leertaste
+				// Für weitere KeyBindings aus if switch Statement machen!! 
+				if (e.keyCode == SWT.SPACE) {
+					if (!isExpanded()) {
+						setExpanded(true);
+					} else if (MinovaSection.this.getExpandable()) {
+						setExpanded(false);
+					}
+				}
 			}
 		});
 
