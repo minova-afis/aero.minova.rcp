@@ -61,10 +61,10 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public void setMessageText(String message) {
-		if (control instanceof LookupComposite) {
-			((LookupComposite) control).setMessage(message);
-		} else if (control instanceof Text) {
-			((Text) control).setMessage(message);
+		if (control instanceof LookupComposite lc) {
+			lc.setMessage(message);
+		} else if (control instanceof Text t) {
+			t.setMessage(message);
 		}
 	}
 
@@ -74,14 +74,14 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 			editable = false;
 		}
 
-		if (control instanceof LookupComposite) {
-			((LookupComposite) control).setEditable(editable);
-		} else if (control instanceof Text) {
-			((Text) control).setEditable(editable);
-		} else if (control instanceof TextAssist) {
-			((TextAssist) control).setEditable(editable);
-		} else if (control instanceof Button) {
-			((Button) control).setEnabled(editable);
+		if (control instanceof LookupComposite lc) {
+			lc.setEditable(editable);
+		} else if (control instanceof Text t) {
+			t.setEditable(editable);
+		} else if (control instanceof TextAssist ta) {
+			ta.setEditable(editable);
+		} else if (control instanceof Button b) {
+			b.setEnabled(editable);
 		}
 	}
 
