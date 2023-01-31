@@ -63,20 +63,21 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			return;
 		}
 
+		LookupComposite lc = (LookupComposite) control;
+
 		if (value == null) {
-			((LookupComposite) control).getDescription().setText("");
-			((LookupComposite) control).setText("");
-			if (((LookupComposite) control).getEditable()) {
-				((LookupComposite) control).setMessage("...");
+			lc.getDescription().setText("");
+			lc.setText("");
+			if (lc.getEditable()) {
+				lc.setMessage("...");
 			}
 			return;
 		}
-		if (value instanceof LookupValue) {
-			LookupValue lv = (LookupValue) value;
-			((LookupComposite) control).getContentProvider().translateLookup(lv);
-			((LookupComposite) control).getDescription().setText(lv.description);
-			((LookupComposite) control).setText(lv.keyText);
-			((LookupComposite) control).setMessage("...");
+		if (value instanceof LookupValue lv) {
+			lc.getContentProvider().translateLookup(lv);
+			lc.getDescription().setText(lv.description);
+			lc.setText(lv.keyText);
+			lc.setMessage("...");
 		} else {
 			Integer keyLong = null;
 			String keyText = null;
@@ -109,18 +110,15 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 
 		// Zunächst wird geprüft, ob der FocusListener aktiviert wurde, während keine
 		// Optionen vorlagen oder der DisplayValue neu gesetzt wird
-		if (field.getValue() == getDisplayValue()) {
-			String displayText = ((LookupComposite) control).getText();
+		if (field.getValue() == getDisplayValue() && control instanceof LookupComposite lc) {
+			String displayText = lc.getText();
 			if (("").equals(displayText)) {
-				if (((LookupComposite) control).getEditable()) {
-					((LookupComposite) control).setMessage("");
+				if (lc.getEditable()) {
+					lc.setMessage("");
 				}
 				field.setValue(null, false);
-			} else {
-				LookupValue value = (LookupValue) field.getValue();
-				if (value != null && !displayText.equals(value.keyText)) {
-					field.setValue(null, false);
-				}
+			} else if (field.getValue() instanceof LookupValue value && !displayText.equals(value.keyText)) {
+				field.setValue(null, false);
 			}
 		}
 	}
