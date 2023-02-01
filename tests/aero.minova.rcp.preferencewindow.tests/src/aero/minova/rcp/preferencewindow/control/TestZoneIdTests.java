@@ -1,39 +1,37 @@
 package aero.minova.rcp.preferencewindow.control;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.prefs.Preferences;
 
-public class TestZoneIdTests {
+class TestZoneIdTests {
 
-	public static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
+	static final String PREFERENCES_NODE = "aero.minova.rcp.preferencewindow";
 	Preferences preferences = InstanceScope.INSTANCE.getNode(PREFERENCES_NODE);
-	
 
 	@Test
-	public void testNotNull() {
+	void testNotNull() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);
 		assertNotNull(zones);
 	}
 
 	@Test
-	public void testGetIdENGLISH() {
+	void testGetIdENGLISH() {
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.US);
 		assertNotNull(CustomTimeZone.getId(zones, "Central European Time", Locale.US));
 		assertEquals("Europe/Monaco", CustomTimeZone.getId(zones, "Central European Time", Locale.US).toString());
 	}
 
 	@Test
-	public void testGetTimeZoneId() {
+	void testGetTimeZoneId() {
 		Object value = "Ulyanovsk Time";
 		Locale l = Locale.getDefault(Category.DISPLAY);
 		Map<String, ZoneId> zones = CustomTimeZone.getZones(Locale.GERMAN);

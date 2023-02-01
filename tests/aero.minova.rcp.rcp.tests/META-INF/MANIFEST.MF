@@ -7,4 +7,4 @@ Fragment-Host: aero.minova.rcp.rcp;bundle-version="1.2.0"
 Automatic-Module-Name: aero.minova.rcp.rcp.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.junit.jupiter.api;bundle-version="5.7.1",
- org.junit;bundle-version="4.13.0"
+ org.junit.jupiter.params;bundle-version="5.8.1"
