@@ -5,7 +5,7 @@ Bundle-SymbolicName: aero.minova.rcp.model.tests
 Bundle-Version: 12.7.4.qualifier
 Automatic-Module-Name: aero.minova.rcp.model.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Require-Bundle: org.junit,
+Require-Bundle: 
  aero.minova.rcp.model,
  com.google.gson,
  org.junit.jupiter.api

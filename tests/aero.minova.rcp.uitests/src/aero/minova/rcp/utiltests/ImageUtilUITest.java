@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import aero.minova.rcp.dataservice.ImageUtil;
@@ -19,7 +19,7 @@ class ImageUtilUITest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void testGetImageDescriptorFromImagesBundle() {
 
 		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptor("Book.Command", false);
@@ -28,7 +28,7 @@ class ImageUtilUITest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	void testGetToolBarImageDescriptorFromImagesBundle() {
 		ImageDescriptor imageDescriptorFromImagesBundle = ImageUtil.getImageDescriptor("Book.Command", true);
 		assertEquals(24, imageDescriptorFromImagesBundle.getImageData(100).width);

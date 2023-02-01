@@ -6,5 +6,5 @@ Bundle-Version: 12.7.4.qualifier
 Automatic-Module-Name: aero.minova.rcp.preferencewindow.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: aero.minova.rcp.preferencewindow;bundle-version="1.0.0",
- org.junit,
- org.eclipse.equinox.preferences
+ org.eclipse.equinox.preferences,
+ org.junit.jupiter.api
