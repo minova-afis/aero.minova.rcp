@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>aero.minova.rcp.bundles</artifactId>
-	<packaging>pom</packaging>
-	<name>[mvn] Bundles</name>
 
 	<parent>
 		<groupId>aero.minova.rcp</groupId>
 		<artifactId>aero.minova.rcp.root</artifactId>
 		<version>12.7.3-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
+
+	<artifactId>aero.minova.rcp.bundles</artifactId>
+	<packaging>pom</packaging>
+	<name>[mvn] Bundles</name>
 
 	<modules>
 		<module>aero.minova.rcp.css</module>
@@ -30,6 +30,7 @@
 		<module>aero.minova.rcp.widgets</module>
 		<module>jakarta.xml.bind-api</module>
 	</modules>
+
 	<build>
 		<pluginManagement>
 			<plugins>

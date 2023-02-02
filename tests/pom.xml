@@ -1,15 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>aero.minova.rcp.tests</artifactId>
-    <packaging>pom</packaging>
 
     <parent>
         <groupId>aero.minova.rcp</groupId>
         <artifactId>aero.minova.rcp.root</artifactId>
         <version>12.7.3-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <artifactId>aero.minova.rcp.tests</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!-- This will be set by Jacoco prepare-agent goal -->
+        <additionalTestArgLine>${tycho.testArgLine}</additionalTestArgLine>
+
+        <!-- Workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=397015 -->
+        <sonar.sources></sonar.sources>
+        <sonar.tests>src</sonar.tests>
+    </properties>
 
     <modules>
 <!--        <module>aero.minova.rcp.model.tests</module>-->
@@ -19,14 +29,37 @@
 <!--		<module>aero.minova.rcp.uitests</module>-->
     </modules>
 
-    <dependencies>
-        <dependency>
-            <!--  must be on the classpath test coverage  -->
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.agent</artifactId>
-            <classifier>runtime</classifier>
-            <version>0.8.8</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/plugin1/Main.class</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-surefire-plugin</artifactId>
+                <version>${tycho.version}</version>
+                <configuration>
+                    <!-- additionalTestArgLine is set in the parent project with the
+                      Jacoco agent when the jacoco profile is active (and it will be empty when
+                      jacoco profile is not active). This way, you can customize argLine without
+                      overwriting the jacoco agent set by jacoco:prepare-agent. -->
+                    <argLine>${additionalTestArgLine} -DbuildingWithTycho=true</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

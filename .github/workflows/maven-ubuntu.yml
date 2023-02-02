@@ -33,32 +33,22 @@ jobs:
 
       - run: sudo apt-get install xvfb
 
-      - name: Maven build
+      - name: Maven build and SonarQube
         run: |
-          mvn --batch-mode package \
+          mvn --batch-mode --no-transfer-progress \
             -P repo-github -P all-tests \
+            clean install \
+            dependency-check:aggregate \
+            sonar:sonar \
             -Dusername=$GITHUB_ACCESS_TOKEN \
-            -DAWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-            -DAWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
             --file pom.xml \
             --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-
-      - name: SonarQube scan
-        run: |
-          mvn --batch-mode --no-transfer-progress \
-            dependency-check:aggregate \
-            sonar:sonar \
-            -P repo-github -P all-tests \
-            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
-            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-            --settings .github/settings.xml
-        env:
-          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
