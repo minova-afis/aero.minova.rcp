@@ -12,22 +12,6 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.rcp.tests</artifactId>
-    <version>12.7.3-SNAPSHOT</version>
     <packaging>eclipse-test-plugin</packaging>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-surefire-plugin</artifactId>
-                <version>${tycho.version}</version>
-                <configuration>
-                    <excludes>
-                        <!-- Tests trying to access the server-->
-                        <exclude>DetailUtilTests</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
