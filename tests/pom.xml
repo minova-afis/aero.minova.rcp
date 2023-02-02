@@ -9,6 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <groupId>aero.minova.rcp</groupId>
     <artifactId>aero.minova.rcp.tests</artifactId>
     <packaging>pom</packaging>
 
