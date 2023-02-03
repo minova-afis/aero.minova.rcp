@@ -38,8 +38,6 @@ jobs:
           key: ${{ runner.os }}-sonar
 
       - run: |
-          sudo apt-get update
-          sudo apt-get upgrade
           sudo apt-get install xvfb
 
       - name: Maven build and SonarQube
