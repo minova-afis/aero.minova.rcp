@@ -27,7 +27,7 @@
         <module>aero.minova.rcp.rcp.tests</module>
         <module>aero.minova.rcp.preferencewindow.tests</module>
         <module>aero.minova.rcp.xml.tests</module>
-<!--		<module>aero.minova.rcp.uitests</module>-->
+		<module>aero.minova.rcp.uitests</module>
     </modules>
 
     <build>
