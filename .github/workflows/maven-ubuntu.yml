@@ -31,6 +31,12 @@ jobs:
           java-package: 'jdk'
           cache: 'maven'
 
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
       - run: sudo apt-get install xvfb
 
       - name: Maven build and SonarQube
