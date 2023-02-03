@@ -41,17 +41,19 @@ jobs:
           sudo apt-get install xvfb
 
       - name: Maven build and SonarQube
-        run: |
-          mvn --batch-mode --no-transfer-progress \
-            -P repo-github -P all-tests \
-            clean install \
-            dependency-check:aggregate \
-            sonar:sonar \
-            -Dusername=$GITHUB_ACCESS_TOKEN \
-            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
-            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-            --file pom.xml \
-            --settings .github/settings.xml
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: |
+            mvn --batch-mode --no-transfer-progress \
+              -P repo-github -P all-tests \
+              clean install \
+              dependency-check:aggregate \
+              sonar:sonar \
+              -Dusername=$GITHUB_ACCESS_TOKEN \
+              -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+              -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
+              --file pom.xml \
+              --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
