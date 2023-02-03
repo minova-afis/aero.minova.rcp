@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DISPLAY: :0
 
     steps:
       - name: Get branch name
@@ -37,22 +39,25 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
-      - run: |
-          sudo apt-get install xvfb
+      - name: Setup xvfb (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
+          # start xvfb in the background
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
       - name: Maven build and SonarQube
         run: |
-          xvfb-run --auto-servernum \
-            mvn --batch-mode --no-transfer-progress \
-              -P repo-github -P all-tests \
-              clean install \
-              dependency-check:aggregate \
-              sonar:sonar \
-              -Dusername=$GITHUB_ACCESS_TOKEN \
-              -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
-              -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-              --file pom.xml \
-              --settings .github/settings.xml
+          mvn --batch-mode --no-transfer-progress \
+            -P repo-github -P all-tests \
+            clean install \
+            dependency-check:aggregate \
+            sonar:sonar \
+            -Dusername=$GITHUB_ACCESS_TOKEN \
+            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
+            --file pom.xml \
+            --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
