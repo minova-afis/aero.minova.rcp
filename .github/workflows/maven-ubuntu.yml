@@ -41,9 +41,8 @@ jobs:
           sudo apt-get install xvfb
 
       - name: Maven build and SonarQube
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: |
+        run: |
+          xvfb-run --auto-servernum \
             mvn --batch-mode --no-transfer-progress \
               -P repo-github -P all-tests \
               clean install \
