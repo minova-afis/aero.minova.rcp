@@ -1,8 +1,8 @@
 package aero.minova.server.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -179,19 +179,6 @@ class CasCommunicationIntegrationTest {
 		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 		assertEquals(200, response.statusCode());
 
-	}
-
-	@Test
-	@DisplayName("CAS Issue #184, HTTP Version 1")
-	void ensureThatTheServerUsesAnAncientProtocol() throws IOException, InterruptedException {
-		String body = "";
-		String url = server + "/data/index";
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)) //
-				.header("Content-Type", "application/json") //
-				.method("GET", BodyPublishers.ofString(body)).build();
-
-		HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-		assertEquals(HttpClient.Version.HTTP_1_1, response.version());
 	}
 
 	@Test

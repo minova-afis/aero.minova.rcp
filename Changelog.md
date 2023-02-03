@@ -14,12 +14,15 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
-### Neu
+### Änderung
+- Alle Tests von JUnit4 auf JUnit5 umgestellt
+
+## [12.7.4] - 31.01.2023
 
 ### Änderung
 - NumberField überarbeitet. Die Formatierung geschieht im TextAssist und nicht mehr direkt im Feld
 
-## [12.7.0] - 17.01.2023
+## [12.7.0], [12.7.1], [12.7.2], [12.7.3] - 17.01.2023
 **ACHTUNG: Ab diesem Release wird JAVA Version 17 benötigt!**
 
 ### Änderung

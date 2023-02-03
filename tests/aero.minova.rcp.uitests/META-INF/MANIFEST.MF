@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Uitests
 Bundle-SymbolicName: aero.minova.rcp.uitests
-Bundle-Version: 12.7.3.qualifier
+Bundle-Version: 12.7.4.qualifier
 Automatic-Module-Name: aero.minova.rcp.uitests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.swtbot.e4.finder;bundle-version="3.1.0",
@@ -35,7 +35,6 @@ Require-Bundle: org.eclipse.swtbot.e4.finder;bundle-version="3.1.0",
  org.eclipse.swtbot.junit5_x;bundle-version="3.1.0",
  org.junit.jupiter.api;bundle-version="5.7.1",
  org.eclipse.jdt.junit5.runtime;bundle-version="1.0.1300",
- org.junit,
  org.eclipse.equinox.preferences
 Import-Package: org.eclipse.e4.core.contexts,
  org.eclipse.e4.ui.workbench,
