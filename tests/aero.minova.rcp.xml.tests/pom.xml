@@ -3,9 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>aero.minova.rcp</groupId>
-    <artifactId>aero.minova.rcp.xml.tests</artifactId>
-    <packaging>eclipse-test-plugin</packaging>
 
     <parent>
         <groupId>aero.minova.rcp</groupId>
@@ -13,18 +10,10 @@ http://maven.apache.org/maven-v4_0_0.xsd">
         <version>12.7.4-SNAPSHOT</version>
     </parent>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-surefire-plugin</artifactId>
-                <version>${tycho.version}</version>
-                <configuration>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <groupId>aero.minova.rcp</groupId>
+    <artifactId>aero.minova.rcp.xml.tests</artifactId>
+    <packaging>eclipse-test-plugin</packaging>
+
 </project>
 
 

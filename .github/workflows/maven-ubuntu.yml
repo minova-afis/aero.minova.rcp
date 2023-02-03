@@ -13,52 +13,55 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DISPLAY: :0
 
     steps:
       - name: Get branch name
         id: branch-name
-        uses: tj-actions/branch-names@v5.1
+        uses: tj-actions/branch-names@v6.4
 
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-package: 'jdk'
           cache: 'maven'
 
-      - run: sudo apt-get install xvfb
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
 
-      - name: Maven build
+      - name: Setup xvfb (Linux)
+        if: runner.os == 'Linux'
         run: |
-          mvn --batch-mode package \
+          sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
+          # start xvfb in the background
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+      - name: Maven build and SonarQube
+        run: |
+          mvn --batch-mode --no-transfer-progress \
             -P repo-github -P all-tests \
+            clean install \
+            dependency-check:aggregate \
+            sonar:sonar \
             -Dusername=$GITHUB_ACCESS_TOKEN \
-            -DAWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-            -DAWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
             --file pom.xml \
             --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-
-      - name: SonarQube scan
-        run: |
-          mvn --batch-mode --no-transfer-progress \
-            dependency-check:aggregate \
-            sonar:sonar \
-            -P repo-github -P all-tests \
-            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
-            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-            --settings .github/settings.xml
-        env:
-          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
