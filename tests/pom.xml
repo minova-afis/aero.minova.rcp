@@ -5,7 +5,7 @@
     <parent>
         <groupId>aero.minova.rcp</groupId>
         <artifactId>aero.minova.rcp.root</artifactId>
-        <version>12.7.3-SNAPSHOT</version>
+        <version>12.7.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,9 +23,9 @@
     </properties>
 
     <modules>
-<!--        <module>aero.minova.rcp.model.tests</module>-->
+        <module>aero.minova.rcp.model.tests</module>
         <module>aero.minova.rcp.rcp.tests</module>
-<!--        <module>aero.minova.rcp.preferencewindow.tests</module>-->
+        <module>aero.minova.rcp.preferencewindow.tests</module>
         <module>aero.minova.rcp.xml.tests</module>
 		<module>aero.minova.rcp.uitests</module>
     </modules>
