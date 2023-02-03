@@ -50,7 +50,7 @@
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <version>${tycho.version}</version>
                 <configuration>
-                    <argLine>${ui.test.vmargs}</argLine>
+                    <argLine>${additionalTestArgLine} -DbuildingWithTycho=true ${ui.test.vmargs}</argLine>
                     <appArgLine>-nl de -clearPersistedState -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas
                     </appArgLine>
                     <useUIHarness>true</useUIHarness>
