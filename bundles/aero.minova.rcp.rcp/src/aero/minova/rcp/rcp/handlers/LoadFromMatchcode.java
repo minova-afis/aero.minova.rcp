@@ -21,6 +21,7 @@ import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
+import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
 import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MField;
@@ -61,36 +62,33 @@ public class LoadFromMatchcode {
 		partService.activate(part);
 		WFCIndexPart indexPart = (WFCIndexPart) part.getObject();
 
-		// Matchcode Feld oder Feld mit dessen Eigenschaften ermitteln (key-type="user")
+		// Matchcode Feld ermitteln
 		for (MField field2 : detailPart.getDetail().getFields()) {
-			if (field2.isKeyTypeUser() || field2.getName().equals(Constants.TABLE_KEYTEXT)) {
+			if (field2.getName().equals(Constants.TABLE_KEYTEXT)) {
 				field = field2;
 			}
 		}
 
 		if (field != null && field.getValue() != null) {
 			((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
-
-			// Tabelle für IndexView Aufruf erstellen
-			Table t = TableBuilder.newTable(indexViewName) //
-					.withColumn(Constants.TABLE_KEYLONG, DataType.INTEGER)//
-					.withColumn(Constants.TABLE_KEYTEXT, DataType.STRING)//
-					.create();
-			Row row = RowBuilder.newRow() //
-					.withValue(null) //
-					.withValue(field.getValue().getStringValue()) //
-					.create();
-			t.addRow(row);
+			Table table = dataFormService.getTableFromFormIndex(indexPart.getForm());
+			Row row = RowBuilder.newRow().create();
+			for (Column column : table.getColumns()) {
+				if (column.getName().equals(Constants.TABLE_KEYTEXT)) {
+					row.addValue(field.getValue());
+				} else {
+					row.addValue(null);
+				}
+			}
+			table.addRow(row);
 
 			// IndexView aufrufen
-			CompletableFuture<Table> tableFuture = dataService.getTableAsync(t);
-
-			// Tabelle für die Read-Prozedur erstellen
-			Table table = dataFormService.getTableFromFormIndex(indexPart.getForm());
+			Table tableFuture = dataService.getTableAsync(table).get();
+			table.clearRows();
 			Row row2 = RowBuilder.newRow().create();
 			for (Column column : table.getColumns()) {
 				if (column.isKey()) {
-					row2.addValue(tableFuture.get().getValue(column.getName(), 0));
+					row2.addValue(tableFuture.getValue(column.getName(), 0));
 				} else {
 					row2.addValue(null);
 				}
