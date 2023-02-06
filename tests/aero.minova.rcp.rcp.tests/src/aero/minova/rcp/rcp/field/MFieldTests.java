@@ -1,9 +1,10 @@
 package aero.minova.rcp.rcp.field;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MBooleanField;
@@ -11,7 +12,7 @@ import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.form.MNumberField;
 import aero.minova.rcp.model.form.MTextField;
 
-public class MFieldTests {
+class MFieldTests {
 
 	MTextField mTextField;
 	MBooleanField mBooleanField;
@@ -20,37 +21,39 @@ public class MFieldTests {
 
 	// MTestField
 	@Test
-	public void textFieldsetValue() {
+	void textFieldsetValue() {
 		mTextField = new MTextField();
 		String testString = "test";
 		mTextField.setValue(new Value(testString), false);
 		assertEquals(mTextField.getValue().getStringValue(), testString);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void textFieldsetWrongValueType() {
+	@Test
+	void textFieldsetWrongValueType() {
 		textFieldsetValue();
 		Double testDouble = 3.0;
-		mTextField.setValue(new Value(testDouble), false);
+		Value value = new Value(testDouble);
+		assertThrows(IllegalArgumentException.class, () -> mTextField.setValue(value, false));
+
 	}
 
 	@Test
-	public void textFieldsetSameValueAsBefore() {
+	void textFieldsetSameValueAsBefore() {
 		textFieldsetValue();
 		String testString = "test";
 		mTextField.setValue(new Value(testString), false);
-		assertEquals(mTextField.getValue().getStringValue(), testString);
+		assertEquals(testString, mTextField.getValue().getStringValue());
 	}
 
 	@Test
-	public void textFieldsetValueNull() {
+	void textFieldsetValueNull() {
 		textFieldsetValue();
 		mTextField.setValue(null, false);
-		assertEquals(mTextField.getValue(), null);
+		assertEquals(null, mTextField.getValue());
 	}
 
 	@Test
-	public void textFieldetDifferent() {
+	void textFieldetDifferent() {
 		textFieldsetValue();
 		String testString = "othertest";
 		mTextField.setValue(new Value(testString), false);
@@ -59,22 +62,23 @@ public class MFieldTests {
 
 	// MBooleanField
 	@Test
-	public void booleanFieldsetValue() {
+	void booleanFieldsetValue() {
 		mBooleanField = new MBooleanField();
 		Boolean testBoolean = true;
 		mBooleanField.setValue(new Value(testBoolean), false);
 		assertEquals(mBooleanField.getValue().getBooleanValue(), testBoolean);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void booleanFieldsetWrongValueType() {
+	@Test
+	void booleanFieldsetWrongValueType() {
 		booleanFieldsetValue();
 		Double testDouble = 3.0;
-		mBooleanField.setValue(new Value(testDouble), false);
+		Value value = new Value(testDouble);
+		assertThrows(IllegalArgumentException.class, () -> mBooleanField.setValue(value, false));
 	}
 
 	@Test
-	public void booleanFieldsetSameValueAsBefore() {
+	void booleanFieldsetSameValueAsBefore() {
 		booleanFieldsetValue();
 		Boolean testBoolean = true;
 		mBooleanField.setValue(new Value(testBoolean), false);
@@ -85,14 +89,14 @@ public class MFieldTests {
 	/**
 	 * Boolean Felder dürfen keinen null Value haben (kann nicht dargestellt werden)
 	 */
-	public void booleanFieldsetValueNull() {
+	void booleanFieldsetValueNull() {
 		booleanFieldsetValue();
 		mBooleanField.setValue(null, false);
 		assertEquals(new Value(false), mBooleanField.getValue());
 	}
 
 	@Test
-	public void booleanFieldetDifferent() {
+	void booleanFieldetDifferent() {
 		booleanFieldsetValue();
 		Boolean testBoolean = false;
 		mBooleanField.setValue(new Value(testBoolean), false);
@@ -101,22 +105,23 @@ public class MFieldTests {
 
 	// MNumberField
 	@Test
-	public void numberFieldsetValue() {
+	void numberFieldsetValue() {
 		mNumberField = new MNumberField(2);
 		Number testNumber = 1.00;
 		mNumberField.setValue(new Value(testNumber), false);
 		assertEquals(mNumberField.getValue().getDoubleValue(), testNumber);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void numberFieldsetWrongValueType() {
+	@Test
+	void numberFieldsetWrongValueType() {
 		numberFieldsetValue();
 		String testString = "testString";
-		mNumberField.setValue(new Value(testString), false);
+		Value value = new Value(testString);
+		assertThrows(IllegalArgumentException.class, () -> mNumberField.setValue(value, false));
 	}
 
 	@Test
-	public void numberFieldsetSameValueAsBefore() {
+	void numberFieldsetSameValueAsBefore() {
 		numberFieldsetValue();
 		Number testNumber = 1.00;
 		mNumberField.setValue(new Value(testNumber), false);
@@ -124,14 +129,14 @@ public class MFieldTests {
 	}
 
 	@Test
-	public void numberFieldsetValueNull() {
+	void numberFieldsetValueNull() {
 		numberFieldsetValue();
 		mNumberField.setValue(null, false);
-		assertEquals(mNumberField.getValue(), null);
+		assertEquals(null, mNumberField.getValue());
 	}
 
 	@Test
-	public void numberFieldetDifferent() {
+	void numberFieldetDifferent() {
 		numberFieldsetValue();
 		Number testNumber = 2.00;
 		mNumberField.setValue(new Value(testNumber), false);
@@ -141,23 +146,24 @@ public class MFieldTests {
 	// MLookupField
 
 	@Test
-	public void lookupFieldsetValue() {
+	void lookupFieldsetValue() {
 		mLookupField = new MLookupField();
 		Integer testNumber = 1;
 		mLookupField.setValue(new Value(testNumber), false);
 		assertEquals(mLookupField.getValue().getIntegerValue(), testNumber);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	@Ignore("Fails currently")
-	public void lookupFieldsetWrongValueType() {
+	@Test
+	@Disabled("Fails currently")
+	void lookupFieldsetWrongValueType() {
 		lookupFieldsetValue();
 		String testString = "testString";
-		mLookupField.setValue(new Value(testString), false);
+		Value value = new Value(testString);
+		assertThrows(IllegalArgumentException.class, () -> mLookupField.setValue(value, false));
 	}
 
 	@Test
-	public void lookupFieldsetSameValueAsBefore() {
+	void lookupFieldsetSameValueAsBefore() {
 		lookupFieldsetValue();
 		Integer testNumber = 1;
 		mLookupField.setValue(new Value(testNumber), false);
@@ -165,14 +171,14 @@ public class MFieldTests {
 	}
 
 	@Test
-	public void lookupFieldsetValueNull() {
+	void lookupFieldsetValueNull() {
 		lookupFieldsetValue();
 		mLookupField.setValue(null, false);
-		assertEquals(mLookupField.getValue(), null);
+		assertEquals(null, mLookupField.getValue());
 	}
 
 	@Test
-	public void lookupFieldetDifferent() {
+	void lookupFieldetDifferent() {
 		lookupFieldsetValue();
 		Integer testNumber = 2;
 		mLookupField.setValue(new Value(testNumber), false);

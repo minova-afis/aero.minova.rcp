@@ -11,15 +11,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.runners.MethodSorters;
 
 import aero.minova.rcp.dataservice.HashService;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class HashFileTest {
 
 	@Test
@@ -44,8 +41,8 @@ class HashFileTest {
 	void ensureThatTheSameFileHasedTwiceHasSameHashCode() throws IOException {
 		// Used https://passwordsgenerator.net/md5-hash-generator/ to calculate the
 		// hashcode with lower case flag set
-		String hashedOnce= HashService.hashFile(Path.of("resources", "some.txt").toFile());
-		String hashedTwice= HashService.hashFile(Path.of("resources", "some.txt").toFile());
+		String hashedOnce = HashService.hashFile(Path.of("resources", "some.txt").toFile());
+		String hashedTwice = HashService.hashFile(Path.of("resources", "some.txt").toFile());
 		assertEquals(hashedOnce, hashedTwice);
 	}
 
@@ -96,21 +93,20 @@ class HashFileTest {
 
 		assertTrue(Files.exists(file1), "File should exist");
 		String hashDirectory1 = HashService.hashDirectory(tempDir);
-		
+
 		Path file2 = tempDir2.resolve("myfile.txt");
 
 		Files.write(file2, input);
 		assertTrue(Files.exists(file2), "File should exist");
-		
+
 		String hashDirectory2 = HashService.hashDirectory(tempDir2);
 		assertEquals(hashDirectory1, hashDirectory2);
-		
+
 	}
 
 	@Test
 	@DisplayName("Ensure that two directories with different content have different hash")
-	void hashDynamicDirectoryWhichHaveFileWithSameContentButDifferentName(@TempDir Path tempDir, @TempDir Path tempDir2)
-			throws IOException {
+	void hashDynamicDirectoryWhichHaveFileWithSameContentButDifferentName(@TempDir Path tempDir, @TempDir Path tempDir2) throws IOException {
 
 		Path file1 = tempDir.resolve("myfile.txt");
 

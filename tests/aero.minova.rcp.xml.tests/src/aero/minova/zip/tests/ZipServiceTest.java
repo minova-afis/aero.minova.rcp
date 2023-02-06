@@ -9,21 +9,17 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.runners.MethodSorters;
 
 import aero.minova.rcp.dataservice.ZipService;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ZipServiceTest {
 
 	@Test
 	@DisplayName("Ensure that we can unzip a zip file")
-	void ensureThatUnzipWorks(@TempDir Path tempDir)
-			throws IOException {
+	void ensureThatUnzipWorks(@TempDir Path tempDir) throws IOException {
 		ZipService.unzipFile(Path.of("resources", "zipped", "i18n.zip1").toFile(), tempDir.toString());
 		Path resolve = tempDir.resolve("i18n");
 		assertTrue(resolve.toFile().exists(), "Extracted i18n Verzeichnis muss existieren");
@@ -35,7 +31,7 @@ class ZipServiceTest {
 	@DisplayName("Ensure that the target folder is deleted before unzip operation")
 	void ensureThatTargetFileIsDeleteBeforeUnzip(@TempDir Path tempDir) throws IOException {
 		// Create new file in target folder
-		Path targetDir= tempDir.resolve("i18n");
+		Path targetDir = tempDir.resolve("i18n");
 		Files.createDirectory(targetDir);
 		Path existingFile = tempDir.resolve("i18n").resolve("existingfile.txt");
 
@@ -45,8 +41,7 @@ class ZipServiceTest {
 //
 //		// Unzip file
 		ZipService.unzipFile(Path.of("resources", "zipped", "i18n.zip1").toFile(), tempDir.toString());
-		assertFalse(Files.exists(existingFile, LinkOption.NOFOLLOW_LINKS),
-				"Zip operation should have delete the existing file");
+		assertFalse(Files.exists(existingFile, LinkOption.NOFOLLOW_LINKS), "Zip operation should have delete the existing file");
 
 	}
 
