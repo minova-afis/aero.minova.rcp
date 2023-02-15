@@ -71,10 +71,4 @@ jobs:
         with:
           name: dependency-check-report.html
           path: target/dependency-check-report.html
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: /**/surefire-reports/*.xml
     
