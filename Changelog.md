@@ -14,11 +14,17 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+
+### Neu
+- Mit F3 kann das Detail für den einegegebenen Matchcode geladen
+
 ### Änderung
 - Alle Tests von JUnit4 auf JUnit5 umgestellt
 
 ### Bugfixes
+- Mit Leertaste Sektionen aus- und einklappen
 - Sonderzeichen in Lookups ermöglichen
+
 
 ## [12.7.4] - 31.01.2023
 

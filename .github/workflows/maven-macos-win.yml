@@ -12,7 +12,7 @@ on:
 
 jobs: 
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
       - name: Get branch name
@@ -36,15 +36,13 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
 
+      - name: Maven version
+        run: |
+          mvn --version
+
       - name: Build with Maven
         run: |
           mvn --batch-mode --no-transfer-progress clean verify -P all-tests --fae --file pom.xml --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v1
-        if: always()
-        with:
-          files: /**/surefire-reports/*.xml

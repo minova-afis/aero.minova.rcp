@@ -71,17 +71,4 @@ jobs:
         with:
           name: dependency-check-report.html
           path: target/dependency-check-report.html
-
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: minova-wfc-linux
-#        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*linux*.zip
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: minova-wfc-mac
-#        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*mac*.zip
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: minova-wfc-win
-#        path: /home/runner/work/aero.minova.rcp/aero.minova.rcp/releng/aero.minova.rcp.product/target/products/*win*.zip
     
