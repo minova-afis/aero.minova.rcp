@@ -37,7 +37,7 @@ public class WildcardMatcher {
 				regex.append(".*");
 				break;
 			default:
-				regex.append(String.valueOf(c));
+				regex.append(Pattern.quote(String.valueOf(c)));
 				break;
 			}
 		}
