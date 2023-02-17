@@ -17,6 +17,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Änderung
 - Alle Tests von JUnit4 auf JUnit5 umgestellt
 
+### Bugfixes
+- Sonderzeichen in Lookups ermöglichen
+
 ## [12.7.4] - 31.01.2023
 
 ### Änderung
