@@ -6,7 +6,7 @@ name: RCP build on Win OS and Mac
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
   workflow_dispatch:
 
