@@ -1,6 +1,7 @@
 package aero.minova.rcp.model;
 
 import java.io.Serializable;
+import java.text.DecimalFormatSymbols;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -8,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 
+import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.TimeUtil;
@@ -107,6 +109,32 @@ public class Value implements Serializable {
 			break;
 		}
 		return returnValue;
+	}
+	
+	public static Value getValueForStringFromDataType(String valueString, DataType type, Locale locale, String timezone) {
+		Value v = null;
+		
+		switch (type) {
+		case STRING:
+			v = new Value(valueString);
+			break;
+		case BOOLEAN:
+			v = new Value(Boolean.valueOf(valueString));
+			break;
+		case DOUBLE:
+		case INTEGER:
+		case BIGDECIMAL:
+			DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+			v = NumberFormatUtil.newValue(valueString, type, dfs);
+			break;
+		case INSTANT:
+			v = new Value(DateTimeUtil.getDateTime(valueString, timezone));
+			break;
+		default:
+			break;
+		}
+		
+		return v;
 	}
 
 	public Value(Object valueNew, DataType dataType) {
