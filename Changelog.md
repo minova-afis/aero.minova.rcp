@@ -24,6 +24,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - Mit Leertaste Sektionen aus- und einklappen
 - Sonderzeichen in Lookups ermöglichen
+- Spaltenreihenfolge (und -breite unter Mac) beim Laden der Selektionskriterien wieder herstellen
 
 
 ## [12.7.4] - 31.01.2023
