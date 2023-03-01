@@ -20,6 +20,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderung
 - Alle Tests von JUnit4 auf JUnit5 umgestellt
+- Nattable Release 2.0.5 verwenden
 
 ### Bugfixes
 - Mit Leertaste Sektionen aus- und einklappen
