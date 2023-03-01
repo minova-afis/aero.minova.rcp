@@ -529,7 +529,6 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		StringBuilder size = new StringBuilder();
 		for (int i : bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder()) {
 			size.append(i + "," + bodyLayerStack.getBodyDataLayer().getColumnWidthByPosition(i) + ";");
-
 		}
 		prefs.put(prefix + "size", size.toString());
 
@@ -566,13 +565,13 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		saveNattable();
 
 		// Inhalt der Suchtabelle wiederherstellen
-		if (this instanceof WFCSearchPart) {
+		if (this instanceof WFCSearchPart searchPart) {
 			String string = prefs.get(form.getIndexView().getSource() + "." + name + ".table", null);
 			if (string != null && !string.isBlank()) {
 				Table prefTable = mjs.json2Table(string, true);
 				getData().getRows().clear();
 				getData().addRowsFromTable(prefTable);
-				((WFCSearchPart) this).updateUserInput();
+				searchPart.updateUserInput();
 			}
 		}
 
@@ -660,8 +659,14 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			if (width < 0) {
 				continue;
 			}
+
+			if (OSUtil.isMac()) {
+				// Unter Mac werden die Spalten sonst kleiner beim Laden
+				width += Math.round(width / 3.03);
+			}
 			bodyLayerStack.getBodyDataLayer().setColumnWidthByPosition(position, width);
 		}
+
 		// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
 		if (bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().size() < order.size()) {
 			ArrayList<Integer> toDelete = new ArrayList<>();
@@ -672,9 +677,9 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			}
 			order.removeAll(toDelete);
 		}
-		bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().removeAll(order);
-		bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().addAll(0, order);
-		bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+
+		bodyLayerStack.getColumnReorderLayer().resetReorder();
+		bodyLayerStack.getColumnReorderLayer().reorderMultipleColumnIndexes(order, 0, true);
 	}
 
 	//////////////////////////////
