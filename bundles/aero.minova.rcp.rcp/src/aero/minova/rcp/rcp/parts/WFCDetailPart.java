@@ -925,7 +925,7 @@ public class WFCDetailPart extends WFCFormPart {
 		List<MField> mFields = new ArrayList<>();
 		for (Field f : grid.getField()) {
 			try {
-				MField mF = ModelToViewModel.convert(f, locale);
+				MField mF = ModelToViewModel.convert(f, locale, timezone);
 				mFields.add(mF);
 			} catch (NullPointerException e) {
 				showErrorMissingSQLIndex(f, grid.getId() + "." + f.getName(), e);
@@ -1033,7 +1033,7 @@ public class WFCDetailPart extends WFCFormPart {
 	public MField createMField(Field field, MSection mSection, String suffix) {
 		String fieldName = suffix + field.getName();
 		try {
-			MField f = ModelToViewModel.convert(field, locale);
+			MField f = ModelToViewModel.convert(field, locale, timezone);
 			f.addValueChangeListener(dirtyFlagUtil);
 			f.setName(fieldName);
 
