@@ -71,6 +71,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.BrowserAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
@@ -125,7 +126,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	public String timezone;
-
+	
 	@Inject
 	DirtyFlagUtil dirtyFlagUtil;
 
@@ -912,6 +913,15 @@ public class WFCDetailCASRequestsUtil {
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 		// Auswahl im Index entfernen
 		broker.send(Constants.BROKER_CLEARSELECTION, perspective);
+	}
+
+	public void setDefaultValues() {
+		for (MField field : mDetail.getFields()) {
+			if (field.getDefaultValueString() != null) {
+				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), CustomLocale.getLocale(), timezone);
+				field.setValue(v, false);
+			}
+		}
 	}
 
 	/**
