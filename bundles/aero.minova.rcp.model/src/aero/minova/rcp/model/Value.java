@@ -110,10 +110,10 @@ public class Value implements Serializable {
 		}
 		return returnValue;
 	}
-	
-	public static Value getValueForStringFromDataType(String valueString, DataType type, Locale locale, String timezone) {
+
+	public static Value getValueForStringFromDataType(String valueString, DataType type, DateTimeType dateTimeType, Locale locale, String timezone) {
 		Value v = null;
-		
+
 		switch (type) {
 		case STRING:
 			v = new Value(valueString);
@@ -121,19 +121,27 @@ public class Value implements Serializable {
 		case BOOLEAN:
 			v = new Value(Boolean.valueOf(valueString));
 			break;
-		case DOUBLE:
-		case INTEGER:
-		case BIGDECIMAL:
+		case DOUBLE, INTEGER, BIGDECIMAL:
 			DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 			v = NumberFormatUtil.newValue(valueString, type, dfs);
 			break;
 		case INSTANT:
-			v = new Value(DateTimeUtil.getDateTime(valueString, timezone));
+			switch (dateTimeType) {
+			case TIME:
+				v = new Value(TimeUtil.getTime(valueString));
+				break;
+			case DATE:
+				v = new Value(DateUtil.getDate(valueString));
+				break;
+			case DATETIME:
+				v = new Value(DateTimeUtil.getDateTime(valueString, timezone));
+				break;
+			}
 			break;
 		default:
 			break;
 		}
-		
+
 		return v;
 	}
 
@@ -231,7 +239,7 @@ public class Value implements Serializable {
 	public Instant getBaseValue() {
 		return type == DataType.PERIOD ? (Instant) value : null;
 	}
-	
+
 	public Number getQuantityValue() {
 		return type == DataType.QUANTITY ? (Number) value : null;
 	}
@@ -240,7 +248,7 @@ public class Value implements Serializable {
 	public String toString() {
 		return "Value [type=" + type + ", value=" + value + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
