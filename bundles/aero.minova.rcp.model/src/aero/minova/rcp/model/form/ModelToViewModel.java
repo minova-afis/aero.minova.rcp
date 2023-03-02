@@ -27,8 +27,6 @@ public class ModelToViewModel {
 		f.setOriginalVisible(field.isVisible());
 		if (field.getDefault() != null) {
 			f.setDefaultValueString(field.getDefault());
-			Value v = Value.getValueForStringFromDataType(f.getDefaultValueString(), f.getDataType(), locale, timezone);
-			f.setValue(v, false);
 		}
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());

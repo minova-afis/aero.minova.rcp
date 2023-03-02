@@ -254,6 +254,7 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		// In XBS gegebene Felder füllen
+		casRequestsUtil.setDefaultValues();
 		casRequestsUtil.setValuesAccordingToXBS();
 	}
 

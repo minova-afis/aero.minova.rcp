@@ -908,6 +908,7 @@ public class WFCDetailCASRequestsUtil {
 
 		// In XBS gegebene Felder wieder füllen
 		setValuesAccordingToXBS();
+		setDefaultValues();
 
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
@@ -918,7 +919,8 @@ public class WFCDetailCASRequestsUtil {
 	public void setDefaultValues() {
 		for (MField field : mDetail.getFields()) {
 			if (field.getDefaultValueString() != null) {
-				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), CustomLocale.getLocale(), timezone);
+				String[] fieldAndOpName = new String[2];
+				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), field.getDateTimeType(), CustomLocale.getLocale(), timezone);
 				field.setValue(v, false);
 			}
 		}
