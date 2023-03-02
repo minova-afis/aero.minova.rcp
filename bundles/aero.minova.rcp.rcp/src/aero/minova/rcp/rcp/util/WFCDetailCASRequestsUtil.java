@@ -922,6 +922,13 @@ public class WFCDetailCASRequestsUtil {
 				String[] fieldAndOpName = new String[2];
 				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), field.getDateTimeType(), CustomLocale.getLocale(), timezone);
 				field.setValue(v, false);
+				if(field.getName().contains(".")) {
+					fieldAndOpName = field.getName().split(".");
+				} else {
+					fieldAndOpName[0] = field.getName();
+					fieldAndOpName[1] = null;
+				}
+				setValueAsCleanForDirtyFlag(v, fieldAndOpName[0], fieldAndOpName[1]);
 			}
 		}
 	}
