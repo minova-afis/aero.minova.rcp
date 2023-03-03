@@ -9,13 +9,12 @@ import aero.minova.rcp.form.model.xsd.TypeParam;
 import aero.minova.rcp.form.model.xsd.Unit;
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.KeyType;
-import aero.minova.rcp.model.Value;
 
 public class ModelToViewModel {
 
 	private ModelToViewModel() {}
 
-	public static MField convert(Field field, Locale locale, String timezone) {
+	public static MField convert(Field field, Locale locale) {
 		MField f = initializeModelField(field, locale);
 
 		f.setName(field.getName());
