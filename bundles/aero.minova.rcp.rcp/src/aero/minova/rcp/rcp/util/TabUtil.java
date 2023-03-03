@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -45,7 +44,7 @@ public class TabUtil {
 		List<Control> tabList = new ArrayList<>();
 		for (Control control : composite.getChildren()) {
 			if (control instanceof NatTable || //
-					((control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text || control instanceof Button)
+					((control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text)
 							&& control.getData(Constants.CONTROL_FIELD) instanceof MField field //
 							&& !field.isReadOnly()//
 							&& field.isVisible())) {
