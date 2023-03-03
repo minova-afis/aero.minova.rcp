@@ -921,16 +921,16 @@ public class WFCDetailCASRequestsUtil {
 	public void setDefaultValues() {
 		for (MField field : mDetail.getFields()) {
 			if (field.getDefaultValueString() != null) {
-				String[] fieldAndOpName = new String[2];
+				String[] opAndFieldName = new String[2];
 				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), field.getDateTimeType(), CustomLocale.getLocale(), timezone);
 				field.setValue(v, false);
 				if(field.getName().contains(".")) {
-					fieldAndOpName = field.getName().split(".");
+					opAndFieldName = field.getName().split(".");
 				} else {
-					fieldAndOpName[0] = field.getName();
-					fieldAndOpName[1] = null;
+					opAndFieldName[0] = null;
+					opAndFieldName[1] = field.getName();
 				}
-				setValueAsCleanForDirtyFlag(v, fieldAndOpName[0], fieldAndOpName[1]);
+				setValueAsCleanForDirtyFlag(v, opAndFieldName[1], opAndFieldName[0]);
 			}
 		}
 	}
