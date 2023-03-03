@@ -252,9 +252,10 @@ public class WFCDetailPart extends WFCFormPart {
 		for (IHelper helper : mDetail.getHelpers()) {
 			helper.setControls(mDetail);
 		}
-
-		// In XBS gegebene Felder füllen
+		// Default Werte aus der Maske in Feldern wieder füllen.
+		// WICHTIG: Zuerst Default Werte setzen und dann die Werte aus der XBS!
 		casRequestsUtil.setDefaultValues();
+		// In XBS gegebene Felder füllen
 		casRequestsUtil.setValuesAccordingToXBS();
 	}
 

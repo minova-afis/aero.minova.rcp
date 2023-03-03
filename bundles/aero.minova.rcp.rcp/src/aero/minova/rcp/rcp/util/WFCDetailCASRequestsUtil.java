@@ -906,9 +906,11 @@ public class WFCDetailCASRequestsUtil {
 			bs.clear();
 		}
 
+		// Default Werte aus der Maske in Feldern wieder füllen.
+		// WICHTIG: Zuerst Default Werte setzen und dann die Werte aus der XBS!
+		setDefaultValues();
 		// In XBS gegebene Felder wieder füllen
 		setValuesAccordingToXBS();
-		setDefaultValues();
 
 		// Revert Button updaten
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
