@@ -46,7 +46,7 @@ public abstract class MField {
 	private boolean readOnly;
 	private boolean originalVisible;
 	private boolean visible;
-	private int tabIndex;
+	private int tabIndex = Integer.MAX_VALUE;
 	private MSection mSection;
 	private String cssClass = Constants.CSS_STANDARD;
 	// Wenn canBeValid = false, dann ist das Feld aufgrund einer Berechnung auf falsch gesetzt

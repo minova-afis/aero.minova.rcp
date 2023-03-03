@@ -1,11 +1,13 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -41,18 +43,30 @@ public class TabUtil {
 	public static void updateTabListOfSectionComposite(Composite composite) {
 
 		List<Control> tabList = new ArrayList<>();
-
-		Control[] compositeChilds = composite.getChildren();
-		for (Control control : compositeChilds) {
-			if (control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text) {
-				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
-				if (!field.isReadOnly()) {
-					tabList.add(control);
-				}
-			} else if (control instanceof NatTable) {
+		for (Control control : composite.getChildren()) {
+			if (control instanceof NatTable || //
+					((control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text || control instanceof Button)
+							&& control.getData(Constants.CONTROL_FIELD) instanceof MField field //
+							&& !field.isReadOnly()//
+							&& field.isVisible())) {
 				tabList.add(control);
 			}
 		}
+
+		tabList.sort((o1, o2) -> {
+			// Haben beide Controls ein MField -> sortieren nach dem Tab-Index
+			if (o1.getData(Constants.CONTROL_FIELD) instanceof MField f1 && o2.getData(Constants.CONTROL_FIELD) instanceof MField f2) {
+				if (f1.getTabIndex() == f2.getTabIndex()) {
+					return 0;
+				} else if (f1.getTabIndex() < f2.getTabIndex()) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+			// Ansonsten Reihenfolge beibehalten
+			return 0;
+		});
 
 		composite.setTabList(tabList.toArray(new Control[0]));
 	}
@@ -65,11 +79,7 @@ public class TabUtil {
 	 * @return nach der Order sortierte TabList
 	 */
 	public static Control[] getSortedSectionTabList(Composite parent) {
-		List<Control> tabList = new ArrayList<>(parent.getChildren().length);
-
-		for (Control section : parent.getChildren()) {
-			tabList.add(section);
-		}
+		List<Control> tabList = Arrays.asList(parent.getChildren());
 
 		Collections.sort(tabList, (f1, f2) -> {
 			int order1 = ((MinovaSectionData) f1.getLayoutData()).getOrder();
