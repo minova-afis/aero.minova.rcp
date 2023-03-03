@@ -225,7 +225,6 @@ public class WFCStatisticDetailPart {
 	public void createStatisticDetail(@UIEventTopic(Constants.BROKER_SELECTSTATISTIC) Row row) {
 		currentRow = row;
 		mDetail.getFields().clear();
-		mSection.getTabList().clear();
 
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node statisticNode = XBSUtil.getNodeWithName(preferences, row.getValue(0).getStringValue());
@@ -368,7 +367,7 @@ public class WFCStatisticDetailPart {
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(clientComposite, field, row, column, mPerspective);
 		} else if (field instanceof MQuantityField) {
-			QuantityField.create(clientComposite, (MQuantityField)field, row, column, locale, mPerspective, translationService);
+			QuantityField.create(clientComposite, (MQuantityField) field, row, column, locale, mPerspective, translationService);
 		}
 	}
 
@@ -401,7 +400,7 @@ public class WFCStatisticDetailPart {
 		for (MField f : mDetail.getFields()) {
 			f.setValue(null, false);
 		}
-		((AbstractValueAccessor) mSection.getTabList().get(0).getValueAccessor()).getControl().setFocus();
+		((AbstractValueAccessor) TabUtil.getMFieldsInTabOrder(parent).get(0).getValueAccessor()).getControl().setFocus();
 	}
 
 	@Inject

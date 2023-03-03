@@ -1,7 +1,6 @@
 package aero.minova.rcp.model.form;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
@@ -70,28 +69,6 @@ public class MSection {
 
 	public void setmDetail(MDetail mDetail) {
 		this.mDetail = mDetail;
-	}
-
-	public List<MField> getTabList() {
-		List<MField> tabList = new ArrayList<>();
-
-		for (MField f : mFields) {
-			if (f.isVisible() && !f.isReadOnly()) {
-				tabList.add(f);
-			}
-		}
-
-		Collections.sort(tabList, (f1, f2) -> {
-			if (f1.getTabIndex() == f2.getTabIndex()) {
-				return 0;
-			} else if (f1.getTabIndex() < f2.getTabIndex()) {
-				return -1;
-			} else {
-				return 1;
-			}
-		});
-
-		return tabList;
 	}
 
 	public void setMFieldList(List<MField> mFields) {

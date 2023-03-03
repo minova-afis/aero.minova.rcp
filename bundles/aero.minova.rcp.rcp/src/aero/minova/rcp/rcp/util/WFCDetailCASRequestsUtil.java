@@ -954,20 +954,19 @@ public class WFCDetailCASRequestsUtil {
 		updateKeytypeUserReadonly();
 	}
 
-	private void focusFirstEmptyField() {
-		for (MSection section : mDetail.getMSectionList()) {
-			for (MField field : section.getTabList()) {
-				if (field.getValue() == null && !field.isReadOnly() && !field.isLabelText()) {
-					((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
-					return;
-				}
+	public void focusFirstEmptyField() {
+		List<MField> list = TabUtil.getMFieldsInTabOrder(wfcDetailPart.getComposite());
+
+		for (MField field : list) {
+			if (field.getValue() == null) {
+				((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
+				return;
 			}
 		}
 
 		// Falls kein leeres Feld gefunden wurde erstes Feld fokusieren
-		List<MField> tabList = mDetail.getMSectionList().get(0).getTabList();
-		if (!tabList.isEmpty()) {
-			((AbstractValueAccessor) tabList.get(0).getValueAccessor()).getControl().setFocus();
+		if (!list.isEmpty()) {
+			((AbstractValueAccessor) list.get(0).getValueAccessor()).getControl().setFocus();
 		}
 	}
 

@@ -126,4 +126,24 @@ public class TabUtil {
 		return tabList.toArray(new Control[0]);
 	}
 
+	/**
+	 * Liefert eine Liste aller MFields in der Tab-Reihenfolge
+	 * 
+	 * @param composite
+	 * @return
+	 */
+	public static List<MField> getMFieldsInTabOrder(Composite composite) {
+		List<MField> fields = new ArrayList<>();
+
+		for (Control child : composite.getChildren()) {
+			if (child.getData(Constants.CONTROL_FIELD) instanceof MField mfield) {
+				fields.add(mfield);
+			}
+			if (child instanceof Composite childCompo) {
+				fields.addAll(getMFieldsInTabOrder(childCompo));
+			}
+		}
+
+		return fields;
+	}
 }
