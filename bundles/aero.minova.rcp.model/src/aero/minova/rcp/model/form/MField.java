@@ -55,6 +55,7 @@ public abstract class MField {
 	private boolean keyTypeUser = false;
 	private boolean labelText;
 	private boolean useResolveParms = false;
+	private String defaultValueString;
 
 	protected MField(DataType dataType) {
 		this.dataType = dataType;
@@ -525,4 +526,13 @@ public abstract class MField {
 	public void setUseResolveParms(boolean useResolveParms) {
 		this.useResolveParms = useResolveParms;
 	}
+
+	public String getDefaultValueString() {
+		return defaultValueString;
+	}
+
+	public void setDefaultValueString(String defaultValueString) {
+		this.defaultValueString = defaultValueString;
+	}
+	
 }
