@@ -123,6 +123,7 @@ import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.util.CustomComparator;
 import aero.minova.rcp.rcp.util.StaticXBSValueUtil;
+import aero.minova.rcp.util.OSUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -834,6 +835,10 @@ public class SectionGrid {
 				if (width < 0) {
 					continue;
 				}
+				if (OSUtil.isMac()) {
+					// Unter Mac werden die Spalten sonst kleiner beim Laden
+					width += Math.round(width / 3.03);
+				}
 				bodyDataLayer.setColumnWidthByPosition(position, width);
 			}
 			// Änderungen in der Maske beachten (neue Spalten, Spalten gelöscht)
@@ -846,9 +851,13 @@ public class SectionGrid {
 				}
 				order.removeAll(toDelete);
 			}
-			columnReorderLayer.getColumnIndexOrder().removeAll(order);
-			columnReorderLayer.getColumnIndexOrder().addAll(0, order);
-			columnReorderLayer.reorderColumnPosition(0, 0); // Damit erzwingen wir einen redraw
+
+			columnReorderLayer.resetReorder();
+			int i = 0;
+			for (int index : order) {
+				columnReorderLayer.reorderColumnPosition(columnReorderLayer.getColumnIndexOrder().indexOf(index), i, true);
+				i++;
+			}
 		}
 
 		// Sortierung
