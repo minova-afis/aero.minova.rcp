@@ -15,6 +15,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 
+## [12.8.0] - 06.03.2023
+
 ### Neu
 - Mit F3 kann das Detail für den einegegebenen Matchcode geladen
 - Über default="<Wert>" können Fields statische Werte zugewiesen werden
@@ -29,7 +31,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - Mit Leertaste Sektionen aus- und einklappen
 - Sonderzeichen in Lookups ermöglichen
-- Spaltenreihenfolge (und -breite unter Mac) beim Laden der Selektionskriterien wieder herstellen
+- Spaltenreihenfolge (und -breite unter Mac) beim Laden der Selektionskriterien und in Grids wieder herstellen
 
 
 ## [12.7.4] - 31.01.2023
