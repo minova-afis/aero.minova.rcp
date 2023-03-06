@@ -6,11 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Twistie;
@@ -19,7 +17,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MSection;
-import aero.minova.rcp.widgets.LookupComposite;
 
 public class TabUtil {
 
@@ -44,9 +41,8 @@ public class TabUtil {
 		List<Control> tabList = new ArrayList<>();
 		for (Control control : composite.getChildren()) {
 			if (control instanceof NatTable || //
-					((control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text)
-							&& control.getData(Constants.CONTROL_FIELD) instanceof MField field //
-							&& !field.isReadOnly()//
+					(control.getData(Constants.CONTROL_FIELD) instanceof MField field //
+							&& !field.isReadOnly() //
 							&& field.isVisible())) {
 				tabList.add(control);
 			}
