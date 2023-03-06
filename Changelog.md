@@ -18,12 +18,13 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Neu
 - Mit F3 kann das Detail für den einegegebenen Matchcode geladen
 - Über default="<Wert>" können Fields statische Werte zugewiesen werden
+- `tab-index` in Masken auslesen und verwenden
+- Windows: Checkboxen mit Tab wählbar machen, mit `+` und `-` kann der Haken bei ausgewähltem Feld gesetzt bzw. entfernt werden. Unter Mac lassen sich Checkboxen leider überhaupt nicht mit Tab ansteuern
 
 ### Änderung
 - Alle Tests von JUnit4 auf JUnit5 umgestellt
 - Nattable Release 2.0.5 verwenden
-- `tab-index` in Masken auslesen und verwenden
-- Windows: Checkboxen mit Tab wählbar machen, mit `+` und `-` kann der Haken bei ausgewähltem Feld gesetzt bzw. entfernt werden. Unter Mac lassen sich Checkboxen leider überhaupt nicht mit Tab ansteuern
+
 
 ### Bugfixes
 - Mit Leertaste Sektionen aus- und einklappen
