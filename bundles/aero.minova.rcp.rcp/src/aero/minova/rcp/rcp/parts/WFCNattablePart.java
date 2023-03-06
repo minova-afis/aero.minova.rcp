@@ -679,7 +679,11 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		}
 
 		bodyLayerStack.getColumnReorderLayer().resetReorder();
-		bodyLayerStack.getColumnReorderLayer().reorderMultipleColumnIndexes(order, 0, true);
+		int i = 0;
+		for (int index : order) {
+			bodyLayerStack.getColumnReorderLayer().reorderColumnPosition(bodyLayerStack.getColumnReorderLayer().getColumnIndexOrder().indexOf(index), i, true);
+			i++;
+		}
 	}
 
 	//////////////////////////////
