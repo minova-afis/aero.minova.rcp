@@ -17,6 +17,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Mit F3 kann das Detail für den einegegebenen Matchcode geladen
+- Über default="<Wert>" können Fields statische Werte zugewiesen werden
 
 ### Änderung
 - Alle Tests von JUnit4 auf JUnit5 umgestellt
