@@ -11,8 +11,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 import aero.minova.rcp.constants.Constants;
-import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
 public class SelectDetailPart {
@@ -28,8 +26,6 @@ public class SelectDetailPart {
 		List<MPart> findElements = model.findElements(mPerspective, Constants.DETAIL_PART, MPart.class);
 		MPart part = findElements.get(0);
 		partService.activate(part);
-		WFCDetailPart detailPart = (WFCDetailPart) part.getObject();
-		MField field = detailPart.getDetail().getMSectionList().get(0).getTabList().get(0);
-		((AbstractValueAccessor) field.getValueAccessor()).getControl().setFocus();
+		((WFCDetailPart) part.getObject()).getRequestUtil().focusFirstEmptyField();
 	}
 }

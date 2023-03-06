@@ -1,6 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,18 +42,30 @@ public class TabUtil {
 	public static void updateTabListOfSectionComposite(Composite composite) {
 
 		List<Control> tabList = new ArrayList<>();
-
-		Control[] compositeChilds = composite.getChildren();
-		for (Control control : compositeChilds) {
-			if (control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text) {
-				MField field = (MField) control.getData(Constants.CONTROL_FIELD);
-				if (!field.isReadOnly()) {
-					tabList.add(control);
-				}
-			} else if (control instanceof NatTable) {
+		for (Control control : composite.getChildren()) {
+			if (control instanceof NatTable || //
+					((control instanceof LookupComposite || control instanceof TextAssist || control instanceof Text)
+							&& control.getData(Constants.CONTROL_FIELD) instanceof MField field //
+							&& !field.isReadOnly()//
+							&& field.isVisible())) {
 				tabList.add(control);
 			}
 		}
+
+		tabList.sort((o1, o2) -> {
+			// Haben beide Controls ein MField -> sortieren nach dem Tab-Index
+			if (o1.getData(Constants.CONTROL_FIELD) instanceof MField f1 && o2.getData(Constants.CONTROL_FIELD) instanceof MField f2) {
+				if (f1.getTabIndex() == f2.getTabIndex()) {
+					return 0;
+				} else if (f1.getTabIndex() < f2.getTabIndex()) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+			// Ansonsten Reihenfolge beibehalten
+			return 0;
+		});
 
 		composite.setTabList(tabList.toArray(new Control[0]));
 	}
@@ -65,11 +78,7 @@ public class TabUtil {
 	 * @return nach der Order sortierte TabList
 	 */
 	public static Control[] getSortedSectionTabList(Composite parent) {
-		List<Control> tabList = new ArrayList<>(parent.getChildren().length);
-
-		for (Control section : parent.getChildren()) {
-			tabList.add(section);
-		}
+		List<Control> tabList = Arrays.asList(parent.getChildren());
 
 		Collections.sort(tabList, (f1, f2) -> {
 			int order1 = ((MinovaSectionData) f1.getLayoutData()).getOrder();
@@ -116,4 +125,24 @@ public class TabUtil {
 		return tabList.toArray(new Control[0]);
 	}
 
+	/**
+	 * Liefert eine Liste aller MFields in der Tab-Reihenfolge
+	 * 
+	 * @param composite
+	 * @return
+	 */
+	public static List<MField> getMFieldsInTabOrder(Composite composite) {
+		List<MField> fields = new ArrayList<>();
+
+		for (Control child : composite.getChildren()) {
+			if (child.getData(Constants.CONTROL_FIELD) instanceof MField mfield) {
+				fields.add(mfield);
+			}
+			if (child instanceof Composite childCompo) {
+				fields.addAll(getMFieldsInTabOrder(childCompo));
+			}
+		}
+
+		return fields;
+	}
 }

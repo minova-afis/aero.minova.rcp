@@ -4,6 +4,8 @@ public class Constants {
 
 	private Constants() {}
 
+	public static final String ERROR = "Error";
+
 	// Parts
 	public static final String SEARCH_PART = "aero.minova.rcp.rcp.part.search";
 	public static final String INDEX_PART = "aero.minova.rcp.rcp.part.index";

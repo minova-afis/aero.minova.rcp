@@ -225,7 +225,6 @@ public class WFCStatisticDetailPart {
 	public void createStatisticDetail(@UIEventTopic(Constants.BROKER_SELECTSTATISTIC) Row row) {
 		currentRow = row;
 		mDetail.getFields().clear();
-		mSection.getTabList().clear();
 
 		Preferences preferences = (Preferences) mApplication.getTransientData().get(Constants.XBS_FILE_NAME);
 		Node statisticNode = XBSUtil.getNodeWithName(preferences, row.getValue(0).getStringValue());
@@ -355,8 +354,8 @@ public class WFCStatisticDetailPart {
 	private void createField(Composite clientComposite, MField field, int row, int column) {
 		if (field instanceof MBooleanField) {
 			BooleanField.create(clientComposite, field, row, column, locale, mPerspective);
-		} else if (field instanceof MNumberField) {
-			NumberField.create(clientComposite, (MNumberField) field, row, column, locale, mPerspective, translationService);
+		} else if (field instanceof MNumberField nf) {
+			NumberField.create(clientComposite, nf, row, column, locale, mPerspective, translationService);
 		} else if (field instanceof MDateTimeField) {
 			DateTimeField.create(clientComposite, field, row, column, locale, timezone, mPerspective, translationService);
 		} else if (field instanceof MShortDateField) {
@@ -367,8 +366,8 @@ public class WFCStatisticDetailPart {
 			LookupField.create(clientComposite, field, row, column, locale, mPerspective);
 		} else if (field instanceof MTextField || field instanceof MParamStringField) {
 			TextField.create(clientComposite, field, row, column, mPerspective);
-		} else if (field instanceof MQuantityField) {
-			QuantityField.create(clientComposite, (MQuantityField)field, row, column, locale, mPerspective, translationService);
+		} else if (field instanceof MQuantityField qf) {
+			QuantityField.create(clientComposite, qf, row, column, locale, mPerspective, translationService);
 		}
 	}
 
@@ -401,7 +400,7 @@ public class WFCStatisticDetailPart {
 		for (MField f : mDetail.getFields()) {
 			f.setValue(null, false);
 		}
-		((AbstractValueAccessor) mSection.getTabList().get(0).getValueAccessor()).getControl().setFocus();
+		((AbstractValueAccessor) TabUtil.getMFieldsInTabOrder(parent).get(0).getValueAccessor()).getControl().setFocus();
 	}
 
 	@Inject
@@ -409,7 +408,7 @@ public class WFCStatisticDetailPart {
 	public void showErrorMessage(@UIEventTopic(Constants.BROKER_SHOWERRORMESSAGE) String message) {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		if (activePerspective.equals(mPerspective)) {
-			MessageDialog.openError(shell, getTranslation("Error"), getTranslation(message));
+			MessageDialog.openError(shell, getTranslation(Constants.ERROR), getTranslation(message));
 		}
 	}
 
@@ -435,9 +434,9 @@ public class WFCStatisticDetailPart {
 			value += "\nProcedure/View: " + et.getProcedureOrView();
 
 			if (et.getT() == null) {
-				MessageDialog.openError(shell, getTranslation("Error"), value);
+				MessageDialog.openError(shell, getTranslation(Constants.ERROR), value);
 			} else {
-				ShowErrorDialogHandler.execute(shell, getTranslation("Error"), value, et.getT());
+				ShowErrorDialogHandler.execute(shell, getTranslation(Constants.ERROR), value, et.getT());
 			}
 		}
 	}
