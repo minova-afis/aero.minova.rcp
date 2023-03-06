@@ -71,6 +71,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.accessor.BrowserAccessor;
 import aero.minova.rcp.rcp.accessor.DetailAccessor;
@@ -125,7 +126,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	public String timezone;
-
+	
 	@Inject
 	DirtyFlagUtil dirtyFlagUtil;
 
@@ -905,6 +906,9 @@ public class WFCDetailCASRequestsUtil {
 			bs.clear();
 		}
 
+		// Default Werte aus der Maske in Feldern wieder füllen.
+		// WICHTIG: Zuerst Default Werte setzen und dann die Werte aus der XBS!
+		setDefaultValues();
 		// In XBS gegebene Felder wieder füllen
 		setValuesAccordingToXBS();
 
@@ -912,6 +916,23 @@ public class WFCDetailCASRequestsUtil {
 		broker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, "aero.minova.rcp.rcp.handledtoolitem.revert");
 		// Auswahl im Index entfernen
 		broker.send(Constants.BROKER_CLEARSELECTION, perspective);
+	}
+
+	public void setDefaultValues() {
+		for (MField field : mDetail.getFields()) {
+			if (field.getDefaultValueString() != null) {
+				String[] opAndFieldName = new String[2];
+				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), field.getDateTimeType(), CustomLocale.getLocale(), timezone);
+				field.setValue(v, false);
+				if(field.getName().contains(".")) {
+					opAndFieldName = field.getName().split(".");
+				} else {
+					opAndFieldName[0] = null;
+					opAndFieldName[1] = field.getName();
+				}
+				setValueAsCleanForDirtyFlag(v, opAndFieldName[1], opAndFieldName[0]);
+			}
+		}
 	}
 
 	/**

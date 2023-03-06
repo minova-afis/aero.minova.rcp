@@ -24,6 +24,9 @@ public class ModelToViewModel {
 		f.setOriginalRequired(field.isRequired());
 		f.setOriginalReadOnly(field.isReadOnly());
 		f.setOriginalVisible(field.isVisible());
+		if (field.getDefault() != null) {
+			f.setDefaultValueString(field.getDefault());
+		}
 		if (field.getNumberColumnsSpanned() != null) {
 			f.setNumberColumnsSpanned(field.getNumberColumnsSpanned().intValue());
 		}

@@ -1,6 +1,7 @@
 package aero.minova.rcp.model;
 
 import java.io.Serializable;
+import java.text.DecimalFormatSymbols;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -8,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 
+import aero.minova.rcp.model.util.NumberFormatUtil;
 import aero.minova.rcp.util.DateTimeUtil;
 import aero.minova.rcp.util.DateUtil;
 import aero.minova.rcp.util.TimeUtil;
@@ -109,6 +111,40 @@ public class Value implements Serializable {
 		return returnValue;
 	}
 
+	public static Value getValueForStringFromDataType(String valueString, DataType type, DateTimeType dateTimeType, Locale locale, String timezone) {
+		Value v = null;
+
+		switch (type) {
+		case STRING:
+			v = new Value(valueString);
+			break;
+		case BOOLEAN:
+			v = new Value(Boolean.valueOf(valueString));
+			break;
+		case DOUBLE, INTEGER, BIGDECIMAL:
+			DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
+			v = NumberFormatUtil.newValue(valueString, type, dfs);
+			break;
+		case INSTANT:
+			switch (dateTimeType) {
+			case TIME:
+				v = new Value(TimeUtil.getTime(valueString));
+				break;
+			case DATE:
+				v = new Value(DateUtil.getDate(valueString));
+				break;
+			case DATETIME:
+				v = new Value(DateTimeUtil.getDateTime(valueString, timezone));
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+
+		return v;
+	}
+
 	public Value(Object valueNew, DataType dataType) {
 		type = dataType;
 		value = valueNew;
@@ -203,7 +239,7 @@ public class Value implements Serializable {
 	public Instant getBaseValue() {
 		return type == DataType.PERIOD ? (Instant) value : null;
 	}
-	
+
 	public Number getQuantityValue() {
 		return type == DataType.QUANTITY ? (Number) value : null;
 	}
@@ -212,7 +248,7 @@ public class Value implements Serializable {
 	public String toString() {
 		return "Value [type=" + type + ", value=" + value + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
