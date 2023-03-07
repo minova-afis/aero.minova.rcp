@@ -19,7 +19,6 @@ public abstract class MField {
 
 	private ArrayList<ValueChangeListener> listeners;
 	private Value fieldValue;
-	private Value displayValue;
 	private IValueAccessor valueAccessor;
 	private String name;
 	private String label;
@@ -129,7 +128,7 @@ public abstract class MField {
 		Value oldValue = this.fieldValue;
 		this.fieldValue = value;
 		if (getValueAccessor() != null) {
-			displayValue = getValueAccessor().setValue(value, user);
+			getValueAccessor().setValue(value, user);
 		}
 		fire(new ValueChangeEvent(this, oldValue, value, user));
 
@@ -534,5 +533,14 @@ public abstract class MField {
 	public void setDefaultValueString(String defaultValueString) {
 		this.defaultValueString = defaultValueString;
 	}
-	
+
+	/**
+	 * Setzt den Tooltip für das Feld. Wird übersetzt
+	 * 
+	 * @param tooltip
+	 */
+	public void setTooltip(String tooltip) {
+		valueAccessor.setTooltip(tooltip);
+	}
+
 }
