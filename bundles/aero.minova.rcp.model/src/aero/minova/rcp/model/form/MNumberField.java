@@ -25,19 +25,23 @@ public class MNumberField extends MField {
 			numberValue = getValue().getIntegerValue();
 		}
 
+		String tooltip = null;
 		boolean maxFits = true;
 		if (getMaximumValue() != null) {
 			maxFits = numberValue <= getMaximumValue();
+			tooltip = maxFits ? tooltip : "@msg.NumberTooHigh %" + numberValue + ">" + getMaximumValue();
 		}
 		boolean minFits = true;
 		if (getMinimumValue() != null) {
 			minFits = numberValue >= getMinimumValue();
+			tooltip = minFits ? tooltip : "@msg.NumberTooLow %" + numberValue + "<" + getMinimumValue();
 		}
 
 		boolean validTest = super.isValid() && minFits && maxFits;
 		if (!validTest) {
 			setInvalidColor();
 		}
+		setTooltip(tooltip);
 		return validTest;
 	}
 }
