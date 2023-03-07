@@ -623,4 +623,9 @@ public class LookupComposite extends Composite {
 		return "Lookup (" + label.getText() + ")";
 	}
 
+	@Override
+	public void setToolTipText(String tooltip) {
+		text.setToolTipText(tooltip);
+	}
+
 }
