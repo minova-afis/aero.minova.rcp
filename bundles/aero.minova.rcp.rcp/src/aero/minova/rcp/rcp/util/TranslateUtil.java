@@ -32,32 +32,11 @@ public class TranslateUtil {
 		}
 		for (Control control : composite.getChildren()) {
 			if (control.getData(TRANSLATE_PROPERTY) != null) {
-				String property = (String) control.getData(TRANSLATE_PROPERTY);
-				String value = translationService.translate(property, null);
-				if (control instanceof ExpandableComposite) {
-					ExpandableComposite expandableComposite = (ExpandableComposite) control;
-					expandableComposite.setText(value);
-					translate((Composite) expandableComposite.getClient(), translationService, locale);
-
-					translateToolbar(expandableComposite, translationService);
-				} else if (control instanceof Label) {
-					Label l = ((Label) control);
-					Object data = l.getData(LookupField.AERO_MINOVA_RCP_LOOKUP);
-					if (data != null) {
-						// TODO aus den Preferences Laden
-						value = value + " ▼";
-					}
-					((Label) control).setText(value);
-				} else if (control instanceof Button) {
-					((Button) control).setText(value);
-				}
-				if (control instanceof Composite) {
-					translate((Composite) control, translationService, locale);
-				}
+				translateControl(translationService, locale, control);
 			} else {
 				for (Control child : composite.getChildren()) {
-					if (child instanceof Composite) {
-						translate((Composite) child, translationService, locale);
+					if (child instanceof Composite c) {
+						translate(c, translationService, locale);
 					}
 				}
 			}
@@ -66,6 +45,28 @@ public class TranslateUtil {
 			if (control.getData(TRANSLATE_LOCALE) != null) {
 				control.setData(TRANSLATE_LOCALE, locale);
 			}
+		}
+	}
+
+	private static void translateControl(TranslationService translationService, Locale locale, Control control) {
+		String property = (String) control.getData(TRANSLATE_PROPERTY);
+		String value = translationService.translate(property, null);
+		if (control instanceof ExpandableComposite expandableComposite) {
+			expandableComposite.setText(value);
+			translate((Composite) expandableComposite.getClient(), translationService, locale);
+
+			translateToolbar(expandableComposite, translationService);
+		} else if (control instanceof Label l) {
+			Object data = l.getData(LookupField.AERO_MINOVA_RCP_LOOKUP);
+			if (data != null) {
+				value = value + " ▼";
+			}
+			l.setText(value);
+		} else if (control instanceof Button b) {
+			b.setText(value);
+		}
+		if (control instanceof Composite c) {
+			translate(c, translationService, locale);
 		}
 	}
 
