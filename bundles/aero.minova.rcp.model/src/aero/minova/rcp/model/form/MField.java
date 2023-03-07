@@ -540,7 +540,9 @@ public abstract class MField {
 	 * @param tooltip
 	 */
 	public void setTooltip(String tooltip) {
-		valueAccessor.setTooltip(tooltip);
+		if (getValueAccessor() != null) {
+			valueAccessor.setTooltip(tooltip);
+		}
 	}
 
 }
