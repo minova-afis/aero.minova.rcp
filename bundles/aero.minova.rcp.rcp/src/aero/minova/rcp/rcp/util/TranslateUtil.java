@@ -3,7 +3,10 @@ package aero.minova.rcp.rcp.util;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_LOCALE;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
+import java.text.MessageFormat;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.widgets.Button;
@@ -67,9 +70,7 @@ public class TranslateUtil {
 	}
 
 	private static void translateToolbar(ExpandableComposite expandableComposite, TranslationService translationService) {
-		if (expandableComposite.getTextClient() instanceof ToolBar) {
-			ToolBar bar = (ToolBar) expandableComposite.getTextClient();
-
+		if (expandableComposite.getTextClient() instanceof ToolBar bar) {
 			for (ToolItem i : bar.getItems()) {
 				String property = (String) i.getData(TRANSLATE_PROPERTY);
 				String value = translationService.translate(property, null);
@@ -86,5 +87,27 @@ public class TranslateUtil {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Übersetzt einen String der Form "@key %parameter1 %parameter2", wobei die Parameter in den übersetzten String eingesetzt werden. Es ist auch möglich,
+	 * keine Parameter einzugeben.<br>
+	 * <br>
+	 * Beispiel <br>
+	 * Eingabge String: "@msg.TextTooLong %110>100" <br>
+	 * Übersetzung in messagesProperties: "Maximale L\u00E4nge \u00FCberschritten ({0})" <br>
+	 * Rückgabewert dieser Methode: "Maximale Lange überschritten (110>100)"
+	 * 
+	 * @param errorMessage
+	 * @param translationService
+	 * @return
+	 */
+	public static String translateWithParameters(String errorMessage, TranslationService translationService) {
+
+		List<String> errorMessageParts = Stream.of(errorMessage.split("%")).map(String::trim).toList();
+
+		String translatedBase = translationService.translate(errorMessageParts.get(0), null);
+
+		return MessageFormat.format(translatedBase, errorMessageParts.subList(1, errorMessageParts.size()).toArray(new Object[0]));
 	}
 }
