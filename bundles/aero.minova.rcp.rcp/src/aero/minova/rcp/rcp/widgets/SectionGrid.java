@@ -125,6 +125,7 @@ import aero.minova.rcp.rcp.gridvalidation.CrossValidationLabelAccumulator;
 import aero.minova.rcp.rcp.nattable.MinovaGridConfiguration;
 import aero.minova.rcp.rcp.nattable.TriStateCheckBoxPainter;
 import aero.minova.rcp.rcp.util.CustomComparator;
+import aero.minova.rcp.rcp.util.NattableSummaryUtil;
 import aero.minova.rcp.rcp.util.StaticXBSValueUtil;
 import aero.minova.rcp.util.OSUtil;
 import ca.odell.glazedlists.EventList;
@@ -424,7 +425,7 @@ public class SectionGrid {
 
 		ILayer bodyLayer;
 		ILayer rowHeaderLayer;
-		if (true) { // TODO
+		if (NattableSummaryUtil.needsSummary(grid)) {
 			// build the Summary Row
 			FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(eventLayer, viewportLayer, configRegistry, false);
 			summaryRowLayer.setHorizontalCompositeDependency(false);
@@ -454,7 +455,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		gridConfiguration = new MinovaGridConfiguration(dataTable, grid, dataService, translationService);
+		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService, translationService);
 		getNatTable().addConfiguration(gridConfiguration);
 		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
@@ -511,6 +512,10 @@ public class SectionGrid {
 				break;
 			}
 		});
+
+		if (NattableSummaryUtil.needsSummary(grid)) {
+			NattableSummaryUtil.configureSummary(grid, natTable, sortedList, columnPropertyAccessor);
+		}
 
 		FormData fd = new FormData();
 
