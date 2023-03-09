@@ -378,6 +378,7 @@ public class SectionGrid {
 					if (!rowsToUpdate.contains(r) && !rowsToInsert.contains(r)) {
 						rowsToUpdate.add(r);
 					}
+					natTable.refresh(false); // Damit Summary-Row updated
 					return true;
 				}
 				return false;
