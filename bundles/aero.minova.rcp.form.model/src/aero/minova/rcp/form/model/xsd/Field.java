@@ -74,6 +74,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="total" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="aggregate"&gt;
+ *         &lt;simpleType&gt;
+ *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
+ *             &lt;enumeration value="SUM"/&gt;
+ *             &lt;enumeration value="MIN"/&gt;
+ *             &lt;enumeration value="MAX"/&gt;
+ *             &lt;enumeration value="AVERAGE"/&gt;
+ *             &lt;enumeration value="COUNT"/&gt;
+ *           &lt;/restriction&gt;
+ *         &lt;/simpleType&gt;
+ *       &lt;/attribute&gt;
  *       &lt;attribute name="sql-index" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="validation-order" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
  *       &lt;attribute name="number-columns-spanned" default="2"&gt;
@@ -210,6 +221,9 @@ public class Field {
     protected java.lang.Boolean offline;
     @XmlAttribute(name = "total")
     protected java.lang.Boolean total;
+    @XmlAttribute(name = "aggregate")
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String aggregate;
     @XmlAttribute(name = "sql-index", required = true)
     protected BigInteger sqlIndex;
     @XmlAttribute(name = "validation-order")
@@ -938,6 +952,30 @@ public class Field {
      */
     public void setTotal(java.lang.Boolean value) {
         this.total = value;
+    }
+
+    /**
+     * Ruft den Wert der aggregate-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getAggregate() {
+        return aggregate;
+    }
+
+    /**
+     * Legt den Wert der aggregate-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setAggregate(String value) {
+        this.aggregate = value;
     }
 
     /**
