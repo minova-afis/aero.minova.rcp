@@ -28,11 +28,10 @@ public class TextValueAccessor extends AbstractValueAccessor {
 	}
 
 	public void setText(String text) {
-		((Text) control).setText(text);
+		setText(control, text);
 	}
 
 	public void setColor(Color color) {
 		((Text) control).setForeground(color);
 	}
-
 }

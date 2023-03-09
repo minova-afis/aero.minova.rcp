@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.nebula.widgets.opal.textassist.TextAssist;
@@ -20,6 +21,7 @@ import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.IValueAccessor;
 import aero.minova.rcp.model.form.MField;
+import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.widgets.LookupComposite;
 
 public abstract class AbstractValueAccessor implements IValueAccessor {
@@ -34,6 +36,9 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Inject
 	IEventBroker broker;
+
+	@Inject
+	TranslationService translationService;
 
 	protected AbstractValueAccessor(MField field, Control control) {
 		super();
@@ -144,5 +149,25 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 	@Override
 	public void setFilterForLookupContentProvider(Predicate<LookupValue> filter) {
 		// Tut nichts für Felder außer Lookups, ist im LookupValueAccessor überschrieben
+	}
+
+	protected void setText(Control control, String text) {
+		if (control instanceof TextAssist ta) {
+			ta.setText(text);
+		} else if (control instanceof Text t) {
+			t.setText(text);
+		}
+	}
+
+	@Override
+	public void setTooltip(String tooltip) {
+		if (tooltip != null) {
+			tooltip = TranslateUtil.translateWithParameters(tooltip, translationService);
+		}
+		if (control instanceof TextAssist ta) {
+			ta.getChildren()[0].setToolTipText(tooltip);
+		} else {
+			control.setToolTipText(tooltip);
+		}
 	}
 }

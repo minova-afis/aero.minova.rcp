@@ -35,4 +35,6 @@ public interface IValueAccessor {
 	 * @param filter
 	 */
 	void setFilterForLookupContentProvider(Predicate<LookupValue> filter);
+
+	void setTooltip(String tooltip);
 }

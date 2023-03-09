@@ -18,6 +18,9 @@ public class MTextField extends MField {
 		boolean validTest = super.isValid() && textLength <= getMaxTextLength();
 		if (!validTest) {
 			setInvalidColor();
+			setTooltip("@msg.TextTooLong %" + textLength + ">" + getMaxTextLength());
+		} else {
+			setTooltip(null);
 		}
 		return validTest;
 	}
