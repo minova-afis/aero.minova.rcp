@@ -28,6 +28,7 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 
 import aero.minova.rcp.constants.Constants;
@@ -55,7 +56,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		this.grid = grid;
 		this.dataService = dataService;
 		this.readOnlyColumns = new ArrayList<>();
-		contentProviderList = new ArrayList<>();
+		this.contentProviderList = new ArrayList<>();
 		this.translationService = translationService;
 		initGridFields();
 	}
@@ -81,7 +82,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 						return false;
 					}
 				}
-				return true;
+
+				return !cell.getConfigLabels().hasLabel("SUMMARY");
 			}
 
 			@Override
@@ -122,6 +124,9 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private void configureCells(IConfigRegistry configRegistry) {
 		int i = 0;
 		for (Column column : columns) {
+
+			configureSummary(configRegistry, i);
+
 			if (column.isLookup()) {
 				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired(),
 						column.getLookupTable());
@@ -142,6 +147,25 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
 			}
 		}
+	}
+
+	/**
+	 * Default style für Summary ist "Integer Look". In configureDoubleCell() werden die Attribute überschrieben
+	 * 
+	 * @param configRegistry
+	 * @param columnIndex
+	 */
+	private void configureSummary(IConfigRegistry configRegistry, int columnIndex) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
+
+		NumberFormat nf = NumberFormat.getInstance();
+		DefaultIntegerDisplayConverter defaultIntegerDisplayConverter = new DefaultIntegerDisplayConverter(true);
+		defaultIntegerDisplayConverter.setNumberFormat(nf);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultIntegerDisplayConverter, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
 	}
 
 	public void updateContentProvider() {
@@ -340,6 +364,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
 
 		if (locale == null) {
 			locale = Locale.getDefault();
@@ -352,6 +378,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		defaultDoubleDisplayConverter.setNumberFormat(numberFormat);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
 				configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
 
 		if (!isReadOnly) {
 			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);

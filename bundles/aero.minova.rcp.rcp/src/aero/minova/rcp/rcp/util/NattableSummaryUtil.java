@@ -1,5 +1,7 @@
 package aero.minova.rcp.rcp.util;
 
+import java.util.List;
+
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -13,6 +15,7 @@ import org.eclipse.nebula.widgets.nattable.summaryrow.SummationSummaryProvider;
 
 import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.form.model.xsd.Form;
+import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.nattable.data.MinovaColumnPropertyAccessor;
 import ca.odell.glazedlists.SortedList;
@@ -22,6 +25,21 @@ public class NattableSummaryUtil {
 	private NattableSummaryUtil() {}
 
 	public static void configureSummary(Form form, NatTable natTable, SortedList<Row> sortedList, MinovaColumnPropertyAccessor columnPropertyAccessor) {
+		List<ColumnWrapper> columns = form.getIndexView().getColumn().stream().map(c -> new ColumnWrapper(c.getAggregate(), c.isTotal())).toList();
+		configureSummary(columns, natTable, sortedList, columnPropertyAccessor);
+	}
+
+	public static void configureSummary(Grid grid, NatTable natTable, SortedList<Row> sortedList, MinovaColumnPropertyAccessor columnPropertyAccessor) {
+		List<ColumnWrapper> columns = grid.getField().stream().map(f -> new ColumnWrapper(f.getAggregate(), f.isTotal())).toList();
+		configureSummary(columns, natTable, sortedList, columnPropertyAccessor);
+	}
+
+	public static boolean needsSummary(Grid grid) {
+		return grid.getField().stream().anyMatch(f -> f.isTotal() || f.getAggregate() != null);
+	}
+
+	private static void configureSummary(List<ColumnWrapper> columns, NatTable natTable, SortedList<Row> sortedList,
+			MinovaColumnPropertyAccessor columnPropertyAccessor) {
 		final IDataProvider summaryDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 
 		// add summary configuration
@@ -30,12 +48,11 @@ public class NattableSummaryUtil {
 			@Override
 			public void configureRegistry(IConfigRegistry configRegistry) {
 				int i = 0;
-				for (aero.minova.rcp.form.model.xsd.Column column : form.getIndexView().getColumn()) {
+				for (ColumnWrapper cw : columns) {
 					ISummaryProvider summaryProvider = null;
 
-					if (column.getAggregate() != null) {
-						AggregateOption agg = AggregateOption.valueOf(column.getAggregate());
-						switch (agg) {
+					if (cw.aggregateOption != null) {
+						switch (cw.aggregateOption) {
 						case AVERAGE:
 							summaryProvider = new AverageSummaryProvider(summaryDataProvider);
 							break;
@@ -57,7 +74,7 @@ public class NattableSummaryUtil {
 					}
 
 					// Summe ("total" in .xml)
-					if (column.isTotal() != null && column.isTotal()) {
+					if (cw.total) {
 						summaryProvider = new SummationSummaryProvider(summaryDataProvider, false);
 					}
 
@@ -103,9 +120,9 @@ public class NattableSummaryUtil {
 			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number) {
+				if (dataValue instanceof Number n) {
 					valueRows++;
-					total += ((Number) dataValue).doubleValue();
+					total += n.doubleValue();
 				}
 			}
 			if (valueRows == 0) {
@@ -131,8 +148,8 @@ public class NattableSummaryUtil {
 			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number && ((Number) dataValue).doubleValue() < min) {
-					min = ((Number) dataValue).doubleValue();
+				if (dataValue instanceof Number n && n.doubleValue() < min) {
+					min = n.doubleValue();
 				}
 			}
 			if (min == Double.MAX_VALUE) {
@@ -158,8 +175,8 @@ public class NattableSummaryUtil {
 			for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 				Object dataValue = this.dataProvider.getDataValue(columnIndex, rowIndex);
 				// this check is necessary because of the GroupByObject
-				if (dataValue instanceof Number && ((Number) dataValue).doubleValue() > max) {
-					max = ((Number) dataValue).doubleValue();
+				if (dataValue instanceof Number n && n.doubleValue() > max) {
+					max = n.doubleValue();
 				}
 			}
 			if (max == Double.MIN_VALUE) {
@@ -168,4 +185,15 @@ public class NattableSummaryUtil {
 			return max;
 		}
 	}
+
+	static class ColumnWrapper {
+		AggregateOption aggregateOption;
+		boolean total;
+
+		ColumnWrapper(String aggregateOption, Boolean total) {
+			this.aggregateOption = aggregateOption != null ? AggregateOption.valueOf(aggregateOption) : null;
+			this.total = total != null && total;
+		}
+	}
+
 }

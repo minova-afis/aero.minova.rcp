@@ -426,6 +426,20 @@
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute default="false" name="total" type="xs:boolean" />
+		<xs:attribute name="aggregate" use="optional">
+			<xs:annotation>
+				<xs:documentation>Wird benötigt, damit bei Grids die Summenzeile mit "Aggregate" konfiguriert werden kann</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="SUM" />
+					<xs:enumeration value="MIN" />
+					<xs:enumeration value="MAX" />
+					<xs:enumeration value="AVERAGE" />
+					<xs:enumeration value="COUNT" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 		<xs:attribute name="sql-index" type="xs:integer" use="required" />
 		<xs:attribute name="validation-order" type="xs:integer" use="optional" />
 		<xs:attribute default="2" name="number-columns-spanned" use="optional">

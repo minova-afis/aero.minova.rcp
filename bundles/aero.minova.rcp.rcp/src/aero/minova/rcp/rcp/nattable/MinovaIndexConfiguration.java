@@ -41,7 +41,6 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 	private void configureCells(IConfigRegistry configRegistry) {
 		int i = 0;
 		for (Column column : columns) {
-
 			if (column.getType().equals(DataType.BOOLEAN)) {
 				configureBooleanCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX);
 			} else if (column.getType().equals(DataType.INSTANT) && formColumns.get(column.getName()).getShortDate() != null) {
@@ -75,17 +74,7 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 				AggregateOption agg = AggregateOption.valueOf(formColumns.get(column.getName()).getAggregate());
 				switch (agg) {
 				case AVERAGE:
-					summaryProvider = (columnIndex, children) -> {
-						double total = 0;
-						for (Row r : children) {
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-								total += r.getValue(columnIndex).getIntegerValue();
-							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
-								total += r.getValue(columnIndex).getDoubleValue();
-							}
-						}
-						return total / children.size();
-					};
+					summaryProvider = (columnIndex, children) -> sumRows(columnIndex, children) / children.size();
 					break;
 
 				case COUNT:
@@ -93,53 +82,15 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 					break;
 
 				case MAX:
-					summaryProvider = (columnIndex, children) -> {
-						double max = Double.MIN_VALUE;
-						for (Row r : children) {
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-								if (r.getValue(columnIndex).getIntegerValue() > max) {
-									max = r.getValue(columnIndex).getIntegerValue();
-								}
-							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null
-									&& r.getValue(columnIndex).getDoubleValue() > max) {
-								max = r.getValue(columnIndex).getDoubleValue();
-							}
-
-						}
-						return max;
-					};
+					summaryProvider = this::getMax;
 					break;
 
 				case MIN:
-					summaryProvider = (columnIndex, children) -> {
-						double min = Double.MAX_VALUE;
-						for (Row r : children) {
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-								if (r.getValue(columnIndex).getIntegerValue() < min) {
-									min = r.getValue(columnIndex).getIntegerValue();
-								}
-							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null
-									&& r.getValue(columnIndex).getDoubleValue() < min) {
-								min = r.getValue(columnIndex).getDoubleValue();
-							}
-
-						}
-						return min;
-					};
+					summaryProvider = this::getMin;
 					break;
 
 				case SUM:
-					summaryProvider = (columnIndex, children) -> {
-						double total = 0;
-						for (Row r : children) {
-							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-								total += r.getValue(columnIndex).getIntegerValue();
-							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
-								total += r.getValue(columnIndex).getDoubleValue();
-							}
-						}
-						return total;
-					};
+					summaryProvider = this::sumRows;
 					break;
 				default:
 					break;
@@ -148,17 +99,7 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 
 			// Summe ("total" in .xml)
 			if (formColumns.get(column.getName()).isTotal() != null && formColumns.get(column.getName()).isTotal()) {
-				summaryProvider = (columnIndex, children) -> {
-					double total = 0;
-					for (Row r : children) {
-						if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
-							total += r.getValue(columnIndex).getIntegerValue();
-						} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
-							total += r.getValue(columnIndex).getDoubleValue();
-						}
-					}
-					return total;
-				};
+				summaryProvider = this::sumRows;
 			}
 
 			if (summaryProvider != null) {
@@ -169,6 +110,50 @@ public class MinovaIndexConfiguration extends MinovaColumnConfiguration {
 			i++;
 		}
 		configRegistry.registerConfigAttribute(GroupByConfigAttributes.GROUP_BY_CHILD_COUNT_PATTERN, "[{0}]");
+	}
+
+	private Object getMin(int columnIndex, List<Row> children) {
+		double min = Double.MAX_VALUE;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null && r.getValue(columnIndex).getIntegerValue() < min) {
+				min = r.getValue(columnIndex).getIntegerValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null && r.getValue(columnIndex).getDoubleValue() < min) {
+				min = r.getValue(columnIndex).getDoubleValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null
+					&& r.getValue(columnIndex).getBigDecimalValue() < min) {
+				min = r.getValue(columnIndex).getBigDecimalValue();
+			}
+		}
+		return min;
+	}
+
+	private Object getMax(int columnIndex, List<Row> children) {
+		double max = Double.MIN_VALUE;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null && r.getValue(columnIndex).getIntegerValue() > max) {
+				max = r.getValue(columnIndex).getIntegerValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null && r.getValue(columnIndex).getDoubleValue() > max) {
+				max = r.getValue(columnIndex).getDoubleValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null
+					&& r.getValue(columnIndex).getBigDecimalValue() > max) {
+				max = r.getValue(columnIndex).getBigDecimalValue();
+			}
+		}
+		return max;
+	}
+
+	private double sumRows(int columnIndex, List<Row> children) {
+		double total = 0;
+		for (Row r : children) {
+			if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
+				total += r.getValue(columnIndex).getIntegerValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
+				total += r.getValue(columnIndex).getDoubleValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null) {
+				total += r.getValue(columnIndex).getBigDecimalValue();
+			}
+		}
+		return total;
 	}
 
 	private void configureIntegerCell(IConfigRegistry configRegistry, int columnIndex, String configLabel) {
