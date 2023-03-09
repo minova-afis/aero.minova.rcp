@@ -45,6 +45,7 @@ import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.FixedSummaryRowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultColumnHeaderDataLayer;
@@ -52,6 +53,7 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
+import org.eclipse.nebula.widgets.nattable.layer.CompositeLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayerListener;
@@ -68,6 +70,7 @@ import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.summaryrow.FixedSummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellPainterMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -417,7 +420,24 @@ public class SectionGrid {
 		// build the row header layer
 		IDataProvider rowHeaderDataProvider = new DefaultRowHeaderDataProvider(bodyDataProvider);
 		DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
-		ILayer rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
+
+		ILayer bodyLayer;
+		ILayer rowHeaderLayer;
+		if (true) { // TODO
+			// build the Summary Row
+			FixedSummaryRowLayer summaryRowLayer = new FixedSummaryRowLayer(eventLayer, viewportLayer, configRegistry, false);
+			summaryRowLayer.setHorizontalCompositeDependency(false);
+			CompositeLayer summaryComposite = new CompositeLayer(1, 2);
+			summaryComposite.setChildLayer("SUMMARY", summaryRowLayer, 0, 0);
+			summaryComposite.setChildLayer(GridRegion.BODY, viewportLayer, 0, 1);
+			bodyLayer = summaryComposite;
+
+			rowHeaderLayer = new FixedSummaryRowHeaderLayer(rowHeaderDataLayer, summaryComposite, selectionLayer);
+			((FixedSummaryRowHeaderLayer) rowHeaderLayer).setSummaryRowLabel("");
+		} else {
+			rowHeaderLayer = new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer);
+			bodyLayer = viewportLayer;
+		}
 
 		// build the corner layer
 		IDataProvider cornerDataProvider = new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider);
@@ -425,7 +445,7 @@ public class SectionGrid {
 		ILayer cornerLayer = new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
 
 		// build the grid layer
-		GridLayer gridLayer = new GridLayer(viewportLayer, sortHeaderLayer, rowHeaderLayer, cornerLayer);
+		GridLayer gridLayer = new GridLayer(bodyLayer, sortHeaderLayer, rowHeaderLayer, cornerLayer);
 
 		setNatTable(new NatTable(composite, gridLayer, false));
 
@@ -433,7 +453,7 @@ public class SectionGrid {
 		getNatTable().setConfigRegistry(configRegistry);
 		getNatTable().addConfiguration(new DefaultNatTableStyleConfiguration());
 		getNatTable().addConfiguration(new SingleClickSortConfiguration());
-		gridConfiguration = new MinovaGridConfiguration(dataTable.getColumns(), grid, dataService, translationService);
+		gridConfiguration = new MinovaGridConfiguration(dataTable, grid, dataService, translationService);
 		getNatTable().addConfiguration(gridConfiguration);
 		columnHideShowLayer.hideColumnPositions(gridConfiguration.getHiddenColumns());
 
