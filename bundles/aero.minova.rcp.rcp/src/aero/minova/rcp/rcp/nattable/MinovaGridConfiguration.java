@@ -28,18 +28,25 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.summaryrow.ISummaryProvider;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.summaryrow.SummaryRowLayer;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 
+import aero.minova.rcp.constants.AggregateOption;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.form.model.xsd.Field;
 import aero.minova.rcp.form.model.xsd.Grid;
 import aero.minova.rcp.model.Column;
 import aero.minova.rcp.model.DataType;
+import aero.minova.rcp.model.Row;
+import aero.minova.rcp.model.Table;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 
 public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 
+	private Table dataTable;
 	private List<Column> columns;
 	private Locale locale = CustomLocale.getLocale();
 	private Grid grid;
@@ -50,14 +57,105 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private List<GridLookupContentProvider> contentProviderList;
 	private TranslationService translationService;
 
-	public MinovaGridConfiguration(List<Column> columns, Grid grid, IDataService dataService, TranslationService translationService) {
-		this.columns = columns;
+	public MinovaGridConfiguration(Table dataTable, Grid grid, IDataService dataService, TranslationService translationService) {
+		this.dataTable = dataTable;
+		this.columns = dataTable.getColumns();
 		this.grid = grid;
 		this.dataService = dataService;
 		this.readOnlyColumns = new ArrayList<>();
 		contentProviderList = new ArrayList<>();
 		this.translationService = translationService;
 		initGridFields();
+	}
+
+	private void configureGroupSummary(IConfigRegistry configRegistry) {
+		int i = 0;
+		for (Field f : grid.getField()) {
+
+			ISummaryProvider summaryProvider = null;
+
+			if (f.getAggregate() != null) {
+				AggregateOption agg = AggregateOption.valueOf(f.getAggregate());
+				switch (agg) {
+
+				case AVERAGE:
+					summaryProvider = columnIndex -> sumValues(columnIndex) / dataTable.getRows().size();
+					break;
+
+				case COUNT:
+					summaryProvider = columnIndex -> dataTable.getRows().size();
+					break;
+
+				case MAX:
+					summaryProvider = columnIndex -> {
+						double max = Double.MIN_VALUE;
+						for (Row r : dataTable.getRows()) {
+							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null
+									&& r.getValue(columnIndex).getIntegerValue() > max) {
+								max = r.getValue(columnIndex).getIntegerValue();
+							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null
+									&& r.getValue(columnIndex).getDoubleValue() > max) {
+								max = r.getValue(columnIndex).getDoubleValue();
+							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null
+									&& r.getValue(columnIndex).getBigDecimalValue() > max) {
+								max = r.getValue(columnIndex).getBigDecimalValue();
+							}
+						}
+						return max;
+					};
+					break;
+
+				case MIN:
+					summaryProvider = columnIndex -> {
+						double min = Double.MAX_VALUE;
+						for (Row r : dataTable.getRows()) {
+							if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null
+									&& r.getValue(columnIndex).getIntegerValue() < min) {
+								min = r.getValue(columnIndex).getIntegerValue();
+							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null
+									&& r.getValue(columnIndex).getDoubleValue() < min) {
+								min = r.getValue(columnIndex).getDoubleValue();
+							} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null
+									&& r.getValue(columnIndex).getBigDecimalValue() < min) {
+								min = r.getValue(columnIndex).getBigDecimalValue();
+							}
+						}
+						return min;
+					};
+					break;
+
+				case SUM:
+					summaryProvider = this::sumValues;
+					break;
+				}
+			}
+
+			// Summe ("total" in .xml)
+			if (f.isTotal()) { // TODO
+				summaryProvider = this::sumValues;
+			}
+
+			if (summaryProvider != null) {
+				configRegistry.registerConfigAttribute(SummaryRowConfigAttributes.SUMMARY_PROVIDER, summaryProvider, DisplayMode.NORMAL,
+						SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + i);
+			}
+
+			i++;
+		}
+	}
+
+	private double sumValues(int columnIndex) {
+		double total = 0;
+		for (Row r : dataTable.getRows()) {
+			if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getIntegerValue() != null) {
+				total += r.getValue(columnIndex).getIntegerValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getDoubleValue() != null) {
+				total += r.getValue(columnIndex).getDoubleValue();
+			} else if (r.getValue(columnIndex) != null && r.getValue(columnIndex).getBigDecimalValue() != null) {
+				total += r.getValue(columnIndex).getBigDecimalValue();
+			}
+		}
+		return total;
 	}
 
 	public void initGridFields() {
@@ -81,7 +179,9 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 						return false;
 					}
 				}
-				return true;
+
+				return !cell.getConfigLabels().hasLabel("SUMMARY");
+
 			}
 
 			@Override
@@ -105,6 +205,7 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		cellStyle.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.getColor(235, 235, 235));
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, Constants.READ_ONLY_CELL_LABEL);
 
+		configureGroupSummary(configRegistry);
 		configureCells(configRegistry);
 	}
 
@@ -122,6 +223,9 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 	private void configureCells(IConfigRegistry configRegistry) {
 		int i = 0;
 		for (Column column : columns) {
+
+			configureSummary(configRegistry, i);
+
 			if (column.isLookup()) {
 				configureLookupCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired(),
 						column.getLookupTable());
@@ -142,6 +246,25 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 				configureTextCell(configRegistry, i++, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX, column.isReadOnly(), column.isRequired());
 			}
 		}
+	}
+
+	/**
+	 * Default style für Summary ist "Integer Look". In configureDoubleCell() werden die Attribute überschrieben
+	 * 
+	 * @param configRegistry
+	 * @param columnIndex
+	 */
+	private void configureSummary(IConfigRegistry configRegistry, int columnIndex) {
+		Style cellStyle = new Style();
+		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
+
+		NumberFormat nf = NumberFormat.getInstance();
+		DefaultIntegerDisplayConverter defaultIntegerDisplayConverter = new DefaultIntegerDisplayConverter(true);
+		defaultIntegerDisplayConverter.setNumberFormat(nf);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultIntegerDisplayConverter, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
 	}
 
 	public void updateContentProvider() {
@@ -340,6 +463,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		Style cellStyle = new Style();
 		cellStyle.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, HorizontalAlignmentEnum.RIGHT);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL, configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, cellStyle, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
 
 		if (locale == null) {
 			locale = Locale.getDefault();
@@ -352,6 +477,8 @@ public class MinovaGridConfiguration extends AbstractRegistryConfiguration {
 		defaultDoubleDisplayConverter.setNumberFormat(numberFormat);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
 				configLabel + columnIndex);
+		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, defaultDoubleDisplayConverter, DisplayMode.NORMAL,
+				SummaryRowLayer.DEFAULT_SUMMARY_COLUMN_CONFIG_LABEL_PREFIX + columnIndex);
 
 		if (!isReadOnly) {
 			MinovaGridTextCellEditor attributeValue = new MinovaGridTextCellEditor(true, true);
