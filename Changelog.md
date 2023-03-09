@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Neu
+- Grid um Summenzeile erweitern (gleiche Syntax wie im Index, `aggregate` oder `total`)
 
 ## [12.8.0] - 06.03.2023
 
