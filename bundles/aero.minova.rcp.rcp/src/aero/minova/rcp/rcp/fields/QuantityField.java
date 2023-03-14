@@ -72,7 +72,7 @@ public class QuantityField {
 
 				DecimalFormatSymbols dfs = new DecimalFormatSymbols(locale);
 				try {
-					if (!unit.isBlank()) {
+					if (unit != null && !unit.isBlank()) {
 						unit = field.getUnitFromEntry(unit);
 						if (unit != null) {
 							field.setUnitText(unit);
@@ -80,7 +80,7 @@ public class QuantityField {
 							throw new NullPointerException();
 						}
 					}
-					QuantityValue value = new QuantityValue(number, null, field.getDataType(), dfs);
+					QuantityValue value = new QuantityValue(number, field.getUnitText() , field.getDataType(), dfs);
 					field.setValue(value, true);
 					result.add(NumberFormatUtil.getValueString(numberFormat, field.getDataType(), value) + " " + unit);
 				} catch (Exception e) {
