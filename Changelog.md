@@ -18,6 +18,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Grid um Summenzeile erweitern (gleiche Syntax wie im Index, `aggregate` oder `total`)
 - Methode zum Anzeigen von Tooltips, bei falscher Eingabe in Text- oder Nummerfeld entsprechende Meldung anzeigen
 
+### Bugfixes
+- Eingaben von Einheiten im QuantityField setzen wieder die Einheit
 
 ## [12.8.0] - 06.03.2023
 
