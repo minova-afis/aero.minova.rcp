@@ -14,8 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * Tritt auf, wenn der Wert einer Komponente geändert
- * 				wird
+ * Tritt auf, wenn der Wert einer Komponente geändert wird
  * 			
  * 
  * <p>Java-Klasse für value-change complex type.

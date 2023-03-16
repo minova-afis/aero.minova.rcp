@@ -11,8 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Wird ausgeführt, wenn die Aktionen innerhalb eines
- * 				Events einen Fehler liefern
+ * Wird ausgeführt, wenn die Aktionen innerhalb eines Events einen Fehler liefern
  * 			
  * 
  * <p>Java-Klasse für onfail complex type.
