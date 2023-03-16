@@ -17,6 +17,7 @@ public class Constants {
 
 	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
 	public static final String REVERT_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.revert";
+	public static final String DELETE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.delete";
 
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
@@ -64,6 +65,9 @@ public class Constants {
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
 	public static final String BLOCK_REQUEST = "Block";
+	public static final String CORRECT_REQUEST = "Correct";
+	public static final String CANCLE_REQUEST = "Cancel";
+	public static final String ANNOUNCE_REQUEST = "Announce";
 
 	// Liste an Broker-Konstanten
 	public static final String BROKER_SAVEENTRY = "aero/minova/rcp/SaveEntry";
