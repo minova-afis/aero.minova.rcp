@@ -183,8 +183,6 @@ public class WFCDetailPart extends WFCFormPart {
 	private WFCDetailCASRequestsUtil casRequestsUtil;
 	private DirtyFlagUtil dirtyFlagUtil;
 
-	private IEclipseContext appContext;
-
 	private int detailWidth;
 
 	@Inject
@@ -208,10 +206,10 @@ public class WFCDetailPart extends WFCFormPart {
 
 	@PostConstruct
 	public void postConstruct(Composite parent, MWindow window, MApplication mApp) {
+
 		resManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		composite = parent;
 		formToolkit = new FormToolkit(parent.getDisplay());
-		appContext = mApp.getContext();
 		mApplication = mApp;
 		getForm();
 
@@ -230,6 +228,7 @@ public class WFCDetailPart extends WFCFormPart {
 
 		layoutForm(parent);
 
+		mDetail.setBooking("booking".equalsIgnoreCase(form.getDetail().getType()));
 		mDetail.setDetailAccessor(new DetailAccessor(mDetail));
 		ContextInjectionFactory.inject(mDetail.getDetailAccessor(), mPerspective.getContext()); // In Context, damit Injection verfügbar ist
 		mPerspective.getContext().set(MDetail.class, mDetail); // MDetail per Injection ermöglichen
