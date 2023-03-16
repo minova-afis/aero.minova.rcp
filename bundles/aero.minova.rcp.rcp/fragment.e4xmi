@@ -128,6 +128,13 @@
     </elements>
     <elements xsi:type="commands:Command" xmi:id="__iku8L_AEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.command.traverseenter" commandName="Traverse Enter"/>
     <elements xsi:type="commands:Command" xmi:id="_J23REJy3Ee2MhuNDMqZCVQ" elementId="aero.minova.rcp.rcp.command.loadfrommatchcode" commandName="Load From Matchcode"/>
+    <elements xsi:type="commands:Command" xmi:id="_OuDY0MMfEe2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.command.announcedetail" commandName="AnnounceDetail">
+      <persistedState key="persistState" value="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_fUZkMMMYEe2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.command.gotodetail" commandName="GoToDetail">
+      <persistedState key="persistState" value="false"/>
+      <parameters xmi:id="_jeeX8MMYEe2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.commandparameter.gotofield" name="goToField" optional="false"/>
+    </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Le0doLbxEeuZF8ZS2_h9rA" featurename="trimBars" parentElementId="aero.minova.rcp.rcp.window.main">
     <elements xsi:type="basic:TrimBar" xmi:id="_Le0dobbxEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.trimbar.top"/>
@@ -190,6 +197,8 @@
             <handlers xmi:id="_7D6yUL_AEeuboN5m_phYZw" elementId="aero.minova.rcp.rcp.handler.traverseenter" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.TraverseEnterHandler" command="__iku8L_AEeuboN5m_phYZw"/>
             <handlers xmi:id="_KaRx8EYAEeycuKxXCizfMA" elementId="aero.minova.rcp.rcp.handler.copydetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.CopyHandler" command="_5WObEEX_EeycuKxXCizfMA"/>
             <handlers xmi:id="_OW8b0EYAEeycuKxXCizfMA" elementId="aero.minova.rcp.rcp.handler.blockdetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.BlockHandler" command="_77kssEX_EeycuKxXCizfMA"/>
+            <handlers xmi:id="_2GracMMeEe2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.handler.announcedetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AnnounceHandler" command="_OuDY0MMfEe2_uLh8_XzGAQ"/>
+            <handlers xmi:id="_2c_osMMeEe2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.handler.gotodetail" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.GoToHandler" command="_fUZkMMMYEe2_uLh8_XzGAQ"/>
             <toolbar xmi:id="_CeFnubbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.part.details.toolbar"/>
           </children>
         </children>
@@ -307,6 +316,10 @@
       </children>
     </elements>
     <elements xsi:type="menu:ToolBarContribution" xmi:id="_4Q-jsMH8EeuXx4JvJ_IjeA" elementId="aero.minova.rcp.rcp.toolbarcontribution.2" parentId="aero.minova.rcp.rcp.part.details.toolbar">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_DZ6cUL9UEe2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.handledtoolitem.announce" label="@Action.Announce" iconURI="platform:/plugin/aero.minova.rcp.images/images/SaveRecord.Command/32x32.png" tooltip="@Action.Announce" command="_OuDY0MMfEe2_uLh8_XzGAQ">
+        <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_FaAHoMMsEe2VJZY5cdNS1A" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.AnnounceHandler"/>
+      </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnurbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.save" label="@Action.Save" iconURI="platform:/plugin/aero.minova.rcp.images/images/SaveRecord.Command/32x32.png" tooltip="@Action.Save" command="_laMxurbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
       </children>
@@ -324,6 +337,21 @@
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_-YjXYEX9EeycuKxXCizfMA" elementId="aero.minova.rcp.rcp.handledtoolitem.block" label="@Action.Block" iconURI="platform:/plugin/aero.minova.rcp.images/images/Block.Command/32x32.png" tooltip="@Action.Block" type="Check" command="_77kssEX_EeycuKxXCizfMA">
         <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_pp8j4EYJEeycuKxXCizfMA" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.BlockHandler"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_oF0mYMF_Ee2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.handledtoolitem.bookingoriginalrow" label="@BookingOriginalRow.Command" iconURI="platform:/plugin/aero.minova.rcp.images/images/BookingOriginalRow.Command/32x32.png" tooltip="@BookingOriginalRow.Command" command="_fUZkMMMYEe2_uLh8_XzGAQ">
+        <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_VTCe0MPaEe2IQ6BCGc_rmQ" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.GoToHandler"/>
+        <parameters xmi:id="_uHXsYMPgEe2IQ6BCGc_rmQ" elementId="aero.minova.rcp.rcp.parameter.gotooriginal" name="aero.minova.rcp.rcp.commandparameter.gotofield" value="originalkey"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_oVDVMMF_Ee2_uLh8_XzGAQ" elementId="aero.minova.rcp.rcp.handledtoolitem.bookingcanclerow" label="@BookingCancelRow.Command" iconURI="platform:/plugin/aero.minova.rcp.images/images/BookingCancelRow.Command/32x32.png" tooltip="@BookingCancelRow.Command" command="_fUZkMMMYEe2_uLh8_XzGAQ">
+        <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_Vt4nwMPaEe2IQ6BCGc_rmQ" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.GoToHandler"/>
+        <parameters xmi:id="_PYqt8MPhEe2IQ6BCGc_rmQ" elementId="aero.minova.rcp.rcp.parameter.gotocanceled" name="aero.minova.rcp.rcp.commandparameter.gotofield" value="canceledkey"/>
+      </children>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnvLbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.bookingcorrectrow" label="@BookingCorrectRow.Command" iconURI="platform:/plugin/aero.minova.rcp.images/images/BookingCorrectRow.Command/32x32.png" tooltip="@BookingCorrectRow.Command" command="_fUZkMMMYEe2_uLh8_XzGAQ">
+        <persistedState key="persistState" value="false"/>
+        <visibleWhen xsi:type="ui:ImperativeExpression" xmi:id="_WIQ2oMPaEe2IQ6BCGc_rmQ" contributionURI="bundleclass://aero.minova.rcp.rcp/aero.minova.rcp.rcp.handlers.GoToHandler"/>
+        <parameters xmi:id="_Vu-vwMPhEe2IQ6BCGc_rmQ" elementId="aero.minova.rcp.rcp.parameter.gotocorrected" name="aero.minova.rcp.rcp.commandparameter.gotofield" value="correctedkey"/>
       </children>
       <children xsi:type="menu:HandledToolItem" xmi:id="_CeFnwbbyEeuZF8ZS2_h9rA" elementId="aero.minova.rcp.rcp.handledtoolitem.print" label="@Action.PrintDetail" iconURI="platform:/plugin/aero.minova.rcp.images/images/Print.Command/32x32.png" tooltip="@Action.PrintDetail" command="_laMxwbbdEeuZF8ZS2_h9rA">
         <persistedState key="persistState" value="false"/>
