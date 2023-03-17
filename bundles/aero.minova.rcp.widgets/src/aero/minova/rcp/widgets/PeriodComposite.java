@@ -214,4 +214,19 @@ public class PeriodComposite extends Composite {
 		this.userInput = userInput;
 	}
 
+	@Override
+	public void setToolTipText(String tooltip) {
+		if (baseDateControl instanceof TextAssist ta) {
+			ta.getChildren()[0].setToolTipText(tooltip);
+		} else {
+			baseDateControl.setToolTipText(tooltip);
+		}
+
+		if (dueDateControl instanceof TextAssist ta) {
+			ta.getChildren()[0].setToolTipText(tooltip);
+		} else {
+			dueDateControl.setToolTipText(tooltip);
+		}
+	}
+
 }

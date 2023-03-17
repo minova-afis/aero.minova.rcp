@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MDI Menu Model
 Bundle-SymbolicName: aero.minova.rcp.form.menu
-Bundle-Version: 12.8.0.qualifier
+Bundle-Version: 12.8.1.qualifier
 Export-Package: aero.minova.rcp.form.menu.mdi
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.sun.xml.bind.v2;version="2.3.3",
