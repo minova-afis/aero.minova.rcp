@@ -393,9 +393,9 @@ public class WFCDetailCASRequestsUtil {
 				MField f = mDetail.getField(name);
 				if (f != null) {
 					checkedFields.add(f);
-					if (f instanceof MQuantityField) {
+					if (f instanceof MQuantityField qf) {
 						QuantityValue value = new QuantityValue((Number) table.getValue(i, 0).getValue(),
-								table.getValue(((MQuantityField) f).getUnitFieldName(), 0).getStringValue());
+								table.getValue(qf.getUnitFieldName(), 0).getStringValue());
 						table.setValue(i, 0, value);
 					}
 					f.setValue(table.getValue(i, 0), false);
@@ -529,18 +529,13 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	private Table getInsertUpdateTable(Form buildForm) {
-		Table formTable;
-		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(buildForm, updateRequest);
-		} else {
-			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
-			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
-			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
-				String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
-				boolean isAField = mDetail.getField(fieldname) != null ? true : false;
-				if (isAField && mDetail.getField(fieldname).isPrimary()) {
-					c.setOutputType(OutputType.OUTPUT);
-				}
+		Table formTable = dataFormService.getTableFromFormDetail(buildForm, getKeys() == null ? Constants.INSERT_REQUEST : updateRequest);
+
+		// Primary-Keys als Output definieren
+		for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
+			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+			if (mDetail.getField(fieldname) != null && mDetail.getField(fieldname).isPrimary()) {
+				c.setOutputType(OutputType.OUTPUT);
 			}
 		}
 		return formTable;
@@ -626,14 +621,9 @@ public class WFCDetailCASRequestsUtil {
 		}
 
 		SqlProcedureResult mainResult = resultList.get(0).getSQLProcedureResult();
-		if (insert) {
-			setKeysFromTable(mainResult.getOutputParameters());
-			broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.DataSaved");
-			handleUserAction(Constants.INSERT_REQUEST, mainResult.getOutputParameters());
-		} else {
-			broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.DataUpdated");
-			handleUserAction(Constants.UPDATE_REQUEST, currentKeyTable);
-		}
+		setKeysFromTable(mainResult.getOutputParameters());
+		broker.send(Constants.BROKER_SHOWNOTIFICATION, insert ? "msg.DataSaved" : "msg.DataUpdated");
+		handleUserAction(mainResult.getOutputParameters());
 
 		if (autoReloadIndex) {
 			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
@@ -660,12 +650,9 @@ public class WFCDetailCASRequestsUtil {
 	 *
 	 * @param updateRequest
 	 */
-	private void handleUserAction(String updateRequest, Table keyTable) {
-		Map<MPerspective, String> map = new HashMap<>();
-		map.put(perspective, updateRequest);
-
+	private void handleUserAction(Table keyTable) {
 		if (mDetail.isClearAfterSave()) {
-			clearFields(map);
+			clearFields("");
 		} else {
 			reloadFields(keyTable);
 		}
@@ -677,8 +664,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void reloadIndex(@UIEventTopic(Constants.BROKER_RELOADINDEX) String message) {
-		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-		if (activePerspective.equals(perspective)) {
+		if (isActivePerspective()) {
 			ParameterizedCommand cmd = commandService.createCommand(Constants.AERO_MINOVA_RCP_RCP_COMMAND_LOADINDEX, null);
 			handlerService.executeHandler(cmd);
 		}
@@ -756,6 +742,16 @@ public class WFCDetailCASRequestsUtil {
 			}
 		}
 
+		// Bei Booking Primary-Keys als Output definieren, damit Stornosatz geladen werden kann
+		if (mDetail.isBooking()) {
+			for (aero.minova.rcp.model.Column c : deleteTable.getColumns()) {
+				String fieldname = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+				if (mDetail.getField(fieldname) != null && mDetail.getField(fieldname).isPrimary()) {
+					c.setOutputType(OutputType.OUTPUT);
+				}
+			}
+		}
+
 		Row r = new Row();
 		for (Column c : deleteTable.getColumns()) {
 			String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + c.getName();
@@ -785,9 +781,12 @@ public class WFCDetailCASRequestsUtil {
 			handlerService.executeHandler(cmd);
 		}
 		broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.DataDeleted");
-		Map<MPerspective, String> map = new HashMap<>();
-		map.put(perspective, Constants.DELETE_REQUEST);
-		clearFields(map);
+
+		if (mDetail.isBooking()) { // Bei Booking Stornosatz laden
+			reloadFields(resultList.get(0).getSQLProcedureResult().getOutputParameters());
+		} else {
+			clearFields("");
+		}
 		sendEventToHelper(ActionCode.AFTERDEL);
 		focusFirstEmptyField();
 	}
@@ -803,8 +802,7 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	@Deprecated(since = "12.6.0", forRemoval = true)
 	public void callProcedureWithTable(@UIEventTopic(Constants.BROKER_PROCEDUREWITHTABLE) Table table) {
-		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-		if (activePerspective.equals(perspective) && table != null) {
+		if (isActivePerspective() && table != null) {
 
 			CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(table);
 
@@ -840,8 +838,8 @@ public class WFCDetailCASRequestsUtil {
 	 */
 	@Optional
 	@Inject
-	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
-		if (map.keySet().iterator().next() != perspective) {
+	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) String s) {
+		if (!isActivePerspective()) {
 			return;
 		}
 
@@ -850,7 +848,7 @@ public class WFCDetailCASRequestsUtil {
 		}
 		updateGridLookupValues();
 		sendEventToHelper(ActionCode.BEFORENEW);
-		clearFields(map);
+		clearFields("");
 		// Helper-Klasse triggern, damit die Standard-Werte gesetzt werden können.
 		sendEventToHelper(ActionCode.AFTERNEW);
 		focusFirstEmptyField();
@@ -872,14 +870,26 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
+	 * Direkt Methode clearFields(String s) benutzten. Diese Methode wird in einem Helper (für ScharrCPC) verwendet, vorerst behalten
+	 * 
+	 * @param map
+	 */
+	@Optional
+	@Inject
+	@Deprecated(since = "12.9.0", forRemoval = true)
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
+		clearFields("");
+	}
+
+	/**
 	 * Diese Methode bereiningt die Felder nach einer Erfolgreichen CAS-Anfrage
 	 *
 	 * @param origin
 	 */
 	@Optional
 	@Inject
-	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
-		if (map.keySet().iterator().next() != perspective) {
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) String s) {
+		if (!isActivePerspective()) {
 			return;
 		}
 
@@ -890,19 +900,19 @@ public class WFCDetailCASRequestsUtil {
 		// Entfernen der Sub-Fields von den paramString Feldern
 		ArrayList<MField> paramfields = new ArrayList<>();
 		for (MField f : mDetail.getFields()) {
-			if (f instanceof MParamStringField) {
-				paramfields.addAll(((MParamStringField) f).getSubMFields());
+			if (f instanceof MParamStringField ps) {
+				paramfields.addAll(ps.getSubMFields());
 			}
 		}
 		mDetail.getFields().removeAll(paramfields);
 		// Felder auf Null setzen!
 		for (MField f : mDetail.getFields()) {
-			if (f instanceof MQuantityField) {
-				f.setUnitText(translationService.translate(((MQuantityField) f).getOriginalUnitText(), null));
+			if (f instanceof MQuantityField qf) {
+				f.setUnitText(translationService.translate(qf.getOriginalUnitText(), null));
 			}
 			f.setValue(null, false);
-			if (f instanceof MLookupField) {
-				((MLookupField) f).setOptions(null);
+			if (f instanceof MLookupField lf) {
+				lf.setOptions(null);
 			}
 		}
 
@@ -955,8 +965,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Optional
 	public void reloadFields(@UIEventTopic(Constants.BROKER_RELOADFIELDS) Table keyTable) {
-		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-		if (activePerspective.equals(perspective)) {
+		if (isActivePerspective()) {
 			if (keyTable == null) {
 				keyTable = currentKeyTable;
 			}
@@ -1068,9 +1077,9 @@ public class WFCDetailCASRequestsUtil {
 		// SubFelder von Param-String Feldern entfernen
 		List<MField> toRemove = new ArrayList<>();
 		for (MField mField : mDetail.getFields()) {
-			if (mField instanceof MParamStringField && mField.getMSection().equals(mSection)) {
-				toRemove.addAll(((MParamStringField) mField).getSubMFields());
-				((MParamStringField) mField).clearSubMFields();
+			if (mField instanceof MParamStringField psf && mField.getMSection().equals(mSection)) {
+				toRemove.addAll(psf.getSubMFields());
+				psf.clearSubMFields();
 			}
 		}
 		mSection.getMFields().removeAll(toRemove);
@@ -1086,11 +1095,10 @@ public class WFCDetailCASRequestsUtil {
 				visibleMFields.add(f);
 			}
 
-			if (f instanceof MParamStringField) {
+			if (f instanceof MParamStringField mParamString) {
 				String name = f.getName();
 				String suffix = name.contains("\\.") ? name.substring(name.lastIndexOf("\\."), name.length()) : "";
 
-				MParamStringField mParamString = (MParamStringField) f;
 				paramStringFields.add(mParamString);
 				for (Field subField : mParamString.getSubFields()) {
 					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
@@ -1154,15 +1162,15 @@ public class WFCDetailCASRequestsUtil {
 			for (Object o : f.getDetail().getHeadAndPageAndGrid()) {
 				List<Object> fieldsOrGrids = new ArrayList<>();
 
-				if (o instanceof Head) {
-					fieldsOrGrids = ((Head) o).getFieldOrGrid();
-				} else if (o instanceof Page) {
-					fieldsOrGrids = ((Page) o).getFieldOrGrid();
+				if (o instanceof Head h) {
+					fieldsOrGrids = h.getFieldOrGrid();
+				} else if (o instanceof Page p) {
+					fieldsOrGrids = p.getFieldOrGrid();
 				}
 
 				for (Object fieldOrGrid : fieldsOrGrids) {
-					if (fieldOrGrid instanceof Field) {
-						subfields.add((Field) fieldOrGrid);
+					if (fieldOrGrid instanceof Field field) {
+						subfields.add(field);
 					}
 				}
 			}
@@ -1251,5 +1259,10 @@ public class WFCDetailCASRequestsUtil {
 	@Deprecated(since = "12.0.36", forRemoval = false)
 	public boolean checkDirty() {
 		return dirtyFlagUtil.checkDirty();
+	}
+
+	private boolean isActivePerspective() {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		return activePerspective.equals(perspective);
 	}
 }
