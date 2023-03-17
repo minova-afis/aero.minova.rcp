@@ -59,8 +59,8 @@ public class DeleteDetailHandler {
 				if (Constants.DELETE_DETAIL_BUTTON.equals(item.getElementId())) {
 					HandledToolItemImpl toolItem = (HandledToolItemImpl) item;
 					toolItem.setIconURI(toolItem.getIconURI().replace("DeleteRecord", "CancelBooking"));
-					toolItem.setLabel("@Action.CancleBooking");
-					toolItem.setTooltip("@Action.CancleBooking");
+					toolItem.setLabel("@Action.CancelBooking");
+					toolItem.setTooltip("@Action.CancelBooking");
 					break;
 				}
 			}

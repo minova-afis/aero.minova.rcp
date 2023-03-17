@@ -103,8 +103,8 @@ public class SaveDetailHandler implements ValueChangeListener {
 
 		if (setToCorrect) {
 			saveToolItem.setIconURI(saveToolItem.getIconURI().replace("/Book", "/CorrectBooking"));
-			saveToolItem.setLabel("@Action.CorrectBooking");
-			saveToolItem.setTooltip("@Action.CorrectBooking");
+			saveToolItem.setLabel("@Action.Correct");
+			saveToolItem.setTooltip("@Action.Correct");
 		} else {
 			saveToolItem.setIconURI(saveToolItem.getIconURI().replace("/CorrectBooking", "/Book"));
 			saveToolItem.setLabel("@Action.Book");
