@@ -15,6 +15,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Neu
+- Booking-Toolbar, aktiviert über Flag `type="booking"` in der Maske
 
 ### Änderung
 
