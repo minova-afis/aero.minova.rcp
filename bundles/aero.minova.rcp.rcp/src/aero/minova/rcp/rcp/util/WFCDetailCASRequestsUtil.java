@@ -85,6 +85,9 @@ public class WFCDetailCASRequestsUtil {
 
 	private static final String ERROR = "Error";
 
+	private String updateRequest = Constants.UPDATE_REQUEST;
+	private String deleteRequest = Constants.DELETE_REQUEST;
+
 	@Inject
 	protected UISynchronize sync;
 
@@ -126,7 +129,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.TIMEZONE)
 	public String timezone;
-	
+
 	@Inject
 	DirtyFlagUtil dirtyFlagUtil;
 
@@ -155,6 +158,12 @@ public class WFCDetailCASRequestsUtil {
 		this.wfcDetailPart = wfcDetailPart;
 		this.selectedOptionPages = new HashMap<>();
 		this.selectedGrids = new HashMap<>();
+
+		// Bei Buchungs-Toolbar wird Update zu Correct und Delete zu Cancel
+		if (mDetail.isBooking()) {
+			updateRequest = Constants.CORRECT_REQUEST;
+			deleteRequest = Constants.CANCEL_REQUEST;
+		}
 	}
 
 	/**
@@ -522,7 +531,7 @@ public class WFCDetailCASRequestsUtil {
 	private Table getInsertUpdateTable(Form buildForm) {
 		Table formTable;
 		if (getKeys() != null) {
-			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.UPDATE_REQUEST);
+			formTable = dataFormService.getTableFromFormDetail(buildForm, updateRequest);
 		} else {
 			formTable = dataFormService.getTableFromFormDetail(buildForm, Constants.INSERT_REQUEST);
 			// Bei Insert wird OUTPUT gesetzt, damit die Keys des neu erstellten Eintrags zurückgegeben werden
@@ -546,9 +555,9 @@ public class WFCDetailCASRequestsUtil {
 			sg.closeEditor();
 			sg.setPrimaryKeys(getKeys());
 
-			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + deleteRequest + g.getProcedureSuffix()).create();
 			Table gridInsertTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.INSERT_REQUEST + g.getProcedureSuffix()).create();
-			Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.UPDATE_REQUEST + g.getProcedureSuffix()).create();
+			Table gridUpdateTable = TableBuilder.newTable(g.getProcedurePrefix() + updateRequest + g.getProcedureSuffix()).create();
 
 			for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
 				aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
@@ -568,13 +577,13 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			if (!gridDeleteTable.getRows().isEmpty()) {
-				procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId() + "_" + Constants.DELETE_REQUEST, gridDeleteTable));
+				procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId() + "_" + deleteRequest, gridDeleteTable));
 			}
 			if (!gridInsertTable.getRows().isEmpty()) {
 				procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId() + "_" + Constants.INSERT_REQUEST, gridInsertTable));
 			}
 			if (!gridUpdateTable.getRows().isEmpty()) {
-				procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId() + "_" + Constants.UPDATE_REQUEST, gridUpdateTable));
+				procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId() + "_" + updateRequest, gridUpdateTable));
 			}
 		}
 	}
@@ -703,7 +712,7 @@ public class WFCDetailCASRequestsUtil {
 				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
 				sg.closeEditor();
 
-				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + Constants.DELETE_REQUEST + g.getProcedureSuffix()).create();
+				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + deleteRequest + g.getProcedureSuffix()).create();
 				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
 					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
 					gridDeleteTable.addColumn(c);
@@ -731,26 +740,30 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
-	 * Sucht die aktiven Controls aus der XMLDetailPart und baut anhand deren Werte eine Abfrage an den CAS zusammen
+	 * Baut die Tabelle für die Delete/Cancel-Anfrage
 	 */
 	private Table createDeleteTableFromForm(Form deleteForm) {
-		String tablename = deleteForm.getIndexView() != null ? "sp" : "op";
-		if ((!"sp".equals(deleteForm.getDetail().getProcedurePrefix()) && !"op".equals(deleteForm.getDetail().getProcedurePrefix()))) {
-			tablename = deleteForm.getDetail().getProcedurePrefix();
+		Table deleteTable;
+		// Bei Booking oder entsprechendem Flag in der Maske alle Felder übergeben
+		if (deleteForm.getDetail().isDeleteRequiresAllParams() || mDetail.isBooking()) { //
+			deleteTable = dataFormService.getTableFromFormDetail(deleteForm, deleteRequest);
+		} else { // Ansonsten nur primary-Keys
+			deleteTable = new Table();
+			deleteTable.setName(deleteForm.getDetail().getProcedurePrefix() + deleteRequest + deleteForm.getDetail().getProcedureSuffix());
+			for (Field f : dataFormService.getAllPrimaryFieldsFromForm(deleteForm)) {
+				String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + f.getName();
+				deleteTable.addColumn(new Column(f.getName(), mDetail.getField(fieldName).getDataType()));
+			}
 		}
-		tablename += "Delete";
-		tablename += deleteForm.getDetail().getProcedureSuffix();
-		TableBuilder tb = TableBuilder.newTable(tablename);
-		RowBuilder rb = RowBuilder.newRow();
-		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(deleteForm)) {
-			String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + f.getName();
-			tb.withColumn(f.getName(), mDetail.getField(fieldName).getDataType());
-			rb.withValue(mDetail.getField(fieldName).getValue());
+
+		Row r = new Row();
+		for (Column c : deleteTable.getColumns()) {
+			String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+			r.addValue(mDetail.getField(fieldName).getValue());
 		}
-		Table t = tb.create();
-		Row r = rb.create();
-		t.addRow(r);
-		return t;
+
+		deleteTable.addRow(r);
+		return deleteTable;
 	}
 
 	/**
@@ -922,9 +935,10 @@ public class WFCDetailCASRequestsUtil {
 		for (MField field : mDetail.getFields()) {
 			if (field.getDefaultValueString() != null) {
 				String[] opAndFieldName = new String[2];
-				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), field.getDateTimeType(), CustomLocale.getLocale(), timezone);
+				Value v = Value.getValueForStringFromDataType(field.getDefaultValueString(), field.getDataType(), field.getDateTimeType(),
+						CustomLocale.getLocale(), timezone);
 				field.setValue(v, false);
-				if(field.getName().contains(".")) {
+				if (field.getName().contains(".")) {
 					opAndFieldName = field.getName().split(".");
 				} else {
 					opAndFieldName[0] = null;
