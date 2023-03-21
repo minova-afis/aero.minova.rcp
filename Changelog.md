@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Neu
 - Booking-Toolbar, aktiviert über Flag `type="booking"` in der Maske
+- Lookup-Masken nutzbar machen (nur Update Prozeduren, kein Insert)
 
 ### Änderung
 
