@@ -37,7 +37,10 @@ public class GoToHandler {
 	 */
 	@Evaluate
 	public boolean visible(MPart part) {
-		return ((WFCDetailPart) part.getObject()).getDetail().isBooking();
+		if (part.getObject() != null) {
+			return ((WFCDetailPart) part.getObject()).getDetail().isBooking();
+		}
+		return false;
 	}
 
 	@CanExecute
