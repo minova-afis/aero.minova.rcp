@@ -4,6 +4,7 @@ package aero.minova.rcp.rcp.parts;
 import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1043,6 +1044,18 @@ public class WFCDetailPart extends WFCFormPart {
 
 			if (field.isVisible()) {
 				mSection.addMField(f);
+			}
+
+			if ("primary".equalsIgnoreCase(field.getKeyType())) {
+				f.addValueChangeListener(evt -> {
+					if (f.getValue() == null) {
+						return;
+					}
+					if (casRequestsUtil.getKeys() == null) {
+						casRequestsUtil.setKeys(new HashMap<>());
+					}
+					casRequestsUtil.getKeys().put(f.getName(), f.getValue());
+				});
 			}
 
 			return f;

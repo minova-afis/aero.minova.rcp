@@ -150,8 +150,6 @@ public class WFCDetailCASRequestsUtil {
 
 	private WFCDetailPart wfcDetailPart;
 
-	private Table currentKeyTable;
-
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective, WFCDetailPart wfcDetailPart) {
 		this.mDetail = detail;
 		this.perspective = perspective;
@@ -186,7 +184,6 @@ public class WFCDetailCASRequestsUtil {
 				broker.send(Constants.BROKER_CLEARSELECTION, perspective);
 				return;
 			}
-			currentKeyTable = table;
 
 			sendEventToHelper(ActionCode.BEFOREREAD);
 			updateGridLookupValues();
@@ -531,11 +528,13 @@ public class WFCDetailCASRequestsUtil {
 	private Table getInsertUpdateTable(Form buildForm) {
 		Table formTable = dataFormService.getTableFromFormDetail(buildForm, getKeys() == null ? Constants.INSERT_REQUEST : updateRequest);
 
-		// Primary-Keys als Output definieren
-		for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
-			String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
-			if (mDetail.getField(fieldname) != null && mDetail.getField(fieldname).isPrimary()) {
-				c.setOutputType(OutputType.OUTPUT);
+		// Primary-Keys als Output definieren (für INSERT oder bei INSERT und CORRECT bei Buchung)
+		if (mDetail.isBooking() || getKeys() == null) {
+			for (aero.minova.rcp.model.Column c : formTable.getColumns()) {
+				String fieldname = (buildForm == form ? "" : buildForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+				if (mDetail.getField(fieldname) != null && mDetail.getField(fieldname).isPrimary()) {
+					c.setOutputType(OutputType.OUTPUT);
+				}
 			}
 		}
 		return formTable;
@@ -637,6 +636,11 @@ public class WFCDetailCASRequestsUtil {
 	 * @param t
 	 */
 	private void setKeysFromTable(Table t) {
+
+		if (t == null) {
+			return;
+		}
+
 		Map<String, Value> newKeys = new HashMap<>();
 		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(form)) {
 			int index = t.getColumnIndex(f.getName());
@@ -967,7 +971,13 @@ public class WFCDetailCASRequestsUtil {
 	public void reloadFields(@UIEventTopic(Constants.BROKER_RELOADFIELDS) Table keyTable) {
 		if (isActivePerspective()) {
 			if (keyTable == null) {
-				keyTable = currentKeyTable;
+				keyTable = new Table();
+				Row r = new Row();
+				for (Entry<String, Value> e : keys.entrySet()) {
+					keyTable.addColumn(new Column(e.getKey(), e.getValue().getType()));
+					r.addValue(e.getValue());
+				}
+				keyTable.addRow(r);
 			}
 			readData(keyTable, false); // Nach Speichern soll discard-Nachricht nicht angezeigt werden
 		}
