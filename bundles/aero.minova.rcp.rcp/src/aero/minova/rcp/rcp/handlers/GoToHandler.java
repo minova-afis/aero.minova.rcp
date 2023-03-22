@@ -21,8 +21,6 @@ import aero.minova.rcp.rcp.parts.WFCIndexPart;
 
 public class GoToHandler {
 
-	private static final String COMMAND_PARAMETER = "aero.minova.rcp.rcp.commandparameter.gotofield";
-
 	@Inject
 	private IDataFormService dataFormService;
 
@@ -44,12 +42,12 @@ public class GoToHandler {
 	}
 
 	@CanExecute
-	public boolean canExecute(MPart part, @Named(COMMAND_PARAMETER) String fieldName) {
+	public boolean canExecute(MPart part, @Named(Constants.COMMAND_PARAMETER_GOTOFIELD) String fieldName) {
 		return ((WFCDetailPart) part.getObject()).getDetail().getField(fieldName).getValue() != null;
 	}
 
 	@Execute
-	public void execute(MPerspective mPerspective, MPart part, @Named(COMMAND_PARAMETER) String fieldName) {
+	public void execute(MPerspective mPerspective, MPart part, @Named(Constants.COMMAND_PARAMETER_GOTOFIELD) String fieldName) {
 		WFCDetailPart detailPart = (WFCDetailPart) part.getObject();
 		WFCIndexPart indexPart = (WFCIndexPart) eModelService.findElements(mPerspective, Constants.INDEX_PART, MPart.class).get(0).getObject();
 

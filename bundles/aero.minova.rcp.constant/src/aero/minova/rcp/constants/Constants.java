@@ -214,6 +214,7 @@ public class Constants {
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL = "aero.minova.rcp.rcp.command.savedetail";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART = "aero.minova.rcp.rcp.command.selectsearchpart";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON = "aero.minova.rcp.rcp.command.dynamicbuttoncommand";
+	public static final String COMMAND_PARAMETER_GOTOFIELD = "aero.minova.rcp.rcp.commandparameter.gotofield";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";
