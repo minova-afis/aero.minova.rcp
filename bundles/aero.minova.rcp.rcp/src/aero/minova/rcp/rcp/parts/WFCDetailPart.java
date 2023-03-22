@@ -1046,6 +1046,7 @@ public class WFCDetailPart extends WFCFormPart {
 				mSection.addMField(f);
 			}
 
+			// Wird ein primary-key geändert muss dies weitergegeben werden, damit Lookup-Masken funktionieren
 			if ("primary".equalsIgnoreCase(field.getKeyType())) {
 				f.addValueChangeListener(evt -> {
 					if (f.getValue() == null) {
