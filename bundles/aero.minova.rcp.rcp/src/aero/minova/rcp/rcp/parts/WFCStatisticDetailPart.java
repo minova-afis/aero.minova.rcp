@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -392,8 +391,8 @@ public class WFCStatisticDetailPart {
 
 	@Optional
 	@Inject
-	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) Map<MPerspective, String> map) {
-		if (map.keySet().iterator().next() != mPerspective) {
+	public void newFields(@UIEventTopic(Constants.BROKER_NEWENTRY) String s) {
+		if (!isActivePerspective()) {
 			return;
 		}
 
@@ -475,4 +474,8 @@ public class WFCStatisticDetailPart {
 		return mDetail;
 	}
 
+	private boolean isActivePerspective() {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		return activePerspective.equals(mPerspective);
+	}
 }

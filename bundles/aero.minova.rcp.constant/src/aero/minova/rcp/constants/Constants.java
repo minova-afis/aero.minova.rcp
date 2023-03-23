@@ -17,6 +17,7 @@ public class Constants {
 
 	public static final String SAVE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.save";
 	public static final String REVERT_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.revert";
+	public static final String DELETE_DETAIL_BUTTON = "aero.minova.rcp.rcp.handledtoolitem.delete";
 
 	public static final String MDI_FILE_NAME = "application.mdi";
 	public static final String XBS_FILE_NAME = "application.xbs";
@@ -64,6 +65,9 @@ public class Constants {
 	public static final String UPDATE_REQUEST = "Update";
 	public static final String READ_REQUEST = "Read";
 	public static final String BLOCK_REQUEST = "Block";
+	public static final String CORRECT_REQUEST = "Correct";
+	public static final String CANCEL_REQUEST = "Cancel";
+	public static final String ANNOUNCE_REQUEST = "Announce";
 
 	// Liste an Broker-Konstanten
 	public static final String BROKER_SAVEENTRY = "aero/minova/rcp/SaveEntry";
@@ -210,6 +214,7 @@ public class Constants {
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SAVEDETAIL = "aero.minova.rcp.rcp.command.savedetail";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_SELECTSEARCHPART = "aero.minova.rcp.rcp.command.selectsearchpart";
 	public static final String AERO_MINOVA_RCP_RCP_COMMAND_DYNAMIC_BUTTON = "aero.minova.rcp.rcp.command.dynamicbuttoncommand";
+	public static final String COMMAND_PARAMETER_GOTOFIELD = "aero.minova.rcp.rcp.commandparameter.gotofield";
 
 	// XBS Einstellungen
 	public static final String XBS_SHOW_DELETE_DIALOG = "ShowDeleteDialog";

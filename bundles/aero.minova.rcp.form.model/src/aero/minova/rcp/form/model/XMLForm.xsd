@@ -2,24 +2,23 @@
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.1">
 	<xs:complexType name="column">
 		<xs:choice maxOccurs="1" minOccurs="1">
-			<xs:element name="number" type="number" />
-			<xs:element name="bignumber" type="bignumber" />
-			<xs:element name="boolean" />
-			<xs:element name="percentage" type="percentage" />
-			<xs:element name="text" type="text" />
-			<xs:element name="short-date" />
-			<xs:element name="long-date" />
-			<xs:element name="short-time" />
-			<xs:element name="long-time" />
-			<xs:element name="date-time" />
-			<xs:element name="week-day" />
-			<xs:element name="money" type="money" />
+			<xs:element name="number" type="number"/>
+			<xs:element name="bignumber" type="bignumber"/>
+			<xs:element name="boolean"/>
+			<xs:element name="percentage" type="percentage"/>
+			<xs:element name="text" type="text"/>
+			<xs:element name="short-date"/>
+			<xs:element name="long-date"/>
+			<xs:element name="short-time"/>
+			<xs:element name="long-time"/>
+			<xs:element name="date-time"/>
+			<xs:element name="week-day"/>
+			<xs:element name="money" type="money"/>
 		</xs:choice>
 		<xs:attribute name="name" type="xs:NCName" use="required">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">Name der Spalte in der View bzw. StoredProcedure, die in
-						der Eigenschaft
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Name der Spalte in der View bzw. StoredProcedure, die in der Eigenschaft
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -27,31 +26,23 @@
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:appinfo>
-					<jxb:property name="label" />
+					<jxb:property name="label"/>
 				</xs:appinfo>
-				<xs:documentation> Hier wird der zu übersetzende text eingetragten.
-					'@' Muss voran gestellt werden.
+				<xs:documentation> Hier wird der zu übersetzende text eingetragten. '@' Muss voran gestellt werden.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="offline" type="xs:boolean" use="optional">
 			<xs:annotation>
-				<xs:documentation> Wenn true, dann wird das Feld nicht mit den
-					Standard-Prozeduren verwendet. Kann für die
-					Darstellung
-					abgeleiteter Werte verwendet werden
-					oder
-					als Input für
-					procedure-Actions
+				<xs:documentation> Wenn true, dann wird das Feld nicht mit den Standard-Prozeduren verwendet. Kann für die Darstellung abgeleiteter Werte verwendet werden
+					oder als Input für procedure-Actions
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="key" type="xs:boolean" use="optional" default="false">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Gibt an, dass die Spalte einen Schlüssel enthält, der
-						auch für das Auslesen der Detaildaten erforderlich
-						ist.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Gibt an, dass die Spalte einen Schlüssel enthält, der auch für das Auslesen der Detaildaten erforderlich ist.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -59,9 +50,7 @@
 		<xs:attribute name="total" type="xs:boolean" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Wenn 'true', dann wird für diese Spalte auch die Summe
-						ermittelt. Es macht nur für Spalten vom Datentyp
-						'number' Sinn.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Wenn 'true', dann wird für diese Spalte auch die Summe ermittelt. Es macht nur für Spalten vom Datentyp 'number' Sinn.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -69,11 +58,11 @@
 		<xs:attribute name="aggregate" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="SUM" />
-					<xs:enumeration value="MIN" />
-					<xs:enumeration value="MAX" />
-					<xs:enumeration value="AVERAGE" />
-					<xs:enumeration value="COUNT" />
+					<xs:enumeration value="SUM"/>
+					<xs:enumeration value="MIN"/>
+					<xs:enumeration value="MAX"/>
+					<xs:enumeration value="AVERAGE"/>
+					<xs:enumeration value="COUNT"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -81,14 +70,10 @@
 		<xs:attribute name="size" type="xs:integer" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Für die einzelnen Datentypen ist eine Standardbreite im
-						System hinterlegt. Beim Datentyp 'text'
-						definiert dieses Feld die
-						Breite der Spalte in
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Für die einzelnen Datentypen ist eine Standardbreite im System hinterlegt. Beim Datentyp 'text' definiert dieses Feld die Breite der Spalte in
 						Pixel.
 					</p>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Der Wert 0 blendet eine Spalte aus. Sie kann aber durch
-						aufziehen wieder sichtbar gemacht werden.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Der Wert 0 blendet eine Spalte aus. Sie kann aber durch aufziehen wieder sichtbar gemacht werden.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -96,8 +81,7 @@
 		<xs:attribute name="visible" type="xs:boolean" use="optional" default="true">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">Mit visible="false" kann eine Spalte ausgeblendet
-						werden.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Mit visible="false" kann eine Spalte ausgeblendet werden.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -105,8 +89,7 @@
 		<xs:attribute name="localize-key" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">Name der Spalte, die den PrimaryKey für die Übersetzung
-						liefert
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Name der Spalte, die den PrimaryKey für die Übersetzung liefert
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -121,8 +104,7 @@
 		<xs:attribute name="read-only" type="xs:boolean" use="optional" default="true">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">mit read-only="false" kann in Nat-Tables die Spalte
-						editiert werden
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">mit read-only="false" kann in Nat-Tables die Spalte editiert werden
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -130,8 +112,7 @@
 		<xs:attribute name="group" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">in Nat-Tables kann die Spalte einer Gruppe zugeordnet
-						werden, dann bekommt man einen zweizeiligen Header
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">in Nat-Tables kann die Spalte einer Gruppe zugeordnet werden, dann bekommt man einen zweizeiligen Header
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -142,8 +123,7 @@
 			<xs:element maxOccurs="unbounded" minOccurs="1" name="column" type="column">
 				<xs:annotation>
 					<xs:documentation>
-						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Eine Spalte im Inhaltsverzeichnis. Der Name muss mit
-							dem Namen der View übereinstimmen.
+						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Eine Spalte im Inhaltsverzeichnis. Der Name muss mit dem Namen der View übereinstimmen.
 						</p>
 					</xs:documentation>
 				</xs:annotation>
@@ -158,35 +138,26 @@
 		<xs:attribute name="source" type="xs:NCName" use="required">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Name der View in der Datenbank, über die die Suche
-						durchgeführt wird. Die View liefert die Daten in der
-						darzustellenden Form. Dies gilt
-						insbesondere für
-						Nachschlagespalten.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Name der View in der Datenbank, über die die Suche durchgeführt wird. Die View liefert die Daten in der darzustellenden Form. Dies gilt
+						insbesondere für Nachschlagespalten.
 					</p>
 					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Die View sollte immer mit dbo. beginnen.</p>
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="id" type="xs:NCName" use="optional" />
+		<xs:attribute name="id" type="xs:NCName" use="optional"/>
 		<xs:attribute default="auto" name="index-report" type="xs:NCName" use="optional">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Dieses Attribut bestimmt den Bericht, der beim Druck
-						aller Datensätze verwendet wird. Er muss die
-						gleichen
-						Selektionskriterien verarbeiten
-						können,
-						die auch die View im
-						Attribut 'source' funktionieren.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Dieses Attribut bestimmt den Bericht, der beim Druck aller Datensätze verwendet wird. Er muss die gleichen Selektionskriterien verarbeiten
+						können, die auch die View im Attribut 'source' funktionieren.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="sort-by" type="xs:string" use="optional">
 			<xs:annotation>
-				<xs:documentation>Kommaseparierte Feldliste der Standard
-					Sortierreihenfolge
+				<xs:documentation>Kommaseparierte Feldliste der Standard Sortierreihenfolge
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -200,22 +171,20 @@
 		<!-- <xs:attribute name="detail-report" type="xs:string" use="optional"/> -->
 		<!-- <xs:attribute name="detail-report-procedure" type="xs:string" use="optional"/> -->
 		<!-- <xs:attribute name="detail-report-root" type="xs:string" use="optional"/> -->
-		<!-- <xs:attribute name="detail-report-type" use="optional"> <xs:simpleType> <xs:restriction base="xs:string"> <xs:enumeration value=""> <xs:annotation> <xs:documentation>Wenn 
-			nichts angegeben wird oder das Attribut weg gelassen wird, dann wird ein Crystal report benutzt.</xs:documentation> </xs:annotation> </xs:enumeration> <xs:enumeration 
-			value="auto"> <xs:annotation> <xs:documentation>Es wird nur eine XSL-Datei benötigt</xs:documentation> </xs:annotation> </xs:enumeration> <xs:enumeration value="view"> 
-			<xs:annotation> <xs:documentation>Der Bericht wird durch verwendung der View 'index-view'XML mit den Selektionskriterien vom Index verwendet. Oder mit den Keys. 
-			Es wird nur eine XSL-Datei benötigt.</xs:documentation> </xs:annotation> </xs:enumeration> <xs:enumeration value="procedure"> <xs:annotation> <xs:documentation>Der 
-			Bericht wird durch Aufruf einer Prozedur erstellt. Das Attribut 'detail-report-procedure' und 'detail-report' müssen gesetzt sein.</xs:documentation> </xs:annotation> 
-			</xs:enumeration> <xs:enumeration value="none"> <xs:annotation> <xs:documentation>tbbPrintAllDetail und tbbPrintDetail werden auf unsichtbar gesetzt. Ist notwendig 
-			bei Spezialmasken, die eigene Print Knöpfe haben. Zum Beispiel Manki/Boni Abrechnung (AutomatedStockAdjustment).</xs:documentation> </xs:annotation> </xs:enumeration> 
-			<xs:enumeration value="html"> <xs:annotation> <xs:documentation>Der Detailreport wird über MinovaStatisticsServer (BIRT) erstellt.</xs:documentation> </xs:annotation> 
+		<!-- <xs:attribute name="detail-report-type" use="optional"> <xs:simpleType> <xs:restriction base="xs:string"> <xs:enumeration value=""> <xs:annotation> <xs:documentation>Wenn
+			nichts angegeben wird oder das Attribut weg gelassen wird, dann wird ein Crystal report benutzt.</xs:documentation> </xs:annotation> </xs:enumeration> <xs:enumeration
+			value="auto"> <xs:annotation> <xs:documentation>Es wird nur eine XSL-Datei benötigt</xs:documentation> </xs:annotation> </xs:enumeration> <xs:enumeration value="view">
+			<xs:annotation> <xs:documentation>Der Bericht wird durch verwendung der View 'index-view'XML mit den Selektionskriterien vom Index verwendet. Oder mit den Keys.
+			Es wird nur eine XSL-Datei benötigt.</xs:documentation> </xs:annotation> </xs:enumeration> <xs:enumeration value="procedure"> <xs:annotation> <xs:documentation>Der
+			Bericht wird durch Aufruf einer Prozedur erstellt. Das Attribut 'detail-report-procedure' und 'detail-report' müssen gesetzt sein.</xs:documentation> </xs:annotation>
+			</xs:enumeration> <xs:enumeration value="none"> <xs:annotation> <xs:documentation>tbbPrintAllDetail und tbbPrintDetail werden auf unsichtbar gesetzt. Ist notwendig
+			bei Spezialmasken, die eigene Print Knöpfe haben. Zum Beispiel Manki/Boni Abrechnung (AutomatedStockAdjustment).</xs:documentation> </xs:annotation> </xs:enumeration>
+			<xs:enumeration value="html"> <xs:annotation> <xs:documentation>Der Detailreport wird über MinovaStatisticsServer (BIRT) erstellt.</xs:documentation> </xs:annotation>
 			</xs:enumeration> </xs:restriction> </xs:simpleType> </xs:attribute> -->
 		<xs:attribute name="read-only" type="xs:boolean" use="optional" default="true">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Dieses Attribut kann für NATTable auf "false" gesetzt
-						werden. Dann kann im Index-Bereich gespeichert
-						werden.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Dieses Attribut kann für NATTable auf "false" gesetzt werden. Dann kann im Index-Bereich gespeichert werden.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -225,133 +194,131 @@
 		<xs:attribute default="0" name="decimals" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
-					<xs:minInclusive value="0" />
-					<xs:maxInclusive value="100" />
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="100"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute default="-100.0" name="min-value" type="xs:float" use="optional" />
-		<xs:attribute default="100.0" name="max-value" type="xs:float" use="optional" />
+		<xs:attribute default="-100.0" name="min-value" type="xs:float" use="optional"/>
+		<xs:attribute default="100.0" name="max-value" type="xs:float" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="lookup">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="type-param" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="type-param"/>
 		</xs:sequence>
-		<xs:attribute name="key-long-name" type="xs:NCName" use="optional" />
-		<xs:attribute name="key-text-name" type="xs:NCName" use="optional" />
-		<xs:attribute name="description-name" type="xs:string" use="optional" />
-		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" />
-		<xs:attribute name="table" type="xs:NCName" use="optional" />
-		<xs:attribute name="filter-blocked" type="xs:boolean" use="optional" default="false" />
-		<xs:attribute name="filter-last-action" type="xs:boolean" use="optional" default="true" />
-		<xs:attribute name="form" type="xs:string" use="optional" />
-		<xs:attribute name="use-resolve-params" type="xs:boolean" use="optional" default="false" />
+		<xs:attribute name="key-long-name" type="xs:NCName" use="optional"/>
+		<xs:attribute name="key-text-name" type="xs:NCName" use="optional"/>
+		<xs:attribute name="description-name" type="xs:string" use="optional"/>
+		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional"/>
+		<xs:attribute name="table" type="xs:NCName" use="optional"/>
+		<xs:attribute name="filter-blocked" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="filter-last-action" type="xs:boolean" use="optional" default="true"/>
+		<xs:attribute name="form" type="xs:string" use="optional"/>
+		<xs:attribute name="use-resolve-params" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="number">
 		<xs:attribute default="0" name="decimals" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
-					<xs:minInclusive value="0" />
-					<xs:maxInclusive value="11" />
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="11"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="min-value" type="xs:float" use="optional" />
-		<xs:attribute name="max-value" type="xs:float" use="optional" />
+		<xs:attribute name="min-value" type="xs:float" use="optional"/>
+		<xs:attribute name="max-value" type="xs:float" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="unit">
-		<xs:attribute name="unitKeyText" type="xs:string" use="required" />
+		<xs:attribute name="unitKeyText" type="xs:string" use="required"/>
 		<xs:attribute name="unitText" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="quantity">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" name="unit" type="unit" />
+			<xs:element maxOccurs="unbounded" name="unit" type="unit"/>
 		</xs:sequence>
 		<xs:attribute default="0" name="decimals" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
-					<xs:minInclusive value="0" />
-					<xs:maxInclusive value="11" />
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="11"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="min-value" type="xs:float" use="optional" />
-		<xs:attribute name="max-value" type="xs:float" use="optional" />
-		<xs:attribute name="unit-field-name" type="xs:NCName" use="required" />
-		<xs:attribute name="unit-field-sql-index" type="xs:integer" use="required" />
+		<xs:attribute name="min-value" type="xs:float" use="optional"/>
+		<xs:attribute name="max-value" type="xs:float" use="optional"/>
+		<xs:attribute name="unit-field-name" type="xs:NCName" use="required"/>
+		<xs:attribute name="unit-field-sql-index" type="xs:integer" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="radio">
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:appinfo>
-					<jxb:property name="label" />
+					<jxb:property name="label"/>
 				</xs:appinfo>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">Dieser Name sollte immer mit '@' beginnen.
-						Dann wird der Name in den Messages
-						nachgeschlagen.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Dieser Name sollte immer mit '@' beginnen. Dann wird der Name in den Messages nachgeschlagen.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="name" type="xs:ID" use="required" />
+		<xs:attribute name="name" type="xs:ID" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="bignumber">
 		<xs:attribute default="0" name="decimals" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
-					<xs:minInclusive value="0" />
-					<xs:maxInclusive value="11" />
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="11"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="min-value" type="xs:float" use="optional" />
-		<xs:attribute name="max-value" type="xs:float" use="optional" />
+		<xs:attribute name="min-value" type="xs:float" use="optional"/>
+		<xs:attribute name="max-value" type="xs:float" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="editor">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-field" type="ref-field" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-field" type="ref-field"/>
 		</xs:sequence>
-		<xs:attribute name="editor" type="xs:NCName" use="required" />
+		<xs:attribute name="editor" type="xs:NCName" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="money">
 		<xs:attribute default="2" name="decimals" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
-					<xs:minInclusive value="0" />
-					<xs:maxInclusive value="10" />
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="10"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="min-value" type="xs:float" use="optional" />
-		<xs:attribute name="max-value" type="xs:float" use="optional" />
+		<xs:attribute name="min-value" type="xs:float" use="optional"/>
+		<xs:attribute name="max-value" type="xs:float" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="boolean">
-		<xs:attribute default="false" name="tristate" use="optional" type="xs:boolean" />
+		<xs:attribute default="false" name="tristate" use="optional" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="color">
 	</xs:complexType>
 	<!-- wird vom editor (vom Typ IBindingHandler) verwendet. Siehe #2122 -->
 	<xs:complexType name="ref-field">
-		<xs:attribute name="field-name" type="xs:string" use="required" />
-		<xs:attribute name="type" type="xs:string" use="required" />
+		<xs:attribute name="field-name" type="xs:string" use="required"/>
+		<xs:attribute name="type" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!-- Parameter String Type -->
 	<xs:complexType name="param-string">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field"/>
 		</xs:sequence>
-		<xs:attribute name="xml-file" type="xs:string" use="optional" />
+		<xs:attribute name="xml-file" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="type-param">
-		<xs:attribute name="field-name" type="xs:string" use="required" />
+		<xs:attribute name="field-name" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="text">
 		<xs:attribute default="50" name="length" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:int">
-					<xs:minInclusive value="1" />
-					<xs:maxInclusive value="1024" />
+					<xs:minInclusive value="1"/>
+					<xs:maxInclusive value="1024"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -359,37 +326,37 @@
 	<xs:complexType name="field">
 		<xs:sequence>
 			<xs:choice maxOccurs="1" minOccurs="1">
-				<xs:element name="number" type="number" />
-				<xs:element name="bignumber" type="bignumber" />
-				<xs:element name="lookup" type="lookup" />
-				<xs:element name="percentage" type="percentage" />
-				<xs:element name="text" type="text" />
-				<xs:element name="short-date" />
-				<xs:element name="long-date" />
-				<xs:element name="short-time" />
-				<xs:element name="long-time" />
-				<xs:element name="date-time" />
-				<xs:element name="week-day" />
-				<xs:element name="editor" type="editor" />
-				<xs:element name="money" type="money" />
-				<xs:element name="quantity" type="quantity" />
-				<xs:element name="param-string" type="param-string" />
-				<xs:element name="void" />
-				<xs:element name="boolean" type="boolean" />
-				<xs:element name="color" type="color" />
-				<xs:element name="label-text" />
-				<xs:element name="period" />
-				<xs:element name="radiobox" type="radiobox" />
+				<xs:element name="number" type="number"/>
+				<xs:element name="bignumber" type="bignumber"/>
+				<xs:element name="lookup" type="lookup"/>
+				<xs:element name="percentage" type="percentage"/>
+				<xs:element name="text" type="text"/>
+				<xs:element name="short-date"/>
+				<xs:element name="long-date"/>
+				<xs:element name="short-time"/>
+				<xs:element name="long-time"/>
+				<xs:element name="date-time"/>
+				<xs:element name="week-day"/>
+				<xs:element name="editor" type="editor"/>
+				<xs:element name="money" type="money"/>
+				<xs:element name="quantity" type="quantity"/>
+				<xs:element name="param-string" type="param-string"/>
+				<xs:element name="void"/>
+				<xs:element name="boolean" type="boolean"/>
+				<xs:element name="color" type="color"/>
+				<xs:element name="label-text"/>
+				<xs:element name="period"/>
+				<xs:element name="radiobox" type="radiobox"/>
 			</xs:choice>
 			<xs:element minOccurs="0" maxOccurs="unbounded" name="msg">
 				<xs:complexType>
-					<xs:attribute name="key" type="xs:string" use="required" />
+					<xs:attribute name="key" type="xs:string" use="required"/>
 					<xs:attribute name="type" use="optional" default="okcancel">
 						<xs:simpleType>
 							<xs:restriction base="xs:string">
-								<xs:enumeration value="okcancel" />
-								<xs:enumeration value="yesnocancel" />
-								<xs:enumeration value="yesno" />
+								<xs:enumeration value="okcancel"/>
+								<xs:enumeration value="yesnocancel"/>
+								<xs:enumeration value="yesno"/>
 							</xs:restriction>
 						</xs:simpleType>
 					</xs:attribute>
@@ -399,100 +366,94 @@
 		<xs:attribute name="text" type="xs:string" use="optional">
 			<xs:annotation>
 				<xs:appinfo>
-					<jxb:property name="label" />
+					<jxb:property name="label"/>
 				</xs:appinfo>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Spaltenname. Dieser Name sollte immer mit '@' beginnen.
-						Dann wird der Name in den Messages
-						nachgeschlagen.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Spaltenname. Dieser Name sollte immer mit '@' beginnen. Dann wird der Name in den Messages nachgeschlagen.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="tab-index" type="xs:integer" use="optional" />
+		<xs:attribute name="tab-index" type="xs:integer" use="optional"/>
 		<!--xs:attribute name="tab-index" type="xs:IDREF"/ -->
-		<xs:attribute name="name" type="xs:ID" use="required" />
-		<xs:attribute name="default" type="xs:string" use="optional" />
-		<xs:attribute default="false" name="required" type="xs:boolean" />
+		<xs:attribute name="name" type="xs:ID" use="required"/>
+		<xs:attribute name="default" type="xs:string" use="optional"/>
+		<xs:attribute default="false" name="required" type="xs:boolean"/>
 		<xs:attribute name="offline" type="xs:boolean" use="optional">
 			<xs:annotation>
-				<xs:documentation>Wenn true, dann wird das Feld nicht mit den
-					Standard-Prozeduren verwendet. Kann für die Darstellung
-					abgeleiteter Werte verwendet werden
-					oder
-					als Input für
-					procedure-Actions
+				<xs:documentation>Wenn true, dann wird das Feld nicht mit den Standard-Prozeduren verwendet. Kann für die Darstellung abgeleiteter Werte verwendet werden
+					oder als Input für procedure-Actions
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute default="false" name="total" type="xs:boolean" />
+		<xs:attribute default="false" name="total" type="xs:boolean"/>
 		<xs:attribute name="aggregate" use="optional">
 			<xs:annotation>
 				<xs:documentation>Wird benötigt, damit bei Grids die Summenzeile mit "Aggregate" konfiguriert werden kann</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="SUM" />
-					<xs:enumeration value="MIN" />
-					<xs:enumeration value="MAX" />
-					<xs:enumeration value="AVERAGE" />
-					<xs:enumeration value="COUNT" />
+					<xs:enumeration value="SUM"/>
+					<xs:enumeration value="MIN"/>
+					<xs:enumeration value="MAX"/>
+					<xs:enumeration value="AVERAGE"/>
+					<xs:enumeration value="COUNT"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="sql-index" type="xs:integer" use="required" />
-		<xs:attribute name="validation-order" type="xs:integer" use="optional" />
+		<xs:attribute name="sql-index" type="xs:integer" use="required"/>
+		<xs:attribute name="validation-order" type="xs:integer" use="optional"/>
 		<xs:attribute default="2" name="number-columns-spanned" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:integer">
-					<xs:enumeration value="2" />
-					<xs:enumeration value="4" />
+					<xs:enumeration value="2"/>
+					<xs:enumeration value="4"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="number-rows-spanned" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="auto" />
-					<xs:enumeration value="1" />
-					<xs:enumeration value="2" />
-					<xs:enumeration value="3" />
-					<xs:enumeration value="4" />
-					<xs:enumeration value="5" />
-					<xs:enumeration value="6" />
-					<xs:enumeration value="7" />
-					<xs:enumeration value="8" />
-					<xs:enumeration value="9" />
-					<xs:enumeration value="10" />
-					<xs:enumeration value="fill" />
+					<xs:enumeration value="auto"/>
+					<xs:enumeration value="1"/>
+					<xs:enumeration value="2"/>
+					<xs:enumeration value="3"/>
+					<xs:enumeration value="4"/>
+					<xs:enumeration value="5"/>
+					<xs:enumeration value="6"/>
+					<xs:enumeration value="7"/>
+					<xs:enumeration value="8"/>
+					<xs:enumeration value="9"/>
+					<xs:enumeration value="10"/>
+					<xs:enumeration value="fill"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="fill" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="none" />
-					<xs:enumeration value="horizontal" />
-					<xs:enumeration value="vertical" />
-					<xs:enumeration value="both" />
-					<xs:enumeration value="toright" />
-					<xs:enumeration value="toleft" />
+					<xs:enumeration value="none"/>
+					<xs:enumeration value="horizontal"/>
+					<xs:enumeration value="vertical"/>
+					<xs:enumeration value="both"/>
+					<xs:enumeration value="toright"/>
+					<xs:enumeration value="toleft"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="key-type" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="primary" />
-					<xs:enumeration value="user" />
-					<xs:enumeration value="static" />
-					<xs:enumeration value="none" />
+					<xs:enumeration value="primary"/>
+					<xs:enumeration value="user"/>
+					<xs:enumeration value="static"/>
+					<xs:enumeration value="none"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute default="true" name="visible" type="xs:boolean" use="optional" />
-		<xs:attribute name="unit-text" type="xs:string" use="optional" />
-		<xs:attribute default="false" name="read-only" type="xs:boolean" use="optional" />
+		<xs:attribute default="true" name="visible" type="xs:boolean" use="optional"/>
+		<xs:attribute name="unit-text" type="xs:string" use="optional"/>
+		<xs:attribute default="false" name="read-only" type="xs:boolean" use="optional"/>
 		<!--xs:attribute name="length" type="xs:integer"/ -->
 	</xs:complexType>
 	<xs:complexType name="layout-table">
@@ -500,9 +461,7 @@
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="row" type="layout-table-row">
 				<xs:annotation>
 					<xs:documentation>
-						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Die Tabelle wird in logische Zeilen und Spalten
-							unterteilt. Die Spalten haben nicht unbedingt die
-							gleiche Breite.
+						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Die Tabelle wird in logische Zeilen und Spalten unterteilt. Die Spalten haben nicht unbedingt die gleiche Breite.
 						</p>
 					</xs:documentation>
 				</xs:annotation>
@@ -511,8 +470,7 @@
 		<xs:attribute name="column-count" type="xs:int" use="required">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Die Anzahl der Spalten innerhalb der Tabelle wird in
-						diesem Attribut festgelegt.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Die Anzahl der Spalten innerhalb der Tabelle wird in diesem Attribut festgelegt.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -520,24 +478,23 @@
 	</xs:complexType>
 	<xs:complexType name="layout-table-row">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="1" name="column" type="layout-table-column" />
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="column" type="layout-table-column"/>
 		</xs:sequence>
-		<xs:attribute name="name" type="xs:ID" use="required" />
-		<xs:attribute name="text" type="xs:string" use="optional" />
+		<xs:attribute name="name" type="xs:ID" use="required"/>
+		<xs:attribute name="text" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="layout-table-column">
 		<xs:sequence>
 			<xs:choice>
-				<xs:element maxOccurs="1" minOccurs="0" name="label" type="label" />
-				<xs:element maxOccurs="1" minOccurs="0" name="field" type="field" />
+				<xs:element maxOccurs="1" minOccurs="0" name="label" type="label"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="field" type="field"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="number-columns-spanned" type="xs:int" default="1">
 			<xs:annotation>
 				<xs:documentation>
 					<p xmlns="http://purl.oclc.org/dsdl/schematron">
-						Dieses Feld definiert, wie viele Spalten für das Feld / den
-						Bezeichner verwendet werden. Sie werden dann als
+						Dieses Feld definiert, wie viele Spalten für das Feld / den Bezeichner verwendet werden. Sie werden dann als
 						<emph>ein</emph>
 						Feld zusammengefasst.
 					</p>
@@ -548,8 +505,7 @@
 			<xs:annotation>
 				<xs:documentation>
 					<p xmlns="http://purl.oclc.org/dsdl/schematron">
-						Mit diesem Wert kann man der Spalte eine Bezeichnung geben. Sie
-						wird nicht automatisch angezeigt. Sie kann aber von
+						Mit diesem Wert kann man der Spalte eine Bezeichnung geben. Sie wird nicht automatisch angezeigt. Sie kann aber von
 						<emph>label</emph>
 						verwendet werden.
 					</p>
@@ -561,8 +517,7 @@
 		<xs:annotation>
 			<xs:documentation>
 				<p xmlns="http://purl.oclc.org/dsdl/schematron">
-					Dieses Element dient zum Platzieren von Elementen auf der
-					Oberfläche. Es kann nur im Element
+					Dieses Element dient zum Platzieren von Elementen auf der Oberfläche. Es kann nur im Element
 					<emph>table</emph>
 					verwendet werden.
 				</p>
@@ -571,8 +526,7 @@
 		<xs:attribute name="field" type="xs:IDREF">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron">Wenn der Wert des Labels über ein Feld definiert wird,
-						muss hier das entsprechende Feld angegeben werden.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Wenn der Wert des Labels über ein Feld definiert wird, muss hier das entsprechende Feld angegeben werden.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
@@ -581,9 +535,7 @@
 			<xs:annotation>
 				<xs:documentation>
 					<p xmlns="http://purl.oclc.org/dsdl/schematron">
-						Wenn der Wert des Labels über eine Zeile definiert wird, muss hier
-						das entsprechende Feld angegeben werden. Es wird
-						der Wert von
+						Wenn der Wert des Labels über eine Zeile definiert wird, muss hier das entsprechende Feld angegeben werden. Es wird der Wert von
 						<emph>text</emph>
 						aus der Zeile verwendet.
 					</p>
@@ -604,153 +556,137 @@
 		<xs:attribute name="align" default="right">
 			<xs:annotation>
 				<xs:documentation>
-					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Labels können rechts- und linksbündig angeordnet
-						werden. Dieses Attribut sollte nur bei Bezeichnern
-						verwendet
-						werden, die als Überschrift einer
-						Tabellenspalte dienen. Direkte
-						Feldbezeichner sollten nicht mit dem
-						Attribut belegt werden.
+					<p xmlns="http://purl.oclc.org/dsdl/schematron"> Labels können rechts- und linksbündig angeordnet werden. Dieses Attribut sollte nur bei Bezeichnern verwendet werden, die als Überschrift einer
+						Tabellenspalte dienen. Direkte Feldbezeichner sollten nicht mit dem Attribut belegt werden.
 					</p>
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="left" />
-					<xs:enumeration value="right" />
+					<xs:enumeration value="left"/>
+					<xs:enumeration value="right"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="detail">
 		<xs:sequence maxOccurs="unbounded" minOccurs="1">
-			<xs:element maxOccurs="1" minOccurs="0" name="head" type="head" />
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="head"/>
 			<!-- Kein Head mehr, deshalb mindestens 1 Page -->
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="page" type="page" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" ref="browser" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="page" type="page"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="browser"/>
 		</xs:sequence>
 		<!-- Entweder oder -->
-		<xs:attribute name="procedure-suffix" type="xs:NCName" />
+		<xs:attribute name="procedure-suffix" type="xs:NCName"/>
 		<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="xpcor">
 			<xs:annotation>
 				<xs:documentation>Prozedurprefix (z.B. 'xpcor', 'op', 'sp' usw.)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="import" type="xs:NCName" />
+		<xs:attribute name="import" type="xs:NCName"/>
 		<!-- /Entweder oder -->
 		<!-- optional -->
-		<xs:attribute default="false" name="clear-after-save" type="xs:boolean" />
-		<xs:attribute default="true" name="button-delete-visible" type="xs:boolean" />
-		<xs:attribute default="true" name="button-new-visible" type="xs:boolean" />
-		<xs:attribute default="false" name="button-block-visible" type="xs:boolean" />
-		<xs:attribute default="true" name="button-cancel-visible" type="xs:boolean" />
-		<xs:attribute default="false" name="button-copy-visible" type="xs:boolean" />
-		<xs:attribute default="true" name="button-save-visible" type="xs:boolean" />
+		<xs:attribute default="false" name="clear-after-save" type="xs:boolean"/>
+		<xs:attribute default="true" name="button-delete-visible" type="xs:boolean"/>
+		<xs:attribute default="true" name="button-new-visible" type="xs:boolean"/>
+		<xs:attribute default="false" name="button-block-visible" type="xs:boolean"/>
+		<xs:attribute default="true" name="button-cancel-visible" type="xs:boolean"/>
+		<xs:attribute default="false" name="button-copy-visible" type="xs:boolean"/>
+		<xs:attribute default="true" name="button-save-visible" type="xs:boolean"/>
+		<xs:attribute default="false" name="button-announce-visible" type="xs:boolean"/>
 		<xs:attribute default="false" name="delete-requires-all-params" type="xs:boolean">
 			<xs:annotation>
-				<xs:documentation>True, wenn die Delete-Funktion alle Parameter
-					braucht
+				<xs:documentation>True, wenn die Delete-Funktion alle Parameter braucht
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute default="false" name="read-default-values" type="xs:boolean" />
+		<xs:attribute default="false" name="read-default-values" type="xs:boolean"/>
 		<xs:attribute default="false" name="execute-always" type="xs:boolean">
 			<xs:annotation>
-				<xs:documentation>True, wenn die Prozeduren ausgeführt werden
-					sollen, auch wenn es keine Datenänderungen gibt.
+				<xs:documentation>True, wenn die Prozeduren ausgeführt werden sollen, auch wenn es keine Datenänderungen gibt.
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="class" type="xs:string" />
+		<xs:attribute name="class" type="xs:string"/>
 		<xs:attribute name="documentation" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>Falls das Detail durch eine Klasse dargestellt
-					wird, kann hier die zugehörige Dokumentation im
-					DocBook-Format
-					angegeben werden. Die
-					Erweiterungen für Sprache und und Länderkürzel
-					bitte nicht mit angeben! Beispiel:
-					&lt;detail class="DetailClass"
-					documentation="DetailClass" /&gt; Hier
-					wird,
-					je nach Sprache, die
-					DetailClass.doc.xml
-					oder DetailClass_SPRACHE.doc.xml gesucht.
+				<xs:documentation>Falls das Detail durch eine Klasse dargestellt wird, kann hier die zugehörige Dokumentation im DocBook-Format angegeben werden. Die
+					Erweiterungen für Sprache und und Länderkürzel bitte nicht mit angeben! Beispiel: &lt;detail class="DetailClass" documentation="DetailClass" /&gt; Hier
+					wird, je nach Sprache, die DetailClass.doc.xml oder DetailClass_SPRACHE.doc.xml gesucht. 
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="id" type="xs:NCName" />
+		<xs:attribute name="id" type="xs:NCName"/>
 		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="masterdata" />
-					<xs:enumeration value="booking" />
+					<xs:enumeration value="masterdata"/>
+					<xs:enumeration value="booking"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute default="false" name="custom" type="xs:boolean" />
+		<xs:attribute default="false" name="custom" type="xs:boolean"/>
 		<xs:attribute name="layout">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="expandable" />
-					<xs:enumeration value="default" />
+					<xs:enumeration value="expandable"/>
+					<xs:enumeration value="default"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="offline" type="xs:boolean" default="false">
 			<xs:annotation>
-				<xs:documentation>Falls der ganze Detailbereich offline ist, muss
-					das procedure-suffix zwar trotzdem angegeben
-					werden, aber es werden
-					keine Prozeduren
+				<xs:documentation>Falls der ganze Detailbereich offline ist, muss das procedure-suffix zwar trotzdem angegeben werden, aber es werden keine Prozeduren
 					verwendet.
 				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute default="false" name="execute-announce" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation>Für Option-Pages. True, wenn die Announce-Prozedur beim Anmelden ausgeführt werden soll.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<!-- optional -->
 	</xs:complexType>
 	<xs:complexType name="events">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="onclick" type="onclick" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="onbinder" type="onbinder" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="value-change" type="value-change" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="onclick" type="onclick"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="onbinder" type="onbinder"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="value-change" type="value-change"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="radiobox">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="2" name="radio" type="radio" />
+			<xs:element maxOccurs="unbounded" minOccurs="2" name="radio" type="radio"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="page">
 		<xs:sequence maxOccurs="1" minOccurs="1">
 			<xs:choice maxOccurs="1" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button"/>
 			</xs:choice>
 			<xs:choice maxOccurs="1" minOccurs="1">
 				<xs:choice maxOccurs="unbounded" minOccurs="0">
-					<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
-					<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid" />
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field"/>
+					<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid"/>
 				</xs:choice>
 				<xs:element maxOccurs="1" minOccurs="0" name="table" type="layout-table">
 					<xs:annotation>
 						<xs:documentation>
-							<p xmlns="http://purl.oclc.org/dsdl/schematron"> Mit diesem Tag kann man ein spezifisches Layout
-								definieren. Man legt dann innerhalb des Tags einzelne
-								row-Elemente an, die dann wiederum mit
-								column-Elementen gefüllt
-								werden.
+							<p xmlns="http://purl.oclc.org/dsdl/schematron"> Mit diesem Tag kann man ein spezifisches Layout definieren. Man legt dann innerhalb des Tags einzelne row-Elemente an, die dann wiederum mit
+								column-Elementen gefüllt werden.
 							</p>
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
 		</xs:sequence>
-		<xs:attribute name="text" type="xs:string" use="required" />
-		<xs:attribute name="icon" type="xs:NCName" />
-		<xs:attribute name="id" type="xs:NCName" />
-		<xs:attribute default="true" name="visible" type="xs:boolean" />
+		<xs:attribute name="text" type="xs:string" use="required"/>
+		<xs:attribute name="icon" type="xs:NCName"/>
+		<xs:attribute name="id" type="xs:NCName"/>
+		<xs:attribute default="true" name="visible" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="button">
 		<xs:annotation>
@@ -758,15 +694,13 @@
 		</xs:annotation>
 		<xs:attribute name="id" type="xs:string" use="optional">
 			<xs:annotation>
-				<xs:documentation>Eindeutiger Bezeichner dieses Knopfes. Wird beim
-					Event-Handling benutzt (refid)
+				<xs:documentation>Eindeutiger Bezeichner dieses Knopfes. Wird beim Event-Handling benutzt (refid)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true">
 			<xs:annotation>
-				<xs:documentation>True wenn der Knopf deaktiviert ist. Mit
-					dynamic-Element kann das Attribut verändert werden
+				<xs:documentation>True wenn der Knopf deaktiviert ist. Mit dynamic-Element kann das Attribut verändert werden
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -782,8 +716,7 @@
 		</xs:attribute>
 		<xs:attribute name="refers-to" type="xs:string" use="optional">
 			<xs:annotation>
-				<xs:documentation>definiert den Bezug des Buttons auf eine Element
-					mit der angegebenen id
+				<xs:documentation>definiert den Bezug des Buttons auf eine Element mit der angegebenen id
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -799,7 +732,7 @@
 			<xs:documentation>Setzt Felder auf gegebene Werte</xs:documentation>
 		</xs:annotation>
 		<xs:sequence minOccurs="0" maxOccurs="unbounded">
-			<xs:element name="field" type="fieldset" />
+			<xs:element name="field" type="fieldset"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="fieldset">
@@ -819,18 +752,16 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="instance">
 		<xs:annotation>
-			<xs:documentation>Erstellt eine Klasseninstanz und speichert sie in
-				einem Objektpool unter dem namen object-name
+			<xs:documentation>Erstellt eine Klasseninstanz und speichert sie in einem Objektpool unter dem namen object-name
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="param" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="registry-param" type="registry-param" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-param" type="ref-param" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="param"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="registry-param" type="registry-param"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-param" type="ref-param"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required">
@@ -840,11 +771,8 @@
 		</xs:attribute>
 		<xs:attribute name="object-name" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Objektname (Variablenname). Muss für
-					object-access=form eindeutig innerhalb der Form sein und für
-					object-access=application innerhalb
-					aller
-					Masken!
+				<xs:documentation>Objektname (Variablenname). Muss für object-access=form eindeutig innerhalb der Form sein und für object-access=application innerhalb
+					aller Masken!
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -856,17 +784,13 @@
 				<xs:restriction base="xs:token">
 					<xs:enumeration value="form">
 						<xs:annotation>
-							<xs:documentation>Dieses Objekt lebt nur solange die Form lebt.
-								Danach wird die Variable gelöscht.
+							<xs:documentation>Dieses Objekt lebt nur solange die Form lebt. Danach wird die Variable gelöscht.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
 					<xs:enumeration value="application">
 						<xs:annotation>
-							<xs:documentation>Dieses Objekt lebt solange die gesamte
-								Applikation lebt! Man kann auf dieses Objekt auch aus
-								anderen
-								Masken zugreifen.
+							<xs:documentation>Dieses Objekt lebt solange die gesamte Applikation lebt! Man kann auf dieses Objekt auch aus anderen Masken zugreifen.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -874,35 +798,27 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="method">
 		<xs:annotation>
-			<xs:documentation>Führt eine Methode innerhalb eines definierten
-				Objektes aus. Die Objekte können mit instance
-				angelegt werden.
+			<xs:documentation>Führt eine Methode innerhalb eines definierten Objektes aus. Die Objekte können mit instance angelegt werden.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="param" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="registry-param" type="registry-param" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-param" type="ref-param" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="param"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="registry-param" type="registry-param"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-param" type="ref-param"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="ref-object-name" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Objektname. Kann sowohl lokal sein (access=form),
-					als auch gloabal aus anderen Masken
-					(access=application)
+				<xs:documentation>Objektname. Kann sowohl lokal sein (access=form), als auch gloabal aus anderen Masken (access=application)
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="return-object-name" type="xs:string">
 			<xs:annotation>
-				<xs:documentation>Return-Objekt - falls vorhanden - kan mittels
-					dieses Attributs gespeichert werden. Der Zugriff wird
-					über
-					return-object-access definiert
+				<xs:documentation>Return-Objekt - falls vorhanden - kan mittels dieses Attributs gespeichert werden. Der Zugriff wird über return-object-access definiert
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -914,26 +830,20 @@
 		</xs:attribute>
 		<xs:attribute default="form" name="return-object-access" use="optional">
 			<xs:annotation>
-				<xs:documentation>Lebenszyklus der return Variable. Nur wenn
-					return-object-name definiert ist dieses Attribut
-					nützlich
+				<xs:documentation>Lebenszyklus der return Variable. Nur wenn return-object-name definiert ist dieses Attribut nützlich
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
 					<xs:enumeration value="form">
 						<xs:annotation>
-							<xs:documentation>Dieses Objekt lebt nur solange die Form lebt.
-								Danach wird die Variable gelöscht.
+							<xs:documentation>Dieses Objekt lebt nur solange die Form lebt. Danach wird die Variable gelöscht.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
 					<xs:enumeration value="application">
 						<xs:annotation>
-							<xs:documentation>Dieses Objekt lebt solange die gesamte
-								Applikation lebt! Man kann auf dieses Objekt auch aus
-								anderen
-								Masken zugreifen.
+							<xs:documentation>Dieses Objekt lebt solange die gesamte Applikation lebt! Man kann auf dieses Objekt auch aus anderen Masken zugreifen.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -941,53 +851,47 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="param">
 		<xs:annotation>
 			<xs:documentation>Konstruktor Parameter</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:annotation>
-				<xs:documentation>Ist nur wichtig für benutzerdefinierte Datentypen,
-					die mit einem bestimmten Konstruktor aufgerufen
-					werden müssen
+				<xs:documentation>Ist nur wichtig für benutzerdefinierte Datentypen, die mit einem bestimmten Konstruktor aufgerufen werden müssen
 				</xs:documentation>
 			</xs:annotation>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="param" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="registry-param" type="registry-param" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-param" type="ref-param" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="param"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="registry-param" type="registry-param"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="ref-param" type="ref-param"/>
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="type" use="required">
 			<xs:annotation>
-				<xs:documentation>Datentyp. Kann auch eine Klasse sein - dann muss
-					man ggf. die Konstruktorparameter als childs
-					dieses Tags anlegen.
-					Rekursion ist möglich.
+				<xs:documentation>Datentyp. Kann auch eine Klasse sein - dann muss man ggf. die Konstruktorparameter als childs dieses Tags anlegen. Rekursion ist möglich.
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:union>
 					<xs:simpleType>
 						<xs:restriction base="xs:token">
-							<xs:enumeration value="long" />
-							<xs:enumeration value="int" />
-							<xs:enumeration value="float" />
-							<xs:enumeration value="double" />
-							<xs:enumeration value="boolean" />
-							<xs:enumeration value="byte" />
-							<xs:enumeration value="char" />
-							<xs:enumeration value="short" />
-							<xs:enumeration value="String" />
-							<xs:enumeration value="date" />
-							<xs:enumeration value="Object[]" />
+							<xs:enumeration value="long"/>
+							<xs:enumeration value="int"/>
+							<xs:enumeration value="float"/>
+							<xs:enumeration value="double"/>
+							<xs:enumeration value="boolean"/>
+							<xs:enumeration value="byte"/>
+							<xs:enumeration value="char"/>
+							<xs:enumeration value="short"/>
+							<xs:enumeration value="String"/>
+							<xs:enumeration value="date"/>
+							<xs:enumeration value="Object[]"/>
 						</xs:restriction>
 					</xs:simpleType>
 					<!-- Sollte durch xs:pattern ersetzt sein -->
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
-							<xs:pattern value=".+" />
+							<xs:pattern value=".+"/>
 							<!--<xs:minLength value="1"/> -->
 						</xs:restriction>
 					</xs:simpleType>
@@ -1001,7 +905,6 @@
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="registry-param">
 		<xs:annotation>
 			<xs:documentation>Konstruktor Parameter</xs:documentation>
@@ -1009,59 +912,55 @@
 		<xs:attribute name="type" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="long" />
-					<xs:enumeration value="int" />
-					<xs:enumeration value="float" />
-					<xs:enumeration value="double" />
-					<xs:enumeration value="boolean" />
-					<xs:enumeration value="byte" />
-					<xs:enumeration value="char" />
-					<xs:enumeration value="short" />
-					<xs:enumeration value="String" />
-					<xs:enumeration value="date" />
-					<xs:enumeration value="Object[]" />
+					<xs:enumeration value="long"/>
+					<xs:enumeration value="int"/>
+					<xs:enumeration value="float"/>
+					<xs:enumeration value="double"/>
+					<xs:enumeration value="boolean"/>
+					<xs:enumeration value="byte"/>
+					<xs:enumeration value="char"/>
+					<xs:enumeration value="short"/>
+					<xs:enumeration value="String"/>
+					<xs:enumeration value="date"/>
+					<xs:enumeration value="Object[]"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="registry-key" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Registrierungsschlüssel relativ zum
-					Applikationsschlüssel
+				<xs:documentation>Registrierungsschlüssel relativ zum Applikationsschlüssel
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute default="false" name="user-registry" type="xs:boolean" use="optional">
 			<xs:annotation>
-				<xs:documentation>True, wenn die Benutzerregistrierung verwendet
-					werden soll. Default ist die Local-Machine.l
+				<xs:documentation>True, wenn die Benutzerregistrierung verwendet werden soll. Default ist die Local-Machine.l
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="ref-param">
 		<xs:annotation>
 			<xs:documentation>Konstruktor Parameter</xs:documentation>
 		</xs:annotation>
 		<xs:attribute default="String" name="type">
 			<xs:annotation>
-				<xs:documentation>Datentyp. Kann leer bleiben, wenn der Typ vom Feld
-					übernommer werden soll.
+				<xs:documentation>Datentyp. Kann leer bleiben, wenn der Typ vom Feld übernommer werden soll.
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="long" />
-					<xs:enumeration value="int" />
-					<xs:enumeration value="float" />
-					<xs:enumeration value="double" />
-					<xs:enumeration value="boolean" />
-					<xs:enumeration value="byte" />
-					<xs:enumeration value="char" />
-					<xs:enumeration value="short" />
-					<xs:enumeration value="String" />
-					<xs:enumeration value="date" />
-					<xs:enumeration value="Object[]" />
+					<xs:enumeration value="long"/>
+					<xs:enumeration value="int"/>
+					<xs:enumeration value="float"/>
+					<xs:enumeration value="double"/>
+					<xs:enumeration value="boolean"/>
+					<xs:enumeration value="byte"/>
+					<xs:enumeration value="char"/>
+					<xs:enumeration value="short"/>
+					<xs:enumeration value="String"/>
+					<xs:enumeration value="date"/>
+					<xs:enumeration value="Object[]"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -1071,9 +970,9 @@
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="KeyLong" />
-					<xs:enumeration value="KeyText" />
-					<xs:enumeration value="Description" />
+					<xs:enumeration value="KeyLong"/>
+					<xs:enumeration value="KeyText"/>
+					<xs:enumeration value="Description"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -1118,7 +1017,6 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="event-param">
 		<xs:annotation>
 			<xs:documentation>Ein Parameter der Prozedur</xs:documentation>
@@ -1136,21 +1034,20 @@
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="INPUT" />
-					<xs:enumeration value="OUTPUT" />
-					<xs:enumeration value="INPUTOUTPUT" />
+					<xs:enumeration value="INPUT"/>
+					<xs:enumeration value="OUTPUT"/>
+					<xs:enumeration value="INPUTOUTPUT"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:element name="procedure">
 		<xs:annotation>
 			<xs:documentation>Führt eine Datenbankprozedur aus</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="event-param" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="param" type="event-param"/>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:NCName" use="required">
 				<xs:annotation>
@@ -1166,14 +1063,14 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set" />
-				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard"/>
 			</xs:choice>
-			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail" />
+			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail"/>
 		</xs:sequence>
 		<xs:attribute name="action" use="required">
 			<xs:simpleType>
@@ -1200,8 +1097,7 @@
 					</xs:enumeration>
 					<xs:enumeration value="userdefined">
 						<xs:annotation>
-							<xs:documentation>Tritt auf, bevor ein benutzerdefiniertes Skript
-								ausgeführt wird
+							<xs:documentation>Tritt auf, bevor ein benutzerdefiniertes Skript ausgeführt wird
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -1227,8 +1123,7 @@
 					</xs:enumeration>
 					<xs:enumeration value="userdefined">
 						<xs:annotation>
-							<xs:documentation>Tritt auf, nachdem ein benutzerdefiniertes
-								Skript ausgeführt wird
+							<xs:documentation>Tritt auf, nachdem ein benutzerdefiniertes Skript ausgeführt wird
 							</xs:documentation>
 						</xs:annotation>
 					</xs:enumeration>
@@ -1236,7 +1131,6 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="onclick">
 		<xs:annotation>
 			<xs:documentation>Tritt auf, wenn eine Komponente angeklickt wird
@@ -1244,39 +1138,36 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set" />
-				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard"/>
 			</xs:choice>
-			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail" />
+			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail"/>
 		</xs:sequence>
 		<xs:attribute name="refid" type="xs:NCName" use="required">
 			<xs:annotation>
-				<xs:documentation>Entweder der Name eines Fields oder ID eines
-					Controls
+				<xs:documentation>Entweder der Name eines Fields oder ID eines Controls
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="value-change">
 		<xs:annotation>
-			<xs:documentation>Tritt auf, wenn der Wert einer Komponente geändert
-				wird
+			<xs:documentation>Tritt auf, wenn der Wert einer Komponente geändert wird
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set"/>
 			</xs:choice>
-			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail" />
+			<xs:element maxOccurs="1" minOccurs="0" name="onfail" type="onfail"/>
 		</xs:sequence>
 		<xs:attribute name="type" use="optional" default="BOTH">
 			<xs:annotation>
@@ -1285,35 +1176,32 @@
 			</xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
-					<xs:enumeration value="USER" />
-					<xs:enumeration value="SYSTEM" />
-					<xs:enumeration value="BOTH" />
+					<xs:enumeration value="USER"/>
+					<xs:enumeration value="SYSTEM"/>
+					<xs:enumeration value="BOTH"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="field-name" type="xs:string" use="required">
 			<xs:annotation>
-				<xs:documentation>Feldname. Mit dem prefix 'Parent_' wird der
-					Feldname des übergeordneten Bundles gecheckt
+				<xs:documentation>Feldname. Mit dem prefix 'Parent_' wird der Feldname des übergeordneten Bundles gecheckt
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="onfail">
 		<xs:annotation>
-			<xs:documentation>Wird ausgeführt, wenn die Aktionen innerhalb eines
-				Events einen Fehler liefern
+			<xs:documentation>Wird ausgeführt, wenn die Aktionen innerhalb eines Events einen Fehler liefern
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set" />
-				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="binder" type="binder"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" ref="procedure"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="instance" type="instance"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="method"/>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="set" type="set"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="wizard" type="wizard"/>
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -1331,44 +1219,39 @@
 	<xs:element name="form">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="1" minOccurs="0" name="index-view" type="index-view" />
-				<xs:element maxOccurs="1" minOccurs="0" name="detail" type="detail" />
-				<xs:element maxOccurs="1" minOccurs="0" name="events" type="events" />
+				<xs:element maxOccurs="1" minOccurs="0" name="index-view" type="index-view"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="detail" type="detail"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="events" type="events"/>
 			</xs:sequence>
 			<xs:attribute name="icon" type="xs:NCName" use="required">
 				<xs:annotation>
 					<xs:documentation>
-						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Das Icon muss im ImagePath zu finden sein. Es wird der
-							Maske zugeordnet.
+						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Das Icon muss im ImagePath zu finden sein. Es wird der Maske zugeordnet.
 						</p>
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="helper-class" type="xs:NCName" use="optional" />
-			<xs:attribute name="data-handler" type="xs:string" use="optional" />
+			<xs:attribute name="helper-class" type="xs:NCName" use="optional"/>
+			<xs:attribute name="data-handler" type="xs:string" use="optional"/>
 			<xs:attribute name="title" type="xs:string" use="required">
 				<xs:annotation>
 					<xs:documentation>
-						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Der Titel der Maske. Wird die Maske als OptionPage
-							verwendet, wird dieser Titel als Bezeichnung der
-							Section
-							(TabPage) verwenden.
+						<p xmlns="http://purl.oclc.org/dsdl/schematron"> Der Titel der Maske. Wird die Maske als OptionPage verwendet, wird dieser Titel als Bezeichnung der Section (TabPage) verwenden.
 						</p>
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
-
 	<xs:complexType name="head">
 		<xs:sequence maxOccurs="1" minOccurs="1">
 			<xs:choice maxOccurs="1" minOccurs="0">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button"/>
 			</xs:choice>
 			<xs:choice maxOccurs="1" minOccurs="1">
 				<xs:choice maxOccurs="unbounded" minOccurs="0">
-					<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
-					<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid" />
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field"/>
+					<xs:element maxOccurs="unbounded" minOccurs="0" ref="grid"/>
 				</xs:choice>
 			</xs:choice>
 		</xs:sequence>
@@ -1379,13 +1262,13 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button"/>
 				<xs:choice maxOccurs="1" minOccurs="1">
 					<xs:choice maxOccurs="unbounded" minOccurs="0">
-						<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
+						<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field"/>
 					</xs:choice>
 				</xs:choice>
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events"/>
 			</xs:sequence>
 			<xs:attribute name="procedure-prefix" type="xs:NCName" use="optional" default="xpcor">
 				<xs:annotation>
@@ -1400,22 +1283,19 @@
 			</xs:attribute>
 			<xs:attribute default="false" name="read-requires-all-params" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>True, wenn die Read-Funktion alle Parameter
-						braucht
+					<xs:documentation>True, wenn die Read-Funktion alle Parameter braucht
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute default="false" name="delete-requires-all-params" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>True, wenn die Delete-Funktion alle Parameter
-						braucht
+					<xs:documentation>True, wenn die Delete-Funktion alle Parameter braucht
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute default="false" name="value-required" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>True, wenn mindestens eine Zeile eingegeben
-						werden muss
+					<xs:documentation>True, wenn mindestens eine Zeile eingegeben werden muss
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -1433,8 +1313,7 @@
 			</xs:attribute>
 			<xs:attribute default="false" name="read-only" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>True, wenn keine Werte ins Grid eingegeben werden
-						können.
+					<xs:documentation>True, wenn keine Werte ins Grid eingegeben werden können.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -1450,47 +1329,37 @@
 			</xs:attribute>
 			<xs:attribute default="" name="title" type="xs:string" use="optional">
 				<xs:annotation>
-					<xs:documentation>Grid-Überschrift vom Grid. Erscheint über dem
-						Grid oder in der TabPage, wenn es sich ein
-						Stand-Alone Grid
-						handelt
+					<xs:documentation>Grid-Überschrift vom Grid. Erscheint über dem Grid oder in der TabPage, wenn es sich ein Stand-Alone Grid handelt
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="sort-by" type="xs:string" use="optional">
 				<xs:annotation>
-					<xs:documentation>Kommaseparierte Feldliste der Standard
-						Sortierreihenfolge
+					<xs:documentation>Kommaseparierte Feldliste der Standard Sortierreihenfolge
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="group-by" type="xs:string" use="optional">
 				<xs:annotation>
-					<xs:documentation>Kommaseparierte Feldliste der Standard
-						Gruppierung
+					<xs:documentation>Kommaseparierte Feldliste der Standard Gruppierung
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="icon" type="xs:NCName">
 				<xs:annotation>
-					<xs:documentation>TabPage-Icon, wenn es sich um ein Stand-Alone
-						Grid handelt
+					<xs:documentation>TabPage-Icon, wenn es sich um ein Stand-Alone Grid handelt
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="data-handler" type="xs:string">
 				<xs:annotation>
-					<xs:documentation> Wenn dieser Wert einen Klassennamen definiert,
-						der geladen werden kann, wird diese Klasse für die
-						Funktionen
-						verwendet.
+					<xs:documentation> Wenn dieser Wert einen Klassennamen definiert, der geladen werden kann, wird diese Klasse für die Funktionen verwendet.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="id" type="xs:NCName" use="required">
 				<xs:annotation>
-					<xs:documentation>ID, die für die Referenzierung verwendet werden
-						kann
+					<xs:documentation>ID, die für die Referenzierung verwendet werden kann
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -1500,10 +1369,14 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute default="false" name="execute-announce" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>True, wenn die Announce-Prozedur beim Anmelden ausgeführt werden soll.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 			<xs:attribute name="fill">
 				<xs:annotation>
-					<xs:documentation>Definiert die fill-Eigenschaft des Grids (wird
-						noch nicht verwendet außer "auto")
+					<xs:documentation>Definiert die fill-Eigenschaft des Grids (wird noch nicht verwendet außer "auto")
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
@@ -1541,19 +1414,17 @@
 						</xs:enumeration>
 						<xs:enumeration value="auto">
 							<xs:annotation>
-								<xs:documentation>Mit Klick auf "Resize" passt sich die Größe
-									automatisch an
+								<xs:documentation>Mit Klick auf "Resize" passt sich die Größe automatisch an
 								</xs:documentation>
 							</xs:annotation>
 						</xs:enumeration>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute default="true" name="clear-after-new" type="xs:boolean" />
+			<xs:attribute default="true" name="clear-after-new" type="xs:boolean"/>
 			<xs:attribute default="false" name="execute-always" type="xs:boolean">
 				<xs:annotation>
-					<xs:documentation>True, wenn die Prozeduren ausgeführt werden
-						sollen, auch wenn es keine Datenänderungen gibt.
+					<xs:documentation>True, wenn die Prozeduren ausgeführt werden sollen, auch wenn es keine Datenänderungen gibt.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
@@ -1562,8 +1433,8 @@
 	<xs:element name="addon">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
-				<xs:element maxOccurs="1" minOccurs="0" name="events" type="events" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button"/>
+				<xs:element maxOccurs="1" minOccurs="0" name="events" type="events"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -1573,13 +1444,13 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="button" type="button"/>
 				<xs:choice maxOccurs="1" minOccurs="1">
 					<xs:choice maxOccurs="unbounded" minOccurs="0">
-						<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
+						<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field"/>
 					</xs:choice>
 				</xs:choice>
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="events" type="events"/>
 			</xs:sequence>
 			<xs:attribute default="" name="title" type="xs:string" use="optional">
 				<xs:annotation>
@@ -1589,15 +1460,13 @@
 			</xs:attribute>
 			<xs:attribute name="icon" type="xs:NCName">
 				<xs:annotation>
-					<xs:documentation>TabPage-Icon, wenn es sich um ein Stand-Alone
-						Browser handelt
+					<xs:documentation>TabPage-Icon, wenn es sich um ein Stand-Alone Browser handelt
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 			<xs:attribute name="id" type="xs:NCName" use="required">
 				<xs:annotation>
-					<xs:documentation>ID, die für die Referenzierung verwendet werden
-						kann.
+					<xs:documentation>ID, die für die Referenzierung verwendet werden kann.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>

@@ -91,7 +91,6 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 			resolveLookup.thenAccept(llv -> sync.asyncExec(() -> {
 				Value v = llv.isEmpty() ? null : llv.get(0);
 				field.setValue(v, false);
-				updateControlFromValue(control, v);
 			}));
 		}
 	}

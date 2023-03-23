@@ -1,8 +1,5 @@
 package aero.minova.rcp.rcp.handlers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -26,8 +23,7 @@ public class NewDetailHandler {
 		if (perspective == null) {
 			return;
 		}
-		Map<MPerspective, String> map = new HashMap<>();
-		map.put(perspective, Constants.CLEAR_REQUEST);
-		broker.post(Constants.BROKER_NEWENTRY, map);
+
+		broker.post(Constants.BROKER_NEWENTRY, Constants.CLEAR_REQUEST);
 	}
 }

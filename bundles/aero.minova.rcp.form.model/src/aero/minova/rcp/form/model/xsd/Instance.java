@@ -14,8 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * Erstellt eine Klasseninstanz und speichert sie in
- * 				einem Objektpool unter dem namen object-name
+ * Erstellt eine Klasseninstanz und speichert sie in einem Objektpool unter dem namen object-name
  * 			
  * 
  * <p>Java-Klasse für instance complex type.

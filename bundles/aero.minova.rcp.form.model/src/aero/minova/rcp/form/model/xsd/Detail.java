@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="button-cancel-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="button-copy-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="button-save-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
+ *       &lt;attribute name="button-announce-visible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="delete-requires-all-params" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="read-default-values" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="execute-always" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -63,6 +64,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
  *       &lt;attribute name="offline" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="execute-announce" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -109,6 +111,8 @@ public class Detail {
     protected java.lang.Boolean buttonCopyVisible;
     @XmlAttribute(name = "button-save-visible")
     protected java.lang.Boolean buttonSaveVisible;
+    @XmlAttribute(name = "button-announce-visible")
+    protected java.lang.Boolean buttonAnnounceVisible;
     @XmlAttribute(name = "delete-requires-all-params")
     protected java.lang.Boolean deleteRequiresAllParams;
     @XmlAttribute(name = "read-default-values")
@@ -131,6 +135,8 @@ public class Detail {
     protected String layout;
     @XmlAttribute(name = "offline")
     protected java.lang.Boolean offline;
+    @XmlAttribute(name = "execute-announce")
+    protected java.lang.Boolean executeAnnounce;
 
     /**
      * Gets the value of the headAndPageAndGrid property.
@@ -437,6 +443,34 @@ public class Detail {
     }
 
     /**
+     * Ruft den Wert der buttonAnnounceVisible-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public boolean isButtonAnnounceVisible() {
+        if (buttonAnnounceVisible == null) {
+            return false;
+        } else {
+            return buttonAnnounceVisible;
+        }
+    }
+
+    /**
+     * Legt den Wert der buttonAnnounceVisible-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public void setButtonAnnounceVisible(java.lang.Boolean value) {
+        this.buttonAnnounceVisible = value;
+    }
+
+    /**
      * Ruft den Wert der deleteRequiresAllParams-Eigenschaft ab.
      * 
      * @return
@@ -694,6 +728,34 @@ public class Detail {
      */
     public void setOffline(java.lang.Boolean value) {
         this.offline = value;
+    }
+
+    /**
+     * Ruft den Wert der executeAnnounce-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public boolean isExecuteAnnounce() {
+        if (executeAnnounce == null) {
+            return false;
+        } else {
+            return executeAnnounce;
+        }
+    }
+
+    /**
+     * Legt den Wert der executeAnnounce-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public void setExecuteAnnounce(java.lang.Boolean value) {
+        this.executeAnnounce = value;
     }
 
 }

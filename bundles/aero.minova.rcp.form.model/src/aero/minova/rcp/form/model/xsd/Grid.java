@@ -49,6 +49,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="data-handler" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *       &lt;attribute name="helper-class" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
+ *       &lt;attribute name="execute-announce" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="fill"&gt;
  *         &lt;simpleType&gt;
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
@@ -127,6 +128,8 @@ public class Grid {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
     protected String helperClass;
+    @XmlAttribute(name = "execute-announce")
+    protected java.lang.Boolean executeAnnounce;
     @XmlAttribute(name = "fill")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String fill;
@@ -664,6 +667,34 @@ public class Grid {
      */
     public void setHelperClass(String value) {
         this.helperClass = value;
+    }
+
+    /**
+     * Ruft den Wert der executeAnnounce-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public boolean isExecuteAnnounce() {
+        if (executeAnnounce == null) {
+            return false;
+        } else {
+            return executeAnnounce;
+        }
+    }
+
+    /**
+     * Legt den Wert der executeAnnounce-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link java.lang.Boolean }
+     *     
+     */
+    public void setExecuteAnnounce(java.lang.Boolean value) {
+        this.executeAnnounce = value;
     }
 
     /**

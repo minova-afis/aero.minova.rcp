@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import aero.minova.rcp.form.model.xsd.Form;
 import aero.minova.rcp.model.helper.IHelper;
@@ -17,17 +18,18 @@ import aero.minova.rcp.model.helper.IHelper;
  */
 public class MDetail {
 
-	private HashMap<String, MField> fields = new HashMap<>();
+	private TreeMap<String, MField> fields = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	private List<MField> primaryFields = new ArrayList<>();
-	private HashMap<String, MGrid> grids = new HashMap<>();
-	private HashMap<String, MBrowser> browsers = new HashMap<>();
-	private HashMap<String, MButton> buttons = new HashMap<>();
+	private TreeMap<String, MGrid> grids = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+	private TreeMap<String, MBrowser> browsers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+	private TreeMap<String, MButton> buttons = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	private List<MSection> mSectionList = new ArrayList<>();
 	private List<IHelper> helpers = new ArrayList<>();
 	private Map<String, Form> optionPages = new HashMap<>();
 	private Map<String, Map<String, String>> optionPageKeys = new HashMap<>();
 	private IDetailAccessor detailAccessor;
 	private boolean clearAfterSave;
+	private boolean isBooking;
 
 	/**
 	 * Ein neues Feld dem Detail hinzufügen. Dabei muss selbst auf die Eindeutigkeit geachtet werden. Z.B.
@@ -83,7 +85,7 @@ public class MDetail {
 	public Collection<MBrowser> getBrowsers() {
 		return browsers.values();
 	}
-	
+
 	/**
 	 * Ein neuer MBrowser dem Detail hinzufügen.
 	 *
@@ -96,7 +98,7 @@ public class MDetail {
 		}
 		browsers.put(b.getId(), b);
 	}
-	
+
 	/**
 	 * Liefert den MBrowser mit der ID
 	 *
@@ -294,5 +296,13 @@ public class MDetail {
 		for (MGrid g : grids.values()) {
 			g.closeEditor();
 		}
+	}
+
+	public boolean isBooking() {
+		return isBooking;
+	}
+
+	public void setBooking(boolean isBooking) {
+		this.isBooking = isBooking;
 	}
 }

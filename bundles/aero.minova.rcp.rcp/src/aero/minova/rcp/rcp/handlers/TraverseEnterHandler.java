@@ -368,8 +368,8 @@ public class TraverseEnterHandler {
 		for (int i = ic + 1; i < selectionLayer.getColumnCount(); i++) {
 			int index = selectionLayer.getColumnIndexByPosition(i);
 			Column column = dataTable.getColumns().get(index);
-			if (column.isRequired() && dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())) == null
-					|| dataTable.getRows().get(irs).getValue(dataTable.getColumnIndex(column.getName())).getValue() == null) {
+
+			if (column.isRequired() && (dataTable.getValue(index, irs) == null || dataTable.getValue(index, irs).getValue() == null)) {
 				natTable.setFocus();
 				return natTable.doCommand(new SelectCellCommand(selectionLayer, i, irs, false, false));
 			}
