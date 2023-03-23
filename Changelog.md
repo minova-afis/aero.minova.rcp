@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Änderung
+- Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
+
 ## [12.9.0] - 23.03.2023
 
 ### Neu
