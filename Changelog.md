@@ -14,13 +14,11 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.9.0] - 23.03.2023
+
 ### Neu
 - Booking-Toolbar, aktiviert über Flag `type="booking"` in der Maske
 - Lookup-Masken nutzbar machen (nur Update Prozeduren, kein Insert)
-
-### Änderung
-
-### Bugfixes
 
 ## [12.8.1] - 14.03.2023
 
