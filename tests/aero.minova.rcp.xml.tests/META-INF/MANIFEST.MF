@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: XML and Json tests
 Bundle-SymbolicName: aero.minova.rcp.xml.tests
-Bundle-Version: 12.8.1.qualifier
+Bundle-Version: 12.9.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.xml.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: 

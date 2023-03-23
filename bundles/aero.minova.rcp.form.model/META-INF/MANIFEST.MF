@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: XSD Form Model
 Bundle-SymbolicName: aero.minova.rcp.form.model
-Bundle-Version: 12.8.1.qualifier
+Bundle-Version: 12.9.0.qualifier
 Export-Package: aero.minova.rcp.form.model.xsd
 Import-Package: com.sun.xml.bind.v2;version="2.3.3",
  javax.xml.bind;version="2.3.3",
