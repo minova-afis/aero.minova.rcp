@@ -18,7 +18,7 @@ NatTable {
 NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 	.selectionAnchor:select, .SummaryRow, .ROW_HEADER, .TREE_EXPANDED,
 	.TREE_EXPANDED:select, .TREE_COLLAPSED, .TREE_COLLAPSED:select,
-	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select {
+	.GROUP_BY_OBJECT, .GROUP_BY_OBJECT:select { 
 	font-size: 12pt; 
 	padding: 3;
 }
@@ -26,7 +26,7 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 MinovaSection {
 	date-width: 90px;
 	date-time-width: 130px;
-	number-width: 90px;
+	number-width: 80px;
 	row-height: 24px;
 	section-spacing: 5px;
 	text-width: 130px;
