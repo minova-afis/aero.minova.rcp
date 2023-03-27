@@ -15,7 +15,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Änderung
+- Überall .classpath und prefs updaten (für Java 17)
 - Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
+
 
 ## [12.9.0] - 23.03.2023
 
