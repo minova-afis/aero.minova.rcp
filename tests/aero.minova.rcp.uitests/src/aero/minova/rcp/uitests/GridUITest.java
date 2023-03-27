@@ -58,8 +58,6 @@ class GridUITest {
 	@BeforeEach
 	void beforeClass() {
 
-		// Do not start on Linux
-
 		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
 		// Maske über das Menü öffnen
@@ -129,10 +127,6 @@ class GridUITest {
 
 	@Test
 	public void ensureDataEntryCanBeCreated() {
-		// Do not start on Linux
-		if (OSUtil.isLinux()) {
-			return;
-		}
 
 		// Auf "Optimieren" Klicken, damit mehr Einträge im Index angezeigt werden können
 		detailPart = bot.partById(Constants.DETAIL_PART);
@@ -156,11 +150,6 @@ class GridUITest {
 	@Disabled("Currently fail so disable to be able to continue without test breakages")
 	@DisplayName("Zeilen in Grids einfügen, ändern und löschen testen und das Speichern überprüfen (nicht Ubuntu)!")
 	public void testGridFunctions() {
-
-		// Do not start on Linux
-		if (OSUtil.isLinux()) {
-			return;
-		}
 
 		detailPart = bot.partById(Constants.DETAIL_PART);
 		wfcPart = (WFCDetailPart) detailPart.getPart().getObject();
