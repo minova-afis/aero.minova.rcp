@@ -7,8 +7,10 @@ Automatic-Module-Name: aero.minova.rcp.widgets
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.jface,
  org.eclipse.swt,
+ org.eclipse.e4.core.di.extensions,
  org.eclipse.ui.forms,
  org.eclipse.core.runtime,
+ aero.minova.rcp.preferences,
  aero.minova.rcp.model,
  aero.minova.rcp.constant,
  org.eclipse.e4.core.services,
@@ -17,8 +19,6 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.e4.core.di.annotations,
  org.eclipse.nebula.widgets.opal.textassist,
  aero.minova.rcp.preferencewindow,
- org.eclipse.e4.core.di.extensions,
- aero.minova.rcp.preferences,
  org.eclipse.jface.notifications
 Export-Package: aero.minova.rcp.widgets
 Bundle-ActivationPolicy: lazy
