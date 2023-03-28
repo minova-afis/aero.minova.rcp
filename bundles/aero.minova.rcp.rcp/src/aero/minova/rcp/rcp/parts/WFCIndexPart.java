@@ -104,7 +104,6 @@ public class WFCIndexPart extends WFCNattablePart {
 		@Override
 		protected void doSelectionAction() {
 			// Ausgewählten Zeilen müssen gefiltert werden, um Gruppen-Zeilen zu entfernen
-			@SuppressWarnings("unchecked")
 			List<? extends Object> c = getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
 			List<Row> collection = c.stream().filter(Row.class::isInstance).map(Row.class::cast).toList();
 

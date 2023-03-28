@@ -188,20 +188,17 @@ public class SectionGrid {
 	private Map<Integer, Boolean> originalRequiredColumns;
 
 	private int prevHeight;
-	private static final int BUFFER = 31;
 	private int defaultHeight;
 
 	private ColumnReorderLayer columnReorderLayer;
 
 	private DataLayer bodyDataLayer;
 
-	private SortHeaderLayer sortHeaderLayer;
+	private SortHeaderLayer<Object> sortHeaderLayer;
 
 	private MinovaGridConfiguration gridConfiguration;
 
 	private ViewportLayer viewportLayer;
-
-	private GlazedListsEventLayer eventLayer;
 
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 
@@ -377,7 +374,7 @@ public class SectionGrid {
 			}
 		});
 
-		eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
+		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);

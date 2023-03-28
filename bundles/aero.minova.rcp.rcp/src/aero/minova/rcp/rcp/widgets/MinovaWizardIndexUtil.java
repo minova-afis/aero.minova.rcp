@@ -13,7 +13,6 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfigurat
 import org.eclipse.nebula.widgets.nattable.copy.command.CopyDataCommandHandler;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.groupBy.GroupByDataLayer;
@@ -254,7 +253,7 @@ public class MinovaWizardIndexUtil {
 
 		private final SortedList<T> sortedList;
 
-		private final IRowDataProvider<Row> bodyDataProvider;
+		private final IDataProvider bodyDataProvider;
 
 		private final SelectionLayer selectionLayer;
 
@@ -266,7 +265,7 @@ public class MinovaWizardIndexUtil {
 
 		private TreeLayer treeLayer;
 
-		private GlazedListsEventLayer glazedListsEventLayer;
+		private GlazedListsEventLayer<T> glazedListsEventLayer;
 
 		private ViewportLayer viewportLayer;
 
@@ -284,7 +283,7 @@ public class MinovaWizardIndexUtil {
 			bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor, configRegistry);
 
 			// get the IDataProvider that was created by the GroupByDataLayer
-			this.bodyDataProvider = (IRowDataProvider<Row>) bodyDataLayer.getDataProvider();
+			this.bodyDataProvider = bodyDataLayer.getDataProvider();
 
 			// layer for event handling of GlazedLists and PropertyChanges
 			glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer, this.sortedList);
@@ -300,7 +299,7 @@ public class MinovaWizardIndexUtil {
 			setUnderlyingLayer(viewportLayer);
 		}
 
-		public GlazedListsEventLayer getGlazedListsEventLayer() {
+		public GlazedListsEventLayer<T> getGlazedListsEventLayer() {
 			return glazedListsEventLayer;
 		}
 
@@ -324,7 +323,7 @@ public class MinovaWizardIndexUtil {
 			return this.treeLayer;
 		}
 
-		public IRowDataProvider<Row> getBodyDataProvider() {
+		public IDataProvider getBodyDataProvider() {
 			return this.bodyDataProvider;
 		}
 
