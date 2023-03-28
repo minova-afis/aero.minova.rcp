@@ -26,7 +26,6 @@ import aero.minova.rcp.workspace.WorkspaceException;
  *
  * @author Wilfried Saak
  */
-@SuppressWarnings("restriction")
 public abstract class WorkspaceHandler {
 
 	protected final Logger logger;

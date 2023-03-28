@@ -7,7 +7,6 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * @author Wilfried Saak
  */
-@SuppressWarnings("restriction")
 public class MinovaSectionAdapter extends CompositeElement {
 	public MinovaSectionAdapter(Composite composite, CSSEngine engine) {
 		super(composite, engine);

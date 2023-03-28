@@ -13,7 +13,6 @@ import aero.minova.rcp.css.widgets.MinovaSection;
 /**
  * @author Wilfried Saak
  */
-@SuppressWarnings("restriction")
 public class MinovaSectionPropertyHandler extends AbstractCSSPropertySWTHandler implements ICSSPropertyHandler {
 	/**
 	 * definiert die Breite eines Text Widgets für Datumsangaben.
@@ -46,10 +45,12 @@ public class MinovaSectionPropertyHandler extends AbstractCSSPropertySWTHandler 
 
 	@Override
 	protected void applyCSSProperty(Control control, String property, CSSValue value, String pseudo, CSSEngine engine) throws Exception {
-		if (!(control instanceof MinovaSection))
+		if (!(control instanceof MinovaSection)) {
 			return;
-		if (value.getCssValueType() != CSSValue.CSS_PRIMITIVE_VALUE)
+		}
+		if (value.getCssValueType() != CSSValue.CSS_PRIMITIVE_VALUE) {
 			return;
+		}
 
 		MinovaSection minovaSection = (MinovaSection) control;
 		String val = value.getCssText();

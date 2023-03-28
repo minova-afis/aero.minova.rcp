@@ -51,7 +51,6 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
-@SuppressWarnings("restriction")
 public class PerspectiveControl {
 
 	@Inject

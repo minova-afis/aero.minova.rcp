@@ -38,7 +38,6 @@ import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
-@SuppressWarnings("restriction")
 public class LifeCycle {
 
 	public static final String DEFAULT_CONFIG_FOLDER = ".minwfc";

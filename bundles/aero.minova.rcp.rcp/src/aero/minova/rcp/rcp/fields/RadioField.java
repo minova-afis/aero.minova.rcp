@@ -33,7 +33,6 @@ import aero.minova.rcp.model.form.MRadioField;
 import aero.minova.rcp.rcp.accessor.BooleanValueAccessor;
 import aero.minova.rcp.rcp.accessor.RadioValueAccessor;
 
-@SuppressWarnings("restriction")
 public class RadioField {
 
 	private RadioField() {

@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 /**
  * @author Wilfried Saak
  */
-@SuppressWarnings("restriction")
 public class MinovaSectionElementProvider implements IElementProvider {
 
 	@Override

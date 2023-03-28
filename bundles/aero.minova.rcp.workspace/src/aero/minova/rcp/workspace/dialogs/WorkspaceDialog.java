@@ -34,7 +34,6 @@ import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
-@SuppressWarnings("restriction")
 public class WorkspaceDialog extends Dialog {
 
 	private Text username;

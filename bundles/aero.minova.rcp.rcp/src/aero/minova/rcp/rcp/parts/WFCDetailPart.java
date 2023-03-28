@@ -145,7 +145,6 @@ import aero.minova.rcp.rcp.widgets.BrowserSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.util.ScreenshotUtil;
 
-@SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
 	@Inject

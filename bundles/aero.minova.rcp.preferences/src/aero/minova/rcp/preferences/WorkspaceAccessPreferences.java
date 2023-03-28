@@ -16,7 +16,6 @@ import org.eclipse.equinox.security.storage.StorageException;
  *
  * @author avots
  */
-@SuppressWarnings("restriction")
 public class WorkspaceAccessPreferences {
 	public static final String USER = "user";
 	public static final String URL = "url";

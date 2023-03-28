@@ -90,7 +90,6 @@ import aero.minova.rcp.rcp.util.TranslateUtil;
 import aero.minova.rcp.util.ScreenshotUtil;
 import aero.minova.rcp.widgets.MinovaNotifier;
 
-@SuppressWarnings("restriction")
 public class WFCStatisticDetailPart {
 
 	private static final int MARGIN_SECTION = 8;
@@ -427,7 +426,7 @@ public class WFCStatisticDetailPart {
 					Value v = errorTable.getRows().get(0).getValue(i);
 					params.add(v.getStringValue());
 				}
-				value = MessageFormat.format(value, params.toArray(new String[0]));
+				value = MessageFormat.format(value, params.toArray(new Object[0]));
 			}
 			value += "\n\nUser : " + et.getUser();
 			value += "\nProcedure/View: " + et.getProcedureOrView();

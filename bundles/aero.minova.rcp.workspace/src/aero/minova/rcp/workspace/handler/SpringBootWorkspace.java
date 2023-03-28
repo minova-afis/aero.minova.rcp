@@ -40,7 +40,6 @@ import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
 
-@SuppressWarnings("restriction")
 public class SpringBootWorkspace extends WorkspaceHandler {
 
 	private static final String XXXXXXXXXXXXXXXXXXXX = "xxxxxxxxxxxxxxxxxxxx";

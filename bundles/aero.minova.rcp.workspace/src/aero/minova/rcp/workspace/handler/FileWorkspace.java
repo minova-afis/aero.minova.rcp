@@ -23,7 +23,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
 
-@SuppressWarnings("restriction")
 public class FileWorkspace extends WorkspaceHandler {
 
 	private String connectionString = "";

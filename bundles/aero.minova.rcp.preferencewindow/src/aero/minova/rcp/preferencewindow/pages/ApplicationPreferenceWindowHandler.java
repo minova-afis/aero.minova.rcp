@@ -89,7 +89,6 @@ public class ApplicationPreferenceWindowHandler {
 	@Inject
 	IDataService dataService;
 
-	@SuppressWarnings("restriction")
 	@Inject
 	EHandlerService handlerService;
 
