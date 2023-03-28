@@ -1,8 +1,5 @@
 package aero.minova.rcp.css.widgets;
 
-import java.awt.event.KeyListener;
-
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.swt.SWT;
@@ -76,7 +73,7 @@ public class MinovaSection extends Section {
 			public void keyPressed(KeyEvent e) {
 
 				// Aus- /Einklappen bei drücken von Leertaste
-				// Für weitere KeyBindings aus if switch Statement machen!! 
+				// Für weitere KeyBindings aus if switch Statement machen!!
 				if (e.keyCode == SWT.SPACE) {
 					if (!isExpanded()) {
 						setExpanded(true);

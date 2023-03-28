@@ -143,7 +143,7 @@ class GridUITest {
 
 		UITestUtil.loadIndex(indexPart.getToolbarButtons().get(0));
 
-		int numberEntries = indexNattable.rowCount();
+		// int numberEntries = indexNattable.rowCount();
 
 		createEntry();
 		saveDetail();
@@ -169,7 +169,7 @@ class GridUITest {
 
 		// Testeintrag erstellen
 		reloadIndex();
-		int numberEntries = indexNattable.rowCount();
+		// int numberEntries = indexNattable.rowCount();
 		createEntry();
 		saveDetail();
 		reloadIndex();
@@ -257,34 +257,34 @@ class GridUITest {
 	/**
 	 * Erstellt einige Testzeilen im Grid
 	 */
-	private void insertRows() {
-		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);
-
-		assertNotNull(btnInsert, "Der Insert Button konnte nicht gefunden werden.");
-		UITestUtil.sleep();
-		btnInsert.click();
-		btnInsert.click();
-		btnInsert.click();
-		btnInsert.click();
-		UITestUtil.sleep();
-
-		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
-		SWTBotNatTable gridNattable = swtNatTableBot.nattable(2);
-
-		gridNattable.setCellDataValueByPosition(0, 1, "1");
-		gridNattable.setCellDataValueByPosition(0, 2, "12");
-
-		gridNattable.setCellDataValueByPosition(1, 1, "2");
-		gridNattable.setCellDataValueByPosition(1, 2, "22");
-
-		gridNattable.setCellDataValueByPosition(2, 1, "3");
-		gridNattable.setCellDataValueByPosition(2, 2, "32");
-
-		gridNattable.setCellDataValueByPosition(3, 1, "4");
-		gridNattable.setCellDataValueByPosition(3, 2, "42");
-
-		UITestUtil.sleep();
-	}
+//	private void insertRows() {
+//		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);
+//
+//		assertNotNull(btnInsert, "Der Insert Button konnte nicht gefunden werden.");
+//		UITestUtil.sleep();
+//		btnInsert.click();
+//		btnInsert.click();
+//		btnInsert.click();
+//		btnInsert.click();
+//		UITestUtil.sleep();
+//
+//		SWTNatTableBot swtNatTableBot = new SWTNatTableBot();
+//		SWTBotNatTable gridNattable = swtNatTableBot.nattable(2);
+//
+//		gridNattable.setCellDataValueByPosition(0, 1, "1");
+//		gridNattable.setCellDataValueByPosition(0, 2, "12");
+//
+//		gridNattable.setCellDataValueByPosition(1, 1, "2");
+//		gridNattable.setCellDataValueByPosition(1, 2, "22");
+//
+//		gridNattable.setCellDataValueByPosition(2, 1, "3");
+//		gridNattable.setCellDataValueByPosition(2, 2, "32");
+//
+//		gridNattable.setCellDataValueByPosition(3, 1, "4");
+//		gridNattable.setCellDataValueByPosition(3, 2, "42");
+//
+//		UITestUtil.sleep();
+//	}
 
 	/**
 	 * Löscht einige Zeilen und Verändert andere

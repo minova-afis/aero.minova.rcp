@@ -34,6 +34,8 @@ import aero.minova.rcp.rcp.accessor.BooleanValueAccessor;
 @SuppressWarnings("restriction")
 public class BooleanField {
 
+	private BooleanField() {}
+
 	public static Control create(Composite composite, MField field, int row, int column, Locale locale, MPerspective perspective) {
 		String labelText = field.getLabel() == null ? "" : field.getLabel();
 

@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -32,9 +31,6 @@ public class SwitchPerspectiveHandler {
 
 	@Inject
 	EModelService modelService;
-
-	@Inject
-	private TranslationService translationService;
 
 	@Execute
 	public void execute(IEclipseContext context, //
