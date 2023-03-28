@@ -5,8 +5,9 @@ Bundle-SymbolicName: aero.minova.rcp.preferencewindow;singleton:=true
 Bundle-Version: 12.9.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.preferencewindow
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Require-Bundle: javax.inject,
- org.eclipse.e4.ui.css.swt.theme,
+Require-Bundle: org.eclipse.e4.ui.css.swt.theme,
+ org.eclipse.e4.ui.css.swt,
+ javax.inject,
  org.eclipse.e4.core.di.annotations,
  org.eclipse.e4.ui.workbench,
  org.eclipse.e4.ui.model.workbench,
@@ -26,8 +27,7 @@ Require-Bundle: javax.inject,
  aero.minova.rcp.form.setup,
  aero.minova.rcp.dataservice,
  org.eclipse.e4.ui.services,
- org.apache.commons.io,
- org.eclipse.e4.ui.css.swt
+ org.apache.commons.io
 Export-Package: aero.minova.rcp.preferencewindow.builder,
  aero.minova.rcp.preferencewindow.control
 Bundle-ActivationPolicy: lazy
