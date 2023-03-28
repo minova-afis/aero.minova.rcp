@@ -6,6 +6,7 @@ Bundle-Version: 12.9.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: aero.minova.rcp.constant
 Export-Package: aero.minova.rcp.constants,
+ aero.minova.rcp.exceptions,
  aero.minova.rcp.util
 Require-Bundle: org.eclipse.swt,
  org.eclipse.equinox.preferences,
