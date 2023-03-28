@@ -38,7 +38,6 @@ import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
-import aero.minova.rcp.util.OSUtil;
 
 @SuppressWarnings("restriction")
 @ExtendWith(SWTBotJunit5Extension.class)
@@ -56,9 +55,6 @@ public class MenuUITest {
 
 	@Test
 	public void openPreferencesAndTestMenu() {
-		if (OSUtil.isLinux()) {
-			return;
-		}
 
 		// Einstellungen über Command öffnen
 		Display.getDefault().asyncExec(() -> {

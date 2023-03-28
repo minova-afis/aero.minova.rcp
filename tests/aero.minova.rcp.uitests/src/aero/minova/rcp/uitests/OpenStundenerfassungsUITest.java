@@ -24,7 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.uitests.util.UITestUtil;
-import aero.minova.rcp.util.OSUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
 class OpenStundenerfassungsUITest {
@@ -84,10 +83,6 @@ class OpenStundenerfassungsUITest {
 	@Test
 	@DisplayName("Suchezeile löschen und Suche komplett zurücksetzten (Nicht Ubuntu)")
 	void deleteRowAndRevertSearch() {
-		// Do not start on Linux
-		if (OSUtil.isLinux()) {
-			return;
-		}
 
 		open();
 		// immer zwei Einträge pro Zeile, da Nattable ansonsten nicht updatet (neue
