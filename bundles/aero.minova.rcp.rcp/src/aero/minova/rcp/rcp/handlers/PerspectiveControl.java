@@ -128,8 +128,6 @@ public class PerspectiveControl {
 							perspective.getPersistedState().get(Constants.FORM_NAME), //
 							perspective.getLabel(), //
 							perspective.getIconURI(), //
-							perspective.getLocalizedLabel(), //
-							perspective.getLocalizedTooltip(), //
 							true);
 				}
 				if (perspective == modelService.getActivePerspective(window)) {
@@ -141,8 +139,6 @@ public class PerspectiveControl {
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
-						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
-						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
 						true);
 			}
 		}
@@ -187,8 +183,7 @@ public class PerspectiveControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, String localizedLabel, String localizedTooltip,
-			boolean openAll) {
+	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, boolean openAll) {
 		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		shortcut = getToolItemFor(perspectiveId);
@@ -427,8 +422,6 @@ public class PerspectiveControl {
 						added.getPersistedState().get(Constants.FORM_NAME), //
 						added.getLabel(), //
 						added.getIconURI(), //
-						added.getLocalizedLabel(), //
-						added.getLocalizedTooltip(), //
 						false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {

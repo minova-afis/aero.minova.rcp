@@ -13,9 +13,9 @@ public class CustomComparator implements Comparator<Object> {
 			}
 		} else if (o2 == null) {
 			return 1;
-		} else if (o1 instanceof Comparable && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
-																													// gleiche Klasse haben
-			return ((Comparable) o1).compareTo(o2);
+		} else if (o1 instanceof Comparable c1 && o2 instanceof Comparable && o1.getClass().equals(o2.getClass())) { // Auch überprüfen, ob die Objekte die
+																														// gleiche Klasse haben
+			return c1.compareTo(o2);
 		} else {
 			return o1.toString().compareTo(o2.toString());
 		}

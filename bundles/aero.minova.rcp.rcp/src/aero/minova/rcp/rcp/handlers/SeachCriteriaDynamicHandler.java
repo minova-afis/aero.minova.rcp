@@ -35,9 +35,8 @@ public class SeachCriteriaDynamicHandler {
 		// Hier müssen wir wissen welche Form geladen ist, damit wir die Korrekten Kriterien laden.
 		Table data = null;
 
-		Object part = mpart.getObject();
-		if (part instanceof WFCSearchPart) {
-			data = ((WFCSearchPart) part).getData();
+		if (mpart.getObject() instanceof WFCSearchPart searchpart) {
+			data = searchpart.getData();
 		}
 
 		if (data != null) {

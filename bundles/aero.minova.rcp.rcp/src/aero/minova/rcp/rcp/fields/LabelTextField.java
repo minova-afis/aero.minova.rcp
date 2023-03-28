@@ -5,7 +5,6 @@ import static aero.minova.rcp.rcp.fields.FieldUtil.TRANSLATE_PROPERTY;
 
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.widgets.LabelFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
@@ -19,6 +18,7 @@ import aero.minova.rcp.css.CssType;
 import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.model.form.MField;
 
+@SuppressWarnings("restriction")
 public class LabelTextField {
 
 	private LabelTextField() {

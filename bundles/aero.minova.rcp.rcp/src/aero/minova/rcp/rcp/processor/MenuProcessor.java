@@ -121,8 +121,8 @@ public class MenuProcessor {
 				}
 
 				for (Object object : menuOrEntry) {
-					if (object instanceof MenuType) {
-						MMenu createMenu = createMenu((MenuType) object, actionsMDI, modelService, mApplication);
+					if (object instanceof MenuType mt) {
+						MMenu createMenu = createMenu(mt, actionsMDI, modelService, mApplication);
 						menuContribution.getChildren().add(createMenu);
 					}
 				}
@@ -151,14 +151,10 @@ public class MenuProcessor {
 
 		if (!menuMDI.getEntryOrMenu().isEmpty() && menuMDI.getEntryOrMenu() != null) {
 			for (Object object : menuMDI.getEntryOrMenu()) {
-				if (object instanceof Entry) {
-					Entry entryMDI = (Entry) object;
-					if (!entryMDI.getType().equals("separator")) {
-						String id2 = ((Action) entryMDI.getId()).getId();
-						MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actionsMDI.get(id2), modelService, mApplication);
-						menuGen.getChildren().add(handledMenuItem);
-					}
-
+				if (object instanceof Entry entryMDI && !entryMDI.getType().equals("separator")) {
+					String id2 = ((Action) entryMDI.getId()).getId();
+					MHandledMenuItem handledMenuItem = createMenuEntry(entryMDI, actionsMDI.get(id2), modelService, mApplication);
+					menuGen.getChildren().add(handledMenuItem);
 				}
 			}
 		}

@@ -21,10 +21,7 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -92,7 +89,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
-import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -146,14 +142,10 @@ public class SectionGrid {
 	private EHandlerService handlerService;
 	@Inject
 	private IDataService dataService;
-	@Inject
-	private MPerspective perspective;
-	@Inject
-	private EModelService emservice;
+
 	@Inject
 	private Form form;
-	@Inject
-	private MWindow mwindow;
+
 	@Inject
 	private IEventBroker broker;
 	@Inject
@@ -197,7 +189,6 @@ public class SectionGrid {
 
 	private int prevHeight;
 	private static final int BUFFER = 31;
-	private int defaultWidth = ICssStyler.CSS_TEXT_WIDTH - BUFFER;
 	private int defaultHeight;
 
 	private ColumnReorderLayer columnReorderLayer;
@@ -830,11 +821,11 @@ public class SectionGrid {
 		prefsDetailSections.put(key + ".size", size);
 
 		// Sortierung
-		String sort = "";
+		StringBuilder sort = new StringBuilder();
 		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
-			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+			sort.append(i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";");
 		}
-		prefsDetailSections.put(key + ".sortby", sort);
+		prefsDetailSections.put(key + ".sortby", sort.toString());
 
 		try {
 			prefsDetailSections.flush();

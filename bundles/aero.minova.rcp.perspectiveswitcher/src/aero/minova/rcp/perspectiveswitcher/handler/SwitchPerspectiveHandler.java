@@ -2,8 +2,6 @@ package aero.minova.rcp.perspectiveswitcher.handler;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -11,6 +9,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -27,10 +26,13 @@ public class SwitchPerspectiveHandler {
 	protected MApplication application;
 
 	@Inject
-	EPartService partService;
+	protected EPartService partService;
 
 	@Inject
-	EModelService modelService;
+	protected EModelService modelService;
+
+	@Inject
+	Logger logger;
 
 	@Execute
 	public void execute(IEclipseContext context, //
@@ -43,7 +45,7 @@ public class SwitchPerspectiveHandler {
 		Objects.requireNonNull(perspectiveId);
 		Objects.requireNonNull(perspectiveName);
 
-		openPerspective(context, perspectiveId, window, formName, perspectiveName, perspectiveIcon);
+		openPerspective(context, perspectiveId, formName, perspectiveName, perspectiveIcon);
 	}
 
 	/**
@@ -55,13 +57,12 @@ public class SwitchPerspectiveHandler {
 	 * @throws ExecutionException
 	 *             If the perspective could not be opened.
 	 */
-	private final void openPerspective(IEclipseContext context, String perspectiveID, MWindow window, String formName, String perspectiveName,
-			String perspectiveIcon) {
+	private final void openPerspective(IEclipseContext context, String perspectiveID, String formName, String perspectiveName, String perspectiveIcon) {
 		MUIElement element = modelService.find(perspectiveID, application);
 		if (element == null) {
 			/* MPerspective perspective = */ createNewPerspective(context, perspectiveID, formName, perspectiveName, perspectiveIcon);
 		} else {
-			switchTo(element, perspectiveID, window);
+			switchTo(element, perspectiveID);
 		}
 	}
 
@@ -89,16 +90,15 @@ public class SwitchPerspectiveHandler {
 		}
 
 		if (element == null) {
-			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
+			logger.error("Can't find or clone Perspective " + perspectiveID);
 		} else {
-
 			element.setElementId(perspectiveID);
 			perspective = (MPerspective) element;
 			perspective.getPersistedState().put(Constants.FORM_NAME, formName);
 			perspective.setLabel(perspectiveName);
 			perspective.setIconURI(perspectiveIcon);
 			perspectiveStack.getChildren().add(perspective);
-			switchTo(perspective, perspectiveID, window);
+			switchTo(perspective, perspectiveID);
 		}
 		return perspective;
 	}
@@ -108,11 +108,11 @@ public class SwitchPerspectiveHandler {
 	 *
 	 * @param element
 	 */
-	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID, MWindow window) {
+	public void switchTo(MUIElement element, @Named(Constants.FORM_NAME) String perspectiveID) {
 		if (element instanceof MPerspective) {
 			partService.switchPerspective(perspectiveID);
 		} else {
-			Logger.getGlobal().log(Level.SEVERE, "Can't find or clone Perspective " + perspectiveID);
+			logger.error("Can't find or clone Perspective " + perspectiveID);
 		}
 
 	}

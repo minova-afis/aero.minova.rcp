@@ -20,7 +20,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -68,9 +67,6 @@ public class PrintIndexHandler {
 
 	@Inject
 	private TranslationService translationService;
-
-	@Inject
-	private IEventBroker broker;
 
 	@Inject
 	private EPartService ePartService;
@@ -159,6 +155,7 @@ public class PrintIndexHandler {
 			columnReorderLayer.getColumnIndexOrder();
 
 			// Gruppierung
+			@SuppressWarnings("unchecked")
 			TreeList<Row> treeList = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
 			List<Integer> groupByIndicesReordered = new ArrayList<>();
@@ -297,6 +294,7 @@ public class PrintIndexHandler {
 	 * @param fileName
 	 * @param title
 	 */
+	@SuppressWarnings("unchecked")
 	private void createXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
 			List<Integer> columnReorderList, StringBuffer xml, String fileName, String title) {
 

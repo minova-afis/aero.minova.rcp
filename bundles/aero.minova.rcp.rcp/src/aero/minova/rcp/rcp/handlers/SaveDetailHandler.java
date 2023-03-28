@@ -22,6 +22,7 @@ import aero.minova.rcp.model.form.MGrid;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 
+@SuppressWarnings("restriction")
 public class SaveDetailHandler implements ValueChangeListener {
 
 	@Inject

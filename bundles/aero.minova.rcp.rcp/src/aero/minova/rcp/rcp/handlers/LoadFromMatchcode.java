@@ -2,7 +2,6 @@
 package aero.minova.rcp.rcp.handlers;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -17,18 +16,13 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.IDataFormService;
 import aero.minova.rcp.dataservice.IDataService;
 import aero.minova.rcp.model.Column;
-import aero.minova.rcp.model.DataType;
-import aero.minova.rcp.model.FilterValue;
 import aero.minova.rcp.model.Row;
 import aero.minova.rcp.model.Table;
-import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.builder.RowBuilder;
-import aero.minova.rcp.model.builder.TableBuilder;
 import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.parts.WFCIndexPart;
-import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 
 public class LoadFromMatchcode {
 
@@ -47,14 +41,12 @@ public class LoadFromMatchcode {
 	@Execute
 	public void execute(MPerspective mPerspective) throws InterruptedException, ExecutionException {
 		MField field = null;
-		String indexViewName;
 
 		// Wir holen uns den DetailPart
 		List<MPart> findElements = model.findElements(mPerspective, Constants.DETAIL_PART, MPart.class);
 		MPart part = findElements.get(0);
 		partService.activate(part);
 		WFCDetailPart detailPart = (WFCDetailPart) part.getObject();
-		indexViewName = detailPart.getForm().getIndexView().getSource();
 
 		// Wir holen uns den IndexPart
 		findElements = model.findElements(mPerspective, Constants.INDEX_PART, MPart.class);

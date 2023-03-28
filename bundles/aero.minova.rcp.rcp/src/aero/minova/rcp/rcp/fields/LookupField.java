@@ -26,7 +26,10 @@ import aero.minova.rcp.rcp.accessor.LookupValueAccessor;
 import aero.minova.rcp.widgets.LookupComposite;
 import aero.minova.rcp.widgets.LookupContentProvider;
 
+@SuppressWarnings("restriction")
 public class LookupField {
+
+	private LookupField() {}
 
 	public static final String AERO_MINOVA_RCP_LOOKUP = "LookUp";
 

@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.nattable;
 import java.time.Instant;
 import java.util.Locale;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.data.convert.DisplayConverter;
 import org.osgi.service.prefs.Preferences;
@@ -21,24 +20,22 @@ public class DateTimeDisplayConverter extends DisplayConverter {
 	private String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 	private String timezone = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.STRING, "", locale);
 
-
 	public DateTimeDisplayConverter(Locale locale) {
 		this.locale = locale;
 	}
 
 	@Override
 	public Object canonicalToDisplayValue(Object canonicalValue) {
-		if (canonicalValue instanceof Instant) {
-			IEclipsePreferences node = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
-			return DateTimeUtil.getDateTimeString((Instant) canonicalValue, locale, dateUtil, timeUtil, timezone);
+		if (canonicalValue instanceof Instant i) {
+			return DateTimeUtil.getDateTimeString(i, locale, dateUtil, timeUtil, timezone);
 		}
 		return null;
 	}
 
 	@Override
 	public Object displayToCanonicalValue(Object displayValue) {
-		if (displayValue instanceof String && !((String) displayValue).isBlank()) {
-			Instant res = DateTimeUtil.getDateTime((String) displayValue, timezone);
+		if (displayValue instanceof String dvs && !dvs.isBlank()) {
+			Instant res = DateTimeUtil.getDateTime(dvs, timezone);
 			if (res != null) {
 				return res;
 			} else {

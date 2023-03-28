@@ -1,11 +1,8 @@
 package aero.minova.rcp.rcp.nattable;
 
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
@@ -91,10 +88,7 @@ public class MinovaSearchConfiguration extends MinovaColumnConfiguration {
 		if (locale == null) {
 			locale = Locale.getDefault();
 		}
-		IEclipsePreferences node = InstanceScope.INSTANCE.getNode("aero.minova.rcp.preferencewindow");
-		String string = node.get("timezone", "UTC");
-		ZoneId z = ZoneId.of(string);
-		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.INSTANT, locale, DateTimeType.DATETIME, z);
+		FilterDisplayConverter fdc = new FilterDisplayConverter(DataType.INSTANT, locale, DateTimeType.DATETIME);
 		configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, fdc, DisplayMode.NORMAL,
 				ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + columnIndex);
 	}

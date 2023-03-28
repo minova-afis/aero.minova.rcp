@@ -3,7 +3,6 @@ package aero.minova.rcp.rcp.parts;
 import static org.eclipse.nebula.widgets.nattable.selection.SelectionUtils.getSelectedRowObjects;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -105,8 +104,9 @@ public class WFCIndexPart extends WFCNattablePart {
 		@Override
 		protected void doSelectionAction() {
 			// Ausgewählten Zeilen müssen gefiltert werden, um Gruppen-Zeilen zu entfernen
-			List c = getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
-			List<Row> collection = (List<Row>) c.stream().filter(Row.class::isInstance).collect(Collectors.toList());
+			@SuppressWarnings("unchecked")
+			List<? extends Object> c = getSelectedRowObjects(getSelectionLayer(), getBodyLayerStack().getBodyDataProvider(), false);
+			List<Row> collection = c.stream().filter(Row.class::isInstance).map(Row.class::cast).toList();
 
 			Table t = dataFormService.getTableFromFormIndex(form);
 			for (Row r : collection) {
@@ -136,6 +136,7 @@ public class WFCIndexPart extends WFCNattablePart {
 	/**
 	 * Diese Methode ließt die Index-Spalten aus und erstellet daraus eine Table, diese wird dann an den CAS als Anfrage übergeben.
 	 */
+	@SuppressWarnings("rawtypes")
 	@Inject
 	@Optional
 	public void load(@UIEventTopic(Constants.BROKER_LOADINDEXTABLE) Table resultTable) {

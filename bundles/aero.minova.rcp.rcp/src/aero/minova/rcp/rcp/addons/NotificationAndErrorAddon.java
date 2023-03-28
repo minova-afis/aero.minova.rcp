@@ -172,7 +172,7 @@ public class NotificationAndErrorAddon {
 					break;
 				}
 			}
-			value = MessageFormat.format(value, params.toArray(new String[0]));
+			value = MessageFormat.format(value, params.toArray());
 		}
 
 		return value;
