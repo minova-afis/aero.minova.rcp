@@ -70,7 +70,6 @@ import aero.minova.rcp.model.form.MQuantityField;
 import aero.minova.rcp.model.form.MSection;
 import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.model.helper.IHelper;
-import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.rcp.accessor.AbstractValueAccessor;
@@ -793,46 +792,6 @@ public class WFCDetailCASRequestsUtil {
 		}
 		sendEventToHelper(ActionCode.AFTERDEL);
 		focusFirstEmptyField();
-	}
-
-	/**
-	 * Ruft eine Prozedur mit der übergebenen Tabelle auf. Über den Broker kann auf die Ergebnisse gehört werden
-	 *
-	 * @deprecated Diese Methiode sollte nicht verwendet werden, da sie recht umständlich ist. Stattdessen einfach die Prozedur über den DataService direkt
-	 *             aufrufen.
-	 * @param table
-	 */
-	@Inject
-	@Optional
-	@Deprecated(since = "12.6.0", forRemoval = true)
-	public void callProcedureWithTable(@UIEventTopic(Constants.BROKER_PROCEDUREWITHTABLE) Table table) {
-		if (isActivePerspective() && table != null) {
-
-			CompletableFuture<SqlProcedureResult> tableFuture = dataService.callProcedureAsync(table);
-
-			// Fehler abfangen
-			tableFuture.exceptionally(ex -> {
-				broker.send(Constants.BROKER_PROCEDUREWITHTABLEERROR, ex);
-				return null;
-			});
-
-			// Hier wollen wir, dass der Benutzer warten muss wir bereitsn schon mal die Detailfelder vor
-			tableFuture.thenAccept(ta -> sync.syncExec(() -> {
-				broker.send(Constants.BROKER_PROCEDUREWITHTABLESUCCESS, ta);
-				if (ta != null && ta.getResultSet() != null && ERROR.equals(ta.getResultSet().getName())) {
-					ErrorObject e = new ErrorObject(ta.getResultSet(), dataService.getUserName());
-					broker.send(Constants.BROKER_SHOWERROR, e);
-				} else if (ta != null) {
-					selectedTable = ta.getResultSet();
-					if (!selectedTable.getRows().isEmpty()) {
-						updateSelectedEntry(false);
-					} else {
-						broker.send(Constants.BROKER_PROCEDUREWITHTABLEEMPTYRESPONSE, ta);
-					}
-				}
-				broker.send(Constants.BROKER_PROCEDUREWITHTABLESUCCESSFINISHED, ta);
-			}));
-		}
 	}
 
 	/**
