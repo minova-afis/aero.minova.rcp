@@ -66,13 +66,11 @@ import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
 
+@SuppressWarnings("restriction")
 public class ApplicationPreferenceWindowHandler {
 
 	// Konstante für den Pfad der .prefs erstellen
 	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-
-	// Widget Builder Impelentierung
-	private PreferenceWindowModel pwm;
 
 	@Inject
 	ILocaleChangeService lcs;
@@ -102,7 +100,7 @@ public class ApplicationPreferenceWindowHandler {
 
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench, IEclipseContext context) {
-		pwm = new PreferenceWindowModel(s);
+		PreferenceWindowModel pwm = new PreferenceWindowModel(s);
 		ContextInjectionFactory.inject(pwm, application.getContext()); // In Context injected, damit TranslationService genutzt werden kann
 
 		this.workbench = workbench;
@@ -201,14 +199,10 @@ public class ApplicationPreferenceWindowHandler {
 	}
 
 	private void updateTheme(String newTheme, IThemeEngine themeEngine, IWorkbench workbench) {
-
-		switch (newTheme) {
-		case "M":
+		if ("M".equals(newTheme)) {
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme", true);
-			break;
-		default:
+		} else {
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme-" + newTheme, true);
-			break;
 		}
 
 		workbench.restart();
