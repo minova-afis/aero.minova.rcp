@@ -10,10 +10,12 @@ public class CustomPWFloatText extends CustomPWText {
 	/**
 	 * Constructor
 	 *
-	 * @param label associated label
-	 * @param propertyKey associated key
+	 * @param label
+	 *            associated label
+	 * @param propertyKey
+	 *            associated key
 	 */
-	public CustomPWFloatText(final String label,@Optional  String tooltip, final String propertyKey) {
+	public CustomPWFloatText(final String label, @Optional String tooltip, final String propertyKey) {
 		super(label, tooltip, propertyKey);
 	}
 
@@ -23,7 +25,8 @@ public class CustomPWFloatText extends CustomPWText {
 	@Override
 	public void addVerifyListeners() {
 		text.addListener(SWT.Verify, e -> {
-			if (e.character != 0 && !Character.isDigit(e.character) && e.keyCode != SWT.BS && e.keyCode != SWT.DEL && e.character != '.' && e.character != ',') {
+			if (e.character != 0 && !Character.isDigit(e.character) && e.keyCode != SWT.BS && e.keyCode != SWT.DEL && e.character != '.'
+					&& e.character != ',') {
 				e.doit = false;
 				return;
 			}
@@ -36,8 +39,10 @@ public class CustomPWFloatText extends CustomPWText {
 	/**
 	 * Check if an entry is a float
 	 *
-	 * @param entry text typed by the user
-	 * @param keyCode key code
+	 * @param entry
+	 *            text typed by the user
+	 * @param keyCode
+	 *            key code
 	 * @return true if the user typed a float value, false otherwise
 	 */
 	private boolean verifyEntry(final String entry, final int keyCode) {
@@ -68,10 +73,11 @@ public class CustomPWFloatText extends CustomPWText {
 	public void check() {
 		final Object value = PreferenceWindow.getInstance().getValueFor(getCustomPropertyKey());
 		if (value == null) {
-			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), new Float(0));
+			PreferenceWindow.getInstance().setValue(getCustomPropertyKey(), Float.valueOf(0));
 		} else {
 			if (!(value instanceof Float)) {
-				throw new UnsupportedOperationException("The property '" + getCustomPropertyKey() + "' has to be a Float because it is associated to a float text widget");
+				throw new UnsupportedOperationException(
+						"The property '" + getCustomPropertyKey() + "' has to be a Float because it is associated to a float text widget");
 			}
 		}
 	}
@@ -81,7 +87,7 @@ public class CustomPWFloatText extends CustomPWText {
 	 */
 	@Override
 	public Object convertValue() {
-		if(text.getText().equals("")) {
+		if (text.getText().equals("")) {
 			return 0.0;
 		}
 		return Float.parseFloat(text.getText());
@@ -96,4 +102,3 @@ public class CustomPWFloatText extends CustomPWText {
 	}
 
 }
-
