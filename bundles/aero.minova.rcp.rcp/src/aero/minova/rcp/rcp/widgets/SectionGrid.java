@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -19,7 +21,6 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -148,8 +149,8 @@ public class SectionGrid {
 
 	@Inject
 	private IEventBroker broker;
-	@Inject
-	Logger logger;
+
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
@@ -671,7 +672,7 @@ public class SectionGrid {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -762,7 +763,7 @@ public class SectionGrid {
 					NoSuchFieldException error = new NoSuchFieldException(
 							"String \"" + e.getValue().substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()) + "\" can't be parsed to Type \""
 									+ c.getType() + "\" of Column \"" + c.getName() + "\"! (As defined in .xbs)");
-					logger.error(error);
+					logger.error(error.getMessage(), error);
 					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", error.getMessage());
 				}
 			} else {
@@ -827,7 +828,7 @@ public class SectionGrid {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 
 	}

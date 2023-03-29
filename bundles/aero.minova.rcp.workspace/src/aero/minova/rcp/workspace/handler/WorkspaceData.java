@@ -15,7 +15,6 @@ import org.eclipse.osgi.service.datalocation.Location;
  *
  * @author Wilfried Saak
  */
-@SuppressWarnings("unused")
 class WorkspaceData {
 	private URL connection;
 	private boolean isInBackingStore = false;
@@ -55,8 +54,7 @@ class WorkspaceData {
 		return workspaces;
 	}
 
-	public WorkspaceData() {
-	}
+	public WorkspaceData() {}
 
 	/**
 	 * @return Connection to the server.

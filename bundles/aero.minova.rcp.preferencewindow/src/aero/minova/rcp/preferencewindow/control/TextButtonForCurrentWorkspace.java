@@ -6,10 +6,9 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.util.List;
 
-import javax.inject.Inject;
-
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IWorkbench;
@@ -34,8 +33,7 @@ import aero.minova.rcp.dataservice.internal.FileUtil;
 
 public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	IEclipseContext context;
 	IDataService dataService;
@@ -84,7 +82,7 @@ public class TextButtonForCurrentWorkspace extends CustomPWWidget {
 				try {
 					Desktop.getDesktop().open(dataService.getStoragePath().toAbsolutePath().toFile());
 				} catch (IOException e1) {
-					logger.error(e1);
+					logger.error(e1.getMessage(), e1);
 				}
 			}
 		});

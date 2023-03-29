@@ -9,13 +9,14 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -126,8 +127,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 	@Inject
 	protected MPart mPart;
 
-	@Inject
-	protected Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	protected IEclipseContext context;
 
@@ -505,7 +505,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 

@@ -6,9 +6,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -28,8 +29,7 @@ public class SeachCriteriaDynamicHandler {
 	@Preference
 	private IEclipsePreferences prefs;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	public void aboutToShow(EModelService service, List<MMenuElement> items, MPart mpart, String action) {
 		// Hier müssen wir wissen welche Form geladen ist, damit wir die Korrekten Kriterien laden.
@@ -54,7 +54,7 @@ public class SeachCriteriaDynamicHandler {
 					}
 				}
 			} catch (BackingStoreException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 	}

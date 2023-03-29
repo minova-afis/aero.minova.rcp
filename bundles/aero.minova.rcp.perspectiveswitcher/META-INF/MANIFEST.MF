@@ -6,6 +6,7 @@ Bundle-Version: 12.9.0.qualifier
 Automatic-Module-Name: aero.minova.rcp.perspectiveswitcher
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: javax.inject,
+ org.eclipse.core.runtime,
  org.eclipse.e4.core.contexts,
  org.eclipse.e4.ui.model.workbench,
  org.eclipse.e4.ui.workbench,

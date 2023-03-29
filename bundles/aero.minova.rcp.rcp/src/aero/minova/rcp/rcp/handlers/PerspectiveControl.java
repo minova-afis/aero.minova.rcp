@@ -13,11 +13,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -53,8 +54,7 @@ import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstant
 
 public class PerspectiveControl {
 
-	@Inject
-	private Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	private EModelService modelService;
@@ -107,7 +107,7 @@ public class PerspectiveControl {
 			if (item != null && item.getData() != null) {
 				openMenuFor(item, (String) item.getData());
 			} else {
-				logger.debug("No item found or item is null");
+				logger.info("No item found or item is null");
 			}
 		});
 
@@ -309,7 +309,7 @@ public class PerspectiveControl {
 		try {
 			prefsToolbarOrder.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 

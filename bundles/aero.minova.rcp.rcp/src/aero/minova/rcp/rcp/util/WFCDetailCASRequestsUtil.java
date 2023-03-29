@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -20,7 +22,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.di.UISynchronize;
@@ -115,8 +116,7 @@ public class WFCDetailCASRequestsUtil {
 	@Inject
 	IEventBroker broker;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.AUTO_RELOAD_INDEX)
@@ -514,7 +514,7 @@ public class WFCDetailCASRequestsUtil {
 					} catch (Exception exception) {
 						NoSuchFieldException error = new NoSuchFieldException("String \"" + value.substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length())
 								+ "\" can't be parsed to Type \"" + opField.getDataType() + "\" of Field \"" + e.getKey() + "\"! (As defined in .xbs)");
-						logger.error(error);
+						logger.error(error.getMessage(), error);
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), ERROR, error.getMessage());
 					}
 				} else {
@@ -721,9 +721,9 @@ public class WFCDetailCASRequestsUtil {
 			try {
 				deleteEntry(transactionResult.get());
 			} catch (ExecutionException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			} catch (InterruptedException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 				Thread.currentThread().interrupt();
 			}
 		}

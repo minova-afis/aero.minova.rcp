@@ -18,9 +18,9 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -42,8 +42,7 @@ public class LifeCycle {
 
 	public static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	UISynchronize sync;
@@ -88,10 +87,10 @@ public class LifeCycle {
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
-			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null, logger);
+			WorkspaceDialog workspaceDialog = new WorkspaceDialog(null);
 			workspaceDialog.setDefaultConnectionString(defaultConnectionString);
 
-			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
+			if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().isEmpty()) {
 				// Wenn Default-Workspace gesetzt ist diesen nutzen
 				workspaceLocation = loginDefaultWorkspace(workspaceLocation, workspaceDialog);
 			} else {
@@ -119,7 +118,7 @@ public class LifeCycle {
 	 */
 	private URI loginDefaultWorkspace(URI workspaceLocation, WorkspaceDialog workspaceDialog) {
 		try {
-			Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
+			Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData();
 			if (savedPrimaryWorkspaceAccessData.isPresent()) {
 				ISecurePreferences sPrefs = savedPrimaryWorkspaceAccessData.get();
 				if (!Platform.getInstanceLocation().isSet()) {
@@ -128,7 +127,7 @@ public class LifeCycle {
 					workspaceLocation = parseURI(workspaceLocation);
 
 					if (workspaceLocation == null) {
-						WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
+						WorkspaceAccessPreferences.resetDefaultWorkspace();
 						workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 					} else {
 						workspaceLocation = checkDefaultWorkspace(workspaceLocation, sPrefs);
@@ -136,7 +135,7 @@ public class LifeCycle {
 				}
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			workspaceLocation = loadWorkspaceConfigManually(workspaceDialog, workspaceLocation);
 		}
 		return workspaceLocation;
@@ -146,7 +145,7 @@ public class LifeCycle {
 		try {
 			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 		} catch (URISyntaxException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		return workspaceLocation;
 	}
@@ -166,14 +165,13 @@ public class LifeCycle {
 		String url = sPrefs.get(WorkspaceAccessPreferences.URL, null);
 
 		try {
-			WorkspaceHandler workspaceHandler = WorkspaceHandler.newInstance(sPrefs.name(), url, logger);
+			WorkspaceHandler workspaceHandler = WorkspaceHandler.newInstance(sPrefs.name(), url);
 			workspaceHandler.checkConnection(username, pw, workspaceLocation.toString(), true);
 			workspaceHandler.open();
 
-			dataService.setLogger(logger);
 			dataService.setCredentials(username, pw, url, workspaceLocation);
 		} catch (WorkspaceException e) {
-			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, logger, sPrefs.name());
+			WorkspaceDialog defaultDialog = new WorkspaceDialog(null, sPrefs.name());
 			defaultDialog.setDefaultConnectionString(defaultConnectionString);
 			workspaceLocation = loadWorkspaceConfigManually(defaultDialog, workspaceLocation);
 		}
@@ -209,11 +207,10 @@ public class LifeCycle {
 		if (argPW != null && argURL != null && argUser != null) {
 			try {
 				URI workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
-				dataService.setLogger(logger);
 				dataService.setCredentials(argUser, argPW, argURL, workspaceLocation);
 				return true;
 			} catch (URISyntaxException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 
@@ -251,7 +248,7 @@ public class LifeCycle {
 					workbenchContext.set(Constants.SHOW_WORKSPACE_RESET_MESSAGE, true);
 				}
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 	}
@@ -271,7 +268,7 @@ public class LifeCycle {
 			Files.deleteIfExists(Path.of(workspaceLocation)
 					.resolve(".metadata/.plugins/org.eclipse.core.runtime/.settings/aero.minova.rcp.preferences.detailsections.prefs"));
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -288,7 +285,7 @@ public class LifeCycle {
 			readOut = in.readLine();
 			return readOut;
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		return "";
 	}
@@ -302,10 +299,9 @@ public class LifeCycle {
 		try {
 			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 		} catch (URISyntaxException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		Objects.requireNonNull(workspaceLocation);
-		dataService.setLogger(logger);
 		dataService.setCredentials(workspaceDialog.getUsername(), //
 				workspaceDialog.getPassword(), //
 				workspaceDialog.getConnection(), //

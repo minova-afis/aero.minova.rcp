@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -37,6 +39,8 @@ public class DataFormService implements IDataFormService {
 	IDataService dataService;
 
 	EventAdmin eventAdmin;
+
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.MANDATORY)
 	void registerEventAdmin(EventAdmin admin) {
@@ -103,7 +107,7 @@ public class DataFormService implements IDataFormService {
 				.collect(Collectors.toList());
 		for (Field f : allFields) {
 			dataTable.addColumn(createColumnFromField(f, prefix));
-			if(f.getQuantity() != null) {
+			if (f.getQuantity() != null) {
 				Field qF = new Field();
 				qF.setName(f.getQuantity().getUnitFieldName());
 				qF.setSqlIndex(f.getQuantity().getUnitFieldSqlIndex());
@@ -270,7 +274,7 @@ public class DataFormService implements IDataFormService {
 		try {
 			form = XmlProcessor.get(formContent, Form.class);
 		} catch (JAXBException ex) {
-			dataService.getLogger().error(ex);
+			logger.error(ex.getMessage(), ex);
 		}
 
 		return form;
@@ -280,9 +284,9 @@ public class DataFormService implements IDataFormService {
 		try {
 			return dataService.getCachedFileContent(name).get();
 		} catch (ExecutionException e1) {
-			dataService.getLogger().error(e1);
+			logger.error(e1.getMessage(), e1);
 		} catch (InterruptedException e) {
-			dataService.getLogger().error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
 		return "";

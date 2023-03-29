@@ -5,7 +5,8 @@ import java.text.MessageFormat;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -34,8 +35,7 @@ public class Preview {
 	@Inject
 	private MPart part;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	private Browser browser;
 
@@ -110,7 +110,7 @@ public class Preview {
 		try {
 			Thread.sleep(1);
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
 	}

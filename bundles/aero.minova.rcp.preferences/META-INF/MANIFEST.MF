@@ -7,5 +7,6 @@ Automatic-Module-Name: aero.minova.rcp.preferences
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.equinox.security,
  org.eclipse.equinox.registry,
- org.eclipse.e4.core.services
+ org.eclipse.e4.core.services,
+ org.eclipse.core.runtime
 Export-Package: aero.minova.rcp.preferences

@@ -10,13 +10,14 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
@@ -97,8 +98,7 @@ public class ApplicationPreferenceWindowHandler {
 
 	IWorkbench workbench;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench, IEclipseContext context) {
@@ -167,7 +167,7 @@ public class ApplicationPreferenceWindowHandler {
 				preferences.flush();
 				lcs.changeApplicationLocale(CustomLocale.getLocale());
 			} catch (BackingStoreException | NullPointerException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 

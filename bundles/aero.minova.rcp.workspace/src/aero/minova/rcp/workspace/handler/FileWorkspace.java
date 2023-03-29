@@ -18,7 +18,6 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.services.log.Logger;
 
 import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
@@ -30,8 +29,8 @@ public class FileWorkspace extends WorkspaceHandler {
 	/**
 	 * @param connection
 	 */
-	public FileWorkspace(URL connection, Logger logger) {
-		super(logger);
+	public FileWorkspace(URL connection) {
+		super();
 		workspaceData.setConnection(connection);
 	}
 
@@ -148,7 +147,7 @@ public class FileWorkspace extends WorkspaceHandler {
 				sysNode.exportNode(connectionOS);
 				connectionOS.close();
 			} catch (IOException | BackingStoreException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 			throw new WorkspaceException(MessageFormat.format("connection.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 		}
@@ -159,7 +158,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			InputStream prefsIS = new FileInputStream(applicationXbs);
 			Preferences.importPreferences(prefsIS);
 		} catch (IOException | InvalidPreferencesFormatException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -173,7 +172,7 @@ public class FileWorkspace extends WorkspaceHandler {
 			sysNode.exportNode(applicationOS);
 			applicationOS.close();
 		} catch (IOException | BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		throw new WorkspaceException(MessageFormat.format("application.xbs does not exist in folder {0}!", appDir.getAbsolutePath()));
 	}
@@ -199,7 +198,7 @@ public class FileWorkspace extends WorkspaceHandler {
 				instanceLocationUrl = new URL("file", null, path);
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
 			} catch (IllegalStateException | IOException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 			URL workspaceURL = Platform.getInstanceLocation().getURL();
 			File workspaceDir = new File(workspaceURL.getPath());

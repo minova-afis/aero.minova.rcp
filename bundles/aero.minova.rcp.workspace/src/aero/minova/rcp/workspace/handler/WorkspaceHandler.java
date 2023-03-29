@@ -7,7 +7,8 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
@@ -28,7 +29,7 @@ import aero.minova.rcp.workspace.WorkspaceException;
  */
 public abstract class WorkspaceHandler {
 
-	protected final Logger logger;
+	static ILog logger = Platform.getLog(WorkspaceHandler.class);
 	protected final WorkspaceData workspaceData;
 
 	/**
@@ -44,10 +45,10 @@ public abstract class WorkspaceHandler {
 	 * @return
 	 * @throws MalformedURLException
 	 */
-	public static WorkspaceHandler newInstance(String profile, String connection, Logger logger) throws WorkspaceException {
+	public static WorkspaceHandler newInstance(String profile, String connection) throws WorkspaceException {
 		if (connection == null || connection.length() == 0) {
 			try {
-				List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger);
+				List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData();
 				for (ISecurePreferences store : workspaceAccessDatas) {
 					if (profile.equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
 						connection = store.get(WorkspaceAccessPreferences.URL, "");
@@ -55,7 +56,7 @@ public abstract class WorkspaceHandler {
 					}
 				}
 			} catch (StorageException e) {
-				logger.error(e, e.getMessage());
+				logger.error(e.getMessage(), e);
 			}
 		}
 		URL url;
@@ -70,20 +71,20 @@ public abstract class WorkspaceHandler {
 
 		switch (url.getProtocol()) {
 		case "file":
-			return new FileWorkspace(url, logger);
+			return new FileWorkspace(url);
 		case "http":
 		case "https":
-			return new SpringBootWorkspace(profile, url, logger);
+			return new SpringBootWorkspace(profile, url);
 		default:
 			return null;
 		}
 	}
 
-	public static WorkspaceHandler newInstance(ISecurePreferences node, Logger logger) throws MalformedURLException, StorageException, WorkspaceException {
+	public static WorkspaceHandler newInstance(ISecurePreferences node) throws MalformedURLException, StorageException, WorkspaceException {
 		String connection = node.get(WorkspaceAccessPreferences.URL, "N/A");
 		String profile = node.get(WorkspaceAccessPreferences.PROFILE, "N/A");
 
-		WorkspaceHandler instance = newInstance(profile, connection, logger);
+		WorkspaceHandler instance = newInstance(profile, connection);
 		if (instance != null) {
 			instance.workspaceData.setConnection(new URL(connection));
 			instance.workspaceData.setProfile(node.get("profile", "unknown"));
@@ -94,8 +95,7 @@ public abstract class WorkspaceHandler {
 		return instance;
 	}
 
-	protected WorkspaceHandler(Logger logger) {
-		this.logger = logger;
+	protected WorkspaceHandler() {
 		this.workspaceData = new WorkspaceData();
 	}
 
@@ -134,7 +134,7 @@ public abstract class WorkspaceHandler {
 		try {
 			return workspaceData.getConnection().toURI().toURL().toString();
 		} catch (MalformedURLException | URISyntaxException e) {
-			logger.error(e, e.getMessage());
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}

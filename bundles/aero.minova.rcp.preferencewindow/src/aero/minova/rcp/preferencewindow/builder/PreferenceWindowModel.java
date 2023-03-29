@@ -14,8 +14,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.MApplication;
 
@@ -34,8 +35,7 @@ public class PreferenceWindowModel {
 	@Inject
 	MApplication mApplication;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	// Allgemeine Einstellungen aus XBS Datei
 	private Map<String, String> xbsPreferences;
@@ -65,7 +65,7 @@ public class PreferenceWindowModel {
 					PreferenceTabDescriptor createExecutableExtension = (PreferenceTabDescriptor) element.createExecutableExtension("class");
 					cprf.add(createExecutableExtension);
 				} catch (CoreException e) {
-					logger.error(e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
