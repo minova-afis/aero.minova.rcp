@@ -16,6 +16,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ### Änderung
 - Überall .classpath und prefs updaten (für Java 17)
+- Warnungen entfernen, Code bereinigen
 - Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
 
 
