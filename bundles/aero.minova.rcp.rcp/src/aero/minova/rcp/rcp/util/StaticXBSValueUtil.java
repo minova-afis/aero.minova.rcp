@@ -73,6 +73,8 @@ public class StaticXBSValueUtil {
 			break;
 		case ZONED:
 			return new Value(ZonedDateTime.parse(valueString), DataType.ZONED);
+		case QUANTITY:
+			// TODO #1462
 		}
 		return null;
 	}

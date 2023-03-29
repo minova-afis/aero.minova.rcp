@@ -19,6 +19,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.preferencewindow.control.CustomLocale;
 import aero.minova.rcp.translate.service.WFCTranslationService;
 
+@SuppressWarnings("restriction")
 public class Manager {
 
 	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
