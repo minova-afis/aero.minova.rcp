@@ -19,6 +19,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
 - Tests unter Linux wieder aktivieren
 
+### Bugfixes
+- Tab in Statistik-Part ausbessern
 
 ## [12.9.0] - 23.03.2023
 
