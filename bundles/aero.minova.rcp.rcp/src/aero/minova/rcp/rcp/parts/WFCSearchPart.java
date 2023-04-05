@@ -189,8 +189,7 @@ public class WFCSearchPart extends WFCNattablePart {
 		for (Row r : getData().getRows()) {
 			for (int i = 0; i < getData().getColumnCount(); i++) {
 				Value v = r.getValue(i);
-				if (v instanceof FilterValue && ((FilterValue) v).getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
-					FilterValue fv = (FilterValue) v;
+				if (v instanceof FilterValue fv && fv.getFilterValue() != null && ((FilterValue) v).getFilterValue().getInstantValue() != null) {
 					Instant inst;
 					if (form.getIndexView().getColumn().get(i).getShortTime() != null) {
 						inst = TimeUtil.getTime(fv.getUserInputWithoutOperator());
