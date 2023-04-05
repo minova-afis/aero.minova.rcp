@@ -4,12 +4,13 @@ package aero.minova.rcp.rcp.handlers;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
@@ -38,8 +39,7 @@ public class DynamicButtonHandler {
 	@Inject
 	protected IMinovaPluginService pluginService;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Execute
 	public void execute(IEclipseContext context, Shell shell, @Optional @Named(Constants.CLAZZ) String className,
@@ -59,7 +59,7 @@ public class DynamicButtonHandler {
 					wizardDialog.open();
 				}
 			} catch (Exception e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		} else if (Constants.PROCEDURE.equals(className)) {
 			Procedure p = (Procedure) context.get(parameter);
@@ -98,7 +98,7 @@ public class DynamicButtonHandler {
 				}
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 
 		if (iWizard == null) {

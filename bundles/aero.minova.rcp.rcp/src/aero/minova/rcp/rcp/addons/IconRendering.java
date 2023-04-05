@@ -4,9 +4,7 @@ package aero.minova.rcp.rcp.addons;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -34,8 +32,7 @@ public class IconRendering {
 			return;
 		}
 		// Ensure that this event is for a MMenuItem or MToolBar
-		if (!(objElement instanceof MMenuElement && !(objElement instanceof MPopupMenu))
-				&& !(objElement instanceof MToolBar)) {
+		if (!(objElement instanceof MMenuElement && !(objElement instanceof MPopupMenu)) && !(objElement instanceof MToolBar)) {
 			return;
 		}
 
@@ -48,8 +45,7 @@ public class IconRendering {
 
 		MPart part = (MPart) parent;
 		ImageUtil.updateIconsForPart(part);
-		if (uiElement instanceof MToolBar) {
-			MToolBar toolbar = (MToolBar) uiElement;
+		if (uiElement instanceof MToolBar toolbar) {
 			ImageUtil.updateIconsForToolbarItems(toolbar);
 		}
 

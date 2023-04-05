@@ -35,6 +35,7 @@ import aero.minova.rcp.model.helper.ActionCode;
 import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 
+@SuppressWarnings("restriction")
 public class BlockHandler implements ValueChangeListener {
 
 	@Inject

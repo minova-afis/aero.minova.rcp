@@ -2,11 +2,10 @@ package aero.minova.rcp.rcp.widgets;
 
 import java.text.MessageFormat;
 
-import javax.inject.Inject;
-
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
@@ -27,8 +26,7 @@ public class BrowserSection {
 	private Browser browser;
 	private boolean loading;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	public BrowserSection(Composite composite) {
 		this.composite = composite;
@@ -110,7 +108,7 @@ public class BrowserSection {
 		try {
 			Thread.sleep(1);
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
 	}

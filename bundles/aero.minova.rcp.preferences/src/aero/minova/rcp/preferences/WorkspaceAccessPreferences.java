@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -16,7 +17,6 @@ import org.eclipse.equinox.security.storage.StorageException;
  *
  * @author avots
  */
-@SuppressWarnings("restriction")
 public class WorkspaceAccessPreferences {
 	public static final String USER = "user";
 	public static final String URL = "url";
@@ -27,6 +27,8 @@ public class WorkspaceAccessPreferences {
 	private static final String AERO_MINOVA_RCP_WORKSPACE = "aero.minova.rcp.workspace";
 	private static final String WORKSPACES = "aero.minova.rcp.workspace";
 	public static final String IS_PRIMARY_WORKSPACE = "isPrimaryWorkspace";
+
+	static ILog logger = Platform.getLog(WorkspaceAccessPreferences.class);
 
 	private WorkspaceAccessPreferences() {}
 
@@ -58,7 +60,7 @@ public class WorkspaceAccessPreferences {
 		}
 	}
 
-	public static void deleteSavedWorkspace(String name, Logger logger) {
+	public static void deleteSavedWorkspace(String name) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
 				.node(WORKSPACES);
@@ -69,12 +71,12 @@ public class WorkspaceAccessPreferences {
 			try {
 				node.flush();
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 	}
 
-	public static List<ISecurePreferences> getSavedWorkspaceAccessData(Logger logger) {
+	public static List<ISecurePreferences> getSavedWorkspaceAccessData() {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//
 				.node(WORKSPACES);
@@ -83,25 +85,25 @@ public class WorkspaceAccessPreferences {
 			try {
 				savedWorkspaceHandlers.add(workspaces.node(workspaceName));
 			} catch (Exception e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 		return savedWorkspaceHandlers;
 	}
 
-	public static void resetDefaultWorkspace(Logger logger) {
-		WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).ifPresent(prefs -> {
+	public static void resetDefaultWorkspace() {
+		WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().ifPresent(prefs -> {
 			try {
 				prefs.putBoolean(WorkspaceAccessPreferences.IS_PRIMARY_WORKSPACE, false, false);
 				prefs.flush();
 			} catch (StorageException | IOException e1) {
-				logger.debug(e1, "Could not reset default workspace.");
+				logger.info("Could not reset default workspace.", e1);
 			}
 		});
 	}
 
-	public static Optional<ISecurePreferences> getSavedPrimaryWorkspaceAccessData(Logger logger) {
-		return getSavedWorkspaceAccessData(logger).stream()//
+	public static Optional<ISecurePreferences> getSavedPrimaryWorkspaceAccessData() {
+		return getSavedWorkspaceAccessData().stream()//
 				.filter(w -> {
 					try {
 						return w.getBoolean(IS_PRIMARY_WORKSPACE, false);

@@ -17,12 +17,10 @@ Require-Bundle: org.eclipse.osgi,
  javax.inject,
  org.eclipse.e4.core.di.extensions,
  org.eclipse.nebula.widgets.nattable.core,
- aero.minova.rcp.preferences
+ aero.minova.rcp.preferences,
+ org.eclipse.jface,
+ aero.minova.rcp.form.model
 Bundle-ActivationPolicy: lazy
-Import-Package: aero.minova.rcp.form.model.xsd,
- org.eclipse.jface.wizard,
- org.eclipse.nebula.widgets.nattable.layer;version="1.6.0",
- org.eclipse.swt.events
 Export-Package: aero.minova.rcp.model,
  aero.minova.rcp.model.builder,
  aero.minova.rcp.model.event,

@@ -11,8 +11,6 @@ import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.fieldassist.IContentProposal;
-import org.eclipse.jface.fieldassist.IContentProposalListener;
 import org.eclipse.jface.fieldassist.IContentProposalListener2;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
@@ -145,8 +143,6 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	 */
 	protected char[] autoActivationCharacters;
 
-	private boolean verifyText;
-
 	/**
 	 * Creates the default TextCellEditor that does not commit on pressing the up/down arrow keys and will not move the selection on committing a value by
 	 * pressing enter.
@@ -228,18 +224,18 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		// Note: this is currently only implemented in here, as the
 		// TextCellEditor is the only editor that supports just in time
 		// conversion/validation
-		if (this.inputConversionErrorHandler instanceof RenderErrorHandling) {
+		if (this.inputConversionErrorHandler instanceof RenderErrorHandling reh) {
 			IStyle conversionErrorStyle = this.configRegistry.getConfigAttribute(EditConfigAttributes.CONVERSION_ERROR_STYLE, DisplayMode.EDIT,
-					this.labelStack.getLabels());
+					this.labelStack);
 
-			((RenderErrorHandling) this.inputConversionErrorHandler).setErrorStyle(conversionErrorStyle);
+			reh.setErrorStyle(conversionErrorStyle);
 		}
 
-		if (this.inputValidationErrorHandler instanceof RenderErrorHandling) {
+		if (this.inputValidationErrorHandler instanceof RenderErrorHandling reh) {
 			IStyle validationErrorStyle = this.configRegistry.getConfigAttribute(EditConfigAttributes.VALIDATION_ERROR_STYLE, DisplayMode.EDIT,
-					this.labelStack.getLabels());
+					this.labelStack);
 
-			((RenderErrorHandling) this.inputValidationErrorHandler).setErrorStyle(validationErrorStyle);
+			reh.setErrorStyle(validationErrorStyle);
 		}
 
 		// if a IControlContentAdapter is registered, create and register a ContentProposalAdapter
@@ -250,8 +246,8 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 
 		this.text.forceFocus();
 
-		if (originalCanonicalValue instanceof FilterValue) {
-			this.text.setText(((FilterValue) originalCanonicalValue).getUserInput());
+		if (originalCanonicalValue instanceof FilterValue fv) {
+			this.text.setText(fv.getUserInput());
 		}
 
 		Display.getDefault().asyncExec(() -> {
@@ -309,7 +305,7 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 		textControl.setFont(this.cellStyle.getAttributeValue(CellStyleAttributes.FONT));
 		Cursor cursor = new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM);
 		textControl.setCursor(cursor);
-		textControl.addDisposeListener((e) -> {
+		textControl.addDisposeListener(e -> {
 			if (cursor != null && !cursor.isDisposed()) {
 				cursor.dispose();
 			}
@@ -322,9 +318,9 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 			public void keyPressed(KeyEvent event) {
 				if (isCommitOnEnter() && (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR)) {
 
-					boolean commit = (event.stateMask == SWT.MOD3) ? false : true;
+					boolean commit = event.stateMask != SWT.MOD3;
 					if (isCommitWithCtrlKey()) {
-						commit = (event.stateMask == SWT.MOD1) ? true : false;
+						commit = event.stateMask == SWT.MOD1;
 					}
 					MoveDirectionEnum move = MoveDirectionEnum.NONE;
 					if (MinovaTextCellEditor.this.moveSelectionOnEnter && MinovaTextCellEditor.this.editMode == EditModeEnum.INLINE) {
@@ -483,22 +479,6 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	}
 
 	/**
-	 * Set the error description text that will be shown in the decoration hover.
-	 *
-	 * @param errorText
-	 *            The text to be shown as a description for the decoration, or <code>null</code> if there should be no description.
-	 * @see ControlDecoration#setDescriptionText(String)
-	 * @deprecated The error decoration text is dynamically set by the {@link RenderErrorHandling} if a
-	 *             {@link org.eclipse.nebula.widgets.nattable.data.convert.ConversionFailedException} or a
-	 *             {@link org.eclipse.nebula.widgets.nattable.data.validate.ValidationFailedException} is thrown. A value set via this method will be
-	 *             overridden.
-	 */
-	@Deprecated
-	public void setErrorDecorationText(String errorText) {
-		this.decorationProvider.setErrorDecorationText(errorText);
-	}
-
-	/**
 	 * Force the error decoration hover to show immediately.
 	 *
 	 * @param customErrorText
@@ -605,27 +585,21 @@ public class MinovaTextCellEditor extends AbstractCellEditor {
 	protected void configureContentProposalAdapter(final ContentProposalAdapter contentProposalAdapter) {
 		// add the necessary listeners to support the interaction between the
 		// content proposal and this text editor
-		contentProposalAdapter.addContentProposalListener(new IContentProposalListener() {
-
-			@Override
-			public void proposalAccepted(IContentProposal proposal) {
-				commit(MoveDirectionEnum.NONE);
-			}
-		});
+		contentProposalAdapter.addContentProposalListener(proposal -> commit(MoveDirectionEnum.NONE));
 
 		contentProposalAdapter.addContentProposalListener(new IContentProposalListener2() {
 
 			@Override
 			public void proposalPopupClosed(ContentProposalAdapter adapter) {
-				if (MinovaTextCellEditor.this.focusListener instanceof InlineFocusListener) {
-					((InlineFocusListener) MinovaTextCellEditor.this.focusListener).handleFocusChanges = true;
+				if (MinovaTextCellEditor.this.focusListener instanceof InlineFocusListener ifl) {
+					ifl.handleFocusChanges = true;
 				}
 			}
 
 			@Override
 			public void proposalPopupOpened(ContentProposalAdapter adapter) {
-				if (MinovaTextCellEditor.this.focusListener instanceof InlineFocusListener) {
-					((InlineFocusListener) MinovaTextCellEditor.this.focusListener).handleFocusChanges = false;
+				if (MinovaTextCellEditor.this.focusListener instanceof InlineFocusListener ifl) {
+					ifl.handleFocusChanges = false;
 				}
 				// set the focus to the popup so on enabling via keystroke the
 				// selection via keyboard is immediately possible

@@ -181,7 +181,7 @@ public class PrintDetailHandler {
 		Row row = RowBuilder.newRow().withValue("" + integerValue).create();
 		table.addRow(row);
 
-		PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, window, broker, sync, table, rootElements.get(maskName),
+		PrintUtil.getXMLAndShowPDF(dataService, modelService, partService, translationService, sync, table, rootElements.get(maskName),
 				"reports/" + reportNames.get(maskName), "outputReports/" + maskName.replace(".xml", "") + "_" + integerValue + "_Detail.pdf", mPerspective,
 				disablePreview);
 	}

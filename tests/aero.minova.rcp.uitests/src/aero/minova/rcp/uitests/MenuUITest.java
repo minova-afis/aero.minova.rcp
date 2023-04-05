@@ -39,7 +39,6 @@ import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
 
-@SuppressWarnings("restriction")
 @ExtendWith(SWTBotJunit5Extension.class)
 public class MenuUITest {
 

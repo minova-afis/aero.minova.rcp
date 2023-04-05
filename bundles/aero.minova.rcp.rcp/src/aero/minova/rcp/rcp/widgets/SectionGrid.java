@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -19,12 +21,8 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -92,7 +90,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.constants.GridChangeType;
-import aero.minova.rcp.css.ICssStyler;
 import aero.minova.rcp.css.widgets.MinovaSection;
 import aero.minova.rcp.css.widgets.MinovaSectionData;
 import aero.minova.rcp.dataservice.IDataFormService;
@@ -146,18 +143,14 @@ public class SectionGrid {
 	private EHandlerService handlerService;
 	@Inject
 	private IDataService dataService;
-	@Inject
-	private MPerspective perspective;
-	@Inject
-	private EModelService emservice;
+
 	@Inject
 	private Form form;
-	@Inject
-	private MWindow mwindow;
+
 	@Inject
 	private IEventBroker broker;
-	@Inject
-	Logger logger;
+
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.GRID_TAB_NAVIGATION)
@@ -196,21 +189,17 @@ public class SectionGrid {
 	private Map<Integer, Boolean> originalRequiredColumns;
 
 	private int prevHeight;
-	private static final int BUFFER = 31;
-	private int defaultWidth = ICssStyler.CSS_TEXT_WIDTH - BUFFER;
 	private int defaultHeight;
 
 	private ColumnReorderLayer columnReorderLayer;
 
 	private DataLayer bodyDataLayer;
 
-	private SortHeaderLayer sortHeaderLayer;
+	private SortHeaderLayer<Object> sortHeaderLayer;
 
 	private MinovaGridConfiguration gridConfiguration;
 
 	private ViewportLayer viewportLayer;
-
-	private GlazedListsEventLayer eventLayer;
 
 	private MinovaColumnPropertyAccessor columnPropertyAccessor;
 
@@ -386,7 +375,7 @@ public class SectionGrid {
 			}
 		});
 
-		eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
+		GlazedListsEventLayer<Row> eventLayer = new GlazedListsEventLayer<>(bodyDataLayer, sortedList);
 
 		columnReorderLayer = new ColumnReorderLayer(eventLayer);
 		ColumnHideShowLayer columnHideShowLayer = new ColumnHideShowLayer(columnReorderLayer);
@@ -683,7 +672,7 @@ public class SectionGrid {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -774,7 +763,7 @@ public class SectionGrid {
 					NoSuchFieldException error = new NoSuchFieldException(
 							"String \"" + e.getValue().substring(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL.length()) + "\" can't be parsed to Type \""
 									+ c.getType() + "\" of Column \"" + c.getName() + "\"! (As defined in .xbs)");
-					logger.error(error);
+					logger.error(error.getMessage(), error);
 					MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", error.getMessage());
 				}
 			} else {
@@ -830,16 +819,16 @@ public class SectionGrid {
 		prefsDetailSections.put(key + ".size", size);
 
 		// Sortierung
-		String sort = "";
+		StringBuilder sort = new StringBuilder();
 		for (int i : sortHeaderLayer.getSortModel().getSortedColumnIndexes()) {
-			sort += i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";";
+			sort.append(i + "," + sortHeaderLayer.getSortModel().getSortDirection(i) + ";");
 		}
-		prefsDetailSections.put(key + ".sortby", sort);
+		prefsDetailSections.put(key + ".sortby", sort.toString());
 
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 
 	}

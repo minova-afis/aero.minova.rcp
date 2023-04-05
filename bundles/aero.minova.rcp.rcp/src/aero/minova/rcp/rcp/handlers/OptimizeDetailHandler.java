@@ -20,12 +20,9 @@ public class OptimizeDetailHandler {
 	public void execute(EModelService emservice, MWindow mwindow, MPerspective mPerspective) {
 		MPart detail = emservice.findElements(emservice.getActivePerspective(mwindow), "aero.minova.rcp.rcp.part.details", MPart.class).get(0);
 
-		Integer defaultSectionWidth = (Integer) mPerspective.getContext().get(Constants.DETAIL_WIDTH);
-
 		// Detail-Composite finden (Kann auch Statistik-Part sein)
 		Composite detailComposite;
-		if (detail.getObject() instanceof WFCDetailPart) {
-			WFCDetailPart wfcDetailPart = (WFCDetailPart) detail.getObject();
+		if (detail.getObject() instanceof WFCDetailPart wfcDetailPart) {
 			detailComposite = (Composite) wfcDetailPart.getComposite().getData(Constants.DETAIL_COMPOSITE);
 		} else {
 			WFCStatisticDetailPart wfcStatisticDetailPart = (WFCStatisticDetailPart) detail.getObject();

@@ -95,8 +95,8 @@
                     <target>
                         <artifact>
                             <groupId>aero.minova.rcp</groupId>
-                            <artifactId>eclipse-2021-09</artifactId>
-                            <version>1.0.1-SNAPSHOT</version>
+                            <artifactId>rcp-target</artifactId>
+                            <version>12.9.0</version>
                         </artifact>
                     </target>
                     <resolveWithExecutionEnvironmentConstraints>false</resolveWithExecutionEnvironmentConstraints>

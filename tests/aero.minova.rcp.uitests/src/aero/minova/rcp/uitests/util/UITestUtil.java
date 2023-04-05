@@ -32,7 +32,7 @@ public class UITestUtil {
 		} while (!loadToolbarButton.isEnabled());
 	}
 
-	public static IEclipseContext getEclipseContext(Class c) {
+	public static IEclipseContext getEclipseContext(Class<? extends Object> c) {
 		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(c).getBundleContext());
 		return serviceContext.get(IWorkbench.class).getApplication().getContext();
 	}

@@ -17,6 +17,8 @@ import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
@@ -25,7 +27,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -145,7 +146,6 @@ import aero.minova.rcp.rcp.widgets.BrowserSection;
 import aero.minova.rcp.rcp.widgets.SectionGrid;
 import aero.minova.rcp.util.ScreenshotUtil;
 
-@SuppressWarnings("restriction")
 public class WFCDetailPart extends WFCFormPart {
 
 	@Inject
@@ -192,8 +192,7 @@ public class WFCDetailPart extends WFCFormPart {
 	@Inject
 	EModelService eModelService;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	MApplication mApplication;
 
@@ -344,7 +343,7 @@ public class WFCDetailPart extends WFCFormPart {
 				}
 			}
 		} catch (Exception e1) {
-			logger.error(e1);
+			logger.error("Error finding Helper", e1);
 		}
 
 		if (iHelper == null) {
@@ -375,13 +374,13 @@ public class WFCDetailPart extends WFCFormPart {
 								String opContent = dataService.getHashedFile(op.getName()).get();
 								addOPForGridOrBrowser(parent, op, opContent);
 							} catch (JAXBException e1) {
-								logger.error(e1);
+								logger.error("JAXB Error", e1);
 							}
 						}
 					} catch (ExecutionException e) {
-						logger.error(e);
+						logger.error("Error getting OPs", e);
 					} catch (InterruptedException e) {
-						logger.error(e);
+						logger.error("Error getting OPs", e);
 						Thread.currentThread().interrupt();
 					} catch (NoSuchFieldException e) {
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", e.getMessage());
@@ -425,7 +424,7 @@ public class WFCDetailPart extends WFCFormPart {
 			if (mDetail.getField(opFieldName) == null) {
 				NoSuchFieldException error = new NoSuchFieldException(
 						"Option Page \"" + opForm.getDetail().getProcedureSuffix() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
-				logger.error(error);
+				logger.error(error.getMessage(), error);
 				throw error;
 			}
 
@@ -436,7 +435,7 @@ public class WFCDetailPart extends WFCFormPart {
 			if (mDetail.getField(mainFieldName) == null) {
 				NoSuchFieldException error = new NoSuchFieldException("Main Mask does not contain Field \"" + mainFieldName + "\", needed for OP \""
 						+ opForm.getDetail().getProcedureSuffix() + "\"! (As defined in .xbs)");
-				logger.error(error);
+				logger.error(error.getMessage(), error);
 				throw error;
 			}
 		}
@@ -478,7 +477,7 @@ public class WFCDetailPart extends WFCFormPart {
 			if (!sgColumnNames.contains(e.getKey())) {
 				NoSuchFieldException error = new NoSuchFieldException(
 						"Grid \"" + sg.getDataTable().getName() + "\" does not contain Field \"" + e.getKey() + "\"! (As defined in .xbs)");
-				logger.error(error);
+				logger.error(error.getMessage(), error);
 				throw error;
 			}
 			if (e.getValue().startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
@@ -487,7 +486,7 @@ public class WFCDetailPart extends WFCFormPart {
 			if (mDetail.getField(e.getValue()) == null) {
 				NoSuchFieldException error = new NoSuchFieldException("Main Mask does not contain Field \"" + e.getValue() + "\", needed for Grid \""
 						+ sg.getDataTable().getName() + "\"! (As defined in .xbs)");
-				logger.error(error);
+				logger.error(error.getMessage(), error);
 				throw error;
 			}
 		}
@@ -1181,7 +1180,7 @@ public class WFCDetailPart extends WFCFormPart {
 		try {
 			prefsDetailSections.flush();
 		} catch (BackingStoreException e1) {
-			logger.error(e1);
+			logger.error(e1.getMessage(), e1);
 		}
 	}
 

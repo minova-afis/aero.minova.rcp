@@ -2,10 +2,9 @@ package aero.minova.rcp.preferencewindow.control;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
-
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -27,8 +26,7 @@ import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 
 public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	TranslationService translationService;
 	IStylingEngine engine;
@@ -73,14 +71,14 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 		engine.setClassname(text, Constants.CSS_READONLY);
 
 		// Auslesen des PrimaryWorksapces
-		Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger);
+		Optional<ISecurePreferences> savedPrimaryWorkspaceAccessData = WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData();
 		if (savedPrimaryWorkspaceAccessData.isPresent()) {
 			ISecurePreferences prefs = savedPrimaryWorkspaceAccessData.get();
 			try {
 				String profil = prefs.get(WorkspaceAccessPreferences.PROFILE, null);
 				text.setText(profil);
-			} catch (StorageException e1) {
-				logger.error(e1);
+			} catch (StorageException e) {
+				logger.error(e.getMessage(), e);
 			}
 		} else {
 			text.setText(translationService.translate("@msg.NotSet", null));
@@ -96,8 +94,8 @@ public class TextButtonForDefaultWorkspace extends CustomPWWidget {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				text.setText(translationService.translate("@msg.NotSet", null));
-				if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData(logger).isEmpty()) {
-					WorkspaceAccessPreferences.resetDefaultWorkspace(logger);
+				if (!WorkspaceAccessPreferences.getSavedPrimaryWorkspaceAccessData().isEmpty()) {
+					WorkspaceAccessPreferences.resetDefaultWorkspace();
 				}
 			}
 		});

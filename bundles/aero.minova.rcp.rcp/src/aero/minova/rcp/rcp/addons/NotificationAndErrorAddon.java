@@ -13,10 +13,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -48,8 +49,7 @@ public class NotificationAndErrorAddon {
 	@Named(IServiceConstants.ACTIVE_SHELL)
 	Shell shell;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	private static final String ERROR = "Error";
 	private static final String DEFAULT = "DEFAULT";
@@ -135,7 +135,7 @@ public class NotificationAndErrorAddon {
 					try {
 						params.add("" + NumberFormat.getInstance(locale).parse(v.getStringValue()).intValue());
 					} catch (ParseException e) {
-						logger.error(e);
+						logger.error(e.getMessage(), e);
 					}
 					break;
 				case "f.iso":
@@ -145,7 +145,7 @@ public class NotificationAndErrorAddon {
 					try {
 						params.add("" + NumberFormat.getInstance(locale).parse(v.getStringValue()).floatValue());
 					} catch (ParseException e) {
-						logger.error(e);
+						logger.error(e.getMessage(), e);
 					}
 					break;
 				case "d.iso":
@@ -153,7 +153,7 @@ public class NotificationAndErrorAddon {
 						Date parsedDate = new SimpleDateFormat("yyyyMMdd").parse(v.getStringValue());
 						params.add(DateUtil.getDateString(parsedDate.toInstant(), locale, null));
 					} catch (ParseException e) {
-						logger.error(e);
+						logger.error(e.getMessage(), e);
 					}
 					break;
 				case "d":
@@ -161,7 +161,7 @@ public class NotificationAndErrorAddon {
 						Date parsedDate = new SimpleDateFormat("ddMMyyyy").parse(v.getStringValue());
 						params.add(DateUtil.getDateString(parsedDate.toInstant(), locale, null));
 					} catch (ParseException e) {
-						logger.error(e);
+						logger.error(e.getMessage(), e);
 					}
 					break;
 				case DEFAULT: // Spalte mit DEFAULT-String -> kein Param
@@ -172,7 +172,7 @@ public class NotificationAndErrorAddon {
 					break;
 				}
 			}
-			value = MessageFormat.format(value, params.toArray(new String[0]));
+			value = MessageFormat.format(value, params.toArray());
 		}
 
 		return value;

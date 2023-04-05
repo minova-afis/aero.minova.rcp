@@ -9,13 +9,14 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -126,8 +127,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 	@Inject
 	protected MPart mPart;
 
-	@Inject
-	protected Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	protected IEclipseContext context;
 
@@ -200,6 +200,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		createComposite(parent);
 	}
 
+	@SuppressWarnings("unchecked")
 	public NatTable createNatTable(Composite parent, Form form, Table table) {
 
 		// Datenmodel für die Eingaben
@@ -232,8 +233,8 @@ public abstract class WFCNattablePart extends WFCFormPart {
 
 			if (useSummaryRow()) {
 				// connect sortModel to GroupByDataLayer to support sorting by group by summary values
-				((GroupByDataLayer) bodyLayerStack.getBodyDataLayer()).initializeTreeComparator(sortHeaderLayer.getSortModel(), bodyLayerStack.getTreeLayer(),
-						true);
+				((GroupByDataLayer<Object>) bodyLayerStack.getBodyDataLayer()).initializeTreeComparator(sortHeaderLayer.getSortModel(),
+						bodyLayerStack.getTreeLayer(), true);
 			}
 
 			headerLayer = sortHeaderLayer;
@@ -364,7 +365,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 
 		protected final SortedList<T> sortedList;
 
-		protected final IDataProvider bodyDataProvider;
+		protected final IRowDataProvider<T> bodyDataProvider;
 
 		protected final SelectionLayer selectionLayer;
 
@@ -384,6 +385,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 
 		protected ColumnHideShowLayer columnHideShowLayer;
 
+		@SuppressWarnings("unchecked")
 		public BodyLayerStack(List<T> values, IColumnPropertyAccessor<T> columnPropertyAccessor, ConfigRegistry configRegistry) {
 			eventList = GlazedLists.eventList(values);
 			TransformedList<T, T> rowObjectsGlazedList = GlazedLists.threadSafeList(eventList);
@@ -394,7 +396,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			if (useGroupBy()) {
 				bodyDataLayer = new GroupByDataLayer<>(getGroupByModel(), this.sortedList, columnPropertyAccessor, configRegistry);
 				// get the IDataProvider that was created by the GroupByDataLayer
-				this.bodyDataProvider = bodyDataLayer.getDataProvider();
+				this.bodyDataProvider = (IRowDataProvider<T>) bodyDataLayer.getDataProvider();
 			} else {
 				bodyDataProvider = new ListDataProvider<>(sortedList, columnPropertyAccessor);
 				bodyDataLayer = new DataLayer(bodyDataProvider);
@@ -408,7 +410,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			this.selectionLayer = new SelectionLayer(getColumnHideShowLayer());
 
 			if (useGroupBy()) {
-				treeLayer = new TreeLayer(this.selectionLayer, ((GroupByDataLayer) bodyDataLayer).getTreeRowModel());
+				treeLayer = new TreeLayer(this.selectionLayer, ((GroupByDataLayer<Object>) bodyDataLayer).getTreeRowModel());
 				viewportLayer = new ViewportLayer(treeLayer);
 			} else {
 				viewportLayer = new ViewportLayer(selectionLayer);
@@ -445,8 +447,8 @@ public abstract class WFCNattablePart extends WFCFormPart {
 			return this.treeLayer;
 		}
 
-		public IRowDataProvider<Row> getBodyDataProvider() {
-			return (IRowDataProvider<Row>) this.bodyDataProvider;
+		public IRowDataProvider<T> getBodyDataProvider() {
+			return this.bodyDataProvider;
 		}
 
 		public GroupByModel getGroupByModel() {
@@ -503,7 +505,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -787,7 +789,7 @@ public abstract class WFCNattablePart extends WFCFormPart {
 		return bodyLayerStack.getSelectionLayer();
 	}
 
-	public BodyLayerStack getBodyLayerStack() {
+	public BodyLayerStack<Row> getBodyLayerStack() {
 		return this.bodyLayerStack;
 	}
 

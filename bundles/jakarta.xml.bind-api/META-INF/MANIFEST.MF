@@ -5,5 +5,5 @@ Bundle-SymbolicName: jakarta.xml.bind-api
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: jakarta.xml.bind;bundle-version="2.3.3.v20201118-1818"
 Automatic-Module-Name: jakarta.xml.bind.api
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.sun.xml.bind.v2;version="2.3.3"

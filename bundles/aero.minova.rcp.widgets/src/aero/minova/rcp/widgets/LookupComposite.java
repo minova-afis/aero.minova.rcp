@@ -7,7 +7,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
-import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -67,8 +68,7 @@ public class LookupComposite extends Composite {
 	@Inject
 	private TranslationService translationService;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	private long popupTime;
 
@@ -556,9 +556,9 @@ public class LookupComposite extends Composite {
 					contentProvider.setValues(l);
 					gettingData = false;
 				} catch (ExecutionException e) {
-					logger.error(e);
+					logger.error(e.getMessage(), e);
 				} catch (InterruptedException e) {
-					logger.error(e);
+					logger.error(e.getMessage(), e);
 					Thread.currentThread().interrupt();
 				}
 			} else {

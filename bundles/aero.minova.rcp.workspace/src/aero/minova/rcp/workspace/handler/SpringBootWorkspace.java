@@ -32,7 +32,6 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
@@ -40,7 +39,6 @@ import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
 
-@SuppressWarnings("restriction")
 public class SpringBootWorkspace extends WorkspaceHandler {
 
 	private static final String XXXXXXXXXXXXXXXXXXXX = "xxxxxxxxxxxxxxxxxxxx";
@@ -49,8 +47,8 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 
 	private static final int TIMEOUT_DURATION = 15;
 
-	public SpringBootWorkspace(String profile, URL connection, Logger logger) {
-		super(logger);
+	public SpringBootWorkspace(String profile, URL connection) {
+		super();
 		workspaceData.setConnection(connection);
 		workspaceData.setProfile(profile);
 	}
@@ -58,7 +56,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 	@Override
 	public boolean checkConnection(String username, String password, String applicationArea, Boolean saveAsDefault) throws WorkspaceException {
 		String profile = getProfile();
-		List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger);
+		List<ISecurePreferences> workspaceAccessDatas = WorkspaceAccessPreferences.getSavedWorkspaceAccessData();
 		ISecurePreferences store = null;
 		try {
 			for (ISecurePreferences iSecurePreferences : workspaceAccessDatas) {
@@ -103,7 +101,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			try {
 				checkCredentials(getPassword());
 			} catch (UnsupportedEncodingException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 
@@ -122,7 +120,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				}
 				Platform.getInstanceLocation().set(instanceLocationUrl, false);
 			} catch (IllegalStateException | IOException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 			URL workspaceURL = Platform.getInstanceLocation().getURL();
 			File workspaceDir = new File(workspaceURL.getPath());
@@ -134,7 +132,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 			checkDir(workspaceDir, "data");
 			checkDir(workspaceDir, "plugins");
 
-			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
+			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData()) {
 				try {
 					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
 
@@ -150,13 +148,13 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						break;
 					}
 				} catch (StorageException | IOException e) {
-					logger.error(e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 
 		} else {
 			// 2. Auslesen aus dem Store dieser wurde bereits gestezt!
-			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
+			for (ISecurePreferences store : WorkspaceAccessPreferences.getSavedWorkspaceAccessData()) {
 				try {
 					if (getProfile().equals(store.get(WorkspaceAccessPreferences.PROFILE, null))) {
 						if (getPassword().isEmpty() || getPassword().equals(XXXXXXXXXXXXXXXXXXXX)) {
@@ -169,14 +167,14 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 						break;
 					}
 				} catch (StorageException e) {
-					logger.error(e);
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
 		try {
 			checkCredentials(workspaceData.getPassword());
 		} catch (UnsupportedEncodingException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -258,20 +256,20 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				throw new WorkspaceException("Unexpected Answer, please check Server!");
 			}
 		} catch (ConnectException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			throw new WorkspaceException("ConnectException " + e.getMessage());
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			throw new WorkspaceException("IOException\nUser, Password or Server incorrect?");
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 			throw new WorkspaceException("InterruptedException " + e.getMessage());
 		} catch (IllegalArgumentException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			throw new WorkspaceException("IllegalArgumentException " + e.getMessage() + "\nInvalid URL?");
 		} catch (NullPointerException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			throw new WorkspaceException("NullPointerException " + e.getMessage() + "\nPlease enter Password again");
 		}
 	}

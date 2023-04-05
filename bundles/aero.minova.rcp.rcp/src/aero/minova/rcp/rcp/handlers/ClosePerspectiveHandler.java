@@ -11,7 +11,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
@@ -20,9 +19,6 @@ import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstant
 import aero.minova.rcp.perspectiveswitcher.handler.SwitchPerspectiveHandler;
 
 public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
-
-	@Inject
-	EModelService modelService;
 
 	@Inject
 	TranslationService translationService;
@@ -37,6 +33,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 
 		// Hat die Perspektive Änderungen, die verworfen werden sollen?
 		boolean discard = true;
+		@SuppressWarnings("unchecked")
 		List<MPerspective> changedPerspectives = ((List<MPerspective>) application.getContext().get(Constants.DIRTY_PERSPECTIVES));
 		changedPerspectives = changedPerspectives == null ? new ArrayList<>() : changedPerspectives;
 		if (changedPerspectives.contains(perspective)) {
@@ -58,7 +55,7 @@ public class ClosePerspectiveHandler extends SwitchPerspectiveHandler {
 		if (activePerspective) {
 			List<MPerspective> perspectiveList = modelService.findElements(application, null, MPerspective.class);
 			if (!perspectiveList.isEmpty()) {
-				switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId(), window);
+				switchTo(perspectiveList.get(0), perspectiveList.get(0).getElementId());
 			}
 		}
 	}

@@ -30,7 +30,6 @@ public class WindowCloseListenerAddon {
 	// instantiated after the processing of the add-ons
 	// hence this approach uses method injection
 
-	@SuppressWarnings("restriction")
 	@Inject
 	@Optional
 	private void adjustWindowCloseHandler(@UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) MApplication application, IWorkbench workbench,

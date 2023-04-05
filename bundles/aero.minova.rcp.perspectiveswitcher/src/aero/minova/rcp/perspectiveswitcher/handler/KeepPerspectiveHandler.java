@@ -5,10 +5,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -38,8 +39,7 @@ public class KeepPerspectiveHandler {
 	@Inject
 	EPartService partService;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	Preferences prefs = InstanceScope.INSTANCE.getNode(Constants.PREFERENCES_KEPTPERSPECTIVES);
 
@@ -73,7 +73,7 @@ public class KeepPerspectiveHandler {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 

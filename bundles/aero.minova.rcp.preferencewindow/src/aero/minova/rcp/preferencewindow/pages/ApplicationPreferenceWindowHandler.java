@@ -10,13 +10,14 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
@@ -65,13 +66,11 @@ import aero.minova.rcp.preferencewindow.control.TextButtonForCurrentWorkspace;
 import aero.minova.rcp.preferencewindow.control.TextButtonForDefaultWorkspace;
 import aero.minova.rcp.preferencewindow.control.TimeFormattingWidget;
 
+@SuppressWarnings("restriction")
 public class ApplicationPreferenceWindowHandler {
 
 	// Konstante für den Pfad der .prefs erstellen
 	Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
-
-	// Widget Builder Impelentierung
-	private PreferenceWindowModel pwm;
 
 	@Inject
 	ILocaleChangeService lcs;
@@ -89,7 +88,6 @@ public class ApplicationPreferenceWindowHandler {
 	@Inject
 	IDataService dataService;
 
-	@SuppressWarnings("restriction")
 	@Inject
 	EHandlerService handlerService;
 
@@ -98,12 +96,11 @@ public class ApplicationPreferenceWindowHandler {
 
 	IWorkbench workbench;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Execute
 	public void execute(IThemeEngine themeEngine, IWorkbench workbench, IEclipseContext context) {
-		pwm = new PreferenceWindowModel(s);
+		PreferenceWindowModel pwm = new PreferenceWindowModel(s);
 		ContextInjectionFactory.inject(pwm, application.getContext()); // In Context injected, damit TranslationService genutzt werden kann
 
 		this.workbench = workbench;
@@ -168,7 +165,7 @@ public class ApplicationPreferenceWindowHandler {
 				preferences.flush();
 				lcs.changeApplicationLocale(CustomLocale.getLocale());
 			} catch (BackingStoreException | NullPointerException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 		}
 
@@ -202,14 +199,10 @@ public class ApplicationPreferenceWindowHandler {
 	}
 
 	private void updateTheme(String newTheme, IThemeEngine themeEngine, IWorkbench workbench) {
-
-		switch (newTheme) {
-		case "M":
+		if ("M".equals(newTheme)) {
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme", true);
-			break;
-		default:
+		} else {
 			themeEngine.setTheme("aero.minova.rcp.defaulttheme-" + newTheme, true);
-			break;
 		}
 
 		workbench.restart();

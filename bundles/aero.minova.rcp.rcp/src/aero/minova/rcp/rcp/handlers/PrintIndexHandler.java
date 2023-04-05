@@ -16,12 +16,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.transform.TransformerException;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -63,6 +63,8 @@ import ca.odell.glazedlists.TreeList;
 
 public class PrintIndexHandler {
 
+	private static final String A_Z_A_Z0_9 = "[^a-zA-Z0-9]";
+
 	@Inject
 	private IDataService dataService;
 
@@ -70,7 +72,7 @@ public class PrintIndexHandler {
 	private TranslationService translationService;
 
 	@Inject
-	private IEventBroker broker;
+	private EModelService eModelService;
 
 	@Inject
 	private EPartService ePartService;
@@ -78,8 +80,7 @@ public class PrintIndexHandler {
 	@Inject
 	private MPerspective mPerspective;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.CREATE_XML_XS)
@@ -118,7 +119,9 @@ public class PrintIndexHandler {
 	public void downloadPFDZip() {
 		try {
 			dataService.getHashedZip("pdf.zip");
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// Trotzdem versuchen, den Ordner zu finden, könnte ja schon geladen worden sein
+		}
 		File pdfFolder = dataService.getStoragePath().resolve("pdf/").toFile();
 		pdfFolderExists = pdfFolder.exists();
 	}
@@ -127,31 +130,25 @@ public class PrintIndexHandler {
 	public boolean canExecute(MPart mpart) {
 		Object o = mpart.getObject();
 		boolean hasRows = false;
-		if (o instanceof WFCIndexPart) {
-			@SuppressWarnings("unchecked")
-			List<Row> dataList = ((WFCIndexPart) o).getBodyLayerStack().getSortedList();
+		if (o instanceof WFCIndexPart indexPart) {
+			List<Row> dataList = indexPart.getBodyLayerStack().getSortedList();
 			hasRows = !dataList.isEmpty();
 		}
 		return pdfFolderExists && hasRows;
 	}
 
 	@Execute
-	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window, EModelService modelService,
-			EPartService partService) {
+	public void execute(@Named(IServiceConstants.ACTIVE_SELECTION) List<Row> rows, MPart mpart, MWindow window) {
 
 		String xmlRootTag = null;
 		String title = null;
 		Object o = mpart.getObject();
-		StringBuffer xml = new StringBuffer();
 
-		MPerspective activePerspective = modelService.getActivePerspective(window);
-		title = translationService.translate(activePerspective.getLabel(), null);
+		title = translationService.translate(mPerspective.getLabel(), null);
 
 		Path pathReports = dataService.getStoragePath().resolve("pdf/");
 		String xslString = null;
-		if (o instanceof WFCIndexPart) {
-
-			WFCIndexPart indexPart = (WFCIndexPart) o;
+		if (o instanceof WFCIndexPart indexPart) {
 			Table data = indexPart.getData();
 			xmlRootTag = data.getName();
 			SortedList<Row> sortedDataList = indexPart.getSortedList();
@@ -159,57 +156,15 @@ public class PrintIndexHandler {
 			columnReorderLayer.getColumnIndexOrder();
 
 			// Gruppierung
-			TreeList<Row> treeList = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getTreeList();
+			@SuppressWarnings("unchecked")
+			TreeList<Object> treeList = ((GroupByDataLayer<Object>) indexPart.getBodyLayerStack().getBodyDataLayer()).getTreeList();
 			List<Integer> groupByIndices = indexPart.getGroupByHeaderLayer().getGroupByModel().getGroupByColumnIndexes();
 			List<Integer> groupByIndicesReordered = new ArrayList<>();
 
 			// Optimalen Spaltenbreiten ermitteln
-			int[] widths = new int[columnReorderLayer.getColumnCount()];
-			if (optimizeWidths) {
-				for (int i = 0; i < widths.length; i++) {
-					widths[i] = i;
-				}
-				// Hier wird die optimale Breite für Spalten aufgrund des Tabellen-Körpers ermittelt. Aufgrund der extremen Länge einzelner Spalten die durch
-				// Gruppierung zustande kommt wird hier der GlazedListsEventLayer verwendet, der die Gruppierungs-Zeilen nicht enthält
-				ILayer layer = indexPart.getBodyLayerStack().getGlazedListsEventLayer();
-				int[] widthsBody = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
-						new GCFactory(indexPart.getNattable()), layer, widths);
-				// Hier wird die optimale Breite für Spalten aufgrund des Headers ermittelt
-				layer = indexPart.getColumnHeaderDataLayer();
-				int[] widthsHeader = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
-						new GCFactory(indexPart.getNattable()), layer, widths);
+			int[] widths = getWidths(indexPart, columnReorderLayer);
 
-				// Die Breite einer Spalte ist das Maximum der Header und Body Breite
-				for (int i = 0; i < widths.length; i++) {
-					widths[i] = Math.max(widthsBody[i], widthsHeader[i]);
-				}
-			}
-
-			// ColumnInfo erstellen
-			List<ColumnInfo> colConfig = new ArrayList<>();
-			int i = 0;
-			for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
-				int width = columnReorderLayer.getColumnWidthByPosition(i);
-				if (optimizeWidths) {
-					width = widths[i1];
-				}
-				boolean vis = (!hideEmptyCols || !isColumnEmpty(i1, sortedDataList)) && data.getColumns().get(i1).isVisible();
-
-				Column c = data.getColumns().get(i1);
-				ColumnInfo columnInfo = new ColumnInfo(c, width, vis, i);
-				if (c.getDecimals() != null) {
-					NumberFormat numberFormat = NumberFormat.getInstance(CustomLocale.getLocale());
-					numberFormat.setMinimumFractionDigits(c.getDecimals());
-					numberFormat.setMaximumFractionDigits(c.getDecimals());
-					columnInfo.numberFormat = numberFormat;
-				}
-				colConfig.add(columnInfo);
-
-				if (groupByIndices.contains(i1)) {
-					groupByIndicesReordered.add(i);
-				}
-				i++;
-			}
+			List<ColumnInfo> colConfig = getColumnInfos(data, sortedDataList, columnReorderLayer, groupByIndices, groupByIndicesReordered, widths);
 
 			ReportConfiguration rConfig = new ReportConfiguration();
 			if (indexFont != null && !indexFont.isEmpty()) {
@@ -217,7 +172,9 @@ public class PrintIndexHandler {
 				int fontsize = 8;
 				try {
 					fontsize = fontData.getHeight();
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					// Dann default 8 nutzen
+				}
 				rConfig.setProp("FontSizeCriteria", fontsize + "");
 				rConfig.setProp("FontSizeCell", fontsize + "");
 				rConfig.setProp("FontFamily", fontData.getName());
@@ -229,49 +186,106 @@ public class PrintIndexHandler {
 				ContextInjectionFactory.inject(tableCreator, mPerspective.getContext());
 				xslString = tableCreator.createXSL(xmlRootTag, title, colConfig, rConfig, pathReports, groupByIndicesReordered);
 			} catch (ReportCreationException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 
-			createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xml, xmlRootTag, title);
+			String xmlString = createXML(indexPart, treeList, groupByIndices, colConfig, columnReorderLayer.getColumnIndexOrder(), xmlRootTag, title);
 
-			try {
-				Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title.replace(" ", "_") + "_Index.pdf");
-				Files.createDirectories(pathPDF.getParent());
-
-				pathPDF = Path.of(FileUtil.createFile(pathPDF.toString()));
-				URL urlPDF = pathPDF.toFile().toURI().toURL();
-
-				Path pathXML = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xml");
-				Path pathXSL = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xsl");
-				pathXML = Path.of(FileUtil.createFile(pathXML.toString()));
-				pathXSL = Path.of(FileUtil.createFile(pathXSL.toString()));
-				IOUtil.saveLoud(xml.toString(), pathXML.toString(), "UTF-8");
-				IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
-
-				// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
-				if (!disablePreview) {
-					PrintUtil.checkPreview(activePerspective, modelService, partService);
-				}
-
-				urlPDF = PrintUtil.generatePDF(urlPDF, xml.toString(), pathXSL.toFile());
-
-				if (!createXmlXsl) {
-					Files.delete(pathXSL);
-					Files.delete(pathXML);
-				}
-
-				if (disablePreview) {
-					PrintUtil.showFile(urlPDF.toString(), null);
-				} else {
-					PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(activePerspective, modelService, partService));
-				}
-			} catch (IOException | SAXException | TransformerException e) {
-				e.printStackTrace();
-				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
-						translationService.translate("@msg.ErrorShowingFile", null), e);
-			}
-
+			saveAndShowPDF(xmlRootTag, title, xslString, xmlString);
 		}
+	}
+
+	private void saveAndShowPDF(String xmlRootTag, String title, String xslString, String xmlString) {
+		try {
+			Path pathPDF = dataService.getStoragePath().resolve("outputReports/" + title.replace(" ", "_") + "_Index.pdf");
+			Files.createDirectories(pathPDF.getParent());
+
+			pathPDF = Path.of(FileUtil.createFile(pathPDF.toString()));
+			URL urlPDF = pathPDF.toFile().toURI().toURL();
+
+			Path pathXML = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xml");
+			Path pathXSL = dataService.getStoragePath().resolve("pdf/" + xmlRootTag + "_Index.xsl");
+			pathXML = Path.of(FileUtil.createFile(pathXML.toString()));
+			pathXSL = Path.of(FileUtil.createFile(pathXSL.toString()));
+			IOUtil.saveLoud(xmlString, pathXML.toString(), "UTF-8");
+			IOUtil.saveLoud(xslString, pathXSL.toString(), "UTF-8");
+
+			// Wenn ein file schon geladen wurde muss dieses erst freigegeben werden (unter Windows)
+			if (!disablePreview) {
+				PrintUtil.checkPreview(mPerspective, eModelService, ePartService);
+			}
+
+			urlPDF = PrintUtil.generatePDF(urlPDF, xmlString, pathXSL.toFile());
+
+			if (!createXmlXsl) {
+				Files.delete(pathXSL);
+				Files.delete(pathXML);
+			}
+
+			if (disablePreview) {
+				PrintUtil.showFile(urlPDF.toString(), null);
+			} else {
+				PrintUtil.showFile(urlPDF.toString(), PrintUtil.checkPreview(mPerspective, eModelService, ePartService));
+			}
+		} catch (IOException | SAXException | TransformerException e) {
+			e.printStackTrace();
+			ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
+					translationService.translate("@msg.ErrorShowingFile", null), e);
+		}
+	}
+
+	private List<ColumnInfo> getColumnInfos(Table data, SortedList<Row> sortedDataList, ColumnReorderLayer columnReorderLayer, List<Integer> groupByIndices,
+			List<Integer> groupByIndicesReordered, int[] widths) {
+		// ColumnInfo erstellen
+		List<ColumnInfo> colConfig = new ArrayList<>();
+		int i = 0;
+		for (Integer i1 : columnReorderLayer.getColumnIndexOrder()) {
+			int width = columnReorderLayer.getColumnWidthByPosition(i);
+			if (optimizeWidths) {
+				width = widths[i1];
+			}
+			boolean vis = (!hideEmptyCols || !isColumnEmpty(i1, sortedDataList)) && data.getColumns().get(i1).isVisible();
+
+			Column c = data.getColumns().get(i1);
+			ColumnInfo columnInfo = new ColumnInfo(c, width, vis, i);
+			if (c.getDecimals() != null) {
+				NumberFormat numberFormat = NumberFormat.getInstance(CustomLocale.getLocale());
+				numberFormat.setMinimumFractionDigits(c.getDecimals());
+				numberFormat.setMaximumFractionDigits(c.getDecimals());
+				columnInfo.numberFormat = numberFormat;
+			}
+			colConfig.add(columnInfo);
+
+			if (groupByIndices.contains(i1)) {
+				groupByIndicesReordered.add(i);
+			}
+			i++;
+		}
+		return colConfig;
+	}
+
+	private int[] getWidths(WFCIndexPart indexPart, ColumnReorderLayer columnReorderLayer) {
+		int[] widths = new int[columnReorderLayer.getColumnCount()];
+		if (optimizeWidths) {
+			for (int i = 0; i < widths.length; i++) {
+				widths[i] = i;
+			}
+			// Hier wird die optimale Breite für Spalten aufgrund des Tabellen-Körpers ermittelt. Aufgrund der extremen Länge einzelner Spalten die durch
+			// Gruppierung zustande kommt wird hier der GlazedListsEventLayer verwendet, der die Gruppierungs-Zeilen nicht enthält
+			ILayer layer = indexPart.getBodyLayerStack().getGlazedListsEventLayer();
+			int[] widthsBody = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(), new GCFactory(indexPart.getNattable()),
+					layer, widths);
+			// Hier wird die optimale Breite für Spalten aufgrund des Headers ermittelt
+			layer = indexPart.getColumnHeaderDataLayer();
+			int[] widthsHeader = MaxCellBoundsHelper.getPreferredColumnWidths(indexPart.getNattable().getConfigRegistry(),
+					new GCFactory(indexPart.getNattable()), layer, widths);
+
+			// Die Breite einer Spalte ist das Maximum der Header und Body Breite
+			for (int i = 0; i < widths.length; i++) {
+				widths[i] = Math.max(widthsBody[i], widthsHeader[i]);
+			}
+		}
+		return widths;
 	}
 
 	private boolean isColumnEmpty(Integer i, SortedList<Row> rows) {
@@ -297,9 +311,10 @@ public class PrintIndexHandler {
 	 * @param fileName
 	 * @param title
 	 */
-	private void createXML(WFCIndexPart indexPart, TreeList<Row> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
-			List<Integer> columnReorderList, StringBuffer xml, String fileName, String title) {
+	private String createXML(WFCIndexPart indexPart, TreeList<Object> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
+			List<Integer> columnReorderList, String fileName, String title) {
 
+		StringBuilder xml = new StringBuilder();
 		// Viewport layer umgehen, damit in addSumRow() auf alle Zeilen zugegriffen werden kann
 		ILayer layer = indexPart.getBodyLayerStack().getUnderlyingLayerByPosition(2, 4).getUnderlyingLayerByPosition(2, 4);
 
@@ -311,63 +326,7 @@ public class PrintIndexHandler {
 		if (groupByIndices.isEmpty()) { // Keine Gruppierung
 			addRows(xml, treeList, colConfig, columnReorderList);
 		} else {
-			int level = 0; // "Level" der Gruppierung (1: erste Gruppierung, 2: zweite Gruppierung, ...)
-			int newLevel = 0;
-			int rowIndex = 0;
-			String[] sumRows = new String[groupByIndices.size() + 1];
-
-			// Liste der Zeilen (inklusive Gruppierungs-Zeilen) der Reihe nach abarbeiten
-			for (Object o : treeList) {
-				if (o instanceof GroupByObject) {
-					GroupByObject gbo = (GroupByObject) o;
-
-					// Zusammenfassung am Ende der Gruppierung einfügen
-					newLevel = gbo.getDescriptor().size();
-					for (int i = level; i >= newLevel; i--) {
-						xml.append(sumRows[i]);
-					}
-					level = newLevel;
-
-					// Überschrift für Gruppierung
-					String tableTitle = "";
-					String colName = "";
-					String colValString = "";
-					for (int i : groupByIndices) {
-						if (gbo.getDescriptor().containsKey(i)) {
-							colName = translationService.translate(colConfig.get(columnReorderList.indexOf(i)).column.getLabel(), null);
-							Object colVal = gbo.getDescriptor().get(i);
-							colValString = colVal.toString();
-							if (colVal instanceof Instant) {
-								colValString = DateTimeUtil.getDateTimeString((Instant) colVal, CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone);
-							}
-							tableTitle += colName + ": " + colValString + ", ";
-						}
-					}
-					tableTitle = tableTitle.substring(0, tableTitle.length() - 2);
-
-					// Gruppierung in xml
-					xml.append("<Group>\n" + "<Text><![CDATA[" + colName + "]]></Text>\n");
-					xml.append("<Field>" + colName + "</Field>\n");
-					xml.append("<Value><![CDATA[" + colValString + "]]></Value>\n");
-					xml.append("<GroupText><![CDATA[" + tableTitle + "]]></GroupText>\n");
-
-					// Tabelle wird nur für "tiefste" Gruppe gedruckt
-					if (gbo.getDescriptor().containsKey(groupByIndices.get(groupByIndices.size() - 1))) {
-						addRows(xml, ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo), colConfig, columnReorderList);
-					}
-
-					// Zusammenfassung als String erstellen und für später speichern
-					String sumRow = addSumRow(indexPart, colConfig, columnReorderList, rowIndex, gbo, layer);
-					sumRow += "</Group>\n";
-					sumRows[level] = sumRow;
-				}
-				rowIndex++;
-			}
-
-			// Letzten Zusammenfassungen einfügen
-			for (int i = level; i > 0; i--) {
-				xml.append(sumRows[i]);
-			}
+			addGroupByRows(indexPart, treeList, groupByIndices, colConfig, columnReorderList, xml, layer);
 		}
 		addFinalSummary(xml, indexPart, colConfig);
 		xml.append("</Group>\n");
@@ -375,42 +334,115 @@ public class PrintIndexHandler {
 		xml.append("</IndexView>\n");
 		xml.append("</" + fileName + ">");
 
+		return xml.toString();
 	}
 
-	private void addRows(StringBuffer xml, List<Row> rows, List<ColumnInfo> colConfig, List<Integer> columnReorderList) {
-		xml.append("<Rows>\n");
-		for (final Row r : rows) {
-			int colIndex = 0;
-			xml.append("<Row>\n");
-			for (final Integer d : columnReorderList) {
-				Column c = colConfig.get(colIndex).column;
-				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
-				if (r.getValue(d) != null) {
-					if (r.getValue(d).getType() == DataType.DOUBLE) {
-						xml.append(colConfig.get(colIndex).numberFormat.format(r.getValue(d).getDoubleValue()));
-					} else if (r.getValue(d).getType() == DataType.INTEGER) {
-						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone));
-					} else if (r.getValue(d).getType() == DataType.BOOLEAN && r.getValue(d).getBooleanValue()) {
-						xml.append(1);
-					} else {
-						// Information über Instant Formatierung wird übergeben
-						xml.append("<![CDATA[");
-						xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), c.getDateTimeType(), dateUtilPref, timeUtilPref, timezone));
-						xml.append("]]>");
-					}
+	@SuppressWarnings("unchecked")
+	private void addGroupByRows(WFCIndexPart indexPart, TreeList<Object> treeList, List<Integer> groupByIndices, List<ColumnInfo> colConfig,
+			List<Integer> columnReorderList, StringBuilder xml, ILayer layer) {
+		int level = 0; // "Level" der Gruppierung (1: erste Gruppierung, 2: zweite Gruppierung, ...)
+		int newLevel = 0;
+		int rowIndex = 0;
+		String[] sumRows = new String[groupByIndices.size() + 1];
+
+		// Liste der Zeilen (inklusive Gruppierungs-Zeilen) der Reihe nach abarbeiten
+		for (Object o : treeList) {
+			if (o instanceof GroupByObject gbo) {
+				// Zusammenfassung am Ende der Gruppierung einfügen
+				newLevel = gbo.getDescriptor().size();
+				for (int i = level; i >= newLevel; i--) {
+					xml.append(sumRows[i]);
 				}
-				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
-				colIndex++;
+				level = newLevel;
+
+				addGroupByValues(groupByIndices, colConfig, columnReorderList, xml, gbo);
+
+				// Tabelle wird nur für "tiefste" Gruppe gedruckt
+				if (gbo.getDescriptor().containsKey(groupByIndices.get(groupByIndices.size() - 1))) {
+					addRows(xml, ((GroupByDataLayer<Object>) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo), colConfig,
+							columnReorderList);
+				}
+
+				// Zusammenfassung als String erstellen und für später speichern
+				String sumRow = addSumRow(indexPart, colConfig, columnReorderList, rowIndex, gbo, layer);
+				sumRow += "</Group>\n";
+				sumRows[level] = sumRow;
 			}
-			xml.append("</Row>\n");
+			rowIndex++;
+		}
+
+		// Letzten Zusammenfassungen einfügen
+		for (int i = level; i > 0; i--) {
+			xml.append(sumRows[i]);
+		}
+	}
+
+	private void addGroupByValues(List<Integer> groupByIndices, List<ColumnInfo> colConfig, List<Integer> columnReorderList, StringBuilder xml,
+			GroupByObject gbo) {
+		// Überschrift für Gruppierung
+		StringBuilder tableTitle = new StringBuilder();
+		String colName = "";
+		String colValString = "";
+		for (int i : groupByIndices) {
+			if (gbo.getDescriptor().containsKey(i)) {
+				colName = translationService.translate(colConfig.get(columnReorderList.indexOf(i)).column.getLabel(), null);
+				Object colVal = gbo.getDescriptor().get(i);
+				colValString = colVal.toString();
+				if (colVal instanceof Instant instant) {
+					colValString = DateTimeUtil.getDateTimeString(instant, CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone);
+				}
+				tableTitle.append(colName + ": " + colValString + ", ");
+			}
+		}
+
+		// Gruppierung in xml
+		xml.append("<Group>\n" + "<Text><![CDATA[" + colName + "]]></Text>\n");
+		xml.append("<Field>" + colName + "</Field>\n");
+		xml.append("<Value><![CDATA[" + colValString + "]]></Value>\n");
+		xml.append("<GroupText><![CDATA[" + tableTitle.substring(0, tableTitle.length() - 2) + "]]></GroupText>\n");
+	}
+
+	private void addRows(StringBuilder xml, List<Object> list, List<ColumnInfo> colConfig, List<Integer> columnReorderList) {
+		xml.append("<Rows>\n");
+		for (Object o : list) {
+			if (o instanceof Row r) {
+
+				int colIndex = 0;
+				xml.append("<Row>\n");
+				addRowString(xml, colConfig, columnReorderList, r, colIndex);
+				xml.append("</Row>\n");
+			}
 		}
 		xml.append("</Rows>\n");
 
 	}
 
+	private void addRowString(StringBuilder xml, List<ColumnInfo> colConfig, List<Integer> columnReorderList, Row r, int colIndex) {
+		for (final Integer d : columnReorderList) {
+			Column c = colConfig.get(colIndex).column;
+			xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
+			if (r.getValue(d) != null) {
+				if (r.getValue(d).getType() == DataType.DOUBLE) {
+					xml.append(colConfig.get(colIndex).numberFormat.format(r.getValue(d).getDoubleValue()));
+				} else if (r.getValue(d).getType() == DataType.INTEGER) {
+					xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone));
+				} else if (r.getValue(d).getType() == DataType.BOOLEAN && Boolean.TRUE.equals(r.getValue(d).getBooleanValue())) {
+					xml.append(1);
+				} else {
+					// Information über Instant Formatierung wird übergeben
+					xml.append("<![CDATA[");
+					xml.append(r.getValue(d).getValueString(CustomLocale.getLocale(), c.getDateTimeType(), dateUtilPref, timeUtilPref, timezone));
+					xml.append("]]>");
+				}
+			}
+			xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">\n");
+			colIndex++;
+		}
+	}
+
 	private String addSumRow(WFCIndexPart indexPart, List<ColumnInfo> colConfig, List<Integer> columnReorderList, int rowIndex, GroupByObject gbo,
 			ILayer layer) {
-		String sumRow = "<SumRow>\n";
+		StringBuilder sumRow = new StringBuilder("<SumRow>\n");
 
 		int indexInSummary = 0;
 		for (int i = 0; i < colConfig.size(); i++) {
@@ -420,31 +452,33 @@ public class PrintIndexHandler {
 			}
 
 			LabelStack labelStack = layer.getConfigLabelsByPosition(indexInSummary, rowIndex);
-			IGroupBySummaryProvider<Row> summaryProvider = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer())
+			@SuppressWarnings("unchecked")
+			IGroupBySummaryProvider<Row> summaryProvider = ((GroupByDataLayer<Row>) indexPart.getBodyLayerStack().getBodyDataLayer())
 					.getGroupBySummaryProvider(labelStack);
 
 			if (summaryProvider != null) {
 				int columnIndex = columnReorderList.get(i);
-				List<Row> children = ((GroupByDataLayer) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo);
+				@SuppressWarnings("unchecked")
+				List<Row> children = ((GroupByDataLayer<Row>) indexPart.getBodyLayerStack().getBodyDataLayer()).getItemsInGroup(gbo);
 				Object summary = summaryProvider.summarize(columnIndex, children);
 				if (summary instanceof Double) {
 					summary = colConfig.get(i).numberFormat.format(summary);
 				}
 
 				Column c = colConfig.get(i).column;
-				sumRow += "<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">";
-				sumRow += summary;
-				sumRow += "</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n";
+				sumRow.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
+				sumRow.append(summary);
+				sumRow.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">\n");
 			}
 
 			indexInSummary++;
 		}
 
-		sumRow += "</SumRow>\n";
-		return sumRow;
+		sumRow.append("</SumRow>\n");
+		return sumRow.toString();
 	}
 
-	private void addFinalSummary(StringBuffer xml, WFCIndexPart indexPart, List<ColumnInfo> colConfig) {
+	private void addFinalSummary(StringBuilder xml, WFCIndexPart indexPart, List<ColumnInfo> colConfig) {
 		xml.append("<SumRow>\n");
 
 		FixedSummaryRowLayer summaryLayer = indexPart.getSummaryRowLayer();
@@ -462,9 +496,9 @@ public class PrintIndexHandler {
 			}
 			if (summary != null) {
 				Column c = colConfig.get(i).column;
-				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">");
+				xml.append("<" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">");
 				xml.append(summary);
-				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll("[^a-zA-Z0-9]", "") + ">\n");
+				xml.append("</" + translationService.translate(PrintUtil.prepareTranslation(c), null).replaceAll(A_Z_A_Z0_9, "") + ">\n");
 			}
 
 			indexInSummary++;
@@ -479,12 +513,19 @@ public class PrintIndexHandler {
 	 * @param xml
 	 * @param filename
 	 */
-	private void addHeader(StringBuffer xml, String filename) {
+	private void addHeader(StringBuilder xml, String filename) {
 		xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 		xml.append("<" + filename + ">\n");
-		xml.append("<Site>\n" + "<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>\n" + "<Address2><![CDATA[Tröltschstraße 4]]></Address2>\n"
-				+ "<Address3><![CDATA[97072 Würzburg]]></Address3>\n" + "<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>\n"
-				+ "<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>\n" + "<Application>WFC</Application>\n" + "<Logo>logo.gif</Logo>\n" + "</Site>");
+		xml.append("""
+				<Site>
+				<Address1><![CDATA[MINOVA Information Services GmbH]]></Address1>
+				<Address2><![CDATA[Tröltschstraße 4]]></Address2>
+				<Address3><![CDATA[97072 Würzburg]]></Address3>
+				<Phone><![CDATA[+49 (931) 322 35-0]]></Phone>
+				<Fax><![CDATA[+49 (931) 322 35-55]]></Fax>
+				<Application>WFC</Application>
+				<Logo>logo.gif</Logo>
+				</Site>""");
 		xml.append("<PrintDate><![CDATA["
 				+ DateTimeUtil.getDateTimeString(DateTimeUtil.getDateTime("0 0", timezone), CustomLocale.getLocale(), dateUtilPref, timeUtilPref, timezone)
 				+ "]]></PrintDate>\n");

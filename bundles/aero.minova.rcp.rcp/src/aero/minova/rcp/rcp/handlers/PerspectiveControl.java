@@ -13,11 +13,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -51,11 +52,9 @@ import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.perspectiveswitcher.commands.E4WorkbenchParameterConstants;
 
-@SuppressWarnings("restriction")
 public class PerspectiveControl {
 
-	@Inject
-	private Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	private EModelService modelService;
@@ -108,7 +107,7 @@ public class PerspectiveControl {
 			if (item != null && item.getData() != null) {
 				openMenuFor(item, (String) item.getData());
 			} else {
-				logger.debug("No item found or item is null");
+				logger.info("No item found or item is null");
 			}
 		});
 
@@ -129,8 +128,6 @@ public class PerspectiveControl {
 							perspective.getPersistedState().get(Constants.FORM_NAME), //
 							perspective.getLabel(), //
 							perspective.getIconURI(), //
-							perspective.getLocalizedLabel(), //
-							perspective.getLocalizedTooltip(), //
 							true);
 				}
 				if (perspective == modelService.getActivePerspective(window)) {
@@ -142,8 +139,6 @@ public class PerspectiveControl {
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMNAME, ""), //
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_FORMLABEL, ""), //
 						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_ICONURI, ""), //
-						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDLABEL, ""), //
-						prefsKeptPerspectives.get(id + Constants.KEPT_PERSPECTIVE_LOCALIZEDTOOLTIP, ""), //
 						true);
 			}
 		}
@@ -188,8 +183,7 @@ public class PerspectiveControl {
 	/*
 	 * Add shortcut for the perspective in the toolbar
 	 */
-	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, String localizedLabel, String localizedTooltip,
-			boolean openAll) {
+	public void addPerspectiveShortcut(String perspectiveId, String formName, String formLable, String iconURI, boolean openAll) {
 		String keptPerspective = prefsKeptPerspectives.get(perspectiveId + Constants.KEPT_PERSPECTIVE_FORMNAME, "");
 
 		shortcut = getToolItemFor(perspectiveId);
@@ -315,7 +309,7 @@ public class PerspectiveControl {
 		try {
 			prefsToolbarOrder.flush();
 		} catch (BackingStoreException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -428,8 +422,6 @@ public class PerspectiveControl {
 						added.getPersistedState().get(Constants.FORM_NAME), //
 						added.getLabel(), //
 						added.getIconURI(), //
-						added.getLocalizedLabel(), //
-						added.getLocalizedTooltip(), //
 						false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {

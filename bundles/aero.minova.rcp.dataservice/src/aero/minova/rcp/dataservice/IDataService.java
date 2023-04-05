@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.e4.core.services.log.Logger;
-
 import aero.minova.rcp.model.DataType;
 import aero.minova.rcp.model.LookupValue;
 import aero.minova.rcp.model.SqlProcedureResult;
@@ -136,10 +134,6 @@ public interface IDataService {
 
 	String getUserName();
 
-	void setLogger(Logger logger);
-
-	Logger getLogger();
-
 	void sendLogs();
 
 	Path getStoragePath();
@@ -154,6 +148,6 @@ public interface IDataService {
 	String getSiteParameter(String key, String defaultVal);
 
 	HttpClient.Builder getHttpClientBuilder();
-	
+
 	URI getServer();
 }

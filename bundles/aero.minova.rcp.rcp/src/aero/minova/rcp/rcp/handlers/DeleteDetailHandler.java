@@ -20,6 +20,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.util.DirtyFlagUtil;
 
+@SuppressWarnings("restriction")
 public class DeleteDetailHandler {
 
 	@Inject

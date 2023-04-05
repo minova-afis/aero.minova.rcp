@@ -10,12 +10,12 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.xml.transform.TransformerException;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
@@ -34,9 +34,10 @@ public class PrintUtil {
 
 	private PrintUtil() {}
 
+	static ILog logger = Platform.getLog(PrintUtil.class);
+
 	public static void getXMLAndShowPDF(IDataService dataService, EModelService modelService, EPartService partService, TranslationService translationService,
-			MWindow window, IEventBroker broker, UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath,
-			MPerspective mPerspective, boolean disablePreview) {
+			UISynchronize sync, Table table, String rootElement, String xslPath, String resultPath, MPerspective mPerspective, boolean disablePreview) {
 
 		CompletableFuture<Path> tableFuture = dataService.getXMLAsync(table, rootElement);
 		tableFuture.thenAccept(xmlPath -> sync.asyncExec(() -> {
@@ -65,7 +66,7 @@ public class PrintUtil {
 					PrintUtil.showFile(pdfFile.toString(), PrintUtil.checkPreview(mPerspective, modelService, partService));
 				}
 			} catch (IOException | SAXException | TransformerException e) {
-				dataService.getLogger().error(e);
+				logger.error(e.getMessage(), e);
 				ShowErrorDialogHandler.execute(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
 						translationService.translate("@msg.ErrorShowingFile", null), e);
 			}

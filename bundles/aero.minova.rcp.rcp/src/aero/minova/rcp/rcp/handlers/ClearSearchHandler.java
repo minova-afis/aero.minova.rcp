@@ -1,7 +1,5 @@
 package aero.minova.rcp.rcp.handlers;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -24,7 +22,6 @@ public class ClearSearchHandler {
 
 	@Execute
 	public void execute(MPerspective mPerspective) {
-		List<MPart> findElements = model.findElements(mPerspective, Constants.SEARCH_PART, MPart.class);
 		broker.post(Constants.BROKER_DELETEROWSEARCHTABLE, Constants.SEARCH_PART);
 	}
 

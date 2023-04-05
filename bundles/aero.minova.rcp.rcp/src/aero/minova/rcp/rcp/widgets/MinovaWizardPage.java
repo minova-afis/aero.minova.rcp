@@ -116,12 +116,12 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	 */
 	protected void init() {
 		IWizardContainer wizardContainer = this.getContainer();
-		if (wizardContainer instanceof WizardDialog) {
+		if (wizardContainer instanceof WizardDialog wd) {
 			// und was anderes kommt eigentlich nicht vor...
 
 			// füge den oben definierten Listener hinzu, der onSelect aufruft
 			// intern wird bereits geprüft, ob der Listener doppelt ist
-			((WizardDialog) wizardContainer).addPageChangedListener(mwpcl);
+			wd.addPageChangedListener(mwpcl);
 
 			// von abgeleiteten Klassen können auch mehr Listener hinzugefügt werden
 		}
@@ -151,8 +151,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 		MField mField = null;
 		switch (dataType) {
-		case BIGDECIMAL:
-		case DOUBLE:
+		case BIGDECIMAL, DOUBLE:
 			mField = new MNumberField(2);
 			break;
 		case BOOLEAN:
@@ -161,8 +160,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case FILTER:
 			// Sollte nicht vorkommen
 			break;
-		case INSTANT:
-		case ZONED:
+		case INSTANT, ZONED:
 			switch (dateTimeType) {
 			case DATE:
 				mField = new MShortDateField();
@@ -184,6 +182,12 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case STRING:
 			mField = new MTextField();
 			((MTextField) mField).setMaxTextLength(200);
+			break;
+		case QUANTITY:
+			// Sollte nicht vorkommen?
+			break;
+		case PERIOD:
+			// Sollte nicht vorkommen?
 			break;
 		}
 
@@ -218,8 +222,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 	protected Control createUIField(MField mField, DateTimeType dateTimeType, Composite composite, int row, int column) {
 		Control c = null;
 		switch (mField.getDataType()) {
-		case BIGDECIMAL:
-		case DOUBLE:
+		case BIGDECIMAL, DOUBLE:
 			c = NumberField.create(composite, (MNumberField) mField, row, column, locale, mPerspective, translationService);
 			break;
 		case BOOLEAN:
@@ -228,8 +231,7 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		case FILTER:
 			// Sollte nicht vorkommen
 			break;
-		case INSTANT:
-		case ZONED:
+		case INSTANT, ZONED:
 			switch (dateTimeType) {
 			case DATE:
 				c = ShortDateField.create(composite, mField, row, column, locale, timezone, mPerspective, translationService);
@@ -253,6 +255,10 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 			break;
 		case QUANTITY:
 			c = QuantityField.create(composite, (MQuantityField) mField, row, column, locale, mPerspective, translationService);
+			break;
+		case PERIOD:
+			// Sollte nicht vorkommen
+			break;
 		}
 
 		if (c != null) {
@@ -288,8 +294,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 		@Override
 		public void pageChanged(PageChangedEvent event) {
 			Object selectedPage = event.getSelectedPage();
-			if (selectedPage instanceof MinovaWizardPage) {
-				((MinovaWizardPage) selectedPage).onSelect();
+			if (selectedPage instanceof MinovaWizardPage mwp) {
+				mwp.onSelect();
 			}
 		}
 	}
@@ -314,8 +320,8 @@ public class MinovaWizardPage extends WizardPage implements ValueChangeListener 
 
 	public boolean popupIsOpen() {
 		Control focussedControl = ((DetailAccessor) mDetail.getDetailAccessor()).getSelectedControl();
-		if (focussedControl instanceof LookupComposite) {
-			return ((LookupComposite) focussedControl).popupIsOpen();
+		if (focussedControl instanceof LookupComposite lc) {
+			return lc.popupIsOpen();
 		}
 		return false;
 	}

@@ -9,8 +9,9 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.swt.widgets.Control;
@@ -31,8 +32,7 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 	@Inject
 	UISynchronize sync;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	public LookupValueAccessor(MField field, LookupComposite control) {
 		super(field, control);
@@ -147,9 +147,9 @@ public class LookupValueAccessor extends AbstractValueAccessor {
 				field.setValue(l.get(0), true);
 			}
 		} catch (ExecutionException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
 	}

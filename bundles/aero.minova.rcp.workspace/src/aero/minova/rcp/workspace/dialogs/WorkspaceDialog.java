@@ -6,7 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.Dialog;
@@ -34,7 +35,6 @@ import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.workspace.WorkspaceException;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
-@SuppressWarnings("restriction")
 public class WorkspaceDialog extends Dialog {
 
 	private Text username;
@@ -51,17 +51,17 @@ public class WorkspaceDialog extends Dialog {
 	private String pwText;
 	private String connectionText;
 
-	private Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
+
 	private boolean loadedProfile = false;
 	private String defaultConnectionString;
 
-	public WorkspaceDialog(Shell parentShell, Logger logger) {
+	public WorkspaceDialog(Shell parentShell) {
 		super(parentShell);
-		this.logger = logger;
 	}
 
-	public WorkspaceDialog(Shell parentShell, Logger logger, String profileName) {
-		this(parentShell, logger);
+	public WorkspaceDialog(Shell parentShell, String profileName) {
+		this(parentShell);
 		this.profileName = profileName;
 	}
 
@@ -103,7 +103,7 @@ public class WorkspaceDialog extends Dialog {
 					}
 					loadProfileData();
 				} catch (NullPointerException ex) {
-					logger.error(ex);
+					logger.error(ex.getMessage(), ex);
 				}
 			}
 		});
@@ -118,12 +118,12 @@ public class WorkspaceDialog extends Dialog {
 		deleteProfile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
-				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText(), logger);
+				WorkspaceAccessPreferences.deleteSavedWorkspace(profile.getText());
 				try {
 					// Workspace Ordner löschen
 					FileUtils.deleteDirectory(new File(applicationArea.getText().replace("file:", "")));
 				} catch (IOException e1) {
-					logger.error(e1);
+					logger.error(e1.getMessage(), e1);
 				}
 				profile.clearSelection();
 				profile.removeAll();
@@ -203,11 +203,11 @@ public class WorkspaceDialog extends Dialog {
 	 * Füllt die ComboBox mit den vorhandenen Profilen
 	 */
 	private void fillProfiles() {
-		for (ISecurePreferences prefs : WorkspaceAccessPreferences.getSavedWorkspaceAccessData(logger)) {
+		for (ISecurePreferences prefs : WorkspaceAccessPreferences.getSavedWorkspaceAccessData()) {
 			try {
 				profile.add(prefs.get(WorkspaceAccessPreferences.PROFILE, ""));
 			} catch (StorageException e1) {
-				logger.error(e1, e1.getMessage());
+				logger.error(e1.getMessage(), e1);
 			}
 		}
 	}
@@ -219,7 +219,7 @@ public class WorkspaceDialog extends Dialog {
 	private void loadProfileData() {
 		WorkspaceHandler workspaceHandler = null;
 		try {
-			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
+			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText());
 			if (workspaceHandler != null) {
 				workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(), btnDefault.getSelection());
 				profile.setText(workspaceHandler.getProfile());
@@ -230,7 +230,7 @@ public class WorkspaceDialog extends Dialog {
 				message.setText(workspaceHandler.getMessage());
 			}
 		} catch (WorkspaceException e1) {
-			logger.error(e1);
+			logger.error(e1.getMessage(), e1);
 			message.setText(e1.getMessage());
 		}
 
@@ -252,7 +252,7 @@ public class WorkspaceDialog extends Dialog {
 		WorkspaceHandler workspaceHandler = null;
 		try {
 			message.setText("");
-			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText(), logger);
+			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText());
 			workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(), btnDefault.getSelection());
 			workspaceHandler.open();
 		} catch (WorkspaceException e) {

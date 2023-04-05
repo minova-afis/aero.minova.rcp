@@ -5,11 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.services.log.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -29,7 +28,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 
 	private IDataService dataService;
 	private boolean downloadPlugins = true;
-	private Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Reference
 	void getDummyService(IDummyService dummyService) {
@@ -41,7 +40,6 @@ public class MinovaPluginService implements IMinovaPluginService {
 	@Reference
 	void getDataService(IDataService dataService) {
 		this.dataService = dataService;
-		logger = dataService.getLogger();
 	}
 
 	@Override
@@ -61,13 +59,13 @@ public class MinovaPluginService implements IMinovaPluginService {
 		Path pluginPath = Paths.get(storagePath.toString(), "plugins");
 		List<Path> plugins = null;
 		try (Stream<Path> list = Files.list(pluginPath)) {
-			plugins = list.filter(f -> f.toString().contains(pluginName)).filter(f -> f.toString().toLowerCase().endsWith("jar")).collect(Collectors.toList());
+			plugins = list.filter(f -> f.toString().contains(pluginName)).filter(f -> f.toString().toLowerCase().endsWith("jar")).toList();
 			if (plugins.isEmpty()) {
 				logger.error("Plugin für Klasse " + helperClass + " konnte nicht geladen werden");
 				return;
 			}
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			return;
 		}
 
@@ -101,7 +99,7 @@ public class MinovaPluginService implements IMinovaPluginService {
 			Bundle installBundle = bundleContext.installBundle(newestPlugin.toUri().toString());
 			installBundle.start(Bundle.START_ACTIVATION_POLICY);
 		} catch (BundleException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 

@@ -27,15 +27,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 	private Locale locale;
 	private DataType datatype;
 	private DateTimeType datetimetype;
-	private ZoneId zoneId;
 	private int decimals;
-
-	public FilterDisplayConverter(DataType datatype, Locale locale, DateTimeType datetimetype, ZoneId zoneId) {
-		this.locale = locale;
-		this.datatype = datatype;
-		this.datetimetype = datetimetype;
-		this.zoneId = zoneId;
-	}
 
 	public FilterDisplayConverter(DataType datatype, Locale locale, DateTimeType datetimetype) {
 		this.locale = locale;
@@ -60,8 +52,7 @@ public class FilterDisplayConverter extends DisplayConverter {
 		String timeUtil = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIME_UTIL, DisplayType.TIME_UTIL, "", locale);
 		String timezone = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.STRING, "", locale);
 
-		if (canonicalValue instanceof FilterValue) {
-			FilterValue cv = (FilterValue) canonicalValue;
+		if (canonicalValue instanceof FilterValue cv) {
 			String val = "";
 			if (cv.getValue().toString().contains("null")) {
 				return cv.getValue().toString();
@@ -103,15 +94,11 @@ public class FilterDisplayConverter extends DisplayConverter {
 		Preferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 		String timezone = (String) InstancePreferenceAccessor.getValue(preferences, ApplicationPreferences.TIMEZONE, DisplayType.STRING, "", locale);
 
-		if (displayValue instanceof String) {
-			String valueString = (String) displayValue;
+		if (displayValue instanceof String valueString) {
 
 			int operatorPos;
 			switch (datatype) {
-			case INSTANT:
-			case ZONED:
-			case INTEGER:
-			case DOUBLE:
+			case INSTANT, ZONED, INTEGER, DOUBLE:
 				operatorPos = OperatorExtractionUtil.getOperatorEndIndex(valueString, Constants.getNumberOperators());
 				break;
 			case STRING:

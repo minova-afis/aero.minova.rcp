@@ -37,11 +37,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Component;
@@ -85,7 +85,7 @@ import aero.minova.rcp.preferences.ApplicationPreferences;
 @Component
 public class DataService implements IDataService {
 
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	HashMap<String, String> serverHashes = new HashMap<>();
 
@@ -103,7 +103,6 @@ public class DataService implements IDataService {
 
 	private static final FilterValue fv = new FilterValue(">", "0", "");
 
-	private static final boolean LOG = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/server"));
 	private static final boolean LOG_CACHE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/cache"));
 	private static final boolean LOG_SQL_STRING = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/logsqlstring"));
 	private static final boolean DISABLE_FILE_UPDATE = "true".equalsIgnoreCase(Platform.getDebugOption("aero.minova.rcp.dataservice/debug/disablefileupdate"));
@@ -167,7 +166,7 @@ public class DataService implements IDataService {
 					.authenticator(authentication);
 			httpClient = httpClientBuilder.build();
 		} catch (UnsupportedEncodingException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 
 		gson = new GsonBuilder() //
@@ -204,9 +203,9 @@ public class DataService implements IDataService {
 				}
 			}
 		} catch (ExecutionException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -458,7 +457,7 @@ public class DataService implements IDataService {
 		try {
 			Files.createDirectories(path.getParent());
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
@@ -512,9 +511,9 @@ public class DataService implements IDataService {
 				downloadFile(filename).join();
 			}
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
 		return getCachedFileContent(filename);
@@ -532,10 +531,10 @@ public class DataService implements IDataService {
 				}
 			}
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			return false;
 		} catch (InterruptedException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 			return false;
 		}
@@ -555,7 +554,7 @@ public class DataService implements IDataService {
 		try {
 			Files.createDirectories(path.getParent());
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		Path finalPath = Path.of(FileUtil.createFile(path.toString()));
 
@@ -706,7 +705,7 @@ public class DataService implements IDataService {
 					return Files.readString(cachedFile.toPath());
 				}
 			} catch (IOException | URISyntaxException e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 			throw new CompletionException("File not found", null);
 		});
@@ -918,11 +917,6 @@ public class DataService implements IDataService {
 	}
 
 	@Override
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
-
-	@Override
 	public void sendLogs() {
 		try {
 			ZipService.zipFile(getStoragePath().resolve(".metadata").toString(), getStoragePath().resolve("logs.zip").toString());
@@ -959,7 +953,7 @@ public class DataService implements IDataService {
 			});
 
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -1042,7 +1036,7 @@ public class DataService implements IDataService {
 				sqlString = SQLStringUtil.prepareViewString(table);
 			}
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 
 		if (LOG_SQL_STRING) {
@@ -1059,7 +1053,7 @@ public class DataService implements IDataService {
 					sqlStringBuilder.append(SQLStringUtil.prepareProcedureString(e.getTable()) + "\n");
 				}
 			} catch (Exception e) {
-				logger.error(e);
+				logger.error(e.getMessage(), e);
 			}
 			String sqlString = sqlStringBuilder.toString().strip();
 			body = body + "\n" + sqlString;
@@ -1071,10 +1065,5 @@ public class DataService implements IDataService {
 		if (logger != null) {
 			logger.info(body);
 		}
-	}
-
-	@Override
-	public Logger getLogger() {
-		return logger;
 	}
 }
