@@ -1053,7 +1053,7 @@ public class WFCDetailCASRequestsUtil {
 		t.addRow(r);
 		try {
 			if (dataService.callProcedureAsync(t).get() != null) {
-				broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.actionSuccess");
+				broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.ActionSuccess");
 			}
 		} catch (ExecutionException e) {
 			// Fehler werden im DataService angezeigt
