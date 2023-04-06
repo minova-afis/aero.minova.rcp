@@ -112,7 +112,7 @@ public class OpenServiceContractUITest {
 
 		indexNattable.click(3, 1);
 
-		UITestUtil.sleep();
+		waitForDetailLoaded();
 
 		// Überprüfen, ob Daten geladen wurden
 		MPart part = detailPart.getPart();
@@ -131,7 +131,7 @@ public class OpenServiceContractUITest {
 		filterIndexToMinWfc();
 		indexNattable.click(3, 1);
 
-		UITestUtil.sleep();
+		waitForDetailLoaded();
 
 		// Überprüfen, ob Daten geladen wurden
 		MPart part = detailPart.getPart();
@@ -176,5 +176,16 @@ public class OpenServiceContractUITest {
 		do {
 			UITestUtil.sleep(500);
 		} while (!indexToolbar.get(0).isEnabled());
+	}
+
+	private void waitForDetailLoaded() {
+		MPart part = detailPart.getPart();
+		WFCDetailPart wfcPart = (WFCDetailPart) part.getObject();
+
+		int i = 15;
+		while (wfcPart.getDetail().getField("KeyText").getValue() == null && i > 0) {
+			UITestUtil.sleep();
+			i--;
+		}
 	}
 }
