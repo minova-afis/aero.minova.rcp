@@ -12,14 +12,24 @@
     <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
     <booleanAttribute key="default" value="false"/>
     <setAttribute key="deselected_workspace_bundles">
+        <setEntry value="aero.minova.afis.shipment.helper"/>
+        <setEntry value="aero.minova.cas.plugin.attachments.helper"/>
         <setEntry value="aero.minova.graduation.helper"/>
         <setEntry value="aero.minova.invoice.helper"/>
         <setEntry value="aero.minova.jobdefinition.helper"/>
+        <setEntry value="aero.minova.jobdestination.helper"/>
+        <setEntry value="aero.minova.jobresult.helper"/>
         <setEntry value="aero.minova.journaltemplate.helper"/>
+        <setEntry value="aero.minova.sam.helper"/>
         <setEntry value="aero.minova.servicecontract.helper"/>
         <setEntry value="aero.minova.translation"/>
+        <setEntry value="aero.minova.truck.truckmeterreading.helper"/>
+        <setEntry value="aero.minova.tta.movementservice.helper"/>
+        <setEntry value="aero.minova.workingtime.github.helper"/>
         <setEntry value="aero.minova.workingtime.helper"/>
         <setEntry value="aero.minova.workingtime.helper.tests"/>
+        <setEntry value="com.minova.oiltanking.emergencyoperation.helper"/>
+        <setEntry value="testing"/>
     </setAttribute>
     <booleanAttribute key="includeOptional" value="true"/>
     <stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
@@ -381,10 +391,6 @@
         <setEntry value="org.w3c.dom.svg@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
-        <setEntry value="aero.minova.afis.shipment.helper@default:default"/>
-        <setEntry value="aero.minova.cas.plugin.attachments.helper@default:default"/>
-        <setEntry value="aero.minova.jobdestination.helper@default:default"/>
-        <setEntry value="aero.minova.jobresult.helper@default:default"/>
         <setEntry value="aero.minova.libs.fop@default:default"/>
         <setEntry value="aero.minova.libs.jtds@default:default"/>
         <setEntry value="aero.minova.rcp.constant@default:default"/>
@@ -408,6 +414,7 @@
         <setEntry value="aero.minova.rcp.widgets@default:default"/>
         <setEntry value="aero.minova.rcp.workspace@default:default"/>
         <setEntry value="aero.minova.rcp.xml.tests@default:default"/>
+        <setEntry value="jakarta.xml.bind-api@default:false"/>
     </setAttribute>
     <booleanAttribute key="show_selected_only" value="false"/>
     <booleanAttribute key="tracing" value="false"/>
