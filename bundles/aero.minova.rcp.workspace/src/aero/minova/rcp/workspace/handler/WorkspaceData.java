@@ -16,6 +16,7 @@ import org.eclipse.osgi.service.datalocation.Location;
  * @author Wilfried Saak
  */
 class WorkspaceData {
+	private static final String WORKSPACE_DATA_ALREADY_STORED_IN_BACKING_STORE = "WorkspaceData already stored in backing store!";
 	private URL connection;
 	private boolean isInBackingStore = false;
 	private boolean isSaved = false;
@@ -32,19 +33,23 @@ class WorkspaceData {
 		WorkspaceData[] workspaces = new WorkspaceData[nodeWorkspaces.childrenNames().length];
 		int i = 0;
 
-//		nodeWorkspaces.removeNode();
 		for (String nodeName : nodeWorkspaces.childrenNames()) {
 			WorkspaceData workspace = new WorkspaceData();
 			workspaces[i++] = workspace;
 			ISecurePreferences nodeWorkspace = nodeWorkspaces.node(nodeName);
+
 			try {
 				workspace.setConnection(new URL(nodeWorkspace.get("url", "N/A")));
-			} catch (MalformedURLException e) {} catch (StorageException e) {}
+			} catch (MalformedURLException | StorageException e) {
+				workspace.setConnection(null);
+			}
+
 			try {
 				workspace.setUsername(nodeWorkspace.get("username", ""));
 			} catch (StorageException e) {
 				workspace.setUsername("");
 			}
+
 			try {
 				workspace.setProfile(nodeWorkspace.get("profile", ""));
 			} catch (StorageException e) {
@@ -53,8 +58,6 @@ class WorkspaceData {
 		}
 		return workspaces;
 	}
-
-	public WorkspaceData() {}
 
 	/**
 	 * @return Connection to the server.
@@ -114,7 +117,7 @@ class WorkspaceData {
 
 	public void setConnection(URL connection) {
 		if (isInBackingStore()) {
-			throw new RuntimeException("WorkspaceData already stored in backing store!");
+			throw new RuntimeException(WORKSPACE_DATA_ALREADY_STORED_IN_BACKING_STORE);
 		}
 		this.connection = connection;
 	}
@@ -130,7 +133,7 @@ class WorkspaceData {
 
 	public void setProfile(String profile) {
 		if (isInBackingStore()) {
-			throw new RuntimeException("WorkspaceData already stored in backing store!");
+			throw new RuntimeException(WORKSPACE_DATA_ALREADY_STORED_IN_BACKING_STORE);
 		}
 		this.profile = profile;
 		updateWorkspaceHash();
@@ -142,7 +145,7 @@ class WorkspaceData {
 
 	public void setUsername(String username) {
 		if (isInBackingStore()) {
-			throw new RuntimeException("WorkspaceData already stored in backing store!");
+			throw new RuntimeException(WORKSPACE_DATA_ALREADY_STORED_IN_BACKING_STORE);
 		}
 		this.username = username;
 		updateWorkspaceHash();

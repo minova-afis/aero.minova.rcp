@@ -58,8 +58,7 @@ public class MinovaCTabFolderPropertyHandler extends AbstractCSSPropertySWTHandl
 			case 32:
 				height = 54;
 				break;
-			case 40:
-			case 54:
+			case 40, 54:
 				height = 70;
 				break;
 			default: // Darf nicht vorkommen
@@ -71,8 +70,7 @@ public class MinovaCTabFolderPropertyHandler extends AbstractCSSPropertySWTHandl
 
 	@Override
 	protected String retrieveCSSProperty(Control control, String property, String pseudo, CSSEngine engine) throws Exception {
-		if (control instanceof CTabFolder) {
-			CTabFolder folder = (CTabFolder) control;
+		if (control instanceof CTabFolder folder) {
 			return Integer.toString(folder.getTabHeight());
 		}
 		return null;
