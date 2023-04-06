@@ -26,10 +26,10 @@ NatTable>.BODY, .BODY:select, .COLUMN_HEADER, .COLUMN_HEADER:select,
 MinovaSection {
 	date-width: 90px;
 	date-time-width: 130px;
-	number-width: 80px;
+	number-width: 90px;
 	row-height: 24px;
 	section-spacing: 5px;
-	text-width: 130px;
+	text-width: 145px;
 	time-width: 65px;
 }
 
