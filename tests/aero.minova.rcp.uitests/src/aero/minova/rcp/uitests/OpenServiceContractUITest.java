@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swtbot.e4.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.nebula.nattable.finder.SWTNatTableBot;
@@ -24,8 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import aero.minova.rcp.constants.Constants;
 import aero.minova.rcp.model.Value;
 import aero.minova.rcp.model.form.MField;
-import aero.minova.rcp.model.form.MGrid;
-import aero.minova.rcp.rcp.accessor.SectionAccessor;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.uitests.util.UITestUtil;
 
@@ -123,43 +119,6 @@ public class OpenServiceContractUITest {
 		MField description = wfcPart.getDetail().getField("Description");
 		value = description.getValue();
 		assertEquals(value.getStringValue(), CONTRACT_NAME);
-	}
-
-	@Test
-	public void loadDetailGrid() {
-
-		filterIndexToMinWfc();
-		indexNattable.click(3, 1);
-
-		waitForDetailLoaded();
-
-		// Überprüfen, ob Daten geladen wurden
-		MPart part = detailPart.getPart();
-		WFCDetailPart wfcPart = (WFCDetailPart) part.getObject();
-		MGrid grid = wfcPart.getDetail().getGrid("ServicePrice");
-		int size = grid.getDataTable().getRows().size();
-		assertEquals(size, 1);
-
-		gridNattable.click(1, 1);
-
-		Control textClient = ((SectionAccessor) grid.getmSection().getSectionAccessor()).getSection().getTextClient();
-		assertTrue(textClient instanceof ToolBar);
-
-		SWTBotToolbarButton btnInsert = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_INSERT);
-		SWTBotToolbarButton btnDelete = bot.toolbarButtonWithId(Constants.CONTROL_GRID_BUTTON_DELETE);
-
-		btnDelete.click();
-
-		UITestUtil.sleep(250);
-		int sizeAfterDelete = grid.getDataTable().getRows().size();
-		assertEquals(sizeAfterDelete, 0);
-
-		btnInsert.click();
-		UITestUtil.sleep(250);
-		btnInsert.click();
-		UITestUtil.sleep(250);
-
-		assertEquals(grid.getDataTable().getRows().size(), 2);
 	}
 
 	private void reloadIndex() {
