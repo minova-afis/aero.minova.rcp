@@ -15,6 +15,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ## [Unreleased]
 
 ### Änderung
+- Benachrichtigung anzeigen, wenn Prozeduraufruf über Knopf erfolgreich war (ohne Helper, benötigt i18n 12.14.0)
 - Überall .classpath und prefs updaten (für Java 17)
 - Warnungen entfernen, Code bereinigen
 - Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
