@@ -14,17 +14,15 @@
     <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
     <booleanAttribute key="default" value="false"/>
     <setAttribute key="deselected_workspace_bundles">
-        <setEntry value="aaaa"/>
-        <setEntry value="aero.minova.test.saw.rcp"/>
         <setEntry value="aero.minova.translation"/>
     </setAttribute>
     <booleanAttribute key="includeOptional" value="true"/>
     <stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-        <listEntry value="/aero.minova.rcp.uitests/src/aero/minova/rcp/utiltests/ImageUtilTest.java"/>
+        <listEntry value="/aero.minova.rcp.uitests"/>
     </listAttribute>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-        <listEntry value="1"/>
+        <listEntry value="4"/>
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
     <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
@@ -43,8 +41,7 @@
     <stringAttribute key="product" value="org.eclipse.sdk.ide"/>
     <booleanAttribute key="run_in_ui_thread" value="true"/>
     <setAttribute key="selected_target_bundles">
-        <setEntry value="ca.odell.glazedlists*1.11.0.v20190926-1838@default:default"/>
-        <setEntry value="ca.odell.glazedlists*1.9.0.v201303080712@default:default"/>
+        <setEntry value="ca.odell.glazedlists@default:default"/>
         <setEntry value="com.google.gson@default:default"/>
         <setEntry value="com.ibm.icu@default:default"/>
         <setEntry value="com.jcraft.jsch@default:default"/>
@@ -65,12 +62,10 @@
         <setEntry value="org.apache.batik.css@default:default"/>
         <setEntry value="org.apache.batik.i18n@default:default"/>
         <setEntry value="org.apache.batik.util@default:default"/>
-        <setEntry value="org.apache.commons.codec*1.14.0.v20200818-1422@default:default"/>
-        <setEntry value="org.apache.commons.codec*1.6.0.v201305230611@default:default"/>
+        <setEntry value="org.apache.commons.codec@default:default"/>
         <setEntry value="org.apache.commons.io@default:default"/>
         <setEntry value="org.apache.commons.jxpath@default:default"/>
-        <setEntry value="org.apache.commons.logging*1.1.1.v201101211721@default:default"/>
-        <setEntry value="org.apache.commons.logging*1.2.0.v20180409-1502@default:default"/>
+        <setEntry value="org.apache.commons.logging@default:default"/>
         <setEntry value="org.apache.felix.gogo.command@default:default"/>
         <setEntry value="org.apache.felix.gogo.runtime@default:default"/>
         <setEntry value="org.apache.felix.gogo.shell@default:default"/>
@@ -78,7 +73,6 @@
         <setEntry value="org.apache.httpcomponents.httpclient@default:default"/>
         <setEntry value="org.apache.httpcomponents.httpcore@default:default"/>
         <setEntry value="org.apache.jasper.glassfish@default:default"/>
-        <setEntry value="org.apache.log4j@default:default"/>
         <setEntry value="org.apache.lucene.analyzers-common@default:default"/>
         <setEntry value="org.apache.lucene.analyzers-smartcn@default:default"/>
         <setEntry value="org.apache.lucene.core@default:default"/>
@@ -119,15 +113,8 @@
         <setEntry value="org.eclipse.e4.core.di@default:default"/>
         <setEntry value="org.eclipse.e4.core.services@default:default"/>
         <setEntry value="org.eclipse.e4.emf.xpath@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.bundle.spy@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.context.spy@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.css.spy@default:default"/>
         <setEntry value="org.eclipse.e4.tools.emf.ui@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.event.spy@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.model.spy@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.preference.spy@default:default"/>
         <setEntry value="org.eclipse.e4.tools.services@default:default"/>
-        <setEntry value="org.eclipse.e4.tools.spy@default:default"/>
         <setEntry value="org.eclipse.e4.ui.bindings@default:default"/>
         <setEntry value="org.eclipse.e4.ui.css.core@default:default"/>
         <setEntry value="org.eclipse.e4.ui.css.swt.theme@default:default"/>
@@ -385,11 +372,6 @@
         <setEntry value="org.w3c.dom.svg@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
-        <setEntry value="Test2@default:default"/>
-        <setEntry value="aero.minova.graduation.helper@default:default"/>
-        <setEntry value="aero.minova.invoice.helper@default:default"/>
-        <setEntry value="aero.minova.jobdefinition.helper@default:default"/>
-        <setEntry value="aero.minova.journaltemplate.helper@default:default"/>
         <setEntry value="aero.minova.libs.fop@default:default"/>
         <setEntry value="aero.minova.libs.jtds@default:default"/>
         <setEntry value="aero.minova.rcp.constant@default:default"/>
@@ -413,10 +395,6 @@
         <setEntry value="aero.minova.rcp.widgets@default:default"/>
         <setEntry value="aero.minova.rcp.workspace@default:default"/>
         <setEntry value="aero.minova.rcp.xml.tests@default:default"/>
-        <setEntry value="aero.minova.servicecontract.helper@default:default"/>
-        <setEntry value="aero.minova.workingtime.helper.tests@default:default"/>
-        <setEntry value="aero.minova.workingtime.helper@default:default"/>
-        <setEntry value="test@default:default"/>
     </setAttribute>
     <booleanAttribute key="show_selected_only" value="false"/>
     <booleanAttribute key="tracing" value="false"/>
