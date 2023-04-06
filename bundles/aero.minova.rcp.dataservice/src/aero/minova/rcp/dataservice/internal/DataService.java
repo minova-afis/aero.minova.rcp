@@ -19,9 +19,6 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -32,10 +29,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -81,6 +74,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.util.SSLContextUtil;
 
 @Component
 public class DataService implements IDataService {
@@ -162,7 +156,7 @@ public class DataService implements IDataService {
 			};
 			// TODO: fix certificate-problems
 			httpClientBuilder = HttpClient.newBuilder()//
-					.sslContext(disabledSslVerificationContext())//
+					.sslContext(SSLContextUtil.getTrustAllSSLContext())//
 					.authenticator(authentication);
 			httpClient = httpClientBuilder.build();
 		} catch (UnsupportedEncodingException e) {
@@ -208,31 +202,6 @@ public class DataService implements IDataService {
 			logger.error(e.getMessage(), e);
 			Thread.currentThread().interrupt();
 		}
-	}
-
-	private static SSLContext disabledSslVerificationContext() {
-		SSLContext sslContext = null;// Remove certificate validation
-
-		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-			@Override
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-
-			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-
-			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-		} };
-
-		try {
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustAllCerts, new SecureRandom());
-		} catch (NoSuchAlgorithmException | KeyManagementException e) {
-			throw new RuntimeException(e);
-		}
-		return sslContext;
 	}
 
 	@Override
