@@ -200,39 +200,46 @@ public class WFCDetailCASRequestsUtil {
 
 			addGridsToReadList(table, procedureList);
 
-			CompletableFuture<List<TransactionResultEntry>> transactionResult = dataService.callTransactionAsync(procedureList);
-
-			transactionResult.thenAccept(list -> sync.asyncExec(() -> {
-				if (list != null && !list.isEmpty()) {
-
-					for (TransactionResultEntry resEntry : list) {
-						String id = resEntry.getId();
-						SqlProcedureResult res = resEntry.getSQLProcedureResult();
-						if (id.equals(Constants.TRANSACTION_PARENT)) { // Hauptmaske
-							selectedTable = res.getOutputParameters();
-						} else if (id.startsWith(Constants.OPTION_PAGE + "_")) { // OP
-							String opID = id.substring(id.indexOf("_") + 1);
-							getSelectedOptionPages().put(opID, res.getOutputParameters());
-						} else if (id.startsWith(Constants.GRID + "_")) { // Grid
-							MGrid g = mDetail.getGrid(id.substring(id.indexOf("_") + 1));
-							if (g != null && res.getResultSet() != null) {
-								setGridContent(g, res.getResultSet());
-							}
-						}
-					}
-
-					// Alle Browser im Detailbereich leeren
-					for (MBrowser mB : mDetail.getBrowsers()) {
-						BrowserAccessor bA = (BrowserAccessor) mB.getBrowserAccessor();
-						bA.getBrowserSection().clear();
-					}
-
-					updateSelectedEntry(false);
-					sendEventToHelper(ActionCode.AFTERREAD);
-					broker.send(Constants.BROKER_CHECKDIRTY, "");
-				}
-			}));
+			callAndProcessRead(procedureList);
 		});
+	}
+
+	private void callAndProcessRead(List<TransactionEntry> procedureList) {
+		CompletableFuture<List<TransactionResultEntry>> transactionResult = dataService.callTransactionAsync(procedureList);
+		transactionResult.thenAccept(list -> sync.asyncExec(() -> {
+			if (list != null && !list.isEmpty()) {
+
+				for (TransactionResultEntry resEntry : list) {
+					processReadResult(resEntry);
+				}
+
+				// Alle Browser im Detailbereich leeren
+				for (MBrowser mB : mDetail.getBrowsers()) {
+					BrowserAccessor bA = (BrowserAccessor) mB.getBrowserAccessor();
+					bA.getBrowserSection().clear();
+				}
+
+				updateSelectedEntry(false);
+				sendEventToHelper(ActionCode.AFTERREAD);
+				broker.send(Constants.BROKER_CHECKDIRTY, "");
+			}
+		}));
+	}
+
+	private void processReadResult(TransactionResultEntry resEntry) {
+		String id = resEntry.getId();
+		SqlProcedureResult res = resEntry.getSQLProcedureResult();
+		if (id.equals(Constants.TRANSACTION_PARENT)) { // Hauptmaske
+			selectedTable = res.getOutputParameters();
+		} else if (id.startsWith(Constants.OPTION_PAGE + "_")) { // OP
+			String opID = id.substring(id.indexOf("_") + 1);
+			getSelectedOptionPages().put(opID, res.getOutputParameters());
+		} else if (id.startsWith(Constants.GRID + "_")) { // Grid
+			MGrid g = mDetail.getGrid(id.substring(id.indexOf("_") + 1));
+			if (g != null && res.getResultSet() != null) {
+				setGridContent(g, res.getResultSet());
+			}
+		}
 	}
 
 	private void addGridsToReadList(Table keyTable, List<TransactionEntry> procedureList) {
@@ -249,30 +256,9 @@ public class WFCDetailCASRequestsUtil {
 
 					boolean found = false;
 					if (!sg.getFieldnameToValue().isEmpty()) { // Zuordnung aus .xbs nutzen, Keys aus keyTable
-						if (sg.getFieldnameToValue().containsKey(f.getName())) {
-							found = true;
-							String valueFromXBS = sg.getFieldnameToValue().get(f.getName());
-							Value v = null;
-							if (!valueFromXBS.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
-								Row row = keyTable.getRows().get(0);
-								v = row.getValue(keyTable.getColumnIndex(valueFromXBS));
-							} else {
-								v = new Value(valueFromXBS.substring(1), sg.getDataTable().getColumn(f.getName()).getType());
-							}
-							gridRowBuilder.withValue(v);
-						}
-
+						found = getGridValueFromXBS(keyTable, gridRowBuilder, sg, f);
 					} else { // Default Verhalten, entsprechenden Wert über Namen aus keyTable holen, erster Primary bekommt KeyLong
-						int index = keyTable.getColumnIndex(f.getName());
-						if (firstPrimary) {
-							index = keyTable.getColumnIndex(Constants.TABLE_KEYLONG);
-						}
-
-						if (index >= 0) {
-							found = true;
-							Row row = keyTable.getRows().get(0);
-							gridRowBuilder.withValue(row.getValue(index).getValue());
-						}
+						found = getGridValueFromFirstPrimary(keyTable, gridRowBuilder, firstPrimary, f);
 					}
 					if (!found) {
 						gridRowBuilder.withValue(null);
@@ -286,6 +272,36 @@ public class WFCDetailCASRequestsUtil {
 
 			procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId(), gridRequestTable));
 		}
+	}
+
+	private boolean getGridValueFromFirstPrimary(Table keyTable, RowBuilder gridRowBuilder, boolean firstPrimary, Field f) {
+		int index = keyTable.getColumnIndex(f.getName());
+		if (firstPrimary) {
+			index = keyTable.getColumnIndex(Constants.TABLE_KEYLONG);
+		}
+
+		if (index >= 0) {
+			Row row = keyTable.getRows().get(0);
+			gridRowBuilder.withValue(row.getValue(index).getValue());
+			return true;
+		}
+		return false;
+	}
+
+	private boolean getGridValueFromXBS(Table keyTable, RowBuilder gridRowBuilder, SectionGrid sg, Field f) {
+		if (sg.getFieldnameToValue().containsKey(f.getName())) {
+			String valueFromXBS = sg.getFieldnameToValue().get(f.getName());
+			Value v = null;
+			if (!valueFromXBS.startsWith(Constants.OPTION_PAGE_QUOTE_ENTRY_SYMBOL)) {
+				Row row = keyTable.getRows().get(0);
+				v = row.getValue(keyTable.getColumnIndex(valueFromXBS));
+			} else {
+				v = new Value(valueFromXBS.substring(1), sg.getDataTable().getColumn(f.getName()).getType());
+			}
+			gridRowBuilder.withValue(v);
+			return true;
+		}
+		return false;
 	}
 
 	public void setGridContent(MGrid g, Table data) {
@@ -461,21 +477,7 @@ public class WFCDetailCASRequestsUtil {
 		int valuePosition = 0;
 
 		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(buildForm)) {
-
-			if (getKeys() == null && buildForm.equals(form)) { // Hauptmaske, keine Keys gegeben (Insert)
-				rb.withValue(null);
-			} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) { // OPs
-				if (getKeys() != null) { // Bei Update Key-Wert aus Hauptmaske
-					MField correspondingField = mDetail.getField(keysToIndex.get(f.getName()));
-					rb.withValue(getKeys().get(correspondingField.getName()));
-				} else { // Bei Insert ReferenceValue auf Hauptmasken-Wert setzen
-					rb.withValue(new ReferenceValue(Constants.TRANSACTION_PARENT, keysToIndex.get(f.getName())));
-				}
-			} else if (getKeys() != null && getKeys().containsKey(f.getName())) { // Hauptmaske, Keys gegeben (Update)
-				rb.withValue(getKeys().get(f.getName()));
-			} else {
-				rb.withValue(null);
-			}
+			addValueToRow(buildForm, keysToIndex, rb, f);
 			valuePosition++;
 		}
 
@@ -494,6 +496,23 @@ public class WFCDetailCASRequestsUtil {
 		Row r = rb.create();
 		formTable.addRow(r);
 		return formTable;
+	}
+
+	private void addValueToRow(Form buildForm, Map<String, String> keysToIndex, RowBuilder rb, Field f) {
+		if (getKeys() == null && buildForm.equals(form)) { // Hauptmaske, keine Keys gegeben (Insert)
+			rb.withValue(null);
+		} else if (keysToIndex != null && keysToIndex.containsKey(f.getName())) { // OPs
+			if (getKeys() != null) { // Bei Update Key-Wert aus Hauptmaske
+				MField correspondingField = mDetail.getField(keysToIndex.get(f.getName()));
+				rb.withValue(getKeys().get(correspondingField.getName()));
+			} else { // Bei Insert ReferenceValue auf Hauptmasken-Wert setzen
+				rb.withValue(new ReferenceValue(Constants.TRANSACTION_PARENT, keysToIndex.get(f.getName())));
+			}
+		} else if (getKeys() != null && getKeys().containsKey(f.getName())) { // Hauptmaske, Keys gegeben (Update)
+			rb.withValue(getKeys().get(f.getName()));
+		} else {
+			rb.withValue(null);
+		}
 	}
 
 	public void setValuesAccordingToXBS() {
@@ -697,24 +716,7 @@ public class WFCDetailCASRequestsUtil {
 			}
 
 			// In allen Grids alle Zeilen löschen
-			for (MGrid g : mDetail.getGrids()) {
-				SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
-				sg.closeEditor();
-
-				Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + deleteRequest + g.getProcedureSuffix()).create();
-				for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
-					aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
-					gridDeleteTable.addColumn(c);
-				}
-
-				for (Row row : sg.getDataTable().getRows()) {
-					gridDeleteTable.addRow(row);
-				}
-
-				if (!gridDeleteTable.getRows().isEmpty()) {
-					procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId(), gridDeleteTable));
-				}
-			}
+			addGridDeleteToList(procedureList);
 
 			CompletableFuture<List<TransactionResultEntry>> transactionResult = dataService.callTransactionAsync(procedureList);
 			try {
@@ -729,31 +731,46 @@ public class WFCDetailCASRequestsUtil {
 	}
 
 	/**
+	 * Fügt Prozeduren hinzu, um in allen Grids alle Zeilen zu löschen
+	 * 
+	 * @param procedureList
+	 */
+	private void addGridDeleteToList(List<TransactionEntry> procedureList) {
+		for (MGrid g : mDetail.getGrids()) {
+			SectionGrid sg = ((GridAccessor) g.getGridAccessor()).getSectionGrid();
+			sg.closeEditor();
+
+			Table gridDeleteTable = TableBuilder.newTable(g.getProcedurePrefix() + deleteRequest + g.getProcedureSuffix()).create();
+			for (aero.minova.rcp.model.Column gridColumn : g.getDataTable().getColumns()) {
+				aero.minova.rcp.model.Column c = new aero.minova.rcp.model.Column(gridColumn.getName(), gridColumn.getType());
+				gridDeleteTable.addColumn(c);
+			}
+
+			for (Row row : sg.getDataTable().getRows()) {
+				gridDeleteTable.addRow(row);
+			}
+
+			if (!gridDeleteTable.getRows().isEmpty()) {
+				procedureList.add(new TransactionEntry(Constants.GRID + "_" + g.getId(), gridDeleteTable));
+			}
+		}
+	}
+
+	/**
 	 * Baut die Tabelle für die Delete/Cancel-Anfrage
 	 */
 	private Table createDeleteTableFromForm(Form deleteForm) {
 		Table deleteTable;
+
 		// Bei Booking oder entsprechendem Flag in der Maske alle Felder übergeben
-		if (deleteForm.getDetail().isDeleteRequiresAllParams() || mDetail.isBooking()) { //
+		if (deleteForm.getDetail().isDeleteRequiresAllParams() || mDetail.isBooking()) {
 			deleteTable = dataFormService.getTableFromFormDetail(deleteForm, deleteRequest);
 		} else { // Ansonsten nur primary-Keys
-			deleteTable = new Table();
-			deleteTable.setName(deleteForm.getDetail().getProcedurePrefix() + deleteRequest + deleteForm.getDetail().getProcedureSuffix());
-			for (Field f : dataFormService.getAllPrimaryFieldsFromForm(deleteForm)) {
-				String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + f.getName();
-				deleteTable.addColumn(new Column(f.getName(), mDetail.getField(fieldName).getDataType()));
-			}
+			deleteTable = getDeleteTableWithPrimaryKeys(deleteForm);
 		}
 
 		// Bei Booking Primary-Keys als Output definieren, damit Stornosatz geladen werden kann
-		if (mDetail.isBooking()) {
-			for (aero.minova.rcp.model.Column c : deleteTable.getColumns()) {
-				String fieldname = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + c.getName();
-				if (mDetail.getField(fieldname) != null && mDetail.getField(fieldname).isPrimary()) {
-					c.setOutputType(OutputType.OUTPUT);
-				}
-			}
-		}
+		markPrimaryColumnsAsOutput(deleteForm, deleteTable);
 
 		Row r = new Row();
 		for (Column c : deleteTable.getColumns()) {
@@ -763,6 +780,27 @@ public class WFCDetailCASRequestsUtil {
 
 		deleteTable.addRow(r);
 		return deleteTable;
+	}
+
+	private Table getDeleteTableWithPrimaryKeys(Form deleteForm) {
+		Table deleteTable = new Table();
+		deleteTable.setName(deleteForm.getDetail().getProcedurePrefix() + deleteRequest + deleteForm.getDetail().getProcedureSuffix());
+		for (Field f : dataFormService.getAllPrimaryFieldsFromForm(deleteForm)) {
+			String fieldName = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + f.getName();
+			deleteTable.addColumn(new Column(f.getName(), mDetail.getField(fieldName).getDataType()));
+		}
+		return deleteTable;
+	}
+
+	private void markPrimaryColumnsAsOutput(Form deleteForm, Table deleteTable) {
+		if (mDetail.isBooking()) {
+			for (aero.minova.rcp.model.Column c : deleteTable.getColumns()) {
+				String fieldname = (deleteForm == form ? "" : deleteForm.getDetail().getProcedureSuffix() + ".") + c.getName();
+				if (mDetail.getField(fieldname) != null && mDetail.getField(fieldname).isPrimary()) {
+					c.setOutputType(OutputType.OUTPUT);
+				}
+			}
+		}
 	}
 
 	/**
@@ -830,18 +868,6 @@ public class WFCDetailCASRequestsUtil {
 			return dialog.open() == 0;
 		}
 		return true;
-	}
-
-	/**
-	 * Direkt Methode clearFields(String s) benutzten. Diese Methode wird in einem Helper (für ScharrCPC) verwendet, vorerst behalten
-	 * 
-	 * @param map
-	 */
-	@Optional
-	@Inject
-	@Deprecated(since = "12.9.0", forRemoval = true)
-	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
-		clearFields("");
 	}
 
 	/**
@@ -929,7 +955,7 @@ public class WFCDetailCASRequestsUtil {
 	@Optional
 	public void reloadFields(@UIEventTopic(Constants.BROKER_RELOADFIELDS) Table keyTable) {
 		if (isActivePerspective()) {
-			if (keyTable == null) {
+			if (keyTable == null && keys != null) {
 				keyTable = new Table();
 				Row r = new Row();
 				for (Entry<String, Value> e : keys.entrySet()) {
@@ -1025,7 +1051,15 @@ public class WFCDetailCASRequestsUtil {
 			r.addValue(f.getValue());
 		}
 		t.addRow(r);
-		dataService.callProcedureAsync(t);
+		try {
+			if (dataService.callProcedureAsync(t).get() != null) {
+				broker.send(Constants.BROKER_SHOWNOTIFICATION, "msg.actionSuccess");
+			}
+		} catch (ExecutionException e) {
+			// Fehler werden im DataService angezeigt
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	/**
@@ -1055,29 +1089,7 @@ public class WFCDetailCASRequestsUtil {
 		mDetail.getFields().removeAll(toRemove);
 
 		List<MField> visibleMFields = new ArrayList<>();
-
-		List<MParamStringField> paramStringFields = new ArrayList<>();
-		List<MField> tmp = new ArrayList<>();
-		tmp.addAll(mSection.getMFields());
-		for (MField f : tmp) {
-			if (f.isVisible()) {
-				visibleMFields.add(f);
-			}
-
-			if (f instanceof MParamStringField mParamString) {
-				String name = f.getName();
-				String suffix = name.contains("\\.") ? name.substring(name.lastIndexOf("\\."), name.length()) : "";
-
-				paramStringFields.add(mParamString);
-				for (Field subField : mParamString.getSubFields()) {
-					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
-					if (subMField.isVisible()) {
-						visibleMFields.add(subMField);
-					}
-					mParamString.addSubMField(subMField);
-				}
-			}
-		}
+		List<MParamStringField> paramStringFields = getParamStringFields(mSection, visibleMFields);
 
 		// Ganzen Body/ Client Area der Section entfernen
 		MinovaSection section = ((SectionAccessor) mSection.getSectionAccessor()).getSection();
@@ -1114,6 +1126,32 @@ public class WFCDetailCASRequestsUtil {
 			((AbstractValueAccessor) focussed.getValueAccessor()).getControl().setFocus();
 		}
 
+	}
+
+	private List<MParamStringField> getParamStringFields(MSection mSection, List<MField> visibleMFields) {
+		List<MParamStringField> paramStringFields = new ArrayList<>();
+		List<MField> tmp = new ArrayList<>();
+		tmp.addAll(mSection.getMFields());
+		for (MField f : tmp) {
+			if (f.isVisible()) {
+				visibleMFields.add(f);
+			}
+
+			if (f instanceof MParamStringField mParamString) {
+				String name = f.getName();
+				String suffix = name.contains("\\.") ? name.substring(name.lastIndexOf("\\."), name.length()) : "";
+
+				paramStringFields.add(mParamString);
+				for (Field subField : mParamString.getSubFields()) {
+					MField subMField = wfcDetailPart.createMField(subField, mSection, suffix);
+					if (subMField.isVisible()) {
+						visibleMFields.add(subMField);
+					}
+					mParamString.addSubMField(subMField);
+				}
+			}
+		}
+		return paramStringFields;
 	}
 
 	/**
@@ -1221,6 +1259,23 @@ public class WFCDetailCASRequestsUtil {
 		broker.post(Constants.BROKER_CHECKDIRTY, ""); // Check triggern
 	}
 
+	private boolean isActivePerspective() {
+		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
+		return activePerspective.equals(perspective);
+	}
+
+	/**
+	 * Direkt Methode clearFields(String s) benutzten. Diese Methode wird in einem Helper (für ScharrCPC) verwendet, vorerst behalten
+	 * 
+	 * @param map
+	 */
+	@Optional
+	@Inject
+	@Deprecated(since = "12.9.0", forRemoval = true)
+	public void clearFields(@UIEventTopic(Constants.BROKER_CLEARFIELDS) Map<MPerspective, String> map) {
+		clearFields("");
+	}
+
 	/**
 	 * @deprecated Stattdessen {@link DirtyFlagUtil#checkDirty()} nutzen. Einige Helper benutzen diese Methode, deshalb bleibt sie
 	 * @return
@@ -1228,10 +1283,5 @@ public class WFCDetailCASRequestsUtil {
 	@Deprecated(since = "12.0.36", forRemoval = false)
 	public boolean checkDirty() {
 		return dirtyFlagUtil.checkDirty();
-	}
-
-	private boolean isActivePerspective() {
-		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
-		return activePerspective.equals(perspective);
 	}
 }
