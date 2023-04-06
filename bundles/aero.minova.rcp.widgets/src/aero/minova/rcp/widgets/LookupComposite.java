@@ -187,8 +187,7 @@ public class LookupComposite extends Composite {
 			table.setSelection(index);
 			event.doit = false;
 			break;
-		case SWT.CR:
-		case SWT.KEYPAD_CR:
+		case SWT.CR, SWT.KEYPAD_CR:
 			if (popup.isVisible() && table.getSelectionIndex() != -1) {
 				text.setText(table.getSelection()[0].getText());
 				popup.setVisible(false);
