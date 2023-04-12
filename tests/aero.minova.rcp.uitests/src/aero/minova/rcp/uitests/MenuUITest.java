@@ -14,10 +14,7 @@ import java.util.Map;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.translation.TranslationService;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.e4.finder.widgets.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -27,29 +24,34 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.osgi.framework.FrameworkUtil;
 
 import aero.minova.rcp.dataservice.XmlProcessor;
 import aero.minova.rcp.form.menu.mdi.Main;
 import aero.minova.rcp.form.menu.mdi.Main.Action;
 import aero.minova.rcp.form.menu.mdi.Main.Entry;
 import aero.minova.rcp.form.menu.mdi.MenuType;
+import aero.minova.rcp.uitests.util.UITestUtil;
+import aero.minova.rcp.util.OSUtil;
 
 @ExtendWith(SWTBotJunit5Extension.class)
 public class MenuUITest {
 
-	private static SWTWorkbenchBot bot;
+	private SWTWorkbenchBot bot;
 	TranslationService translationService;
+	ECommandService commandService;
+	EHandlerService handlerService;
 
 	@BeforeEach
-	public void beforeClass() throws Exception {
-		bot = new SWTWorkbenchBot(getEclipseContext());
+	public void beforeClass() {
+		bot = new SWTWorkbenchBot(UITestUtil.getEclipseContext(this.getClass()));
 		SWTBotPreferences.TIMEOUT = 30000;
-		this.translationService = getEclipseContext().get(TranslationService.class);
+		this.translationService = UITestUtil.getEclipseContext(this.getClass()).get(TranslationService.class);
+
+		commandService = UITestUtil.getEclipseContext(this.getClass()).get(ECommandService.class);
+		handlerService = UITestUtil.getEclipseContext(this.getClass()).get(EHandlerService.class);
 	}
 
 	@Test
@@ -57,8 +59,6 @@ public class MenuUITest {
 
 		// Einstellungen über Command öffnen
 		Display.getDefault().asyncExec(() -> {
-			ECommandService commandService = getEclipseContext().get(ECommandService.class);
-			EHandlerService handlerService = getEclipseContext().get(EHandlerService.class);
 			ParameterizedCommand cmd = commandService.createCommand("org.eclipse.ui.window.preferences", null);
 			handlerService.executeHandler(cmd);
 		});
@@ -114,17 +114,17 @@ public class MenuUITest {
 	}
 
 	private int checkEntries(List<String> entries, int counter, Object menuOrEntry) {
-		if (menuOrEntry instanceof MenuType) {
-			String translated = translationService.translate(((MenuType) menuOrEntry).getText(), null);
+		if (menuOrEntry instanceof MenuType mt) {
+			String translated = translationService.translate(mt.getText(), null);
 			assertEquals(translated, entries.get(counter));
 			counter++;
-			for (Object o : ((MenuType) menuOrEntry).getEntryOrMenu()) {
+			for (Object o : mt.getEntryOrMenu()) {
 				counter = checkEntries(entries, counter, o);
 			}
 		} else {
 			Entry entry = (Entry) menuOrEntry;
-			if (entry.getId() instanceof Action) {
-				String name = ((Action) entry.getId()).getText();
+			if (entry.getId() instanceof Action action) {
+				String name = action.getText();
 				String translated = translationService.translate(name, null);
 				assertEquals(translated, entries.get(counter));
 				counter++;
@@ -133,14 +133,23 @@ public class MenuUITest {
 		return counter;
 	}
 
-	protected static IEclipseContext getEclipseContext() {
-		final IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(FrameworkUtil.getBundle(MenuUITest.class).getBundleContext());
-		return serviceContext.get(IWorkbench.class).getApplication().getContext();
-	}
+	@Test
+	public void openAbout() {
 
-	@AfterEach
-	public void sleep() {
-		bot.sleep(10000);
+		// TODO: Unter Linux wird das Fenster anscheinend nicht ordentlich geschlossen
+		if (OSUtil.isLinux()) {
+			return;
+		}
+
+		// About-Fenster über Command öffnen
+		Display.getDefault().asyncExec(() -> {
+			ParameterizedCommand cmd = commandService.createCommand("org.eclipse.ui.help.aboutAction", null);
+			handlerService.executeHandler(cmd);
+		});
+
+		SWTBotShell shell = bot.shell("About");
+		assertNotNull(shell);
+		shell.close();
 	}
 
 }

@@ -51,6 +51,8 @@ public class AboutDialog extends TitleAreaDialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
+		this.getShell().setText("About");
+
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		parent.setLayout(layout);

@@ -47,8 +47,7 @@ public class MinovaSectionStyler implements ICssStyler {
 	private List<Control> getStylableControls() {
 		List<Control> controls = new ArrayList<>();
 		for (Control control : section.getChildren()) {
-			if (control instanceof Composite) {
-				Composite composite = (Composite) control;
+			if (control instanceof Composite composite) {
 				for (Control c : composite.getChildren()) {
 					if (c.getData(CssData.CSSDATA_KEY) != null) {
 						controls.add(c);

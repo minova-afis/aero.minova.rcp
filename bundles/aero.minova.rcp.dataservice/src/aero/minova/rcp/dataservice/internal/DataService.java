@@ -19,23 +19,14 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -81,6 +72,7 @@ import aero.minova.rcp.model.form.MField;
 import aero.minova.rcp.model.form.MLookupField;
 import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.preferences.ApplicationPreferences;
+import aero.minova.rcp.util.SSLContextUtil;
 
 @Component
 public class DataService implements IDataService {
@@ -95,8 +87,12 @@ public class DataService implements IDataService {
 	private HashMap<String, HashMap<Integer, LookupValue>> cache = new HashMap<>();
 
 	private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+	private static final String APPLICATION_JSON = "application/json";
 	private static final String CONTENT_TYPE = "Content-Type";
-	public static final String ERROR = "Error";
+	private static final String ERROR = "Error";
+	private static final String USE_CACHE = "UseCache: ";
+	private static final String MESSAGE = "Message";
+	private static final String DATA_PROCEDURE = "data/procedure";
 
 	private int minTimeBetweenError = 3;
 	Map<String, Long> timeOfLastErrorMessage = new HashMap<>();
@@ -160,9 +156,9 @@ public class DataService implements IDataService {
 					return new PasswordAuthentication(encodedUser, encodedPW.toCharArray());
 				}
 			};
-			// TODO: fix certificate-problems
+
 			httpClientBuilder = HttpClient.newBuilder()//
-					.sslContext(disabledSslVerificationContext())//
+					.sslContext(SSLContextUtil.getTrustAllSSLContext())//
 					.authenticator(authentication);
 			httpClient = httpClientBuilder.build();
 		} catch (UnsupportedEncodingException e) {
@@ -210,31 +206,6 @@ public class DataService implements IDataService {
 		}
 	}
 
-	private static SSLContext disabledSslVerificationContext() {
-		SSLContext sslContext = null;// Remove certificate validation
-
-		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-			@Override
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-
-			@Override
-			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-
-			@Override
-			public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-		} };
-
-		try {
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, trustAllCerts, new SecureRandom());
-		} catch (NoSuchAlgorithmException | KeyManagementException e) {
-			throw new RuntimeException(e);
-		}
-		return sslContext;
-	}
-
 	@Override
 	public CompletableFuture<Table> getTableAsync(Table seachTable) {
 		return getTableAsync(seachTable, true);
@@ -244,7 +215,7 @@ public class DataService implements IDataService {
 		String body = gson.toJson(searchTable);
 
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/index")) //
-				.header(CONTENT_TYPE, "application/json") //
+				.header(CONTENT_TYPE, APPLICATION_JSON) //
 				.method("POST", BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
@@ -272,7 +243,7 @@ public class DataService implements IDataService {
 	public CompletableFuture<List<TransactionResultEntry>> callTransactionAsync(List<TransactionEntry> procedureList) {
 		String body = gson.toJson(procedureList);
 		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/x-procedure")) //
-				.header(CONTENT_TYPE, "application/json") //
+				.header(CONTENT_TYPE, APPLICATION_JSON) //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
@@ -318,8 +289,8 @@ public class DataService implements IDataService {
 
 	public CompletableFuture<SqlProcedureResult> callProcedureAsync(Table table, boolean showErrorMessage) {
 		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
-				.header(CONTENT_TYPE, "application/json") //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve(DATA_PROCEDURE)) //
+				.header(CONTENT_TYPE, APPLICATION_JSON) //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15))).build();
 
@@ -404,7 +375,7 @@ public class DataService implements IDataService {
 		// HTTP Status >= 300 -> Fehler
 		Table error = new Table();
 		error.setName(ERROR);
-		error.addColumn(new Column("Message", DataType.STRING));
+		error.addColumn(new Column(MESSAGE, DataType.STRING));
 		String message = "Internal Server Error"; // Default Fehler
 		if (serverAnswer.getMessage() != null) {
 			message = serverAnswer.getMessage();
@@ -437,7 +408,7 @@ public class DataService implements IDataService {
 		SqlProcedureResult fromJson;
 		Table error = new Table();
 		error.setName(ERROR);
-		error.addColumn(new Column("Message", DataType.STRING));
+		error.addColumn(new Column(MESSAGE, DataType.STRING));
 		error.addRow(RowBuilder.newRow().withValue("msg.NoErrorMessageAvailable").create());
 		fromJson = new SqlProcedureResult();
 		fromJson.setResultSet(error);
@@ -448,8 +419,8 @@ public class DataService implements IDataService {
 	@Override
 	public CompletableFuture<Path> getXMLAsync(Table table, String rootElement) {
 		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
-				.header(CONTENT_TYPE, "application/json") //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve(DATA_PROCEDURE)) //
+				.header(CONTENT_TYPE, APPLICATION_JSON) //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * (long) 2)).build();
 
@@ -545,8 +516,8 @@ public class DataService implements IDataService {
 	public CompletableFuture<Path> getPDFAsync(Table table, String fileName) {
 		String method = "PDF";
 		String body = gson.toJson(table);
-		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve("data/procedure")) //
-				.header(CONTENT_TYPE, "application/json") //
+		HttpRequest request = HttpRequest.newBuilder().uri(server.resolve(DATA_PROCEDURE)) //
+				.header(CONTENT_TYPE, APPLICATION_JSON) //
 				.POST(BodyPublishers.ofString(body))//
 				.timeout(Duration.ofSeconds(preferences.getInt(ApplicationPreferences.TIMEOUT_CAS, 15) * (long) 2)).build();
 
@@ -733,12 +704,12 @@ public class DataService implements IDataService {
 
 	@Override
 	public CompletableFuture<List<LookupValue>> listLookup(MLookupField field, boolean useCache) {
-		useCache = false;
+		boolean useCacheLookup = false; // siehe #707
 		if (field.getLookupTable() != null) {
-			return getLookupValuesFromTable(field.getLookupTable(), field.getLookupDescription(), null, null, false, useCache);
+			return getLookupValuesFromTable(field.getLookupTable(), field.getLookupDescription(), null, null, false, useCacheLookup);
 		} else {
 			String procedureName = field.getLookupProcedurePrefix() + "List";
-			return getLookupValuesFromProcedure(procedureName, field, null, null, false, useCache);
+			return getLookupValuesFromProcedure(procedureName, field, null, null, false, useCacheLookup);
 		}
 	}
 
@@ -748,11 +719,11 @@ public class DataService implements IDataService {
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(tableName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
-			logCache("UseCache: " + tableName);
+			logCache(USE_CACHE + tableName);
 			list.addAll(map.values());
 			return CompletableFuture.supplyAsync(() -> list);
 		} else if (useCache && map.containsKey(keyLong)) {
-			logCache("UseCache: " + tableName + " (" + keyLong + ")");
+			logCache(USE_CACHE + tableName + " (" + keyLong + ")");
 			list.add(map.get(keyLong));
 			return CompletableFuture.supplyAsync(() -> list);
 		}
@@ -811,15 +782,28 @@ public class DataService implements IDataService {
 		HashMap<Integer, LookupValue> map = cache.computeIfAbsent(hashName, k -> new HashMap<>());
 
 		if (useCache && !resolve && !map.isEmpty()) {
-			logCache("UseCache: " + hashName);
+			logCache(USE_CACHE + hashName);
 			list.addAll(map.values());
 			return CompletableFuture.supplyAsync(() -> list);
 		} else if (useCache && map.containsKey(keyLong)) {
-			logCache("UseCache: " + hashName + " (" + keyLong + ")");
+			logCache(USE_CACHE + hashName + " (" + keyLong + ")");
 			list.add(map.get(keyLong));
 			return CompletableFuture.supplyAsync(() -> list);
 		}
 
+		Table t = getLookupValuesFromProcedureTable(procedureName, field, keyLong, keyText, resolve);
+
+		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
+
+		tableFuture.exceptionally(e -> {
+			handleLookupError(procedureName, list, map, e);
+			return null;
+		});
+
+		return tableFuture.thenApplyAsync(res -> handleLookupFromProcedureResponse(procedureName, list, map, res));
+	}
+
+	private Table getLookupValuesFromProcedureTable(String procedureName, MField field, Integer keyLong, String keyText, boolean resolve) {
 		Table t = TableBuilder.newTable(procedureName).create();
 		Row row = RowBuilder.newRow().create();
 
@@ -855,34 +839,29 @@ public class DataService implements IDataService {
 		}
 
 		t.addRow(row);
+		return t;
+	}
 
-		CompletableFuture<SqlProcedureResult> tableFuture = callProcedureAsync(t, false);
-
-		tableFuture.exceptionally(e -> {
-			handleLookupError(procedureName, list, map, e);
-			return null;
-		});
-
-		return tableFuture.thenApplyAsync(res -> {
-			try {
-				if (res != null) {
-					Table ta = res.getResultSet();
-					if (ta != null) {
-						for (Row r : ta.getRows()) {
-							LookupValue lv = new LookupValue(//
-									r.getValue(0).getIntegerValue(), //
-									r.getValue(1).getStringValue(), //
-									r.getValue(2) == null ? null : r.getValue(2).getStringValue());
-							map.put(lv.keyLong, lv);
-							list.add(lv);
-						}
+	private List<LookupValue> handleLookupFromProcedureResponse(String procedureName, List<LookupValue> list, HashMap<Integer, LookupValue> map,
+			SqlProcedureResult res) {
+		try {
+			if (res != null) {
+				Table ta = res.getResultSet();
+				if (ta != null) {
+					for (Row r : ta.getRows()) {
+						LookupValue lv = new LookupValue(//
+								r.getValue(0).getIntegerValue(), //
+								r.getValue(1).getStringValue(), //
+								r.getValue(2) == null ? null : r.getValue(2).getStringValue());
+						map.put(lv.keyLong, lv);
+						list.add(lv);
 					}
 				}
-			} catch (Exception e) {
-				handleLookupError(procedureName, list, map, e);
 			}
-			return list;
-		});
+		} catch (Exception e) {
+			handleLookupError(procedureName, list, map, e);
+		}
+		return list;
 	}
 
 	@Override
@@ -941,7 +920,7 @@ public class DataService implements IDataService {
 				if (response.statusCode() != 200) { // Fehlermeldung anzeigen
 					Table error = new Table();
 					error.setName(ERROR);
-					error.addColumn(new Column("Message", DataType.STRING));
+					error.addColumn(new Column(MESSAGE, DataType.STRING));
 					error.addRow(RowBuilder.newRow().withValue(response.body()).create());
 					ErrorObject eo = new ErrorObject(error, username, "sendingLogs");
 					postError(eo);
@@ -970,7 +949,7 @@ public class DataService implements IDataService {
 		}
 
 		// Notification, dass Default-Wert genutzt wird
-		Table t = TableBuilder.newTable("Notification").withColumn("Message", DataType.STRING)//
+		Table t = TableBuilder.newTable("Notification").withColumn(MESSAGE, DataType.STRING)//
 				.withColumn("s", DataType.STRING)//
 				.withColumn("s", DataType.STRING).create();
 		Row r = RowBuilder.newRow().withValue("msg.UsingDefaultTSiteParameterValue").withValue(key).withValue(defaultVal).create();
@@ -998,7 +977,7 @@ public class DataService implements IDataService {
 	 * @param message
 	 */
 	public void postNotification(Object message) {
-		Dictionary<String, Object> data = new Hashtable<>(2);
+		Map<String, Object> data = new HashMap<>(2);
 		data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWNOTIFICATION);
 		data.put(IEventBroker.DATA, message);
 		Event event = new Event(Constants.BROKER_SHOWNOTIFICATION, data);
@@ -1008,7 +987,7 @@ public class DataService implements IDataService {
 	public void postError(ErrorObject value) {
 		// Selbe Fehlermeldung höchstens alle minTimeBetweenError Sekunden anzeigen
 		if ((System.currentTimeMillis() - timeOfLastErrorMessage.getOrDefault(value.getMessage(), (long) -1)) > minTimeBetweenError * 1000) {
-			Dictionary<String, Object> data = new Hashtable<>(2);
+			Map<String, Object> data = new HashMap<>(2);
 			data.put(EventConstants.EVENT_TOPIC, Constants.BROKER_SHOWERROR);
 			data.put(IEventBroker.DATA, value);
 			Event event = new Event(Constants.BROKER_SHOWERROR, data);

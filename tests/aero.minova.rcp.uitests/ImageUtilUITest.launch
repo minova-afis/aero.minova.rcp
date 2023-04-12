@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.JunitLaunchConfig">
     <booleanAttribute key="append.args" value="true"/>
+    <stringAttribute key="application" value="org.eclipse.pde.junit.runtime.coretestapplication"/>
     <booleanAttribute key="askclear" value="false"/>
     <booleanAttribute key="automaticAdd" value="true"/>
     <booleanAttribute key="automaticValidate" value="true"/>
+    <stringAttribute key="bad_container_name" value="UiTe"/>
     <stringAttribute key="bootstrap" value=""/>
     <stringAttribute key="checked" value="[NONE]"/>
     <booleanAttribute key="clearConfig" value="true"/>
@@ -12,22 +14,29 @@
     <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
     <booleanAttribute key="default" value="false"/>
     <setAttribute key="deselected_workspace_bundles">
-        <setEntry value="Test2"/>
+        <setEntry value="aero.minova.afis.shipment.helper"/>
+        <setEntry value="aero.minova.cas.plugin.attachments.helper"/>
         <setEntry value="aero.minova.graduation.helper"/>
         <setEntry value="aero.minova.invoice.helper"/>
         <setEntry value="aero.minova.jobdefinition.helper"/>
+        <setEntry value="aero.minova.jobdestination.helper"/>
+        <setEntry value="aero.minova.jobresult.helper"/>
         <setEntry value="aero.minova.journaltemplate.helper"/>
+        <setEntry value="aero.minova.sam.helper"/>
         <setEntry value="aero.minova.servicecontract.helper"/>
-        <setEntry value="aero.minova.test.saw.rcp"/>
         <setEntry value="aero.minova.translation"/>
+        <setEntry value="aero.minova.truck.truckmeterreading.helper"/>
+        <setEntry value="aero.minova.tta.movementservice.helper"/>
+        <setEntry value="aero.minova.workingtime.github.helper"/>
         <setEntry value="aero.minova.workingtime.helper"/>
         <setEntry value="aero.minova.workingtime.helper.tests"/>
-        <setEntry value="test"/>
+        <setEntry value="com.minova.oiltanking.emergencyoperation.helper"/>
+        <setEntry value="testing"/>
     </setAttribute>
-    <booleanAttribute key="includeOptional" value="false"/>
+    <booleanAttribute key="includeOptional" value="true"/>
     <stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-        <listEntry value="/aero.minova.rcp.uitests/src/aero/minova/rcp/uitests/OpenStundenerfassungsTest.java"/>
+        <listEntry value="/aero.minova.rcp.uitests/src/aero/minova/rcp/utiltests/ImageUtilUITest.java"/>
     </listAttribute>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="1"/>
@@ -39,22 +48,24 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
-    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
-    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="aero.minova.rcp.uitests.OpenStundenerfassungsTest"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -user=admin -pw=rqgzxTf71EAx8chvchMi -url=http://publictest.minova.com:17280/cas"/>
+    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="aero.minova.rcp.utiltests.ImageUtilUITest"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="aero.minova.rcp.uitests"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dorg.eclipse.swt.graphics.Resource.reportNonDisposed=true"/>
     <stringAttribute key="pde.version" value="3.3"/>
-    <stringAttribute key="product" value="aero.minova.rcp.rcp.product"/>
+    <stringAttribute key="product" value="org.eclipse.sdk.ide"/>
     <booleanAttribute key="run_in_ui_thread" value="false"/>
     <setAttribute key="selected_target_bundles">
-        <setEntry value="ca.odell.glazedlists*1.11.0.v20190926-1838@default:default"/>
+        <setEntry value="ca.odell.glazedlists@default:default"/>
         <setEntry value="com.google.gson@default:default"/>
         <setEntry value="com.ibm.icu@default:default"/>
         <setEntry value="com.sun.jna.platform@default:default"/>
         <setEntry value="com.sun.jna@default:default"/>
         <setEntry value="com.sun.xml.bind@default:default"/>
+        <setEntry value="jakarta.activation@default:default"/>
+        <setEntry value="jakarta.servlet-api@default:default"/>
         <setEntry value="jakarta.xml.bind@default:default"/>
         <setEntry value="javax.activation@default:default"/>
         <setEntry value="javax.annotation@default:default"/>
@@ -64,18 +75,20 @@
         <setEntry value="org.apache.batik.css@default:default"/>
         <setEntry value="org.apache.batik.i18n@default:default"/>
         <setEntry value="org.apache.batik.util@default:default"/>
-        <setEntry value="org.apache.commons.codec*1.14.0.v20200818-1422@default:default"/>
+        <setEntry value="org.apache.commons.codec@default:default"/>
         <setEntry value="org.apache.commons.io@default:default"/>
         <setEntry value="org.apache.commons.jxpath@default:default"/>
-        <setEntry value="org.apache.commons.logging*1.2.0.v20180409-1502@default:default"/>
+        <setEntry value="org.apache.commons.logging@default:default"/>
+        <setEntry value="org.apache.felix.gogo.command@default:default"/>
+        <setEntry value="org.apache.felix.gogo.runtime@default:default"/>
+        <setEntry value="org.apache.felix.gogo.shell@default:default"/>
         <setEntry value="org.apache.felix.scr@1:true"/>
-        <setEntry value="org.apache.log4j@default:default"/>
-        <setEntry value="org.apache.poi@default:default"/>
         <setEntry value="org.apache.xmlgraphics@default:default"/>
         <setEntry value="org.apiguardian@default:default"/>
         <setEntry value="org.bouncycastle.bcpg@default:default"/>
         <setEntry value="org.bouncycastle.bcprov@default:default"/>
         <setEntry value="org.eclipse.ant.core@default:default"/>
+        <setEntry value="org.eclipse.collections@default:default"/>
         <setEntry value="org.eclipse.compare.core@default:default"/>
         <setEntry value="org.eclipse.core.commands@default:default"/>
         <setEntry value="org.eclipse.core.contenttype@default:default"/>
@@ -91,6 +104,7 @@
         <setEntry value="org.eclipse.core.resources@default:default"/>
         <setEntry value="org.eclipse.core.runtime@default:true"/>
         <setEntry value="org.eclipse.core.variables@default:default"/>
+        <setEntry value="org.eclipse.debug.core@default:default"/>
         <setEntry value="org.eclipse.e4.core.commands@default:default"/>
         <setEntry value="org.eclipse.e4.core.contexts@default:default"/>
         <setEntry value="org.eclipse.e4.core.di.annotations@default:default"/>
@@ -123,53 +137,65 @@
         <setEntry value="org.eclipse.equinox.bidi@default:default"/>
         <setEntry value="org.eclipse.equinox.common@2:true"/>
         <setEntry value="org.eclipse.equinox.event@default:default"/>
+        <setEntry value="org.eclipse.equinox.frameworkadmin.equinox@default:default"/>
+        <setEntry value="org.eclipse.equinox.frameworkadmin@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.artifact.repository@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.core@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.director.app@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.director@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.engine@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.garbagecollector@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.jarprocessor@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.metadata.repository@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.metadata@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.publisher.eclipse@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.publisher@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.repository.tools@default:default"/>
         <setEntry value="org.eclipse.equinox.p2.repository@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.touchpoint.eclipse@default:default"/>
+        <setEntry value="org.eclipse.equinox.p2.updatesite@default:default"/>
         <setEntry value="org.eclipse.equinox.preferences@default:default"/>
         <setEntry value="org.eclipse.equinox.region@default:false"/>
         <setEntry value="org.eclipse.equinox.registry@default:default"/>
         <setEntry value="org.eclipse.equinox.security.macosx@default:false"/>
         <setEntry value="org.eclipse.equinox.security@default:default"/>
+        <setEntry value="org.eclipse.equinox.simpleconfigurator.manipulator@default:default"/>
+        <setEntry value="org.eclipse.equinox.simpleconfigurator@1:true"/>
         <setEntry value="org.eclipse.equinox.transforms.hook@default:false"/>
         <setEntry value="org.eclipse.equinox.weaving.hook@default:false"/>
         <setEntry value="org.eclipse.help@default:default"/>
+        <setEntry value="org.eclipse.jdt.annotation*2.2.600.v20200408-1511@default:default"/>
+        <setEntry value="org.eclipse.jdt.compiler.apt@default:false"/>
+        <setEntry value="org.eclipse.jdt.compiler.tool@default:false"/>
+        <setEntry value="org.eclipse.jdt.core@default:default"/>
+        <setEntry value="org.eclipse.jdt.debug@default:default"/>
         <setEntry value="org.eclipse.jdt.junit.runtime@default:default"/>
-        <setEntry value="org.eclipse.jdt.junit4.runtime@default:default"/>
         <setEntry value="org.eclipse.jdt.junit5.runtime@default:default"/>
+        <setEntry value="org.eclipse.jdt.launching@default:default"/>
         <setEntry value="org.eclipse.jface.databinding@default:default"/>
         <setEntry value="org.eclipse.jface.notifications@default:default"/>
         <setEntry value="org.eclipse.jface.text@default:default"/>
         <setEntry value="org.eclipse.jface@default:default"/>
-        <setEntry value="org.eclipse.nebula.cwt@default:default"/>
-        <setEntry value="org.eclipse.nebula.widgets.cdatetime@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.nattable.core@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.nattable.extension.e4@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.nattable.extension.glazedlists@default:default"/>
-        <setEntry value="org.eclipse.nebula.widgets.nattable.extension.nebula@default:default"/>
-        <setEntry value="org.eclipse.nebula.widgets.nattable.extension.poi@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.opal.commons@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.opal.dialog@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.opal.preferencewindow@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.opal.textassist@default:default"/>
         <setEntry value="org.eclipse.nebula.widgets.opal.titledseparator@default:default"/>
-        <setEntry value="org.eclipse.nebula.widgets.richtext@default:default"/>
         <setEntry value="org.eclipse.osgi.compatibility.state@default:false"/>
         <setEntry value="org.eclipse.osgi.services@default:default"/>
         <setEntry value="org.eclipse.osgi.util@default:default"/>
         <setEntry value="org.eclipse.osgi@-1:true"/>
-        <setEntry value="org.eclipse.pde.ds.lib@default:default"/>
+        <setEntry value="org.eclipse.pde.build@default:default"/>
+        <setEntry value="org.eclipse.pde.core@default:default"/>
         <setEntry value="org.eclipse.pde.junit.runtime@default:default"/>
         <setEntry value="org.eclipse.swt.cocoa.macosx.x86_64@default:false"/>
         <setEntry value="org.eclipse.swt@default:default"/>
         <setEntry value="org.eclipse.swtbot.e4.finder@default:default"/>
         <setEntry value="org.eclipse.swtbot.eclipse.core@default:default"/>
         <setEntry value="org.eclipse.swtbot.eclipse.finder@default:default"/>
-        <setEntry value="org.eclipse.swtbot.junit4_x@default:default"/>
         <setEntry value="org.eclipse.swtbot.junit5_x@default:default"/>
         <setEntry value="org.eclipse.swtbot.nebula.nattable.finder@default:default"/>
         <setEntry value="org.eclipse.swtbot.swt.finder@default:default"/>
@@ -180,7 +206,7 @@
         <setEntry value="org.eclipse.ui.forms@default:default"/>
         <setEntry value="org.eclipse.ui.ide@default:default"/>
         <setEntry value="org.eclipse.ui.navigator@default:default"/>
-        <setEntry value="org.eclipse.ui.trace@default:default"/>
+        <setEntry value="org.eclipse.ui.views@default:default"/>
         <setEntry value="org.eclipse.ui.workbench.texteditor@default:default"/>
         <setEntry value="org.eclipse.ui.workbench@default:default"/>
         <setEntry value="org.eclipse.ui@default:default"/>
@@ -196,9 +222,14 @@
         <setEntry value="org.junit.platform.launcher@default:default"/>
         <setEntry value="org.junit.platform.runner@default:default"/>
         <setEntry value="org.junit.platform.suite.api@default:default"/>
+        <setEntry value="org.junit.platform.suite.commons@default:default"/>
+        <setEntry value="org.junit.platform.suite.engine@default:default"/>
         <setEntry value="org.junit.vintage.engine@default:default"/>
         <setEntry value="org.junit@default:default"/>
         <setEntry value="org.opentest4j@default:default"/>
+        <setEntry value="org.sat4j.core@default:default"/>
+        <setEntry value="org.sat4j.pb@default:default"/>
+        <setEntry value="org.slf4j.api@default:default"/>
         <setEntry value="org.tukaani.xz@default:default"/>
         <setEntry value="org.w3c.css.sac@default:default"/>
         <setEntry value="org.w3c.dom.events@default:default"/>
@@ -206,7 +237,6 @@
         <setEntry value="org.w3c.dom.svg@default:default"/>
     </setAttribute>
     <setAttribute key="selected_workspace_bundles">
-        <setEntry value="aaaa@default:default"/>
         <setEntry value="aero.minova.libs.fop@default:default"/>
         <setEntry value="aero.minova.libs.jtds@default:default"/>
         <setEntry value="aero.minova.rcp.constant@default:default"/>
@@ -230,11 +260,12 @@
         <setEntry value="aero.minova.rcp.widgets@default:default"/>
         <setEntry value="aero.minova.rcp.workspace@default:default"/>
         <setEntry value="aero.minova.rcp.xml.tests@default:default"/>
+        <setEntry value="jakarta.xml.bind-api@default:false"/>
     </setAttribute>
     <booleanAttribute key="show_selected_only" value="false"/>
     <booleanAttribute key="tracing" value="false"/>
     <booleanAttribute key="useCustomFeatures" value="false"/>
     <booleanAttribute key="useDefaultConfig" value="true"/>
     <booleanAttribute key="useDefaultConfigArea" value="false"/>
-    <booleanAttribute key="useProduct" value="true"/>
+    <booleanAttribute key="useProduct" value="false"/>
 </launchConfiguration>

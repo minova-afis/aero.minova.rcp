@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
-import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.List;
@@ -29,13 +28,13 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
+import aero.minova.rcp.util.SSLContextUtil;
 import aero.minova.rcp.workspace.LifeCycle;
 import aero.minova.rcp.workspace.WorkspaceException;
 
@@ -195,22 +194,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				/*
 				 * Falls kein Keystore vorhanden ist, vertrauen wird erstmal allem, damit es für die lokale Entwicklung einfacher ist.
 				 */
-				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-
-					@Override
-					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-						return null;
-					}
-
-					@Override
-					public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-
-					@Override
-					public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
-				} };
-				SSLContext sslContext = SSLContext.getInstance("TLS");
-				sslContext.init(null, trustAllCerts, new SecureRandom());
-				return sslContext;
+				return SSLContextUtil.getTrustAllSSLContext();
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
