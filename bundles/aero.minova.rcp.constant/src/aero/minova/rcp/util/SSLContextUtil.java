@@ -13,6 +13,11 @@ public class SSLContextUtil {
 
 	private SSLContextUtil() {}
 
+	/**
+	 * ACHTUNG: wir vertrauen aktuell jedem. Das führt ggf zu Sicherheitslücken
+	 * 
+	 * @return
+	 */
 	public static SSLContext getTrustAllSSLContext() {
 		SSLContext sslContext = null;
 		try {
