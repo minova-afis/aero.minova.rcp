@@ -25,7 +25,10 @@ import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -36,10 +39,12 @@ import aero.minova.rcp.dataservice.ImageUtil;
 import aero.minova.rcp.preferences.WorkspaceAccessPreferences;
 import aero.minova.rcp.translate.lifecycle.Manager;
 import aero.minova.rcp.workspace.dialogs.WorkspaceDialog;
+import aero.minova.rcp.workspace.dialogs.WorkspaceSetDialog;
 import aero.minova.rcp.workspace.handler.WorkspaceHandler;
 
 public class LifeCycle {
 
+	private static final String WFC_APPLICATION = "WFC.Application";
 	public static final String DEFAULT_CONFIG_FOLDER = ".minwfc";
 
 	ILog logger = Platform.getLog(this.getClass());
@@ -53,7 +58,18 @@ public class LifeCycle {
 	String defaultConnectionString;
 
 	@PostContextCreate
-	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException {
+	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
+
+		// Ist in der Debug-Konfiguration eine "Location" gesetzt nicht starten, siehe #1152
+		if (Platform.getInstanceLocation().isSet()) {
+			String message = "It seems like you have set a location in your debug configuration. Please remove it so the application can work properly.";
+			logger.error(message);
+			WorkspaceSetDialog wst = new WorkspaceSetDialog(null, "Workspace Location is set", null, message, MessageDialog.ERROR, 0,
+					new String[] { IDialogConstants.OK_LABEL });
+			wst.open();
+			System.exit(1);
+		}
+
 		URI workspaceLocation = null;
 
 		// Bei -clearPersistedState müssen unsere Einstellungen auch gelöscht werden
@@ -75,15 +91,15 @@ public class LifeCycle {
 		workbenchContext.set(Constants.SETTINGS_PROPERTIES, settings);
 		defaultConnectionString = settings.getProperty(Constants.SETTINGS_DEFAULT_CONNECTION_STRING);
 
+		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor(WFC_APPLICATION, 16);
+		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 32);
+		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 64);
+		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor(WFC_APPLICATION, 256);
+		Window.setDefaultImages(
+				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
+
 		// Versuchen über Commandline-Argumente einzuloggen, für UI-Tests genutzt
 		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
-
-		ImageDescriptor imageDefault = ImageUtil.getImageDescriptor("WFC.Application", 16);
-		ImageDescriptor imageDefault2 = ImageUtil.getImageDescriptor("WFC.Application", 32);
-		ImageDescriptor imageDefault3 = ImageUtil.getImageDescriptor("WFC.Application", 64);
-		ImageDescriptor imageDefault4 = ImageUtil.getImageDescriptor("WFC.Application", 256);
-		WorkspaceDialog.setDefaultImages(
-				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
@@ -151,7 +167,7 @@ public class LifeCycle {
 	}
 
 	/**
-	 * Überprüfen, ob die Default-Login-Daten gültig sind. Ansonsten Öffnen des Default-Workspaces
+	 * Überprüfen, ob die Default-Login-Daten gültig sind. Ansonsten Login-Dialog öffnen
 	 * 
 	 * @param workspaceLocation
 	 * @param workspaceDialog
@@ -191,7 +207,7 @@ public class LifeCycle {
 		String argPW = null;// "rqgzxTf71EAx8chvchMi";
 		String argURL = null;// "http://publictest.minova.com:17280/cas";
 
-		// Auslesen der übergabenen ProgrammArgumente
+		// Auslesen der übergebenen Programm Argumente
 		for (String string : Platform.getApplicationArgs()) {
 			if (string.startsWith("-user=")) {
 				argUser = string.substring(string.indexOf("=") + 1);
@@ -290,17 +306,26 @@ public class LifeCycle {
 		return "";
 	}
 
+	/**
+	 * Öffnet den Workspace Dialog und initialisiert nach Klick auf OK den DataService mit den eingegebenen Daten
+	 * 
+	 * @param workspaceDialog
+	 * @param workspaceLocation
+	 * @return
+	 */
 	private URI loadWorkspaceConfigManually(WorkspaceDialog workspaceDialog, URI workspaceLocation) {
 		int returnCode;
 		if ((returnCode = workspaceDialog.open()) != 0) {
 			logger.info("ReturnCode: " + returnCode);
 			System.exit(returnCode);
 		}
+
 		try {
 			workspaceLocation = Platform.getInstanceLocation().getURL().toURI();
 		} catch (URISyntaxException e) {
 			logger.error(e.getMessage(), e);
 		}
+
 		Objects.requireNonNull(workspaceLocation);
 		dataService.setCredentials(workspaceDialog.getUsername(), //
 				workspaceDialog.getPassword(), //
