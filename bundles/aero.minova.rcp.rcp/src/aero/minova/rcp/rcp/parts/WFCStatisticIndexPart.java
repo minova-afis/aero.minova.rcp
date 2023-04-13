@@ -66,8 +66,11 @@ public class WFCStatisticIndexPart extends WFCNattablePart {
 		String type = translationService.translate("@Type", null);
 		String description = translationService.translate("@Description", null);
 
-		data = TableBuilder.newTable("statistic").withColumn("MatchCode", DataType.STRING).withColumn("name", DataType.STRING)
-				.withColumn("type", DataType.STRING).withColumn("description", DataType.STRING).create();
+		data = TableBuilder.newTable("statistic")//
+				.withColumn("MatchCode", DataType.STRING)//
+				.withColumn("name", DataType.STRING)//
+				.withColumn("type", DataType.STRING)//
+				.withColumn("description", DataType.STRING).create();
 		data.getColumns().get(1).setLabel(name);
 		data.getColumns().get(2).setLabel(type);
 		data.getColumns().get(3).setLabel(description);
