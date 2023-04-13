@@ -60,16 +60,6 @@ public class LifeCycle {
 	@PostContextCreate
 	void postContextCreate(IEclipseContext workbenchContext) throws IllegalStateException, IOException {
 
-		// Ist in der Debug-Konfiguration eine "Location" gesetzt nicht starten, siehe #1152
-		if (Platform.getInstanceLocation().isSet()) {
-			String message = "It seems like you have set a location in your debug configuration. Please remove it so the application can work properly.";
-			logger.error(message);
-			WorkspaceSetDialog wst = new WorkspaceSetDialog(null, "Workspace Location is set", null, message, MessageDialog.ERROR, 0,
-					new String[] { IDialogConstants.OK_LABEL });
-			wst.open();
-			System.exit(1);
-		}
-
 		URI workspaceLocation = null;
 
 		// Bei -clearPersistedState müssen unsere Einstellungen auch gelöscht werden
@@ -86,7 +76,9 @@ public class LifeCycle {
 		if (settingsPath.toFile().exists()) {
 			try (BufferedInputStream targetStream = new BufferedInputStream(new FileInputStream(settingsPath.toFile()))) {
 				settings.load(targetStream);
-			} catch (IOException e) {}
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 		workbenchContext.set(Constants.SETTINGS_PROPERTIES, settings);
 		defaultConnectionString = settings.getProperty(Constants.SETTINGS_DEFAULT_CONNECTION_STRING);
@@ -99,7 +91,17 @@ public class LifeCycle {
 				new Image[] { imageDefault.createImage(), imageDefault2.createImage(), imageDefault3.createImage(), imageDefault4.createImage() });
 
 		// Versuchen über Commandline-Argumente einzuloggen, für UI-Tests genutzt
-		boolean loginCommandLine = loginViaCommandLine(workbenchContext);
+		boolean loginCommandLine = loginViaCommandLine();
+
+		// Ist in der Debug-Konfiguration eine "Location" gesetzt (und handelt es sich nicht um Tests) nicht starten, siehe #1152
+		if (Platform.getInstanceLocation().isSet() && !loginCommandLine) {
+			String message = "It seems like you have set a location in your debug configuration. Please remove it so the application can work properly.";
+			logger.error(message);
+			WorkspaceSetDialog wst = new WorkspaceSetDialog(null, "Workspace Location is set", null, message, MessageDialog.ERROR, 0,
+					new String[] { IDialogConstants.OK_LABEL });
+			wst.open();
+			System.exit(1);
+		}
 
 		// Ansonsten Default Profil oder manuelles Eingeben der Daten
 		if (!loginCommandLine) {
@@ -201,7 +203,7 @@ public class LifeCycle {
 	 * @param workbenchContext
 	 * @return
 	 */
-	private boolean loginViaCommandLine(IEclipseContext workbenchContext) {
+	private boolean loginViaCommandLine() {
 
 		String argUser = null;// "admin";
 		String argPW = null;// "rqgzxTf71EAx8chvchMi";
