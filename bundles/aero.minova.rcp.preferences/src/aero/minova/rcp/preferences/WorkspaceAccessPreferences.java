@@ -32,7 +32,7 @@ public class WorkspaceAccessPreferences {
 
 	private WorkspaceAccessPreferences() {}
 
-	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String password, String profile, String applicationArea,
+	public static void storeWorkspaceAccessData(String workspaceName, String url, String userName, String profile, String applicationArea,
 			boolean isPrimaryWorksace) {
 		final ISecurePreferences workspaces = SecurePreferencesFactory.getDefault()//
 				.node(AERO_MINOVA_RCP_WORKSPACE)//

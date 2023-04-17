@@ -217,9 +217,8 @@ public class WorkspaceDialog extends Dialog {
 	 * gesetzt!
 	 */
 	private void loadProfileData() {
-		WorkspaceHandler workspaceHandler = null;
 		try {
-			workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText());
+			WorkspaceHandler workspaceHandler = WorkspaceHandler.newInstance(profile.getText(), connectionString.getText());
 			if (workspaceHandler != null) {
 				workspaceHandler.checkConnection(username.getText(), password.getText(), applicationArea.getText(), btnDefault.getSelection());
 				profile.setText(workspaceHandler.getProfile());

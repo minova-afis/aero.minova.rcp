@@ -86,8 +86,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 		workspaceData.setApplicationArea(applicationArea);
 
 		// Profil speichern
-		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(), getPassword(), getProfile(), applicationArea,
-				saveAsDefault);
+		WorkspaceAccessPreferences.storeWorkspaceAccessData(profile, getConnectionString(), getUsername(), getProfile(), applicationArea, saveAsDefault);
 
 		return true;
 	}
@@ -170,6 +169,7 @@ public class SpringBootWorkspace extends WorkspaceHandler {
 				}
 			}
 		}
+
 		try {
 			checkCredentials(workspaceData.getPassword());
 		} catch (UnsupportedEncodingException e) {

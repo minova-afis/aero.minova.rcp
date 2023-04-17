@@ -21,6 +21,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 - Nummernfelder etwas verkleinern, um Einheiten mehr Platz zu geben
 - Tests unter Linux wieder aktivieren
 - Nattable Spalten mit maximal Breite 3000 wiederherstellen
+- Bei gesetzter Location in der Debug Konfiguration Anwendung nicht starten
 
 ### Bugfixes
 - Tab in Statistik-Part ausbessern
