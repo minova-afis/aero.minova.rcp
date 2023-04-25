@@ -347,7 +347,9 @@ public class WFCDetailPart extends WFCFormPart {
 		}
 
 		if (iHelper == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", translationService.translate("@msg.HelperNotFound", null));
+			logger.error("Couldn't find Helper " + helperName);
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error",
+					translationService.translate("@msg.HelperNotFound", null) + " (" + helperName + ")");
 		} else {
 			getDetail().addHelper(iHelper);
 			ContextInjectionFactory.inject(iHelper, mPerspective.getContext()); // In Context, damit Injection verfügbar ist
