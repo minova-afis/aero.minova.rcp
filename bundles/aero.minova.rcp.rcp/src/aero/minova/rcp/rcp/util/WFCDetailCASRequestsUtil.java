@@ -3,6 +3,7 @@ package aero.minova.rcp.rcp.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -130,6 +131,10 @@ public class WFCDetailCASRequestsUtil {
 	public String timezone;
 
 	@Inject
+	@Preference(nodePath = ApplicationPreferences.PREFERENCES_NODE, value = ApplicationPreferences.SELECT_ALL_CONTROLS)
+	boolean selectAllControls;
+
+	@Inject
 	DirtyFlagUtil dirtyFlagUtil;
 
 	private MDetail mDetail;
@@ -148,6 +153,8 @@ public class WFCDetailCASRequestsUtil {
 	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(ApplicationPreferences.PREFERENCES_NODE);
 
 	private WFCDetailPart wfcDetailPart;
+
+	private Locale locale;
 
 	public void initializeCasRequestUtil(MDetail detail, MPerspective perspective, WFCDetailPart wfcDetailPart) {
 		this.mDetail = detail;
@@ -1107,7 +1114,7 @@ public class WFCDetailCASRequestsUtil {
 		// Setzen der TabListe für die einzelnen Sections
 		TabUtil.updateTabListOfSectionComposite(clientComposite);
 		// Setzen der TabListe der Sections im Part.
-		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, wfcDetailPart.isSelectAllControls()));
+		clientComposite.getParent().setTabList(TabUtil.getTabListForSection(clientComposite.getParent(), mSection, selectAllControls));
 
 		// Vorherige Wert wieder in UI eintragen
 		for (MField f : mSection.getMFields()) {
@@ -1119,7 +1126,7 @@ public class WFCDetailCASRequestsUtil {
 
 		section.requestLayout();
 		section.style();
-		TranslateUtil.translate(clientComposite, translationService, wfcDetailPart.getLocale());
+		TranslateUtil.translate(clientComposite, translationService, locale);
 
 		// Zuvor selektiertes Feld wieder auswählen
 		if (focussed != null && focussed.getValueAccessor() != null && !((AbstractValueAccessor) focussed.getValueAccessor()).getControl().isDisposed()) {
@@ -1262,6 +1269,12 @@ public class WFCDetailCASRequestsUtil {
 	private boolean isActivePerspective() {
 		MPerspective activePerspective = model.getActivePerspective(partContext.get(MWindow.class));
 		return activePerspective.equals(perspective);
+	}
+
+	@Inject
+	@Optional
+	private void getNotified(@Named(TranslationService.LOCALE) Locale s) {
+		this.locale = s;
 	}
 
 	/**
