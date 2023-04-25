@@ -59,7 +59,7 @@ public class PluginInformation {
 		return patchLevel;
 	}
 
-	public String getBuildnumber() {
+	public String getQualifier() {
 		return qualifier;
 	}
 
@@ -120,6 +120,6 @@ public class PluginInformation {
 	@Override
 	public String toString() {
 		return "PluginInformation " + bundleSymbolicName + "-" + majorRelease + "." + minorRelease + "." + patchLevel
-				+ (!qualifier.equals("") ? "-" + qualifier : "");
+				+ (!getQualifier().equals("") ? "-" + getQualifier() : "");
 	}
 }
