@@ -16,7 +16,7 @@ public class PluginInformation {
 	private int majorRelease;
 	private int minorRelease;
 	private int patchLevel;
-	private String buildnumber;
+	private String qualifier;
 
 	Pattern pattern = Pattern.compile("^(.+)[_-](\\d+)\\.(\\d+)\\.(\\d+)[\\.-]?(.*)\\.jar$");
 
@@ -35,13 +35,7 @@ public class PluginInformation {
 			minorRelease = Integer.parseInt(versionNumber);
 			versionNumber = matcher.group(4);
 			patchLevel = Integer.parseInt(versionNumber);
-			buildnumber = matcher.group(5);
-			if (buildnumber.equalsIgnoreCase("SNAPSHOT")) {
-				// uralt im Vergleich zu einem in eclipse erstelltem Plugin
-				buildnumber = "000000000000";
-			} else if ("".equals(buildnumber)) {
-				buildnumber = null;
-			}
+			qualifier = matcher.group(5);
 		} else {
 			// dann haben wir wohl keine Versions-Info im Dateiname
 			bundleSymbolicName = filename.substring(0, filename.length() - 4); // .jar entfernen
@@ -49,8 +43,8 @@ public class PluginInformation {
 		}
 	}
 
-	public String getBuildnumber() {
-		return buildnumber;
+	public String getBundleSymbolicName() {
+		return bundleSymbolicName;
 	}
 
 	public int getMajorRelease() {
@@ -65,12 +59,12 @@ public class PluginInformation {
 		return patchLevel;
 	}
 
-	public String getBundleSymbolicName() {
-		return bundleSymbolicName;
+	public String getBuildnumber() {
+		return qualifier;
 	}
 
 	/**
-	 * Prüft, ob es sich um das gleiche Bundle handelt. Wenn dem so ist, überprüft es die Versionsnummern und die Buildnumber
+	 * Prüft, ob es sich um das gleiche Bundle handelt. Wenn dem so ist, überprüft es die Versionsnummern. Der Aualifier wird NICHT überprüft
 	 *
 	 * @param pluginInformation
 	 * @return true, wenn diese PluginInformation das jüngere Plugin beschreibt
@@ -101,31 +95,31 @@ public class PluginInformation {
 	}
 
 	/**
-	 * Prüft, überprüft die Versionsnummern und die Buildnumber
+	 * Prüft, überprüft die Versionsnummern und den Qualifier
 	 *
 	 * @param Version
 	 *            pluginInformation
 	 * @return true, wenn diese PluginInformation das aktuellere Plugin beschreibt
 	 */
-	public boolean isDifferent(Version pluginInformation) {
-		if (majorRelease != pluginInformation.getMajor()) {
+	public boolean isDifferent(Version version) {
+		if (majorRelease != version.getMajor()) {
 			return true;
 		}
 
-		if (minorRelease != pluginInformation.getMinor()) {
+		if (minorRelease != version.getMinor()) {
 			return true;
 		}
 
-		if (patchLevel != pluginInformation.getMicro()) {
+		if (patchLevel != version.getMicro()) {
 			return true;
 		}
 
-		return !Objects.equals(buildnumber, pluginInformation.getQualifier());
+		return !Objects.equals(qualifier, version.getQualifier());
 	}
 
 	@Override
 	public String toString() {
-		return "PluginInformation " + bundleSymbolicName + " " + majorRelease + "." + minorRelease + "." + patchLevel
-				+ (buildnumber != null ? "-" + buildnumber : "");
+		return "PluginInformation " + bundleSymbolicName + "-" + majorRelease + "." + minorRelease + "." + patchLevel
+				+ (!qualifier.equals("") ? "-" + qualifier : "");
 	}
 }
