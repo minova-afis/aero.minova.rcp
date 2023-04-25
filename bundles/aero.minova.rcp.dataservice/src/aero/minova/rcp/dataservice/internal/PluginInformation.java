@@ -1,6 +1,7 @@
 package aero.minova.rcp.dataservice.internal;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,7 +12,6 @@ import org.osgi.framework.Version;
  * @since 10.3.0
  */
 public class PluginInformation {
-	File jarFile;
 	private String bundleSymbolicName;
 	private int majorRelease;
 	private int minorRelease;
@@ -20,21 +20,16 @@ public class PluginInformation {
 
 	Pattern pattern = Pattern.compile("^(.+)[_-](\\d+)\\.(\\d+)\\.(\\d+)[\\.-]?(.*)\\.jar$");
 
-	public int getMajorRelease() {
-		return majorRelease;
+	public PluginInformation(File jarFile) {
+		this(jarFile.getName());
 	}
 
-	public PluginInformation(File jarFile) {
-		String versionNumber;
-
-		this.jarFile = jarFile;
-		String filename = jarFile.getName();
-
+	public PluginInformation(String filename) {
 
 		Matcher matcher = pattern.matcher(filename);
 		if (matcher.find(0)) {
 			bundleSymbolicName = matcher.group(1);
-			versionNumber = matcher.group(2);
+			String versionNumber = matcher.group(2);
 			majorRelease = Integer.parseInt(versionNumber);
 			versionNumber = matcher.group(3);
 			minorRelease = Integer.parseInt(versionNumber);
@@ -56,6 +51,10 @@ public class PluginInformation {
 
 	public String getBuildnumber() {
 		return buildnumber;
+	}
+
+	public int getMajorRelease() {
+		return majorRelease;
 	}
 
 	public int getMinorRelease() {
@@ -80,19 +79,25 @@ public class PluginInformation {
 		if (!bundleSymbolicName.equals(pluginInformation.getBundleSymbolicName())) {
 			return false;
 		}
+
 		if (majorRelease < pluginInformation.getMajorRelease()) {
 			return false;
 		}
+		if (majorRelease > pluginInformation.getMajorRelease()) {
+			return true;
+		}
+
 		if (minorRelease < pluginInformation.getMinorRelease()) {
 			return false;
 		}
+		if (minorRelease > pluginInformation.getMinorRelease()) {
+			return true;
+		}
+
 		if (patchLevel < pluginInformation.getPatchLevel()) {
 			return false;
 		}
-		if (buildnumber != null && pluginInformation.getBuildnumber() != null && buildnumber.compareTo(pluginInformation.getBuildnumber()) < 0) {
-			return false;
-		}
-		return true;
+		return (patchLevel > pluginInformation.getPatchLevel());
 	}
 
 	/**
@@ -106,15 +111,21 @@ public class PluginInformation {
 		if (majorRelease != pluginInformation.getMajor()) {
 			return true;
 		}
+
 		if (minorRelease != pluginInformation.getMinor()) {
 			return true;
 		}
+
 		if (patchLevel != pluginInformation.getMicro()) {
 			return true;
 		}
-		if (buildnumber != null && pluginInformation.getQualifier() != null && buildnumber.compareTo(pluginInformation.getQualifier()) < 0) {
-			return true;
-		}
-		return false;
+
+		return !Objects.equals(buildnumber, pluginInformation.getQualifier());
+	}
+
+	@Override
+	public String toString() {
+		return "PluginInformation " + bundleSymbolicName + " " + majorRelease + "." + minorRelease + "." + patchLevel
+				+ (buildnumber != null ? "-" + buildnumber : "");
 	}
 }
