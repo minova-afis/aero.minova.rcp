@@ -160,6 +160,20 @@ class OpenStundenerfassungsUITest {
 		assertTrue(Integer.parseInt(numberEntriesString) > 0);
 	}
 
+	@Test
+	@DisplayName("Index Drucken")
+	void printIndex() {
+		open();
+		reloadIndex();
+
+		assertTrue(indexToolbar.get(5).isEnabled());
+		indexToolbar.get(5).click();
+
+		SWTBotView previewPart = bot.partById(Constants.PREVIEW_PART);
+		assertNotNull(previewPart);
+		previewPart.close();
+	}
+
 	@AfterEach
 	void sleep() {
 		bot.sleep(1000);
