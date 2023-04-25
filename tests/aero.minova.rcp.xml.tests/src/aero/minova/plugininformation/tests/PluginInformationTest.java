@@ -25,8 +25,8 @@ class PluginInformationTest {
 		pI2 = new PluginInformation("test-12.0.0.jar");
 		assertTrue(pI1.isNewerAs(pI2));
 
-		pI1 = new PluginInformation("test-12.3.1.jar");
-		pI2 = new PluginInformation("test-12.1.0.jar");
+		pI1 = new PluginInformation("test-12.0.12.jar");
+		pI2 = new PluginInformation("test-12.0.2.jar");
 		assertTrue(pI1.isNewerAs(pI2));
 
 		// Gleich -> P1 ist nicht jünger
@@ -40,6 +40,10 @@ class PluginInformationTest {
 		assertTrue(!pI1.isNewerAs(pI2));
 
 		// Andere Reihenfolge -> P2 ist älter
+		pI1 = new PluginInformation("test-12.0.0.jar");
+		pI2 = new PluginInformation("test-11.0.0.jar");
+		assertTrue(!pI2.isNewerAs(pI1));
+
 		pI1 = new PluginInformation("test-12.1.0.jar");
 		pI2 = new PluginInformation("test-12.0.0.jar");
 		assertTrue(!pI2.isNewerAs(pI1));
@@ -48,8 +52,8 @@ class PluginInformationTest {
 		pI2 = new PluginInformation("test-12.0.0.jar");
 		assertTrue(!pI2.isNewerAs(pI1));
 
-		pI1 = new PluginInformation("test-12.3.1.jar");
-		pI2 = new PluginInformation("test-12.1.0.jar");
+		pI1 = new PluginInformation("test-12.0.12.jar");
+		pI2 = new PluginInformation("test-12.0.2.jar");
 		assertTrue(!pI2.isNewerAs(pI1));
 
 		pI1 = new PluginInformation("test-12.0.1.jar");
