@@ -64,7 +64,7 @@ public class PluginInformation {
 	}
 
 	/**
-	 * Prüft, ob es sich um das gleiche Bundle handelt. Wenn dem so ist, überprüft es die Versionsnummern. Der Aualifier wird NICHT überprüft
+	 * Prüft, ob es sich um das gleiche Bundle handelt. Wenn dem so ist, überprüft es die Versionsnummern. Der Qualifier wird NICHT überprüft
 	 *
 	 * @param pluginInformation
 	 * @return true, wenn diese PluginInformation das jüngere Plugin beschreibt
