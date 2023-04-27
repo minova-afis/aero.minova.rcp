@@ -26,7 +26,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - Tab in Statistik-Part ausbessern
 - Fehler im Laden des neusten Helpers ausbessern
-- Ausklappen von Gruppen unter Mac funktioniert wieder
+- NatTable auf Version 2.1.0 erhöhen, damit Ausklappen von Gruppen unter Mac wieder funktioniert
 
 ## [12.9.0] - 23.03.2023
 
