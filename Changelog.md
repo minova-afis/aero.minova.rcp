@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.9.1] - 27.04.2023
+
 ### Änderung
 - Benachrichtigung anzeigen, wenn Prozeduraufruf über Knopf erfolgreich war (ohne Helper, benötigt i18n 12.14.0)
 - Überall .classpath und prefs updaten (für Java 17)
