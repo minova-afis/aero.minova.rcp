@@ -26,6 +26,7 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 ### Bugfixes
 - Tab in Statistik-Part ausbessern
 - Fehler im Laden des neusten Helpers ausbessern
+- Ausklappen von Gruppen unter Mac funktioniert wieder
 
 ## [12.9.0] - 23.03.2023
 
