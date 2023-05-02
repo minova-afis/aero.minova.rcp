@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: XBS Setup Model
 Bundle-SymbolicName: aero.minova.rcp.form.setup
-Bundle-Version: 12.9.1.qualifier
+Bundle-Version: 12.9.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: aero.minova.rcp.form.setup
 Export-Package: aero.minova.rcp.form.setup.util,
