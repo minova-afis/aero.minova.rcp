@@ -11,12 +11,11 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -28,6 +27,7 @@ import aero.minova.rcp.form.model.xsd.Procedure;
 import aero.minova.rcp.model.form.MButton;
 import aero.minova.rcp.model.form.MDetail;
 import aero.minova.rcp.model.helper.IMinovaWizard;
+import aero.minova.rcp.model.util.ErrorObject;
 import aero.minova.rcp.rcp.parts.WFCDetailPart;
 import aero.minova.rcp.rcp.widgets.MinovaWizardDialog;
 
@@ -38,6 +38,9 @@ public class DynamicButtonHandler {
 
 	@Inject
 	protected IMinovaPluginService pluginService;
+
+	@Inject
+	IEventBroker broker;
 
 	ILog logger = Platform.getLog(this.getClass());
 
@@ -60,6 +63,7 @@ public class DynamicButtonHandler {
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
+				broker.post(Constants.BROKER_SHOWERROR, new ErrorObject("@msg.CantOpenWizard", e));
 			}
 		} else if (Constants.PROCEDURE.equals(className)) {
 			Procedure p = (Procedure) context.get(parameter);
@@ -102,8 +106,7 @@ public class DynamicButtonHandler {
 		}
 
 		if (iWizard == null) {
-			MessageDialog.openError(Display.getCurrent().getActiveShell(), translationService.translate("@Error", null),
-					translationService.translate("@msg.WizardNotFound", null));
+			broker.post(Constants.BROKER_SHOWERRORMESSAGE, "@msg.WizardNotFound");
 		}
 
 		return iWizard;

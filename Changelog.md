@@ -14,7 +14,11 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Änderung
+- Verbesserte Fehlermeldungen beim Öffnen von Wizards (benötigt i18n 12.15.0)
+
 ### Bugfixes
+- Wizards lassen sich wieder mehrmals Öffnen
 - Blockier-Knopf in Masken mit weiteren Knöpfen in Detail-Toolbar ermöglichen
 
 ## [12.9.1] - 27.04.2023

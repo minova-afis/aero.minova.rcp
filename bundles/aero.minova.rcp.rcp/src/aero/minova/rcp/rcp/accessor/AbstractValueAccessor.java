@@ -161,9 +161,14 @@ public abstract class AbstractValueAccessor implements IValueAccessor {
 
 	@Override
 	public void setTooltip(String tooltip) {
+		if (control.isDisposed()) {
+			return;
+		}
+
 		if (tooltip != null) {
 			tooltip = TranslateUtil.translateWithParameters(tooltip, translationService);
 		}
+
 		if (control instanceof TextAssist ta) {
 			ta.getChildren()[0].setToolTipText(tooltip);
 		} else {

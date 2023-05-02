@@ -18,6 +18,12 @@ public class ErrorObject {
 		this.setT(t);
 	}
 
+	public ErrorObject(String message, Throwable t) {
+		super();
+		this.setMessage(message);
+		this.setT(t);
+	}
+
 	public ErrorObject(Table errorTable, String user) {
 		super();
 		this.setErrorTable(errorTable);
