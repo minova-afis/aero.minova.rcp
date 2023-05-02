@@ -95,7 +95,7 @@ public class BlockHandler implements ValueChangeListener {
 
 		// Knopf finden
 		for (MToolBarElement item : mPart.getToolbar().getChildren()) {
-			if (item.getElementId().equals("aero.minova.rcp.rcp.handledtoolitem.block")) {
+			if (Constants.BLOCK_DETAIL_BUTTON.equals(item.getElementId())) {
 				blockedToolItem = (HandledToolItemImpl) item;
 			}
 		}
