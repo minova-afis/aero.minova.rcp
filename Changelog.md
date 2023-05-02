@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Bugfixes
+- Blockier-Knopf in Masken mit weiteren Knöpfen in Detail-Toolbar ermöglichen
+
 ## [12.9.1] - 27.04.2023
 
 ### Änderung
