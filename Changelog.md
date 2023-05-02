@@ -14,6 +14,8 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+## [12.9.2] - 02.05.2023
+
 ### Änderung
 - Verbesserte Fehlermeldungen beim Öffnen von Wizards (benötigt i18n 12.15.0)
 
