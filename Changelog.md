@@ -14,6 +14,9 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Bugfixes
+- Bei Resolve-Cache von Lookups ggf. die Parameter mit beachten
+
 ## [12.9.2] - 02.05.2023
 
 ### Änderung
