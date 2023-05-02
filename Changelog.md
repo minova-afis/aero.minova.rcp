@@ -14,6 +14,12 @@ Der entsprechende Abschnitt des Changelogs wird auch jeweils in die [Releasenote
 
 ## [Unreleased]
 
+### Änderung
+- Verbesserte Fehlermeldungen beim Öffnen von Wizards
+
+### Bugfixes
+- Wizards lassen sich wieder mehrmals Öffnen
+
 ## [12.9.1] - 27.04.2023
 
 ### Änderung
